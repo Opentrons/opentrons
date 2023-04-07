@@ -1,19 +1,25 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
   Flex,
+  ALIGN_CENTER,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN_REVERSE,
+  JUSTIFY_CENTER,
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
 
-import { Toast } from './Toast'
-import { ToastContext } from './ToastContext'
+import { Snackbar } from '../../atoms/Snackbar'
+import { Toast } from '../../atoms/Toast'
+import { getIsOnDevice } from '../../redux/config'
+import { ToasterContext } from './ToasterContext'
 
-import type { ToastProps, ToastType } from './Toast'
-import type { MakeToastOptions } from './ToastContext'
+import type { SnackbarProps } from '../../atoms/Snackbar'
+import type { ToastProps, ToastType } from '../../atoms/Toast'
+import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {
   children: React.ReactNode
@@ -28,6 +34,11 @@ const TOASTER_OVEN_SIZE = 5
  */
 export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   const [toasts, setToasts] = React.useState<ToastProps[]>([])
+  const [snackbar, setSnackbar] = React.useState<SnackbarProps | null>(null)
+
+  const isOnDevice = useSelector(getIsOnDevice) ?? null
+  const displayType: 'desktop' | 'odd' =
+    isOnDevice != null && isOnDevice ? 'odd' : 'desktop'
 
   /**
    * makes toast, rendering it in the toaster oven display container
@@ -50,6 +61,10 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     return id
   }
 
+  function makeSnackbar(message: string, options?: MakeSnackbarOptions): void {
+    setSnackbar({ message, ...options })
+  }
+
   /**
    * removes (eats) a toast from toaster oven display container
    * @param {string} toastId the id of the toast to remove
@@ -59,7 +74,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   }
 
   return (
-    <ToastContext.Provider value={{ eatToast, makeToast }}>
+    <ToasterContext.Provider value={{ eatToast, makeToast, makeSnackbar }}>
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
@@ -73,6 +88,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           {toasts.map(toast => (
             <Toast
               {...toast}
+              displayType={displayType}
               key={toast.id}
               onClose={() => {
                 toast.onClose?.()
@@ -82,7 +98,24 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           ))}
         </Flex>
       ) : null}
+      {snackbar !== null && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position="absolute"
+          bottom={SPACING.spacingXXL}
+          zIndex={1000}
+        >
+          <Snackbar
+            {...snackbar}
+            onClose={() => {
+              snackbar.onClose?.()
+            }}
+          />
+        </Flex>
+      )}
       {children}
-    </ToastContext.Provider>
+    </ToasterContext.Provider>
   )
 }

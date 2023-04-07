@@ -108,6 +108,25 @@ const MOCK_LABWARE_BY_LIQUID_ID: LabwareByLiquidId = {
   ],
 }
 
+const MOCK_LABWARE_BY_LIQUID_ID_DECIMALS: LabwareByLiquidId = {
+  '4': [
+    {
+      labwareId:
+        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
+      volumeByWell: {
+        A3: 100.1111111,
+        A4: 100,
+        B3: 100,
+        B4: 100,
+        C3: 100,
+        C4: 100,
+        D3: 100,
+        D4: 100,
+      },
+    },
+  ],
+}
+
 const MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE = {
   '4': [
     {
@@ -223,6 +242,12 @@ describe('getTotalVolumePerLiquidId', () => {
     const expected = 1000
     expect(
       getTotalVolumePerLiquidId(LIQUID_ID, MOCK_LABWARE_BY_LIQUID_ID)
+    ).toEqual(expected)
+  })
+  it('returns volume of liquid needed accross all labware when there are decimal points', () => {
+    const expected = 800.1
+    expect(
+      getTotalVolumePerLiquidId('4', MOCK_LABWARE_BY_LIQUID_ID_DECIMALS)
     ).toEqual(expected)
   })
 })

@@ -21,6 +21,7 @@
   "check_tip_on_block": "Check tip on block",
   "check_tip_on_trash": "Check tip on trash bin",
   "check_xy_axes": "Check x- and y-axis in slot {{slotName}}",
+  "check_z_axis_on_slot": "Check z-axis on slot 5",
   "check_z_axis_on_block": "Check z-axis on block",
   "check_z_axis_on_trash": "Check z-axis on trash bin",
   "clear_other_slots": "Clear all other deck slots",
@@ -124,5 +125,8 @@
   "opentrons": "opentrons",
   "custom": "custom",
   "confirm_tip_rack": "Confirm tip rack",
-  "recalibrate_pipette": "Recalibrate pipette"
+  "recalibrate_pipette": "Recalibrate pipette",
+  "return_tip_and_continue": "Return tip and continue to next pipette",
+  "return_tip_and_exit": "Return tip and see calibration health check results",
+  "return_tip": "Return tip"
 }

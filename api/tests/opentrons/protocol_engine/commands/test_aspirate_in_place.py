@@ -35,19 +35,28 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
     return decoy.mock(cls=PipettingHandler)
 
 
-async def test_aspirate_in_place_implementation(
-    decoy: Decoy,
+@pytest.fixture
+def subject(
     pipetting: PipettingHandler,
     state_store: StateStore,
     hardware_api: HardwareAPI,
-) -> None:
-    """It should aspirate in place."""
-    subject = AspirateInPlaceImplementation(
+) -> AspirateInPlaceImplementation:
+    """Get the impelementation subject."""
+    return AspirateInPlaceImplementation(
         pipetting=pipetting,
         hardware_api=hardware_api,
         state_view=state_store,
     )
 
+
+async def test_aspirate_in_place_implementation(
+    decoy: Decoy,
+    pipetting: PipettingHandler,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    subject: AspirateInPlaceImplementation,
+) -> None:
+    """It should aspirate in place."""
     data = AspirateInPlaceParams(
         pipetteId="pipette-id-abc",
         volume=123,
@@ -76,14 +85,9 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
     pipetting: PipettingHandler,
     state_store: StateStore,
     hardware_api: HardwareAPI,
+    subject: AspirateInPlaceImplementation,
 ) -> None:
     """Should raise an exception for not ready to aspirate."""
-    subject = AspirateInPlaceImplementation(
-        pipetting=pipetting,
-        hardware_api=hardware_api,
-        state_view=state_store,
-    )
-
     data = AspirateInPlaceParams(
         pipetteId="pipette-id-abc",
         volume=123,
@@ -103,3 +107,23 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
         " so the plunger can be reset in a known safe position.",
     ):
         await subject.execute(params=data)
+
+
+async def test_aspirate_raises_volume_error(
+    decoy: Decoy, pipetting: PipettingHandler, subject: AspirateInPlaceImplementation
+) -> None:
+    """Should raise an assertion error for volume larger than working volume."""
+    data = AspirateInPlaceParams(
+        pipetteId="abc",
+        volume=50,
+        flowRate=1.23,
+    )
+
+    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
+
+    decoy.when(
+        await pipetting.aspirate_in_place(pipette_id="abc", volume=50, flow_rate=1.23)
+    ).then_raise(AssertionError("blah blah"))
+
+    with pytest.raises(AssertionError):
+        await subject.execute(data)
