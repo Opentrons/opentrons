@@ -126,8 +126,7 @@ export const LiquidsLabwareDetailsModal = (
   return isODD ? (
     <OddModal
       modalSize="large"
-      //  bug in modal component that i want to wait to fix until i merge the modal pr
-      onOutsideClick={() => console.log('wire this up')}
+      onOutsideClick={closeModal}
       header={{
         title: labwareName,
         hasExitIcon: true,
