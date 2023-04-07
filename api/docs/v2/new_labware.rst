@@ -13,8 +13,10 @@ In the example given in the :ref:`overview-section-v2` section, we loaded labwar
 
 .. code-block:: python
 
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
-    tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
+    plate = protocol.load_labware(
+        load_labware='corning_96_wellplate_360ul_flat', location='2')
+    tiprack = protocol.load_labware(
+        load_labware='opentrons_96_tiprack_300ul', location ='1')
 
 
 which informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
@@ -23,9 +25,10 @@ A third optional argument can be used to give the labware a nickname to be displ
 
 .. code-block:: python
 
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                  location='2',
-                                  label='any-name-you-want')
+    plate = protocol.load_labware(
+        load_name="corning_96_wellplate_360ul_flat",
+        location="2",
+        label="any-name-you-want")
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
 :py:class:`opentrons.protocol_api.labware.Labware` object.
@@ -83,7 +86,8 @@ The ending well will be in the bottom right, see the diagram below for further e
 
     def run(protocol):
 
-        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='1')
+        plate = protocol.load_labware(
+            load_name='corning_24_wellplate_3.4ml_flat', location='1')
 
 
 .. versionadded:: 2.0
@@ -216,13 +220,11 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
         greenWater = protocol.define_liquid(
             name="Green water",
             description="Green colored water for demo",
-            display_color="#00FF00",
-        )
+            display_color="#00FF00")
         blueWater = protocol.define_liquid(
             name="Blue water",
             description="Blue colored water for demo",
-            display_color="#0000FF",
-        )
+            display_color="#0000FF")
 
 .. versionadded:: 2.14
         
@@ -236,11 +238,11 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
 .. code-block:: python
 
         well_plate["A1"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["A2"].load_liquid(greenWater, volume=50)
-        well_plate["B1"].load_liquid(blueWater, volume=50)
-        well_plate["B2"].load_liquid(blueWater, volume=50)
-        reservoir["A1"].load_liquid(greenWater, volume=200)
-        reservoir["A2"].load_liquid(blueWater, volume=200)
+        well_plate["A2"].load_liquid(liquid=greenWater, volume=50)
+        well_plate["B1"].load_liquid(liquid=blueWater, volume=50)
+        well_plate["B2"].load_liquid(liquid=blueWater, volume=50)
+        reservoir["A1"].load_liquid(liquid=greenWater, volume=200)
+        reservoir["A2"].load_liquid(liquid=blueWater, volume=200)
         
 .. versionadded:: 2.14
 
@@ -275,7 +277,8 @@ Use :py:meth:`.Well.depth` to get the distance in mm between the very top of the
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        plate = protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location='1')
         depth = plate['A1'].depth # 10.67
 
 Diameter
@@ -288,7 +291,8 @@ Use :py:meth:`.Well.diameter` to get the diameter of a given well in mm. Since d
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        plate = protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location='1')
         diameter = plate['A1'].diameter	# 6.86
 
 
@@ -302,7 +306,8 @@ Use :py:meth:`.Well.length` to get the length of a given well in mm. Length is d
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
+        plate = protocol.load_labware(
+            load_name='nest_12_reservoir_15ml', location='1')
         length = plate['A1'].length	# 8.2
 
 
@@ -317,7 +322,8 @@ Use :py:meth:`.Well.width` to get the width of a given well in mm. Width is defi
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
+        plate = protocol.load_labware(
+            load_name='nest_12_reservoir_15ml', location='1')
         width = plate['A1'].width	# 71.2
 
 
