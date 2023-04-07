@@ -253,7 +253,7 @@ class JsonRunner(AbstractRunner):
 
 
 class LiveRunner(AbstractRunner):
-    """Protocol runner implementation for setup commands."""
+    """Protocol runner implementation for live http protocols."""
 
     def __init__(
         self,
