@@ -83,7 +83,10 @@ class OT3Mount(enum.Enum):
 
     @classmethod
     def from_mount(
-        cls, mount: Union[top_types.Mount, top_types.MountType, top_types.OT3MountType, "OT3Mount"]
+        cls,
+        mount: Union[
+            top_types.Mount, top_types.MountType, top_types.OT3MountType, "OT3Mount"
+        ],
     ) -> "OT3Mount":
         return cls[mount.name]
 

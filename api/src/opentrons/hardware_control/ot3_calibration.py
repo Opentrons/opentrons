@@ -762,7 +762,12 @@ async def calibrate_module(
         LOG.info(
             f"Starting module calibration for {module_id} at {nominal_position} using {mount}"
         )
-        # find the offset
+        # FIXME (ba, 2023-04-04): Well B1 of the module adapter definition includes the z prep offset
+        # of 13x13mm in the nominial position, but we are still using PREP_OFFSET_DEPTH in
+        # find_calibration_structure_height which effectively doubles the offset. We plan
+        # on removing PREP_OFFSET_DEPTH in the near future, but for now just subtract PREP_OFFSET_DEPTH
+        # from the nominal position so we dont have to alter any other part of the system.
+        nominal_position = nominal_position - PREP_OFFSET_DEPTH
         offset = await find_calibration_structure_position(
             hcapi, mount, nominal_position, method=CalibrationMethod.BINARY_SEARCH
         )
