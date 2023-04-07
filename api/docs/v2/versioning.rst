@@ -271,7 +271,7 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
   - Motion planning has been improved to avoid certain erroneous downward movements,
     especially when using :py:meth:`.InstrumentContext.aspirate`.
 
-  - :py:attr:`.Labware.tip_length` will raise a useful error if called on labware that is not a tip rack.
+  - :py:meth:`.Labware.reset` and :py:attr:`.Labware.tip_length` will raise useful errors if called on labware that is not a tip rack.
 
 - Removals
 
@@ -295,8 +295,8 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
 
   - The ``height`` parameter of :py:meth:`.MagneticModuleContext.engage` was removed.
     Use ``offset`` or ``height_from_base`` instead.
-
-  - ``Labware.separate_calibration`` and ``ModuleContext.separate_calibration`` were removed,
+    
+  - ``Labware.separate_calibration`` and :py:meth:`.Labware.set_calibration` were removed,
     since they were holdovers from a calibration system that no longer exists.
 
   - Various methods and setters were removed that could modify tip state outside of

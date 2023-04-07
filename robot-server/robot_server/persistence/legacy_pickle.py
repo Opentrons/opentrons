@@ -143,6 +143,11 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
         _LegacyTypeInfo(original_name="DisplayCategory", current_type=DisplayCategory)
     )
 
+    from opentrons.protocol_engine import DropTipWellOrigin
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="DropTipWellOrigin", current_type=DropTipWellOrigin)
+    )
+
     from opentrons.protocol_engine import EngineStatus
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="EngineStatus", current_type=EngineStatus)

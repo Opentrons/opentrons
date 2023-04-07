@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {
   InputField,
-  CheckboxField,
+  DeprecatedCheckboxField,
   INPUT_TYPE_TEXT,
   INPUT_TYPE_PASSWORD,
 } from '@opentrons/components'
@@ -31,7 +31,7 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
         {...{ className, type, id, name, value, error, onChange, onBlur }}
       />
       {isPassword && (
-        <CheckboxField
+        <DeprecatedCheckboxField
           label={LABEL_SHOW_PASSWORD}
           value={showPw}
           onChange={toggleShowPw}

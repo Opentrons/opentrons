@@ -12,6 +12,8 @@ import {
   COLORS,
   WELL_LABEL_OPTIONS,
   ALIGN_FLEX_START,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -23,7 +25,6 @@ import {
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
@@ -48,7 +49,6 @@ interface JogToWellProps {
   body: React.ReactNode
   initialPosition: VectorOffset
   existingOffset: VectorOffset
-  showLiveOffset?: boolean
 }
 export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
@@ -62,12 +62,18 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     handleJog,
     initialPosition,
     existingOffset,
-    showLiveOffset = true,
   } = props
 
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
     initialPosition
   )
+  React.useEffect(() => {
+    //  NOTE: this will perform a "null" jog when the jog controls mount so
+    //  if a user reaches the "confirm exit" modal (unmounting this component)
+    //  and clicks "go back" we are able so initialize the live offset to whatever
+    //  distance they had already jogged before clicking exit.
+    handleJog('x', 1, 0, setJoggedPosition)
+  }, [])
 
   let wellsToHighlight: string[] = []
   if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
@@ -102,7 +108,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         >
           <StyledText as="h1">{header}</StyledText>
           {body}
-          {showLiveOffset ? <LiveOffsetValue {...liveOffset} /> : null}
+          <LiveOffsetValue {...liveOffset} />
         </Flex>
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacingM}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>

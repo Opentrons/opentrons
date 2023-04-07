@@ -11,12 +11,13 @@ import {
   Icon,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
+  PrimaryButton,
+  SecondaryButton,
   JUSTIFY_CENTER,
   DIRECTION_ROW,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { startBuildrootUpdate } from '../../redux/buildroot'
 
 import type { Dispatch } from '../../redux/types'

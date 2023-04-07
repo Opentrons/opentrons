@@ -8,13 +8,13 @@ import {
   DISPLAY_FLEX,
   DISPLAY_NONE,
   SPACING,
+  PrimaryButton,
   TYPOGRAPHY,
   BORDERS,
   COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
@@ -87,14 +87,16 @@ export const RunPreviewComponent = (
         initialIndex={currentRunCommandIndex}
       >
         {(command, index) => {
-          const borderColor =
-            index === currentRunCommandIndex
-              ? COLORS.blueEnabled
-              : COLORS.transparent
-          const backgroundColor =
-            index === currentRunCommandIndex
-              ? COLORS.lightBlue
-              : COLORS.fundamentalsBackground
+          const isCurrent = index === currentRunCommandIndex
+          const borderColor = isCurrent
+            ? COLORS.blueEnabled
+            : COLORS.transparent
+          const backgroundColor = isCurrent
+            ? COLORS.lightBlue
+            : COLORS.fundamentalsBackground
+          const contentColor = isCurrent
+            ? COLORS.darkBlackEnabled
+            : COLORS.darkGreyEnabled
           return (
             <Flex
               key={command.id}
@@ -112,12 +114,10 @@ export const RunPreviewComponent = (
                 gridGap={SPACING.spacing2}
                 width="100%"
                 border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.warningEnabled : borderColor
+                  index === jumpedIndex ? COLORS.electricPurple : borderColor
                 }`}
                 backgroundColor={
-                  index === jumpedIndex
-                    ? COLORS.warningBackgroundLight
-                    : backgroundColor
+                  index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
                 color={COLORS.darkBlackEnabled}
                 borderRadius={BORDERS.radiusSoftCorners}
@@ -128,10 +128,11 @@ export const RunPreviewComponent = (
                 `}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-                  <CommandIcon command={command} />
+                  <CommandIcon command={command} color={contentColor} />
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
+                    color={contentColor}
                   />
                 </Flex>
               </Flex>

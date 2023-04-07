@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import isEqual from 'lodash/isEqual'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import isEqual from 'lodash/isEqual'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   CompletedProtocolAnalysis,
@@ -23,7 +22,7 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   COLORS,
-  JUSTIFY_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
@@ -137,6 +136,7 @@ export const ResultsSummary = (
           TableComponent={TableComponent}
           JupyterComponent={JupyterSnippet}
           CommandLineComponent={CommandLineSnippet}
+          marginTop={SPACING.spacing4}
         />
       ) : (
         <OffsetTable
@@ -226,12 +226,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 {isEqual(vector, IDENTITY_VECTOR) ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
-                  <Flex justifyContent={JUSTIFY_FLEX_END}>
+                  <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
                         <StyledText
                           as="p"
-                          marginLeft={SPACING.spacing3}
+                          marginLeft={index > 0 ? SPACING.spacing3 : 0}
                           marginRight={SPACING.spacing2}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >

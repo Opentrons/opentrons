@@ -33,8 +33,9 @@ export const CALIBRATION_PROBE = {
 export const HEX_SCREWDRIVER = {
   loadName: 'hex_screwdriver',
   displayName: HEX_SCREWDRIVER_DISPLAY_NAME,
+  //  TODO(jr, 4/3/23): add this subtitle to i18n
   subtitle:
-    'Provided with robot. Using another size can strip the instruments’s screws.',
+    'Provided with the robot. Using another size can strip the instruments’s screws.',
 }
 export const PIPETTE = {
   loadName: 'gen3_pipette',

@@ -189,6 +189,16 @@ export const BeforeBeginning = (
       rightHandBody={rightHandBody}
       bodyText={
         <>
+          {selectedPipette === NINETY_SIX_CHANNEL &&
+          (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
+            <Banner
+              type="warning"
+              size={isOnDevice ? '1.5rem' : SIZE_1}
+              marginY={SPACING.spacing2}
+            >
+              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+            </Banner>
+          ) : null}
           <Trans
             t={t}
             i18nKey={bodyTranslationKey}
@@ -196,16 +206,6 @@ export const BeforeBeginning = (
               block: <StyledText css={BODY_STYLE} />,
             }}
           />
-          {selectedPipette === NINETY_SIX_CHANNEL &&
-          (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner
-              type="warning"
-              size={isOnDevice ? '1.5rem' : SIZE_1}
-              marginTop={SPACING.spacing5}
-            >
-              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-            </Banner>
-          ) : null}
         </>
       }
       proceedButtonText={proceedButtonText}

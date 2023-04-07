@@ -27,6 +27,16 @@ class BinaryMessageId(int, Enum):
     door_switch_state_request = 0x0D
     door_switch_state_info = 0x0E
 
+    # Light messages prefixed by 0x400
+    # 0x40x = light strip
+    add_light_action = 0x400
+    clear_light_action_staging_queue = 0x401
+    start_light_action = 0x402
+    # 0x41x = deck light
+    set_deck_light_request = 0x410
+    get_deck_light_request = 0x411
+    get_deck_light_response = 0x412
+
 
 @unique
 class LightTransitionType(int, Enum):

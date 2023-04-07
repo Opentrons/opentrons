@@ -51,8 +51,8 @@ export function useRunCalibrationStatus(
     const pipetteIsMatch =
       pipette?.requestedPipetteMatch === MATCH ||
       pipette?.requestedPipetteMatch === INEXACT_MATCH
-    // TODO(bh, 8/18/2022): remove isOT3 condition after OT-3 pipette calibration is implemented
-    if (pipette !== null && !pipetteIsMatch && !isOT3) {
+
+    if (pipette !== null && !pipetteIsMatch) {
       calibrationStatus = {
         complete: false,
         reason: 'attach_pipette_failure_reason',

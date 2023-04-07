@@ -329,7 +329,7 @@ def test_get_usage_info(
     ]
 
 
-def test_get_referenced_run_ids(
+def test_get_referencing_run_ids(
     subject: ProtocolStore,
     run_store: RunStore,
 ) -> None:
@@ -351,23 +351,23 @@ def test_get_referenced_run_ids(
 
     subject.insert(protocol_resource_1)
     # Still no runs, so we should still get back an empty list
-    assert subject.get_referenced_run_ids("protocol-id-1") == []
+    assert subject.get_referencing_run_ids("protocol-id-1") == []
 
     run_store.insert(
         run_id="run-id-1",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2022, month=1, day=1, tzinfo=timezone.utc),
     )
-    assert subject.get_referenced_run_ids("protocol-id-1") == ["run-id-1"]
+    assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1"]
 
     run_store.insert(
         run_id="run-id-2",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    assert subject.get_referenced_run_ids("protocol-id-1") == ["run-id-1", "run-id-2"]
+    assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1", "run-id-2"]
 
     run_store.remove(run_id="run-id-1")
     run_store.remove(run_id="run-id-2")
 
-    assert subject.get_referenced_run_ids("protocol-id-1") == []
+    assert subject.get_referencing_run_ids("protocol-id-1") == []

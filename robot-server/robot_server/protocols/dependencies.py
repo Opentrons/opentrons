@@ -12,7 +12,11 @@ from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import ProtocolReader, FileReaderWriter, FileHasher
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.persistence import get_sql_engine, get_persistence_directory
 from robot_server.settings import get_settings

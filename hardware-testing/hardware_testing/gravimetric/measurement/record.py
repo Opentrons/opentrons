@@ -278,6 +278,7 @@ class GravimetricRecorder:
         self._reading_samples = Event()
         self._thread: Optional[Thread] = None
         self._sample_tag: str = ""
+        self._scale_serial: str = ""
         super().__init__()
         self.activate()
 
@@ -306,6 +307,19 @@ class GravimetricRecorder:
         """Scale."""
         return self._scale
 
+    @property
+    def serial_number(self) -> str:
+        """Serial number."""
+        return self._scale_serial
+
+    def set_simulation_mass(self, mass: float) -> None:
+        """Set simulation mass."""
+        self._scale.set_simulation_mass(mass)
+
+    def add_simulation_mass(self, mass: float) -> None:
+        """Add simulation mass."""
+        self._scale.add_simulation_mass(mass)
+
     def activate(self) -> None:
         """Activate."""
         # Some Radwag settings cannot be controlled remotely.
@@ -315,6 +329,7 @@ class GravimetricRecorder:
         self._scale.connect()
         self._scale.initialize()
         self._scale.tare(0.0)
+        self._scale_serial = self._scale.read_serial_number()
 
     def deactivate(self) -> None:
         """Deactivate."""
