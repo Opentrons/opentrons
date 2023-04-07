@@ -1,3 +1,4 @@
+"""OT-3 Module Calibration Script."""
 import argparse
 from traceback import print_exc
 import requests
@@ -33,15 +34,16 @@ BASE_URL = "http://{}:31950"
 PARAMS = {"waitUntilComplete": "true"}
 
 
-def home_z(ip_addr: str) -> None:
+def _home_z(ip_addr: str) -> None:
+    """Home the z axis for the instrument."""
     # Home the instrument axis so we are at a known state
-    print(f"Homing z axis")
+    print("Homing z axis")
     home_z = {"data": {"commandType": "home", "params": {"axes": ["leftZ", "rightZ"]}}}
     url = f"{BASE_URL.format(ip_addr)}/commands"
     requests.post(headers=HEADERS, url=url, json=home_z, params=PARAMS)
 
 
-def main(args: argparse.Namespace) -> None:
+def _main(args: argparse.Namespace) -> None:
     base_url = f"{BASE_URL.format(args.host)}"
 
     # create an empty run
@@ -51,7 +53,7 @@ def main(args: argparse.Namespace) -> None:
     print(f"Created run {run_id}")
 
     # Home the instrument axis so we are at a known state
-    home_z(args.host)
+    _home_z(args.host)
 
     # load the module based on the model
     print(f"Loading the module {args.model} at slot {args.slot}")
@@ -132,9 +134,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     try:
-        main(args)
+        _main(args)
     except Exception:
-        print(f"Unhandlaed exception")
+        print("Unhandled exception")
         print_exc()
     finally:
-        home_z(args.host)
+        _home_z(args.host)
