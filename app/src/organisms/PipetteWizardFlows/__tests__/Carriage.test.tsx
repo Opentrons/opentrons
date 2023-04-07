@@ -48,10 +48,7 @@ describe('Carriage', () => {
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Unscrew Z-axis Carriage')
-    getByText(
-      'Loosen the captive screw on the top right of the gantry carriage. This will release the right pipette mount, which should then freely move up and down.'
-    )
+    getByText('Unscrew z-axis carriage')
     getByAltText('Unscrew gantry')
     getByRole('button', { name: 'Continue' })
     getByLabelText('back').click()
@@ -71,7 +68,7 @@ describe('Carriage', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Reattach Z-axis Carriage')
+    getByText('Reattach z-axis carriage')
     getByText(
       'Push the right pipette mount up to the top of the z-axis. Then tighten the captive screw at the top right of the gantry carriage.'
     )
