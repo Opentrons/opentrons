@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { DIRECTION_COLUMN, Flex, SPACING, } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { BackButton } from '../../atoms/buttons/BackButton'
 import { InstrumentInfo } from '../../organisms/InstrumentInfo.tsx'
 

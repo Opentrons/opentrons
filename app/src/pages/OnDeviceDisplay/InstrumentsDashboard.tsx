@@ -4,20 +4,11 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import {
-  PipetteMountItem,
-  ExtensionMountItem,
-} from '../../organisms/InstrumentMountItem.tsx'
+import { InstrumentMountItem } from '../../organisms/InstrumentMountItem.tsx'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 
 export const InstrumentsDashboard = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const leftPipette =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ?? null
-  const rightPipette =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'right') ?? null
-  const extensionInstrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
   const [wizardProps, setWizardProps] = React.useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>
@@ -25,24 +16,32 @@ export const InstrumentsDashboard = (): JSX.Element => {
   >(null)
 
   return (
-    <Flex
-      padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
-      flexDirection={DIRECTION_COLUMN}
-    >
+    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-        <PipetteMountItem
+        <InstrumentMountItem
           mount="left"
-          attachedPipette={leftPipette}
+          attachedInstrument={
+            (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
+            null
+          }
           setWizardProps={setWizardProps}
         />
-        <PipetteMountItem
+        <InstrumentMountItem
           mount="right"
-          attachedPipette={rightPipette}
+          attachedInstrument={
+            (attachedInstruments?.data ?? []).find(i => i.mount === 'right') ??
+            null
+          }
           setWizardProps={setWizardProps}
         />
-        <ExtensionMountItem
-          attachedInstrument={extensionInstrument}
+        <InstrumentMountItem
+          mount="right"
+          attachedInstrument={
+            (attachedInstruments?.data ?? []).find(
+              i => i.mount === 'extension'
+            ) ?? null
+          }
           setWizardProps={setWizardProps}
         />
       </Flex>

@@ -42,7 +42,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       instrument.instrumentModel === 'p1000_96'
         ? NINETY_SIX_CHANNEL
         : SINGLE_MOUNT_PIPETTES,
-    setSelectedPipette: () => { },
+    setSelectedPipette: () => {},
     closeFlow: () => {
       setWizardProps(null)
     },
@@ -64,9 +64,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     setWizardProps(
       instrument.instrumentModel === 'gripperV1'
         ? {
-          ...sharedGripperWizardProps,
-          flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
-        }
+            ...sharedGripperWizardProps,
+            flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+          }
         : { ...sharedPipetteWizardProps, flowType: FLOWS.CALIBRATE }
     )
   }
@@ -77,7 +77,11 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3} marginTop={SPACING.spacing5}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing3}
+        marginTop={SPACING.spacing5}
+      >
         <InfoItem label={t('last_calibrated')} value="TODO" />
         <InfoItem label={t('firmware_version')} value="TODO" />
         <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
@@ -100,17 +104,13 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
           justifyContent={JUSTIFY_CENTER}
         />
       </Flex>
-      {
-        wizardProps != null && 'mount' in wizardProps ? (
-          <PipetteWizardFlows {...wizardProps} />
-        ) : null
-      }
-      {
-        wizardProps != null && !('mount' in wizardProps) ? (
-          <GripperWizardFlows {...wizardProps} />
-        ) : null
-      }
-    </Flex >
+      {wizardProps != null && 'mount' in wizardProps ? (
+        <PipetteWizardFlows {...wizardProps} />
+      ) : null}
+      {wizardProps != null && !('mount' in wizardProps) ? (
+        <GripperWizardFlows {...wizardProps} />
+      ) : null}
+    </Flex>
   )
 }
 
@@ -132,7 +132,8 @@ function InfoItem(props: InfoItemProps): JSX.Element {
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         fontSize={TYPOGRAPHY.fontSize28}
-        textTransform={TYPOGRAPHY.textTransformCapitalize}>
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+      >
         {props.label}
       </StyledText>
       <StyledText

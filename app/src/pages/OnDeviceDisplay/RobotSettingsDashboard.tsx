@@ -87,7 +87,7 @@ export function RobotSettingsDashboard(): JSX.Element {
 
   return (
     <Flex
-      padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+      padding={SPACING.spacingXXL}
       flexDirection={DIRECTION_COLUMN}
       columnGap={SPACING.spacing3}
     >
