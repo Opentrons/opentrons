@@ -470,8 +470,7 @@ class OT3Controller:
         )
 
     def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
-        """If any of the encoder statuses is ok, parking can proceed."""
-        return any(
+        return all(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
         )

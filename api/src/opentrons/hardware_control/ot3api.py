@@ -931,13 +931,16 @@ class OT3API(
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
         # Cache current position from backend
         await self._cache_current_position()
         await self._cache_encoder_position()
 
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_motor_status(axes_moving):
+        if not self._backend.check_encoder_status(axes_moving):
+            # a moving axis has not been homed before, homing robot now
+            await self.home()
+        elif not self._backend.check_motor_status(axes_moving):
             raise MustHomeError(
                 f"Inaccurate motor position for {str(realmount)}, please home motors."
             )
@@ -979,12 +982,15 @@ class OT3API(
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+
+        if not self._backend.check_encoder_status(axes_moving):
+            await self.home()
 
         # Cache current position from backend
         await self._cache_current_position()
         await self._cache_encoder_position()
 
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
         if not self._backend.check_motor_status([axis for axis in axes_moving]):
             raise MustHomeError(
                 f"Inaccurate motor position for {str(realmount)}, please home motors."

@@ -393,6 +393,7 @@ async def test_move_to_without_homing_first(
         instr_data = AttachedGripper(config=gripper_config, id="test")
         await ot3_hardware.cache_gripper(instr_data)
 
+    print(ot3_hardware._current_position)
     ot3_hardware._backend._motor_status = {}
     assert not ot3_hardware._backend.check_motor_status(homed_axis)
 
@@ -400,7 +401,7 @@ async def test_move_to_without_homing_first(
         mount,
         Point(0.001, 0.001, 0.001),
     )
-    mock_home.assert_called_once_with(homed_axis)
+    mock_home.assert_called_once()
     assert ot3_hardware._backend.check_motor_status(homed_axis)
 
 
