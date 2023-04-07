@@ -22,12 +22,12 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.protocols import ProtocolResource
-from robot_server.maintenance_run.engine_store import EngineStore, EngineConflictError
-from robot_server.maintenance_run.maintenance_run_data_manager import (
+from robot_server.maintenance_runs.engine_store import EngineStore, EngineConflictError
+from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
     RunNotCurrentError,
 )
-from robot_server.maintenance_run.maintenance_run_models import MaintenanceRun
+from robot_server.maintenance_runs.maintenance_run_models import MaintenanceRun
 
 from robot_server.service.task_runner import TaskRunner
 

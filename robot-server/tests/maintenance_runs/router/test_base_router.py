@@ -24,17 +24,17 @@ from robot_server.protocols import (
 )
 
 
-from robot_server.maintenance_run.maintenance_run_models import (
+from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
 )
-from robot_server.maintenance_run.engine_store import EngineConflictError
-from robot_server.maintenance_run.maintenance_run_data_manager import (
+from robot_server.maintenance_runs.engine_store import EngineConflictError
+from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
     RunNotCurrentError,
 )
 from robot_server.runs.run_models import RunNotFoundError
-from robot_server.maintenance_run.router.base_router import (
+from robot_server.maintenance_runs.router.base_router import (
     create_run,
     get_run_data_from_url,
     get_run,
