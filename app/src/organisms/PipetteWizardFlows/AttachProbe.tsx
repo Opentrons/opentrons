@@ -13,7 +13,8 @@ import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
+import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
@@ -85,16 +86,27 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })
   }
 
-  const pipetteCalibratingImage = (
+  const pipetteProbeVid = (
     <Flex marginTop={isOnDevice ? '-5rem' : '-7.6rem'} height="10.2rem">
-      <img src={pipetteCalibrating} alt="Pipette is calibrating" />
+      <video
+        css={css`
+          max-width: 100%;
+          max-height: 100%;
+        `}
+        autoPlay={true}
+        loop={true}
+        controls={false}
+        data-testid={is8Channel ? pipetteProbe8 : pipetteProbe1}
+      >
+        <source src={is8Channel ? pipetteProbe8 : pipetteProbe1} />
+      </video>
     </Flex>
   )
 
   if (isRobotMoving)
     return (
       <InProgressModal
-        alternativeSpinner={isExiting ? null : pipetteCalibratingImage}
+        alternativeSpinner={isExiting ? null : pipetteProbeVid}
         description={t('pipette_calibrating', {
           pipetteName: displayName,
         })}

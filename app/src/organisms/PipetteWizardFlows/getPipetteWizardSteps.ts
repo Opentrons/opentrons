@@ -18,12 +18,12 @@ export const getPipetteWizardSteps = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       return [
-        // {
-        //   section: SECTIONS.BEFORE_BEGINNING,
-        //   mount: mount,
-        //   flowType: flowType,
-        // },
-        // { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
+        {
+          section: SECTIONS.BEFORE_BEGINNING,
+          mount: mount,
+          flowType: flowType,
+        },
+        { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
         { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
         {
           section: SECTIONS.RESULTS,

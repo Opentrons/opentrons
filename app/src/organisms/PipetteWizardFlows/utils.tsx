@@ -37,28 +37,24 @@ export function getPipetteAnimations(
   const { mount, flowType, section } = pipetteWizardStep
 
   let sourcePipette
-  switch (flowType) {
-    case FLOWS.ATTACH: {
-      if (mount === LEFT) {
-        sourcePipette = attachLeft1
-      } else if (mount === RIGHT) {
-        sourcePipette = attachRight1
-      }
-      break
+  if (flowType === FLOWS.DETACH || section === SECTIONS.DETACH_PIPETTE) {
+    if (mount === LEFT && channel === 1) {
+      sourcePipette = detachLeft1
+    } else if (mount === LEFT && channel === 8) {
+      sourcePipette = detachLeft8
+    } else if (mount === RIGHT && channel === 1) {
+      sourcePipette = detachRight1
+    } else if (mount === RIGHT && channel === 8) {
+      sourcePipette = detachRight8
     }
-    case FLOWS.DETACH: {
-      if (mount === LEFT && channel === 1) {
-        sourcePipette = detachLeft1
-      } else if (mount === LEFT && channel === 8) {
-        sourcePipette = detachLeft8
-      } else if (mount === RIGHT && channel === 1) {
-        sourcePipette = detachRight1
-      } else if (mount === RIGHT && channel === 8) {
-        sourcePipette = detachRight8
-      }
-      break
+  } else if (flowType === FLOWS.ATTACH) {
+    if (mount === LEFT) {
+      sourcePipette = attachLeft1
+    } else if (mount === RIGHT) {
+      sourcePipette = attachRight1
     }
   }
+
   let sourceProbe
   if (section === SECTIONS.ATTACH_PROBE && channel === 1) {
     sourceProbe = attachProbe1
@@ -82,7 +78,11 @@ export function getPipetteAnimations(
       autoPlay={true}
       loop={true}
       controls={false}
-      data-testid={sourcePipette}
+      data-testid={
+        section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE
+          ? sourceProbe
+          : sourcePipette
+      }
     >
       <source
         src={

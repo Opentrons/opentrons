@@ -28,7 +28,6 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   return (
     <GenericWizardTile
       header={i18n.format(t('remove_cal_probe'), 'capitalize')}
-      //  TODO(Jr, 10/26/22): replace image with correct one!
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel,
