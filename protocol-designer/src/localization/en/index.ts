@@ -5,6 +5,7 @@ import card from './card.json'
 import context_menu from './context_menu.json'
 import deck from './deck.json'
 import feature_flags from './feature_flags.json'
+import flex from './flex.json'
 import form from './form.json'
 import modal from './modal.json'
 import modules from './modules.json'
@@ -20,6 +21,7 @@ export const en = {
     context_menu,
     deck,
     feature_flags,
+    flex,
     form,
     modal,
     modules,
