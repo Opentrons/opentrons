@@ -22,6 +22,8 @@ endef
 
 ot_sd_name := python-opentrons-shared-data
 
+export OPENTRONS_GIT_DIR=$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
+
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of
 # having the directory name be the package name

@@ -6,10 +6,7 @@ import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../i18n'
-import {
-  useCreateLiveCommandMutation,
-  useCreateCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -20,7 +17,6 @@ import {
   useModuleOverflowMenu,
   useIsHeaterShakerInProtocol,
 } from '../hooks'
-import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
 import {
   mockHeaterShaker,
@@ -39,7 +35,6 @@ jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
-jest.mock('../useModuleIdFromRun')
 
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
@@ -51,14 +46,8 @@ const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
-  typeof useCreateCommandMutation
->
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
->
-const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
-  typeof useModuleIdFromRun
 >
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
@@ -223,9 +212,6 @@ describe('useLatchControls', () => {
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
     )
-    mockUseModuleIdFromRun.mockReturnValue({
-      moduleIdFromRun: 'heatershaker_id',
-    })
     const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
       wrapper,
     })
@@ -272,7 +258,6 @@ describe('useLatchControls', () => {
 describe('useModuleOverflowMenu', () => {
   const store: Store<any> = createStore(jest.fn(), {})
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
 
   beforeEach(() => {
     store.dispatch = jest.fn()
@@ -286,12 +271,6 @@ describe('useModuleOverflowMenu', () => {
     })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
-    } as any)
-
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCreateCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
     } as any)
   })
 
@@ -308,12 +287,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockHeatHeaterShaker,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          false,
           false,
           false
         ),
@@ -349,12 +326,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockHeaterShaker,
-          null,
           mockAboutClick,
           mockTestShakeClick,
           mockHandleWizard,
           mockHandleSlideoutClick,
-          false,
           false,
           false
         ),
@@ -381,12 +356,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockMagneticModuleGen2,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           mockHandleClick,
-          false,
           false,
           false
         ),
@@ -411,12 +384,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockMagDeckEngaged,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          false,
           false,
           false
         ),
@@ -449,12 +420,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTemperatureModuleGen2,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           mockHandleClick,
-          false,
           false,
           false
         ),
@@ -478,12 +447,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTemperatureModuleHeating,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          false,
           false,
           false
         ),
@@ -515,12 +482,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockThermocycler,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           mockHandleClick,
-          false,
           false,
           false
         ),
@@ -544,12 +509,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTCBlockHeating,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          false,
           false,
           false
         ),
@@ -582,12 +545,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockTCLidHeating,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          false,
           false,
           false
         ),
@@ -620,12 +581,10 @@ describe('useModuleOverflowMenu', () => {
       () =>
         useModuleOverflowMenu(
           mockThermocyclerGen2,
-          null,
           jest.fn(),
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          false,
           false,
           false
         ),

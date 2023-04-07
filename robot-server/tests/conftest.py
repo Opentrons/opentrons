@@ -3,21 +3,22 @@ import signal
 import subprocess
 import time
 import sys
-import tempfile
-import os
 import json
+import os
 import pathlib
 import requests
-import pytest
-
+import tempfile
 from datetime import datetime, timezone
-from fastapi import routing
 from mock import MagicMock
-from starlette.testclient import TestClient
+from pathlib import Path
 from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
-from pathlib import Path
+
 from sqlalchemy.engine import Engine as SQLEngine
+
+import pytest
+from fastapi import routing
+from starlette.testclient import TestClient
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -156,13 +157,6 @@ def api_client_no_errors(
     client = TestClient(app, raise_server_exceptions=False)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return client
-
-
-@pytest.fixture(scope="session")
-def request_session() -> requests.Session:
-    session = requests.Session()
-    session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
-    return session
 
 
 @pytest.fixture(scope="session")
@@ -317,20 +311,6 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),
     )
-
-
-@pytest.fixture
-def set_disable_fast_analysis(
-    request_session: requests.Session,
-) -> Iterator[None]:
-    """For integration tests that need to set then clear the
-    enableHttpProtocolSessions feature flag"""
-    url = "http://localhost:31950/settings"
-    data = {"id": "disableFastProtocolUpload", "value": True}
-    request_session.post(url, json=data)
-    yield None
-    data["value"] = None
-    request_session.post(url, json=data)
 
 
 @pytest.fixture
