@@ -25,6 +25,9 @@ PLATFORM := $(shell uname -s)
 is-windows=$(findstring $(PLATFORM), Windows)
 $(if $(is-windows), echo "when using windows with an openSSH version larger then 9 add -O flag to scp command. see comments for more details")
 
+# Make sure the machine is recheable before trying to scp files
+assert-online=$(shell ping -t 1 $(1) 2>&1 > /dev/null || echo "Machine $(1) is unreachable" && exit 1)
+
 # push-python-package: execute a push to the robot of a particular python
 # package.
 #
@@ -33,6 +36,7 @@ $(if $(is-windows), echo "when using windows with an openSSH version larger then
 # argument 3 is any further ssh options, quoted
 # argument 4 is the path to the wheel file
 define push-python-package
+$(assert-online)
 $(if $(is-ot3), echo "This is an OT-3. Use 'make push-ot3' instead." && exit 1)
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/$(notdir $(4))
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
@@ -52,6 +56,7 @@ endef
 # argument 7 is an additional subdir if necessary in the sdist
 # argument 8 is either egg or dist (default egg)
 define push-python-sdist
+$(assert-online)
 $(if $(is-ot3), ,echo "This is an OT-2. Use 'make push' instead." && exit 1)
 scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) $(4) root@$(1):/var/$(notdir $(4))
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
@@ -73,6 +78,7 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the service name
 define restart-service
+$(assert-online)
 ssh $(call id-file-arg,$(2)) $(3)  root@$(1) \
 "systemctl restart $(4)"
 endef
@@ -84,6 +90,7 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the unit file path
 define push-systemd-unit
+	$(assert-online)
 	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/data/
 	ssh $(call id-file-arg,$(2)) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
