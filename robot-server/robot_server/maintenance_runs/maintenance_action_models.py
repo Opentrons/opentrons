@@ -9,10 +9,14 @@ from robot_server.service.json_api import ResourceModel
 class MaintenanceRunActionType(str, Enum):
     """Types of run control actions.
 
-    Args:
+        Args:
+        PLAY: Start or resume a protocol run.
+        PAUSE: Pause a run.
         STOP: Stop (cancel) a run.
     """
 
+    PLAY = "play"
+    PAUSE = "pause"
     STOP = "stop"
 
 

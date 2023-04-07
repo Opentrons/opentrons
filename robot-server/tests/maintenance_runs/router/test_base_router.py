@@ -6,9 +6,9 @@ from pathlib import Path
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
 from robot_server.errors import ApiError
+from robot_server.runs.run_models import RunNotFoundError
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -17,11 +17,6 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
-from robot_server.protocols import (
-    ProtocolStore,
-    ProtocolResource,
-    ProtocolNotFoundError,
-)
 
 
 from robot_server.maintenance_runs.maintenance_run_models import (
@@ -33,7 +28,7 @@ from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
     RunNotCurrentError,
 )
-from robot_server.runs.run_models import RunNotFoundError
+
 from robot_server.maintenance_runs.router.base_router import (
     create_run,
     get_run_data_from_url,
@@ -66,6 +61,7 @@ async def test_create_run(
         createdAt=run_created_at,
         current=True,
         errors=[],
+        actions=[],
         pipettes=[],
         modules=[],
         labware=[],
@@ -133,6 +129,7 @@ async def test_get_run_data_from_url(
         status=pe_types.EngineStatus.IDLE,
         current=False,
         errors=[],
+        actions=[],
         pipettes=[],
         modules=[],
         labware=[],
@@ -150,49 +147,48 @@ async def test_get_run_data_from_url(
     assert result == expected_response
 
 
-#
-#
-# async def test_get_run_with_missing_id(
-#     decoy: Decoy,
-#     mock_run_data_manager: RunDataManager,
-# ) -> None:
-#     """It should 404 if the run ID does not exist."""
-#     not_found_error = RunNotFoundError(run_id="run-id")
-#
-#     decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
-#
-#     with pytest.raises(ApiError) as exc_info:
-#         await get_run_data_from_url(
-#             runId="run-id",
-#             run_data_manager=mock_run_data_manager,
-#         )
-#
-#     assert exc_info.value.status_code == 404
-#     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
-#
-#
-# async def test_get_run() -> None:
-#     """It should wrap the run data in a response."""
-#     run_data = Run(
-#         id="run-id",
-#         protocolId=None,
-#         createdAt=datetime(year=2021, month=1, day=1),
-#         status=pe_types.EngineStatus.IDLE,
-#         current=False,
-#         actions=[],
-#         errors=[],
-#         pipettes=[],
-#         modules=[],
-#         labware=[],
-#         labwareOffsets=[],
-#         liquids=[],
-#     )
-#
-#     result = await get_run(run_data=run_data)
-#
-#     assert result.content.data == run_data
-#     assert result.status_code == 200
-#
+
+
+async def test_get_run_with_missing_id(
+    decoy: Decoy,
+    mock_run_data_manager: MaintenanceRunDataManager,
+) -> None:
+    """It should 404 if the run ID does not exist."""
+    not_found_error = RunNotFoundError(run_id="run-id")
+
+    decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_run_data_from_url(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_get_run() -> None:
+    """It should wrap the run data in a response."""
+    run_data = MaintenanceRun(
+        id="run-id",
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.IDLE,
+        current=False,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+    )
+
+    result = await get_run(run_data=run_data)
+
+    assert result.content.data == run_data
+    assert result.status_code == 200
+
 #
 # async def test_get_runs_empty(
 #     decoy: Decoy,

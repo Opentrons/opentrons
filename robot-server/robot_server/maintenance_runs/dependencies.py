@@ -1,12 +1,15 @@
 """Run router dependency-injection wire-up."""
 from fastapi import Depends
-from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.hardware import get_hardware, get_robot_type
 
 from .maintenance_engine_store import EngineStore

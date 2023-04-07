@@ -5,7 +5,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
+from opentrons.protocol_runner import LiveRunner, RunResult
 from opentrons.protocol_engine import (
     ProtocolEngine,
     Config as ProtocolEngineConfig,
@@ -30,7 +30,7 @@ class RunnerEnginePair(NamedTuple):
     """A stored ProtocolRunner/ProtocolEngine pair."""
 
     run_id: str
-    runner: ProtocolRunner
+    runner: LiveRunner
     engine: ProtocolEngine
 
 
@@ -51,7 +51,6 @@ class EngineStore:
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
-        self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
 
     @property
@@ -61,7 +60,7 @@ class EngineStore:
         return self._runner_engine_pair.engine
 
     @property
-    def runner(self) -> ProtocolRunner:
+    def runner(self) -> LiveRunner:
         """Get the "current" persisted ProtocolRunner."""
         assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
@@ -101,7 +100,7 @@ class EngineStore:
                 block_on_door_open=feature_flags.enable_door_safety_switch(),
             ),
         )
-        runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
+        runner = LiveRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
@@ -119,7 +118,7 @@ class EngineStore:
 
         return engine.state_view.get_summary()
 
-    async def clear(self) -> ProtocolRunResult:
+    async def clear(self) -> RunResult:
         """Remove the persisted ProtocolEngine.
 
         Raises:
@@ -138,4 +137,4 @@ class EngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return ProtocolRunResult(state_summary=run_data, commands=commands)
+        return RunResult(state_summary=run_data, commands=commands)

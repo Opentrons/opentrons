@@ -17,8 +17,8 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     Liquid,
 )
+from robot_server.maintenance_runs.maintenance_action_models import MaintenanceRunAction
 from robot_server.service.json_api import ResourceModel
-from .maintenance_action_models import MaintenanceRunAction
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
@@ -51,7 +51,10 @@ class MaintenanceRunCommandSummary(ResourceModel):
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
     params: CommandParams = Field(..., description="Command execution parameters.")
-
+    intent: Optional[CommandIntent] = Field(
+        None,
+        description="Why this command was added to the run.",
+    )
 
 
 class MaintenanceRun(ResourceModel):
@@ -66,6 +69,10 @@ class MaintenanceRun(ResourceModel):
             "Whether this run is currently controlling the robot."
             " There can be, at most, one current run."
         ),
+    )
+    actions: List[MaintenanceRunAction] = Field(
+        ...,
+        description="Client-initiated run control actions.",
     )
     errors: List[ErrorOccurrence] = Field(
         ...,

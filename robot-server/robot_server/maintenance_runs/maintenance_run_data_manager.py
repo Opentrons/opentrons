@@ -13,7 +13,6 @@ from opentrons.protocol_engine import (
 
 from .maintenance_engine_store import EngineStore
 from .maintenance_run_models import MaintenanceRun
-from .maintenance_action_models import MaintenanceRunAction
 
 
 def _build_run(
@@ -37,6 +36,7 @@ def _build_run(
         id=run_id,
         createdAt=created_at,
         status=state_summary.status,
+        actions=[],     # TODO (spp, 2023-04-23): wire up actions once they are allowed
         errors=state_summary.errors,
         labware=state_summary.labware,
         labwareOffsets=state_summary.labwareOffsets,
@@ -137,21 +137,20 @@ class MaintenanceRunDataManager:
             current=current,
         )
 
-    # async def delete(self, run_id: str) -> None:
-    #     """Delete a current or historical run.
-    #
-    #     Args:
-    #         run_id: The identifier of the run to remove.
-    #
-    #     Raises:
-    #         EngineConflictError: If deleting the current run, the current run
-    #             is not idle and cannot be deleted.
-    #         RunNotFoundError: The given run identifier was not found in the database.
-    #     """
-    #     if run_id == self._engine_store.current_run_id:
-    #         await self._engine_store.clear()
-    #     self._run_store.remove(run_id=run_id)
-    #
+    async def delete(self, run_id: str) -> None:
+        """Delete a current or historical run.
+
+        Args:
+            run_id: The identifier of the run to remove.
+
+        Raises:
+            EngineConflictError: If deleting the current run, the current run
+                is not idle and cannot be deleted.
+            RunNotFoundError: The given run identifier was not found in the database.
+        """
+        if run_id == self._engine_store.current_run_id:
+            await self._engine_store.clear()
+
     # async def update(self, run_id: str, current: Optional[bool]) -> Run:
     #     """Get and potentially archive a run.
     #

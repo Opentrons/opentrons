@@ -6,7 +6,6 @@ from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_runner import ProtocolRunResult
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -89,7 +88,7 @@ async def test_create(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id=run_id, labware_offsets=[], protocol=None)
+        await mock_engine_store.create(run_id=run_id, labware_offsets=[])
     ).then_return(engine_state_summary)
 
     result = await subject.create(
@@ -103,6 +102,7 @@ async def test_create(
         createdAt=created_at,
         current=True,
         status=engine_state_summary.status,
+        actions=[],
         errors=engine_state_summary.errors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
@@ -139,7 +139,6 @@ async def test_create_with_options(
         await mock_engine_store.create(
             run_id=run_id,
             labware_offsets=[labware_offset],
-            protocol=None,
         )
     ).then_return(engine_state_summary)
 
@@ -154,6 +153,7 @@ async def test_create_with_options(
         createdAt=created_at,
         current=True,
         status=engine_state_summary.status,
+        actions=[],
         errors=engine_state_summary.errors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
@@ -173,7 +173,7 @@ async def test_create_engine_error(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id, labware_offsets=[], protocol=None)
+        await mock_engine_store.create(run_id, labware_offsets=[])
     ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(EngineConflictError):
@@ -205,6 +205,7 @@ async def test_get_current_run(
         id=run_id,
         createdAt=datetime(2023, 1, 1),
         status=engine_state_summary.status,
+        actions=[],
         errors=engine_state_summary.errors,
         labware=engine_state_summary.labware,
         labwareOffsets=engine_state_summary.labwareOffsets,
@@ -382,144 +383,20 @@ async def test_get_run_not_current(
 #     ]
 
 
-# async def test_delete_current_run(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-#     subject: RunDataManager,
-# ) -> None:
-#     """It should delete the current run from the engine."""
-#     run_id = "hello world"
-#     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-#
-#     await subject.delete(run_id=run_id)
-#
-#     decoy.verify(
-#         await mock_engine_store.clear(),
-#         mock_run_store.remove(run_id=run_id),
-#     )
+async def test_delete_current_run(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    subject: MaintenanceRunDataManager,
+) -> None:
+    """It should delete the current run from the engine."""
+    run_id = "hello world"
+    decoy.when(mock_engine_store.current_run_id).then_return(run_id)
 
+    await subject.delete(run_id=run_id)
 
-# async def test_delete_historical_run(
-#     decoy: Decoy,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-#     subject: RunDataManager,
-# ) -> None:
-#     """It should delete a historical run from the store."""
-#     run_id = "hello world"
-#     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
-#
-#     await subject.delete(run_id=run_id)
-#
-#     decoy.verify(await mock_engine_store.clear(), times=0)
-#     decoy.verify(mock_run_store.remove(run_id=run_id), times=1)
-
-
-# async def test_update_current(
-#     decoy: Decoy,
-#     engine_state_summary: StateSummary,
-#     run_resource: RunResource,
-#     run_command: commands.Command,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-#     subject: RunDataManager,
-# ) -> None:
-#     """It should persist the current run and clear the engine on current=false."""
-#     run_id = "hello world"
-#     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-#     decoy.when(await mock_engine_store.clear()).then_return(
-#         ProtocolRunResult(commands=[run_command], state_summary=engine_state_summary)
-#     )
-#
-#     decoy.when(
-#         mock_run_store.update_run_state(
-#             run_id=run_id,
-#             summary=engine_state_summary,
-#             commands=[run_command],
-#         )
-#     ).then_return(run_resource)
-#
-#     result = await subject.update(run_id=run_id, current=False)
-#
-#     assert result == Run(
-#         current=False,
-#         id=run_resource.run_id,
-#         protocolId=run_resource.protocol_id,
-#         createdAt=run_resource.created_at,
-#         actions=run_resource.actions,
-#         status=engine_state_summary.status,
-#         errors=engine_state_summary.errors,
-#         labware=engine_state_summary.labware,
-#         labwareOffsets=engine_state_summary.labwareOffsets,
-#         pipettes=engine_state_summary.pipettes,
-#         modules=engine_state_summary.modules,
-#         liquids=engine_state_summary.liquids,
-#     )
-
-
-# @pytest.mark.parametrize("current", [None, True])
-# async def test_update_current_noop(
-#     decoy: Decoy,
-#     engine_state_summary: StateSummary,
-#     run_resource: RunResource,
-#     run_command: commands.Command,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-#     subject: RunDataManager,
-#     current: Optional[bool],
-# ) -> None:
-#     """It should noop on current=None and current=True."""
-#     run_id = "hello world"
-#     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
-#     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
-#         engine_state_summary
-#     )
-#     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
-#
-#     result = await subject.update(run_id=run_id, current=current)
-#
-#     decoy.verify(await mock_engine_store.clear(), times=0)
-#     decoy.verify(
-#         mock_run_store.update_run_state(
-#             run_id=run_id,
-#             summary=matchers.Anything(),
-#             commands=matchers.Anything(),
-#         ),
-#         times=0,
-#     )
-#
-#     assert result == Run(
-#         current=True,
-#         id=run_resource.run_id,
-#         protocolId=run_resource.protocol_id,
-#         createdAt=run_resource.created_at,
-#         actions=run_resource.actions,
-#         status=engine_state_summary.status,
-#         errors=engine_state_summary.errors,
-#         labware=engine_state_summary.labware,
-#         labwareOffsets=engine_state_summary.labwareOffsets,
-#         pipettes=engine_state_summary.pipettes,
-#         modules=engine_state_summary.modules,
-#         liquids=engine_state_summary.liquids,
-#     )
-
-
-# async def test_update_current_not_allowed(
-#     decoy: Decoy,
-#     engine_state_summary: StateSummary,
-#     run_resource: RunResource,
-#     run_command: commands.Command,
-#     mock_engine_store: EngineStore,
-#     mock_run_store: RunStore,
-#     subject: RunDataManager,
-# ) -> None:
-#     """It should noop on current=None."""
-#     run_id = "hello world"
-#     decoy.when(mock_engine_store.current_run_id).then_return("some other id")
-#
-#     with pytest.raises(RunNotCurrentError):
-#         await subject.update(run_id=run_id, current=False)
+    decoy.verify(
+        await mock_engine_store.clear(),
+    )
 
 
 # def test_get_commands_slice_current_run(
