@@ -30,7 +30,7 @@ from ..maintenance_run_models import (
     MaintenanceRunCreate,
     MaintenanceRunUpdate,
 )
-from ..engine_store import EngineConflictError
+from ..maintenance_engine_store import EngineConflictError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager, RunNotCurrentError
 from ..dependencies import get_maintenance_run_data_manager
 

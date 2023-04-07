@@ -15,7 +15,7 @@ from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
 from robot_server.protocols import ProtocolResource
-from robot_server.maintenance_runs.engine_store import EngineStore, EngineConflictError
+from robot_server.maintenance_runs.maintenance_engine_store import EngineStore, EngineConflictError
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ async def protocol_source(tmp_path: Path) -> ProtocolSource:
 
 async def test_create_engine(subject: EngineStore) -> None:
     """It should create an engine for a run."""
-    result = await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    result = await subject.create(run_id="run-id", labware_offsets=[])
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
@@ -61,7 +61,7 @@ async def test_create_engine_uses_robot_type(
     hardware_api = decoy.mock(cls=HardwareControlAPI)
     subject = EngineStore(hardware_api=hardware_api, robot_type=robot_type)
 
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.create(run_id="run-id", labware_offsets=[])
 
     assert subject.engine.state_view.config.robot_type == robot_type
 
@@ -77,7 +77,6 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[labware_offset],
-        protocol=None,
     )
 
     assert result.labwareOffsets == [

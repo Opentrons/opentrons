@@ -9,7 +9,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.hardware import get_hardware, get_robot_type
 
-from .engine_store import EngineStore
+from .maintenance_engine_store import EngineStore
 from .maintenance_run_data_manager import MaintenanceRunDataManager
 
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")

@@ -10,7 +10,7 @@ Examples of "runs" include:
   the frame lights on
 """
 from .router import maintenance_runs_router
-from .engine_store import EngineStore, EngineConflictError
+from .maintenance_engine_store import EngineStore, EngineConflictError
 from .dependencies import get_engine_store
 
 __all__ = [

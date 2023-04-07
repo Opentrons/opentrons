@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from .engine_store import EngineStore
+from .maintenance_engine_store import EngineStore
 from .maintenance_run_models import MaintenanceRun
 from .maintenance_action_models import MaintenanceRunAction
 
@@ -94,15 +94,10 @@ class MaintenanceRunDataManager:
         """
         prev_run_id = self._engine_store.current_run_id
         if prev_run_id is not None:
-            prev_run_result = await self._engine_store.clear()
-            # self._run_store.update_run_state(
-            #     run_id=prev_run_id,
-            #     summary=prev_run_result.state_summary,
-            #     commands=prev_run_result.commands,
-            # )
+            await self._engine_store.clear()
 
         state_summary = await self._engine_store.create(
-            run_id=run_id, labware_offsets=labware_offsets, protocol=None
+            run_id=run_id, labware_offsets=labware_offsets
         )
 
         return _build_run(

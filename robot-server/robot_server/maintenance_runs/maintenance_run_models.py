@@ -51,10 +51,7 @@ class MaintenanceRunCommandSummary(ResourceModel):
     # TODO(mc, 2022-02-01): this does not allow the command summary object to
     # be narrowed based on `commandType`. Will be resolved by TODO above
     params: CommandParams = Field(..., description="Command execution parameters.")
-    intent: Optional[CommandIntent] = Field(
-        None,
-        description="Why this command was added to the run.",
-    )
+
 
 
 class MaintenanceRun(ResourceModel):
@@ -93,13 +90,6 @@ class MaintenanceRun(ResourceModel):
     labwareOffsets: List[LabwareOffset] = Field(
         ...,
         description="Labware offsets to apply as labware are loaded.",
-    )
-    protocolId: Optional[str] = Field(
-        None,
-        description=(
-            "Protocol resource being run, if any. If not present, the run may"
-            " still be used to execute protocol commands over HTTP."
-        ),
     )
     completedAt: Optional[datetime] = Field(
         None,

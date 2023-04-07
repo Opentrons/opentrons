@@ -75,41 +75,10 @@ class EngineStore:
             else None
         )
 
-    # TODO(mc, 2022-03-21): this resource locking is insufficient;
-    # come up with something more sophisticated without race condition holes.
-    async def get_default_engine(self) -> ProtocolEngine:
-        """Get a "default" ProtocolEngine to use outside the context of a run.
-
-        Raises:
-            EngineConflictError: if a run-specific engine is active.
-        """
-        if (
-            self._runner_engine_pair is not None
-            and self.engine.state_view.commands.has_been_played()
-            and not self.engine.state_view.commands.get_is_stopped()
-        ):
-            raise EngineConflictError("An engine for a run is currently active")
-
-        engine = self._default_engine
-
-        if engine is None:
-            # TODO(mc, 2022-03-21): potential race condition
-            engine = await create_protocol_engine(
-                hardware_api=self._hardware_api,
-                config=ProtocolEngineConfig(
-                    robot_type=self._robot_type,
-                    block_on_door_open=False,
-                ),
-            )
-            self._default_engine = engine
-
-        return engine
-
     async def create(
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
-        protocol: Optional[ProtocolResource],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -137,11 +106,7 @@ class EngineStore:
         if self._runner_engine_pair is not None:
             raise EngineConflictError("Another run is currently active.")
 
-        if protocol is not None:
-            # FIXME(mm, 2022-12-21): This `await` introduces a concurrency hazard. If
-            # two requests simultaneously call this method, they will both "succeed"
-            # (with undefined results) instead of one raising EngineConflictError.
-            await runner.load(protocol.source)
+        # TODO (spp): set live runner start func
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)

@@ -6,7 +6,7 @@ from opentrons.protocol_engine import ProtocolEngineError
 
 from robot_server.service.task_runner import TaskRunner
 
-from .engine_store import EngineStore
+from .maintenance_engine_store import EngineStore
 from .maintenance_action_models import MaintenanceRunAction, MaintenanceRunActionType
 
 

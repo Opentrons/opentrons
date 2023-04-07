@@ -28,7 +28,7 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
 )
-from robot_server.maintenance_runs.engine_store import EngineConflictError
+from robot_server.maintenance_runs.maintenance_engine_store import EngineConflictError
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
     RunNotCurrentError,
