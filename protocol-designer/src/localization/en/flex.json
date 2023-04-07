@@ -1,0 +1,11 @@
+{
+  "landing_page": {
+    "welcome": "Welcome to Protocol Designer",
+    "create_flex_protocol": "Create new Opentrons Flex protocol",
+    "create_ot2_protocol": "Create new OT-2 protocol",
+    "import_protocol": "Import a protocol"
+  },
+  "header": {
+    "title": "Create new Opentrons Flex protocol"
+  }
+}

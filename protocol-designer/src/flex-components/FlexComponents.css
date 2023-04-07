@@ -1,0 +1,29 @@
+@import '@opentrons/components';
+
+.pd_landing_page {
+  width: 50%;
+  text-align: center;
+  margin: 86px auto auto;
+}
+
+.ot_flex_logo {
+  width: 160px;
+  height: 160px;
+  margin: 50px auto;
+}
+
+.flex_landing_buttons_wrapper {
+  width: 50%;
+  margin: auto;
+}
+
+.flex_landing_button {
+  margin: 0.75rem 0;
+  height: 3rem;
+  width: 100%;
+}
+
+.flex_landing_button input {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}
