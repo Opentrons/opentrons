@@ -15,7 +15,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
-import screenImage from '../../assets/images/odd/odd_abstract@x2.png'
+import screenImage from '../../assets/images/OnDeviceDisplay/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'finish setting up a robot'
 

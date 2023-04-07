@@ -123,6 +123,6 @@
   "both_mounts": "Both Mounts",
   "ready": "Ready",
   "run_again": "Run again",
-  "have_not_run": "You haven’t run anything!",
-  "have_not_run_description": "Send a protocol to your OT-3 from the desktop app to get started!"
+  "no_recent_runs": "No recent runs",
+  "no_recent_runs_description": "After you run some protocols, they will appear here."
 }
