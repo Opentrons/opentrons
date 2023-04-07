@@ -19,11 +19,11 @@ import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { FLOWS } from '../PipetteWizardFlows/constants'
+import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
-import { Portal } from '../../App/__mocks__/portal'
-import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import type { StyleProps } from '@opentrons/components'
 
 interface InstrumentInfoProps {
   instrument: InstrumentData
@@ -42,7 +42,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       instrument.instrumentModel === 'p1000_96'
         ? NINETY_SIX_CHANNEL
         : SINGLE_MOUNT_PIPETTES,
-    setSelectedPipette: () => {},
+    setSelectedPipette: () => { },
     closeFlow: () => {
       setWizardProps(null)
     },
@@ -64,9 +64,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     setWizardProps(
       instrument.instrumentModel === 'gripperV1'
         ? {
-            ...sharedGripperWizardProps,
-            flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
-          }
+          ...sharedGripperWizardProps,
+          flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+        }
         : { ...sharedPipetteWizardProps, flowType: FLOWS.CALIBRATE }
     )
   }
@@ -77,25 +77,10 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-        <InfoItem>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('last_calibrated')}
-          </StyledText>
-          <StyledText as="h4">TODO</StyledText>
-        </InfoItem>
-        <InfoItem>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('firmware_version')}
-          </StyledText>
-          <StyledText as="h4">TODO</StyledText>
-        </InfoItem>
-        <InfoItem>
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('serial_number')}
-          </StyledText>
-          <StyledText as="h4">{instrument.serialNumber}</StyledText>
-        </InfoItem>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3} marginTop={SPACING.spacing5}>
+        <InfoItem label={t('last_calibrated')} value="TODO" />
+        <InfoItem label={t('firmware_version')} value="TODO" />
+        <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
       </Flex>
       <Flex gridGap={SPACING.spacing3}>
         <MediumButton
@@ -115,19 +100,24 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
           justifyContent={JUSTIFY_CENTER}
         />
       </Flex>
-      <Portal>
-        {wizardProps != null && 'mount' in wizardProps ? (
+      {
+        wizardProps != null && 'mount' in wizardProps ? (
           <PipetteWizardFlows {...wizardProps} />
-        ) : null}
-        {wizardProps != null && !('mount' in wizardProps) ? (
+        ) : null
+      }
+      {
+        wizardProps != null && !('mount' in wizardProps) ? (
           <GripperWizardFlows {...wizardProps} />
-        ) : null}
-      </Portal>
-    </Flex>
+        ) : null
+      }
+    </Flex >
   )
 }
 
-type InfoItemProps = React.ComponentProps<typeof Flex>
+interface InfoItemProps extends StyleProps {
+  label: string
+  value: string
+}
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
@@ -136,8 +126,23 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight36}
-      fontSize={TYPOGRAPHY.fontSize22}
       {...props}
-    />
+    >
+      <StyledText
+        as="h4"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        fontSize={TYPOGRAPHY.fontSize28}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}>
+        {props.label}
+      </StyledText>
+      <StyledText
+        as="h4"
+        color={COLORS.darkBlack_seventy}
+        fontSize={TYPOGRAPHY.fontSize28}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+      >
+        {props.value}
+      </StyledText>
+    </Flex>
   )
 }
