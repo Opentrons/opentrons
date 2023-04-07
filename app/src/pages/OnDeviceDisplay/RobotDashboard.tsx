@@ -11,42 +11,21 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
-import { MiniCardButton } from '../../molecules/MiniCardButton'
+import { Chip } from '../../atoms/Chip'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 
 import abstractImage from '../../assets/images/odd/abstract@x2.png'
 
-import type { MiniCardButtonProps } from '../../molecules/MiniCardButton'
-
-// TODO: kj 12/0/7/2022 this part will be update when hi-fi is ready
-const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
-  {
-    iconName: 'wifi',
-    cardName: 'Run a protocol',
-    destinationPath: '/protocols',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Instrument + Module Hub',
-    destinationPath: '/attach-instruments',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Settings',
-    destinationPath: '/robot-settings',
-  },
-]
+export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
 
-  // ToDo kj 12/07/2022 get protocol runs and add conditional rendering
-  // if there is no run data, shows the following
   return (
     <Flex
       padding={`${String(SPACING.spacing6)} ${String(
@@ -55,14 +34,15 @@ export function RobotDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
-      <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
-        {t('run_again')}
-      </StyledText>
-      <Flex
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <StyledText
+          fontSize={TYPOGRAPHY.fontSize20}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
+          {t('run_again')}
+        </StyledText>
+        {/* <Flex
         width="100%"
         height="14.375rem"
         backgroundColor={COLORS.fundamentalsBackground}
@@ -94,26 +74,54 @@ export function RobotDashboard(): JSX.Element {
         >
           {t('have_not_run_description')}
         </StyledText>
+      </Flex> */}
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
+          <RecentRunCard />
+          <RecentRunCard />
+        </Flex>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
-        marginTop="1.3125rem"
+    </Flex>
+  )
+}
+
+interface RecentRunCardProps {
+  moduleStatus: string // also need to pass the module status type
+  protocolName: string // need to change
+  lastRun: string
+}
+
+function RecentRunCard(): JSX.Element {
+  // function LastRunCard({ moduleStatus, protocolName, lastRun }): JSX.Element {
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      padding={SPACING.spacing5}
+      gridGap={SPACING.spacing5}
+      backgroundColor={COLORS.green_three}
+      width="25.8125rem"
+      borderRadius={BORDERS.size_four}
+    >
+      {/* marginLeft is needed to cancel chip's padding */}
+      <Flex marginLeft={`-${SPACING.spacing4}`}>
+        <Chip type="success" background={false} text={'Ready to run'} />
+      </Flex>
+      <Flex width="100%" height="14rem">
+        <StyledText
+          fontSize={TYPOGRAPHY.fontSize32}
+          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          lineHeight={TYPOGRAPHY.lineHeight42}
+        >
+          {'Covid-19 qPCR Prep (Station C)'}
+        </StyledText>
+      </Flex>
+      <StyledText
+        fontSize={TYPOGRAPHY.fontSize22}
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+        lineHeight={TYPOGRAPHY.lineHeight28}
+        color={COLORS.darkBlack_seventy}
       >
-        {DASHBOARD_ITEMS.map((card, index) => (
-          <MiniCardButton key={`miniCardButton_${index}`} {...card} />
-        ))}
-      </Flex>
-      {/* temp button to robot dashboard until we can detect setup status */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
+        {'Last run 1 min ago'}
+      </StyledText>
     </Flex>
   )
 }
