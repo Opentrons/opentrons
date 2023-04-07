@@ -13,15 +13,19 @@ interface DetachProbeProps extends PipetteWizardStepProps {
 
 export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   const { isRobotMoving, goBack, handleCleanUp } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t, i18n } = useTranslation('pipette_wizard_flows')
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   return (
     <GenericWizardTile
-      header={t('remove_cal_probe')}
+      header={i18n.format(t('remove_cal_probe'), 'capitalize')}
       //  TODO(Jr, 10/26/22): replace image with correct one!
       rightHandBody={<img src={removeProbe} width="100%" alt="Remove probe" />}
-      bodyText={<StyledText css={BODY_STYLE}>{t('remove_probe')}</StyledText>}
+      bodyText={
+        <StyledText css={BODY_STYLE}>
+          {i18n.format(t('remove_probe'), 'capitalize')}
+        </StyledText>
+      }
       proceedButtonText={t('complete_cal')}
       proceed={handleCleanUp}
       back={goBack}

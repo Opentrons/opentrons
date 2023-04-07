@@ -127,6 +127,10 @@ def _retract(
         force_direct=True,
         speed=config.TIP_SPEED_WHILE_RETRACTING,
     )
+    pipette.move_to(
+        well.top().move(channel_offset),
+        force_direct=True,
+    )
 
 
 def _pipette_with_liquid_settings(
