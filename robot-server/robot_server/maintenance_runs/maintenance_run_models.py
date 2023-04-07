@@ -1,4 +1,4 @@
-"""Request and response models for run resources."""
+"""Request and response models for maintenance run resources."""
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -17,11 +17,11 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     Liquid,
 )
+from robot_server.maintenance_runs.maintenance_action_models import MaintenanceRunAction
 from robot_server.service.json_api import ResourceModel
-from .maintenance_action_models import MaintenanceRunAction
 
 
-# TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
+# TODO(mc, 2022-02-01): since the `/maintenance_runs/:run_id/commands` response is now paginated,
 # this summary model is a lot less useful. Remove and replace with full `Command`
 # models once problematically large objects like full labware and module definitions
 # are no longer part of the public command.result API
@@ -70,6 +70,10 @@ class MaintenanceRun(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
+    actions: List[MaintenanceRunAction] = Field(
+        ...,
+        description="Client-initiated run control actions.",
+    )
     errors: List[ErrorOccurrence] = Field(
         ...,
         description="Any errors that have occurred during the run.",
@@ -93,13 +97,6 @@ class MaintenanceRun(ResourceModel):
     labwareOffsets: List[LabwareOffset] = Field(
         ...,
         description="Labware offsets to apply as labware are loaded.",
-    )
-    protocolId: Optional[str] = Field(
-        None,
-        description=(
-            "Protocol resource being run, if any. If not present, the run may"
-            " still be used to execute protocol commands over HTTP."
-        ),
     )
     completedAt: Optional[datetime] = Field(
         None,
@@ -139,3 +136,11 @@ class LabwareDefinitionSummary(BaseModel):
         ...,
         description="The definition's unique resource identifier in the run.",
     )
+
+
+class MaintenanceRunNotFoundError(ValueError):
+    """Error raised when a given Run ID is not found in the store."""
+
+    def __init__(self, run_id: str) -> None:
+        """Initialize the error message from the missing ID."""
+        super().__init__(f"Run {run_id} was not found.")

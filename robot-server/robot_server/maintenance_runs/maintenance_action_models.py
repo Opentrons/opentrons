@@ -10,9 +10,13 @@ class MaintenanceRunActionType(str, Enum):
     """Types of run control actions.
 
     Args:
-        STOP: Stop (cancel) a run.
+    PLAY: Start or resume a protocol run.
+    PAUSE: Pause a run.
+    STOP: Stop (cancel) a run.
     """
 
+    PLAY = "play"
+    PAUSE = "pause"
     STOP = "stop"
 
 
@@ -23,13 +27,13 @@ class MaintenanceRunActionCreate(BaseModel):
 
 
 class MaintenanceRunAction(ResourceModel):
-    """Run control action model.
+    """Maintenance Run control action model.
 
     A RunAction resource represents a client-provided command to
     the run in order to control the execution of the run itself.
 
-    This is different than a protocol command, which represents an individual
-    robotic procedure to execute as part of a protocol.
+    This is different than a run command, which represents an individual
+    robotic procedure to execute.
     """
 
     id: str = Field(..., description="A unique identifier to reference the command.")

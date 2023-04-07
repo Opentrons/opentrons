@@ -9,20 +9,24 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import EngineStatus, types as pe_types
 from opentrons.protocols.models import LabwareDefinition
 
-from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, SimpleBody
-from robot_server.runs.run_models import Run, LabwareDefinitionSummary
-from robot_server.runs.engine_store import EngineStore
-from robot_server.runs.router.labware_router import (
+from robot_server.maintenance_runs.maintenance_run_models import (
+    MaintenanceRun,
+    LabwareDefinitionSummary,
+)
+from robot_server.maintenance_runs.maintenance_engine_store import (
+    MaintenanceEngineStore,
+)
+from robot_server.maintenance_runs.router.labware_router import (
     add_labware_offset,
     add_labware_definition,
 )
 
 
 @pytest.fixture()
-def run() -> Run:
+def run() -> MaintenanceRun:
     """Get a fixture Run response data."""
-    return Run(
+    return MaintenanceRun(
         id="run-id",
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.IDLE,
@@ -33,7 +37,6 @@ def run() -> Run:
         labware=[],
         modules=[],
         labwareOffsets=[],
-        protocolId=None,
         liquids=[],
     )
 
@@ -46,8 +49,8 @@ def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition
 
 async def test_add_labware_offset(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
-    run: Run,
+    mock_maintenance_engine_store: MaintenanceEngineStore,
+    run: MaintenanceRun,
 ) -> None:
     """It should add the labware offset to the engine, assuming the run is current."""
     labware_offset_request = pe_types.LabwareOffsetCreate(
@@ -65,12 +68,12 @@ async def test_add_labware_offset(
     )
 
     decoy.when(
-        mock_engine_store.engine.add_labware_offset(labware_offset_request)
+        mock_maintenance_engine_store.engine.add_labware_offset(labware_offset_request)
     ).then_return(labware_offset)
 
     result = await add_labware_offset(
         request_body=RequestModel(data=labware_offset_request),
-        engine_store=mock_engine_store,
+        engine_store=mock_maintenance_engine_store,
         run=run,
     )
 
@@ -78,69 +81,24 @@ async def test_add_labware_offset(
     assert result.status_code == 201
 
 
-async def test_add_labware_offset_not_current(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    run: Run,
-) -> None:
-    """It should 409 if the run is not current."""
-    not_current_run = run.copy(update={"current": False})
-
-    labware_offset_request = pe_types.LabwareOffsetCreate(
-        definitionUri="namespace_1/load_name_1/123",
-        location=pe_types.LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
-        vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
-    )
-
-    with pytest.raises(ApiError) as exc_info:
-        await add_labware_offset(
-            request_body=RequestModel(data=labware_offset_request),
-            engine_store=mock_engine_store,
-            run=not_current_run,
-        )
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
-
-
 async def test_add_labware_definition(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
-    run: Run,
+    mock_maintenance_engine_store: MaintenanceEngineStore,
+    run: MaintenanceRun,
     labware_definition: LabwareDefinition,
 ) -> None:
     """It should be able to add a labware definition to the engine."""
     uri = pe_types.LabwareUri("some/definition/uri")
 
     decoy.when(
-        mock_engine_store.engine.add_labware_definition(labware_definition)
+        mock_maintenance_engine_store.engine.add_labware_definition(labware_definition)
     ).then_return(uri)
 
     result = await add_labware_definition(
-        engine_store=mock_engine_store,
+        engine_store=mock_maintenance_engine_store,
         run=run,
         request_body=RequestModel(data=labware_definition),
     )
 
     assert result.content.data == LabwareDefinitionSummary(definitionUri=uri)
     assert result.status_code == 201
-
-
-async def test_add_labware_definition_not_current(
-    decoy: Decoy,
-    mock_engine_store: EngineStore,
-    run: Run,
-    labware_definition: LabwareDefinition,
-) -> None:
-    """It should 409 if the run is not current."""
-    not_current_run = run.copy(update={"current": False})
-
-    with pytest.raises(ApiError) as exc_info:
-        await add_labware_definition(
-            engine_store=mock_engine_store,
-            run=not_current_run,
-            request_body=RequestModel(data=labware_definition),
-        )
-
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
