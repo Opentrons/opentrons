@@ -15,7 +15,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
   const { title, hasExitIcon, iconName, iconColor, onClick } = props
   return (
     <Flex
-      height="100px"
+      height="6.25rem"
       width="100%"
       padding={SPACING.spacing6}
       flexDirection={DIRECTION_ROW}

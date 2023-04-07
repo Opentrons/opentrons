@@ -44,4 +44,4 @@ export const bigDropShadow = '0 3px 6px rgba(255, 0, 0, 1)'
 export const smallDropShadow = '0px 3px 6px rgba(0, 0, 0, 0.23)'
 
 // touch screen
-export const shadowSmall = `0px 0px 40px 0px ${black}${opacity40HexCode}`
+export const shadowSmall = '0px 0px 40px rgba(0, 0, 0, 0.4)'

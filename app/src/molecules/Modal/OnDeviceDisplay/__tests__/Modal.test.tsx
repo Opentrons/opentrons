@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { ModalHeader } from '../ModalHeader'
 import { Modal } from '../Modal'
@@ -21,10 +20,10 @@ describe('Modal', () => {
     mockModalHeader.mockReturnValue(<div>mock Modal Header</div>)
   })
   it('should render the modal with no header', () => {
-    const { getByText, getByLabelText } = render(props)
+    const { getByText, getByLabelText, queryByText } = render(props)
     getByText('children')
     getByLabelText('modal_medium')
-    expect(screen.queryByText('mock Modal Header')).not.toBeInTheDocument()
+    expect(queryByText('mock Modal Header')).not.toBeInTheDocument()
   })
   it('should render the modal with header and large modal size', () => {
     props = {
