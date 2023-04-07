@@ -13,10 +13,10 @@ import { ModalHeader } from './ModalHeader'
 import type { ModalHeaderProps, ModalSize } from './types'
 
 interface ModalProps {
-  /*  clicking anywhere outside of the modal closes it  */
+  /** clicking anywhere outside of the modal closes it  */
   onOutsideClick: React.MouseEventHandler
   children: React.ReactNode
-  /*  for small, medium, or large modal sizes, medium by default */
+  /** for small, medium, or large modal sizes, medium by default */
   modalSize?: ModalSize
   header?: ModalHeaderProps
 }
