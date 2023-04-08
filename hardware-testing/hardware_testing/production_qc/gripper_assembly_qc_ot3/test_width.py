@@ -59,7 +59,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             sim_enc_pox = (max_width - width) / 2.0
             api._backend._encoder_position[NodeId.gripper_g] = sim_enc_pox
             await api.refresh_positions()
-        _width_actual = api._gripper_handler.get_gripper().jaw_width
+        _width_actual = api.jaw_width
         assert _width_actual is not None
         print(f"actual width: {_width_actual}")
         result = CSVResult.from_bool(
