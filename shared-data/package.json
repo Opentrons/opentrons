@@ -12,7 +12,7 @@
   "types": "lib/js/index.d.ts",
   "flow:main": "flow-types/js/index.js.flow",
   "dependencies": {
-    "ajv": "6.10.2",
+    "ajv": "^6.12.3",
     "html-react-parser": "^1.2.8",
     "lodash": "4.17.21",
     "svgson": "^5.2.1"

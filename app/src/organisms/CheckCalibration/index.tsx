@@ -68,7 +68,16 @@ const STEPS_IN_ORDER_ONE_PIPETTE: RobotCalibrationCheckStep[] = [
   Sessions.CHECK_STEP_RETURNING_TIP,
   Sessions.CHECK_STEP_RESULTS_SUMMARY,
 ]
-const STEPS_IN_ORDER_SECOND_PIPETTE: RobotCalibrationCheckStep[] = [
+const STEPS_IN_ORDER_BOTH_PIPETTES: RobotCalibrationCheckStep[] = [
+  Sessions.CHECK_STEP_SESSION_STARTED,
+  Sessions.CHECK_STEP_LABWARE_LOADED,
+  Sessions.CHECK_STEP_COMPARING_NOZZLE,
+  Sessions.CHECK_STEP_PREPARING_PIPETTE,
+  Sessions.CHECK_STEP_INSPECTING_TIP,
+  Sessions.CHECK_STEP_COMPARING_TIP,
+  Sessions.CHECK_STEP_COMPARING_HEIGHT,
+  Sessions.CHECK_STEP_COMPARING_POINT_ONE,
+  Sessions.CHECK_STEP_RETURNING_TIP,
   Sessions.CHECK_STEP_LABWARE_LOADED,
   Sessions.CHECK_STEP_COMPARING_NOZZLE,
   Sessions.CHECK_STEP_PREPARING_PIPETTE,
@@ -86,12 +95,11 @@ function getStepIndexCheckingBothPipettes(
   rank: RobotCalibrationCheckPipetteRank | null
 ): number {
   if (currentStep == null || rank == null) return 0
-  return (
-    (rank === CHECK_PIPETTE_RANK_FIRST
-      ? STEPS_IN_ORDER_ONE_PIPETTE.findIndex(step => step === currentStep)
-      : STEPS_IN_ORDER_SECOND_PIPETTE.findIndex(step => step === currentStep) +
-        7) ?? 0
-  )
+  return rank === CHECK_PIPETTE_RANK_FIRST
+    ? STEPS_IN_ORDER_BOTH_PIPETTES.findIndex(step => step === currentStep)
+    : STEPS_IN_ORDER_BOTH_PIPETTES.slice(9).findIndex(
+        step => step === currentStep
+      ) + 9
 }
 
 export function CheckCalibration(
@@ -175,7 +183,7 @@ export function CheckCalibration(
             currentStep={stepIndex}
             totalSteps={
               checkBothPipettes
-                ? STEPS_IN_ORDER_SECOND_PIPETTE.length - 1 + 7
+                ? STEPS_IN_ORDER_BOTH_PIPETTES.length - 1
                 : STEPS_IN_ORDER_ONE_PIPETTE.length - 1
             }
             onExit={confirmExit}

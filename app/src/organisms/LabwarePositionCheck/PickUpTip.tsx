@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import isEqual from 'lodash/isEqual'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { RobotMotionLoader } from './RobotMotionLoader'
@@ -16,51 +17,49 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'
+import { getLabwareDef } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-import { chainRunCommands } from './utils/chainRunCommands'
 
 import type { Jog } from '../../molecules/JogControls/types'
 import type {
   PickUpTipStep,
   RegisterPositionAction,
-  CreateRunCommand,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset, VectorOffset } from '@opentrons/api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
   registerPosition: React.Dispatch<RegisterPositionAction>
-  createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
-  const { t } = useTranslation('labware_position_check')
+  const { t } = useTranslation(['labware_position_check', 'shared'])
   const {
     labwareId,
     pipetteId,
     location,
     protocolData,
     proceed,
-    createRunCommand,
+    chainRunCommands,
     registerPosition,
     handleJog,
     isRobotMoving,
     existingOffsets,
+    workingOffsets,
+    setFatalError,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
-  const [
-    initialPosition,
-    setInitialPosition,
-  ] = React.useState<VectorOffset | null>(null)
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipetteName =
@@ -83,6 +82,13 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       }}
     />,
   ]
+
+  const initialPosition = workingOffsets.find(
+    o =>
+      o.labwareId === labwareId &&
+      isEqual(o.location, location) &&
+      o.initialPosition != null
+  )?.initialPosition
 
   const handleConfirmPlacement = (): void => {
     const modulePrepCommands = protocolData.modules.reduce<CreateCommand[]>(
@@ -120,40 +126,54 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             wellLocation: { origin: 'top' as const },
           },
         },
+        { commandType: 'savePosition', params: { pipetteId } },
       ],
-      createRunCommand,
-      () => {
-        createRunCommand(
-          {
-            command: { commandType: 'savePosition', params: { pipetteId } },
-            waitUntilComplete: true,
-          },
-          {
-            onSuccess: response => {
-              setInitialPosition(response.data.result?.position)
-            },
-          }
-        )
-      }
+      false
     )
+      .then(responses => {
+        const finalResponse = responses[responses.length - 1]
+        if (finalResponse.data.commandType === 'savePosition') {
+          const { position } = finalResponse.data.result
+          registerPosition({
+            type: 'initialPosition',
+            labwareId,
+            location,
+            position,
+          })
+        } else {
+          setFatalError(
+            `PickUpTip failed to save position for initial placement.`
+          )
+        }
+      })
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to save position for initial placement with message: ${e.message}`
+        )
+      })
   }
   const handleConfirmPosition = (): void => {
-    createRunCommand(
-      {
-        command: { commandType: 'savePosition', params: { pipetteId } },
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: response => {
-          const { position } = response.data.result
+    chainRunCommands(
+      [{ commandType: 'savePosition', params: { pipetteId } }],
+      false
+    )
+      .then(responses => {
+        if (responses[0].data.commandType === 'savePosition') {
+          const { position } = responses[0].data.result
           const offset =
             initialPosition != null
               ? getVectorDifference(position, initialPosition)
               : position
+          registerPosition({
+            type: 'finalPosition',
+            labwareId,
+            location,
+            position,
+          })
           registerPosition({ type: 'tipPickUpOffset', offset })
-          createRunCommand(
-            {
-              command: {
+          chainRunCommands(
+            [
+              {
                 commandType: 'pickUpTip',
                 params: {
                   pipetteId,
@@ -162,17 +182,22 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
                   wellLocation: { origin: 'top', offset },
                 },
               },
-              waitUntilComplete: true,
-            },
-            {
-              onSuccess: () => {
-                setShowTipConfirmation(true)
-              },
-            }
+            ],
+            false
           )
-        },
-      }
-    )
+            .then(() => setShowTipConfirmation(true))
+            .catch((e: Error) => {
+              setFatalError(
+                `PickUpTip failed to move from final position with message: ${e.message}`
+              )
+            })
+        }
+      })
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to save final position with message: ${e.message}`
+        )
+      })
   }
 
   const handleConfirmTipAttached = (): void => {
@@ -196,14 +221,19 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
       ],
-      createRunCommand,
-      proceed
+      false
     )
+      .then(() => proceed())
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to move to safe location after tip pick up with message: ${e.message}`
+        )
+      })
   }
   const handleInvalidateTip = (): void => {
-    createRunCommand(
-      {
-        command: {
+    chainRunCommands(
+      [
+        {
           commandType: 'dropTip',
           params: {
             pipetteId,
@@ -211,17 +241,61 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             wellName: 'A1',
           },
         },
-        waitUntilComplete: true,
-      },
-      {
-        onSuccess: () => {
-          registerPosition({ type: 'tipPickUpOffset', offset: null })
-          setShowTipConfirmation(false)
-          setInitialPosition(null)
+        {
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: labwareId,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
         },
-      }
+      ],
+      false
     )
+      .then(() => {
+        registerPosition({ type: 'tipPickUpOffset', offset: null })
+        registerPosition({
+          type: 'finalPosition',
+          labwareId,
+          location,
+          position: null,
+        })
+        setShowTipConfirmation(false)
+      })
+      .catch((e: Error) => {
+        setFatalError(`PickUpTip failed to drop tip with message: ${e.message}`)
+      })
   }
+  const handleGoBack = (): void => {
+    chainRunCommands(
+      [
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
+      false
+    )
+      .then(() => {
+        registerPosition({
+          type: 'initialPosition',
+          labwareId,
+          location,
+          position: null,
+        })
+      })
+      .catch((e: Error) => {
+        setFatalError(
+          `PickUpTip failed to clear tip rack with message: ${e.message}`
+        )
+      })
+  }
+
   const existingOffset =
     getCurrentOffsetForLabwareInLocation(
       existingOffsets,
@@ -229,7 +303,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       location
     )?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving) return <RobotMotionLoader />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return showTipConfirmation ? (
     <TipConfirmation
       invalidateTip={handleInvalidateTip}
@@ -248,11 +325,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           labwareDef={labwareDef}
           pipetteName={pipetteName}
           handleConfirmPosition={handleConfirmPosition}
-          handleGoBack={() => setInitialPosition(null)}
+          handleGoBack={handleGoBack}
           handleJog={handleJog}
-          initialPosition={IDENTITY_VECTOR}
+          initialPosition={initialPosition}
           existingOffset={existingOffset}
-          showLiveOffset={false}
         />
       ) : (
         <PrepareSpace

@@ -167,6 +167,8 @@ async def test_liquid_probe(
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
         log_pressure=False,
+        auto_zero_sensor=True,
+        num_baseline_reads=8,
         sensor_id=SensorId.S0,
     )
     assert position[motor_node][0] == 14
@@ -194,6 +196,8 @@ async def test_liquid_probe(
             plunger_speed=8,
             threshold_pascals=threshold_pascals,
             log_pressure=True,
+            auto_zero_sensor=True,
+            num_baseline_reads=8,
             sensor_id=SensorId.S0,
         )
         mock_bind_output.assert_called()

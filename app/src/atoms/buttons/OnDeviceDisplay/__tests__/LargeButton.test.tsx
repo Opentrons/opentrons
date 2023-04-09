@@ -14,6 +14,7 @@ describe('LargeButton', () => {
       onClick: jest.fn(),
       buttonType: 'primary',
       buttonText: 'large button',
+      iconName: 'play-round-corners',
     }
   })
   it('renders the default button and it works as expected', () => {
@@ -51,13 +52,5 @@ describe('LargeButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toBeDisabled()
-  })
-  it('renders custom icon in the button', () => {
-    props = {
-      ...props,
-      iconName: 'restart',
-    }
-    const { getByLabelText } = render(props)
-    getByLabelText('LargeButton_restart')
   })
 })

@@ -84,7 +84,7 @@ export function CommandText(props: Props): JSX.Element | null {
           t('tc_run_profile_steps', { celsius: celsius, seconds: holdSeconds })
       )
       return (
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
           <StyledText marginBottom={SPACING.spacing2} {...styleProps}>
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,

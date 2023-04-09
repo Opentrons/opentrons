@@ -110,7 +110,7 @@ ot3_dummy_settings = {
     },
     "log_level": "NADA",
     "z_retract_distance": 10,
-    "grip_jaw_home_duty_cycle": 25,
+    "safe_home_distance": 5,
     "deck_transform": [[-0.5, 0, 1], [0.1, -2, 4], [0, 0, -1]],
     "carriage_offset": (1, 2, 3),
     "right_mount_offset": (3, 2, 1),
@@ -126,6 +126,8 @@ ot3_dummy_settings = {
         "expected_liquid_height": 90,
         "log_pressure": True,
         "aspirate_while_sensing": False,
+        "auto_zero_sensor": True,
+        "num_baseline_reads": 10,
         "data_file": "/var/pressure_sensor_data.csv",
     },
     "calibration": {
@@ -138,18 +140,6 @@ ot3_dummy_settings = {
             },
         },
         "edge_sense": {
-            "overrun_tolerance_mm": 2,
-            "early_sense_tolerance_mm": 17,
-            "pass_settings": {
-                "prep_distance_mm": 4,
-                "max_overrun_distance_mm": 5,
-                "speed_mm_per_s": 6,
-                "sensor_threshold_pf": 7,
-            },
-            "search_initial_tolerance_mm": 18,
-            "search_iteration_limit": 3,
-        },
-        "edge_sense_binary": {
             "overrun_tolerance_mm": 2,
             "early_sense_tolerance_mm": 17,
             "pass_settings": {

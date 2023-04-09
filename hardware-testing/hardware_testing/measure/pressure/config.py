@@ -57,8 +57,8 @@ PRESSURE_NONE = PressureEventConfig(
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_INSERTED = PressureEventConfig(
-    min=200.0,
-    max=500.0,
+    min=0.0,
+    max=700.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,

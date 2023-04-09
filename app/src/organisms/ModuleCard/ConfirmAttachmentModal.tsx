@@ -10,15 +10,15 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   Link,
+  PrimaryButton,
+  CheckboxField,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'
 import { updateConfigValue } from '../../redux/config'
-import { CheckboxField } from '../../atoms/CheckboxField'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
-import { shouldLevel } from '@opentrons/shared-data'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,13 +11,12 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
   ALIGN_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
-import { LevelPipette } from './LevelPipette'
 
 import type {
   PipetteNameSpecs,
@@ -38,8 +36,9 @@ interface Props {
   setWantedName: (name: string | null) => void
   back: () => void
   confirm: () => void
-  stepPage: number
-  setStepPage: React.Dispatch<React.SetStateAction<number>>
+  currentStepCount: number
+  nextStep: () => void
+  prevStep: () => void
   attachedWrong: boolean
 }
 
@@ -63,12 +62,18 @@ export function Instructions(props: Props): JSX.Element {
     direction,
     back,
     mount,
-    stepPage,
-    setStepPage,
+    currentStepCount,
+    nextStep,
+    prevStep,
     confirm,
-    attachedWrong,
   } = props
   const { t } = useTranslation('change_pipette')
+
+  React.useEffect(() => {
+    if (direction === 'detach' && currentStepCount === 0) {
+      nextStep()
+    }
+  })
 
   const channels = actualPipette
     ? actualPipette.channels
@@ -81,9 +86,7 @@ export function Instructions(props: Props): JSX.Element {
 
   //  hide continue button if no pipette is selected
   const continueButton = noPipetteSelected ? null : (
-    <PrimaryButton onClick={() => setStepPage(1)}>
-      {t('continue')}
-    </PrimaryButton>
+    <PrimaryButton onClick={() => nextStep()}>{t('continue')}</PrimaryButton>
   )
 
   return (
@@ -95,13 +98,18 @@ export function Instructions(props: Props): JSX.Element {
           marginBottom="12.8rem"
         >
           {direction === 'attach' &&
-          stepPage === 0 &&
+          currentStepCount === 0 &&
           wantedPipette === null ? (
-            <PipetteSelection onPipetteChange={setWantedName} />
+            <PipetteSelection
+              onPipetteChange={pipetteName => {
+                setWantedName(pipetteName)
+                nextStep()
+              }}
+            />
           ) : null}
         </Flex>
       )}
-      {stepPage < 2 ? (
+      {currentStepCount < 3 && (
         <>
           {(actualPipette || wantedPipette) && (
             <Flex
@@ -110,13 +118,13 @@ export function Instructions(props: Props): JSX.Element {
               height="14.5rem"
             >
               <InstructionStep
-                diagram={stepPage === 0 ? 'screws' : 'tab'}
+                diagram={currentStepCount === 1 ? 'screws' : 'tab'}
                 {...{ direction, mount, channels, displayCategory }}
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
                   <Trans
                     t={t}
-                    i18nKey={stepPage === 0 ? stepOne : stepTwo}
+                    i18nKey={currentStepCount === 1 ? stepOne : stepTwo}
                     components={{
                       h1: (
                         <StyledText
@@ -128,7 +136,7 @@ export function Instructions(props: Props): JSX.Element {
                     }}
                   />
 
-                  {direction === 'attach' && stepPage === 0 ? (
+                  {direction === 'attach' && currentStepCount === 1 ? (
                     channels === 8 ? (
                       <Flex flexDirection={DIRECTION_ROW}>
                         <Trans
@@ -166,35 +174,34 @@ export function Instructions(props: Props): JSX.Element {
             marginTop="5.9rem"
           >
             <Btn
-              onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
+              onClick={() => {
+                if (currentStepCount === 0) {
+                  back()
+                } else if (currentStepCount === 1) {
+                  prevStep()
+                  if (wantedPipette != null) setWantedName(null)
+                  if (direction === 'detach') back()
+                } else {
+                  prevStep()
+                }
+              }}
             >
               <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
             </Btn>
-            {stepPage === 0 ? (
+            {currentStepCount < 2 ? (
               continueButton
             ) : (
               <CheckPipettesButton
                 robotName={robotName}
-                actualPipette={actualPipette ?? undefined}
-                onDone={
-                  wantedPipette != null &&
-                  actualPipette != null &&
-                  shouldLevel(wantedPipette) &&
-                  !attachedWrong
-                    ? () => setStepPage(2)
-                    : confirm
-                }
+                direction={direction}
+                onDone={() => {
+                  confirm()
+                  nextStep()
+                }}
               />
             )}
           </Flex>
         </>
-      ) : (
-        <LevelPipette
-          mount={mount}
-          pipetteModelName={actualPipette ? actualPipette.name : ''}
-          confirm={confirm}
-          back={() => setStepPage(1)}
-        />
       )}
     </>
   )

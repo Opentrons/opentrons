@@ -57,12 +57,10 @@ export const ModuleOverflowMenu = (
 
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
-    runId,
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,
     handleSlideoutClick,
-    isLoadedInRun,
     isDisabled,
     isIncompatibleWithOT3
   )

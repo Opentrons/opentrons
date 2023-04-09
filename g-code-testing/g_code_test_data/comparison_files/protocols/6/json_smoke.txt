@@ -1,0 +1,1095 @@
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A Z -> Homing the following axes: Z, A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 Y50.0 -> Setting the max speed for the following axes: Y-Axis: 50.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.8 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.8 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: G0 Y-28.0 -> Moving the robot as follows: The gantry to -28.0 on the Y-Axis ->
+smoothie: G0 Y10.0 -> Moving the robot as follows: The gantry to 10.0 on the Y-Axis ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 X80.0 -> Setting the max speed for the following axes: X-Axis: 80.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 X -> Homing the following axes: X ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 Y80.0 -> Setting the max speed for the following axes: Y-Axis: 80.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 Y -> Homing the following axes: Y ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 Y8.0 -> Setting the max speed for the following axes: Y-Axis: 8.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: G0 Y-3.0 -> Moving the robot as follows: The gantry to -3.0 on the Y-Axis ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G28.2 Y -> Homing the following axes: Y ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: G0 Y-3.0 -> Moving the robot as follows: The gantry to -3.0 on the Y-Axis ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: 0.0 C Axis: 0.0 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M53 -> Disabling microstepping on B-Axis ->
+smoothie: M92 B100.0 -> Setting the following axes steps per mm: B-Axis: 100.0 steps per mm -> Current set steps per mm:
+smoothie: G4 P0.01 -> Pausing movement for 0.01ms ->
+smoothie: M907 B1.75 -> Setting the current (in amps) to: B-Axis Motor: 1.75 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 F60.0 -> Setting speed to 60.0 ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 B-1.0 -> Moving the robot as follows: The left pipette suction to -1.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M52 -> Enabling microstepping on B-Axis ->
+smoothie: M92 B3200.0 -> Setting the following axes steps per mm: B-Axis: 3200.0 steps per mm -> Current set steps per mm:
+smoothie: G4 P0.01 -> Pausing movement for 0.01ms ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 B -> Homing the following axes: B ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: 19.0 C Axis: 0.0 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B-14.5 -> Moving the robot as follows: The left pipette suction to -14.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 C -> Homing the following axes: C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: 19.0 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M371 L -> Reading instrument model for Left pipette -> Read Instrument Model: p300_multi_v2.1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M369 L -> Reading instrument ID for Left pipette -> Read Instrument ID: P20SV202020070101
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M371 R -> Reading instrument model for Right pipette -> Read Instrument Model: p20_single_v2.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M369 R -> Reading instrument ID for Right pipette -> Read Instrument ID: P20SV202020070101
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M371 L -> Reading instrument model for Left pipette -> Read Instrument Model: p300_multi_v2.1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M369 L -> Reading instrument ID for Left pipette -> Read Instrument ID: P20SV202020070101
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M371 R -> Reading instrument model for Right pipette -> Read Instrument Model: p20_single_v2.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M369 R -> Reading instrument ID for Right pipette -> Read Instrument ID: P20SV202020070101
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X14.38 Y164.74 -> Moving the robot as follows: The gantry to 14.38 on the X-Axis The gantry to 164.74 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F600.0 -> Setting speed to 600.0 ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A40.24 -> Moving the robot as follows: The right pipette arm height to 40.24 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A202.0 -> Moving the robot as follows: The right pipette arm height to 202.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A -> Homing the following axes: A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 14.38 Y Axis: 164.74 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C9.188 -> Moving the robot as follows: The right pipette suction to 9.188 ->
+smoothie: G0 C8.888 -> Moving the robot as follows: The right pipette suction to 8.888 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X146.88 Y74.24 -> Moving the robot as follows: The gantry to 146.88 on the X-Axis The gantry to 74.24 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A30.17 -> Moving the robot as follows: The right pipette arm height to 30.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C9.188 -> Moving the robot as follows: The right pipette suction to 9.188 ->
+smoothie: G0 C8.888 -> Moving the robot as follows: The right pipette suction to 8.888 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X164.88 Y29.24 -> Moving the robot as follows: The gantry to 164.88 on the X-Axis The gantry to 29.24 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A30.17 -> Moving the robot as follows: The right pipette arm height to 30.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C9.188 -> Moving the robot as follows: The right pipette suction to 9.188 ->
+smoothie: G0 C8.888 -> Moving the robot as follows: The right pipette suction to 8.888 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X191.88 Y74.24 -> Moving the robot as follows: The gantry to 191.88 on the X-Axis The gantry to 74.24 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A30.17 -> Moving the robot as follows: The right pipette arm height to 30.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C9.188 -> Moving the robot as follows: The right pipette suction to 9.188 ->
+smoothie: G0 C8.888 -> Moving the robot as follows: The right pipette suction to 8.888 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X209.88 Y56.24 -> Moving the robot as follows: The gantry to 209.88 on the X-Axis The gantry to 56.24 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A30.17 -> Moving the robot as follows: The right pipette arm height to 30.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C9.188 -> Moving the robot as follows: The right pipette suction to 9.188 ->
+smoothie: G0 C8.888 -> Moving the robot as follows: The right pipette suction to 8.888 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X245.88 Y11.24 -> Moving the robot as follows: The gantry to 245.88 on the X-Axis The gantry to 11.24 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A30.17 -> Moving the robot as follows: The right pipette arm height to 30.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X347.84 Y351.5 -> Moving the robot as follows: The gantry to 347.84 on the X-Axis The gantry to 351.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A110.75 -> Moving the robot as follows: The right pipette arm height to 110.75 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F900.0 -> Setting speed to 900.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-27.0 -> Moving the robot as follows: The right pipette suction to -27.0 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C0.8 -> Moving the robot as follows: The right pipette suction to 0.8 ->
+smoothie: G0 C0.5 -> Moving the robot as follows: The right pipette suction to 0.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 C -> Homing the following axes: C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 110.75 B Axis: -14.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X14.38 Y155.74 -> Moving the robot as follows: The gantry to 14.38 on the X-Axis The gantry to 155.74 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F600.0 -> Setting speed to 600.0 ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A40.24 -> Moving the robot as follows: The right pipette arm height to 40.24 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A202.0 -> Moving the robot as follows: The right pipette arm height to 202.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A -> Homing the following axes: A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 14.38 Y Axis: 155.74 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C18.301 -> Moving the robot as follows: The right pipette suction to 18.301 ->
+smoothie: G0 C18.001 -> Moving the robot as follows: The right pipette suction to 18.001 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X315.0 Y155.5 -> Moving the robot as follows: The gantry to 315.0 on the X-Axis The gantry to 155.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A46.25 -> Moving the robot as follows: The right pipette arm height to 46.25 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X347.84 Y351.5 -> Moving the robot as follows: The gantry to 347.84 on the X-Axis The gantry to 351.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A110.75 -> Moving the robot as follows: The right pipette arm height to 110.75 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F900.0 -> Setting speed to 900.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-27.0 -> Moving the robot as follows: The right pipette suction to -27.0 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C0.8 -> Moving the robot as follows: The right pipette suction to 0.8 ->
+smoothie: G0 C0.5 -> Moving the robot as follows: The right pipette suction to 0.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 C -> Homing the following axes: C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 110.75 B Axis: -14.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X14.38 Y146.74 -> Moving the robot as follows: The gantry to 14.38 on the X-Axis The gantry to 146.74 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F600.0 -> Setting speed to 600.0 ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A40.24 -> Moving the robot as follows: The right pipette arm height to 40.24 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A202.0 -> Moving the robot as follows: The right pipette arm height to 202.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A -> Homing the following axes: A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 14.38 Y Axis: 146.74 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X288.38 Y223.78 -> Moving the robot as follows: The gantry to 288.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A34.3 -> Moving the robot as follows: The right pipette arm height to 34.3 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C18.301 -> Moving the robot as follows: The right pipette suction to 18.301 ->
+smoothie: G0 C18.001 -> Moving the robot as follows: The right pipette suction to 18.001 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X315.0 Y155.5 -> Moving the robot as follows: The gantry to 315.0 on the X-Axis The gantry to 155.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A46.25 -> Moving the robot as follows: The right pipette arm height to 46.25 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X347.84 Y351.5 -> Moving the robot as follows: The gantry to 347.84 on the X-Axis The gantry to 351.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A110.75 -> Moving the robot as follows: The right pipette arm height to 110.75 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F900.0 -> Setting speed to 900.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-27.0 -> Moving the robot as follows: The right pipette suction to -27.0 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C0.8 -> Moving the robot as follows: The right pipette suction to 0.8 ->
+smoothie: G0 C0.5 -> Moving the robot as follows: The right pipette suction to 0.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 C -> Homing the following axes: C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 110.75 B Axis: -14.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X14.38 Y137.74 -> Moving the robot as follows: The gantry to 14.38 on the X-Axis The gantry to 137.74 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F600.0 -> Setting speed to 600.0 ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A40.24 -> Moving the robot as follows: The right pipette arm height to 40.24 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A54.24 -> Moving the robot as follows: The right pipette arm height to 54.24 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A202.0 -> Moving the robot as follows: The right pipette arm height to 202.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A -> Homing the following axes: A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 14.38 Y Axis: 137.74 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X315.0 Y155.5 -> Moving the robot as follows: The gantry to 315.0 on the X-Axis The gantry to 155.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A46.25 -> Moving the robot as follows: The right pipette arm height to 46.25 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C18.301 -> Moving the robot as follows: The right pipette suction to 18.301 ->
+smoothie: G0 C18.001 -> Moving the robot as follows: The right pipette suction to 18.001 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C18.301 -> Moving the robot as follows: The right pipette suction to 18.301 ->
+smoothie: G0 C18.001 -> Moving the robot as follows: The right pipette suction to 18.001 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C18.301 -> Moving the robot as follows: The right pipette suction to 18.301 ->
+smoothie: G0 C18.001 -> Moving the robot as follows: The right pipette suction to 18.001 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F300.0 -> Setting speed to 300.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A140.04 -> Moving the robot as follows: The right pipette arm height to 140.04 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X347.84 Y351.5 -> Moving the robot as follows: The gantry to 347.84 on the X-Axis The gantry to 351.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A110.75 -> Moving the robot as follows: The right pipette arm height to 110.75 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F900.0 -> Setting speed to 900.0 ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-27.0 -> Moving the robot as follows: The right pipette suction to -27.0 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C0.8 -> Moving the robot as follows: The right pipette suction to 0.8 ->
+smoothie: G0 C0.5 -> Moving the robot as follows: The right pipette suction to 0.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 C -> Homing the following axes: C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 110.75 B Axis: -14.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 A208.0 -> Moving the robot as follows: The right pipette arm height to 208.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A -> Homing the following axes: A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X180.88 Y133.24 -> Moving the robot as follows: The gantry to 180.88 on the X-Axis The gantry to 133.24 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z29.17 -> Moving the robot as follows: The left pipette arm height to 29.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F600.0 -> Setting speed to 600.0 ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z18.17 -> Moving the robot as follows: The left pipette arm height to 18.17 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z29.17 -> Moving the robot as follows: The left pipette arm height to 29.17 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z205.0 -> Moving the robot as follows: The left pipette arm height to 205.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 Z -> Homing the following axes: Z ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 180.88 Y Axis: 133.24 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X322.38 Y223.78 -> Moving the robot as follows: The gantry to 322.38 on the X-Axis The gantry to 223.78 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z29.33 -> Moving the robot as follows: The left pipette arm height to 29.33 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F607.0 -> Setting speed to 607.0 ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B-7.538 -> Moving the robot as follows: The left pipette suction to -7.538 ->
+smoothie: G0 B-7.838 -> Moving the robot as follows: The left pipette suction to -7.838 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z135.07 -> Moving the robot as follows: The left pipette arm height to 135.07 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X413.53 Y42.55 -> Moving the robot as follows: The gantry to 413.53 on the X-Axis The gantry to 42.55 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z110.79 -> Moving the robot as follows: The left pipette arm height to 110.79 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F607.0 -> Setting speed to 607.0 ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B-14.5 -> Moving the robot as follows: The left pipette suction to -14.5 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z135.07 -> Moving the robot as follows: The left pipette arm height to 135.07 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 X381.84 Y351.5 -> Moving the robot as follows: The gantry to 381.84 on the X-Axis The gantry to 351.5 on the Y-Axis ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 Z105.78 -> Moving the robot as follows: The left pipette arm height to 105.78 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F450.0 -> Setting speed to 450.0 ->
+smoothie: M907 A0.1 B1.25 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.25 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B-33.4 -> Moving the robot as follows: The left pipette suction to -33.4 ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.25 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.25 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B0.4 -> Moving the robot as follows: The left pipette suction to 0.4 ->
+smoothie: G0 B0.1 -> Moving the robot as follows: The left pipette suction to 0.1 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.25 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.25 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 B -> Homing the following axes: B ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: 19.0 C Axis: -8.5 X Axis: 381.84 Y Axis: 351.5 Z Axis: 105.78
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B-14.5 -> Moving the robot as follows: The left pipette suction to -14.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+tempdeck: M104 S37.0 -> Setting temperature values to the following: Temperature: 37.0C ->
+tempdeck: M18 -> Halting holding temperature. Reducing temperature to 55C if it is greater than 55C ->
+smoothie: M999 -> Resetting OT-2 from error state ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G28.6 -> Getting homing status for all axes -> The homing status of the robot is: A Axis: 1 B Axis: 1 C Axis: 1 X Axis: 1 Y Axis: 1 Z Axis: 1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M999 -> Resetting OT-2 from error state ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G28.6 -> Getting homing status for all axes -> The homing status of the robot is: A Axis: 1 B Axis: 1 C Axis: 1 X Axis: 1 Y Axis: 1 Z Axis: 1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M92 X80.0 Y80.0 Z400.0 A400.0 -> Setting the following axes steps per mm: X-Axis: 80.0 steps per mm Y-Axis: 80.0 steps per mm Z-Axis: 400.0 steps per mm A-Axis: 400.0 steps per mm -> Current set steps per mm:
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M92 B768.0 C768.0 -> Setting the following axes steps per mm: B-Axis: 768.0 steps per mm C-Axis: 768.0 steps per mm -> Current set steps per mm:
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 381.84 Y Axis: 351.5 Z Axis: 105.78
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M204 S10000.0 A1500.0 B200.0 C200.0 X3000.0 Y2000.0 Z1500.0 -> Setting acceleration for the following axes: Default: 10000.0 X-Axis: 3000.0 Y-Axis: 2000.0 Left Pipette Arm: 1500.0 Right Pipette Arm: 1500.0 Left Pipette Suction: 200.0 Right Pipette Suction: 200.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M371 L -> Reading instrument model for Left pipette -> Read Instrument Model: p300_multi_v2.1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M369 L -> Reading instrument ID for Left pipette -> Read Instrument ID: P20SV202020070101
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M371 R -> Reading instrument model for Right pipette -> Read Instrument Model: p20_single_v2.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M369 R -> Reading instrument ID for Right pipette -> Read Instrument ID: P20SV202020070101
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M92 B3200.0 -> Setting the following axes steps per mm: B-Axis: 3200.0 steps per mm -> Current set steps per mm:
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M365.0 Z155.75 -> Setting the pipette home height for the following axes: Z-Axis: 155.75 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M365.1 B60.0 -> Setting the pipette max travel height for the following axes: B-Axis: 60.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M92 C3200.0 -> Setting the following axes steps per mm: C-Axis: 3200.0 steps per mm -> Current set steps per mm:
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M365.0 A172.15 -> Setting the pipette home height for the following axes: A-Axis: 172.15 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M365.1 C60.0 -> Setting the pipette max travel height for the following axes: C-Axis: 60.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.8 B0.3 C0.05 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.8 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 A Z -> Homing the following axes: Z, A ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 Y50.0 -> Setting the max speed for the following axes: Y-Axis: 50.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.8 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.8 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: G0 Y-28.0 -> Moving the robot as follows: The gantry to -28.0 on the Y-Axis ->
+smoothie: G0 Y10.0 -> Moving the robot as follows: The gantry to 10.0 on the Y-Axis ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 X80.0 -> Setting the max speed for the following axes: X-Axis: 80.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X1.25 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 X -> Homing the following axes: X ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 Y80.0 -> Setting the max speed for the following axes: Y-Axis: 80.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 Y -> Homing the following axes: Y ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 Y8.0 -> Setting the max speed for the following axes: Y-Axis: 8.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: G0 Y-3.0 -> Moving the robot as follows: The gantry to -3.0 on the Y-Axis ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G28.2 Y -> Homing the following axes: Y ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: G0 Y-3.0 -> Moving the robot as follows: The gantry to -3.0 on the Y-Axis ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: -8.5 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M53 -> Disabling microstepping on B-Axis ->
+smoothie: M92 B100.0 -> Setting the following axes steps per mm: B-Axis: 100.0 steps per mm -> Current set steps per mm:
+smoothie: G4 P0.01 -> Pausing movement for 0.01ms ->
+smoothie: M907 B1.75 -> Setting the current (in amps) to: B-Axis Motor: 1.75 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 F60.0 -> Setting speed to 60.0 ->
+smoothie: G91 -> Switching to Relative Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 B-1.0 -> Moving the robot as follows: The left pipette suction to -1.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M52 -> Enabling microstepping on B-Axis ->
+smoothie: M92 B3200.0 -> Setting the following axes steps per mm: B-Axis: 3200.0 steps per mm -> Current set steps per mm:
+smoothie: G4 P0.01 -> Pausing movement for 0.01ms ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 B -> Homing the following axes: B ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: 19.0 C Axis: -8.5 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B1.0 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 1.0 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 B-14.5 -> Moving the robot as follows: The left pipette suction to -14.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G28.2 C -> Homing the following axes: C ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -14.5 C Axis: 19.0 X Axis: 418.0 Y Axis: -3.0 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 1.0 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: G0 C-8.5 -> Moving the robot as follows: The right pipette suction to -8.5 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M907 A0.1 B0.3 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.3 C-Axis Motor: 0.05 ->
+smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
+smoothie: M400 -> Waiting for motors to stop moving ->

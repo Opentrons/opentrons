@@ -127,6 +127,8 @@ class LiquidProbeSettings:
     expected_liquid_height: float
     log_pressure: bool
     aspirate_while_sensing: bool
+    auto_zero_sensor: bool
+    num_baseline_reads: int
     data_file: str
 
 
@@ -161,7 +163,6 @@ class EdgeSenseSettings:
 class OT3CalibrationSettings:
     z_offset: ZSenseSettings
     edge_sense: EdgeSenseSettings
-    edge_sense_binary: EdgeSenseSettings
     probe_length: float
 
 
@@ -174,7 +175,7 @@ class OT3Config:
     motion_settings: OT3MotionSettings
     current_settings: OT3CurrentSettings
     z_retract_distance: float
-    grip_jaw_home_duty_cycle: float
+    safe_home_distance: float
     deck_transform: OT3Transform
     carriage_offset: Offset
     left_mount_offset: Offset

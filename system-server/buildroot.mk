@@ -33,6 +33,7 @@ define PYTHON_OPENTRONS_SYSTEM_SERVER_INSTALL_INIT_SYSTEMD
   ln -sf ../$(PYTHON_OPENTRONS_SYSTEM_SERVER_SERVICE_FILE_NAME) \
     $(TARGET_DIR)/etc/systemd/system/opentrons.target.wants/$(PYTHON_OPENTRONS_SYSTEM_SERVER_SERVICE_FILE_NAME)
 endef
+export OPENTRONS_GIT_DIR=$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of

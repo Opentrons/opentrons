@@ -10,8 +10,8 @@ import {
   Icon,
   COLORS,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 

@@ -50,9 +50,9 @@ describe('AttachProbe', () => {
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Attach Calibration Probe')
+    getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByAltText('Attach probe')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
@@ -123,9 +123,9 @@ describe('AttachProbe', () => {
       isOnDevice: true,
     }
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Attach Calibration Probe')
+    getByText('Attach calibration probe')
     getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the A1 (back left corner) pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
     getByAltText('Attach probe')
     getByRole('button', { name: 'Begin calibration' }).click()

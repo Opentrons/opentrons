@@ -10,20 +10,21 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
   Link,
   Box,
   Icon,
   COLORS,
   SIZE_1,
   ALIGN_CENTER,
+  CheckboxField,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
+import { UNREACHABLE } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { PrimaryButton } from '../../../../../atoms/buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
-import { CheckboxField } from '../../../../../atoms/CheckboxField'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
@@ -40,7 +41,6 @@ import {
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
-import { UNREACHABLE } from '../../../../../redux/discovery'
 
 interface FactoryResetSlideoutProps {
   isExpanded: boolean
@@ -65,8 +65,8 @@ export function FactoryResetSlideout({
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
-  const tipLengthCalibrations = useTipLengthCalibrations(robotName)
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
+  const tipLengthCalibrations = useTipLengthCalibrations()
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
