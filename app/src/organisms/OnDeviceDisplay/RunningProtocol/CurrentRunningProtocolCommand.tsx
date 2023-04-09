@@ -1,31 +1,57 @@
 import * as React from 'react'
+import { css, keyframes } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   Flex,
   COLORS,
   DIRECTION_ROW,
   SPACING,
-  Btn,
-  Icon,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   BORDERS,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  DISPLAY_FLEX,
 } from '@opentrons/components'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { RunTimer } from '../../Devices/ProtocolRun/ProtocolRunHeader'
+import { PlayPauseButton, StopButton } from './Buttons'
 
 import type {
   CompletedProtocolAnalysis,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { RunStatus } from '@opentrons/api-client'
+import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+
+const fadeIn = keyframes`
+from {
+  opacity: 0;
+  transform: translateY(100%);
+}
+to {
+  opacity: 1;
+  transform: translateY(0%);
+}
+`
+
+const TITLE_TEXT_STYLE = css`
+  color: ${COLORS.darkBlack_seventy};
+  font-size: 1.75rem;
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: 2.25rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  animation: ${fadeIn} 1.5s ease-in-out;
+`
 
 const RUN_TIMER_STYLE = css`
   font-size: 2rem;
@@ -52,35 +78,54 @@ interface RunTimerInfo {
 }
 
 interface CurrentRunningProtocolCommandProps {
-  currentRunStatus: string
-  protocolName?: string
+  runStatus: RunStatus | null
+  robotSideAnalysis: CompletedProtocolAnalysis | null
+  runTimerInfo: RunTimerInfo
   playRun: () => void
   pauseRun: () => void
   stopRun: () => void
+  trackProtocolRunEvent: TrackProtocolRunEvent
+  protocolName?: string
   currentRunCommandIndex?: number
-  robotSideAnalysis: CompletedProtocolAnalysis | null
-  runTimerInfo: RunTimerInfo
 }
 
 export function CurrentRunningProtocolCommand({
-  currentRunStatus,
-  protocolName,
-  currentRunCommandIndex,
+  runStatus,
   robotSideAnalysis,
   runTimerInfo,
-}: // runId,
-CurrentRunningProtocolCommandProps): JSX.Element | null {
+  playRun,
+  pauseRun,
+  stopRun,
+  trackProtocolRunEvent,
+  protocolName,
+  currentRunCommandIndex,
+}: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const currentCommand = robotSideAnalysis?.commands.find(
     (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
   )
+  const currentRunStatus = t(`status_${runStatus}`)
 
   const onStop = (): void => {
-    console.log('stop the running')
+    stopRun() // from useRunActionMutations
+    trackProtocolRunEvent({ name: 'runCancel' })
   }
 
-  const onPause = (): void => {
-    console.log('stop the running')
+  const onTogglePlayPause = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) {
+      pauseRun()
+      trackProtocolRunEvent({ name: 'runPause' })
+    } else {
+      playRun()
+      // ToDo (kj:03/28/2023) tbd
+      // trackProtocolRunEvent({
+      //   name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
+      //   properties:
+      //     runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
+      //       ? robotAnalyticsData
+      //       : {},
+      // })
+    }
   }
 
   return (
@@ -97,14 +142,7 @@ CurrentRunningProtocolCommandProps): JSX.Element | null {
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
             {currentRunStatus}
           </StyledText>
-          <StyledText
-            color={COLORS.darkBlack_seventy}
-            fontSize="1.75rem"
-            lineHeight="2.25rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {protocolName}
-          </StyledText>
+          <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
         <RunTimer {...runTimerInfo} onDeviceStyle={RUN_TIMER_STYLE} />
       </Flex>
@@ -115,16 +153,12 @@ CurrentRunningProtocolCommandProps): JSX.Element | null {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
-        {/* <Btn height="12.5rem" width="12.5rem">
-          <Icon name="close-circle" size="100%" color={COLORS.red_two} />
-        </Btn> */}
         <StopButton onStop={onStop} />
-        <PauseButton onPause={onPause} />
-        {/* <Btn height="12.5rem" width="12.5rem">
-          <Icon name="pause-circle" size="100%" color={COLORS.blueEnabled} />
-        </Btn> */}
+        <PlayPauseButton
+          onTogglePlayPause={onTogglePlayPause}
+          runStatus={runStatus}
+        />
       </Flex>
-      {/* <StyledText>{runId}</StyledText> */}
       <Flex
         padding={`0.75rem ${SPACING.spacing5}`}
         backgroundColor={COLORS.foundationalBlue}
@@ -140,47 +174,5 @@ CurrentRunningProtocolCommandProps): JSX.Element | null {
         ) : null}
       </Flex>
     </Flex>
-  )
-}
-
-interface StopButtonProps {
-  onStop: () => void
-}
-const StopButton = ({ onStop }: StopButtonProps): JSX.Element => {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red_two}
-      borderRadius="50%"
-      display={DISPLAY_FLEX}
-      height="12.5rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="12.5rem"
-      // onClick={onClose}
-      aria-label="close"
-    >
-      <Icon name="close" color={COLORS.white} size="10rem" />
-    </Btn>
-  )
-}
-
-interface PauseButtonProps {
-  onPause: () => void
-}
-const PauseButton = ({ onPause }: PauseButtonProps): JSX.Element => {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.blueEnabled}
-      borderRadius="50%"
-      display={DISPLAY_FLEX}
-      height="12.5rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="12.5rem"
-      // onClick={onPause}
-      aria-label="pause"
-    >
-      <Icon name="pause" color={COLORS.white} size="5rem" />
-    </Btn>
   )
 }

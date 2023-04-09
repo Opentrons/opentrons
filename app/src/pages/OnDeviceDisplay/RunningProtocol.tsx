@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -12,6 +11,8 @@ import {
   COLORS,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  POSITION_RELATIVE,
+  OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -29,7 +30,9 @@ import {
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
+  RunningProtocolSkelton,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -37,23 +40,23 @@ interface BulletProps {
   isActive: boolean
 }
 const Bullet = styled.div`
-  height: 1rem;
-  width: 1rem;
+  height: 0.5rem;
+  width: 0.5rem;
   border-radius: 50%;
+  z-index: 10;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_fourty};
+    props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_forty};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
 
-type ScreenOption =
+export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
   | 'RunningProtocolCommandList'
 
 export function RunningProtocol(): JSX.Element {
-  const { t } = useTranslation('run_details')
   const { runId } = useParams<OnDeviceRouteParams>()
-  const [currentOption, setCurrentOption] = React.useState<ScreenOption | null>(
+  const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
   const swipe = useSwipe()
@@ -65,7 +68,6 @@ export function RunningProtocol(): JSX.Element {
   )
   const runStatus = useRunStatus(runId)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
@@ -74,31 +76,8 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-
-  const {
-    playRun,
-    pauseRun,
-    stopRun,
-    isPlayRunActionLoading,
-    isPauseRunActionLoading,
-    isStopRunActionLoading,
-  } = useRunActionMutations(runId)
-  // console.log('commands', robotSideAnalysis?.commands)
-
-  // console.log('currentRunCommandIndex', currentRunCommandIndex)
-  console.log(
-    'currentRun',
-    currentRunCommandIndex != null &&
-      robotSideAnalysis?.commands[currentRunCommandIndex]
-  )
-
-  console.log('totalSteps', totalIndex)
-  console.log('currentRunCommandIndex', currentRunCommandIndex)
-  console.log('runStatus', runStatus)
-
-  const currentRunStatus = t(`status_${runStatus}`)
-  
-  console.log('currentRunStatus', currentRunStatus)
+  const { playRun, pauseRun, stopRun } = useRunActionMutations(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
 
   React.useEffect(() => {
     if (
@@ -119,39 +98,54 @@ export function RunningProtocol(): JSX.Element {
   }, [currentOption, swipe, swipe.setSwipeType])
 
   return (
-    <>
-      <StepMeter
-        totalSteps={totalIndex != null ? totalIndex : 0}
-        currentStep={
-          currentRunCommandIndex != null
-            ? Number(currentRunCommandIndex) + 1
-            : 1
-        }
-        OnDevice
-      />
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      overflow={OVERFLOW_HIDDEN}
+    >
+      {robotSideAnalysis != null ? (
+        <StepMeter
+          totalSteps={totalIndex != null ? totalIndex : 0}
+          currentStep={
+            currentRunCommandIndex != null
+              ? Number(currentRunCommandIndex) + 1
+              : 1
+          }
+          OnDevice
+        />
+      ) : null}
       <Flex
         ref={swipe.ref}
         padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
         flexDirection={DIRECTION_COLUMN}
       >
-        {currentOption === 'CurrentRunningProtocolCommand' ? (
-          <CurrentRunningProtocolCommand
-            protocolName={protocolName}
-            currentRunStatus={currentRunStatus}
-            currentRunCommandIndex={currentRunCommandIndex}
-            robotSideAnalysis={robotSideAnalysis}
-            runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
-          />
+        {robotSideAnalysis != null ? (
+          currentOption === 'CurrentRunningProtocolCommand' ? (
+            <CurrentRunningProtocolCommand
+              playRun={playRun}
+              pauseRun={pauseRun}
+              stopRun={stopRun}
+              trackProtocolRunEvent={trackProtocolRunEvent}
+              protocolName={protocolName}
+              runStatus={runStatus}
+              currentRunCommandIndex={currentRunCommandIndex}
+              robotSideAnalysis={robotSideAnalysis}
+              runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
+            />
+          ) : (
+            <RunningProtocolCommandList
+              protocolName={protocolName}
+              runStatus={runStatus}
+              playRun={playRun}
+              pauseRun={pauseRun}
+              stopRun={stopRun}
+              trackProtocolRunEvent={trackProtocolRunEvent}
+              currentRunCommandIndex={currentRunCommandIndex}
+              robotSideAnalysis={robotSideAnalysis}
+            />
+          )
         ) : (
-          <RunningProtocolCommandList
-            protocolName={protocolName}
-            currentRunStatus={currentRunStatus}
-            playRun={playRun}
-            pauseRun={pauseRun}
-            stopRun={stopRun}
-            currentRunCommandIndex={currentRunCommandIndex}
-            robotSideAnalysis={robotSideAnalysis}
-          />
+          <RunningProtocolSkelton currentOption={currentOption} />
         )}
         <Flex
           marginTop="2rem"
@@ -166,6 +160,6 @@ export function RunningProtocol(): JSX.Element {
           <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
         </Flex>
       </Flex>
-    </>
+    </Flex>
   )
 }
