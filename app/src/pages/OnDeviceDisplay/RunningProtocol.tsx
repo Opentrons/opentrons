@@ -171,8 +171,8 @@ export function RunningProtocol(): JSX.Element {
         width="fit-content"
         paddingRight={SPACING.spacing6}
       >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
+        <Link to="/dashboard">
+          <TertiaryButton>back to RobotDashboard</TertiaryButton>
         </Link>
       </Flex>
     </>
