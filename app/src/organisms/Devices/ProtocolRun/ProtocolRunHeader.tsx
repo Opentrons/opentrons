@@ -28,7 +28,6 @@ import {
   Icon,
   IconName,
   useHoverTooltip,
-  useInterval,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
@@ -63,7 +62,6 @@ import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
-import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import {
@@ -77,13 +75,13 @@ import {
   useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { RunProgressMeter } from '../../RunProgressMeter'
-import { CSSProp } from 'styled-components'
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -99,39 +97,6 @@ interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
-}
-
-export function RunTimer({
-  runStatus,
-  startedAt,
-  stoppedAt,
-  completedAt,
-  onDeviceStyle,
-}: {
-  runStatus: string | null
-  startedAt: string | null
-  stoppedAt: string | null
-  completedAt: string | null
-  onDeviceStyle?: CSSProp
-}): JSX.Element {
-  const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
-
-  const endTime =
-    runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
-      ? stoppedAt
-      : completedAt ?? now
-
-  const runTime =
-    startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
-
-  return (
-    <StyledText
-      css={onDeviceStyle != null ? onDeviceStyle : TYPOGRAPHY.pRegular}
-    >
-      {runTime}
-    </StyledText>
-  )
 }
 
 export function ProtocolRunHeader({

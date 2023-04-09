@@ -12,8 +12,6 @@ import {
 
 const STOP_BUTTON_STYLE = css`
   display: flex;
-  height: 12.5rem;
-  width: 12.5rem;
   background-color: ${COLORS.red_two};
   border-radius: 50%;
 
@@ -42,17 +40,27 @@ const STOP_BUTTON_STYLE = css`
 
 interface StopButtonProps {
   onStop?: () => void
+  /** default size 12.5rem */
+  buttonSize?: string
+  /** default size 10rem */
+  iconSize?: string
 }
-export function StopButton({ onStop }: StopButtonProps): JSX.Element {
+export function StopButton({
+  onStop,
+  buttonSize = '12.5rem',
+  iconSize = '10rem',
+}: StopButtonProps): JSX.Element {
   return (
     <Btn
       css={STOP_BUTTON_STYLE}
+      height={buttonSize}
+      width={buttonSize}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       onClick={onStop}
       aria-label="stop"
     >
-      <Icon name="close" color={COLORS.white} size="10rem" />
+      <Icon name="close" color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

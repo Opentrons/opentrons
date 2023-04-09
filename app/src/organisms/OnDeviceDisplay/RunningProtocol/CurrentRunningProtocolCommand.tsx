@@ -18,7 +18,7 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
-import { RunTimer } from '../../Devices/ProtocolRun/ProtocolRunHeader'
+import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
 import { PlayPauseButton, StopButton } from './Buttons'
 
 import type {
@@ -50,7 +50,6 @@ const TITLE_TEXT_STYLE = css`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  animation: ${fadeIn} 1.5s ease-in-out;
 `
 
 const RUN_TIMER_STYLE = css`
@@ -63,11 +62,12 @@ const RUN_TIMER_STYLE = css`
 const COMMAND_ROW_STYLE = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
-  font-weight: ${TYPOGRAPHY.fontWeightRegular}
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+  animation: ${fadeIn} 1.5s ease-in-out;
 `
 
 interface RunTimerInfo {
@@ -106,6 +106,8 @@ export function CurrentRunningProtocolCommand({
   )
   const currentRunStatus = t(`status_${runStatus}`)
 
+  // ToDo (kj:04/09/2023 Add confirm modal)
+  // jira ticket RCORE-562 and RCORE-563
   const onStop = (): void => {
     stopRun() // from useRunActionMutations
     trackProtocolRunEvent({ name: 'runCancel' })
@@ -139,12 +141,16 @@ export function CurrentRunningProtocolCommand({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize28}
+            lineHeight={TYPOGRAPHY.lineHeight36}
+            fontWeight="700"
+          >
             {currentRunStatus}
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
-        <RunTimer {...runTimerInfo} onDeviceStyle={RUN_TIMER_STYLE} />
+        <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
       </Flex>
 
       <Flex

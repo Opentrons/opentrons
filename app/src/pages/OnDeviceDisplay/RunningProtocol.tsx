@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -13,6 +13,7 @@ import {
   ALIGN_CENTER,
   POSITION_RELATIVE,
   OVERFLOW_HIDDEN,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -20,6 +21,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
@@ -98,68 +100,81 @@ export function RunningProtocol(): JSX.Element {
   }, [currentOption, swipe, swipe.setSwipeType])
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      overflow={OVERFLOW_HIDDEN}
-    >
-      {robotSideAnalysis != null ? (
-        <StepMeter
-          totalSteps={totalIndex != null ? totalIndex : 0}
-          currentStep={
-            currentRunCommandIndex != null
-              ? Number(currentRunCommandIndex) + 1
-              : 1
-          }
-          OnDevice
-        />
-      ) : null}
+    <>
       <Flex
-        ref={swipe.ref}
-        padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
         flexDirection={DIRECTION_COLUMN}
+        position={POSITION_RELATIVE}
+        overflow={OVERFLOW_HIDDEN}
       >
         {robotSideAnalysis != null ? (
-          currentOption === 'CurrentRunningProtocolCommand' ? (
-            <CurrentRunningProtocolCommand
-              playRun={playRun}
-              pauseRun={pauseRun}
-              stopRun={stopRun}
-              trackProtocolRunEvent={trackProtocolRunEvent}
-              protocolName={protocolName}
-              runStatus={runStatus}
-              currentRunCommandIndex={currentRunCommandIndex}
-              robotSideAnalysis={robotSideAnalysis}
-              runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
-            />
-          ) : (
-            <RunningProtocolCommandList
-              protocolName={protocolName}
-              runStatus={runStatus}
-              playRun={playRun}
-              pauseRun={pauseRun}
-              stopRun={stopRun}
-              trackProtocolRunEvent={trackProtocolRunEvent}
-              currentRunCommandIndex={currentRunCommandIndex}
-              robotSideAnalysis={robotSideAnalysis}
-            />
-          )
-        ) : (
-          <RunningProtocolSkelton currentOption={currentOption} />
-        )}
-        <Flex
-          marginTop="2rem"
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing4}
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-        >
-          <Bullet
-            isActive={currentOption === 'CurrentRunningProtocolCommand'}
+          <StepMeter
+            totalSteps={totalIndex != null ? totalIndex : 0}
+            currentStep={
+              currentRunCommandIndex != null
+                ? Number(currentRunCommandIndex) + 1
+                : 1
+            }
+            OnDevice
           />
-          <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
+        ) : null}
+        <Flex
+          ref={swipe.ref}
+          padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          flexDirection={DIRECTION_COLUMN}
+        >
+          {robotSideAnalysis != null ? (
+            currentOption === 'CurrentRunningProtocolCommand' ? (
+              <CurrentRunningProtocolCommand
+                playRun={playRun}
+                pauseRun={pauseRun}
+                stopRun={stopRun}
+                trackProtocolRunEvent={trackProtocolRunEvent}
+                protocolName={protocolName}
+                runStatus={runStatus}
+                currentRunCommandIndex={currentRunCommandIndex}
+                robotSideAnalysis={robotSideAnalysis}
+                runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
+              />
+            ) : (
+              <RunningProtocolCommandList
+                protocolName={protocolName}
+                runStatus={runStatus}
+                playRun={playRun}
+                pauseRun={pauseRun}
+                stopRun={stopRun}
+                trackProtocolRunEvent={trackProtocolRunEvent}
+                currentRunCommandIndex={currentRunCommandIndex}
+                robotSideAnalysis={robotSideAnalysis}
+              />
+            )
+          ) : (
+            <RunningProtocolSkelton currentOption={currentOption} />
+          )}
+          <Flex
+            marginTop="2rem"
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing4}
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+          >
+            <Bullet
+              isActive={currentOption === 'CurrentRunningProtocolCommand'}
+            />
+            <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
+          </Flex>
         </Flex>
       </Flex>
-    </Flex>
+      {/* temporary */}
+      <Flex
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing5}
+        width="fit-content"
+        paddingRight={SPACING.spacing6}
+      >
+        <Link to="menu">
+          <TertiaryButton>To ODD Menu</TertiaryButton>
+        </Link>
+      </Flex>
+    </>
   )
 }

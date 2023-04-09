@@ -22,7 +22,7 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
-import { SmallStopButton, SmallPlayPauseButton } from './Buttons'
+import { PlayPauseButton, StopButton } from './Buttons'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
@@ -43,7 +43,7 @@ const TITLE_TEXT_STYLE = css`
 const COMMAND_ROW_STYLE = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
-  font-weight: ${TYPOGRAPHY.fontWeightRegular}
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -121,9 +121,10 @@ export function RunningProtocolCommandList({
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
         <Flex gridGap="1.5rem">
-          <SmallStopButton onStop={onStop} />
-          <SmallPlayPauseButton
+          <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="5rem" />
+          <PlayPauseButton
             onTogglePlayPause={onTogglePlayPause}
+            buttonSize="6.25rem"
             runStatus={runStatus}
           />
         </Flex>

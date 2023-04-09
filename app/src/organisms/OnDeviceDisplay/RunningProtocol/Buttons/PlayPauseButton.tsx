@@ -15,8 +15,6 @@ import type { RunStatus } from '@opentrons/api-client'
 
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
-  height: 12.5rem;
-  width: 12.5rem;
   border-radius: 50%;
   background-color: ${COLORS.blueEnabled};
 
@@ -45,11 +43,17 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
 
 interface PlayPauseButtonProps {
   onTogglePlayPause?: () => void
+  /** default size 12.5rem */
+  buttonSize?: string
+  /** default size 10rem */
+  iconSize?: string
   runStatus?: RunStatus | null
 }
 
 export function PlayPauseButton({
   onTogglePlayPause,
+  buttonSize = '12.5rem',
+  iconSize = '5rem',
   runStatus,
 }: PlayPauseButtonProps): JSX.Element {
   const isRunning = runStatus === RUN_STATUS_RUNNING
@@ -57,12 +61,14 @@ export function PlayPauseButton({
   return (
     <Btn
       css={PLAY_PAUSE_BUTTON_STYLE}
+      height={buttonSize}
+      width={buttonSize}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       onClick={onTogglePlayPause}
       aria-label={isRunning ? 'pause' : 'play'}
     >
-      <Icon name={iconName} color={COLORS.white} size="5rem" />
+      <Icon name={iconName} color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

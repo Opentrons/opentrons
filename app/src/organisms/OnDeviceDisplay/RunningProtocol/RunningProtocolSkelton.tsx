@@ -10,18 +10,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import {
-  PlayPauseButton,
-  SmallPlayPauseButton,
-  SmallStopButton,
-  StopButton,
-} from './Buttons'
+import { PlayPauseButton, StopButton } from './Buttons'
 import { Skeleton } from '../../../atoms/Skeleton'
 
 import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtocol'
 
-const LEFT_BACKGROUND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
-const RIGHT_BACKGROUND_SIZE = '389rem' // RunningProtocolCommandList screen
+const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
+const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen
 
 interface RunningProtocolSkeltonProps {
   currentOption: ScreenOption
@@ -42,18 +37,18 @@ export function RunningProtocolSkelton({
               <Skeleton
                 width="6.9375rem"
                 height="2rem"
-                backgroundSize={LEFT_BACKGROUND_SIZE}
+                backgroundSize={CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE}
               />
               <Skeleton
                 width="27.5rem"
                 height="2rem"
-                backgroundSize={LEFT_BACKGROUND_SIZE}
+                backgroundSize={CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE}
               />
             </Flex>
             <Skeleton
               width="9.625rem"
               height="2.625rem"
-              backgroundSize={LEFT_BACKGROUND_SIZE}
+              backgroundSize={CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE}
             />
           </Flex>
 
@@ -70,7 +65,7 @@ export function RunningProtocolSkelton({
           <Skeleton
             width="54.375rem"
             height="3.25rem"
-            backgroundSize={LEFT_BACKGROUND_SIZE}
+            backgroundSize={CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE}
           />
         </>
       ) : (
@@ -84,49 +79,49 @@ export function RunningProtocolSkelton({
               <Skeleton
                 width="6.9375rem"
                 height="2rem"
-                backgroundSize={RIGHT_BACKGROUND_SIZE}
+                backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
               />
               <Skeleton
                 width="27.5rem"
                 height="2rem"
-                backgroundSize={RIGHT_BACKGROUND_SIZE}
+                backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
               />
             </Flex>
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-              <SmallStopButton />
-              <SmallPlayPauseButton />
+              <StopButton buttonSize="6.25rem" iconSize="5rem" />
+              <PlayPauseButton buttonSize="6.25rem" iconSize="2.5rem" />
             </Flex>
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
             <Skeleton
               width="59rem"
               height="3.25rem"
-              backgroundSize={RIGHT_BACKGROUND_SIZE}
+              backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
             />
             <Skeleton
               width="59rem"
               height="3.25rem"
-              backgroundSize={RIGHT_BACKGROUND_SIZE}
+              backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
             />
             <Skeleton
               width="59rem"
               height="3.25rem"
-              backgroundSize={RIGHT_BACKGROUND_SIZE}
+              backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
             />
             <Skeleton
               width="59rem"
               height="3.25rem"
-              backgroundSize={RIGHT_BACKGROUND_SIZE}
+              backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
             />
             <Skeleton
               width="59rem"
               height="3.25rem"
-              backgroundSize={RIGHT_BACKGROUND_SIZE}
+              backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
             />
             <Skeleton
               width="59rem"
               height="3.25rem"
-              backgroundSize={RIGHT_BACKGROUND_SIZE}
+              backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
             />
           </Flex>
         </>
