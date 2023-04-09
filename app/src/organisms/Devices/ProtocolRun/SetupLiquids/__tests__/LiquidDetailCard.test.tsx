@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { useTrackEvent } from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+} from '../../../../../redux/analytics'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
 jest.mock('../../../../../redux/analytics')
@@ -46,7 +49,7 @@ describe('LiquidDetailCard', () => {
     const [{ getByTestId }] = render(props)
     fireEvent.click(getByTestId('LiquidDetailCard_box'))
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'highlightLiquidInDetailModal',
+      name: ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
       properties: {},
     })
   })

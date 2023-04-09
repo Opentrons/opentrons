@@ -16,7 +16,10 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+} from '../../../../redux/analytics'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
 interface LiquidDetailCardProps {
@@ -62,7 +65,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
 
   const handleSelectedValue = (): void => {
     setSelectedValue(liquidId)
-    trackEvent({ name: 'highlightLiquidInDetailModal', properties: {} })
+    trackEvent({
+      name: ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+      properties: {},
+    })
   }
   return (
     <Box

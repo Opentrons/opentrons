@@ -3,7 +3,10 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
+} from '../../../redux/analytics'
 import { LabwareCard } from '../../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
 import { useToaster } from '../../../organisms/ToasterOven'
@@ -101,7 +104,7 @@ describe('Labware', () => {
     const btn = getByRole('link', { name: 'Open Labware Creator' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'openLabwareCreatorFromBottomOfLabwareLibraryList',
+      name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
       properties: {},
     })
   })
