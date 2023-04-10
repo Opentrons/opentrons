@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from .maintenance_engine_store import EngineStore
+from .maintenance_engine_store import EngineStore, EngineConflictError
 from .maintenance_run_models import MaintenanceRun
 
 
@@ -92,9 +92,11 @@ class MaintenanceRunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
-        prev_run_id = self._engine_store.current_run_id
-        if prev_run_id is not None:
-            await self._engine_store.clear()
+        if self._engine_store.current_run_id is not None:
+            raise EngineConflictError(
+                "A maintenance run is already active. "
+                "Delete it before creating a new one. "
+            )
 
         state_summary = await self._engine_store.create(
             run_id=run_id, labware_offsets=labware_offsets
@@ -108,7 +110,7 @@ class MaintenanceRunDataManager:
         )
 
     def get(self, run_id: str) -> MaintenanceRun:
-        """Get a run resource.
+        """Get a maintenance run resource.
 
         This method will pull from the current run or the historical runs,
         depending on if `run_id` refers to the current run.
@@ -124,9 +126,7 @@ class MaintenanceRunDataManager:
         """
         current = run_id == self._engine_store.current_run_id
         if not current:
-            raise RunNotCurrentError(
-                "Cannot get the run summery of a none current run."
-            )
+            raise RunNotCurrentError("Cannot get the summary of a non-current run.")
         state_summary = self._get_state_summary(run_id=run_id)
 
         # store created_at at engine level

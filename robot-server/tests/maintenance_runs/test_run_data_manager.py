@@ -115,7 +115,7 @@ async def test_create_with_options(
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
 ) -> None:
-    """It should handle creation with a protocol and labware offsets."""
+    """It should handle creation with labware offsets."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
