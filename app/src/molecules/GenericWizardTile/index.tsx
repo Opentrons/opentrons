@@ -17,11 +17,11 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { ODD_MEDIA_QUERY_SPECS } from '../../App/constants'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

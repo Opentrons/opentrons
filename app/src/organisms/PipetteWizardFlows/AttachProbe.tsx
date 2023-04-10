@@ -2,14 +2,12 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import { Flex, TYPOGRAPHY, COLORS, SPACING } from '@opentrons/components'
-import {
-  NINETY_SIX_CHANNEL,
-  ODD_MEDIA_QUERY_SPECS,
-} from '@opentrons/shared-data'
+import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { ODD_MEDIA_QUERY_SPECS } from '../../App/constants'
 import attachProbe from '../../assets/images/change-pip/attach-stem.png'
 import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
 import { BODY_STYLE } from './constants'

@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { TYPOGRAPHY } from '@opentrons/components'
+import { ODD_MEDIA_QUERY_SPECS } from '../../App/constants'
 
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',

@@ -11,9 +11,9 @@ import {
   Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { getIsOnDevice } from '../../redux/config'
+import { ODD_MEDIA_QUERY_SPECS } from '../../App/constants'
 
 interface Props {
   //  optional override of the spinner
