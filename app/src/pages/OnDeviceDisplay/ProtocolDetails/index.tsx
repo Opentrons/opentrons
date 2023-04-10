@@ -31,7 +31,7 @@ import {
 } from '../../../atoms/buttons/OnDeviceDisplay'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
-import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
@@ -242,7 +242,7 @@ const ProtocolSectionContent = (
 }
 
 export function ProtocolDetails(): JSX.Element | null {
-  const { t } = useTranslation(['protocol_details', 'protocol_info'])
+  const { t } = useTranslation(['protocol_details', 'protocol_info', 'shared'])
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -294,7 +294,10 @@ export function ProtocolDetails(): JSX.Element | null {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
       {showMaxPinsAlert && (
-        <TooManyPinsModal
+        <SmallModalChildren
+          header={t('too_many_pins_header')}
+          subText={t('too_many_pins_body')}
+          buttonText={t('shared:close')}
           handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
         />
       )}
