@@ -467,8 +467,8 @@ class CommandView(HasState[CommandState]):
             The ID of the earliest queued command, if any.
 
         Raises:
-            RunStoppedError: The engine is currently stopped, so
-                there are not queued commands.
+            RunStoppedError: The engine is currently stopped or stopping,
+                so it will never run any more commands.
         """
         if self._state.run_result:
             raise RunStoppedError("Engine was stopped")
