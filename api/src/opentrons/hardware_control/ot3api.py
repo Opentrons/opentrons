@@ -798,9 +798,8 @@ class OT3API(
         tool_ax = OT3Axis.of_main_tool_actuator(mount)
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
 
-        if not (
-            self._current_position and self._backend.check_motor_status(position_axes)
-        ):
+        valid_motor = self._current_position and self._backend.check_motor_status(position_axes)
+        if not valid_motor:
             raise MustHomeError(
                 f"Current position of {str(mount)} is unknown; please home motors."
             )
@@ -862,9 +861,8 @@ class OT3API(
         tool_ax = OT3Axis.of_main_tool_actuator(mount)
         position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
 
-        if not (
-            self._backend.check_motor_status(position_axes) and self._encoder_position
-        ):
+        valid_encoder = self._encoder_position and self._backend.check_encoder_status(position_axes)
+        if not valid_encoder:
             raise MustHomeError(
                 f"Encoder position of {str(mount)} is unknown, please home motors."
             )
