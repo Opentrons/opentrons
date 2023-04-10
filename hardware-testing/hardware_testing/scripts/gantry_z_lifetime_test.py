@@ -23,25 +23,25 @@ def convert(seconds):
 
 def _create_points(pos_max_left, pos_max_right, pos_min_left, pos_min_right, x_pt, y_pt, z_pt):
     return {
-         0: [Point(454.703, 396.3, 245.0), OT3Mount.LEFT],# [pos_max_left, OT3Mount.LEFT],
-         1: [Point(508.7, 396.3, 98.34), OT3Mount.RIGHT],# [pos_max_right - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
-         'Tip Pick Up - Right 1': ['', OT3Mount.RIGHT],
+         0: [Point(454.703, 396.3, 245.0), OT3Mount.LEFT, 'start'],# [pos_max_left, OT3Mount.LEFT],
+         1: [Point(508.7, 396.3, 98.34), OT3Mount.RIGHT, 'Z_R'],# [pos_max_right - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
+         'Tip Pick Up - Right 1': ['', OT3Mount.RIGHT, 'P'],
          # 2: [Point(0, 75.0, 98.34), OT3Mount.RIGHT],# [pos_min_left._replace(z=pos_min_right.z), OT3Mount.RIGHT],
-         2: [Point(0, 75.0, 245.0), OT3Mount.RIGHT],# [pos_min_left._replace(z=pos_min_right.z) + types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
-         3: [Point(x_pt, y_pt, z_pt), OT3Mount.LEFT],# Point(-54, 95, 509.15)
-         4: [Point(x_pt, y_pt, z_pt) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT],# Point(-54, 95, 509.15)
-         'Tip Pick Up - Left 1': ['', OT3Mount.LEFT],
+         2: [Point(0, 75.0, 245.0), OT3Mount.RIGHT, 'XY'],# [pos_min_left._replace(z=pos_min_right.z) + types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
+         3: [Point(x_pt, y_pt, z_pt), OT3Mount.LEFT, 'M'],# Point(-54, 95, 509.15)
+         4: [Point(x_pt, y_pt, z_pt) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT, 'Z_L'],# Point(-54, 95, 509.15)
+         'Tip Pick Up - Left 1': ['', OT3Mount.LEFT, 'P'],
          # 6: [Point(-54.0, 396.3, 99.0), OT3Mount.LEFT],# [pos_min_left._replace(x=x_pt, y=pos_max_left.y), OT3Mount.LEFT], #x=-54
-         5: [Point(-54.0, 396.3, 245.0), OT3Mount.LEFT],# [pos_max_left._replace(x=x_pt), OT3Mount.LEFT], #x=-54
-         6: [Point(0, 396.3, 99.0), OT3Mount.RIGHT],# [pos_max_left._replace(x=0) - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
-         'Tip Pick Up - Right 2': ['', OT3Mount.RIGHT],
+         5: [Point(-54.0, 396.3, 245.0), OT3Mount.LEFT, 'Y'],# [pos_max_left._replace(x=x_pt), OT3Mount.LEFT], #x=-54
+         6: [Point(0, 396.3, 99.0), OT3Mount.RIGHT, 'Z_R'],# [pos_max_left._replace(x=0) - types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
+         'Tip Pick Up - Right 2': ['', OT3Mount.RIGHT, 'P'],
          # 9: [Point(510.0, 75.0, 99.0), OT3Mount.RIGHT],# [pos_max_left._replace(x=510, y=pos_min_left.y, z=pos_min_right.z), OT3Mount.RIGHT],
-         7: [Point(510.0, 75.0, 245.0), OT3Mount.RIGHT],# [pos_max_left._replace(x=510, y=pos_min_left.y, z=pos_min_right.z) + types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
-         8: [Point(x_pt, y_pt, z_pt), OT3Mount.LEFT], #Point(463, 95, 509.15)
-         9: [Point(x_pt, y_pt, z_pt) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT], #Point(463, 95, 509.15)
-        'Tip Pick Up - Left 2': ['', OT3Mount.LEFT],
+         7: [Point(510.0, 75.0, 245.0), OT3Mount.RIGHT, 'XY'],# [pos_max_left._replace(x=510, y=pos_min_left.y, z=pos_min_right.z) + types.Point(x=0, y=0, z=150), OT3Mount.RIGHT],
+         8: [Point(x_pt, y_pt, z_pt), OT3Mount.LEFT, 'M'], #Point(463, 95, 509.15)
+         9: [Point(x_pt, y_pt, z_pt) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT, 'Z_L'], #Point(463, 95, 509.15)
+        'Tip Pick Up - Left 2': ['', OT3Mount.LEFT, 'P'],
         # 13: [Point(455.7, 396.3, 99.0), OT3Mount.LEFT],# [pos_max_left._replace(x=x_pt, z=pos_min_left.z), OT3Mount.LEFT],
-        10: [Point(454.7, 396.3, 245.0), OT3Mount.LEFT]#[pos_max_left, OT3Mount.LEFT]
+        10: [Point(454.7, 396.3, 245.0), OT3Mount.LEFT, 'Y']#[pos_max_left, OT3Mount.LEFT]
     }
 
 async def _bowtie_move(api, homed_position_left: types.Point, homed_position_right: types.Point, load: GantryLoad) -> int:
@@ -51,7 +51,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
     pos_max_right = homed_position_right - types.Point(x=1, y=21, z=1)
     pos_min_right = types.Point(x=0, y=75, z=pos_max_right.z - 150)  # stay above deck to be safe
 
-    stall_count = 0
+    stall_count = xy_count = y_count = z_l_count = z_r_count = 0
     x_pt = -54
     y_pt = 95
     z_pt = 509.15
@@ -75,7 +75,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
     if load == GantryLoad.LOW_THROUGHPUT:
         for key in low_tp_points.keys():
             if type(key) == int:
-                print(f"Move {key}\n")
+                print(f">> Move {key} <<\n")
                 if key == 3 or key == 8: # 4 and 11
                     cur_pos = await api.current_position_ot3(OT3Mount.LEFT)
                     x_pt = cur_pos[OT3Axis.X]
@@ -86,13 +86,13 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                     # low_tp_points.update({(key+1): [Point(cur_pos[OT3Axis.X], cur_pos[OT3Axis.Y], cur_pos[OT3Axis.Z_L] - 150)], low_tp_points[key+1][1]})
                 try:
                     await api.move_to(low_tp_points[key][1], low_tp_points[key][0], _check_stalls=True)
-                    print(f"\nCurrent position: {await api.gantry_position(low_tp_points[key][1])} on Mount: {low_tp_points[key][1]}\n")
+                    print(f"Current position: {await api.gantry_position(low_tp_points[key][1])} on Mount: {low_tp_points[key][1]}")
                     encoder_pos = await api.encoder_current_position_ot3(low_tp_points[key][1])
                     if low_tp_points[key][1] == OT3Mount.LEFT:
                         AXIS = OT3Axis.Z_L
                     else:
                         AXIS = OT3Axis.Z_R
-                    print(f"Encoder position: ({encoder_pos[OT3Axis.X]}, {encoder_pos[OT3Axis.Y]}, {encoder_pos[AXIS]})\n")
+                    print(f"Encoder position: ({encoder_pos[OT3Axis.X]}, {encoder_pos[OT3Axis.Y]}, {encoder_pos[AXIS]})")
                     if key != 10:#14:
                         print(f"Moving to: {low_tp_points[key+1][0]} on {low_tp_points[key+1][1]}\n")
                     ###input("\t>>")
@@ -101,28 +101,38 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                 except RuntimeError as e:
                     if "collision_detected" in str(e):
                         print("--STALL DETECTED--\n")
+                        print(f"Axis/Axes stalled: {low_tp_points[key][2]}\n")
                         stall_count += 1
-                        print(f"Total stalls for this cycle: {stall_count}\n")
                         if low_tp_points[key][1] == OT3Mount.LEFT:
                             STALL_AXIS = OT3Axis.Z_L
+                            z_l_count += 1
                         else:
                             STALL_AXIS = OT3Axis.Z_R
+                            z_r_count += 1
                         print("------HOMING------\n")
-                        await api.home()
-                        await api.home()
-                        await api.home()
+                        if 'X' in low_tp_points[key][2]:
+                            await api.home()
+                            xy_count += 1
+                        elif low_tp_points[key][2] == 'Y':
+                            await api.home([OT3Axis.Y])
+                            y_count += 1
+                        elif 'Z' in low_tp_points[key][2]:
+                            await api.home([STALL_AXIS])
+
+                        print(f"Total stalls for this cycle: {stall_count} (XY: {xy_count}, Y: {y_count}, Z_L: {z_l_count}, Z_R: {z_r_count})\n")
+                        # await api.home()
                         home_z_pos = await api.current_position_ot3(low_tp_points[key][1])
                         await api.move_to(low_tp_points[key][1], Point(low_tp_points[key][0][0], low_tp_points[key][0][1], home_z_pos[STALL_AXIS]))
                         await api.move_to(low_tp_points[key][1], low_tp_points[key][0])
 
             else:
-                print(f"{key}\n")
+                print(f">> {key} <<\n")
                 print("Moving mount down to calibration block...\n")
                 tip_pick_up_pos = await api.current_position_ot3(low_tp_points[key][1])
                 await api.move_to(low_tp_points[key][1], Point(tip_pick_up_pos[OT3Axis.X], tip_pick_up_pos[OT3Axis.Y], 72))
                 tip_len = 57
                 # input("/n/t>>")
-                await api.pick_up_tip(low_tp_points[key][1], tip_len)
+                await api.pick_up_tip(low_tp_points[key][1], tip_len, prep_after=False)
                 await api.remove_tip(low_tp_points[key][1])
                 if low_tp_points[key][1] == OT3Mount.LEFT:
                     AXIS = OT3Axis.Z_L
@@ -135,7 +145,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
     else:
         for count, p in enumerate(high_tp_points):
             if type(key) == int:
-                print(f"Move {count}\n")
+                print(f">> Move {count} <<\n")
                 try:
                     await api.move_to(OT3Mount.LEFT, p, _check_stalls=True)
                 except RuntimeError as e:
@@ -150,7 +160,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                         await api.move_to(OT3Mount.LEFT, high_tp_points[key])
 
             else:
-                print(f"{key}\n")
+                print(f">> {key} <<\n")
                 print("Moving mount down to calibration block...\n")
                 tip_pick_up_pos = await api.current_position_ot3(OT3Mount.LEFT)
                 pip_pos = await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
@@ -158,12 +168,12 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                 pip_z_pt = input("\nEnter Z coordinate for tip pick up: >>")
                 await api.move_to(OT3Mount.LEFT, Point(tip_pick_up_pos[OT3Axis.X], tip_pick_up_pos[OT3Axis.Y], pip_z_pt))
                 tip_len = 57
-                await api.pick_up_tip(OT3Mount.LEFT, tip_len)
+                await api.pick_up_tip(OT3Mount.LEFT, tip_len, prep_after=False)
                 await api.remove_tip(OT3Mount.LEFT)
                 await api.home([OT3Axis.Z_L])
                 #await api.move_rel(low_tp_points[key][1], delta=Point(z=-5))
 
-    return stall_count
+    return stall_count, xy_count, y_count, z_l_count, z_r_count
 
 async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
@@ -207,6 +217,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
     header = ['Time (H:M:S)', 'Test Robot', 'Test Configuration', 'Cycle', 'Cycle Stalls',
+              'XY Stall', 'Y Stall', 'Z_L Stall', 'Z_R Stall',
               'Total Stalls', '', 'Left Mount', 'Right Mount', 'Gripper Attached', '', 'Axis',
               'Max Speed (mm/s)', 'Acceleration (mm^2/s)', 'Hold Current (A)',
               'Run Current (A)', 'Max Speed Discontinuity', 'Direction Change Speed Discontinuity']
@@ -216,14 +227,15 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
     start_time = time.perf_counter()
     homed_pos_left = await api.gantry_position(OT3Mount.LEFT)
     homed_pos_right = await api.gantry_position(OT3Mount.RIGHT)
-    stall_count = 0
+    stall_count = xy_count = y_count = z_l_count = z_r_count = 0
     total_stalls = 0
     for i in range(cycles):
-        print(f"========== Cycle {i + 1}/{cycles} ==========\n")
-        stall_count = await _bowtie_move(api, homed_pos_left, homed_pos_right, load)
+        print(f"\n========== Cycle {i + 1}/{cycles} ==========\n")
+        stall_count, xy_count, y_count, z_l_count, z_r_count = await _bowtie_move(api, homed_pos_left, homed_pos_right, load)
         total_stalls += stall_count
         if (i == 0 or i == 1 or i == 2):
             cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_config, i+1, stall_count,
+                          xy_count, y_count, z_l_count, z_r_count,
                           total_stalls, '', lm, rm, gripper, '', OT3Axis.to_kind(AXES[i]),
                           MAX_SPEED[i], ACCEL[i], HOLD_CURRENT[i],
                           RUN_CURRENT[i], MAX_DISCONTINUITY[i], DIRECTION_CHANGE_DISCONTINUITY[i]]
@@ -231,7 +243,8 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
             lm = ''
             gripper = ''
         else:
-            cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_config, i+1, stall_count, total_stalls]
+            cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_config, i+1, stall_count,
+                            xy_count, y_count, z_l_count, z_r_count, total_stalls]
         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
     await api.home()
