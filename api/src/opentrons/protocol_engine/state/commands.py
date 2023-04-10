@@ -535,7 +535,8 @@ class CommandView(HasState[CommandState]):
         """Get whether all added commands have completed.
 
         Raises:
-            CommandExecutionFailedError: if any added command failed.
+            CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
+            `setup`.
         """
         no_command_running = self._state.running_command_id is None
         no_command_queued = len(self._state.queued_command_ids) == 0
