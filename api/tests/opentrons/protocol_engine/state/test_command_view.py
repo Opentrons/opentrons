@@ -260,21 +260,6 @@ def test_get_all_complete_setup_not_fatal() -> None:
     assert result is True
 
 
-def test_get_should_stop() -> None:
-    """It should return true if the run_result status is set."""
-    subject = get_command_view(run_result=RunResult.SUCCEEDED)
-    assert subject.get_stop_requested() is True
-
-    subject = get_command_view(run_result=RunResult.FAILED)
-    assert subject.get_stop_requested() is True
-
-    subject = get_command_view(run_result=RunResult.STOPPED)
-    assert subject.get_stop_requested() is True
-
-    subject = get_command_view(run_result=None)
-    assert subject.get_stop_requested() is False
-
-
 def test_get_is_stopped() -> None:
     """It should return true if stop requested and no command running."""
     subject = get_command_view(run_completed_at=None)

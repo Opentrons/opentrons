@@ -543,13 +543,6 @@ class CommandView(HasState[CommandState]):
         else:
             return False
 
-    def get_stop_requested(self) -> bool:
-        """Get whether an engine stop has been requested.
-
-        A command may still be executing while the engine is stopping.
-        """
-        return self._state.run_result is not None
-
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
@@ -574,7 +567,7 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
-        if self.get_stop_requested():
+        if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):
