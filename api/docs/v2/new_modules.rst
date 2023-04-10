@@ -142,7 +142,7 @@ The examples in this section will use a Temperature Module loaded in slot 3:
         plate = temp_mod.load_labware(
             load_name = 'corning_96_wellplate_360ul_flat')
 
-.. Perhaps put this bit 'o info in a note callout?
+.. Perhaps put this bit 'o info in a note call-out?
 .. note::
     To avoid obstructing other slots, load the Temperature Module in a slot on the horizontal edges of the deck (1, 4, 7, or 10 on the left or 3, 6, or 9 on the right), with the USB cable and power cord pointing away from the deck.
 
@@ -155,7 +155,7 @@ The primary function of the module is to control the temperature of its deck, us
 
 .. code-block:: python
 
-    temp_mod.set_temperature(celsius=4)
+    temp_mod.set_temperature(celsius = 4)
 
 When using ``set_temperature``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
@@ -172,7 +172,7 @@ If you need to confirm in software whether the Temperature Module is holding at 
 
 .. code-block:: python
 
-    temp_mod.set_temperature(celsius=90)
+    temp_mod.set_temperature(celsius = 90)
     temp_mod.status  # 'holding at target'
     temp_mod.deactivate()
     temp_mod.status  # 'idle'
@@ -207,8 +207,10 @@ The examples in this section will use a Magnetic Module loaded in slot 6:
     metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        mag_mod = protocol.load_module('magnetic module gen2', '6')
-        plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+        mag_mod = protocol.load_module(
+            module_name = 'magnetic module gen2', location = '6')
+        plate = mag_mod.load_labware(
+            load_name = 'nest_96_wellplate_100ul_pcr_full_skirt')
 
 .. versionadded:: 2.0
 
@@ -302,8 +304,9 @@ The examples in this section will use a Thermocycler loaded as follows:
     metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module('thermocyclerModuleV2')
-        plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+        tc_mod = protocol.load_module(module_name = 'thermocyclerModuleV2')
+        plate = tc_mod.load_labware(
+            load_name = 'nest_96_wellplate_100ul_pcr_full_skirt')
         
 The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler, since it only has one valid deck location, which covers slots 7, 8, 10, and 11. Attempting to load any other modules or labware in these four slots will raise a ``DeckConflictError``. 
 
@@ -349,7 +352,7 @@ To set the block temperature inside the Thermocycler, use :py:meth:`~.Thermocycl
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(temperature=4)
+        tc_mod.set_block_temperature(temperature = 4)
         
 If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
 
@@ -362,8 +365,8 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(temperature=4, hold_time_minutes=4,
-                                     hold_time_seconds=15)
+        tc_mod.set_block_temperature(
+            temperature = 4, hold_time_minutes = 4,hold_time_seconds = 15)
 
 .. note ::
 
@@ -380,8 +383,8 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(temperature=4, hold_time_seconds=20,
-                                     block_max_volume=80)
+        tc_mod.set_block_temperature(
+            temperature = 4, hold_time_seconds = 20,block_max_volume = 80)
 
 If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
@@ -422,9 +425,12 @@ In terms of the actions that the Thermocycler performs, this would be equivalent
 .. code-block:: python
 
         for i in range(20):
-            tc_mod.set_block_temperature(95, hold_time_seconds=30, block_max_volume=32)
-            tc_mod.set_block_temperature(57, hold_time_seconds=30, block_max_volume=32)
-            tc_mod.set_block_temperature(72, hold_time_seconds=60, block_max_volume=32)
+            tc_mod.set_block_temperature(
+                temperature = 95, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(
+                temperature = 57, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(
+                temperature = 72, hold_time_seconds=60, block_max_volume=32)
             
 However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
@@ -458,7 +464,8 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
     metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         hs_mod = protocol.load_module('heaterShakerModuleV1', 1)
+         hs_mod = protocol.load_module(
+            module_name = 'heaterShakerModuleV1', location = 1)
 
 .. versionadded:: 2.13
 
@@ -484,7 +491,7 @@ To easily add and remove labware from the Heater-Shaker, you can control its lab
 .. code-block:: python
 
     hs_mod.close_labware_latch()
-    hs_mod.set_and_wait_for_shake_speed(500)
+    hs_mod.set_and_wait_for_shake_speed(rpm = 500)
 
 If the labware latch is already closed, ``close_labware_latch()`` will succeed immediately; you don’t have to check the status of the latch before opening or closing it.
 
@@ -529,16 +536,16 @@ Here is an example of how to shake a sample for one minute in a blocking manner 
 
 .. code-block:: python
 
-    hs_mod.set_and_wait_for_shake_speed(500)
-    protocol.delay(minutes=1)
+    hs_mod.set_and_wait_for_shake_speed(rpm = 500)
+    protocol.delay(minutes = 1)
     hs_mod.deactivate_shaker()
 
 These actions will take about 65 seconds total. Compare this with similar-looking commands for holding a sample at a temperature for one minute:
 
 .. code-block:: python
 
-    hs_mod.set_and_wait_for_temperature(75)
-    protocol.delay(minutes=1)
+    hs_mod.set_and_wait_for_temperature(celsius = 75)
+    protocol.delay(minutes = 1)
     hs_mod.deactivate_heater()
 
 This may take much longer, depending on the thermal block used, the volume and type of liquid contained in the labware, and the initial temperature of the module. 
@@ -550,10 +557,10 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
 .. code-block:: python
 
-    hs_mod.set_target_temperature(75)
+    hs_mod.set_target_temperature(celsius = 75)
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(volume = 50, plate['A1'])
+    pipette.dispense(volume = 50, plate['B1'])
     pipette.drop_tip()
     hs_mod.wait_for_temperature()
     protocol.delay(minutes=1)
@@ -565,11 +572,11 @@ Additionally, if you want to pipette while the module holds at a target for a ce
 
 .. code-block:: python
 
-    hs_mod.set_and_wait_for_temperature(75)
+    hs_mod.set_and_wait_for_temperature(celsius = 75)
     start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(volume = 50, plate['A1'])
+    pipette.dispense(volume = 50, plate['B1'])
     pipette.drop_tip()
     # delay for the difference between now and 60 seconds after the reference time
     protocol.delay(max(0, start_time+60 - time.monotonic()))
@@ -603,10 +610,12 @@ In order to send commands to the correct module on the deck, you need to load th
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot 4 on USB port 1
-        temperature_module_1 = protocol.load_module('temperature module gen2', 4)
+        temperature_module_1 = protocol.load_module(
+            module_name = 'temperature module gen2', location = 4)
 
         # Load Temperature Module 2 in deck slot 3 on USB port 2
-        temperature_module_2 = protocol.load_module('temperature module gen2', 3)
+        temperature_module_2 = protocol.load_module(
+            module_name = 'temperature module gen2', location = 3)
         
 For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, it's simplest to use ports 1 and 2, like this:
 
