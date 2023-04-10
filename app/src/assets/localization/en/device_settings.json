@@ -239,5 +239,7 @@
   "display_led_lights": "Display LED Lights",
   "update_channel_description": "Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.",
   "alpha_description": "Warning: alpha releases are feature-complete but may contain significant bugs.",
-  "dev_tools_description": "Enable additional logging and allow access to feature flags."
+  "dev_tools_description": "Enable additional logging and allow access to feature flags.",
+  "attach_a_pipette_before_calibrating": "Attach a pipette in order to perform calibration",
+  "ethernet_connection_description": "Connect an Ethernet cable to the back of the robot and a network switch or hub."
 }

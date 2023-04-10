@@ -319,6 +319,8 @@ class ProtocolEngine:
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
+        # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
+        # tip rack?
         self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
 
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command

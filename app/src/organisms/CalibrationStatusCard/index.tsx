@@ -34,11 +34,11 @@ export function CalibrationStatusCard({
   setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
-  const { taskListStatus } = useCalibrationTaskList(robotName)
+  const { taskListStatus } = useCalibrationTaskList()
 
   // start off assuming we are missing calibrations
-  let statusLabelBackgroundColor = COLORS.errorEnabled
-  let statusLabelIconColor = COLORS.errorEnabled
+  let statusLabelBackgroundColor: string = COLORS.errorEnabled
+  let statusLabelIconColor: string = COLORS.errorEnabled
   let statusLabelText = t('missing_calibration_data')
 
   // if the tasklist is empty, though, all calibrations are good

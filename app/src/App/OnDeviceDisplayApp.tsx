@@ -12,6 +12,8 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
+import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
+import { ToasterOven } from '../organisms/ToasterOven'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
@@ -23,11 +25,11 @@ import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
+import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
-import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
 import { getOnDeviceDisplaySettings } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
 
@@ -99,12 +101,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/setup',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol run</Box>
-      </>
-    ),
+    Component: RunningProtocol,
     exact: true,
     name: 'Protocol Run',
     path: '/protocols/:runId/run',
@@ -182,27 +179,29 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (
-          <Switch>
-            {onDeviceDisplayRoutes.map(
-              ({ Component, exact, path }: RouteProps) => {
-                return (
-                  <Route key={path} exact={exact} path={path}>
-                    <Box
-                      position={POSITION_RELATIVE}
-                      width="100%"
-                      height="100%"
-                      backgroundColor={COLORS.white}
-                      overflow={OVERFLOW_SCROLL}
-                    >
-                      <ModalPortalRoot />
-                      <Component />
-                    </Box>
-                  </Route>
-                )
-              }
-            )}
-            <Redirect exact from="/" to="/dashboard" />
-          </Switch>
+          <ToasterOven>
+            <Switch>
+              {onDeviceDisplayRoutes.map(
+                ({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.white}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                }
+              )}
+              <Redirect exact from="/" to="/dashboard" />
+            </Switch>
+          </ToasterOven>
         )}
       </Box>
     </ApiHostProvider>

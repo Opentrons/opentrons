@@ -20,7 +20,6 @@ const CONTROL_CHILDREN_STYLES = css`
   background-color: ${COLORS.fundamentalsBackground};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing4};
-  margin: ${SPACING.spacing1};
   width: 100%;
   height: 9.75rem;
 
