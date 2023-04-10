@@ -223,9 +223,11 @@ For instance, in this protocol you can see the effects of specifying tipracks:
         tiprack_right = protocol.load_labware(
             load_name = 'opentrons_96_tiprack_300ul', location = '2')
         left_pipette = protocol.load_instrument(
-            instrument_name = 'p300_single', 'left')
+            instrument_name = 'p300_single', mount = 'left')
         right_pipette = protocol.load_instrument(
-            'p300_multi', 'right', tip_racks=[tiprack_right])
+            instrument_name = 'p300_multi',
+            mount = 'right',
+            tip_racks=[tiprack_right])
 
         # You must specify the tip location for the left pipette, which was
         # loaded without specifying tip_racks
@@ -282,34 +284,38 @@ Each of these attributes can be altered without affecting the others.
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
+        tiprack = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = '1')
         pipette = protocol.load_instrument(
-            'p300_single', 'right', tip_racks=[tiprack])
-        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks=[tiprack])
+        plate = protocol.load_labware(
+            load_name = 'corning_384_wellplate_112ul_flat', location = 3)
         pipette.pick_up_tip()
 
         # Aspirate at the default flowrate of 150 ul/s
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # Dispense at the default flowrate of 300 ul/s
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume = 50, plate['A1'])
 
         # Change default aspirate speed to 50ul/s, 1/3 of the default
         pipette.flow_rate.aspirate = 50
         # this aspirate will be at 50ul/s
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # this dispense will be the default 300 ul/s
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume = 50, plate['A1'])
 
         # Slow down dispense too
         pipette.flow_rate.dispense = 50
         # This is still at 50 ul/s
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # This is now at 50 ul/s as well
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume = 50, plate['A1'])
 
         # Also slow down the blow out flowrate from its default
         pipette.flow_rate.blow_out = 100
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # This will be much slower
         pipette.blow_out()
 
