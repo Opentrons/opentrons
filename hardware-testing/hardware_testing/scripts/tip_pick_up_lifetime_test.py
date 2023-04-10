@@ -158,7 +158,7 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
         break ###
 
     json_object = json.dumps(calibrated_slot_loc, indent=11)
-    with open("/home/root/.opentrons/testing_data/calibrated_slot_locations.json", "w") as outfile:
+    with open("/home/root/calibrated_slot_locations.json", "w") as outfile: #    with open("/home/root/.opentrons/testing_data/calibrated_slot_locations.json", "w") as outfile:
         outfile.write(json_object)
     return calibrated_slot_loc
 
@@ -324,7 +324,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
-    parser.add_argument("--pick_up_num", type=int, default=20)
+    parser.add_argument("--pick_up_num", type=int, default=5)
     parser.add_argument("--tip_rack_num", type=int, default=12)
     parser.add_argument("--nc", action="store_true")
     args = parser.parse_args()
