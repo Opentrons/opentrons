@@ -2,7 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { SmallModalChildren } from '../SmallModalChildren'
 
-let props = {
+const props = {
   header: 'header',
   subText: 'subText',
   buttonText: 'buttonText',
