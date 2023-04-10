@@ -1,3 +1,5 @@
+:og:description: How to load and work with Opentrons-verified and custom labware in a Python protocol.
+
 .. _new-labware:
 
 #######
