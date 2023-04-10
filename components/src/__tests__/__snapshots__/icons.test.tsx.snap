@@ -1341,6 +1341,30 @@ exports[`icons minus-box renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons more renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 15 25"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M15.075 12.675L3.07505 24.675L0.925049 22.525L10.825 12.675L0.975047 2.82505L3.12505 0.675049L15.075 12.675Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons move-xy renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;

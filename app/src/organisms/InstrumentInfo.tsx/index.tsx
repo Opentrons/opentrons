@@ -55,14 +55,14 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   }
   const handleDetach: React.MouseEventHandler = () => {
     setWizardProps(
-      instrument.instrumentModel === 'gripperV1'
+      instrument.mount === 'extension'
         ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
         : { ...sharedPipetteWizardProps, flowType: FLOWS.DETACH }
     )
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
     setWizardProps(
-      instrument.instrumentModel === 'gripperV1'
+      instrument.mount === 'extension'
         ? {
             ...sharedGripperWizardProps,
             flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,

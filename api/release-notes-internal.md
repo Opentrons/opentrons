@@ -4,11 +4,11 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.1.0
+# Internal Release 0.2.0
 
-This is 0.1.0, the first internal release for the Opentrons Flex robot software, involving both robot control and the on-device display.
+This is first internal release 0.2.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
 
-This is still pretty early in the process, so some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
+Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
 
 ## Hardware Revision Compatibility
 
@@ -16,6 +16,7 @@ This is still pretty early in the process, so some things are known not to work,
 - This release is compatible with EVT pipettes and gripper only if they have received the tool ID rework.
 - This release is compatible with DVT pipettes and gripper.
 - This release is _not_ compatible with DVT module caddies.
+- This release should be used with pipette bootloaders of at least v7.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
@@ -30,6 +31,13 @@ This is still pretty early in the process, so some things are known not to work,
 - Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
 - Labware pick up failure with gripper
 - Cancelling a protocol might hang - fix is to restart
+
+## Reasonably Sized New Things
+### ODD
+- Liquid setup has come to protocol setup page
+### Robot Control
+- 8-channel pipettes now will use more than 0 amps to pick up tips
+- Module calibration exists in the protocol engine; you can use a script to run it with any pipette for any module. The data will be saved for inspection, but will not be loaded during protocols.
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
@@ -48,11 +56,7 @@ This is still pretty early in the process, so some things are known not to work,
 - After a while, the ODD should go into idle; if you touch it, it will come back online
 
 ## Smaller Known Issues
-### Robot Control
-- Pipette and gripper automated offset calibration still uses linear search and might have issues; double check that it worked right
 
 ## Smaller fun features
-- Pipette firmware senses tips now and puts it on the canbus 
-- The Z-stage will now update its position from encoders after picking up tip instead of homing
-- Some nice images and animations are in place while the robot is starting
-- You can change the brightness of the ODD through the settings
+- Turn on display idle in the display settings for a fun surprise
+- The lights work (don't do anything yet though)

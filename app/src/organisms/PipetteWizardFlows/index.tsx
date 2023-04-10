@@ -241,7 +241,6 @@ export const PipetteWizardFlows = (
         closeFlow()
       }
     }
-
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
