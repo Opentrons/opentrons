@@ -70,7 +70,7 @@ class QueueWorker:
         while True:
             try:
                 command_id = await self._state_store.wait_for(
-                    condition=self._state_store.commands.get_next_queued
+                    condition=self._state_store.commands.get_next_to_execute
                 )
             except RunStoppedError:
                 break

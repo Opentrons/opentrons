@@ -460,7 +460,7 @@ class CommandView(HasState[CommandState]):
 
         return None
 
-    def get_next_queued(self) -> Optional[str]:
+    def get_next_to_execute(self) -> Optional[str]:
         """Return the next command in line to be executed.
 
         Returns:

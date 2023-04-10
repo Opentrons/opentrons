@@ -42,16 +42,16 @@ async def queue_commands(decoy: Decoy, state_store: StateStore) -> None:
     return "command-id-2" the second time, and raise RunStoppedError the third time.
     """
 
-    def get_next_queued() -> Generator[str, None, None]:
+    def get_next_to_execute() -> Generator[str, None, None]:
         yield "command-id-1"
         yield "command-id-2"
         raise RunStoppedError()
 
-    get_next_queued_results = get_next_queued()
+    get_next_to_execute_results = get_next_to_execute()
 
     decoy.when(
-        await state_store.wait_for(condition=state_store.commands.get_next_queued)
-    ).then_do(lambda *args, **kwargs: next(get_next_queued_results))
+        await state_store.wait_for(condition=state_store.commands.get_next_to_execute)
+    ).then_do(lambda *args, **kwargs: next(get_next_to_execute_results))
 
 
 async def test_start_processes_commands(
@@ -131,7 +131,7 @@ async def test_engine_stopped_exception_breaks_loop_gracefully(
 ) -> None:
     """It should `join` gracefully if a RunStoppedError is raised."""
     decoy.when(
-        await state_store.wait_for(condition=state_store.commands.get_next_queued)
+        await state_store.wait_for(condition=state_store.commands.get_next_to_execute)
     ).then_raise(RunStoppedError("oh no"))
 
     subject.start()

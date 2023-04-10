@@ -99,21 +99,21 @@ def test_get_all() -> None:
     assert subject.get_all() == [command_1, command_2, command_3]
 
 
-def test_get_next_queued_returns_first_queued() -> None:
+def test_get_next_to_execute_returns_first_queued() -> None:
     """It should return the next queued command ID."""
     subject = get_command_view(
         queue_status=QueueStatus.RUNNING,
         queued_command_ids=["command-id-1", "command-id-2"],
     )
 
-    assert subject.get_next_queued() == "command-id-1"
+    assert subject.get_next_to_execute() == "command-id-1"
 
 
 @pytest.mark.parametrize(
     "queue_status",
     [QueueStatus.SETUP, QueueStatus.RUNNING],
 )
-def test_get_next_queued_prioritizes_setup_command_queue(
+def test_get_next_to_execute_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
 ) -> None:
     """It should prioritize setup command queue over protocol command queue."""
@@ -123,51 +123,53 @@ def test_get_next_queued_prioritizes_setup_command_queue(
         queued_setup_command_ids=["setup-command-id"],
     )
 
-    assert subject.get_next_queued() == "setup-command-id"
+    assert subject.get_next_to_execute() == "setup-command-id"
 
 
-def test_get_next_queued_returns_none_when_no_pending() -> None:
+def test_get_next_to_execute_returns_none_when_no_queued() -> None:
     """It should return None if there are no queued commands."""
     subject = get_command_view(
         queue_status=QueueStatus.RUNNING,
         queued_command_ids=[],
     )
 
-    assert subject.get_next_queued() is None
+    assert subject.get_next_to_execute() is None
 
 
 @pytest.mark.parametrize("queue_status", [QueueStatus.SETUP, QueueStatus.PAUSED])
-def test_get_next_queued_returns_none_if_not_running(queue_status: QueueStatus) -> None:
+def test_get_next_to_execute_returns_none_if_not_running(
+    queue_status: QueueStatus,
+) -> None:
     """It should not return protocol commands if the engine is not running."""
     subject = get_command_view(
         queue_status=queue_status,
         queued_setup_command_ids=[],
         queued_command_ids=["command-id-1", "command-id-2"],
     )
-    result = subject.get_next_queued()
+    result = subject.get_next_to_execute()
 
     assert result is None
 
 
-def test_get_next_queued_returns_no_commands_if_paused() -> None:
+def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
     """It should not return any type of command if the engine is paused."""
     subject = get_command_view(
         queue_status=QueueStatus.PAUSED,
         queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
     )
-    result = subject.get_next_queued()
+    result = subject.get_next_to_execute()
 
     assert result is None
 
 
 @pytest.mark.parametrize("run_result", RunResult)
-def test_get_next_queued_raises_if_stopped(run_result: RunResult) -> None:
+def test_get_next_to_execute_raises_if_stopped(run_result: RunResult) -> None:
     """It should raise if an engine stop has been requested."""
     subject = get_command_view(run_result=run_result)
 
     with pytest.raises(errors.RunStoppedError):
-        subject.get_next_queued()
+        subject.get_next_to_execute()
 
 
 def test_get_is_running_queue() -> None:
