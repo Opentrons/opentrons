@@ -124,7 +124,6 @@ export function ProtocolDashboard(): JSX.Element {
       {pinnedProtocols.length > 0 && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          height="15rem"
           marginBottom={SPACING.spacing4}
         >
           <StyledText

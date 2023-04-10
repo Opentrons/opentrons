@@ -1,6 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { format } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -10,6 +11,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  truncateString,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -32,6 +34,8 @@ export function PinnedProtocol(props: {
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
+  const displayedName = truncateString(protocolName, cardSize === "full" ? 115 : 90,  cardSize === "full" ? 82 : 45)
+  const { t } = useTranslation('protocol_info')
 
   const cardStyleBySize: {
     [s in CardSizeType]: {
@@ -61,7 +65,7 @@ export function PinnedProtocol(props: {
     longpress: UseLongPressResult,
     protocolId: string
   ): void => {
-    if (!longpress.isLongPressed) {
+    if (longpress.isLongPressed !== true) {
       history.push(`/protocols/${protocolId}`)
     }
   }
@@ -84,34 +88,41 @@ export function PinnedProtocol(props: {
       <StyledText
         key={protocol.id}
         fontSize={cardStyleBySize[cardSize].fontSize}
-        lineHeight="2.0625rem"
+        lineHeight={cardStyleBySize[cardSize].lineHeight}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
-        {protocolName}
+        {displayedName}
       </StyledText>
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing3}
+        width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <StyledText
-          fontSize="1rem"
-          lineHeight="1.125rem"
+          fontSize={TYPOGRAPHY.fontSize22}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+        >
+          {lastRun !== undefined
+            ? `${String(t('last_run'))} ${formatDistance(
+                new Date(lastRun),
+                new Date(),
+                {
+                  addSuffix: true,
+                }
+              ).replace('about ', '')}`
+            : t('no_history')}
+        </StyledText>
+        <StyledText
+          fontSize={TYPOGRAPHY.fontSize22}
+          lineHeight={TYPOGRAPHY.lineHeight28}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {format(new Date(protocol.createdAt), 'MMM Io, p')}
         </StyledText>
-        <StyledText
-          fontSize="1rem"
-          lineHeight="1.125rem"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
-          {lastRun !== undefined
-            ? format(new Date(lastRun), 'MMM Io, p')
-            : 'lastRun'}
-        </StyledText>
       </Flex>
-      {longpress.isLongPressed && (
+      {longpress.isLongPressed === true && (
         <LongPressModal longpress={longpress} protocol={protocol} />
       )}
     </Flex>
