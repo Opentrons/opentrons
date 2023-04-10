@@ -16,12 +16,12 @@ import {
   JUSTIFY_START,
   JUSTIFY_CENTER,
   PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { ODD_MEDIA_QUERY_SPECS } from '../../App/constants'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -36,7 +36,7 @@ const GO_BACK_BUTTON_STYLE = css`
     opacity: 70%;
   }
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: 1.375rem;
 
@@ -52,7 +52,7 @@ const GO_BACK_BUTTON_DISABLED_STYLE = css`
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.75rem;
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
