@@ -64,18 +64,18 @@ For example, if we wanted to have the OT-2 transfer liquid from well A1 to well 
     def run(protocol: protocol_api.ProtocolContext):
         # labware
         plate = protocol.load_labware(
-            load_name="corning_96_wellplate_360ul_flat", location="1")
+            load_name = "corning_96_wellplate_360ul_flat", location = "1")
         tiprack = protocol.load_labware(
-            load_name="opentrons_96_tiprack_300ul", location="2")
+            load_name = "opentrons_96_tiprack_300ul", location = "2")
 
         # pipettes
         left_pipette = protocol.load_instrument(
-            instrument_name="p300_single", mount="left", tip_racks=[tiprack])
+            instrument_name = "p300_single", mount = "left", tip_racks = [tiprack])
 
         # commands
         left_pipette.pick_up_tip()
-        left_pipette.aspirate(volume=100, location=plate["A1"])
-        left_pipette.dispense(volume=100, location=plate["B2"])
+        left_pipette.aspirate(volume = 100, location = plate["A1"])
+        left_pipette.dispense(volume = 100, location = plate["B2"])
         left_pipette.drop_tip()
 
 

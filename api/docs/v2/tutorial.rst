@@ -99,11 +99,11 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 
     def run(protocol: protocol_api.ProtocolContext):
         tips = protocol.load_labware(
-            load_name= 'opentrons_96_tiprack_300ul', location= 1)
+            load_name = 'opentrons_96_tiprack_300ul', location = 1)
         reservoir = protocol.load_labware(
-            load_name= 'nest_12_reservoir_15ml', location= 2)
+            load_name = 'nest_12_reservoir_15ml', location = 2)
         plate = protocol.load_labware(
-            load_name= 'nest_96_wellplate_200ul_flat', location= 3)
+            load_name = 'nest_96_wellplate_200ul_flat', location = 3)
         
 If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
 
@@ -125,13 +125,13 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 .. code-block:: python
 
         p300 = protocol.load_instrument(
-            instrument_name = 'p300_single_gen2', mount= 'left', tip_racks=[tips])
+            instrument_name = 'p300_single_gen2', mount = 'left', tip_racks = [tips])
 
 Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
 
 .. note::
 
-    You may notice that the value of ``tip_racks`` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like ``tip_racks=[tips1, tips2]``.
+    You may notice that the value of ``tip_racks`` is in brackets, indicating that it’s a list. This serial dilution protocol only uses one tip rack, but some protocols require more tips, so you can assign them to a pipette all at once, like ``tip_racks = [tips1, tips2]``.
 
 .. _tutorial-commands:
 Commands
@@ -149,7 +149,7 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 .. code-block:: python
 
-        p300.transfer(volume= 100, source= reservoir['A1'], dest= plate.wells())
+        p300.transfer(volume = 100, source = reservoir['A1'], dest = plate.wells())
 
 Breaking down this single line of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. 
 
@@ -179,7 +179,7 @@ In each row, you first need to add solution. This will be similar to what you di
 .. code-block:: python
 
             p300.transfer(
-                volume= 100, source= reservoir['A2'], dest= row[0], mix_after=(3, 50))
+                volume = 100, source = reservoir['A2'], dest = row[0], mix_after = (3, 50))
 
 As before, the first argument specifies to transfer 100 µL. The second argument is the source, column 2 of the reservoir. The third argument is the destination, the element at index 0 of the current ``row``. Since Python lists are zero-indexed, but columns on labware start numbering at 1, this will be well A1 on the first time through the loop, B1 the second time, and so on. The fourth argument specifies to mix 3 times with 50 µL of fluid each time.
 
@@ -192,7 +192,7 @@ Finally, it’s time to dilute the solution down the row. One approach would be 
 
 .. code-block:: python
 
-            p300.transfer(volume= 100, source= row[:11], dest= row[1:], mix_after=(3, 50))
+            p300.transfer(volume = 100, source = row[:11], dest = row[1:], mix_after = (3, 50))
 
 There’s some Python shorthand here, so let’s unpack it. You can get a range of indices from a list using the colon ``:`` operator, and omitting it at either end means “from the beginning” or “until the end” of the list. So the source is ``row[:11]``, from the beginning of the row until its 11th item. And the destination is ``row[1:]``, from index 1 (column 2!) until the end. Since both of these lists have 11 items, ``transfer()`` will *step through them in parallel*, and they’re constructed so when the source is 0, the destination is 1; when the source is 1, the destination is 2; and so on. This condenses all of the subsequent transfers down the row into a single line of code.
 
@@ -219,7 +219,7 @@ Thus, when adding the diluent, instead of targeting every well on the plate, you
 
 .. code-block:: python
 
-		p300.transfer(volume= 100, source= reservoir['A1'], dest= plate.rows()[0])  
+		p300.transfer(volume = 100, source = reservoir['A1'], dest = plate.rows()[0])  
 
 And by accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
 
@@ -227,9 +227,9 @@ And by accessing an entire column at once, the 8-channel pipette effectively imp
 
         row = plate.rows()[0]
         p300.transfer(
-            volume= 100, source= reservoir['A2'], dest= row[0], mix_after=(3, 50))
+            volume = 100, source = reservoir['A2'], dest = row[0], mix_after = (3, 50))
         p300.transfer(
-            volume= 100, source= row[:11], dest= row[1:], mix_after=(3, 50))
+            volume = 100, source = row[:11], dest = row[1:], mix_after = (3, 50))
 
 Instead of tracking the current row in the ``row`` variable, this code sets it to always be row A (index 0). 
 
