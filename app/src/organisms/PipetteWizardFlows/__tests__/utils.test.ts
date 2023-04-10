@@ -149,10 +149,9 @@ describe('getPipetteAnimations', () => {
     render(
       getPipetteAnimations({
         pipetteWizardStep: mockPipetteWizardStep,
-        channel: 1,
       })
     )
-    screen.getByTestId('Pipette_Attach_1_L.webm')
+    screen.getByTestId('Pipette_Attach_1_8_L.webm')
   })
   it('should return correct video for attach right 1', () => {
     const mockPipetteWizardStep = {
@@ -163,9 +162,8 @@ describe('getPipetteAnimations', () => {
     render(
       getPipetteAnimations({
         pipetteWizardStep: mockPipetteWizardStep,
-        channel: 1,
       })
     )
-    screen.getByTestId('Pipette_Attach_1_R.webm')
+    screen.getByTestId('Pipette_Attach_1_8_R.webm')
   })
 })

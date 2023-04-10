@@ -5,8 +5,8 @@ import { FLOWS, SECTIONS } from './constants'
 
 // TODO(jr, 4/6/23): upload correct animations for attach left 1 & 8 channel loop and
 //  attach right 1 & 8 channel loop
-import attachLeft18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_L.webm'
-import attachRight18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_R.webm'
+import attachLeft18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
+import attachRight18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
 import detachLeft1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
 import detachRight1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_1_R.webm'
 import detachLeft8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_8_L.webm'

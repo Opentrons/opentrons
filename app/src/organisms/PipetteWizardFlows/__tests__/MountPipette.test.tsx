@@ -60,7 +60,7 @@ describe('MountPipette', () => {
     getByText(
       'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
-    getByTestId('Pipette_Attach_1_L.webm')
+    getByTestId('Pipette_Attach_1_8_L.webm')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
