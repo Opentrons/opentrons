@@ -128,17 +128,13 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # MOVE TO GAUGE
     await api.ungrip()
     hover_pos, _ = _get_force_gauge_hover_and_grip_positions(api)
-    target_pos = Point(x=64.0, y=123.3, z=67.6) 
+    target_pos = Point(x=64.0, y=123.3, z=67.6)
     await helpers_ot3.move_to_arched_ot3(api, mount, target_pos._replace(z=87.6))
     if not api.is_simulator:
-        ui.get_user_ready(
-            "please make sure the gauge in the middle of the gripper"
-        )
+        ui.get_user_ready("please make sure the gauge in the middle of the gripper")
     await api.move_to(mount, target_pos)
     if not api.is_simulator:
-        ui.get_user_ready(
-            "prepare to grip"
-        )
+        ui.get_user_ready("prepare to grip")
 
     # LOOP THROUGH FORCES
     ui.print_header("MEASURE NEWTONS")
