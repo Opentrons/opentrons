@@ -1,7 +1,7 @@
 """Gravimetric."""
 from inspect import getsource
 from statistics import stdev
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Any
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
@@ -319,6 +319,32 @@ def _get_operator_name(is_simulating: bool) -> str:
         return "simulation"
 
 
+def _pick_up_tip(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    cfg: config.GravimetricConfig,
+    location: Optional[Any] = None,
+) -> None:
+    pipette.pick_up_tip(location)
+    # NOTE: the accuracy-adjust function gets set on the Pipette
+    #       each time we pick-up a new tip.
+    if cfg.increment:
+        print("clearing pipette ul-per-mm table to be linear")
+        clear_pipette_ul_per_mm(
+            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
+            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
+        )
+
+
+def _drop_tip(
+    ctx: ProtocolContext, pipette: InstrumentContext, cfg: config.GravimetricConfig
+) -> None:
+    if cfg.return_tip:
+        pipette.return_tip(home_after=False)
+    else:
+        pipette.drop_tip(home_after=False)
+
+
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -334,12 +360,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     print(f'found pipette "{pipette_tag}"')
     pipette.starting_tip = tipracks[0][cfg.starting_tip]
     print(f"starting on tip {cfg.starting_tip}")
-
-    def _drop_tip() -> None:
-        if cfg.return_tip:
-            pipette.return_tip(home_after=False)
-        else:
-            pipette.drop_tip(home_after=False)
 
     # GET TEST VOLUMES
     test_volumes = _get_volumes(ctx, cfg)
@@ -367,11 +387,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         simulate=ctx.is_simulating(),
     )
     print(f'found scale "{recorder.serial_number}"')
-    if recorder.is_simulator:
-        if cfg.pipette_volume == 50 or cfg.tip_volume == 50:
-            recorder.set_simulation_mass(15)
-        else:
-            recorder.set_simulation_mass(200)
+    start_sim_mass = {50: 15, 200: 200, 1000: 200}
+    recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
@@ -393,7 +410,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     print("homing...")
     ctx.home()
     print("picking up tip")
-    pipette.pick_up_tip()
+    _pick_up_tip(ctx, pipette, cfg)
     print("moving to vial")
     well = vial["A1"]
     pipette.move_to(well.top())
@@ -406,7 +423,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     vial_volume = liquid_tracker.get_volume(well)
     print(f"software thinks there is {vial_volume} uL of liquid in the vial")
     print("dropping tip")
-    _drop_tip()
+    _drop_tip(ctx, pipette, cfg)
 
     try:
         if not cfg.blank or cfg.inspect:
@@ -422,7 +439,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 print("picking up tip")
                 tip_rack = pipette.tip_racks[0]
                 hover_above_tip = tip_rack["A1"].top(20)
-                pipette.pick_up_tip(hover_above_tip)
+                _pick_up_tip(ctx, pipette, cfg, hover_above_tip)
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx,
                     pipette,
@@ -447,7 +464,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 actual_asp_list.append(evap_aspirate)
                 actual_disp_list.append(evap_dispense)
                 print("dropping tip")
-                _drop_tip()
+                _drop_tip(ctx, pipette, cfg)
             ui.print_header("EVAPORATION AVERAGE")
             average_aspirate_evaporation_ul = sum(actual_asp_list) / len(
                 actual_asp_list
@@ -480,7 +497,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                     print(f"trial total {test_count}/{test_total}")
                     print("picking up tip")
-                    pipette.pick_up_tip()
+                    _pick_up_tip(ctx, pipette, cfg)
                     # NOTE: aspirate will be negative, dispense will be positive
                     (
                         actual_aspirate,
@@ -523,7 +540,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         test_report, trial, volume, asp_with_evap, disp_with_evap
                     )
                     print("dropping tip")
-                    _drop_tip()
+                    _drop_tip(ctx, pipette, cfg)
 
                 ui.print_header(f"{volume} uL CALCULATIONS")
                 # AVERAGE
