@@ -10,7 +10,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { PlayPauseButton, StopButton } from './Buttons'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
 import { Skeleton } from '../../../atoms/Skeleton'
 
 import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtocol'

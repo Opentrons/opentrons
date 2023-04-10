@@ -19,7 +19,8 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
-import { PlayPauseButton, StopButton } from './Buttons'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
 
 import type {
   CompletedProtocolAnalysis,
