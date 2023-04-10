@@ -791,21 +791,19 @@ class OT3API(
         """Return the postion (in deck coords) of the critical point of the
         specified mount.
         """
+        if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
+            raise GripperNotAttachedError(
+                f"Cannot return position for {mount} if no gripper is attached"
+            )
+
         if refresh:
             await self.refresh_positions()
 
-        xyz = [OT3Axis.X, OT3Axis.Y,  OT3Axis.by_mount(mount)]
-        if mount == OT3Mount.GRIPPER:
-            # OT3Axis.G motor status always return False because it is a brushed motor,
-            # so we should skip
-            position_axes = xyz
-        else:
-            position_axes = xyz.append(OT3Axis.of_main_tool_actuator(mount))
-
+        position_axes = [OT3Axis.X, OT3Axis.Y,  OT3Axis.by_mount(mount)]
         valid_motor = self._current_position and self._backend.check_motor_status(position_axes)
         if not valid_motor:
             raise MustHomeError(
-                f"Current position of {str(mount)} is unknown; please home motors."
+                f"Current position of {str(mount)} is invalid; please home motors."
             )
 
         return self._effector_pos_from_carriage_pos(
@@ -861,14 +859,16 @@ class OT3API(
         if refresh:
             await self.refresh_positions()
 
-        z_ax = OT3Axis.by_mount(mount)
-        tool_ax = OT3Axis.of_main_tool_actuator(mount)
-        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
+        if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
+            raise GripperNotAttachedError(
+                f"Cannot return encoder position for {mount} if no gripper is attached"
+            )
 
-        valid_encoder = self._encoder_position and self._backend.check_encoder_status(position_axes)
-        if not valid_encoder:
+        position_axes = [OT3Axis.X, OT3Axis.Y,  OT3Axis.by_mount(mount)]
+        valid_motor = self._encoder_position and self._backend.check_encoder_status(position_axes)
+        if not valid_motor:
             raise MustHomeError(
-                f"Encoder position of {str(mount)} is unknown, please home motors."
+                f"Encoder position of {str(mount)} is invalid; please home motors."
             )
 
         ot3pos = self._effector_pos_from_carriage_pos(
