@@ -93,6 +93,8 @@ export interface HealthPollerTarget {
   ip: string
   /** Port address used to construct health URLs */
   port: number
+  /** custom http agent used in request */
+  agent?: Agent
 }
 
 /**
@@ -157,6 +159,8 @@ export interface DiscoveryClientRobot extends RobotState {
 export interface DiscoveryClientConfig {
   /** Health poll interval used by the HealthPoller */
   healthPollInterval?: number
+  /** Serial port poll interval used by the SerialPortListMonitor */
+  serialPortPollInterval?: number
   /** Robots list to (re)initialize the tracking state */
   initialRobots?: DiscoveryClientRobot[]
   /** Extra IP addresses to manually track */

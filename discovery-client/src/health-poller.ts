@@ -4,14 +4,13 @@ import intersectionBy from 'lodash/intersectionBy'
 import unionBy from 'lodash/unionBy'
 import xorBy from 'lodash/xorBy'
 
-import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
-
 import {
   ROBOT_SERVER_HEALTH_PATH,
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
 
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
+import type { Agent } from 'http'
+import type { RequestInit } from 'node-fetch'
 import type {
   HealthPoller,
   HealthPollerTarget,
@@ -23,21 +22,25 @@ import type {
   LogLevel,
 } from './types'
 
-const DEFAULT_REQUEST_OPTS = {
+const DEFAULT_REQUEST_OPTS: RequestInit = {
   timeout: 10000,
   // NOTE(mc, 2020-11-04): This api version is slightly duplicated
   // across the larger monorepo codebase and is a good argument for a
   // standalone API client library that app, app-shell, and DC can share
   // NOTE(mc, 2020-11-04): Discovery client should remain locked to the lowest
   // available HTTP API version that satisfies its data needs
-  headers: { 'Opentrons-Version': '2' },
+  headers: {
+    'Opentrons-Version': '2',
+    // keeps the serial port socket open for one request, at least
+    Connection: 'keep-alive',
+  },
 }
 
 /**
  * Create a HealthPoller to monitor the health of a set of IP addresses
  */
 export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
-  const { onPollResult, onSerialPortFetch, logger } = options
+  const { onPollResult, logger } = options
   const log = (
     level: LogLevel,
     msg: string,
@@ -51,12 +54,17 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
   let pollIntervalId: NodeJS.Timeout | null = null
   let lastCompletedPollTimeByIp: { [ip: string]: number | undefined } = {}
 
-  const pollAndNotify = (ip: string, port: number): Promise<void> => {
-    log('silly', 'Polling health', { ip, port })
+  const pollAndNotify = (target: {
+    ip: string
+    port: number
+    agent?: Agent
+  }): Promise<void> => {
+    const { ip, port, agent } = target
+    log('silly', 'Polling health', { ip, port, agent })
 
     const pollTime = Date.now()
 
-    return pollHealth(ip, port)
+    return pollHealth(target)
       .then(result => {
         const lastPollTime = lastCompletedPollTimeByIp[ip] ?? 0
 
@@ -107,13 +115,7 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
           // take the head of the queue out and put it back in at the end
           pollQueue.push(head)
           // eslint-disable-next-line no-void
-          void pollAndNotify(head.ip, head.port)
-          if (onSerialPortFetch != null) {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            fetchSerialPortList().then((list: PortInfo[]) =>
-              onSerialPortFetch?.(list)
-            )
-          }
+          void pollAndNotify(head)
         }
       }
 
@@ -128,8 +130,9 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
   function stop(): void {
     log('debug', 'stopping health poller')
     lastCompletedPollTimeByIp = {}
-    // @ts-expect-error(mc, 2021-02-16): guard with a null check for pollIntervalId
-    clearInterval(pollIntervalId)
+    if (pollIntervalId != null) {
+      clearInterval(pollIntervalId)
+    }
     pollIntervalId = null
   }
 
@@ -145,9 +148,10 @@ type FetchAndParseResult<SuccessBody> =
  * be parsed, return the string body to preserve non-JSON NGINX responses
  */
 function fetchAndParse<SuccessBody>(
-  url: string
+  url: string,
+  options?: RequestInit
 ): Promise<FetchAndParseResult<SuccessBody>> {
-  return fetch(url, DEFAULT_REQUEST_OPTS)
+  return fetch(url, { ...DEFAULT_REQUEST_OPTS, ...options })
     .then(resp => {
       const { ok, status } = resp
 
@@ -182,15 +186,25 @@ function fetchAndParse<SuccessBody>(
  * TODO: poll via serial port if connection present and combine in same object if same robot?
  * will poll serial port for every robot
  */
-function pollHealth(ip: string, port: number): Promise<HealthPollerResult> {
+function pollHealth({
+  ip,
+  port,
+  agent,
+}: {
+  ip: string
+  port: number
+  agent?: Agent
+}): Promise<HealthPollerResult> {
   // IPv6 addresses require brackets
   const urlIp = net.isIPv6(ip) ? `[${ip}]` : ip
 
   const healthReq = fetchAndParse<HealthResponse>(
-    `http://${urlIp}:${port}${ROBOT_SERVER_HEALTH_PATH}`
+    `http://${urlIp}:${port}${ROBOT_SERVER_HEALTH_PATH}`,
+    { agent }
   )
   const serverHealthReq = fetchAndParse<ServerHealthResponse>(
-    `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`
+    `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`,
+    { agent }
   )
 
   return Promise.all([healthReq, serverHealthReq]).then(

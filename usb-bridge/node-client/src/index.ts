@@ -1,5 +1,9 @@
-import { buildUSBAgent, fetchSerialPortList } from './usb-agent'
+import {
+  buildUSBAgent,
+  createSerialPortListMonitor,
+  fetchSerialPortList,
+} from './usb-agent'
 import type { AgentOptions, PortInfo } from './usb-agent'
 
-export { buildUSBAgent, fetchSerialPortList }
+export { buildUSBAgent, createSerialPortListMonitor, fetchSerialPortList }
 export type { AgentOptions, PortInfo }

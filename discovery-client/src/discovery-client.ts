@@ -1,4 +1,7 @@
-import { buildUSBAgent } from '@opentrons/usb-bridge/node-client'
+import {
+  buildUSBAgent,
+  // createSerialPortListMonitor,
+} from '@opentrons/usb-bridge/node-client'
 
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
@@ -30,7 +33,7 @@ export function createDiscoveryClient(
 
   const healthPoller = createHealthPoller({
     onPollResult: result => dispatch(Store.healthPolled(result)),
-    onSerialPortFetch: result => dispatch(Store.serialPortsPolled(result)),
+    // onSerialPortFetch: result => dispatch(Store.serialPortsPolled(result)),
     logger,
   })
 
@@ -45,35 +48,38 @@ export function createDiscoveryClient(
   }
 
   const start = (config?: DiscoveryClientConfig): void => {
-    const { healthPollInterval, ...intialState } = config ?? {}
+    const { healthPollInterval, serialPortPollInterval, ...intialState } =
+      config ?? {}
 
     dispatch(Store.initializeState(intialState))
 
     let prevAddrs = getAddresses()
     let prevRobots = getRobots()
-    let prevSerialPorts = getSerialPorts()
+    // let prevSerialPorts = getSerialPorts()
 
     healthPoller.start({
       list: prevAddrs,
       interval: healthPollInterval,
     })
     mdnsBrowser.start()
+    // serialPortListMonitor.start({ interval: serialPortPollInterval })
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!unsubscribe) {
       unsubscribe = subscribe(() => {
         const addrs = getAddresses()
         const robots = getRobots()
-        const serialPorts = getSerialPorts()
+        // const serialPorts = getSerialPorts()
 
-        if (addrs !== prevAddrs || serialPorts !== prevSerialPorts) {
+        // if (addrs !== prevAddrs || serialPorts !== prevSerialPorts) {
+        if (addrs !== prevAddrs) {
           healthPoller.start({ list: addrs })
         }
         if (robots !== prevRobots) onListChange(robots)
 
         prevAddrs = addrs
         prevRobots = robots
-        prevSerialPorts = serialPorts
+        // prevSerialPorts = serialPorts
       })
     }
   }

@@ -9,7 +9,9 @@ import {
   createDiscoveryClient,
   DEFAULT_PORT,
   DEFAULT_PRODUCT_ID,
+  DEFAULT_VENDOR_ID,
 } from '@opentrons/discovery-client'
+import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import {
@@ -27,12 +29,16 @@ import {
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
 
+import type { Agent } from 'http'
+
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type {
   Address,
   DiscoveryClientRobot,
   LegacyService,
   DiscoveryClient,
 } from '@opentrons/discovery-client'
+import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 
 import type { Action, Dispatch } from './types'
 import type { Config } from './config'
@@ -127,6 +133,7 @@ export function registerDiscovery(
   client.start({
     initialRobots,
     healthPollInterval: SLOW_POLL_INTERVAL_MS,
+    serialPortPollInterval: FAST_POLL_INTERVAL_MS,
     manualAddresses: makeManualAddresses(config.candidates),
   })
 
@@ -147,31 +154,29 @@ export function registerDiscovery(
     client.stop()
   })
 
+  let usbHttpAgent: Agent
   let destroyHttpAgent: () => void
 
   async function usbListener(
     _event: IpcMainInvokeEvent,
     config: AxiosRequestConfig
   ): Promise<unknown> {
-    // TODO: replace with serialPortPath passed from discovery client via app
-    // find OT-3 serial port by product ID
-    const ot3UsbSerialPort = client
-      .getSerialPorts?.()
-      .find(port => port.productId === DEFAULT_PRODUCT_ID)
+    try {
+      const response = await axios.request({
+        httpAgent: usbHttpAgent,
+        ...config,
+      })
+      return response.data
+    } catch (e) {
+      log.debug(`usbListener error ${JSON.stringify(e)}`)
+    }
+  }
 
-    // TODO: handle null case properly
-    const httpAgent = client.createHttpAgent?.(
-      ot3UsbSerialPort?.path ?? 'no path found'
+  function isUsbDeviceOt3(device: UsbDevice): boolean {
+    return (
+      device.productId === parseInt(DEFAULT_PRODUCT_ID, 16) &&
+      device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
     )
-
-    destroyHttpAgent = httpAgent?.destroy ?? (() => {})
-
-    const response = await axios.request({
-      httpAgent,
-      ...config,
-    })
-
-    return response.data
   }
 
   return function handleIncomingAction(action: Action) {
@@ -181,10 +186,16 @@ export function registerDiscovery(
       case UI_INITIALIZED:
       case DISCOVERY_START:
         handleRobots()
-        return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
+        return client.start({
+          healthPollInterval: FAST_POLL_INTERVAL_MS,
+          serialPortPollInterval: FAST_POLL_INTERVAL_MS,
+        })
 
       case DISCOVERY_FINISH:
-        return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
+        return client.start({
+          healthPollInterval: SLOW_POLL_INTERVAL_MS,
+          serialPortPollInterval: FAST_POLL_INTERVAL_MS,
+        })
 
       case DISCOVERY_REMOVE:
         return client.removeRobot(
@@ -194,27 +205,76 @@ export function registerDiscovery(
       case CLEAR_CACHE:
         return clearCache()
       case SYSTEM_INFO_INITIALIZED:
-        if (
-          action.payload.usbDevices.find(
-            device => device.productId === parseInt(DEFAULT_PRODUCT_ID, 16)
-          ) != null
-        ) {
-          ipcMain.handle('usb:request', usbListener)
+        if (action.payload.usbDevices.find(isUsbDeviceOt3) != null) {
+          // TODO: extract and use within USB_DEVICE_ADDED
+          fetchSerialPortList()
+            .then((list: PortInfo[]) => {
+              const ot3UsbSerialPort = list.find(
+                port =>
+                  port.productId === DEFAULT_PRODUCT_ID &&
+                  port.vendorId === DEFAULT_VENDOR_ID
+              )
+
+              // TODO: handle null case properly
+              const httpAgent = client.createHttpAgent?.(
+                ot3UsbSerialPort?.path ?? 'no path found'
+              )
+
+              usbHttpAgent = httpAgent as Agent
+              destroyHttpAgent = httpAgent?.destroy ?? (() => {})
+
+              ipcMain.handle('usb:request', usbListener)
+              client.start({
+                healthPollInterval: FAST_POLL_INTERVAL_MS,
+                serialPortPollInterval: FAST_POLL_INTERVAL_MS,
+                manualAddresses: [
+                  {
+                    ip: 'opentrons-usb',
+                    port: DEFAULT_PORT,
+                    agent: usbHttpAgent,
+                  },
+                ],
+              })
+            })
+            .catch(e =>
+              log.debug(`fetchSerialPortList error ${JSON.stringify(e)}`)
+            )
         }
         break
       case USB_DEVICE_ADDED:
-        if (
-          action.payload.usbDevice.productId ===
-          parseInt(DEFAULT_PRODUCT_ID, 16)
-        ) {
+        if (isUsbDeviceOt3(action.payload.usbDevice)) {
+          // TODO: fetch serial ports as above
+          const ot3UsbSerialPort = client
+            .getSerialPorts?.()
+            .find(
+              port =>
+                port.productId === DEFAULT_PRODUCT_ID &&
+                port.vendorId === DEFAULT_VENDOR_ID
+            )
+
+          // TODO: handle null case properly
+          const httpAgent = client.createHttpAgent?.(
+            ot3UsbSerialPort?.path ?? 'no path found'
+          )
+
+          destroyHttpAgent = httpAgent?.destroy ?? (() => {})
+
           ipcMain.handle('usb:request', usbListener)
+          client.start({
+            healthPollInterval: FAST_POLL_INTERVAL_MS,
+            serialPortPollInterval: FAST_POLL_INTERVAL_MS,
+            manualAddresses: [
+              {
+                ip: 'opentrons-usb.com',
+                port: DEFAULT_PORT,
+                agent: usbHttpAgent,
+              },
+            ],
+          })
         }
         break
       case USB_DEVICE_REMOVED:
-        if (
-          action.payload.usbDevice.productId ===
-          parseInt(DEFAULT_PRODUCT_ID, 16)
-        ) {
+        if (isUsbDeviceOt3(action.payload.usbDevice)) {
           destroyHttpAgent?.()
           ipcMain.removeHandler('usb:request')
         }
