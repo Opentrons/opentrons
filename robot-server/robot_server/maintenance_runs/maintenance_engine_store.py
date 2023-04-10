@@ -15,9 +15,6 @@ from opentrons.protocol_engine import (
 )
 
 
-from robot_server.protocols import ProtocolResource
-
-
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
 

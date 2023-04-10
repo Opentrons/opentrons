@@ -14,16 +14,19 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors import ApiError
-from robot_server.runs.run_store import CommandNotFoundError
 from robot_server.service.json_api import (
     RequestModel,
     MultiBodyMeta,
 )
 
 from robot_server.maintenance_runs.maintenance_engine_store import EngineStore
-from robot_server.maintenance_runs.maintenance_run_data_manager import \
-    MaintenanceRunDataManager, RunNotCurrentError
-from robot_server.maintenance_runs.maintenance_run_models import MaintenanceRunCommandSummary
+from robot_server.maintenance_runs.maintenance_run_data_manager import (
+    MaintenanceRunDataManager,
+    RunNotCurrentError,
+)
+from robot_server.maintenance_runs.maintenance_run_models import (
+    MaintenanceRunCommandSummary,
+)
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.maintenance_runs.router.commands_router import (
     CommandCollectionLinks,

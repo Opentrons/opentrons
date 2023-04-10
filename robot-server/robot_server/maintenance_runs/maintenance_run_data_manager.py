@@ -36,7 +36,7 @@ def _build_run(
         id=run_id,
         createdAt=created_at,
         status=state_summary.status,
-        actions=[],     # TODO (spp, 2023-04-23): wire up actions once they are allowed
+        actions=[],  # TODO (spp, 2023-04-23): wire up actions once they are allowed
         errors=state_summary.errors,
         labware=state_summary.labware,
         labwareOffsets=state_summary.labwareOffsets,
@@ -151,44 +151,6 @@ class MaintenanceRunDataManager:
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
 
-    # async def update(self, run_id: str, current: Optional[bool]) -> Run:
-    #     """Get and potentially archive a run.
-    #
-    #     Args:
-    #         run_id: The run to get and maybe archive.
-    #
-    #     Returns:
-    #         The updated run.
-    #
-    #     Raises:
-    #         RunNotFoundError: The run identifier was not found in the database.
-    #         RunNotCurrentError: The run is not the current run.
-    #         EngineConflictError: The run cannot be updated because it is not idle.
-    #     """
-    #     if run_id != self._engine_store.current_run_id:
-    #         raise RunNotCurrentError(
-    #             f"Cannot update {run_id} because it is not the current run."
-    #         )
-    #
-    #     next_current = current if current is False else True
-    #
-    #     if next_current is False:
-    #         commands, state_summary = await self._engine_store.clear()
-    #         run_resource = self._run_store.update_run_state(
-    #             run_id=run_id,
-    #             summary=state_summary,
-    #             commands=commands,
-    #         )
-    #     else:
-    #         state_summary = self._engine_store.engine.state_view.get_summary()
-    #         run_resource = self._run_store.get(run_id=run_id)
-    #
-    #     return _build_run(
-    #         run_resource=run_resource,
-    #         state_summary=state_summary,
-    #         current=next_current,
-    #     )
-
     def get_commands_slice(
         self,
         run_id: str,
@@ -235,9 +197,7 @@ class MaintenanceRunDataManager:
         """
         if run_id != self._engine_store.current_run_id:
             raise RunNotCurrentError(f"{run_id} is not the current maintenance run")
-        return self._engine_store.engine.state_view.commands.get(
-            command_id=command_id
-        )
+        return self._engine_store.engine.state_view.commands.get(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
 

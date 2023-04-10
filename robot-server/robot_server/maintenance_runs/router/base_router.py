@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional, Union
+from typing import Optional
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
@@ -18,17 +18,15 @@ from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,
-    MultiBody,
-    MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
+    Body,
 )
 
 from ...runs.run_models import RunNotFoundError
 from ..maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
-    MaintenanceRunUpdate,
 )
 from ..maintenance_engine_store import EngineConflictError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager, RunNotCurrentError
@@ -44,6 +42,13 @@ class RunNotFound(ErrorDetails):
 
     id: Literal["RunNotFound"] = "RunNotFound"
     title: str = "Run Not Found"
+
+
+class NoCurrentRunFound(ErrorDetails):
+    """An error if there is no current run to fetch."""
+
+    id: Literal["NoCurrentRunFound"] = "NoCurrentRunFound"
+    title: str = "No current run found"
 
 
 class RunAlreadyActive(ErrorDetails):
@@ -180,6 +185,42 @@ async def get_run(
     )
 
 
+@base_router.get(
+    path="/maintenance_runs/current_run",
+    summary="Get the current maintenance run",
+    description="Get the currently active maintenance run, if any",
+    responses={
+        status.HTTP_200_OK: {"model": Body[MaintenanceRun, AllRunsLinks]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoCurrentRunFound]},
+    },
+)
+async def get_current_run(
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
+) -> PydanticResponse[Body[MaintenanceRun, AllRunsLinks]]:
+    """Get the current maintenance run.
+
+    Args:
+        run_data_manager: Current run data management.
+    """
+    current_run_id = run_data_manager.current_run_id
+    if current_run_id is None:
+        raise NoCurrentRunFound(
+            detail="No maintenance run currently running."
+        ).as_error(status.HTTP_404_NOT_FOUND)
+
+    data = run_data_manager.get(current_run_id)
+    links = AllRunsLinks(
+        current=ResourceLink.construct(href=f"/maintenance_runs/{current_run_id}")
+    )
+
+    return await PydanticResponse.create(
+        content=Body.construct(data=data, links=links),
+        status_code=status.HTTP_200_OK,
+    )
+
+
 @base_router.delete(
     path="/maintenance_runs/{runId}",
     summary="Delete a run",
@@ -191,7 +232,9 @@ async def get_run(
 )
 async def remove_run(
     runId: str,
-    run_data_manager: MaintenanceRunDataManager = Depends(get_maintenance_run_data_manager),
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
@@ -212,42 +255,3 @@ async def remove_run(
         content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
     )
-
-
-# @base_router.patch(
-#     path="/runs/{runId}",
-#     summary="Update a run",
-#     description="Update a specific run, returning the updated resource.",
-#     responses={
-#         status.HTTP_200_OK: {"model": SimpleBody[Run]},
-#         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-#         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
-#     },
-# )
-# async def update_run(
-#     runId: str,
-#     request_body: RequestModel[RunUpdate],
-#     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-# ) -> PydanticResponse[SimpleBody[Run]]:
-#     """Update a run by its ID.
-#
-#     Args:
-#         runId: Run ID pulled from URL.
-#         request_body: Update data from request body.
-#         run_data_manager: Current and historical run data management.
-#     """
-#     try:
-#         run_data = await run_data_manager.update(
-#             runId, current=request_body.data.current
-#         )
-#     except EngineConflictError as e:
-#         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
-#     except RunNotCurrentError as e:
-#         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
-#     except RunNotFoundError as e:
-#         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
-#
-#     return await PydanticResponse.create(
-#         content=SimpleBody.construct(data=run_data),
-#         status_code=status.HTTP_200_OK,
-#     )

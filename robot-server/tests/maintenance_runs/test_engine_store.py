@@ -11,7 +11,10 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import LiveRunner, RunResult
 
-from robot_server.maintenance_runs.maintenance_engine_store import EngineStore, EngineConflictError
+from robot_server.maintenance_runs.maintenance_engine_store import (
+    EngineStore,
+    EngineConflictError,
+)
 
 
 @pytest.fixture

@@ -11,7 +11,6 @@ from pydantic import BaseModel, Field
 from opentrons.protocol_engine import (
     ProtocolEngine,
     commands as pe_commands,
-    errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
@@ -28,7 +27,10 @@ from robot_server.service.json_api import (
 from ..maintenance_run_models import MaintenanceRunCommandSummary
 from ..maintenance_run_data_manager import MaintenanceRunDataManager, RunNotCurrentError
 from ..maintenance_engine_store import EngineStore
-from ..dependencies import get_maintenance_engine_store, get_maintenance_run_data_manager
+from ..dependencies import (
+    get_maintenance_engine_store,
+    get_maintenance_run_data_manager,
+)
 from .base_router import RunNotFound, RunStopped
 
 
@@ -104,11 +106,11 @@ async def get_current_run_engine_from_url(
     summary="Enqueue a command",
     description=textwrap.dedent(
         """
-        Add a single command to the maintenance run. 
+        Add a single command to the maintenance run.
 
-        These commands will execute immediately and in the order they are 
-        enqueued. The execution of these commands cannot be paused, 
-        but a maintenance run can be deleted at any point, as long as there 
+        These commands will execute immediately and in the order they are
+        enqueued. The execution of these commands cannot be paused,
+        but a maintenance run can be deleted at any point, as long as there
         are no commands running.
         """
     ),
@@ -217,7 +219,9 @@ async def get_run_commands(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
     ),
-    run_data_manager: MaintenanceRunDataManager = Depends(get_maintenance_run_data_manager),
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
 ) -> PydanticResponse[MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
@@ -296,7 +300,9 @@ async def get_run_commands(
 async def get_run_command(
     runId: str,
     commandId: str,
-    run_data_manager: MaintenanceRunDataManager = Depends(get_maintenance_run_data_manager),
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 
