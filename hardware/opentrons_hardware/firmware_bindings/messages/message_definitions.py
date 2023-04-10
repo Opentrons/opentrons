@@ -803,6 +803,18 @@ class SetGripperErrorTolerance(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class TipStatusQueryRequest(EmptyPayloadMessage):
+    """Request to query the tip presence pin.
+
+    The response should be a PushTipPresenceNotification.
+    """
+
+    message_id: Literal[
+        MessageId.get_tip_status_request
+    ] = MessageId.get_tip_status_request
+
+
+@dataclass
 class PushTipPresenceNotification(BaseMessage):
     """Hardware triggered notification of ejector flag status.
 
