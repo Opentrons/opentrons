@@ -26,10 +26,12 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
 
     def run(protocol: protocol_api.ProtocolContext):
          # Load a Magnetic Module GEN2 in deck slot 1.
-         magnetic_module = protocol.load_module('magnetic module gen2', 1)
+         magnetic_module = protocol.load_module(
+            module_name = 'magnetic module gen2', location = 1)
          
          # Load a Temperature Module GEN1 in deck slot 3.
-         temperature_module = protocol.load_module('temperature module', 3)
+         temperature_module = protocol.load_module(
+            module_name = 'temperature module', location = 3)
 
 When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
 
@@ -37,38 +39,42 @@ When you load a module in a protocol, you inform the OT-2 that you want the spec
 
 Available Modules
 -----------------
+.. Suggesting text changes for intro sentences. The original uses "load name",
+.. but load_module uses module_name. In the intro and table headers,
+.. let's consider using text that mirrors the argument name for the load_module method 
+.. (i.e. refer to "module_name" or "module name" instead of "load name")
 
-The first parameter of :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
+The first parameter of :py:meth:`.ProtocolContext.load_module` is ``module_name``. It tells the robot which Opentrons module is on the deck. The following table lists the acceptable names for each module.
 
 Some modules were added to the Protocol API later than others, and some modules have multiple hardware generations (GEN2 modules have a "GEN2" label on the device). Make sure your protocol's metadata specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
 .. table::
    :widths: 4 5 2
    
-   +--------------------+-------------------------------+---------------------------+
-   | Module             | Load Name                     | Introduced in API Version |
-   +====================+===============================+===========================+
-   | Temperature Module | ``temperature module``        | 2.0                       |
-   | GEN1               | or ``tempdeck``               |                           |
-   +--------------------+-------------------------------+---------------------------+
-   | Temperature Module | ``temperature module gen2``   | 2.3                       |
-   | GEN2               |                               |                           |
-   +--------------------+-------------------------------+---------------------------+
-   | Magnetic Module    | ``magnetic module``           | 2.0                       |
-   | GEN1               | or ``magdeck``                |                           |
-   +--------------------+-------------------------------+---------------------------+
-   | Magnetic Module    | ``magnetic module gen2``      | 2.3                       |
-   | GEN2               |                               |                           |
-   +--------------------+-------------------------------+---------------------------+
-   | Thermocycler       | ``thermocycler module``       | 2.0                       |
-   | Module GEN1        | or ``thermocycler``           |                           |
-   +--------------------+-------------------------------+---------------------------+
-   | Thermocycler       | ``thermocycler module gen2``  | 2.13                      |
-   | Module GEN2        | or ``thermocyclerModuleV2``   |                           |
-   +--------------------+-------------------------------+---------------------------+
-   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                      |
-   | Module             |                               |                           |
-   +--------------------+-------------------------------+---------------------------+
+   +--------------------+-------------------------------+---------------------------------+
+   | Module             | Module Name                   | Introduced in API Version       |
+   +====================+===============================+=================================+
+   | Temperature Module | ``temperature module``        | 2.0                             |
+   | GEN1               | or ``tempdeck``               |                                 |
+   +--------------------+-------------------------------+---------------------------------+
+   | Temperature Module | ``temperature module gen2``   | 2.3                             |
+   | GEN2               |                               |                                 |
+   +--------------------+-------------------------------+---------------------------------+
+   | Magnetic Module    | ``magnetic module``           | 2.0                             |
+   | GEN1               | or ``magdeck``                |                                 |
+   +--------------------+-------------------------------+---------------------------------+
+   | Magnetic Module    | ``magnetic module gen2``      | 2.3                             |
+   | GEN2               |                               |                                 |
+   +--------------------+-------------------------------+---------------------------------+
+   | Thermocycler       | ``thermocycler module``       | 2.0                             |
+   | Module GEN1        | or ``thermocycler``           |                                 |
+   +--------------------+-------------------------------+---------------------------------+
+   | Thermocycler       | ``thermocycler module gen2``  | 2.13                            |
+   | Module GEN2        | or ``thermocyclerModuleV2``   |                                 |
+   +--------------------+-------------------------------+---------------------------------+
+   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                            |
+   | Module             |                               |                                 |
+   +--------------------+-------------------------------+---------------------------------+
 
 Loading Labware onto a Module
 =============================
@@ -82,11 +88,11 @@ Like specifying labware that will be placed directly on the deck of the OT-2, yo
     metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module("temperature module gen2", 1)
+        temp_mod = protocol.load_module(
+            module_name = "temperature module gen2", location = 1)
         temp_labware = temp_mod.load_labware(
-            "opentrons_24_aluminumblock_generic_2ml_screwcap",
-            label="Temperature-Controlled Tubes",
-        )
+            load_name = "opentrons_24_aluminumblock_generic_2ml_screwcap",
+            label = "Temperature-Controlled Tubes")
 
 .. versionadded:: 2.0
 
@@ -131,10 +137,14 @@ The examples in this section will use a Temperature Module loaded in slot 3:
     metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module('temperature module gen2', '3')
-        plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
+        temp_mod = protocol.load_module(
+            module_name = 'temperature module gen2', location = '3')
+        plate = temp_mod.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat')
 
-In order to prevent physical obstruction of other slots, it's best to load the Temperature Module in a slot on the horizontal edges of the deck (1, 4, 7, or 10 on the left or 3, 6, or 9 on the right), with the USB cable and power cord pointing away from the deck.
+.. Perhaps put this bit 'o info in a note callout?
+.. note::
+    To avoid obstructing other slots, load the Temperature Module in a slot on the horizontal edges of the deck (1, 4, 7, or 10 on the left or 3, 6, or 9 on the right), with the USB cable and power cord pointing away from the deck.
 
 .. versionadded:: 2.0
 
