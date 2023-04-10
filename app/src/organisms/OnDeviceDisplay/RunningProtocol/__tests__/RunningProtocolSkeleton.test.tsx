@@ -2,14 +2,16 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { RunningProtocolSkelton } from '../RunningProtocolSkelton'
+import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'
 
-const render = (props: React.ComponentProps<typeof RunningProtocolSkelton>) => {
-  return renderWithProviders(<RunningProtocolSkelton {...props} />)
+const render = (
+  props: React.ComponentProps<typeof RunningProtocolSkeleton>
+) => {
+  return renderWithProviders(<RunningProtocolSkeleton {...props} />)
 }
 
-describe('RunningProtocolSkelton', () => {
-  let props: React.ComponentProps<typeof RunningProtocolSkelton>
+describe('RunningProtocolSkeleton', () => {
+  let props: React.ComponentProps<typeof RunningProtocolSkeleton>
 
   beforeEach(() => {
     props = {

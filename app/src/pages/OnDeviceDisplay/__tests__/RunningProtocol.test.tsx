@@ -17,7 +17,7 @@ import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
-  RunningProtocolSkelton,
+  RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   useRunStatus,
@@ -67,8 +67,8 @@ const mockCurrentRunningProtocolCommand = CurrentRunningProtocolCommand as jest.
 const mockRunningProtocolCommandList = RunningProtocolCommandList as jest.MockedFunction<
   typeof RunningProtocolCommandList
 >
-const mockRunningProtocolSkelton = RunningProtocolSkelton as jest.MockedFunction<
-  typeof RunningProtocolSkelton
+const mockRunningProtocolSkeleton = RunningProtocolSkeleton as jest.MockedFunction<
+  typeof RunningProtocolSkeleton
 >
 
 const RUN_ID = 'run_id'
@@ -150,8 +150,8 @@ describe('RunningProtocol', () => {
     mockRunningProtocolCommandList.mockReturnValue(
       <div>mock RunningProtocolCommandList</div>
     )
-    mockRunningProtocolSkelton.mockReturnValue(
-      <div>mock RunningProtocolSkelton</div>
+    mockRunningProtocolSkeleton.mockReturnValue(
+      <div>mock RunningProtocolSkeleton</div>
     )
   })
 
@@ -165,7 +165,7 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID)
       .mockReturnValue(null)
     const [{ getByText }] = render(`/protocols/${RUN_ID}/run`)
-    getByText('mock RunningProtocolSkelton')
+    getByText('mock RunningProtocolSkeleton')
   })
 
   it('should render CurrentRunningProtocolCommand when loaded the data', () => {

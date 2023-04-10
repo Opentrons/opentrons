@@ -32,7 +32,7 @@ import {
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
-  RunningProtocolSkelton,
+  RunningProtocolSkeleton,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
 
@@ -148,7 +148,7 @@ export function RunningProtocol(): JSX.Element {
               />
             )
           ) : (
-            <RunningProtocolSkelton currentOption={currentOption} />
+            <RunningProtocolSkeleton currentOption={currentOption} />
           )}
           <Flex
             marginTop="2rem"

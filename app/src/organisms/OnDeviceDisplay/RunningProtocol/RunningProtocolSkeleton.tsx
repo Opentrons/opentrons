@@ -19,13 +19,13 @@ import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtoco
 const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
 const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen
 
-interface RunningProtocolSkeltonProps {
+interface RunningProtocolSkeletonProps {
   currentOption: ScreenOption
 }
 
-export function RunningProtocolSkelton({
+export function RunningProtocolSkeleton({
   currentOption,
-}: RunningProtocolSkeltonProps): JSX.Element {
+}: RunningProtocolSkeletonProps): JSX.Element {
   return (
     <>
       {currentOption === 'CurrentRunningProtocolCommand' ? (
