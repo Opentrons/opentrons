@@ -304,7 +304,7 @@ export function ProtocolCard(props: {
         <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
-        {longpress.isLongPressed === true && (
+        {longpress.isLongPressed && (
           <LongPressModal longpress={longpress} protocol={protocol} />
         )}
       </Flex>

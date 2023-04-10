@@ -73,7 +73,7 @@ export function PinnedProtocol(props: {
     longpress: UseLongPressResult,
     protocolId: string
   ): void => {
-    if (longpress.isLongPressed !== true) {
+    if (!longpress.isLongPressed) {
       history.push(`/protocols/${protocolId}`)
     }
   }
@@ -112,7 +112,7 @@ export function PinnedProtocol(props: {
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
           {lastRun !== undefined
-            ? `${String(t('last_run'))} ${formatDistance(
+            ? `${t('last_run')} ${formatDistance(
                 new Date(lastRun),
                 new Date(),
                 {

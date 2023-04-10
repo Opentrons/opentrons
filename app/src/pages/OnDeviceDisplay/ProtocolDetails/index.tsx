@@ -110,7 +110,7 @@ const ProtocolHeader = (props: {
           borderRadius={BORDERS.size_six}
           boxShadow="none"
           onClick={handleRunProtocol}
-          padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`}
+          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
         >
           <StyledText
             fontSize="2.333125rem"
@@ -194,7 +194,7 @@ const Summary = (props: {
         lineHeight={TYPOGRAPHY.lineHeight28}
         marginTop={SPACING.spacing5}
         maxWidth="22rem"
-        padding={`${String(SPACING.spacing3)} 0.75rem`}
+        padding={`${SPACING.spacing3} 0.75rem`}
       >
         <StyledText>{`${t('protocol_info:date_added')}: ${
           date != null
