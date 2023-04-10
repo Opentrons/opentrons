@@ -81,15 +81,9 @@ const removeAndLog = filename => {
   return fs.unlink(filename)
 }
 
-const logNotRemoving = filename => {
-  console.log(`not removing ${filename}`)
-  return Promise.resolve(true)
-}
+const logNotRemoving = filename => Promise.resolve(true)
 
-const logCheckingDir = dirpath => {
-  console.log(`Checking directory ${dirpath}`)
-  return fs.readdir(dirpath)
-}
+const logCheckingDir = dirpath => fs.readdir(dirpath)
 
 const removeUnusedPyExecutables = root =>
   Promise.all(
@@ -98,24 +92,20 @@ const removeUnusedPyExecutables = root =>
         path.join(root, path.join(PYTHON_SITE_PACKAGES_TARGET_WINDOWS, subdir))
       )
       .map(dirToCheck =>
-        logCheckingDir(dirToCheck).then(entries => {
-          console.log(
-            `Removing all exes from the following list: ${entries.join(', ')}`
-          )
-          return entries
+        logCheckingDir(dirToCheck).then(entries =>
+          entries
             .map(entry => path.join(dirToCheck, entry))
             .map(entry =>
               entry.endsWith('exe')
                 ? removeAndLog(entry)
                 : logNotRemoving(entry)
             )
-        })
+        )
       )
   )
 
 module.exports = function beforeBuild(context) {
   const { platform, arch, electronPlatformName } = context
-  console.log(context)
   const platformName = electronPlatformName ?? platform.nodeName
   const standalonePython = getPythonVersion(platformName, arch)
   const isWin = platformName === 'win32'
@@ -176,10 +166,6 @@ module.exports = function beforeBuild(context) {
       console.debug('pip output:', result.stdout)
       // must return a truthy value, or else electron-builder will
       // skip installing project dependencies into the package
-      return true
-    })
-    .catch(error => {
-      console.log('heres an error when doing pip stuff', error)
       return true
     })
     .then(() => {
