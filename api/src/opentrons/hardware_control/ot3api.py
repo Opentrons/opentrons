@@ -794,9 +794,13 @@ class OT3API(
         if refresh:
             await self.refresh_positions()
 
-        z_ax = OT3Axis.by_mount(mount)
-        tool_ax = OT3Axis.of_main_tool_actuator(mount)
-        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, tool_ax]
+        xyz = [OT3Axis.X, OT3Axis.Y,  OT3Axis.by_mount(mount)]
+        if mount == OT3Mount.GRIPPER:
+            # OT3Axis.G motor status always return False because it is a brushed motor,
+            # so we should skip
+            position_axes = xyz
+        else:
+            position_axes = xyz.append(OT3Axis.of_main_tool_actuator(mount))
 
         valid_motor = self._current_position and self._backend.check_motor_status(position_axes)
         if not valid_motor:
