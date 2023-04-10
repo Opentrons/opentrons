@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { ModalShell } from '../../../molecules/Modal'
+import { Modal } from '.'
 
 export function TooManyPinsModal(props: {
   handleCloseMaxPinsAlert: () => void
@@ -19,11 +19,7 @@ export function TooManyPinsModal(props: {
   const { t } = useTranslation(['protocol_info', 'shared'])
 
   return (
-    <ModalShell
-      borderRadius={BORDERS.size_three}
-      onOutsideClick={handleCloseMaxPinsAlert}
-      width="32.375rem"
-    >
+    <Modal onOutsideClick={handleCloseMaxPinsAlert} modalSize="small">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}
@@ -67,6 +63,6 @@ export function TooManyPinsModal(props: {
           </StyledText>
         </Flex>
       </Flex>
-    </ModalShell>
+    </Modal>
   )
 }
