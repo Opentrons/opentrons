@@ -449,7 +449,7 @@ class CommandView(HasState[CommandState]):
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
         for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
-            if self.get_is_complete(cid):
+            if self.get_command_is_final(cid):
                 entry = self._state.commands_by_id[cid]
                 return CurrentCommand(
                     command_id=entry.command.id,
@@ -510,20 +510,26 @@ class CommandView(HasState[CommandState]):
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
-    def get_is_complete(self, command_id: str) -> bool:
-        """Get whether a given command is completed.
+    def get_command_is_final(self, command_id: str) -> bool:
+        """Get whether a given command has reached its final `status`.
 
-        A command is "completed" if one of the following is true:
+        This happens when one of the following is true:
 
-        - Its status is CommandStatus.SUCCEEDED
-        - Its status is CommandStatus.FAILED
+        - Its status is `CommandStatus.SUCCEEDED`.
+        - Its status is `CommandStatus.FAILED`.
+        - Its status is `CommandStatus.QUEUED` but the run has been requested to stop,
+          so the run will never reach it.
 
         Arguments:
             command_id: Command to check.
         """
         status = self.get(command_id).status
 
-        return status == CommandStatus.SUCCEEDED or status == CommandStatus.FAILED
+        return (
+            status == CommandStatus.SUCCEEDED
+            or status == CommandStatus.FAILED
+            or (status == CommandStatus.QUEUED and self._state.run_result is not None)
+        )
 
     def get_all_complete(self) -> bool:
         """Get whether all added commands have completed.

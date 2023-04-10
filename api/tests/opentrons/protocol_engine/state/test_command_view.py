@@ -182,7 +182,7 @@ def test_get_is_running_queue() -> None:
     assert subject.get_is_running() is False
 
 
-def test_get_is_complete() -> None:
+def test_get_command_is_final() -> None:
     """It should be able to tell if a command is complete."""
     completed_command = create_succeeded_command(command_id="command-id-1")
     failed_command = create_failed_command(command_id="command-id-2")
@@ -193,10 +193,10 @@ def test_get_is_complete() -> None:
         commands=[completed_command, failed_command, running_command, pending_command]
     )
 
-    assert subject.get_is_complete("command-id-1") is True
-    assert subject.get_is_complete("command-id-2") is True
-    assert subject.get_is_complete("command-id-3") is False
-    assert subject.get_is_complete("command-id-4") is False
+    assert subject.get_command_is_final("command-id-1") is True
+    assert subject.get_command_is_final("command-id-2") is True
+    assert subject.get_command_is_final("command-id-3") is False
+    assert subject.get_command_is_final("command-id-4") is False
 
 
 def test_get_all_complete() -> None:

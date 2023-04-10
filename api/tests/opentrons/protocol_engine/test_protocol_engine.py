@@ -281,7 +281,7 @@ async def test_add_and_execute_command(
 
     decoy.when(
         await state_store.wait_for(
-            condition=state_store.commands.get_is_complete,
+            condition=state_store.commands.get_command_is_final,
             command_id="command-id",
         ),
     ).then_do(_stub_completed)
