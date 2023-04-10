@@ -15,6 +15,7 @@ import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSetting
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
+import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
 
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
@@ -25,6 +26,7 @@ jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 jest.mock('../../pages/OnDeviceDisplay/AttachInstrumentsDashboard')
+jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
@@ -53,6 +55,9 @@ const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction
 const mockAttachInstrumentsDashboard = AttachInstrumentsDashboard as jest.MockedFunction<
   typeof AttachInstrumentsDashboard
 >
+const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
+  typeof RunningProtocol
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -78,6 +83,7 @@ describe('OnDeviceDisplayApp', () => {
     mockRobotSettingsDashboard.mockReturnValue(
       <div>Mock RobotSettingsDashboard</div>
     )
+    mockRunningProtocol.mockReturnValue(<div>Mock RunningProtocol</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -122,5 +128,9 @@ describe('OnDeviceDisplayApp', () => {
   it('renders a AttachInstrumentsDashboard component from /attach-instruments', () => {
     const [{ getByText }] = render('/attach-instruments')
     getByText('Mock AttachInstrumentsDashboard')
+  })
+  it('renders a RunningProtocol component from /protocols/:runId/run', () => {
+    const [{ getByText }] = render('/protocols/my-run-id/run')
+    getByText('Mock RunningProtocol')
   })
 })
