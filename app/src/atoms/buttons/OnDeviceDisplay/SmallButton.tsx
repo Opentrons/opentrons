@@ -26,7 +26,7 @@ type SmallButtonCategory = 'default' | 'rounded'
 
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
-  onClick: () => void
+  onClick: React.MouseEventHandler
   buttonType: SmallButtonTypes
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement

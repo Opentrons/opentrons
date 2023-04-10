@@ -9,7 +9,7 @@ import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthern
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
-import { AttachInstrumentsDashboard } from '../../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
+import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
@@ -25,7 +25,7 @@ jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
-jest.mock('../../pages/OnDeviceDisplay/AttachInstrumentsDashboard')
+jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
@@ -52,8 +52,8 @@ const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
 const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction<
   typeof RobotSettingsDashboard
 >
-const mockAttachInstrumentsDashboard = AttachInstrumentsDashboard as jest.MockedFunction<
-  typeof AttachInstrumentsDashboard
+const mockInstrumentsDashboard = InstrumentsDashboard as jest.MockedFunction<
+  typeof InstrumentsDashboard
 >
 const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
   typeof RunningProtocol
@@ -70,8 +70,8 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
-    mockAttachInstrumentsDashboard.mockReturnValue(
-      <div>Mock AttachInstrumentsDashboard</div>
+    mockInstrumentsDashboard.mockReturnValue(
+      <div>Mock InstrumentsDashboard</div>
     )
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
     mockConnectViaEthernet.mockReturnValue(<div>Mock ConnectViaEthernet</div>)
@@ -125,9 +125,9 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/robot-settings')
     getByText('Mock RobotSettingsDashboard')
   })
-  it('renders a AttachInstrumentsDashboard component from /attach-instruments', () => {
-    const [{ getByText }] = render('/attach-instruments')
-    getByText('Mock AttachInstrumentsDashboard')
+  it('renders a InstrumentsDashboard component from /instruments', () => {
+    const [{ getByText }] = render('/instruments')
+    getByText('Mock InstrumentsDashboard')
   })
   it('renders a RunningProtocol component from /protocols/:runId/run', () => {
     const [{ getByText }] = render('/protocols/my-run-id/run')
