@@ -160,7 +160,7 @@ describe('RunningProtocol', () => {
     resetAllWhenMocks()
   })
 
-  it('should render Skelton when robotSideAnalysis does not have data', () => {
+  it('should render Skeleton when robotSideAnalysis does not have data', () => {
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue(null)
