@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS, Flex } from '@opentrons/components'
+import { COLORS, Flex, BORDERS } from '@opentrons/components'
 import { Modal } from './Modal'
 import type { Story, Meta } from '@storybook/react'
 
@@ -26,5 +26,10 @@ Default.args = {
     iconName: 'information',
     iconColor: COLORS.black,
   },
-  children: <Flex>children goes here</Flex>,
+  children: (
+    <Flex height="23.5rem" borderRadius={`0 ${BORDERS.size_three}`}>
+      children goes here
+    </Flex>
+  ),
+  isError: false,
 }
