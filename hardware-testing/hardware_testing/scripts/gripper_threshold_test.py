@@ -9,9 +9,10 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper_jaw,
     calibrate_gripper,
-    find_deck_height,
     _probe_deck_at,
-    _get_calibration_square_position_in_slot,
+)
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
 )
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, GripperProbe
@@ -109,7 +110,7 @@ class Gripper_Threshold_Test:
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.GRIPPER
-        self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
+        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
         if self.simulate:
             self.gripper_id = "SIMULATION"
         else:
