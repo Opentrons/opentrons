@@ -531,8 +531,10 @@ class CommandView(HasState[CommandState]):
             or (status == CommandStatus.QUEUED and self._state.run_result is not None)
         )
 
-    def get_all_complete(self) -> bool:
-        """Get whether all added commands have completed.
+    def get_all_commands_final(self) -> bool:
+        """Get whether all commands added so far have reached their final `status`.
+
+        See `get_command_is_final()`.
 
         Raises:
             CommandExecutionFailedError: if any added command failed, and its `intent` wasn't

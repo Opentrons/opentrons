@@ -201,18 +201,18 @@ def test_get_command_is_final() -> None:
     assert subject.get_command_is_final("command-id-4") is False
 
 
-def test_get_all_complete() -> None:
+def test_get_all_commands_final() -> None:
     """It should return True if no commands queued or running."""
     subject = get_command_view(queued_command_ids=[])
-    assert subject.get_all_complete() is True
+    assert subject.get_all_commands_final() is True
 
     subject = get_command_view(queued_command_ids=["queued-command-id"])
-    assert subject.get_all_complete() is False
+    assert subject.get_all_commands_final() is False
 
     subject = get_command_view(
         queued_command_ids=[], running_command_id="running-command-id"
     )
-    assert subject.get_all_complete() is False
+    assert subject.get_all_commands_final() is False
 
 
 def test_get_all_complete_fatal_command_failure() -> None:
@@ -235,7 +235,7 @@ def test_get_all_complete_fatal_command_failure() -> None:
     )
 
     with pytest.raises(errors.ProtocolCommandFailedError, match="Oh no"):
-        subject.get_all_complete()
+        subject.get_all_commands_final()
 
 
 def test_get_all_complete_setup_not_fatal() -> None:
@@ -258,7 +258,7 @@ def test_get_all_complete_setup_not_fatal() -> None:
         commands=[completed_command, failed_command],
     )
 
-    result = subject.get_all_complete()
+    result = subject.get_all_commands_final()
     assert result is True
 
 
