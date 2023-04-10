@@ -117,15 +117,12 @@ export function ProtocolDashboard(): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacingXXL}
       minHeight="25rem"
+      padding={SPACING.spacing6}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing4}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
@@ -227,17 +224,17 @@ export function ProtocolDashboard(): JSX.Element {
         <>
           {pinnedProtocols.length === 0 && (
             <Flex
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
-              height="27.25rem"
               backgroundColor={COLORS.darkBlack_twenty}
+              flexDirection={DIRECTION_COLUMN}
+              height="27.25rem"
+              justifyContent={JUSTIFY_CENTER}
             >
               <img title={t('nothing_here_yet')} src={imgSrc} />
               <StyledText
                 fontSize={TYPOGRAPHY.fontSize32}
-                lineHeight={TYPOGRAPHY.lineHeight42}
                 fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                lineHeight={TYPOGRAPHY.lineHeight42}
                 marginTop={SPACING.spacing4}
                 marginBottom={SPACING.spacing3}
               >
@@ -245,8 +242,8 @@ export function ProtocolDashboard(): JSX.Element {
               </StyledText>
               <StyledText
                 fontSize={TYPOGRAPHY.fontSize28}
-                lineHeight={TYPOGRAPHY.lineHeight36}
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
+                lineHeight={TYPOGRAPHY.lineHeight36}
               >
                 {t('send_a_protocol_to_store')}
               </StyledText>
@@ -265,9 +262,7 @@ export function ProtocolCard(props: {
   const { protocol, lastRun } = props
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
-
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
-
   const longpress = useLongPress()
 
   const handleProtocolClick = (
@@ -281,16 +276,15 @@ export function ProtocolCard(props: {
 
   return (
     <Flex
-      key={protocol.key}
-      onClick={() => handleProtocolClick(longpress, protocol.id)}
-      ref={longpress.ref}
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light_one}
       borderRadius={BORDERS.size_four}
       fontSize={TYPOGRAPHY.fontSize22}
       lineHeight={TYPOGRAPHY.lineHeight28}
       marginBottom={SPACING.spacing3}
+      onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing5}
+      ref={longpress.ref}
     >
       <Flex width="30.8125rem">
         <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

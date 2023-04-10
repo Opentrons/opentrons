@@ -64,15 +64,15 @@ export function PinnedProtocolCarousel(props: {
 
   return (
     <Flex
-      flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_FLEX_START}
+      flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing3}
       ref={swipe.ref}
-      overflow={OVERFLOW_HIDDEN}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
-      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      overflow={OVERFLOW_HIDDEN}
     >
       {pinnedProtocols.map(protocol => {
         const lastRun = runs.data?.data.find(
