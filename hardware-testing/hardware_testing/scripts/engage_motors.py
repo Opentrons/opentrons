@@ -14,7 +14,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 )
 
 MOUNT = OT3Mount.LEFT
-LOAD = GantryLoad.NONE
+LOAD = GantryLoad.LOW_THROUGHPUT
 CYCLES = 1
 SPEED_X = 600
 SPEED_Y = 600
@@ -88,9 +88,11 @@ AXIS_MAP = {'Y': OT3Axis.Y,
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     try:
+        print("HOME")
+        await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         await set_gantry_load_per_axis_settings_ot3(api,
                                         SETTINGS,
-                                        load=None)
+                                        load=LOAD)
         await api.engage_axes([OT3Axis.X, OT3Axis.Y,
                                   OT3Axis.Z_L, OT3Axis.Z_R,
                                   OT3Axis.P_L, OT3Axis.P_R])

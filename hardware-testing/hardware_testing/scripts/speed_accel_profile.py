@@ -91,8 +91,8 @@ TEST_PARAMETERS = {
                 'INC': 10},
             'ACCEL': {
                 'MIN': 100,
-                'MAX': 900,
-                'INC': 200}},
+                'MAX': 300,
+                'INC': 100}},
         'R': {
             'SPEED': {
                 'MIN': 40,
@@ -100,8 +100,8 @@ TEST_PARAMETERS = {
                 'INC': 10},
             'ACCEL': {
                 'MIN': 100,
-                'MAX': 900,
-                'INC': 200}}
+                'MAX': 300,
+                'INC': 100}}
     },
     # GantryLoad.TWO_LOW_THROUGHPUT: {
     #     'X': {
@@ -144,12 +144,12 @@ TEST_PARAMETERS = {
     GantryLoad.HIGH_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 350,
-                'MAX': 500,
+                'MIN': 450,
+                'MAX': 800,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 600,
-                'MAX': 1000,
+                'MIN': 800,
+                'MAX': 1800,
                 'INC': 200}},
         'Y': {
             'SPEED': {
@@ -167,17 +167,17 @@ TEST_PARAMETERS = {
                 'INC': 10},
             'ACCEL': {
                 'MIN': 100,
-                'MAX': 900,
-                'INC': 200}},
+                'MAX': 300,
+                'INC': 100}},
         'R': {
             'SPEED': {
-                'MIN': 30,
-                'MAX': 40,
-                'INC': 5},
+                'MIN': 40,
+                'MAX': 140,
+                'INC': 10},
             'ACCEL': {
-                'MIN': 80,
-                'MAX': 120,
-                'INC': 20}},
+                'MIN': 100,
+                'MAX': 300,
+                'INC': 100}},
     }
 }
 
@@ -189,7 +189,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
-        run_current=1.5
+        run_current=1.0
     ),
     OT3Axis.Y: GantryLoadSettings(
         max_speed=500,
@@ -197,7 +197,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
-        run_current=1.5
+        run_current=1.0
     ),
     OT3Axis.Z_L: GantryLoadSettings(
         max_speed=35,
@@ -205,7 +205,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=1,
         hold_current=1.5,
-        run_current=1.5
+        run_current=1.0
     ),
     OT3Axis.Z_R: GantryLoadSettings(
         max_speed=35,
@@ -213,7 +213,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=1,
         hold_current=1.5,
-        run_current=1.5
+        run_current=1.0
     )
 }
 
@@ -334,6 +334,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
                                    speed=35)
             if(DELAY > 0):
                 time.sleep(DELAY)
+            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             return (move_error, c+1)
 
         #record the current position
@@ -351,6 +352,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
             print('ERROR IN POS MOVE')
             if(DELAY > 0):
                 time.sleep(DELAY)
+            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             return (move_error, c+1);
         else:
             avg_error.append(move_error)
@@ -378,6 +380,7 @@ async def match_z_settings(axis, speed, accel):
 
 async def _main(is_simulating: bool) -> None:
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
+    print("HOMING")
     await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     try:
         #run the test while recording raw results
@@ -410,6 +413,7 @@ async def _main(is_simulating: bool) -> None:
 
                     #attempt to cycle with the test settings
                     # await api.home([AXIS_MAP[test_axis]])
+                    print("HOMING")
                     await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
                     move_output_tuple = await _single_axis_move(test_axis,
                                                                 api,
