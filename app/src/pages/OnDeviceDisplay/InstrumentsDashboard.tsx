@@ -4,7 +4,7 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { InstrumentMountItem } from '../../organisms/InstrumentMountItem.tsx'
+import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 
 export const InstrumentsDashboard = (): JSX.Element => {
@@ -19,7 +19,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-        <InstrumentMountItem
+        <AttachedInstrumentMountItem
           mount="left"
           attachedInstrument={
             (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
@@ -27,7 +27,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
           }
           setWizardProps={setWizardProps}
         />
-        <InstrumentMountItem
+        <AttachedInstrumentMountItem
           mount="right"
           attachedInstrument={
             (attachedInstruments?.data ?? []).find(i => i.mount === 'right') ??
@@ -35,7 +35,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
           }
           setWizardProps={setWizardProps}
         />
-        <InstrumentMountItem
+        <AttachedInstrumentMountItem
           mount="extension"
           attachedInstrument={
             (attachedInstruments?.data ?? []).find(

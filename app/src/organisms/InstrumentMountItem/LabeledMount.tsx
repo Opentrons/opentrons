@@ -17,7 +17,7 @@ import type { Mount } from '../../redux/pipettes/types'
 import { StyledText } from '../../atoms/text'
 import { useTranslation } from 'react-i18next'
 
-const MountButton = styled.button<{ isAttached: boolean }>`
+export const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};

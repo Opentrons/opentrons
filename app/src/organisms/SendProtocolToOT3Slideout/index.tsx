@@ -135,7 +135,7 @@ export function SendProtocolToOT3Slideout(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
-      showOT3Only
+      // showOT3Only
       isAnalysisError={isAnalysisError}
     />
   )

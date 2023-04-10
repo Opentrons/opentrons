@@ -46,6 +46,7 @@ import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
+import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -345,8 +346,8 @@ function PrepareToRun({
           detail={
             liquidsInProtocol !== []
               ? t('initial_liquids_num', {
-                  num: liquidsInProtocol.length,
-                })
+                num: liquidsInProtocol.length,
+              })
               : t('liquids_not_in_setup')
           }
         />
@@ -380,10 +381,7 @@ export function ProtocolSetup(): JSX.Element {
     ),
     // TODO: insert setup screen components below:
     instruments: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Instrument Configuration
-      </>
+      <ProtocolSetupInstruments runId={runId} setSetupScreen={setSetupScreen} />
     ),
     modules: (
       <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
