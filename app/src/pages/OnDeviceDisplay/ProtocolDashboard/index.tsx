@@ -179,7 +179,7 @@ export function ProtocolDashboard(): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacingXXL}
       minHeight="25rem"
     >
       <Navigation routes={onDeviceDisplayRoutes} />
