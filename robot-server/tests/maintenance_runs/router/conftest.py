@@ -2,24 +2,10 @@
 import pytest
 from decoy import Decoy
 
-from robot_server.protocols import ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
-from robot_server.runs.run_store import RunStore
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
 from opentrons.protocol_engine import ProtocolEngine
-
-
-@pytest.fixture()
-def mock_protocol_store(decoy: Decoy) -> ProtocolStore:
-    """Get a mock ProtocolStore interface."""
-    return decoy.mock(cls=ProtocolStore)
-
-
-@pytest.fixture()
-def mock_run_store(decoy: Decoy) -> RunStore:
-    """Get a mock RunStore interface."""
-    return decoy.mock(cls=RunStore)
 
 
 @pytest.fixture()

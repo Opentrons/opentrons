@@ -11,18 +11,18 @@ from opentrons.protocols.models import LabwareDefinition
 
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, SimpleBody
-from robot_server.runs.run_models import Run, LabwareDefinitionSummary
-from robot_server.runs.engine_store import EngineStore
-from robot_server.runs.router.labware_router import (
+from robot_server.maintenance_runs.maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
+from robot_server.maintenance_runs.maintenance_engine_store import EngineStore
+from robot_server.maintenance_runs.router.labware_router import (
     add_labware_offset,
     add_labware_definition,
 )
 
 
 @pytest.fixture()
-def run() -> Run:
+def run() -> MaintenanceRun:
     """Get a fixture Run response data."""
-    return Run(
+    return MaintenanceRun(
         id="run-id",
         createdAt=datetime(year=2021, month=1, day=1),
         status=EngineStatus.IDLE,
@@ -33,7 +33,6 @@ def run() -> Run:
         labware=[],
         modules=[],
         labwareOffsets=[],
-        protocolId=None,
         liquids=[],
     )
 
@@ -47,7 +46,7 @@ def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition
 async def test_add_labware_offset(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    run: Run,
+    run: MaintenanceRun,
 ) -> None:
     """It should add the labware offset to the engine, assuming the run is current."""
     labware_offset_request = pe_types.LabwareOffsetCreate(
@@ -81,7 +80,7 @@ async def test_add_labware_offset(
 async def test_add_labware_offset_not_current(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    run: Run,
+    run: MaintenanceRun,
 ) -> None:
     """It should 409 if the run is not current."""
     not_current_run = run.copy(update={"current": False})
@@ -106,7 +105,7 @@ async def test_add_labware_offset_not_current(
 async def test_add_labware_definition(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    run: Run,
+    run: MaintenanceRun,
     labware_definition: LabwareDefinition,
 ) -> None:
     """It should be able to add a labware definition to the engine."""
@@ -129,7 +128,7 @@ async def test_add_labware_definition(
 async def test_add_labware_definition_not_current(
     decoy: Decoy,
     mock_engine_store: EngineStore,
-    run: Run,
+    run: MaintenanceRun,
     labware_definition: LabwareDefinition,
 ) -> None:
     """It should 409 if the run is not current."""

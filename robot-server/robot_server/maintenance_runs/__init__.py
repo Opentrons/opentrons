@@ -11,7 +11,7 @@ Examples of "runs" include:
 """
 from .router import maintenance_runs_router
 from .maintenance_engine_store import EngineStore, EngineConflictError
-from .dependencies import get_engine_store
+from .dependencies import get_maintenance_engine_store
 
 __all__ = [
     # main export
@@ -19,5 +19,5 @@ __all__ = [
     # engine store
     "EngineStore",
     "EngineConflictError",
-    "get_engine_store",
+    "get_maintenance_engine_store",
 ]

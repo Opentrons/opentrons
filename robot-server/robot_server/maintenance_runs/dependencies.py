@@ -18,7 +18,7 @@ from .maintenance_run_data_manager import MaintenanceRunDataManager
 _engine_store_accessor = AppStateAccessor[EngineStore]("engine_store")
 
 
-async def get_engine_store(
+async def get_maintenance_engine_store(
     app_state: AppState = Depends(get_app_state),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
     robot_type: RobotType = Depends(get_robot_type),
@@ -34,7 +34,7 @@ async def get_engine_store(
 
 
 async def get_maintenance_run_data_manager(
-    engine_store: EngineStore = Depends(get_engine_store),
+    engine_store: EngineStore = Depends(get_maintenance_engine_store),
 ) -> MaintenanceRunDataManager:
     """Get a maintenance run data manager to keep track of current run data."""
     return MaintenanceRunDataManager(
