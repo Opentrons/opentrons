@@ -282,7 +282,7 @@ Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the
 
 Diameter
 ^^^^^^^^
-Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since diameter is a circular measurement, this attribute is only present on labware with circular wells. If the well is not circular, the value returned will be ``None``. Use length and width (see below) for non-circular wells.
+Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since diameter is a circular measurement, this attribute is only present on labware with circular wells. If the well is not circular, the value will be ``None``. Use length and width (see below) for non-circular wells.
 
 .. code-block:: python
     :substitutions:
@@ -296,7 +296,7 @@ Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since d
 
 Length
 ^^^^^^
-Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is defined as the distance along the robot's x-axis (left to right). This attribute is only present on rectangular wells. If the well is not rectangular, the value returned will be ``None``. Use diameter (see above) for circular wells.
+Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is defined as the distance along the robot's x-axis (left to right). This attribute is only present on rectangular wells. If the well is not rectangular, the value will be ``None``. Use diameter (see above) for circular wells.
 
 .. code-block:: python
     :substitutions:
@@ -310,7 +310,7 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
 
 Width
 ^^^^^
-Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the y-axis (front to back). This attribute is only present on rectangular wells. If the well is not rectangular, the value returned will be ``None``. Use diameter (see above) for circular wells.
+Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the y-axis (front to back). This attribute is only present on rectangular wells. If the well is not rectangular, the value will be ``None``. Use diameter (see above) for circular wells.
 
 
 .. code-block:: python
