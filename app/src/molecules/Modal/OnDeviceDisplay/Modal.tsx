@@ -53,6 +53,7 @@ export function Modal(props: ModalProps): JSX.Element {
         backgroundColor={isError ? COLORS.red_two : COLORS.white}
         border={isError ? `0.375rem solid ${COLORS.red_two}` : 'none'}
         width={modalWidth}
+        height="max-content"
         maxHeight="32.5rem"
         borderRadius={BORDERS.size_three}
         boxShadow={BORDERS.shadowSmall}
