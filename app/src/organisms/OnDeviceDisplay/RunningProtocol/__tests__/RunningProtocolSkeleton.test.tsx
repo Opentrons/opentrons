@@ -2,14 +2,16 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { RunningProtocolSkelton } from '../RunningProtocolSkelton'
+import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'
 
-const render = (props: React.ComponentProps<typeof RunningProtocolSkelton>) => {
-  return renderWithProviders(<RunningProtocolSkelton {...props} />)
+const render = (
+  props: React.ComponentProps<typeof RunningProtocolSkeleton>
+) => {
+  return renderWithProviders(<RunningProtocolSkeleton {...props} />)
 }
 
-describe('RunningProtocolSkelton', () => {
-  let props: React.ComponentProps<typeof RunningProtocolSkelton>
+describe('RunningProtocolSkeleton', () => {
+  let props: React.ComponentProps<typeof RunningProtocolSkeleton>
 
   beforeEach(() => {
     props = {
@@ -22,7 +24,7 @@ describe('RunningProtocolSkelton', () => {
     const skeletons = getAllByTestId('Skeleton')
     const buttons = getAllByRole('button')
     expect(buttons.length).toBe(2)
-    // Note Skelton component checks width and height so here just check the number of skeltons and background-size
+    // Note Skeleton component checks width and height so here just check the number of skeletons and background-size
     expect(skeletons.length).toBe(4)
     expect(skeletons[0]).toHaveStyle('animation: shimmer 2s infinite linear')
     expect(skeletons[0]).toHaveStyle(`background-size: 99rem`)
