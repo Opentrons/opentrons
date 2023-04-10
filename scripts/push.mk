@@ -26,7 +26,7 @@ is-windows=$(findstring $(PLATFORM), Windows)
 $(if $(is-windows), echo "when using windows with an openSSH version larger then 9 add -O flag to scp command. see comments for more details")
 
 # Make sure the machine is recheable before trying to scp files
-assert-online=$(shell ping -t 1 $(1) 2>&1 > /dev/null || echo "Machine $(1) is unreachable" && exit 1)
+assert-online=$(if $(shell ssh $(call id-file-arg,$(2)) $(3) -o ConnectTimeout=5 -o ConnectionAttempts=1 root@$(1) echo 0),,$(error Machine $(1) might be offline))
 
 # push-python-package: execute a push to the robot of a particular python
 # package.
