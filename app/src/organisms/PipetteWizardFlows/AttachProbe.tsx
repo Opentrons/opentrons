@@ -6,7 +6,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   SPACING,
-  RESPONSIVESNESS,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
