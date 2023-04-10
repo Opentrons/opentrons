@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 import { i18n } from '../../../../i18n'
-import { ProtocolRow } from '../ProtocolRow'
+import { ProtocolCard } from '../'
 
 const mockPush = jest.fn()
 
@@ -37,7 +37,7 @@ const mockProtocol: ProtocolResource = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolRow protocol={mockProtocol} />
+      <ProtocolCard protocol={mockProtocol} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
