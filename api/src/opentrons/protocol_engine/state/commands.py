@@ -317,7 +317,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
-                self._state.queued_command_ids.clear()
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -541,9 +540,12 @@ class CommandView(HasState[CommandState]):
             `setup`.
         """
         no_command_running = self._state.running_command_id is None
-        no_command_queued = len(self._state.queued_command_ids) == 0
+        no_command_to_execute = (
+            self._state.run_result is not None
+            or len(self._state.queued_command_ids) == 0
+        )
 
-        if no_command_running and no_command_queued:
+        if no_command_running and no_command_to_execute:
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
