@@ -57,7 +57,7 @@ export function ConfirmCancelRunModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      onOutsideClick={() => console.log('need')}
+      onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN}>
