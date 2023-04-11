@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -9,7 +10,7 @@ import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
 
 const mockPlayRun = jest.fn()
 const mockPauseRun = jest.fn()
-const mockStopRun = jest.fn()
+const mockShowModal = jest.fn()
 
 const render = (
   props: React.ComponentProps<typeof RunningProtocolCommandList>
@@ -27,7 +28,7 @@ describe('RunningProtocolCommandList', () => {
       robotSideAnalysis: mockRobotSideAnalysis,
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
-      stopRun: mockStopRun,
+      setShowConfirmCancelRunModal: mockShowModal,
       trackProtocolRunEvent: jest.fn(), // temporary
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
@@ -50,4 +51,13 @@ describe('RunningProtocolCommandList', () => {
     const [{ getByLabelText }] = render(props)
     getByLabelText('play')
   })
+
+  it('when tapping stop button, the modal is showing up', () => {
+    const [{ getByLabelText }] = render(props)
+    const button = getByLabelText('stop')
+    fireEvent.click(button)
+    expect(mockShowModal).toHaveBeenCalled()
+  })
+
+  it.todo('when tapping play button, track event mock function is called')
 })
