@@ -27,7 +27,7 @@ const IN_PROGRESS_STYLE = css`
   text-align: ${TYPOGRAPHY.textAlignCenter};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.75rem;
+    font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
     margin-top: ${SPACING.spacing2};
   }

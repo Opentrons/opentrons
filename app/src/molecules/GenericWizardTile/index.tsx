@@ -38,7 +38,7 @@ const GO_BACK_BUTTON_STYLE = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: 1.375rem;
+    font-size: ${TYPOGRAPHY.fontSize22};
 
     &:hover {
       opacity: 100%;
@@ -53,7 +53,7 @@ const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.75rem;
+    font-size: ${TYPOGRAPHY.fontSize28};
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 `

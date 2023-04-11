@@ -43,8 +43,8 @@ const SUBHEADER_STYLE = css`
   height: 1.75rem;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.75rem;
-    line-height: 2.25rem;
+    font-size: ${TYPOGRAPHY.fontSize28};
+    line-height: ${TYPOGRAPHY.lineHeight36};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
   }
