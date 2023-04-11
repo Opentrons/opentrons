@@ -177,6 +177,12 @@ class MountType(str, enum.Enum):
         return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
 
 
+class OT3MountType(str, enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    GRIPPER = "gripper"
+
+
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833

@@ -1,3 +1,5 @@
+:og:description: How to load and work with Opentrons hardware modules in a Python protocol.
+
 .. _new_modules:
 
 ################
