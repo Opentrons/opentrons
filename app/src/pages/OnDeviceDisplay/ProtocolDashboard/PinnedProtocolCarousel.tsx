@@ -11,6 +11,7 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { PinnedProtocol } from './PinnedProtocol'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
+import type { CardSizeType } from './PinnedProtocol'
 
 export function PinnedProtocolCarousel(props: {
   pinnedProtocols: ProtocolResource[]
@@ -55,12 +56,13 @@ export function PinnedProtocolCarousel(props: {
     swipe.setSwipeType('')
   }
 
-  const cardSize =
-    pinnedProtocols.length === 1
-      ? 'full'
-      : pinnedProtocols.length === 2
-      ? 'half'
-      : 'regular'
+  const cardSize = (): CardSizeType => {
+    let size: CardSizeType = 'regular'
+    if (pinnedProtocols.length < 3) {
+      size = pinnedProtocols.length === 1 ? 'full' : 'half'
+    }
+    return size
+  }
 
   return (
     <Flex
@@ -80,7 +82,7 @@ export function PinnedProtocolCarousel(props: {
         )?.createdAt
         return (
           <PinnedProtocol
-            cardSize={cardSize}
+            cardSize={cardSize()}
             key={protocol.key}
             lastRun={lastRun}
             protocol={protocol}
