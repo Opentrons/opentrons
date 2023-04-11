@@ -286,7 +286,7 @@ export function ProtocolCard(props: {
       padding={SPACING.spacing5}
       ref={longpress.ref}
     >
-      <Flex width="30.8125rem">
+      <Flex width="30.8125rem" overflowWrap="anywhere">
         <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {protocolName}
         </StyledText>
