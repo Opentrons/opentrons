@@ -45,7 +45,7 @@ const render = () => {
   )
 }
 
-describe('Protocol Row', () => {
+describe('ProtocolCard', () => {
   jest.useFakeTimers()
 
   it('should redirect to protocol details after short click', () => {
