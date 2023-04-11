@@ -186,19 +186,38 @@ def test_get_is_running_queue() -> None:
 
 def test_get_command_is_final() -> None:
     """It should be able to tell if a command is complete."""
-    completed_command = create_succeeded_command(command_id="command-id-1")
-    failed_command = create_failed_command(command_id="command-id-2")
-    running_command = create_running_command(command_id="command-id-3")
-    pending_command = create_queued_command(command_id="command-id-4")
+    completed_command = create_succeeded_command(command_id="completed-command-id")
+    failed_command = create_failed_command(command_id="failed-command-id")
+    running_command = create_running_command(command_id="running-command-id")
+    pending_command = create_queued_command(command_id="queued-command-id")
 
     subject = get_command_view(
         commands=[completed_command, failed_command, running_command, pending_command]
     )
 
-    assert subject.get_command_is_final("command-id-1") is True
-    assert subject.get_command_is_final("command-id-2") is True
-    assert subject.get_command_is_final("command-id-3") is False
-    assert subject.get_command_is_final("command-id-4") is False
+    assert subject.get_command_is_final("completed-command-id") is True
+    assert subject.get_command_is_final("failed-command-id") is True
+    assert subject.get_command_is_final("running-command-id") is False
+    assert subject.get_command_is_final("queued-command-id") is False
+
+
+@pytest.mark.parametrize("run_result", RunResult)
+def test_get_command_is_final_when_run_has_result(run_result: RunResult) -> None:
+    """Queued commands are final when the run will never execute any more commands."""
+    completed_command = create_succeeded_command(command_id="completed-command-id")
+    failed_command = create_failed_command(command_id="failed-command-id")
+    running_command = create_running_command(command_id="running-command-id")
+    pending_command = create_queued_command(command_id="queued-command-id")
+
+    subject = get_command_view(
+        commands=[completed_command, failed_command, running_command, pending_command],
+        run_result=run_result,
+    )
+
+    assert subject.get_command_is_final("completed-command-id") is True
+    assert subject.get_command_is_final("failed-command-id") is True
+    assert subject.get_command_is_final("running-command-id") is False
+    assert subject.get_command_is_final("queued-command-id") is True
 
 
 def test_get_all_commands_final() -> None:
