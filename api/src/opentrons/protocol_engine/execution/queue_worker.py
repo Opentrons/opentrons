@@ -73,9 +73,11 @@ class QueueWorker:
                     condition=self._state_store.commands.get_next_to_execute
                 )
             except RunStoppedError:
+                # There are no more commands that we should execute, either because the run has
+                # completed on its own, or because a client requested it to stop.
                 break
             else:
                 await self._command_executor.execute(command_id=command_id)
-                # Yield to the event loop in case we're executing a long run of commands
-                # that never yields internally. For example, a long run of comment commands.
+                # Yield to the event loop in case we're executing a long sequence of commands
+                # that never yields internally. For example, a long sequence of comment commands.
                 await asyncio.sleep(0)
