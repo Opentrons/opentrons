@@ -20,6 +20,7 @@ import {
   useHost,
   useCreateRunMutation,
   useStopRunMutation,
+  useDismissCurrentRunMutation,
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -103,8 +104,10 @@ export const PipetteWizardFlows = (
     },
     host
   )
+  const { dismissCurrentRun } = useDismissCurrentRunMutation()
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: () => {
+      dismissCurrentRun(runId)
       if (currentStep.section === SECTIONS.DETACH_PROBE) {
         proceed()
       } else {
