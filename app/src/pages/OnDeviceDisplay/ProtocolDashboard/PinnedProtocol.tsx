@@ -127,7 +127,7 @@ export function PinnedProtocol(props: {
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
-          {format(new Date(protocol.createdAt), 'MMM Io, p')}
+          {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (
