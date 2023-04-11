@@ -51,6 +51,11 @@ class RobotServerSettings(BaseSettings):
         description="The endpoint to subscribe to notification server topics.",
     )
 
+    system_server_address: str = Field(
+        default="http://localhost:32950",
+        description="The base URL for accessing system server endpoints.",
+    )
+
     persistence_directory: typing.Union[
         # Literal must come first to avoid Pydantic parsing it as a relative Path
         # with the filename "automatically_make_temporary".

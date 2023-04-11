@@ -5,12 +5,11 @@ from typing import Union
 from typing_extensions import Literal
 
 from robot_server.errors import ErrorDetails
+from robot_server.settings import get_settings
 from server_utils.util import call_once
 from robot_server.versioning import get_requested_version
 
 _AUTH_TOKEN_MIN_VERSION = 5
-
-_SYSTEM_SERVER_BASE_URL = "http://localhost:32950"
 
 
 class AuthenticationFailed(ErrorDetails):
@@ -41,11 +40,18 @@ async def _get_system_server_client() -> ClientSession:
         )
 
 
+@call_once
+def _get_system_server_address() -> str:
+    """Dependency to get the system server address from the settings file."""
+    return get_settings().system_server_address
+
+
 async def check_auth_token_header(
     authenticationBearer: Union[str, None] = Header(
         None, description="Authentication token for the client."
     ),
     version: int = Depends(get_requested_version),
+    system_server_addr: str = Depends(_get_system_server_address),
 ) -> None:
     """Get the request's auth token header and verify authenticity."""
     if version < _AUTH_TOKEN_MIN_VERSION:
@@ -62,7 +68,7 @@ async def check_auth_token_header(
 
     try:
         res = await connection.get(
-            f"{_SYSTEM_SERVER_BASE_URL}/system/authorize",
+            f"{system_server_addr}/system/authorize",
             headers={"authenticationBearer": authenticationBearer},
         )
 
