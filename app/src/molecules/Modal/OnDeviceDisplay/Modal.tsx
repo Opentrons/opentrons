@@ -10,7 +10,7 @@ import {
 import { BackgroundOverlay } from '../../BackgroundOverlay'
 import { ModalHeader } from './ModalHeader'
 
-import type { ModalHeaderProps, ModalSize } from './types'
+import type { ModalHeaderBaseProps, ModalSize } from './types'
 
 interface ModalProps {
   /** clicking anywhere outside of the modal closes it  */
@@ -18,10 +18,18 @@ interface ModalProps {
   children: React.ReactNode
   /** for small, medium, or large modal sizes, medium by default */
   modalSize?: ModalSize
-  header?: ModalHeaderProps
+  /** see ModalHeader component for more details */
+  header?: ModalHeaderBaseProps
+  isError?: boolean
 }
 export function Modal(props: ModalProps): JSX.Element {
-  const { modalSize = 'medium', onOutsideClick, children, header } = props
+  const {
+    modalSize = 'medium',
+    onOutsideClick,
+    children,
+    header,
+    isError,
+  } = props
 
   let modalWidth: string = '45.625rem'
   switch (modalSize) {
@@ -43,14 +51,20 @@ export function Modal(props: ModalProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
     >
       <Flex
-        backgroundColor={COLORS.white}
+        backgroundColor={isError ? COLORS.red_two : COLORS.white}
+        border={isError ? `0.375rem solid ${COLORS.red_two}` : 'none'}
         width={modalWidth}
+        height="max-content"
         maxHeight="32.5rem"
         borderRadius={BORDERS.size_three}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing6}
         flexDirection={DIRECTION_COLUMN}
         aria-label={`modal_${modalSize}`}
+        onClick={e => {
+          e.stopPropagation()
+          onOutsideClick(e)
+        }}
       >
         {header != null ? (
           <ModalHeader
@@ -58,9 +72,12 @@ export function Modal(props: ModalProps): JSX.Element {
             iconName={header.iconName}
             iconColor={header.iconColor}
             hasExitIcon={header.hasExitIcon}
+            onClick={onOutsideClick}
+            isError={isError}
           />
         ) : null}
         <Flex
+          backgroundColor={COLORS.white}
           paddingX={SPACING.spacing6}
           paddingBottom={SPACING.spacing6}
           paddingTop={header != null ? '0rem' : SPACING.spacing6}
