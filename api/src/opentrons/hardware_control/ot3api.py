@@ -92,6 +92,7 @@ from .types import (
     GripperProbe,
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
+    UpdateState,
     UpdateStatus,
 )
 from .errors import MustHomeError, GripperNotAttachedError
@@ -294,10 +295,17 @@ class OT3API(
 
         # check for and start firmware updates if required
         if update_firmware:
+            # NOTE: We are logging to stdout so when the hw controller is
+            # built for CLI, the operator can know when updates are running.
+            stdout_handler = logging.StreamHandler()
+            mod_log.addHandler(stdout_handler)
+            mod_log.info("Checking for firmware updates")
             async for progress in api_instance.update_firmware():
-                # NOTE: We are printing to stdout so when the hw controller is
-                # built for a CLI, the operator can know when updates are running.
-                print(progress)
+                for update in progress:
+                    if update.state == UpdateState.updating:
+                        mod_log.info(update)
+            mod_log.info("Finished firmware updates")
+            mod_log.removeHandler(stdout_handler)
 
         await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
