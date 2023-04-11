@@ -193,7 +193,6 @@ term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
 
 .PHONY: docs
-docs: settings_schema.json
-
-settings_schema.json: robot_server/settings.py
-	$(python) -m scripts.settings_schema $@
+docs:
+	$(python) -m robot_server.spec_generator
+	redoc-cli build build/openapi.json -o build/openapi.html
