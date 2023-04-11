@@ -12,14 +12,16 @@ import { ModalHeader } from './ModalHeader'
 
 import type { ModalHeaderBaseProps, ModalSize } from './types'
 
-interface ModalProps extends StyleProps {
+interface ModalProps {
   /** clicking anywhere outside of the modal closes it  */
   onOutsideClick: React.MouseEventHandler
+  /** modal content */
   children: React.ReactNode
   /** for small, medium, or large modal sizes, medium by default */
   modalSize?: ModalSize
   /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
+  /** an option for adding additional styles for an error modal */
   isError?: boolean
 }
 export function Modal(props: ModalProps): JSX.Element {

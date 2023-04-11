@@ -17,7 +17,7 @@ import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 
-import type { ModalHeaderProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -34,7 +34,7 @@ export function ConfirmCancelRunModal({
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
 
-  const modalHeader: ModalHeaderProps = {
+  const modalHeader: ModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
@@ -58,7 +58,6 @@ export function ConfirmCancelRunModal({
       modalSize="medium"
       header={modalHeader}
       onOutsideClick={() => console.log('need')}
-      height="21.75rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex flexDirection={DIRECTION_COLUMN}>
