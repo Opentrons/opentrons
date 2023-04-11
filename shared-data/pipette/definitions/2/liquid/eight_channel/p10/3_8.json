@@ -1,0 +1,54 @@
+{
+  "supportedTips": {
+    "t10": {
+      "defaultAspirateFlowRate": 10.0,
+      "defaultDispenseFlowRate": 10.0,
+      "defaultBlowOutFlowRate": 10.0,
+      "defaultTipLength": 10.0,
+      "defaultTipOverlap": 10.0,
+      "defaultReturnTipHeight": 10.0,
+      "aspirate": {
+        "": [
+          [0.6464, 0.4817, 0.0427],
+          [1.0889, 0.2539, 0.1591],
+          [1.5136, 0.1624, 0.2587],
+          [1.9108, 0.1042, 0.3467],
+          [2.2941, 0.0719, 0.4085],
+          [2.9978, 0.037, 0.4886],
+          [3.7731, 0.0378, 0.4863],
+          [4.7575, 0.0516, 0.4342],
+          [5.5024, 0.011, 0.6275],
+          [6.2686, 0.0114, 0.6253],
+          [7.005, 0.0054, 0.6625],
+          [8.5207, 0.0063, 0.6563]
+        ]
+      },
+      "dispense": {
+        "": [
+          [0.6464, 0.4817, 0.0427],
+          [1.0889, 0.2539, 0.1591],
+          [1.5136, 0.1624, 0.2587],
+          [1.9108, 0.1042, 0.3467],
+          [2.2941, 0.0719, 0.4085],
+          [2.9978, 0.037, 0.4886],
+          [3.7731, 0.0378, 0.4863],
+          [4.7575, 0.0516, 0.4342],
+          [5.5024, 0.011, 0.6275],
+          [6.2686, 0.0114, 0.6253],
+          [7.005, 0.0054, 0.6625],
+          [8.5207, 0.0063, 0.6563]
+        ]
+      },
+      "defaultTipOverlapDictionary": {},
+      "defaultBlowoutVolume": 99.0
+    }
+  },
+  "maxVolume": 10,
+  "minVolume": 1.0,
+  "defaultTipracks": [],
+  "partialTipConfigurations": {
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
+  },
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json"
+}

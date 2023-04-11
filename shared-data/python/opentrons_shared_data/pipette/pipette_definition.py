@@ -130,6 +130,10 @@ class SupportedTipsDefinition(BaseModel):
         description="The default tip overlap associated with this tip type.",
         alias="defaultTipOverlapDictionary",
     )
+    default_blowout_volume: Optional[float] = Field(
+        ..., description="The default volume for a blowout command with this tip type.",
+        alias="defaultBlowoutVolume",
+    )
 
 
 class MotorConfigurations(BaseModel):
@@ -229,9 +233,6 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         ..., alias="plungerPositionsConfigurations"
     )
     available_sensors: AvailableSensorDefinition = Field(..., alias="availableSensors")
-    partial_tip_configurations: PartialTipDefinition = Field(
-        ..., alias="partialTipConfigurations"
-    )
     channels: PipetteChannelType = Field(
         ..., description="The maximum number of channels on the pipette."
     )
@@ -299,10 +300,8 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
     )
-    default_blowout_volume: float = Field(
-        ...,
-        description="The default volume to be used for blow out command.",
-        alias="defaultBlowoutVolume",
+    partial_tip_configurations: Optional[PartialTipDefinition] = Field(
+        ..., alias="partialTipConfigurations"
     )
 
     @validator("supported_tips", pre=True)

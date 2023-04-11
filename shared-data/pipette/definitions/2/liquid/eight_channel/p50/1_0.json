@@ -32,7 +32,8 @@
       "defaultTipOverlapDictionary": {
         "opentrons/tipone_96_tiprack_200ul/1": 6.1,
         "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47
-      }
+      },
+      "defaultBlowoutVolume": 4.712
     },
     "t300": {
       "defaultAspirateFlowRate": 25.0,
@@ -57,7 +58,8 @@
       },
       "defaultTipOverlapDictionary": {
         "opentrons/opentrons_96_tiprack_300ul/1": 7.47
-      }
+      },
+      "defaultBlowoutVolume": 4.712
     }
   },
   "maxVolume": 50,
@@ -65,6 +67,5 @@
   "defaultTipracks": [
     "opentrons/opentrons_96_tiprack_300ul/1",
     "opentrons/opentrons_96_filtertiprack_200ul/1"
-  ],
-  "defaultBlowoutVolume": 4.712
+  ]
 }

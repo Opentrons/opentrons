@@ -1,0 +1,31 @@
+{
+  "displayName": "P10 GEN1",
+  "model": "p10",
+  "displayCategory": "GEN2",
+  "pickUpTipConfigurations": {
+    "current": 1.0,
+    "speed": 6.0,
+    "presses": 2,
+    "increment": 1.0,
+    "distance": 0.0
+  },
+  "dropTipConfigurations": {
+    "current": 0.8,
+    "speed": 1.0,
+    "presses": 0,
+    "increment": 0.0,
+    "distance": 0.0
+  },
+  "plungerMotorConfigurations": { "idle": 0.5, "run": 1.0 },
+  "plungerPositionsConfigurations": {
+    "top": 5.0,
+    "bottom": 10.0,
+    "blowout": 15.0,
+    "drop": 20.0
+  },
+  "availableSensors": { "sensors": [] },
+  "channels": 8,
+  "shaftDiameter": 4.5,
+  "shaftULperMM": 15.904,
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json"
+}

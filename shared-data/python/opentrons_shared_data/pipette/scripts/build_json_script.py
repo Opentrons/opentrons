@@ -184,6 +184,7 @@ def build_geometry_model_v2(
 def build_liquid_model_v2(
     input_dictionary: Dict[str, Any],
     supported_tip_configurations: Dict[str, SupportedTipsDefinition],
+    channels: int,
 ) -> PipetteLiquidPropertiesDefinition:
     if input_dictionary:
         if input_dictionary.get("partialTipConfigurations"):
@@ -194,9 +195,7 @@ def build_liquid_model_v2(
             return PipetteLiquidPropertiesDefinition.parse_obj(
                 {
                     **input_dictionary,
-                    "partialTipConfigurations": _build_partial_tip_configurations(
-                        input_dictionary["channels"]
-                    ),
+                    "partialTipConfigurations": _build_partial_tip_configurations(channels),
                     "supportedTips": supported_tip_configurations,
                 }
             )
@@ -338,13 +337,19 @@ def save_to_file(
     directorypath.mkdir(parents=True, exist_ok=True)
     filepath = directorypath / f"{file_name}.json"
     if isinstance(data, BaseModel):
-        dict_basemodel = data.dict(by_alias=True)
+        # We have to rely on the json serialization of the
+        # pydantic model to properly convert special objects
+        # such as (pipetteModelType) to a string. However,
+        # we also want to add in a new key on top of the
+        # data in the pydantic model so we need to convert it
+        # back to a dictionary before saving to file.
+        json_basemodel = data.json(by_alias=True)
+        dict_basemodel = json.loads(json_basemodel)
         dict_basemodel["$otSharedSchema"] = schema_path
         filepath.write_text(json.dumps(dict_basemodel), encoding="utf-8")
     else:
         data["$otSharedSchema"] = schema_path
         filepath.write_text(json.dumps(data), encoding="utf-8")
-
 
 def migrate_v1_to_v2() -> None:
     """
@@ -517,8 +522,12 @@ def build_new_pipette_model_v2(
                 continue
     geometry_model = build_geometry_model_v2(top_level_pipette_model["geometry"])
     liquid_model = build_liquid_model_v2(
-        top_level_pipette_model["liquid"], pipette_functions_dict
+        top_level_pipette_model["liquid"], pipette_functions_dict, top_level_pipette_model["general"]["channels"]
     )
+    liquid_model_dict = liquid_model.dict(by_alias=True)
+    liquid_model_dict["supportedTips"] = {
+        k.name: v for k, v in liquid_model_dict["supportedTips"].items()
+    }
     pipette_type = f"p{liquid_model.max_volume}"
     physical_model = build_physical_model_v2(
         {
@@ -533,6 +542,7 @@ def build_new_pipette_model_v2(
                 "pickUpTipConfigurations"
             ],
             "dropTipConfigurations": top_level_pipette_model["dropTipConfigurations"],
+            "partialTipConfigurations": liquid_model.partial_tip_configurations
         },
         pipette_type,
     )
@@ -550,7 +560,7 @@ def build_new_pipette_model_v2(
         GENERAL_ROOT / current_pipette_path, file_name, physical_model, GENERAL_SCHEMA
     )
     save_to_file(
-        LIQUID_ROOT / current_pipette_path, file_name, liquid_model, LIQUID_SCHEMA
+        LIQUID_ROOT / current_pipette_path, file_name, liquid_model_dict, LIQUID_SCHEMA
     )
 
 
