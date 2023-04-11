@@ -179,7 +179,7 @@ describe('useRunPipetteInfoByMount hook', () => {
       .calledWith('1')
       .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
-    const { result } = renderHook(() => useRunPipetteInfoByMount('otie', '1'))
+    const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: null,
       right: null,
@@ -187,7 +187,7 @@ describe('useRunPipetteInfoByMount hook', () => {
   })
 
   it('should return run pipette info by mount', () => {
-    const { result } = renderHook(() => useRunPipetteInfoByMount('otie', '1'))
+    const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: ({
         id: 'pipetteId',
