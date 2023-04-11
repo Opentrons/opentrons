@@ -97,7 +97,9 @@ In API version 2.2 or above:
     tip_rack = protocol.load_labware(
         load_name = 'opentrons_96_tiprack_300ul', location = 1)
     pipette = protocol.load_instrument(
-        instrument_name = 'p300_single_gen2', mount = 'left', tip_racks = [tip_rack])
+        instrument_name = 'p300_single_gen2',
+        mount = 'left',
+        tip_racks = [tip_rack])
 
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
@@ -110,7 +112,9 @@ In API version 2.0 and 2.1:
     tip_rack = protocol.load_labware(
         load_name = 'opentrons_96_tiprack_300ul', location = 1)
     pipette = protocol.load_instrument(
-        instrument_name = 'p300_single_gen2', mount = 'left', tip_racks = [tip_rack])
+        instrument_name = 'p300_single_gen2',
+        mount = 'left', 
+        tip_racks = [tip_rack])
 
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
@@ -284,9 +288,11 @@ To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:
 
 .. code-block:: python
 
-    pipette.dispense(50, plate['B1'], rate=2.0) # dispense 50uL to plate:B1 at twice the normal rate
-    pipette.dispense(50)              # dispense 50uL to current position at the normal rate
-
+    # dispense 50uL to plate:B1 at twice the normal rate
+    pipette.dispense(volume = 50, plate['B1'], rate = 2.0)
+    
+    # dispense 50uL to current position at the normal rate
+    pipette.dispense(volume = 50)
 
 The ``location`` parameter is either a well (like ``plate['A1']``) or a position within a well, like the return value of ``plate['A1'].bottom``.
 
@@ -319,9 +325,11 @@ When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location 
 
 .. code-block:: python
 
-    pipette.blow_out()            # blow out in current location
-    pipette.blow_out(plate['B3']) # blow out in current plate:B3
-
+    # blow out in current location
+    pipette.blow_out()
+    
+    # blow out in current plate:B3            
+    pipette.blow_out(plate['B3'])
 
 .. versionadded:: 2.0
 
@@ -338,13 +346,20 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
 
 .. code-block:: python
 
-    pipette.touch_tip()            # touch tip within current location
-    pipette.touch_tip(v_offset=-2) # touch tip 2mm below the top of the current location
-    pipette.touch_tip(plate['B1']) # touch tip within plate:B1
-    pipette.touch_tip(plate['B1'], speed=100) # touch tip within plate:B1 at 100 mm/s
-    pipette.touch_tip(plate['B1'], # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
-                      radius=0.75,
-                      v_offset=-2)
+    # touch tip within current location
+    pipette.touch_tip()
+   
+    # touch tip 2mm below the top of the current location
+    pipette.touch_tip(v_offset = -2)
+    
+    # touch tip within plate:B1
+    pipette.touch_tip(plate['B1'])
+    
+    # touch tip within plate:B1 at 100 mm/s
+    pipette.touch_tip(plate['B1'], speed=100)
+    
+    # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
+    pipette.touch_tip(plate['B1'],radius = 0.75, v_offset = -2)
 
 
 .. versionadded:: 2.0
@@ -370,11 +385,13 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 .. code-block:: python
 
     # mix 4 times, 100uL, in plate:A2
-    pipette.mix(4, 100, plate['A2'])
+    pipette.mix(repetitions = 4, volume = 100, location = plate['A2'])
+    
     # mix 3 times, 50uL, in current location
-    pipette.mix(3, 50)
+    pipette.mix(repetitions = 3, volume = 50)
+    
     # mix 2 times, pipette's max volume, in current location
-    pipette.mix(2)
+    pipette.mix(location = 2)
 
 .. note::
 
@@ -391,8 +408,8 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 
 .. code-block:: python
 
-    pipette.aspirate(100, plate['B4'])
-    pipette.air_gap(20)
+    pipette.aspirate(volume = 100, plate['B4'])
+    pipette.air_gap(volume = 20)
     pipette.drop_tip()
 
 .. versionadded:: 2.0
@@ -414,9 +431,9 @@ The values passed into ``delay()`` specify the number of minutes and seconds tha
 
 .. code-block:: python
 
-    protocol.delay(seconds=2)             # delay for 2 seconds
-    protocol.delay(minutes=5)             # delay for 5 minutes
-    protocol.delay(minutes=5, seconds=2)  # delay for 5 minutes and 2 seconds
+    protocol.delay(seconds = 2) # delay for 2 seconds
+    protocol.delay(minutes = 5) # delay for 5 minutes
+    protocol.delay(minutes = 5, seconds = 2) # delay for 5 minutes and 2 seconds
 
 
 Pause Until Resumed
@@ -466,7 +483,8 @@ None of these functions take any arguments:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        pipette = protocol.load_instrument('p300_single', 'right')
+        pipette = protocol.load_instrument(
+            instrument_name = 'p300_single', location = 'right')
         protocol.home() # Homes the gantry, z axes, and plungers
         pipette.home()  # Homes the right z axis and plunger
         pipette.home_plunger() # Homes the right plunger
@@ -508,10 +526,10 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 
     def run(protocol: protocol_api.ProtocolContext):
         # turn on robot rail lights
-        protocol.set_rail_lights(True)
+        protocol.set_rail_lights(on = True)
 
         # turn off robot rail lights
-        protocol.set_rail_lights(False)
+        protocol.set_rail_lights(on = False)
 
 .. versionadded:: 2.5
 
