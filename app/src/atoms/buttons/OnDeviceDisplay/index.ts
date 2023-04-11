@@ -1,4 +1,4 @@
 export { LargeButton } from './LargeButton'
-export { MediumButtonRounded } from './MediumButtonRounded'
+export { MediumButton } from './MediumButton'
 export { SmallButton } from './SmallButton'
 export { TabbedButton } from './TabbedButton'

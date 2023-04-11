@@ -65,6 +65,7 @@ class DeviceInfoResponse(utils.BinarySerializable):
     flags: VersionFlagsField = VersionFlagsField(0)
     shortsha: FirmwareShortSHADataField = FirmwareShortSHADataField(bytes())
     revision: OptionalRevisionField = OptionalRevisionField("", "", "")
+    subidentifier: utils.UInt8Field = utils.UInt8Field(0)
 
     @classmethod
     def build(cls, data: bytes) -> "DeviceInfoResponse":
@@ -102,8 +103,16 @@ class DeviceInfoResponse(utils.BinarySerializable):
 
         revision = OptionalRevisionField.build(data[data_iter:])
 
+        data_iter = data_iter + revision.NUM_BYTES
+        try:
+            subidentifier = utils.UInt8Field.build(
+                int.from_bytes(data[data_iter : data_iter + 1], "big")
+            )
+        except IndexError:
+            subidentifier = utils.UInt8Field.build(0)
+
         return DeviceInfoResponse(
-            message_id, length, version, flags, shortsha, revision
+            message_id, length, version, flags, shortsha, revision, subidentifier
         )
 
 
@@ -247,6 +256,39 @@ class StartLightAction(utils.BinarySerializable):
     )
 
 
+@dataclass
+class SetDeckLightRequest(utils.BinarySerializable):
+    """Set the deck light on or off."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.set_deck_light_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    # Set to 0 for off, 1 for on
+    setting: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class GetDeckLightRequest(utils.BinarySerializable):
+    """Get the deck light status."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.get_deck_light_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class GetDeckLightResponse(utils.BinarySerializable):
+    """Contains deck light status."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.get_deck_light_response
+    )
+    length: utils.UInt16Field = utils.UInt16Field(1)
+    setting: utils.UInt8Field = utils.UInt8Field(0)
+
+
 BinaryMessageDefinition = Union[
     Echo,
     Ack,
@@ -266,6 +308,9 @@ BinaryMessageDefinition = Union[
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,
+    SetDeckLightRequest,
+    GetDeckLightRequest,
+    GetDeckLightResponse,
 ]
 
 

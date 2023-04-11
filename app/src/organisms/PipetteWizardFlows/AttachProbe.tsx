@@ -2,7 +2,10 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import { Flex, TYPOGRAPHY, COLORS, SPACING } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
+import {
+  NINETY_SIX_CHANNEL,
+  ODD_MEDIA_QUERY_SPECS,
+} from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -38,8 +41,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     errorMessage,
     setShowErrorMessage,
     isOnDevice,
+    selectedPipette,
   } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteId = attachedPipettes[mount]?.id
   const displayName = attachedPipettes[mount]?.modelSpecs.displayName
   const is8Channel = attachedPipettes[mount]?.modelSpecs.channels === 8
@@ -107,14 +111,18 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     />
   ) : (
     <GenericWizardTile
-      header={t('attach_probe')}
+      header={i18n.format(t('attach_probe'), 'capitalize')}
       //  TODO(Jr, 10/26/22): replace image with correct one!
       rightHandBody={<img src={attachProbe} width="100%" alt="Attach probe" />}
       bodyText={
-        is8Channel ? (
+        is8Channel || selectedPipette === NINETY_SIX_CHANNEL ? (
           <Trans
             t={t}
-            i18nKey={'install_probe_8_channel'}
+            i18nKey={
+              is8Channel
+                ? 'install_probe_8_channel'
+                : 'install_probe_96_channel'
+            }
             components={{
               strong: <strong />,
               block: <StyledText css={BODY_STYLE} />,

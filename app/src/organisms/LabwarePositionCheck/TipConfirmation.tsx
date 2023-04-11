@@ -3,13 +3,14 @@ import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
+  PrimaryButton,
+  SecondaryButton,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import { NeedHelpLink } from '../CalibrationPanels'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const LPC_HELP_LINK_URL =

@@ -1,9 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, TYPOGRAPHY, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  TYPOGRAPHY,
+  SPACING,
+  PrimaryButton,
+  SecondaryButton,
+} from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { useAttachedPipetteCalibrations } from '../Devices/hooks'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
@@ -31,8 +37,14 @@ export const Results = (props: ResultsProps): JSX.Element => {
     isFetching,
     setFetching,
   } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
+  const pipetteName =
+    attachedPipettes[mount] != null
+      ? attachedPipettes[mount]?.modelSpecs.displayName
+      : ''
+  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
+  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -40,18 +52,19 @@ export const Results = (props: ResultsProps): JSX.Element => {
   let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      header = t('pip_cal_success')
+      header = t(hasCalData ? 'pip_recal_success' : 'pip_cal_success', {
+        pipetteName: pipetteName,
+      })
       break
     }
     case FLOWS.ATTACH: {
       // attachment flow success
       if (attachedPipettes[mount] != null) {
-        const pipetteName = attachedPipettes[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
         buttonText = t('cal_pipette')
         // attachment flow fail
       } else {
-        header = t('pipette_failed_to_attach')
+        header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
         iconColor = COLORS.errorEnabled
         isSuccess = false
       }
@@ -59,14 +72,16 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
-        header = t('pipette_failed_to_detach')
+        header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
         iconColor = COLORS.errorEnabled
         isSuccess = false
       } else {
-        header = t('pipette_detached')
+        header = i18n.format(t('pipette_detached'), 'capitalize')
         if (selectedPipette === NINETY_SIX_CHANNEL) {
           if (currentStepIndex === totalStepCount) {
-            header = t('ninety_six_detached_success')
+            header = t('ninety_six_detached_success', {
+              pipetteName: NINETY_SIX_CHANNEL,
+            })
           } else {
             header = t('all_pipette_detached')
             subHeader = t('gantry_empty_for_96_channel_success')
@@ -108,20 +123,19 @@ export const Results = (props: ResultsProps): JSX.Element => {
       <>
         {isOnDevice ? null : (
           <SecondaryButton
+            isDangerous
             onClick={handleCleanUpAndClose}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             disabled={isFetching}
             aria-label="Results_errorExit"
             marginRight={SPACING.spacing2}
           >
-            {t('shared:exit')}
+            {i18n.format(t('cancel_attachment'), 'capitalize')}
           </SecondaryButton>
         )}
         <CheckPipetteButton
           proceed={() => setNumberOfTryAgains(numberOfTryAgains + 1)}
-          proceedButtonText={t(
-            flowType === FLOWS.ATTACH ? 'try_again' : 'attach_and_retry'
-          )}
+          proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
           setFetching={setFetching}
           isFetching={isFetching}
           isOnDevice={isOnDevice}

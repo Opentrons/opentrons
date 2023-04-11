@@ -6,10 +6,10 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   useHoverTooltip,
+  PrimaryButton,
 } from '@opentrons/components'
 import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { PrimaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
@@ -51,7 +51,7 @@ export const SetupModules = ({
           padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_setup_prep')}
+          {t('proceed_to_labware_setup_step')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 || runHasStarted ? (

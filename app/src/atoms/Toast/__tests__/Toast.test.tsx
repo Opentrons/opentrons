@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { Toast } from '..'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
-  return renderWithProviders(<Toast {...props} />)[0]
+  return renderWithProviders(<Toast {...props} displayType="desktop" />)[0]
 }
 
 describe('Toast', () => {
@@ -52,8 +52,8 @@ describe('Toast', () => {
       onClose: jest.fn(),
     }
     const { getByTestId, getByLabelText } = render(props)
-    const warningToast = getByTestId('Toast_success')
-    expect(warningToast).toHaveStyle(`color: #04aa65
+    const successToast = getByTestId('Toast_success')
+    expect(successToast).toHaveStyle(`color: #04aa65
     background-color: #f3fffa`)
     getByLabelText('icon_success')
   })

@@ -434,8 +434,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume -= volume_incr
 
     def ok_to_add_volume(self, volume_incr: float) -> bool:
-        return True
         # return self.current_volume + volume_incr <= self.working_volume
+        return True
 
     def add_tip(self, tip_length: float) -> None:
         """

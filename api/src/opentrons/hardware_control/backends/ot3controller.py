@@ -87,6 +87,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     USBTarget,
     FirmwareTarget,
 )
+from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
@@ -130,7 +131,11 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
 )
-from opentrons_hardware.hardware_control.rear_panel_settings import get_door_state
+from opentrons_hardware.hardware_control.rear_panel_settings import (
+    get_door_state,
+    set_deck_light,
+    get_deck_light_state,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -218,6 +223,7 @@ class OT3Controller:
         self._update_required = False
         self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
+        self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -608,6 +614,9 @@ class OT3Controller:
             A dictionary containing the new positions of each axis
         """
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
+        assert (
+            OT3Axis.G not in checked_axes
+        ), "Please home G axis using gripper_home_jaw()"
         if not checked_axes:
             return {}
 
@@ -621,8 +630,6 @@ class OT3Controller:
             if runner
         ]
         positions = await asyncio.gather(*coros)
-        if OT3Axis.G in checked_axes:
-            await self.gripper_home_jaw(self._configuration.grip_jaw_home_duty_cycle)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -927,13 +934,17 @@ class OT3Controller:
         nodes = {axis_to_node(ax) for ax in axes}
         await set_enable_motor(self._messenger, nodes)
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
-        return None
+        if rails is not None:
+            await set_deck_light(1 if rails else 0, self._usb_messenger)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {}
+        return {
+            "rails": await get_deck_light_state(self._usb_messenger),
+            "button": False,
+        }
 
     def pause(self) -> None:
         """Pause the controller activity."""
@@ -1220,3 +1231,6 @@ class OT3Controller:
                     message_id == BinaryMessageId.door_switch_state_info
                 ),
             )
+
+    def status_bar_interface(self) -> status_bar.StatusBar:
+        return self._status_bar

@@ -202,9 +202,11 @@ def fw_update_info() -> Dict[NodeId, str]:
 
 @pytest.fixture
 def fw_node_info() -> Dict[NodeId, DeviceInfoCache]:
-    node_cache1 = DeviceInfoCache(NodeId.head, 1, "12345678", None, PCBARevision(None))
+    node_cache1 = DeviceInfoCache(
+        NodeId.head, 1, "12345678", None, PCBARevision(None), subidentifier=0
+    )
     node_cache2 = DeviceInfoCache(
-        NodeId.gantry_x, 1, "12345678", None, PCBARevision(None)
+        NodeId.gantry_x, 1, "12345678", None, PCBARevision(None), subidentifier=0
     )
     return {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
 
