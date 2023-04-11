@@ -131,7 +131,8 @@ class SupportedTipsDefinition(BaseModel):
         alias="defaultTipOverlapDictionary",
     )
     default_blowout_volume: Optional[float] = Field(
-        ..., description="The default volume for a blowout command with this tip type.",
+        ...,
+        description="The default volume for a blowout command with this tip type.",
         alias="defaultBlowoutVolume",
     )
 

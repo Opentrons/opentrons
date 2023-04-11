@@ -60,9 +60,6 @@ class PipetteConfig:
     default_dispense_flow_rates: Dict[str, float]
     model: PipetteModel
     default_tipracks: List[LabwareUri]
-    default_blow_out_volume: float
-    shaft_diameter: Tuple[PipetteFusedSpec, str, List[str]]
-    shaft_ul_per_mm: Tuple[PipetteFusedSpec, str, List[str]]
 
 
 # Notes:
@@ -188,8 +185,6 @@ def load(
         aspirate_flow_rate=cfg["defaultAspirateFlowRate"]["value"],
         dispense_flow_rate=cfg["defaultDispenseFlowRate"]["value"],
         channels=ensure_value(cfg, "channels", MUTABLE_CONFIGS),
-        shaft_ul_per_mm=(cfg, "shaftULperMM", MUTABLE_CONFIGS),
-        shaft_diameter=(cfg, "shaftDiameter", MUTABLE_CONFIGS),
         nozzle_offset=cfg.get("nozzleOffset", NOZZLE_OFFSET_DEFAULT),  # type: ignore
         plunger_current=ensure_value(cfg, "plungerCurrent", MUTABLE_CONFIGS),
         drop_tip_current=ensure_value(cfg, "dropTipCurrent", MUTABLE_CONFIGS),
@@ -220,9 +215,6 @@ def load(
         ),
         model=pipette_model,
         default_tipracks=cfg["defaultTipracks"],
-        default_blow_out_volume=ensure_value(
-            cfg, "defaultBlowoutVolume", MUTABLE_CONFIGS
-        ),
     )
 
     return res
