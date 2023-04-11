@@ -295,17 +295,12 @@ class OT3API(
 
         # check for and start firmware updates if required
         if update_firmware:
-            # NOTE: We are logging to stdout so when the hw controller is
-            # built for CLI, the operator can know when updates are running.
-            stdout_handler = logging.StreamHandler()
-            mod_log.addHandler(stdout_handler)
             mod_log.info("Checking for firmware updates")
             async for progress in api_instance.update_firmware():
                 for update in progress:
                     if update.state == UpdateState.updating:
                         mod_log.info(update)
-            mod_log.info("Finished firmware updates")
-            mod_log.removeHandler(stdout_handler)
+            mod_log.info("Done with firmware updates")
 
         await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
@@ -316,7 +311,9 @@ class OT3API(
         api_instance._update_door_state(door_state)
         backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
-        backend.initialized = True
+        # set the initialized flag based on wether firmware updates are enabled or not
+        # this way we dont raise `FirmwareUpdateRequired` exception when updates are disabled.
+        backend.initialized = update_firmware
         return api_instance
 
     @classmethod

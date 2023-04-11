@@ -111,11 +111,17 @@ def stop_server() -> None:
 
 
 def build_api() -> ThreadManager[HardwareControlAPI]:
+    # NOTE: We are using StreamHandler so when the hw controller is
+    # being built we can log firmware update progress to stdout.
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    logging.getLogger().addHandler(stream_handler)
     tm = ThreadManager(
         HCApi.build_hardware_controller,
         use_usb_bus=ff.rear_panel_integration(),
         update_firmware=update_firmware,
     )
+    logging.getLogger().removeHandler(stream_handler)
     tm.managed_thread_ready_blocking()
     return tm
 
