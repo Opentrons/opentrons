@@ -43,6 +43,8 @@ from .ot3utils import (
     create_tip_action_group,
     PipetteAction,
     sub_system_to_node_id,
+    NODEID_SUBSYSTEM,
+    USBTARGET_SUBSYSTEM,
 )
 
 try:
@@ -112,6 +114,7 @@ from opentrons.hardware_control.types import (
     UpdateStatus,
     mount_to_subsystem,
     DoorState,
+    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -244,9 +247,18 @@ class OT3Controller:
         self._initialized = value
 
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> Dict[OT3SubSystem, int]:
         """Get the firmware version."""
-        return None
+        subsystem_map: Dict[Union[NodeId, USBTarget], OT3SubSystem] = deepcopy(
+            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], USBTARGET_SUBSYSTEM)
+        )
+        subsystem_map.update(
+            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], NODEID_SUBSYSTEM)
+        )
+        return {
+            subsystem_map[node.application_for()]: device.version
+            for node, device in self._network_info.device_info.items()
+        }
 
     @property
     def update_required(self) -> bool:
