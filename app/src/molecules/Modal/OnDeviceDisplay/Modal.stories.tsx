@@ -28,7 +28,7 @@ Default.args = {
   },
   children: (
     <Flex
-      borderRadius={`0 ${BORDERS.size_three}`}
+      borderRadius={`0px 0px ${BORDERS.size_three} ${BORDERS.size_three}`}
       paddingTop={SPACING.spacing6}
       height="23.5rem"
     >

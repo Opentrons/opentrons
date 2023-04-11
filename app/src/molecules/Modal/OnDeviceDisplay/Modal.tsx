@@ -18,6 +18,7 @@ interface ModalProps {
   children: React.ReactNode
   /** for small, medium, or large modal sizes, medium by default */
   modalSize?: ModalSize
+  /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
   isError?: boolean
 }
