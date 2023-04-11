@@ -33,7 +33,7 @@ const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
   {
     iconName: 'wifi',
     cardName: 'Instrument + Module Hub',
-    destinationPath: '/attach-instruments',
+    destinationPath: '/instruments',
   },
   {
     iconName: 'wifi',
@@ -48,12 +48,7 @@ export function RobotDashboard(): JSX.Element {
   // ToDo kj 12/07/2022 get protocol runs and add conditional rendering
   // if there is no run data, shows the following
   return (
-    <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-      flexDirection={DIRECTION_COLUMN}
-    >
+    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <StyledText
         fontSize="1.25rem"
