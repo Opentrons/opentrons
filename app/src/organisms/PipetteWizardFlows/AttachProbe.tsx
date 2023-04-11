@@ -1,11 +1,14 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
-import { Flex, TYPOGRAPHY, COLORS, SPACING } from '@opentrons/components'
 import {
-  NINETY_SIX_CHANNEL,
-  ODD_MEDIA_QUERY_SPECS,
-} from '@opentrons/shared-data'
+  Flex,
+  TYPOGRAPHY,
+  COLORS,
+  SPACING,
+  RESPONSIVENESS,
+} from '@opentrons/components'
+import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -23,8 +26,8 @@ const IN_PROGRESS_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   text-align: ${TYPOGRAPHY.textAlignCenter};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
-    font-size: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
     margin-top: ${SPACING.spacing2};
   }

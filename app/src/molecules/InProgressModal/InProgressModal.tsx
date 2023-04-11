@@ -9,9 +9,9 @@ import {
   SPACING,
   Flex,
   Icon,
+  RESPONSIVENESS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { getIsOnDevice } from '../../redux/config'
 
@@ -27,7 +27,7 @@ const DESCRIPTION_STYLE = css`
   margin-top: ${SPACING.spacing5};
   margin-bottom: ${SPACING.spacing3};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: 700;
     font-size: 2rem;
     margin-top: ${SPACING.spacing6};
