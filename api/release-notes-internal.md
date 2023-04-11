@@ -4,9 +4,9 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.2.0
+# Internal Release 0.3.0
 
-This is first internal release 0.2.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+This is internal release 0.3.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
 
 Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
 
@@ -21,7 +21,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
 ### ODD
-- Attach, detach, and calibration flows for pipettes or gripper
 - Deleting protocols stored on the robot via the ODD
 - Changing the text size on the ODD through the settings
 
@@ -35,8 +34,10 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Reasonably Sized New Things
 ### ODD
 - Liquid setup has come to protocol setup page
+- Gripper and pipette attach and calibration flows!
+- Running protocol page
 ### Robot Control
-- 8-channel pipettes now will use more than 0 amps to pick up tips
+- Motion configuration fixes from harware testing
 - Module calibration exists in the protocol engine; you can use a script to run it with any pipette for any module. The data will be saved for inspection, but will not be loaded during protocols.
 
 ## Big Things That Do Work Please Do Report Bugs About Them
@@ -50,6 +51,8 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ### ODD
 - Protocol execution
+- Protocol run monitoring
+- Attach and calibrate
 - Network connection management, including viewing IP addresses and connecting to wifi networks
 - Automatic updates of robot software when new internal releases are created
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
