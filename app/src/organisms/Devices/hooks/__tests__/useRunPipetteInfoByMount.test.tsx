@@ -6,6 +6,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
 
 import {
@@ -24,7 +25,6 @@ import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/us
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
-  useTipLengthCalibrations,
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
 } from '..'
@@ -45,6 +45,7 @@ jest.mock('@opentrons/shared-data', () => {
     getLoadedLabwareDefinitionsByUri: jest.fn(),
   }
 })
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../useAttachedPipetteCalibrations')
 jest.mock('../useAttachedPipettes')
@@ -61,8 +62,8 @@ const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jes
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
-const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
-  typeof useTipLengthCalibrations
+const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
+  typeof useAllTipLengthCalibrationsQuery
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
@@ -147,9 +148,9 @@ describe('useRunPipetteInfoByMount hook', () => {
     when(mockUseAttachedPipettes)
       .calledWith()
       .mockReturnValue(ATTACHED_PIPETTES)
-    when(mockUseTipLengthCalibrations)
+    when(mockUseAllTipLengthCalibrationsQuery)
       .calledWith()
-      .mockReturnValue(TIP_LENGTH_CALIBRATIONS)
+      .mockReturnValue({ data: { data: TIP_LENGTH_CALIBRATIONS } } as any)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
