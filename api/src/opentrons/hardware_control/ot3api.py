@@ -799,8 +799,10 @@ class OT3API(
         if refresh:
             await self.refresh_positions()
 
-        position_axes = [OT3Axis.X, OT3Axis.Y,  OT3Axis.by_mount(mount)]
-        valid_motor = self._current_position and self._backend.check_motor_status(position_axes)
+        position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        valid_motor = self._current_position and self._backend.check_motor_status(
+            position_axes
+        )
         if not valid_motor:
             raise MustHomeError(
                 f"Current position of {str(mount)} is invalid; please home motors."
@@ -864,8 +866,10 @@ class OT3API(
                 f"Cannot return encoder position for {mount} if no gripper is attached"
             )
 
-        position_axes = [OT3Axis.X, OT3Axis.Y,  OT3Axis.by_mount(mount)]
-        valid_motor = self._encoder_position and self._backend.check_encoder_status(position_axes)
+        position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        valid_motor = self._encoder_position and self._backend.check_encoder_status(
+            position_axes
+        )
         if not valid_motor:
             raise MustHomeError(
                 f"Encoder position of {str(mount)} is invalid; please home motors."
