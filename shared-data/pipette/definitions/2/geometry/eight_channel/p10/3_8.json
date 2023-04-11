@@ -1,5 +1,0 @@
-{
-  "nozzleOffset": [1.0, 1.0, 1.0],
-  "pathTo3D": "some_string",
-  "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometryPropertiesSchema.json"
-}
