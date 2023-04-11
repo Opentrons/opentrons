@@ -387,8 +387,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         simulate=ctx.is_simulating(),
     )
     print(f'found scale "{recorder.serial_number}"')
-    start_sim_mass = {50: 15, 200: 200, 1000: 200}
-    recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
+    if ctx.is_simulating():
+        start_sim_mass = {50: 15, 200: 200, 1000: 200}
+        recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
