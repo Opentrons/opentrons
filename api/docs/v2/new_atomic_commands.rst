@@ -19,9 +19,12 @@ The examples in this section would be added to the following:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
-        plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        pipette = protocol.load_instrument('p300_single_gen2', mount='left')
+        tiprack = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 2)
+        plate = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 3)
+        pipette = protocol.load_instrument(
+            instrument_name = 'p300_single_gen2', mount ='left')
         # the example code below would go here, inside the run function
 
 
@@ -92,9 +95,9 @@ In API version 2.2 or above:
 .. code-block:: python
 
     tip_rack = protocol.load_labware(
-            'opentrons_96_tiprack_300ul', 1)
+        load_name = 'opentrons_96_tiprack_300ul', location = 1)
     pipette = protocol.load_instrument(
-        'p300_single_gen2', mount='left', tip_racks=[tip_rack])
+        instrument_name = 'p300_single_gen2', mount = 'left', tip_racks = [tip_rack])
 
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
@@ -105,9 +108,9 @@ In API version 2.0 and 2.1:
 .. code-block:: python
 
     tip_rack = protocol.load_labware(
-            'opentrons_96_tiprack_300ul', 1)
+        load_name = 'opentrons_96_tiprack_300ul', location = 1)
     pipette = protocol.load_instrument(
-        'p300_single_gen2', mount='left', tip_racks=[tip_rack])
+        instrument_name = 'p300_single_gen2', mount = 'left', tip_racks = [tip_rack])
 
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
@@ -127,13 +130,15 @@ For this section, instead of using the protocol defined above, consider this set
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
-            'corning_96_wellplate_360ul_flat', 2)
+            load_name = 'corning_96_wellplate_360ul_flat', location = 2)
         tip_rack_1 = protocol.load_labware(
-            'opentrons_96_tiprack_300ul', 3)
+            load_name = 'opentrons_96_tiprack_300ul', location = 3)
         tip_rack_2 = protocol.load_labware(
-            'opentrons_96_tiprack_300ul', 4)
+            load_name = 'opentrons_96_tiprack_300ul', location = 4)
         pipette = protocol.load_instrument(
-            'p300_single_gen2', mount='left', tip_racks=[tip_rack_1, tip_rack_2])
+            instrument_name = 'p300_single_gen2',
+            mount = 'left',
+            tip_racks = [tip_rack_1, tip_rack_2])
 
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and two `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slots 3 and 4 respectively, and uses a P300 Single GEN2 pipette.
 
@@ -215,15 +220,19 @@ The examples in this section should be inserted in the following:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        pipette = protocol.load_instrument('p300_single_gen2', mount='left', tip_racks=[tiprack])
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 2)
+        tiprack = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 3)
+        pipette = protocol.load_instrument(
+            instrument_name = 'p300_single_gen2',
+            mount = 'left',
+            tip_racks = [tiprack])
         pipette.pick_up_tip()
         # example code goes here
 
 
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single GEN2 pipette.
-
 
 .. _new-aspirate:
 
@@ -234,7 +243,8 @@ To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`
 
 .. code-block:: python
 
-    pipette.aspirate(50, plate['A1'], rate=2.0)  # aspirate 50uL from plate:A1
+    pipette.aspirate(
+        volume = 50, plate['A1'], rate = 2.0) # aspirate 50uL from plate:A1
 
 Now the pipette's tip is holding 50 µL.
 
@@ -246,7 +256,8 @@ You can also simply specify the volume to aspirate, and not mention a location. 
 
 .. code-block:: python
 
-    pipette.aspirate(50)                     # aspirate 50uL from current position
+    # aspirate 50uL from current position
+    pipette.aspirate(volume = 50)
 
 Now our pipette's tip is holding 100 µL.
 
