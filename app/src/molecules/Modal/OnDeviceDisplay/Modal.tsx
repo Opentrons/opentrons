@@ -63,7 +63,6 @@ export function Modal(props: ModalProps): JSX.Element {
         aria-label={`modal_${modalSize}`}
         onClick={e => {
           e.stopPropagation()
-          onOutsideClick(e)
         }}
       >
         {header != null ? (
