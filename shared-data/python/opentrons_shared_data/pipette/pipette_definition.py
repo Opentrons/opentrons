@@ -234,6 +234,9 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         ..., alias="plungerPositionsConfigurations"
     )
     available_sensors: AvailableSensorDefinition = Field(..., alias="availableSensors")
+    partial_tip_configurations: PartialTipDefinition = Field(
+        ..., alias="partialTipConfigurations"
+    )
     channels: PipetteChannelType = Field(
         ..., description="The maximum number of channels on the pipette."
     )
@@ -300,9 +303,6 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         description="A list of default tiprack paths.",
         regex="opentrons/[a-z0-9._]+/[0-9]",
         alias="defaultTipracks",
-    )
-    partial_tip_configurations: Optional[PartialTipDefinition] = Field(
-        ..., alias="partialTipConfigurations"
     )
 
     @validator("supported_tips", pre=True)

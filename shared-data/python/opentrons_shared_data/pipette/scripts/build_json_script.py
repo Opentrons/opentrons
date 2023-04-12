@@ -45,7 +45,6 @@ def _migrate_liquid_model_v1(
             "defaultTipracks": name_configurations["defaultTipracks"],
         },
         _migrate_supported_tips(model_configurations, name_configurations),
-        name_configurations["channels"],
     )
 
 
@@ -185,7 +184,6 @@ def build_geometry_model_v2(
 def build_liquid_model_v2(
     input_dictionary: Dict[str, Any],
     supported_tip_configurations: Dict[str, SupportedTipsDefinition],
-    channels: int,
 ) -> PipetteLiquidPropertiesDefinition:
     if input_dictionary:
         if input_dictionary.get("partialTipConfigurations"):
@@ -196,9 +194,6 @@ def build_liquid_model_v2(
             return PipetteLiquidPropertiesDefinition.parse_obj(
                 {
                     **input_dictionary,
-                    "partialTipConfigurations": _build_partial_tip_configurations(
-                        channels
-                    ),
                     "supportedTips": supported_tip_configurations,
                 }
             )
@@ -348,10 +343,12 @@ def save_to_file(
         json_basemodel = data.json(by_alias=True)
         dict_basemodel = json.loads(json_basemodel)
         dict_basemodel["$otSharedSchema"] = schema_path
-        filepath.write_text(json.dumps(dict_basemodel), encoding="utf-8")
+        filepath.write_text(
+            json.dumps(dict_basemodel, ensure_ascii=False), encoding="utf-8"
+        )
     else:
         data["$otSharedSchema"] = schema_path
-        filepath.write_text(json.dumps(data), encoding="utf-8")
+        filepath.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
 def migrate_v1_to_v2() -> None:
@@ -449,7 +446,7 @@ def fill_blowout_configs(
     general_config_files = Path(GENERAL_ROOT).glob("*")
     for pipette_type in general_config_files:  # single, eight, 96-channel
         pipette_type_str = str(pipette_type).split("/")[-1]
-        for volume in volumes[pipette_gen]:  # pipette max volume- p10, p20, p50, etc.
+        for volume in volumes:  # pipette max volume- p10, p20, p50, etc.
             shaft_diameter = shaft_diameters[volume]
             # calculate uL per mm, default blowout vol
             ul_per_mm = math.pi * (shaft_diameter / 2) ** 2
@@ -529,7 +526,6 @@ def build_new_pipette_model_v2(
     liquid_model = build_liquid_model_v2(
         top_level_pipette_model["liquid"],
         pipette_functions_dict,
-        top_level_pipette_model["general"]["channels"],
     )
     liquid_model_dict = liquid_model.dict(by_alias=True)
     liquid_model_dict["supportedTips"] = {
@@ -549,7 +545,9 @@ def build_new_pipette_model_v2(
                 "pickUpTipConfigurations"
             ],
             "dropTipConfigurations": top_level_pipette_model["dropTipConfigurations"],
-            "partialTipConfigurations": liquid_model.partial_tip_configurations,
+            "partialTipConfigurations": _build_partial_tip_configurations(
+                top_level_pipette_model["general"]["channels"]
+            ),
         },
         pipette_type,
     )
