@@ -21,7 +21,7 @@ import {
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
-import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
@@ -35,7 +35,7 @@ export function LongPressModal(props: {
   const { longpress, protocol } = props
   const history = useHistory()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
   const pinned = pinnedProtocolIds.includes(protocol.id)
@@ -102,7 +102,10 @@ export function LongPressModal(props: {
   return (
     <>
       {showMaxPinsAlert ? (
-        <TooManyPinsModal
+        <SmallModalChildren
+          header={t('too_many_pins_header')}
+          subText={t('too_many_pins_body')}
+          buttonText={t('shared:close')}
           handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
         />
       ) : (
