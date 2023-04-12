@@ -24,7 +24,6 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 from opentrons.config.types import (
     CapacitivePassSettings,
 )
-from opentrons_hardware.firmware_bindings.constants import SensorId
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Capacitance Test')
@@ -105,8 +104,8 @@ class Gripper_Capacitance_Test:
             "Rear":None,
         }
         self.sensor_id = {
-            "Front":SensorId.S1,
-            "Rear":SensorId.S0,
+            "Front":"secondary",
+            "Rear":"primary",
         }
         self.gripper_probes = {
             "Front":GripperProbe.FRONT,
@@ -206,7 +205,7 @@ class Gripper_Capacitance_Test:
         await api.move_to(mount, next_position, speed=1)
 
     async def _record_capacitance(
-        self, api: OT3API, mount: OT3Mount, sensor_id: SensorId, x_step: int, z_step: int, deck_height: float
+        self, api: OT3API, mount: OT3Mount, sensor_id: str, x_step: int, z_step: int, deck_height: float
     ) -> None:
         # Move to next height
         current_position = await api.gantry_position(mount)
