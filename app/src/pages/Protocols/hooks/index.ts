@@ -85,3 +85,12 @@ export const useRequiredProtocolLabware = (
   const { onDeckItems, offDeckItems } = getLabwareSetupItemGroups(commands)
   return [...onDeckItems, ...offDeckItems]
 }
+
+export const useMissingProtocolHardware = (
+  protocolId: string
+): ProtocolHardware[] => {
+  const requiredProtocolHardware = useRequiredProtocolHardware(protocolId)
+  return requiredProtocolHardware.filter(hardware => {
+    hardware.connected === true
+  })
+}

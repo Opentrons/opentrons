@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useParams } from 'react-router-dom'
 
 import {
   Flex,
@@ -21,30 +22,33 @@ import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { sortProtocols } from './ProtocolDashboard/utils'
 import { EmptyRecentRun } from '../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
+import { useMissingProtocolHardware } from '../Protocols/hooks'
+
+import type { OnDeviceRouteParams } from '../../App/types'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
 const SORT_KEY = 'recentRun'
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
-
   const protocols = useAllProtocolsQuery()
+  const { protocolId } = useParams<OnDeviceRouteParams>()
+  const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const runs = useAllRunsQuery()
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
   const runData = runs.data?.data != null ? runs.data?.data : []
-
+  const lastRun = runs.data?.data.find(run => run.protocolId === protocolId)
+    ?.createdAt
   /** Currently the max number of displaying recent run protocol is 8 */
   const sortedProtocols = sortProtocols(SORT_KEY, protocolsData, runData).slice(
     0,
     MAXIMUM_RECENT_RUN_PROTOCOLS
   )
-
+  const missingProtocolHardwareType = missingProtocolHardware.map(hardware => {
+    hardware.hardwareType
+  })
+  console.log(missingProtocolHardwareType)
   console.table(sortedProtocols)
-
-  // lastRun
-  // const lastRun = runs.data?.data.find(
-  //   run => run.protocolId === protocol.id
-  // )?.createdAt
 
   return (
     <Flex
@@ -69,8 +73,15 @@ export function RobotDashboard(): JSX.Element {
               {t('run_again')}
             </StyledText>
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
-              <RecentRunCard />
-              <RecentRunCard />
+              {sortedProtocols.map((protocol, id) => {
+                ;<React.Fragment key={id}>
+                  <RecentRunCard
+                    missingHardwareTypes={missingProtocolHardwareType}
+                    lastRun={lastRun ?? ''}
+                    protocolName={protocol.metadata.protocolName ?? ''}
+                  />
+                </React.Fragment>
+              })}
             </Flex>
           </>
         )}
@@ -79,14 +90,15 @@ export function RobotDashboard(): JSX.Element {
   )
 }
 
-// interface RecentRunCardProps {
-//   moduleStatus: string // also need to pass the module status type
-//   protocolName: string // need to change
-//   lastRun: string
-// }
+interface RecentRunCardProps {
+  missingHardwareTypes: 'pipette' | 'module'[]
+  protocolName: string // need to change
+  lastRun: string
+}
 
-function RecentRunCard(): JSX.Element {
-  // function LastRunCard({ moduleStatus, protocolName, lastRun }): JSX.Element {
+function RecentRunCard(props: RecentRunCardProps): JSX.Element {
+  const { t, i18n } = useTranslation('device_details')
+  const { protocolName, lastRun } = props
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -106,7 +118,7 @@ function RecentRunCard(): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
           lineHeight={TYPOGRAPHY.lineHeight42}
         >
-          {'Covid-19 qPCR Prep (Station C)'}
+          {protocolName}
         </StyledText>
       </Flex>
       <StyledText
@@ -115,7 +127,7 @@ function RecentRunCard(): JSX.Element {
         lineHeight={TYPOGRAPHY.lineHeight28}
         color={COLORS.darkBlack_seventy}
       >
-        {'Last run 1 min ago'}
+        {i18n.format(t('last_run_time', { number: lastRun }), 'capitalize')}
       </StyledText>
     </Flex>
   )

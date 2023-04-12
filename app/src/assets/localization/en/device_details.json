@@ -124,5 +124,6 @@
   "ready": "Ready",
   "run_again": "Run again",
   "no_recent_runs": "No recent runs",
-  "no_recent_runs_description": "After you run some protocols, they will appear here."
+  "no_recent_runs_description": "After you run some protocols, they will appear here.",
+  "last_run_time": "last run {{number}} ago"
 }
