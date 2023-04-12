@@ -22,32 +22,32 @@ sensor_threshold_pf=1.0)
 # AXIS = OT3Axis.Z_L
 TRIALS = 5
 
-def between_callback(stop_event, api):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+# def between_callback(stop_event, api):
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#
+#     loop.run_until_complete(plunger_move(stop_event, api))
+#     loop.close()
 
-    loop.run_until_complete(plunger_move(stop_event, api))
-    loop.close()
+async def plunger_move(stop_event, api): # -> int:
 
-async def plunger_move(stop_event, api) -> int:
+    top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, OT3Mount.RIGHT)
 
-    top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    # plunger_cycles = 0
 
-    plunger_cycles = 0
-
-    for i in range(TRIALS):#while True:
-        print("Move to bottom plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, bottom_pos)
-        print("Move to top plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, top_pos)
-        print("Move to bottom plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, bottom_pos)
-        plunger_cycles += 1
-        if stop_event.is_set():
-            break
+    # for i in range(TRIALS):#while True:
+    print("Move to bottom plunger position\n")
+    await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, bottom_pos)
+    print("Move to top plunger position\n")
+    await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, top_pos)
+    print("Move to bottom plunger position\n")
+    await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, bottom_pos)
+    # plunger_cycles += 1
+        # if stop_event.is_set():
+        #     break
     await api.home_plunger(mount)
 
-    return plunger_cycles
+    # return plunger_cycles
 
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
@@ -63,11 +63,16 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
     stop_event = Event()
 
-    plunger_thread = Thread(target=between_callback, args=(stop_event, api))
-    plunger_thread.start()
+    # await asyncio.gather(plunger_move(stop_event, api))
+
+    # plunger_thread = Thread(target=between_callback, args=(stop_event, api))
+    # plunger_thread.start()
 
     for i in range(TRIALS):
         print(f"Trial {i+1}\n")
+
+        asyncio.create_task(plunger_move(stop_event, api))
+        # await asyncio.gather(plunger_move(stop_event, api))
 
         await api.move_to(OT3Mount.LEFT, Point(final_position[OT3Axis.X],
                             final_position[OT3Axis.Y], final_position[OT3Axis.Z_L]))
@@ -80,7 +85,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         await api.remove_tip(OT3Mount.LEFT)
 
     stop_event.set()
-    force_thread.join()
+    # plunger_thread.join()
 
 if __name__ == "__main__":
     mount_options = {
