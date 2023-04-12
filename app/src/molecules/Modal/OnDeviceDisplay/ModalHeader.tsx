@@ -48,7 +48,11 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
         </StyledText>
       </Flex>
       {hasExitIcon && onClick != null ? (
-        <Flex onClick={onClick} aria-label="closeIcon">
+        <Flex
+          onClick={onClick}
+          aria-label="closeIcon"
+          alignItems={ALIGN_CENTER}
+        >
           <Icon size="3.5rem" name="ot-close" />
         </Flex>
       ) : null}
