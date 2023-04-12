@@ -391,11 +391,10 @@ class MoveStopConditionField(utils.UInt8Field):
 
     def __repr__(self) -> str:
         """Print move stop condition."""
-        try:
-            condition = MoveStopCondition(self.value).name
-        except ValueError:
-            condition = str(self.value)
-        return f"{self.__class__.__name__}(value={condition})"
+        flags_list = [
+            flag.name for flag in MoveStopCondition if bool(self.value & flag.value)
+        ]
+        return f"{self.__class__.__name__}(value={','.join(flags_list)})"
 
 
 class LightTransitionTypeField(utils.UInt8Field):
