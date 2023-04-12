@@ -112,6 +112,7 @@ export function RunFailedModal({
           gridGap={SPACING.spacing3}
           padding={SPACING.spacing4}
           overflowY="scroll"
+          maxHeight="7.75rem"
         >
           <StyledText
             fontSize={TYPOGRAPHY.fontSize20}
