@@ -41,7 +41,7 @@ export function RunFailedModal({
   failedCommand,
   errors,
 }: RunFailedModalProps): JSX.Element | null {
-  const { t } = useTranslation(['run_details', 'shared'])
+  const { t, i18n } = useTranslation(['run_details', 'shared'])
   const history = useHistory()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -141,7 +141,7 @@ export function RunFailedModal({
         <Flex marginTop="1.75rem">
           <SmallButton
             buttonType="alert"
-            buttonText={t('shared:close')}
+            buttonText={i18n.format(t('shared:close'), 'titleCase')}
             onClick={handleClose}
             disabled={isCanceling}
           />
