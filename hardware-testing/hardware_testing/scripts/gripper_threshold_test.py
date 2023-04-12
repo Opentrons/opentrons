@@ -39,12 +39,13 @@ def build_arg_parser():
 
 class Gripper_Threshold_Test:
     def __init__(
-        self, simulate: bool, cycles: int, trials: int, slot: int, probes
+        self, simulate: bool, cycles: int, trials: int, slot: int, probe_type, probes
     ) -> None:
         self.simulate = simulate
         self.cycles = cycles
         self.trials = trials
         self.slot = slot
+        self.probe_type = probe_type
         self.probes = probes
         self.api = None
         self.mount = None
@@ -92,7 +93,7 @@ class Gripper_Threshold_Test:
         self.gauge_ports = {
             # "X":"/dev/ttyUSB0",
             # "Y":"/dev/ttyUSB1",
-            "Z":"/dev/ttyUSB2",
+            "Z":"/dev/ttyUSB0",
         }
         self.gauge_offsets = {
             "X":Point(x=5, y=-5, z=9),
@@ -124,7 +125,7 @@ class Gripper_Threshold_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"slot{self.slot}"
+        self.test_tag = f"slot{self.slot}_" + self.probe_type
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -323,5 +324,5 @@ if __name__ == '__main__':
         probes.append("Front")
     elif args.probe == 'rear':
         probes.append("Rear")
-    test = Gripper_Threshold_Test(args.simulate, args.cycles, args.trials, args.slot, probes)
+    test = Gripper_Threshold_Test(args.simulate, args.cycles, args.trials, args.slot, args.probe, probes)
     asyncio.run(test.run())
