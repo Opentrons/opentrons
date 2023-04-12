@@ -7,6 +7,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 
 from robot_server.errors import ApiError
+from robot_server.runs import EngineStore
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.service.json_api import (
     RequestModel,
@@ -88,7 +89,7 @@ async def test_create_run(
     assert result.status_code == 201
 
 
-async def test_create_run_conflict(
+async def test_create_maintenance_run_conflict(
     decoy: Decoy,
     mock_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
@@ -114,6 +115,29 @@ async def test_create_run_conflict(
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
 
+
+async def test_create_maintenance_run_with_protocol_run_conflict(
+        decoy: Decoy,
+        mock_maintenance_run_data_manager:  MaintenanceRunDataManager,
+        mock_engine_store: EngineStore,
+
+) -> None:
+    """It should respond with a conflict error if protocol run is active during maintenance run creation."""
+    created_at = datetime(year=2021, month=1, day=1)
+
+    decoy.when(mock_engine_store.engine.state_view.commands.has_been_played()).then_return(
+        True
+    )
+    with pytest.raises(ApiError) as exc_info:
+        await create_run(
+            run_id="run-id",
+            created_at=created_at,
+            request_body=None,
+            run_data_manager=mock_maintenance_run_data_manager,
+            regular_engine_store=mock_engine_store
+        )
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"
 
 async def test_get_run_data_from_url(
     decoy: Decoy,

@@ -31,7 +31,7 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
-class EngineStore:
+class MaintenanceEngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
     def __init__(

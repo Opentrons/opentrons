@@ -26,7 +26,7 @@ from robot_server.service.json_api import (
 
 from ..maintenance_run_models import MaintenanceRunCommandSummary
 from ..maintenance_run_data_manager import MaintenanceRunDataManager, RunNotCurrentError
-from ..maintenance_engine_store import EngineStore
+from ..maintenance_engine_store import MaintenanceEngineStore
 from ..dependencies import (
     get_maintenance_engine_store,
     get_maintenance_run_data_manager,
@@ -84,7 +84,7 @@ class CommandCollectionLinks(BaseModel):
 
 async def get_current_run_engine_from_url(
     runId: str,
-    engine_store: EngineStore = Depends(get_maintenance_engine_store),
+    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
 ) -> ProtocolEngine:
     """Get run protocol engine.
 

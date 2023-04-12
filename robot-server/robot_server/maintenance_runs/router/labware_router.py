@@ -11,7 +11,7 @@ from robot_server.errors import ErrorBody
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 
 from ..maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
-from ..maintenance_engine_store import EngineStore
+from ..maintenance_engine_store import MaintenanceEngineStore
 from ..dependencies import get_maintenance_engine_store
 from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
 
@@ -38,7 +38,7 @@ labware_router = APIRouter()
 )
 async def add_labware_offset(
     request_body: RequestModel[LabwareOffsetCreate],
-    engine_store: EngineStore = Depends(get_maintenance_engine_store),
+    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
     run: MaintenanceRun = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
     """Add a labware offset to a run.
@@ -79,7 +79,7 @@ async def add_labware_offset(
 )
 async def add_labware_definition(
     request_body: RequestModel[LabwareDefinition],
-    engine_store: EngineStore = Depends(get_maintenance_engine_store),
+    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
     run: MaintenanceRun = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[LabwareDefinitionSummary]]:
     """Add a labware offset to a run.

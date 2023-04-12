@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional
+from typing import Optional, Union
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
@@ -22,8 +22,11 @@ from robot_server.service.json_api import (
     PydanticResponse,
     Body,
 )
+from ...runs import EngineStore
 
 from ...runs.run_models import RunNotFoundError
+from ...runs.dependencies import get_engine_store as get_regular_engine_store
+
 from ..maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
@@ -37,6 +40,8 @@ log = logging.getLogger(__name__)
 base_router = APIRouter()
 
 
+# TODO (spp, 2023-04-10): move all error types from maintenance & regular runs
+#  to a shared location
 class RunNotFound(ErrorDetails):
     """An error if a given run is not found."""
 
@@ -56,6 +61,13 @@ class RunAlreadyActive(ErrorDetails):
 
     id: Literal["RunAlreadyActive"] = "RunAlreadyActive"
     title: str = "Run Already Active"
+
+
+class ProtocolRunIsActive(ErrorDetails):
+    """An error if one tries to create a maintenance run while a protocol run is active."""
+
+    id: Literal["ProtocolRunIsActive"] = "ProtocolRunIsActive"
+    title: str = "Protocol Run Is Active"
 
 
 class RunNotIdle(ErrorDetails):
@@ -121,7 +133,7 @@ async def get_run_data_from_url(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[MaintenanceRun]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunAlreadyActive, ProtocolRunIsActive]]},
     },
 )
 async def create_run(
@@ -131,6 +143,7 @@ async def create_run(
     ),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    regular_engine_store: EngineStore = Depends(get_regular_engine_store)  # <- suggest a better name
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new run.
 
@@ -139,11 +152,16 @@ async def create_run(
         run_data_manager: Current and historical run data management.
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
-        run_auto_deleter: An interface to delete old resources to make room for
-            the new run.
+        regular_engine_store: Engine store associated with regular protocol runs.
     """
-    offsets = request_body.data.labwareOffsets if request_body is not None else []
+    protocol_run_state = regular_engine_store.engine.state_view
+    if protocol_run_state.commands.has_been_played():
+        raise ProtocolRunIsActive(detail="Cannot create maintenance run when "
+                                         "a protocol run is active.").as_error(
+            status.HTTP_409_CONFLICT
+        )
 
+    offsets = request_body.data.labwareOffsets if request_body is not None else []
     try:
         run_data = await run_data_manager.create(
             run_id=run_id,

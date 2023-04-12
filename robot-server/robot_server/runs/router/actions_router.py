@@ -18,6 +18,7 @@ from ..run_controller import RunController, RunActionNotAllowedError
 from ..action_models import RunAction, RunActionCreate
 from ..dependencies import get_engine_store, get_run_store
 from .base_router import RunNotFound, RunStopped
+from ...maintenance_runs import MaintenanceEngineStore, get_maintenance_engine_store
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()
@@ -79,6 +80,7 @@ async def create_run_action(
     run_controller: RunController = Depends(get_run_controller),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
+    maintenance_engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store)
 ) -> PydanticResponse[SimpleBody[RunAction]]:
     """Create a run control action.
 
@@ -89,6 +91,12 @@ async def create_run_action(
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
     """
+    if maintenance_engine_store.current_run_id is not None:
+        # Is it okay to not allow any actions? Technically,
+        raise RunActionNotAllowed(detail="Cannot issue protocol run action when a"
+                                         "maintenance run is active").as_error(
+            status.HTTP_409_CONFLICT
+        )
     try:
         action = run_controller.create_action(
             action_id=action_id,

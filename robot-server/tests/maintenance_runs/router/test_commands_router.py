@@ -19,7 +19,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
 )
 
-from robot_server.maintenance_runs.maintenance_engine_store import EngineStore
+from robot_server.maintenance_runs.maintenance_engine_store import MaintenanceEngineStore
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
     RunNotCurrentError,
@@ -41,7 +41,7 @@ from robot_server.maintenance_runs.router.commands_router import (
 
 async def test_get_current_run_engine_from_url(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_engine_store: MaintenanceEngineStore,
 ) -> None:
     """Should get an instance of a maintenance run protocol engine."""
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
@@ -56,7 +56,7 @@ async def test_get_current_run_engine_from_url(
 
 async def test_get_current_run_engine_from_url_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_engine_store: MaintenanceEngineStore,
 ) -> None:
     """It should 409 if you try to add commands to non-current run."""
     decoy.when(mock_engine_store.current_run_id).then_return("some-other-run-id")

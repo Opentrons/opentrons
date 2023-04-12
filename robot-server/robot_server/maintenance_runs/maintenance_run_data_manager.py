@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from .maintenance_engine_store import EngineStore, EngineConflictError
+from .maintenance_engine_store import MaintenanceEngineStore, EngineConflictError
 from .maintenance_run_models import MaintenanceRun
 
 
@@ -56,7 +56,7 @@ class RunNotCurrentError(ValueError):
 class MaintenanceRunDataManager:
     """Collaborator to manage current and historical run data.
 
-    Provides a facade to both an EngineStore (current run) and a RunStore
+    Provides a facade to both an MaintenanceEngineStore (current run) and a RunStore
     (historical runs). Returns `Run` response models to the router.
 
     Args:
@@ -64,7 +64,7 @@ class MaintenanceRunDataManager:
         run_store: Persistent database of current and historical run data.
     """
 
-    def __init__(self, engine_store: EngineStore) -> None:
+    def __init__(self, engine_store: MaintenanceEngineStore) -> None:
         self._engine_store = engine_store
 
     @property

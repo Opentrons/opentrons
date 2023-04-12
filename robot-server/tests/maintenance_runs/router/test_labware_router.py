@@ -15,7 +15,7 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     LabwareDefinitionSummary,
 )
-from robot_server.maintenance_runs.maintenance_engine_store import EngineStore
+from robot_server.maintenance_runs.maintenance_engine_store import MaintenanceEngineStore
 from robot_server.maintenance_runs.router.labware_router import (
     add_labware_offset,
     add_labware_definition,
@@ -48,7 +48,7 @@ def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition
 
 async def test_add_labware_offset(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_engine_store: MaintenanceEngineStore,
     run: MaintenanceRun,
 ) -> None:
     """It should add the labware offset to the engine, assuming the run is current."""
@@ -82,7 +82,7 @@ async def test_add_labware_offset(
 
 async def test_add_labware_offset_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_engine_store: MaintenanceEngineStore,
     run: MaintenanceRun,
 ) -> None:
     """It should 409 if the run is not current."""
@@ -107,7 +107,7 @@ async def test_add_labware_offset_not_current(
 
 async def test_add_labware_definition(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_engine_store: MaintenanceEngineStore,
     run: MaintenanceRun,
     labware_definition: LabwareDefinition,
 ) -> None:
@@ -130,7 +130,7 @@ async def test_add_labware_definition(
 
 async def test_add_labware_definition_not_current(
     decoy: Decoy,
-    mock_engine_store: EngineStore,
+    mock_engine_store: MaintenanceEngineStore,
     run: MaintenanceRun,
     labware_definition: LabwareDefinition,
 ) -> None:
