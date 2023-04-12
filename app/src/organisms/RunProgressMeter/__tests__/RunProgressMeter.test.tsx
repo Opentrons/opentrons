@@ -66,7 +66,7 @@ describe('RunProgressMeter', () => {
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .mockReturnValue(null)
     when(mockUseAllCommandsQuery)
-      .calledWith(NON_DETERMINISTIC_RUN_ID)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, { cursor: null, pageLength: 1 })
       .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
     when(mockUseCommandQuery)
       .calledWith(NON_DETERMINISTIC_RUN_ID, NON_DETERMINISTIC_COMMAND_ID)

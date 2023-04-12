@@ -1,6 +1,5 @@
 import { css } from 'styled-components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
-import { TYPOGRAPHY } from '@opentrons/components'
+import { TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
 
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
@@ -53,7 +52,7 @@ export const NINETY_SIX_CHANNEL_MOUNTING_PLATE = {
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.275rem;
     line-height: 1.75rem;
   }

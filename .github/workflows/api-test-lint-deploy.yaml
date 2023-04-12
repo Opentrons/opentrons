@@ -104,7 +104,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -154,7 +154,7 @@ jobs:
         with:
           python-version: '3.7'
       - name: 'set complex environment variables'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)

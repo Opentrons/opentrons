@@ -93,6 +93,30 @@ exports[`icons alert-circle renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons arrow-down renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 48 48"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M37.935 21.24L25.905 33.27V7.5H22.155V33.27L10.125 21.24L7.5 23.88L23.76 40.14L24.03 40.41L40.29 24.135L40.56 23.88L37.935 21.24Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons arrow-left renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
@@ -136,6 +160,30 @@ exports[`icons arrow-right renders correctly 1`] = `
 >
   <path
     d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons arrow-up renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 48 49"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M37.935 26.6699L25.905 14.6399V40.4099H22.155V14.6399L10.125 26.6699L7.5 24.0299L23.76 7.76991L24.03 7.49991L40.29 23.7749L40.56 24.0299L37.935 26.6699Z"
     fillRule="evenodd"
   />
 </svg>
@@ -1336,6 +1384,30 @@ exports[`icons minus-box renders correctly 1`] = `
 >
   <path
     d="M17,13H7V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons more renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 15 25"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M15.075 12.675L3.07505 24.675L0.925049 22.525L10.825 12.675L0.975047 2.82505L3.12505 0.675049L15.075 12.675Z"
     fillRule="evenodd"
   />
 </svg>

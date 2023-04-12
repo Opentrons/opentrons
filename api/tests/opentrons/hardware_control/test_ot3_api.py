@@ -4,7 +4,7 @@ from typing import Iterator, Union, Dict, Tuple, List
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, call
+from mock import AsyncMock, patch, Mock, call, PropertyMock
 from opentrons.config.types import (
     GantryLoad,
     CapacitivePassSettings,
@@ -30,6 +30,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     LiquidNotFound,
     EarlyLiquidSenseTrigger,
+    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -1210,3 +1211,32 @@ async def test_light_settings(
     check = await ot3_hardware.get_lights()
     assert check["rails"] != setting
     assert not check["button"]
+
+
+@pytest.mark.parametrize(
+    "versions,version_str",
+    [
+        ({}, "unknown"),
+        ({OT3SubSystem.pipette_right: 2}, "2"),
+        (
+            {
+                OT3SubSystem.pipette_left: 2,
+                OT3SubSystem.gantry_x: 2,
+                OT3SubSystem.gantry_y: 2,
+            },
+            "2",
+        ),
+        ({OT3SubSystem.gripper: 3, OT3SubSystem.head: 1}, "1, 3"),
+    ],
+)
+def test_fw_version(
+    ot3_hardware: ThreadManager[OT3API],
+    versions: Dict[OT3SubSystem, int],
+    version_str: str,
+) -> None:
+    with patch(
+        "opentrons.hardware_control.ot3api.OT3Simulator.fw_version",
+        new_callable=PropertyMock,
+    ) as mock_fw_version:
+        mock_fw_version.return_value = versions
+        assert ot3_hardware.get_fw_version() == version_str

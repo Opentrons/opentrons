@@ -7,6 +7,7 @@ import {
   useConditionalConfirm,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
+  COLORS,
 } from '@opentrons/components'
 import {
   LEFT,
@@ -346,46 +347,45 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
-  return isOnDevice ? (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      position={POSITION_ABSOLUTE}
-    >
-      <WizardHeader
-        exitDisabled={isRobotMoving || isFetchingPipettes}
-        title={wizardTitle}
-        currentStep={currentStepIndex}
-        totalSteps={totalStepCount}
-        onExit={exitWizardButton}
-      />
-      {modalContent}
-    </Flex>
-  ) : (
+  const wizardHeader = (
+    <WizardHeader
+      exitDisabled={isRobotMoving || isFetchingPipettes}
+      title={wizardTitle}
+      currentStep={currentStepIndex}
+      totalSteps={totalStepCount}
+      onExit={exitWizardButton}
+    />
+  )
+
+  return (
     <Portal level="top">
-      <ModalShell
-        width="47rem"
-        height={
-          //  changing modal height for now on BeforeBeginning 96 channel attach flow
-          //  until we do design qa to normalize the modal sizes
-          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-          selectedPipette === NINETY_SIX_CHANNEL &&
-          flowType === FLOWS.ATTACH
-            ? '70%'
-            : 'auto'
-        }
-        header={
-          <WizardHeader
-            exitDisabled={isRobotMoving || isFetchingPipettes}
-            title={wizardTitle}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={exitWizardButton}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {Boolean(isOnDevice) ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.fundamentalsBackground}
+        >
+          {wizardHeader}
+          {modalContent}
+        </Flex>
+      ) : (
+        <ModalShell
+          width="47rem"
+          height={
+            //  changing modal height for now on BeforeBeginning 96 channel attach flow
+            //  until we do design qa to normalize the modal sizes
+            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+            selectedPipette === NINETY_SIX_CHANNEL &&
+            flowType === FLOWS.ATTACH
+              ? '70%'
+              : 'auto'
+          }
+          header={wizardHeader}
+        >
+          {modalContent}
+        </ModalShell>
+      )}
     </Portal>
   )
 }
