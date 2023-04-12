@@ -28,7 +28,7 @@ export function EmptyRecentRun(): JSX.Element {
       <Flex marginBottom={SPACING.spacing4}>
         <img
           src={abstractImage}
-          alt="Robot Dashboard no protocol run data"
+          alt="RobotDashboard no recent run protocols"
           width="284px"
           height="166px"
         />

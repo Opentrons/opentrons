@@ -59,7 +59,7 @@ export function RobotDashboard(): JSX.Element {
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {sortProtocols.length !== 0 ? (
+        {sortProtocols.length === 0 ? (
           <>
             <EmptyRecentRun />
           </>
