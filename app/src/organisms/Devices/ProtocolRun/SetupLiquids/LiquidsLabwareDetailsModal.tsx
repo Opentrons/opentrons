@@ -43,7 +43,7 @@ export const LiquidsLabwareDetailsModal = (
 ): JSX.Element | null => {
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
-  const isODD = useSelector(getIsOnDevice)
+  const isOnDevice = useSelector(getIsOnDevice)
   const currentLiquidRef = React.useRef<HTMLDivElement>(null)
   const protocolData = useMostRecentCompletedAnalysis(runId)
   const commands = protocolData?.commands ?? []
@@ -99,7 +99,7 @@ export const LiquidsLabwareDetailsModal = (
       )}
     />
   )
-  const liquidCard = filteredLiquidsInLoadOrder.map((liquid, index) => {
+  const liquidCard = filteredLiquidsInLoadOrder.map(liquid => {
     const labwareInfoEntry = Object.entries(labwareInfo).find(
       entry => entry[0] === liquid.id
     )
@@ -107,7 +107,7 @@ export const LiquidsLabwareDetailsModal = (
       labwareInfoEntry != null && (
         <Flex
           width="100%"
-          key={index}
+          key={liquid.id}
           ref={selectedValue === liquid.id ? currentLiquidRef : undefined}
         >
           <LiquidDetailCard
@@ -123,7 +123,7 @@ export const LiquidsLabwareDetailsModal = (
     )
   })
 
-  return isODD ? (
+  return isOnDevice ? (
     <OddModal
       modalSize="large"
       onOutsideClick={closeModal}

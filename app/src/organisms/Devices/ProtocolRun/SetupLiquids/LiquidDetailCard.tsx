@@ -1,3 +1,7 @@
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,16 +18,24 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { getIsOnDevice } from '../../../../redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
+const LIQUID_CARD_STYLE = css`
+  ${BORDERS.cardOutlineBorder}
+  &:hover {
+    border: 1px solid ${COLORS.medGreyHover};
+    cursor: pointer;
+  }
+`
+const LIQUID_CARD_ODD_STYLE = css`
+  border-color: ${COLORS.medGreyEnabled};
+  border: ${SPACING.spacing2} solid ${COLORS.medGreyEnabled};
+  border-radius: ${BORDERS.size_three};
+`
 interface LiquidDetailCardProps {
   liquidId: string
   displayName: string
@@ -47,25 +59,13 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     labwareWellOrdering,
   } = props
   const trackEvent = useTrackEvent()
-  const isOdd = useSelector(getIsOnDevice)
+  const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('protocol_setup')
 
-  const LIQUID_CARD_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
-    &:hover {
-      border: 1px solid ${COLORS.medGreyHover};
-      cursor: pointer;
-    }
-  `
   const ACTIVE_STYLE = css`
-    background-color: ${isOdd ? COLORS.medBlue : COLORS.lightBlue};
-    border: ${isOdd ? SPACING.spacing2 : `1px`} solid ${COLORS.blueEnabled};
-    border-radius: ${isOdd ? `0.75rem` : 0};
-  `
-  const LIQUID_CARD_ODD_STYLE = css`
-    border-color: ${COLORS.medGreyEnabled};
-    border: ${SPACING.spacing2} solid ${COLORS.medGreyEnabled};
-    border-radius: ${BORDERS.size_three};
+    background-color: ${isOnDevice ? COLORS.medBlue : COLORS.lightBlue};
+    border: ${isOnDevice ? SPACING.spacing2 : `1px`} solid ${COLORS.blueEnabled};
+    border-radius: ${isOnDevice ? BORDERS.size_three : 0};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
@@ -77,7 +77,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     trackEvent({ name: 'highlightLiquidInDetailModal', properties: {} })
   }
 
-  return isOdd ? (
+  return isOnDevice ? (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_ODD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
@@ -120,11 +120,13 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           height="2.75rem"
           padding={`${SPACING.spacing3} 0.75rem`}
           alignItems={TYPOGRAPHY.textAlignCenter}
-          marginTop="1rem"
+          marginTop={SPACING.spacing4}
           width="max-content"
         >
-          {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
-          {MICRO_LITERS} {t('total_vol')}
+          <>
+            {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
+            {MICRO_LITERS} {t('total_vol')}
+          </>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
@@ -138,7 +140,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
             {volumePerWellRange.map((well, index) => {
               return (
                 <Flex
-                  key={index}
+                  key={`${well.wellName}_${index}`}
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   paddingBottom={
@@ -224,7 +226,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex
-                key={index}
+                key={`${well.wellName}_${index}`}
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 paddingBottom={
