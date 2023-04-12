@@ -120,6 +120,7 @@ export function RunningProtocol(): JSX.Element {
     <>
       {showRunFailedModal ? (
         <RunFailedModal
+          runId={runId}
           setShowRunFailedModal={setShowRunFailedModal}
           failedStep={currentRunCommandIndex}
           failedCommand={failedCommand}
