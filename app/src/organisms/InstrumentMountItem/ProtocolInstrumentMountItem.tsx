@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -14,16 +15,15 @@ import {
   BORDERS,
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
-import { PipetteName, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { getGripperDisplayName, getPipetteNameSpecs, PipetteName, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 
 import type { Mount } from '../../redux/pipettes/types'
-import type { InstrumentData, PipetteOffsetCalibration } from '@opentrons/api-client'
+import type { InstrumentData, PipetteOffsetCalibration, GripperData } from '@opentrons/api-client'
+import type { GripperModel } from '@opentrons/shared-data'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
-import styled from 'styled-components'
-import { StyledText } from '../../atoms/text'
 
 export const MountButton = styled.button<{ isReady: boolean }>`
   display: flex;
@@ -44,10 +44,9 @@ export const MountButton = styled.button<{ isReady: boolean }>`
 interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
   attachedInstrument: InstrumentData | null
-  attachedCalibrationData: PipetteOffsetCalibration | null
-  speccedName: PipetteName
+  attachedCalibrationData: PipetteOffsetCalibration | GripperData['data']['calibratedOffset'] | null
+  speccedName: PipetteName | GripperModel
 }
-
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
@@ -71,19 +70,18 @@ export function ProtocolInstrumentMountItem(
       <MountButton onClick={handleClick} isReady={isAttachedWithCal}>
         <Flex
           width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
         >
           <Flex
-            flex="2 0 auto"
+            flex="2"
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing2}
           >
             <MountLabel>{t('mount', { mount })}</MountLabel>
-            <SpeccedInstrumentName>{speccedName}</SpeccedInstrumentName>
+            <SpeccedInstrumentName>{mount === 'extension' ? getGripperDisplayName(speccedName) : getPipetteNameSpecs(speccedName)?.displayName}</SpeccedInstrumentName>
           </Flex>
 
-          <Flex flex="1 0 auto" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3} justifyContent={JUSTIFY_FLEX_START}>
+          <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3} justifyContent={JUSTIFY_FLEX_START}>
             <Icon
               size="1.5rem"
               name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
@@ -92,7 +90,7 @@ export function ProtocolInstrumentMountItem(
               isAttachedWithCal ? t('calibrated') : t('no_data')}
             </CalibrationStatus>
           </Flex>
-          <Flex flex="1 0 auto">
+          <Flex flex="1">
             <SmallButton
               onClick={handleClick}
               buttonText={attachedInstrument != null ? t('calibrate') : t('attach')}
@@ -142,5 +140,5 @@ const CalibrationStatus = styled.p`
   text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${({color}) => color}
+  color: ${({ color }) => color}
 `

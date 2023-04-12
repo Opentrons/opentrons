@@ -4,11 +4,13 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useAllPipetteOffsetCalibrationsQuery, useInstrumentsQuery } from '@opentrons/react-api-client'
 import { BackButton } from '../../atoms/buttons'
-import { ContinueButton } from '../ProtocolSetupModules' 
+import { ContinueButton } from '../ProtocolSetupModules'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
+import type { GripperModel } from '@opentrons/shared-data'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -23,6 +25,9 @@ export function ProtocolSetupInstruments({
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { data: allPipettesCalibrationData } = useAllPipetteOffsetCalibrationsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+
+  const usesGripper = mostRecentAnalysis?.commands.some(c => c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper') ?? false
+  const attachedGripperMatch = usesGripper ? (attachedInstruments?.data ?? []).find((i): i is GripperData => (i.instrumentType === 'gripper')) ?? null : null
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%" gridGap={SPACING.spacing3}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
@@ -41,30 +46,41 @@ export function ProtocolSetupInstruments({
         <ColumnLabel>{t('location')}</ColumnLabel>
         <ColumnLabel>{t('calibration')}</ColumnLabel>
       </Flex>
-      {mostRecentAnalysis != null
-        ? mostRecentAnalysis.pipettes.map(loadedPipette => {
-          const attachedInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === loadedPipette.mount) ?? null
-          return (
-            <ProtocolInstrumentMountItem
-              key={loadedPipette.mount}
-              mount={loadedPipette.mount}
-              speccedName={loadedPipette.pipetteName}
-              attachedInstrument={attachedInstrument}
-              attachedCalibrationData={
-                attachedInstrument != null
-                  ? allPipettesCalibrationData?.data.find(cal => (cal.mount === attachedInstrument.mount && cal.pipette === attachedInstrument.instrumentName)) ?? null
-                  : null
-              } />
-          )
-        })
-        : null
-      }
+      {(mostRecentAnalysis?.pipettes ?? []).map(loadedPipette => {
+        const attachedPipetteMatch = (attachedInstruments?.data ?? []).find((i): i is PipetteData => (
+          i.instrumentType === 'pipette'
+          && i.mount === loadedPipette.mount
+          && i.instrumentName === loadedPipette.pipetteName
+        )) ?? null
+        return (
+          <ProtocolInstrumentMountItem
+            key={loadedPipette.mount}
+            mount={loadedPipette.mount}
+            speccedName={loadedPipette.pipetteName}
+            attachedInstrument={attachedPipetteMatch}
+            attachedCalibrationData={
+              attachedPipetteMatch != null
+                ? allPipettesCalibrationData?.data.find(cal => (cal.mount === attachedPipetteMatch.mount && cal.pipette === attachedInstrument.instrumentName)) ?? null
+                : null
+            } />
+        )
+      })}
+      {usesGripper
+        ? (
+          <ProtocolInstrumentMountItem
+            key='extension'
+            mount='extension'
+            speccedName={attachedGripperMatch?.instrumentModel as GripperModel}
+            attachedInstrument={attachedGripperMatch}
+            attachedCalibrationData={attachedGripperMatch?.data.calibratedOffset ?? null} />
+        )
+        : null}
     </Flex>
   )
 }
 
 const ColumnLabel = styled.p`
-  flex: 1 0 auto;
+  flex: 1;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight28};
