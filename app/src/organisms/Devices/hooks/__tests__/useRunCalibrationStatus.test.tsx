@@ -27,7 +27,7 @@ describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {
     when(mockUseDeckCalibrationStatus).calledWith('otie').mockReturnValue('OK')
 
-    when(mockUseRunPipetteInfoByMount).calledWith('otie', '1').mockReturnValue({
+    when(mockUseRunPipetteInfoByMount).calledWith('1').mockReturnValue({
       left: null,
       right: null,
     })
@@ -59,7 +59,7 @@ describe('useRunCalibrationStatus hook', () => {
   })
   it('should return attach pipette if missing', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         left: {
           requestedPipetteMatch: 'incompatible',
@@ -85,7 +85,7 @@ describe('useRunCalibrationStatus hook', () => {
   })
   it('should return calibrate pipette if cal date null', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         left: {
           requestedPipetteMatch: 'match',
@@ -111,7 +111,7 @@ describe('useRunCalibrationStatus hook', () => {
   })
   it('should return calibrate tip rack if cal date null', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         left: {
           requestedPipetteMatch: 'match',
@@ -137,7 +137,7 @@ describe('useRunCalibrationStatus hook', () => {
   })
   it('should ignore tip rack calibration for the OT-3', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         left: {
           requestedPipetteMatch: 'match',
@@ -163,7 +163,7 @@ describe('useRunCalibrationStatus hook', () => {
   })
   it('should return complete if everything is calibrated', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         left: {
           requestedPipetteMatch: 'match',

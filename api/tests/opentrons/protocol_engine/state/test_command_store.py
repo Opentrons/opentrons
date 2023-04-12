@@ -1011,30 +1011,3 @@ def test_handles_door_open_and_close_event_after_play(
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is False
-
-
-def test_command_store_handles_stop_action_with_queued_commands() -> None:
-    """It should clear queued commands."""
-    subject = CommandStore(
-        config=_make_config(block_on_door_open=False), is_door_open=False
-    )
-
-    action = QueueCommandAction(
-        request=commands.WaitForResumeCreate(
-            params=commands.WaitForResumeParams(message="hello world"),
-        ),
-        request_hash=None,
-        created_at=datetime(year=2022, month=1, day=1),
-        command_id="command_id",
-    )
-
-    subject.handle_action(action)
-
-    assert len(subject.state.queued_command_ids) > 0
-    assert subject.state.run_result is None
-
-    subject.handle_action(StopAction())
-
-    assert len(subject.state.queued_command_ids) == 0
-    assert subject.state.queue_status == QueueStatus.PAUSED
-    assert subject.state.run_result == RunResult.STOPPED

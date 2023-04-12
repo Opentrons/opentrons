@@ -38,6 +38,7 @@ import {
   RunFailedModal,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -67,6 +68,10 @@ export function RunningProtocol(): JSX.Element {
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
+  const [
+    showConfirmCancelRunModal,
+    setShowConfirmCancelRunModal,
+  ] = React.useState<boolean>(false)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -84,7 +89,7 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const { playRun, pauseRun, stopRun } = useRunActionMutations(runId)
+  const { playRun, pauseRun } = useRunActionMutations(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
 
   const errors = runRecord?.data.errors
@@ -143,6 +148,12 @@ export function RunningProtocol(): JSX.Element {
             OnDevice
           />
         ) : null}
+        {showConfirmCancelRunModal ? (
+          <ConfirmCancelRunModal
+            runId={runId}
+            setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+          />
+        ) : null}
         <Flex
           ref={swipe.ref}
           padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
@@ -153,7 +164,7 @@ export function RunningProtocol(): JSX.Element {
               <CurrentRunningProtocolCommand
                 playRun={playRun}
                 pauseRun={pauseRun}
-                stopRun={stopRun}
+                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
                 protocolName={protocolName}
                 runStatus={runStatus}
@@ -167,7 +178,7 @@ export function RunningProtocol(): JSX.Element {
                 runStatus={runStatus}
                 playRun={playRun}
                 pauseRun={pauseRun}
-                stopRun={stopRun}
+                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
                 currentRunCommandIndex={currentRunCommandIndex}
                 robotSideAnalysis={robotSideAnalysis}
