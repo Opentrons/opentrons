@@ -195,4 +195,4 @@ term:
 .PHONY: docs
 docs:
 	$(python) -m robot_server.spec_generator
-	redoc-cli build docs/build/openapi.json -o docs/dist/api_reference.html
+	redoc-cli build docs/build/openapi.json -o docs/dist/http/api_reference.html
