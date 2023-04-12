@@ -48,6 +48,7 @@ import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 import type { OnDeviceRouteParams } from '../../App/types'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { GripperData, PipetteData } from '@opentrons/api-client'
+import { getAreInstrumentsReady, getProtocolUsesGripper } from '../../organisms/ProtocolSetupInstruments/utils'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -197,33 +198,9 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  const speccedPipettes = (mostRecentAnalysis?.pipettes ?? [])
-  const allSpeccedPipettesReady = speccedPipettes.every(loadedPipette => {
-    const attachedPipetteMatch = (attachedInstruments?.data ?? []).find((i): i is PipetteData => (
-      i.instrumentType === 'pipette'
-      && i.mount === loadedPipette.mount
-      && i.instrumentName === loadedPipette.pipetteName
-    )) ?? null
-    const calibrationData = attachedPipetteMatch != null
-      ? allPipettesCalibrationData?.data.find(cal => (
-        cal.mount === attachedPipetteMatch.mount
-        && cal.pipette === attachedPipetteMatch.instrumentName
-      )) ?? null
-      : null
-    return attachedPipetteMatch != null && calibrationData != null
-  })
-  const usesGripper = mostRecentAnalysis?.commands.some(c => c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper') ?? false
-  const isExtensionMountReady = usesGripper
-    ? (attachedInstruments?.data ?? []).find((i): i is GripperData => (
-      i.instrumentType === 'gripper'
-      && i.data.calibratedOffset != null
-    )) ?? null
-    : true
-
-  const instrumentsDetail = t('instruments_connected', {
-    count: speccedPipettes.length + (usesGripper ? 1 : 0),
-  })
-  const instrumentsStatus = allSpeccedPipettesReady && isExtensionMountReady ? 'ready' : 'not ready'
+  const speccedInstrumentCount = mostRecentAnalysis != null ? mostRecentAnalysis.pipettes.length + (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0) : 0
+  const instrumentsDetail = t('instruments_connected', { count: speccedInstrumentCount })
+  const instrumentsStatus = mostRecentAnalysis != null && attachedInstruments != null && getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments, allPipettesCalibrationData) ? 'ready' : 'not ready'
 
   // Modules information
   const protocolHasModules =
