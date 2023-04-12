@@ -1234,7 +1234,6 @@ def test_fw_version(
     versions: Dict[OT3SubSystem, int],
     version_str: str,
 ) -> None:
-    backend = ot3_hardware.managed_obj._backend
     with patch(
         "opentrons.hardware_control.ot3api.OT3Simulator.fw_version",
         new_callable=PropertyMock,
