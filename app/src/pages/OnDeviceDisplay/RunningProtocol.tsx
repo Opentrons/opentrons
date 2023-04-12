@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -20,6 +21,7 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -33,6 +35,7 @@ import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
+  RunFailedModal,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
 
@@ -61,6 +64,9 @@ export function RunningProtocol(): JSX.Element {
   const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
+  const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
+    false
+  )
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -81,6 +87,11 @@ export function RunningProtocol(): JSX.Element {
   const { playRun, pauseRun, stopRun } = useRunActionMutations(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
 
+  const errors = runRecord?.data.errors
+  const failedCommand = robotSideAnalysis?.commands.find(
+    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+  )
+
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -99,8 +110,22 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_FAILED) {
+      setShowRunFailedModal(true)
+    }
+  }, [runStatus])
+
   return (
     <>
+      {showRunFailedModal ? (
+        <RunFailedModal
+          setShowRunFailedModal={setShowRunFailedModal}
+          failedStep={currentRunCommandIndex}
+          failedCommand={failedCommand}
+          errors={errors}
+        />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
