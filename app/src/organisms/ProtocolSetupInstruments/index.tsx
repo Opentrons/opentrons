@@ -69,7 +69,7 @@ export function ProtocolSetupInstruments({
         paddingX={SPACING.spacing5}
       >
         <ColumnLabel>{t('location')}</ColumnLabel>
-        <ColumnLabel>{t('calibration')}</ColumnLabel>
+        <ColumnLabel>{t('calibration_status')}</ColumnLabel>
       </Flex>
       {(mostRecentAnalysis?.pipettes ?? []).map(loadedPipette => {
         const attachedPipetteMatch =

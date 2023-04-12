@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
-import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import {

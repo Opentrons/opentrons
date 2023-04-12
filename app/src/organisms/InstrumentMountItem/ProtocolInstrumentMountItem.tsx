@@ -33,7 +33,7 @@ import type {
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 
-export const MountButton = styled.div<{ isReady: boolean }>`
+export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
@@ -77,14 +77,25 @@ export function ProtocolInstrumentMountItem(
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
-  const handleClick: React.MouseEventHandler = () => {
-    console.log('button clicked', mount, attachedInstrument)
+  const handleCalibrate: React.MouseEventHandler = () => {
+    console.log(
+      'TODO: handle calibrate wizard after maintenance runs are real',
+      mount,
+      attachedInstrument
+    )
+  }
+  const handleAttach: React.MouseEventHandler = () => {
+    console.log(
+      'TODO: handle attach wizard after maintenance runs are real',
+      mount,
+      attachedInstrument
+    )
   }
   const isAttachedWithCal =
     attachedInstrument != null && attachedCalibrationData != null
   return (
     <>
-      <MountButton onClick={handleClick} isReady={isAttachedWithCal}>
+      <MountItem isReady={isAttachedWithCal}>
         <Flex width="100%" alignItems={ALIGN_CENTER}>
           <Flex
             flex="2"
@@ -122,7 +133,9 @@ export function ProtocolInstrumentMountItem(
           </Flex>
           <Flex flex="1">
             <SmallButton
-              onClick={handleClick}
+              onClick={
+                attachedInstrument != null ? handleCalibrate : handleAttach
+              }
               buttonText={
                 attachedInstrument != null ? t('calibrate') : t('attach')
               }
@@ -132,7 +145,7 @@ export function ProtocolInstrumentMountItem(
             />
           </Flex>
         </Flex>
-      </MountButton>
+      </MountItem>
       {showChoosePipetteModal ? (
         <ChoosePipette
           proceed={() => {

@@ -169,5 +169,7 @@
   "closing": "Closing...",
   "calibration": "Calibration",
   "mount": "{{mount}} Mount",
-  "no_data": "No data"
+  "no_data": "No data",
+  "attach": "attach",
+  "calibration_status": "calibration status"
 }

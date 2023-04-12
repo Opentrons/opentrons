@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 import {
   Flex,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   SPACING,
   COLORS,
   TYPOGRAPHY,
@@ -17,32 +16,10 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
-import { MiniCardButton } from '../../molecules/MiniCardButton'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 
 import abstractImage from '../../assets/images/odd/abstract@x2.png'
-
-import type { MiniCardButtonProps } from '../../molecules/MiniCardButton'
-
-// TODO: kj 12/0/7/2022 this part will be update when hi-fi is ready
-const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
-  {
-    iconName: 'wifi',
-    cardName: 'Run a protocol',
-    destinationPath: '/protocols',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Instrument + Module Hub',
-    destinationPath: '/instruments',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Settings',
-    destinationPath: '/robot-settings',
-  },
-]
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')

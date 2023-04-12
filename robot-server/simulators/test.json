@@ -8,7 +8,14 @@
       "tip_length": 0,
       "channels": 1
     },
-    "left": null
+    "left": {
+      "model": "p10_single_v1",
+      "id": "123",
+      "max_volume": 10,
+      "name": "p10_single",
+      "tip_length": 0,
+      "channels": 1
+    }
   },
   "attached_modules": {
     "thermocycler": [
