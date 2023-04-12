@@ -6,6 +6,22 @@
     "import_protocol": "Import a protocol"
   },
   "header": {
-    "title": "Create new Opentrons Flex protocol"
+    "title": "Create new Opentrons Flex protocol",
+    "cancel_button": "Cancel",
+    "required_fields": "*required fields"
+  },
+  "round_tabs": {
+    "next": "Next",
+    "previous": "Previous",
+    "go_to_liquids_page": "Create protocol, on to liquids"
+  },
+  "name_and_description": {
+    "title": "Protocol Name and description"
+  },
+  "pipettes_selection": {
+    "title": "Pipette Selection"
+  },
+  "modules_selection": {
+    "title": "Module Selection"
   }
 }
