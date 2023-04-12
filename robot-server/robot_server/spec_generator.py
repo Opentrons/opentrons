@@ -28,5 +28,5 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-with open("build/openapi.json", "w") as f:
+with open("docs/build/openapi.json", "w") as f:
     json.dump(custom_openapi(), f)
