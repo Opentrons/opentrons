@@ -1,13 +1,18 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  COLORS,
+  SPACING,
+  TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
+} from '@opentrons/components'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { BODY_STYLE, FLOWS } from './constants'
 
@@ -23,7 +28,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
     chainRunCommands,
     isOnDevice,
   } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [errorMessage, setErrorMessage] = React.useState<boolean>(false)
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   const handleCheckZAxis = (): void => {
@@ -52,7 +57,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
   return errorMessage ? (
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
-      header={t('z_axis_still_attached')}
+      header={i18n.format(t('z_axis_still_attached'), 'capitalize')}
       subHeader={t(
         numberOfTryAgains > 2
           ? 'something_seems_wrong'
@@ -60,8 +65,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       )}
       isSuccess={false}
     >
-      <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
-        {t('cancel_attachment')}
+      <SecondaryButton
+        isDangerous
+        onClick={goBack}
+        marginRight={SPACING.spacing2}
+      >
+        {i18n.format(t('cancel_attachment'), 'capitalize')}
       </SecondaryButton>
       <PrimaryButton
         textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -72,8 +81,9 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t(
-        flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'
+      header={i18n.format(
+        t(flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'),
+        'capitalize'
       )}
       rightHandBody={
         <img

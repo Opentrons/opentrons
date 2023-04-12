@@ -1,11 +1,13 @@
 """Gravimetric."""
+from inspect import getsource
 from statistics import stdev
 from typing import Optional, Tuple, List
 
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
-from hardware_testing.data import create_run_id_and_start_time, ui
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
+from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from . import report
@@ -26,7 +28,7 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from .liquid_class.defaults import get_test_volumes
+from .liquid_class.defaults import get_test_volumes, get_liquid_class
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
@@ -87,6 +89,24 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
+def _check_if_software_supports_high_volumes() -> bool:
+    src_a = getsource(Pipette.set_current_volume)
+    src_b = getsource(Pipette.ok_to_add_volume)
+    modified_a = "# assert new_volume <= self.working_volume" in src_a
+    modified_b = "return True" in src_b
+    return modified_a and modified_b
+
+
+def _reduce_volumes_to_not_exceed_software_limit(
+    test_volumes: List[float], cfg: config.GravimetricConfig
+) -> List[float]:
+    for i, v in enumerate(test_volumes):
+        liq_cls = get_liquid_class(cfg.pipette_volume, cfg.tip_volume, int(v))
+        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
+        test_volumes[i] = min(v, max_vol - 0.1)
+    return test_volumes
+
+
 def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[float]:
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
@@ -97,22 +117,41 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
         ]
     else:
         test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
-    # anything volumes < 2uL must be done on the super-high-precision scale
-    if cfg.low_volume:
-        test_volumes = [v for v in test_volumes if v < config.LOW_VOLUME_UPPER_LIMIT_UL]
-    else:
-        test_volumes = [
-            v for v in test_volumes if v >= config.LOW_VOLUME_UPPER_LIMIT_UL
-        ]
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
-    return sorted(test_volumes, reverse=True)
+    if not _check_if_software_supports_high_volumes():
+        if ctx.is_simulating():
+            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
+                test_volumes, cfg
+            )
+        else:
+            raise RuntimeError("you are not the correct branch")
+    return sorted(test_volumes, reverse=False)  # lowest volumes first
+
+
+def _get_channel_offset(cfg: config.GravimetricConfig, channel: int) -> Point:
+    assert (
+        channel < cfg.pipette_channels
+    ), f"unexpected channel on {cfg.pipette_channels} channel pipette: {channel}"
+    if cfg.pipette_channels == 1:
+        return Point()
+    if cfg.pipette_channels == 8:
+        return Point(y=channel * 9.0)
+    if cfg.pipette_channels == 96:
+        row = channel % 8  # A-H
+        col = int(float(channel) / 8.0)  # 1-12
+        return Point(x=col * 9.0, y=row * 9.0)
+    raise ValueError(f"unexpected number of channels in config: {cfg.pipette_channels}")
 
 
 def _load_pipette(
     ctx: ProtocolContext, cfg: config.GravimetricConfig, tipracks: List[Labware]
 ) -> InstrumentContext:
-    pip_name = f"p{cfg.pipette_volume}_single"
+    load_str_channels = {1: "single", 8: "multi", 96: "96"}
+    if cfg.pipette_channels not in load_str_channels:
+        raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
+    chnl_str = load_str_channels[cfg.pipette_channels]
+    pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount, tip_racks=tipracks)
     pipette.default_speed = config.GANTRY_MAX_SPEED
@@ -165,7 +204,9 @@ def _jog_to_find_liquid_height(
     _well_depth = well.depth
     _liquid_height = _well_depth
     _jog_size = -1.0
-    while not ctx.is_simulating():
+    if ctx.is_simulating():
+        return _liquid_height - 1
+    while True:
         pipette.move_to(well.bottom(_liquid_height))
         inp = input(
             f"height={_liquid_height}: ENTER to jog {_jog_size} mm, "
@@ -186,6 +227,7 @@ def _run_trial(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     well: Well,
+    channel_offset: Point,
     tip_volume: int,
     volume: float,
     trial: int,
@@ -195,7 +237,8 @@ def _run_trial(
     blank: bool,
     inspect: bool,
     mix: bool = False,
-) -> Tuple[float, float]:
+    stable: bool = True,
+) -> Tuple[float, MeasurementData, float, MeasurementData]:
     pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
 
     def _tag(m_type: MeasurementType) -> str:
@@ -205,10 +248,12 @@ def _run_trial(
         m_tag = _tag(m_type)
         if recorder.is_simulator and not blank:
             if m_type == MeasurementType.ASPIRATE:
-                recorder.scale.add_simulation_mass(volume * -0.001)
+                recorder.add_simulation_mass(volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
-                recorder.scale.add_simulation_mass(volume * 0.001)
-        m_data = record_measurement_data(ctx, m_tag, recorder, shorten=inspect)
+                recorder.add_simulation_mass(volume * 0.001)
+        m_data = record_measurement_data(
+            ctx, m_tag, recorder, pipette.mount, stable, shorten=inspect
+        )
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (
@@ -222,7 +267,7 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
-    pipette.move_to(well.top())
+    pipette.move_to(well.top().move(channel_offset))
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
 
@@ -233,6 +278,7 @@ def _run_trial(
         tip_volume,
         volume,
         well,
+        channel_offset,
         liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=blank,
@@ -250,6 +296,7 @@ def _run_trial(
         tip_volume,
         volume,
         well,
+        channel_offset,
         liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=blank,
@@ -262,7 +309,14 @@ def _run_trial(
     # calculate volumes
     volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
     volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
-    return volume_aspirate, volume_dispense
+    return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
+
+
+def _get_operator_name(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("OPERATOR name:").strip()
+    else:
+        return "simulation"
 
 
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
@@ -312,25 +366,25 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         ),
         simulate=ctx.is_simulating(),
     )
-    print(f'found scale "{recorder.scale.read_serial_number()}"')
+    print(f'found scale "{recorder.serial_number}"')
     if recorder.is_simulator:
-        if cfg.low_volume:
-            recorder.scale.set_simulation_mass(200)
+        if cfg.pipette_volume == 50 or cfg.tip_volume == 50:
+            recorder.set_simulation_mass(15)
         else:
-            recorder.scale.set_simulation_mass(15)
+            recorder.set_simulation_mass(200)
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
-    test_report.set_operator("unknown")
-    test_report.set_version("unknown")
+    test_report.set_operator(_get_operator_name(ctx.is_simulating()))
+    test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
         robot="ot3",
         pipette=pipette_tag,
-        scale=recorder.scale.read_serial_number(),
+        scale=recorder.serial_number,
         environment="None",
         liquid="None",
     )
@@ -366,11 +420,14 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             for trial in range(config.NUM_BLANK_TRIALS):
                 ui.print_header(f"BLANK {trial + 1}/{config.NUM_BLANK_TRIALS}")
                 print("picking up tip")
-                pipette.pick_up_tip()
-                evap_aspirate, evap_dispense = _run_trial(
+                tip_rack = pipette.tip_racks[0]
+                hover_above_tip = tip_rack["A1"].top(20)
+                pipette.pick_up_tip(hover_above_tip)
+                evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx,
                     pipette,
                     vial["A1"],
+                    Point(),  # first channel
                     cfg.tip_volume,
                     test_volumes[-1],
                     trial,
@@ -380,6 +437,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     blank=True,  # stay away from the liquid
                     inspect=cfg.inspect,
                     mix=cfg.mix,
+                    stable=True,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -411,105 +469,129 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         test_total = len(test_volumes) * cfg.trials
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
-            actual_asp_list = list()
-            actual_disp_list = list()
-            for trial in range(cfg.trials):
-                test_count += 1
-                ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
-                print(f"trial total {test_count}/{test_total}")
-                print("picking up tip")
-                pipette.pick_up_tip()
-                # NOTE: aspirate will be negative, dispense will be positive
-                actual_aspirate, actual_dispense = _run_trial(
-                    ctx,
-                    pipette,
-                    vial["A1"],
-                    cfg.tip_volume,
-                    volume,
-                    trial,
-                    recorder,
-                    test_report,
-                    liquid_tracker,
-                    blank=False,
-                    inspect=cfg.inspect,
-                    mix=cfg.mix,
-                )
-                print(
-                    "measured volumes:\n"
-                    f"\taspirate: {round(actual_aspirate, 2)} uL\n"
-                    f"\tdispense: {round(actual_dispense, 2)} uL"
-                )
-                # factor in average evaporation (which should each be negative uL amounts)
-                asp_with_evap = actual_aspirate - average_aspirate_evaporation_ul
-                disp_with_evap = actual_dispense - average_dispense_evaporation_ul
-                print(
-                    "volumes with evaporation:\n"
-                    f"\taspirate: {round(asp_with_evap, 2)} uL\n"
-                    f"\tdispense: {round(disp_with_evap, 2)} uL"
-                )
-                # convert volumes to positive amounts
-                aspirate_rectified = abs(asp_with_evap)
-                dispense_rectified = abs(disp_with_evap)
-                print(
-                    "volumes rectified:\n"
-                    f"\taspirate: {round(aspirate_rectified, 2)} uL\n"
-                    f"\tdispense: {round(dispense_rectified, 2)} uL"
-                )
-                actual_asp_list.append(aspirate_rectified)
-                actual_disp_list.append(dispense_rectified)
-                report.store_trial(
-                    test_report, trial, volume, aspirate_rectified, dispense_rectified
-                )
-                print("dropping tip")
-                _drop_tip()
+            for channel in range(cfg.pipette_channels):
+                channel_offset = _get_channel_offset(cfg, channel)
+                actual_asp_list = list()
+                actual_disp_list = list()
+                aspirate_data_list = []
+                dispense_data_list = []
+                for trial in range(cfg.trials):
+                    test_count += 1
+                    ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
+                    print(f"trial total {test_count}/{test_total}")
+                    print("picking up tip")
+                    pipette.pick_up_tip()
+                    # NOTE: aspirate will be negative, dispense will be positive
+                    (
+                        actual_aspirate,
+                        aspirate_data,
+                        actual_dispense,
+                        dispense_data,
+                    ) = _run_trial(
+                        ctx,
+                        pipette,
+                        vial["A1"],
+                        channel_offset,
+                        cfg.tip_volume,
+                        volume,
+                        trial,
+                        recorder,
+                        test_report,
+                        liquid_tracker,
+                        blank=False,
+                        inspect=cfg.inspect,
+                        mix=cfg.mix,
+                        stable=True,
+                    )
+                    print(
+                        "measured volumes:\n"
+                        f"\taspirate: {round(actual_aspirate, 2)} uL\n"
+                        f"\tdispense: {round(actual_dispense, 2)} uL"
+                    )
+                    asp_with_evap = actual_aspirate - average_aspirate_evaporation_ul
+                    disp_with_evap = actual_dispense + average_dispense_evaporation_ul
+                    print(
+                        "measured volumes with evaporation:\n"
+                        f"\taspirate: {round(asp_with_evap, 2)} uL\n"
+                        f"\tdispense: {round(disp_with_evap, 2)} uL"
+                    )
+                    actual_asp_list.append(asp_with_evap)
+                    actual_disp_list.append(disp_with_evap)
+                    aspirate_data_list.append(aspirate_data)
+                    dispense_data_list.append(dispense_data)
+                    report.store_trial(
+                        test_report, trial, volume, asp_with_evap, disp_with_evap
+                    )
+                    print("dropping tip")
+                    _drop_tip()
 
-            ui.print_header(f"{volume} uL CALCULATIONS")
-            # AVERAGE
-            dispense_average = sum(actual_disp_list) / len(actual_disp_list)
-            aspirate_average = sum(actual_asp_list) / len(actual_asp_list)
-            # %CV
-            if len(actual_asp_list) <= 1:
-                print("skipping CV, only 1x trial per volume")
-                aspirate_cv = -0.01  # negative number is impossible
-                dispense_cv = -0.01
-            else:
-                aspirate_cv = stdev(actual_asp_list) / aspirate_average
-                dispense_cv = stdev(actual_disp_list) / dispense_average
-            # %D
-            aspirate_d = (aspirate_average - volume) / volume
-            dispense_d = (dispense_average - volume) / volume
-            print(
-                "aspirate:\n"
-                f"\tavg: {round(aspirate_average, 2)} uL\n"
-                f"\tcv: {round(aspirate_cv * 100.0, 2)}%\n"
-                f"\td: {round(aspirate_d * 100.0, 2)}%"
-            )
-            print(
-                "dispense:\n"
-                f"\tavg: {round(dispense_average, 2)} uL\n"
-                f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
-                f"\td: {round(dispense_d * 100.0, 2)}%"
-            )
-            report.store_volume(
-                test_report,
-                "aspirate",
-                volume,
-                aspirate_average,
-                aspirate_cv,
-                aspirate_d,
-            )
-            report.store_volume(
-                test_report,
-                "dispense",
-                volume,
-                dispense_average,
-                dispense_cv,
-                dispense_d,
-            )
+                ui.print_header(f"{volume} uL CALCULATIONS")
+                # AVERAGE
+                dispense_average = sum(actual_disp_list) / len(actual_disp_list)
+                aspirate_average = sum(actual_asp_list) / len(actual_asp_list)
+                # %CV
+                if len(actual_asp_list) <= 1:
+                    print("skipping CV, only 1x trial per volume")
+                    aspirate_cv = -0.01  # negative number is impossible
+                    dispense_cv = -0.01
+                else:
+                    aspirate_cv = stdev(actual_asp_list) / aspirate_average
+                    dispense_cv = stdev(actual_disp_list) / dispense_average
+                # %D
+                aspirate_d = (aspirate_average - volume) / volume
+                dispense_d = (dispense_average - volume) / volume
+                # Average Celsius
+                aspirate_celsius_avg = sum(
+                    a_data.environment.celsius_pipette for a_data in dispense_data_list
+                ) / len(aspirate_data_list)
+                dispense_celsius_avg = sum(
+                    d_data.environment.celsius_pipette for d_data in aspirate_data_list
+                ) / len(dispense_data_list)
+                # Average humidity
+                aspirate_humidity_avg = sum(
+                    a_data.environment.humidity_pipette for a_data in dispense_data_list
+                ) / len(aspirate_data_list)
+                dispense_humidity_avg = sum(
+                    d_data.environment.humidity_pipette for d_data in aspirate_data_list
+                ) / len(dispense_data_list)
+                print(
+                    "aspirate:\n"
+                    f"\tavg: {round(aspirate_average, 2)} uL\n"
+                    f"\tcv: {round(aspirate_cv * 100.0, 2)}%\n"
+                    f"\td: {round(aspirate_d * 100.0, 2)}%"
+                )
+                print(
+                    "dispense:\n"
+                    f"\tavg: {round(dispense_average, 2)} uL\n"
+                    f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
+                    f"\td: {round(dispense_d * 100.0, 2)}%"
+                )
+                report.store_volume(
+                    test_report,
+                    "aspirate",
+                    volume,
+                    aspirate_average,
+                    aspirate_cv,
+                    aspirate_d,
+                    aspirate_celsius_avg,
+                    aspirate_humidity_avg,
+                )
+                report.store_volume(
+                    test_report,
+                    "dispense",
+                    volume,
+                    dispense_average,
+                    dispense_cv,
+                    dispense_d,
+                    dispense_celsius_avg,
+                    dispense_humidity_avg,
+                )
     finally:
         print("ending recording")
         recorder.stop()
         recorder.deactivate()  # stop the server
+        hw_api = ctx._core.get_hardware()
+        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
     for vol in test_volumes:
         print(f"  * {vol}:")

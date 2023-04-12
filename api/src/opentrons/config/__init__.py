@@ -278,6 +278,13 @@ CONFIG_ELEMENTS = (
         ConfigElementType.DIR,
         "The dir where gripper calibration is stored",
     ),
+    ConfigElement(
+        "module_calibration_dir",
+        "Module Calibration Directory",
+        Path("robot") / "modules",
+        ConfigElementType.DIR,
+        "The dir where module calibration is stored",
+    ),
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,

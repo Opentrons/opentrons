@@ -17,28 +17,34 @@ function promisifyProcess(command: string): Promise<string> {
   })
 }
 
-interface SDNotify {
+const verbForState = (state: boolean): string => (state ? 'start' : 'stop')
+
+interface SystemD {
   ready: () => Promise<string>
   sendStatus: (text: string) => Promise<string>
+  setRemoteDevToolsEnabled: (enabled: boolean) => Promise<string>
 }
 
-const provideExports = (): SDNotify => {
+const provideExports = (): SystemD => {
   if (platform === 'linux') {
     return {
       ready: () => promisifyProcess('/bin/systemd-notify --ready'),
       sendStatus: text =>
         promisifyProcess(`/bin/systemd-notify --status=${text}`),
+      setRemoteDevToolsEnabled: enabled =>
+        promisifyProcess(
+          `/bin/systemctl ${verbForState(
+            enabled
+          )} opentrons-robot-app-devtools.socket`
+        ),
     }
   } else {
     return {
-      ready: () => {
-        return new Promise<string>(resolve => resolve('fake notify done'))
-      },
-      sendStatus: text => {
-        return new Promise<string>(resolve =>
-          resolve(`fake status done for ${text}`)
-        )
-      },
+      ready: () => new Promise<string>(resolve => resolve('fake notify done')),
+      sendStatus: text =>
+        new Promise<string>(resolve => resolve(`fake status done for ${text}`)),
+      setRemoteDevToolsEnabled: enabled =>
+        new Promise<string>(resolve => resolve(`dev tools set to ${enabled}`)),
     }
   }
 }

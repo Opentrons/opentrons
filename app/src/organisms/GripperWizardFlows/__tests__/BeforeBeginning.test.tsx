@@ -34,7 +34,6 @@ describe('BeforeBeginning', () => {
       runId: RUN_ID_1,
       attachedGripper: {},
       flowType: GRIPPER_FLOW_TYPES.ATTACH,
-      setIsBetweenCommands: jest.fn(),
       createRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
@@ -61,27 +60,19 @@ describe('BeforeBeginning', () => {
     getByText('Gripper')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
-    // expect(props.chainRunCommands).toHaveBeenCalledWith(
-    //   [
-    //     {
-    //       commandType: 'home',
-    //       params: {},
-    //     },
-    //     {
-    //       commandType: 'loadPipette',
-    //       params: {
-    //         mount: LEFT,
-    //         pipetteId: 'abc',
-    //         pipetteName: 'p1000_single_gen3',
-    //       },
-    //     },
-    //     {
-    //       commandType: 'calibration/moveToLocation',
-    //       params: { pipetteId: 'abc', location: 'attachOrDetach' },
-    //     },
-    //   ],
-    //   false
-    // )
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'home',
+          params: {},
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
+        },
+      ],
+      true
+    )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
@@ -101,27 +92,15 @@ describe('BeforeBeginning', () => {
     // getByText('mock need help link')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
-    // expect(props.chainRunCommands).toHaveBeenCalledWith(
-    //   [
-    //     {
-    //       commandType: 'home',
-    //       params: {},
-    //     },
-    //     {
-    //       commandType: 'loadPipette',
-    //       params: {
-    //         mount: LEFT,
-    //         pipetteId: 'abc',
-    //         pipetteName: 'p1000_single_gen3',
-    //       },
-    //     },
-    //     {
-    //       commandType: 'calibration/moveToLocation',
-    //       params: { pipetteId: 'abc', location: 'attachOrDetach' },
-    //     },
-    //   ],
-    //   false
-    // )
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
+        },
+      ],
+      true
+    )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
@@ -142,27 +121,19 @@ describe('BeforeBeginning', () => {
     // getByText('mock need help link')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
-    // expect(props.chainRunCommands).toHaveBeenCalledWith(
-    //   [
-    //     {
-    //       commandType: 'home',
-    //       params: {},
-    //     },
-    //     {
-    //       commandType: 'loadPipette',
-    //       params: {
-    //         mount: LEFT,
-    //         pipetteId: 'abc',
-    //         pipetteName: 'p1000_single_gen3',
-    //       },
-    //     },
-    //     {
-    //       commandType: 'calibration/moveToLocation',
-    //       params: { pipetteId: 'abc', location: 'attachOrDetach' },
-    //     },
-    //   ],
-    //   false
-    // )
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'home',
+          params: {},
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
+        },
+      ],
+      true
+    )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })

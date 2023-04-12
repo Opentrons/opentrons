@@ -7,13 +7,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
-import {
-  useAttachedPipettes,
-  useRobot,
-  useTipLengthCalibrations,
-} from '../../organisms/Devices/hooks'
+import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
 import type { FormattedPipetteOffsetCalibration } from '.'
@@ -42,11 +39,8 @@ export function RobotSettingsTipLengthCalibration({
 }: RobotSettingsTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
-  const robot = useRobot(robotName)
-
   const attachedPipettes = useAttachedPipettes()
-  // wait for robot request to resolve instead of using name directly from params
-  const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
+  const tipLengthCalibrations = useAllTipLengthCalibrationsQuery().data?.data
   const tipLengthCalsForPipettesAndDefaultRacks: Array<
     Partial<Omit<TipLengthCalibration, 'pipette' | 'uri'>> &
       Pick<TipLengthCalibration, 'pipette' | 'uri'>

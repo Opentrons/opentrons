@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   SPACING,
+  SecondaryButton,
+  AlertPrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 import type { Direction } from './types'

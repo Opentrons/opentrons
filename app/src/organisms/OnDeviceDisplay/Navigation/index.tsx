@@ -43,9 +43,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      paddingX={SPACING.spacing1}
-      paddingBottom="0.75rem"
-      height="7rem"
+      marginBottom={SPACING.spacing5}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

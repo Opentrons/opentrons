@@ -9,9 +9,9 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   Btn,
+  PrimaryButton,
 } from '@opentrons/components'
 import { Modal } from '../../../../molecules/Modal'
-import { PrimaryButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 
 interface RobotIsBusyModalProps {

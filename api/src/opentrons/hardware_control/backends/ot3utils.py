@@ -22,6 +22,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteType,
     SensorId,
     PipetteTipActionType,
+    USBTarget,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -66,6 +67,25 @@ SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
     OT3SubSystem.pipette_left: NodeId.pipette_left,
     OT3SubSystem.pipette_right: NodeId.pipette_right,
     OT3SubSystem.gripper: NodeId.gripper,
+}
+
+NODEID_SUBSYSTEM: Dict[NodeId, OT3SubSystem] = {
+    NodeId.gantry_x: OT3SubSystem.gantry_x,
+    NodeId.gantry_x_bootloader: OT3SubSystem.gantry_x,
+    NodeId.gantry_y: OT3SubSystem.gantry_y,
+    NodeId.gantry_y_bootloader: OT3SubSystem.gantry_y,
+    NodeId.head: OT3SubSystem.head,
+    NodeId.head_bootloader: OT3SubSystem.head,
+    NodeId.pipette_left: OT3SubSystem.pipette_left,
+    NodeId.pipette_left_bootloader: OT3SubSystem.pipette_left,
+    NodeId.pipette_right: OT3SubSystem.pipette_right,
+    NodeId.pipette_right_bootloader: OT3SubSystem.pipette_right,
+    NodeId.gripper: OT3SubSystem.gripper,
+    NodeId.gripper_bootloader: OT3SubSystem.gripper,
+}
+
+USBTARGET_SUBSYSTEM: Dict[USBTarget, OT3SubSystem] = {
+    USBTarget.rear_panel: OT3SubSystem.rear_panel
 }
 
 
@@ -163,7 +183,7 @@ def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
     node_to_subsystem = {
         node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
-    return node_to_subsystem[node_id]
+    return node_to_subsystem[node_id.application_for()]
 
 
 def get_current_settings(

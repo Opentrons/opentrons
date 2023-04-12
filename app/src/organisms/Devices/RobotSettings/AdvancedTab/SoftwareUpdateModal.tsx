@@ -7,6 +7,8 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
@@ -14,7 +16,6 @@ import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { PrimaryButton, SecondaryButton } from '../../../../atoms/buttons'
 import { Banner } from '../../../../atoms/Banner'
 import { Modal } from '../../../../molecules/Modal'
 import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'

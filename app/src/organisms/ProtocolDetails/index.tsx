@@ -26,7 +26,9 @@ import {
   SIZE_1,
   SIZE_5,
   SPACING,
+  RoundTab,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -37,12 +39,10 @@ import {
 import { protocolHasLiquids } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
-import { PrimaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
-import { RoundTab } from '../../molecules/RoundTab'
 import { useTrackEvent } from '../../redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
@@ -437,7 +437,7 @@ export function ProtocolDetails(
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >
-                  {t('run_protocol')}
+                  {t('start_setup')}
                 </PrimaryButton>
               </Flex>
             </Flex>

@@ -14,7 +14,8 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { INFO_TOAST, useToast } from '../../../../atoms/Toast'
+import { INFO_TOAST } from '../../../../atoms/Toast'
+import { useToaster } from '../../../../organisms/ToasterOven'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'
@@ -37,7 +38,7 @@ export function Troubleshooting({
   const logsAvailable = robot?.health != null && robot.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
   const [toastId, setToastId] = React.useState<string | null>(null)
-  const { makeToast, eatToast } = useToast()
+  const { makeToast, eatToast } = useToaster()
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {

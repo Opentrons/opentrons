@@ -9,6 +9,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   COLORS,
+  PrimaryButton,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -20,7 +21,6 @@ import {
 import { useTrackEvent } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 

@@ -7,6 +7,7 @@ import {
   useConditionalConfirm,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
+  COLORS,
 } from '@opentrons/components'
 import {
   LEFT,
@@ -14,10 +15,12 @@ import {
   SINGLE_MOUNT_PIPETTES,
   RIGHT,
 } from '@opentrons/shared-data'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useHost,
   useCreateRunMutation,
   useStopRunMutation,
+  useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
 import { ModalShell } from '../../molecules/Modal'
@@ -25,6 +28,7 @@ import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettes } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
@@ -123,22 +127,27 @@ export const PipetteWizardFlows = (
       )
     }
   }
+  const handleClose = (): void => {
+    setIsExiting(false)
+    closeFlow()
+  }
+
+  const runStatus = useRunStatus(runId)
+  const { deleteRun } = useDeleteRunMutation({
+    onSuccess: () => {
+      handleClose()
+    },
+  })
+
+  React.useEffect(() => {
+    if (runId != null && runStatus === RUN_STATUS_STOPPED) deleteRun(runId)
+  }, [runStatus, runId, deleteRun])
+
+  // TODO (sb, 3/21/23) temp update to stop homing on exit of a flow, readd home when RSS bug is fixed
   const handleCleanUpAndClose = (): void => {
     setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
-    chainRunCommands(
-      [
-        {
-          commandType: 'home' as const,
-          params: {},
-        },
-      ],
-      false
-    ).then(() => {
-      if (runId !== '') stopRun(runId)
-      setIsExiting(false)
-      closeFlow()
-    })
+    runId != null ? stopRun(runId) : handleClose()
   }
   const {
     confirm: confirmExit,
@@ -232,7 +241,6 @@ export const PipetteWizardFlows = (
         closeFlow()
       }
     }
-
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
@@ -339,46 +347,45 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
-  return isOnDevice ? (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      position={POSITION_ABSOLUTE}
-    >
-      <WizardHeader
-        exitDisabled={isRobotMoving || isFetchingPipettes}
-        title={wizardTitle}
-        currentStep={currentStepIndex}
-        totalSteps={totalStepCount}
-        onExit={exitWizardButton}
-      />
-      {modalContent}
-    </Flex>
-  ) : (
+  const wizardHeader = (
+    <WizardHeader
+      exitDisabled={isRobotMoving || isFetchingPipettes}
+      title={wizardTitle}
+      currentStep={currentStepIndex}
+      totalSteps={totalStepCount}
+      onExit={exitWizardButton}
+    />
+  )
+
+  return (
     <Portal level="top">
-      <ModalShell
-        width="47rem"
-        height={
-          //  changing modal height for now on BeforeBeginning 96 channel attach flow
-          //  until we do design qa to normalize the modal sizes
-          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-          selectedPipette === NINETY_SIX_CHANNEL &&
-          flowType === FLOWS.ATTACH
-            ? '70%'
-            : 'auto'
-        }
-        header={
-          <WizardHeader
-            exitDisabled={isRobotMoving || isFetchingPipettes}
-            title={wizardTitle}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={exitWizardButton}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {Boolean(isOnDevice) ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.fundamentalsBackground}
+        >
+          {wizardHeader}
+          {modalContent}
+        </Flex>
+      ) : (
+        <ModalShell
+          width="47rem"
+          height={
+            //  changing modal height for now on BeforeBeginning 96 channel attach flow
+            //  until we do design qa to normalize the modal sizes
+            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+            selectedPipette === NINETY_SIX_CHANNEL &&
+            flowType === FLOWS.ATTACH
+              ? '70%'
+              : 'auto'
+          }
+          header={wizardHeader}
+        >
+          {modalContent}
+        </ModalShell>
+      )}
     </Portal>
   )
 }

@@ -10,6 +10,7 @@ class GravimetricConfig:
 
     name: str
     pipette_volume: int
+    pipette_channels: int
     pipette_mount: str
     tip_volume: int
     trials: int
@@ -18,7 +19,6 @@ class GravimetricConfig:
     slot_vial: int
     slots_tiprack: List[int]
     increment: bool
-    low_volume: bool
     return_tip: bool
     blank: bool
     mix: bool
