@@ -168,5 +168,6 @@
   "opening": "Opening...",
   "closing": "Closing...",
   "calibration": "Calibration",
-  "mount": "{{mount}} Mount"
+  "mount": "{{mount}} Mount",
+  "no_data": "No data"
 }

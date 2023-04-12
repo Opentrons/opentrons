@@ -1,15 +1,14 @@
 import { COLORS, ALIGN_CENTER, DIRECTION_COLUMN, Flex, JUSTIFY_SPACE_BETWEEN, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import * as React from 'react'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useAllPipetteOffsetCalibrationsQuery, useInstrumentsQuery } from '@opentrons/react-api-client'
 import { BackButton } from '../../atoms/buttons'
-import { ContinueButton } from '../ProtocolSetupModules' // Probably should move this to atoms/buttons as well
+import { ContinueButton } from '../ProtocolSetupModules' 
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import { useAllPipetteOffsetCalibrationsQuery, useInstrumentsQuery } from '@opentrons/react-api-client'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { StyledText } from '../../atoms/text'
-import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
-import styled, { css } from 'styled-components'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -47,15 +46,15 @@ export function ProtocolSetupInstruments({
           const attachedInstrument = (attachedInstruments?.data ?? []).find(i => i.mount === loadedPipette.mount) ?? null
           return (
             <ProtocolInstrumentMountItem
-            key={loadedPipette.mount}
-            mount={loadedPipette.mount}
-            speccedName={loadedPipette.pipetteName}
-            attachedInstrument={attachedInstrument}
-            attachedCalibrationData={
-              attachedInstrument != null
-                ? allPipettesCalibrationData?.data.find(cal => (cal.mount === attachedInstrument.mount && cal.pipette === attachedInstrument.instrumentModel)) ?? null
-                : null
-            } />
+              key={loadedPipette.mount}
+              mount={loadedPipette.mount}
+              speccedName={loadedPipette.pipetteName}
+              attachedInstrument={attachedInstrument}
+              attachedCalibrationData={
+                attachedInstrument != null
+                  ? allPipettesCalibrationData?.data.find(cal => (cal.mount === attachedInstrument.mount && cal.pipette === attachedInstrument.instrumentName)) ?? null
+                  : null
+              } />
           )
         })
         : null

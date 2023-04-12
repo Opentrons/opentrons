@@ -65,9 +65,10 @@ export function ProtocolInstrumentMountItem(
   const handleClick: React.MouseEventHandler = () => {
     console.log('button clicked', mount, attachedInstrument)
   }
+  const isAttachedWithCal = attachedInstrument != null && attachedCalibrationData != null
   return (
     <>
-      <MountButton onClick={handleClick} isReady={attachedInstrument != null && attachedCalibrationData != null}>
+      <MountButton onClick={handleClick} isReady={isAttachedWithCal}>
         <Flex
           width="100%"
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -81,29 +82,23 @@ export function ProtocolInstrumentMountItem(
             <MountLabel>{t('mount', { mount })}</MountLabel>
             <SpeccedInstrumentName>{speccedName}</SpeccedInstrumentName>
           </Flex>
-          {
-            attachedCalibrationData != null
-              ? (
-                <Flex flex="1 0 auto" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3} justifyContent={JUSTIFY_FLEX_START}>
-                  <Icon name='ot-check' size="1.5rem" color={COLORS.successEnabled} />
-                  <StyledText>{t('calibrated')}</StyledText>
-                </Flex>
-              ) : (
-                <Flex flex="1 0 auto" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3} justifyContent={JUSTIFY_FLEX_START}>
-                  <Icon name='ot-alert' size="1.5rem" color={COLORS.warningEnabled} />
-                  <StyledText>{t('no_data')}</StyledText>
-                </Flex>
-              )
-          }
+
+          <Flex flex="1 0 auto" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3} justifyContent={JUSTIFY_FLEX_START}>
+            <Icon
+              size="1.5rem"
+              name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
+              color={isAttachedWithCal ? COLORS.successEnabled : COLORS.warningEnabled} />
+            <CalibrationStatus color={isAttachedWithCal ? COLORS.green_one : COLORS.yellow_one}>{
+              isAttachedWithCal ? t('calibrated') : t('no_data')}
+            </CalibrationStatus>
+          </Flex>
           <Flex flex="1 0 auto">
             <SmallButton
               onClick={handleClick}
-              buttonText={
-                attachedInstrument != null
-                  ? t('calibrate')
-                  : t('attach')
-              }
-              buttonType='tertiaryHighLight'
+              buttonText={attachedInstrument != null ? t('calibrate') : t('attach')}
+              buttonType='default'
+              buttonCategory='rounded'
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
             />
           </Flex>
         </Flex>
@@ -139,4 +134,13 @@ const SpeccedInstrumentName = styled.p`
   text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
+`
+
+const CalibrationStatus = styled.p`
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  text-align: ${TYPOGRAPHY.textAlignLeft};
+  text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
+  font-size: ${TYPOGRAPHY.fontSize22};
+  line-height: ${TYPOGRAPHY.lineHeight28};
+  color: ${({color}) => color}
 `
