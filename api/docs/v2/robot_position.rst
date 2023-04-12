@@ -26,14 +26,14 @@ Every well on every piece of labware you load has three addressable positions â€
 
 .. code-block:: python
 
-   plate['A1'].top()     # the top center of the well
+   plate['A1'].top() # the top center of the well
 
 This is a good position to use for :ref:`new-blow-out` or any other operation where you don't want the tip to contact the liquid. In addition, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, and negative ``z`` numbers move it down:
 
 .. code-block:: python
 
-   plate['A1'].top(z=1)  # 1 mm above the top center of the well
-   plate['A1'].top(z=-1) # 1 mm below the top center of the well
+   plate['A1'].top(z = 1)  # 1 mm above the top center of the well
+   plate['A1'].top(z = -1) # 1 mm below the top center of the well
 
 .. versionadded:: 2.0
 
@@ -41,15 +41,15 @@ This is a good position to use for :ref:`new-blow-out` or any other operation wh
 
 .. code-block:: python
 
-   plate['A1'].bottom()     # the bottom center of the well
+   plate['A1'].bottom() # the bottom center of the well
 
 This is a good position to start for aspiration or any other operation where you want the tip to contact the liquid. The same as with :py:meth:`.Well.top`, you can adjust the height of this position with the optional argument ``z``, which is measured in mm. Positive ``z`` numbers move the position up, and negative ``z``` numbers move it down:
 
 .. code-block:: python
 
-   plate['A1'].bottom(z=1)  # 1 mm above the bottom center of the well
-   plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
-                            # this may be dangerous!
+   plate['A1'].bottom(z = 1)  # 1 mm above the bottom center of the well
+   plate['A1'].bottom(z = -1) # 1 mm below the bottom center of the well
+                              # this may be dangerous!
 
 
 .. warning::
@@ -85,29 +85,32 @@ Changing these attributes will affect all subsequent aspirate and dispense actio
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-        pipette = protocol.load_instrument('p300_single', 'right', tip_racks = [tiprack])
-        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
+        tiprack = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = '1')
+        pipette = protocol.load_instrument(
+            instrument_name = 'p300_single', mount = 'right', tip_racks = [tiprack])
+        plate = protocol.load_labware(
+            load_name = 'corning_384_wellplate_112ul_flat', location = 3)
 
         pipette.pick_up_tip()
 
         # aspirate 1 mm above the bottom of the well (default)
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # dispense 1 mm above the bottom of the well (default)
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume = 50, plate['A1'])
 
         # change clearance for aspiration to 2 mm
         pipette.well_bottom_clearance.aspirate = 2
         # aspirate 2 mm above the bottom of the well
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # still dispensing 1 mm above the bottom
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume = 50, plate['A1'])
 
-        pipette.aspirate(50, plate['A1'])
+        pipette.aspirate(volume = 50, plate['A1'])
         # change clearance for dispensing to 10 mm      
         pipette.well_bottom_clearance.dispense = 10
         # dispense high above the well
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume = 50, plate['A1'])
 
 .. versionadded:: 2.0
 
@@ -133,10 +136,14 @@ To prepare code written for Jupyter notebook so it can be run in the app, you ne
     metadata = {'apiLevel': '2.12'}
 
     def run(protocol):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
-        reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
-        p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tiprack])
+        tiprack = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 1)
+        reservoir = protocol.load_labware(
+            load_name = 'nest_12_reservoir_15ml', location = 2)
+        plate = protocol.load_labware(
+            load_name = 'nest_96_wellplate_200ul_flat', location = 3)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single_gen2', 'left', tip_racks=[tiprack])
         p300.pick_up_tip()
         p300.return_tip()
 		
@@ -144,20 +151,24 @@ After importing this protocol to the Opentrons App, run Labware Position Check t
 
 .. code-block:: python
 	
-    labware_1 = protocol.load_labware("opentrons_96_tiprack_300ul", location="1")
+    labware_1 = protocol.load_labware(
+        load_name = "opentrons_96_tiprack_300ul", location = "1")
     labware_1.set_offset(x=0.00, y=0.00, z=0.00)
 
-    labware_2 = protocol.load_labware("nest_12_reservoir_15ml", location="2")
+    labware_2 = protocol.load_labware(
+        load_name = "nest_12_reservoir_15ml", location = "2")
     labware_2.set_offset(x=0.10, y=0.20, z=0.30)
 
-    labware_3 = protocol.load_labware("nest_96_wellplate_200ul_flat", location="3")
+    labware_3 = protocol.load_labware(
+        load_name = "nest_96_wellplate_200ul_flat", location = "3")
     labware_3.set_offset(x=0.10, y=0.20, z=0.30)
     
 You'll notice that this code uses generic names for the loaded labware. If you want to match the labware names already in your protocol, add your own ``.set_offset()`` calls using the arguments provided by Labware Position Check:
 
 .. code-block:: python
 
-    reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
+    reservoir = protocol.load_labware(
+        load_name = 'nest_12_reservoir_15ml', location = 2)
     reservoir.set_offset(x=0.10, y=0.20, z=0.30)
     
 .. versionadded:: 2.12
@@ -248,21 +259,29 @@ This distinction is important for the :py:meth:`.Location.move` method, which op
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='1')
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '2')
-        pipette = protocol.load_instrument('p300_single', 'right', tip_racks = [tiprack])
+        plate = protocol.load_labware(
+            load_name = 'corning_24_wellplate_3.4ml_flat', location = '1')
+        tiprack = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = '2')
+        pipette = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks = [tiprack])
         pipette.pick_up_tip()
 
         # get the location at the center of well A1
         center_location = plate['A1'].center()
 
-        # get a location 1 mm right, 1 mm back, and 1 mm up from the center of well A1
+        # get a location 1 mm right, 1 mm back,
+        # and 1 mm up from the center of well A1
         adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
 
-        # aspirate 1 mm right, 1 mm back, and 1 mm up from the center of well A1
-        pipette.aspirate(50, adjusted_location)
+        # aspirate 1 mm right, 1 mm back,
+        # and 1 mm up from the center of well A1
+        pipette.aspirate(volume = 50, adjusted_location)
         # dispense at the same location
-        pipette.dispense(50, center_location.move(types.Point(x=1, y=1, z=1)))
+        pipette.dispense(
+            volume = 50, center_location.move(types.Point(x=1, y=1, z=1)))
 
 .. note::
 
