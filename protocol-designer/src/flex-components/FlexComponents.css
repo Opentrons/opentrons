@@ -27,3 +27,37 @@
   position: fixed;
   clip: rect(1px 1px 1px 1px);
 }
+
+.flex_header {
+  position: relative;
+  margin-top: 3rem;
+}
+
+.flex_header > * {
+  margin: 1rem 2.5rem;
+}
+
+.flex_title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.required_fields {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.flex_round_tabs_button_wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex_round_tabs_button_100p {
+  width: 100%;
+  margin: 1rem;
+}
+
+.flex_round_tabs_button_50p {
+  width: 50%;
+  margin: 1rem;
+}
