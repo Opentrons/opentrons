@@ -107,11 +107,11 @@ exports[`icons arrow-down renders correctly 1`] = `
   className=" c0 foo"
   fill="currentColor"
   version="1.1"
-  viewBox="0 0 34 34"
+  viewBox="0 0 48 48"
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M30.935 14.24L18.905 26.27V0.5H15.155V26.27L3.125 14.24L0.5 16.88L16.76 33.14L17.03 33.41L33.29 17.135L33.56 16.88L30.935 14.24Z"
+    d="M37.935 21.24L25.905 33.27V7.5H22.155V33.27L10.125 21.24L7.5 23.88L23.76 40.14L24.03 40.41L40.29 24.135L40.56 23.88L37.935 21.24Z"
     fillRule="evenodd"
   />
 </svg>
@@ -179,11 +179,11 @@ exports[`icons arrow-up renders correctly 1`] = `
   className=" c0 foo"
   fill="currentColor"
   version="1.1"
-  viewBox="0 0 34 34"
+  viewBox="0 0 48 49"
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M30.935 19.6699L18.905 7.63991V33.4099H15.155V7.63991L3.125 19.6699L0.5 17.0299L16.76 0.769913L17.03 0.499912L33.29 16.7749L33.56 17.0299L30.935 19.6699Z"
+    d="M37.935 26.6699L25.905 14.6399V40.4099H22.155V14.6399L10.125 26.6699L7.5 24.0299L23.76 7.76991L24.03 7.49991L40.29 23.7749L40.56 24.0299L37.935 26.6699Z"
     fillRule="evenodd"
   />
 </svg>
