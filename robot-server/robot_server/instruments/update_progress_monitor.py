@@ -15,15 +15,16 @@ from robot_server.instruments.instrument_models import (
     MountTypesStr,
 )
 
-_UPDATE_STATUS_GETTER_TIMEOUT = 5  # seconds
-
-
-class InstrumentNotFound(RuntimeError):
-    """Error raised when there is no instrument attached on the specified mount."""
-
 
 class UpdateIdNotFound(KeyError):
-    """Error raised when a specified Update ID is not found."""
+    """Specified update ID not present."""
+
+
+class InstrumentNotFound(ValueError):
+    """Specified instrument not present."""
+
+
+_UPDATE_STATUS_GETTER_TIMEOUT = 5  # seconds
 
 
 class UpdatePossiblyFailed(RuntimeError):

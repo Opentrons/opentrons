@@ -44,6 +44,8 @@ from .update_progress_monitor import (
     UpdateIdNotFound,
 )
 from ..errors import ErrorDetails, ErrorBody
+from ..errors.global_errors import IDNotFound
+from ..errors.robot_errors import InstrumentNotFound, NotSupportedOnOT2
 from ..service.dependencies import get_unique_id, get_current_time
 from ..service.task_runner import TaskRunner, get_task_runner
 
@@ -69,13 +71,6 @@ async def get_update_progress_monitor(
     return update_progress_monitor
 
 
-class InstrumentNotFound(ErrorDetails):
-    """An error if no instrument is found on the given mount."""
-
-    id: Literal["InstrumentNotFound"] = "InstrumentNotFound"
-    title: str = "Instrument Not Found"
-
-
 class NoUpdateAvailable(ErrorDetails):
     """An error if no update is available for the specified mount."""
 
@@ -88,20 +83,6 @@ class UpdateInProgress(ErrorDetails):
 
     id: Literal["UpdateInProgress"] = "UpdateInProgress"
     title: str = "An update is already in progress."
-
-
-class NotSupportedOnOT2(ErrorDetails):
-    """An error if one tries to update instruments on the OT2."""
-
-    id: Literal["NotSupportedOnOT2"] = "NotSupportedOnOT2"
-    title: str = "Cannot update OT2 instruments' firmware."
-
-
-class InvalidUpdateId(ErrorDetails):
-    """And error raised if trying to fetch a non-existent update process' status."""
-
-    id: Literal["InvalidUpdateId"] = "InvalidUpdateId"
-    title: str = "No such update ID found."
 
 
 class UpdateInfoNotFound(ErrorDetails):
@@ -292,7 +273,7 @@ async def update_firmware(
     description="Get firmware update status & progress of the specified update.",
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[InvalidUpdateId]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[IDNotFound]},
     },
 )
 async def get_firmware_update_status(
@@ -305,7 +286,7 @@ async def get_firmware_update_status(
     try:
         update_response = update_progress_monitor.get_progress_status(update_id)
     except UpdateIdNotFound as e:
-        raise InvalidUpdateId(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+        raise IDNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=update_response),
