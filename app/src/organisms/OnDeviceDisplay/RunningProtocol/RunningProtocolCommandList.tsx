@@ -64,7 +64,7 @@ interface RunningProtocolCommandListProps {
   robotSideAnalysis: CompletedProtocolAnalysis | null
   playRun: () => void
   pauseRun: () => void
-  stopRun: () => void
+  setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
   protocolName?: string
   currentRunCommandIndex?: number
@@ -75,7 +75,7 @@ export function RunningProtocolCommandList({
   robotSideAnalysis,
   playRun,
   pauseRun,
-  stopRun,
+  setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
   protocolName,
   currentRunCommandIndex,
@@ -86,9 +86,7 @@ export function RunningProtocolCommandList({
   const currentRunStatus = t(`status_${runStatus}`)
 
   const onStop = (): void => {
-    stopRun()
-    // ToDo (kj:03/28/2023) update event information name & properties
-    trackProtocolRunEvent({ name: 'runCancel', properties: {} })
+    setShowConfirmCancelRunModal(true)
   }
 
   const onTogglePlayPause = (): void => {
@@ -127,6 +125,7 @@ export function RunningProtocolCommandList({
             onTogglePlayPause={onTogglePlayPause}
             buttonSize="6.25rem"
             runStatus={runStatus}
+            iconSize="2.5rem"
           />
         </Flex>
       </Flex>

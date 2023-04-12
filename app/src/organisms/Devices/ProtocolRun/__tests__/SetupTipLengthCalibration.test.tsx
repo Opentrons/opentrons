@@ -51,12 +51,10 @@ const render = () => {
 
 describe('SetupTipLengthCalibration', () => {
   beforeEach(() => {
-    when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        left: PIPETTE_INFO,
-        right: null,
-      })
+    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+      left: PIPETTE_INFO,
+      right: null,
+    })
     when(mockSetupTipLengthCalibrationButton).mockReturnValue(
       <div>Mock SetupTipLengthCalibrationButton</div>
     )
@@ -81,12 +79,10 @@ describe('SetupTipLengthCalibration', () => {
     expect(queryByText('Last calibrated:')).toBeFalsy()
   })
   it('renders two tip length calibrations when protocol run requires two pipettes', () => {
-    when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        left: PIPETTE_INFO,
-        right: PIPETTE_INFO,
-      })
+    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+      left: PIPETTE_INFO,
+      right: PIPETTE_INFO,
+    })
     const { getAllByText, queryByText } = render()
 
     expect(getAllByText('pipette 1')).toHaveLength(2)
@@ -99,7 +95,7 @@ describe('SetupTipLengthCalibration', () => {
   })
   it('renders last calibrated date when available', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         left: {
           ...PIPETTE_INFO,
@@ -120,7 +116,7 @@ describe('SetupTipLengthCalibration', () => {
   })
   it('renders not calibrated yet when not calibrated', () => {
     when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         left: {
           ...PIPETTE_INFO,

@@ -65,6 +65,13 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
     setSnackbar({ message, ...options })
   }
 
+  // This function is needed to actually make the snackbar auto-close in the context of the
+  // ToasterOven. It closes fine by itself in tests and storybook, but we need to eat it
+  // here to remove it from the page as a whole.
+  function eatSnackbar(): void {
+    setSnackbar(null)
+  }
+
   /**
    * removes (eats) a toast from toaster oven display container
    * @param {string} toastId the id of the toast to remove
@@ -111,6 +118,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
             {...snackbar}
             onClose={() => {
               snackbar.onClose?.()
+              eatSnackbar()
             }}
           />
         </Flex>

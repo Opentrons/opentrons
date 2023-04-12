@@ -2,9 +2,10 @@ import argparse
 import csv
 import json
 from ast import literal_eval
-from typing import Optional, Dict, Union, Any, cast
+from typing import Optional, Dict, Union, Any, cast, List
 from pathlib import Path
 from pydantic import BaseModel
+import math
 
 from ... import get_shared_data_root
 from .. import name_config, model_config
@@ -193,14 +194,14 @@ def build_liquid_model_v2(
             return PipetteLiquidPropertiesDefinition.parse_obj(
                 {
                     **input_dictionary,
-                    "partialTipConfigurations": _build_partial_tip_configurations(
-                        input_dictionary["channels"]
-                    ),
                     "supportedTips": supported_tip_configurations,
                 }
             )
     max_volume = int(input("please provide the max volume of the pipette\n"))
     min_volume = float(input("please provide the min volume of the pipette\n"))
+    default_blow_out_volume = float(
+        input("please provide the default blow out volume\n")
+    )
     default_tipracks = input(
         "please input the load names of default tipracks separated by commas\n"
     )
@@ -211,6 +212,7 @@ def build_liquid_model_v2(
             "maxVolume": max_volume,
             "minVolume": min_volume,
             "defaultTipracks": list_default_tipracks,
+            "defaultBlowOutVolume": default_blow_out_volume,
         }
     )
 
@@ -233,6 +235,10 @@ def build_physical_model_v2(
         "Please provide a list of available sensors, separated by comma\n"
     )
     channels = input(f"Please provide the number of channels your {pipette_type} has\n")
+    shaft_diam = float(input(f"Please provide the shaft diameter of {pipette_type}\n"))
+    shaft_ul_per_mm = float(
+        input(f"Please provide the uL to mm conversion for {pipette_type}\n")
+    )
     pick_up_tip_configurations = _build_tip_handling_configurations("pickup")
     drop_tip_configurations = _build_tip_handling_configurations("drop")
     plunger_positions = _build_plunger_positions()
@@ -253,6 +259,8 @@ def build_physical_model_v2(
             ),
             "partialTipConfigurations": partial_tip_configurations,
             "channels": channels,
+            "shaftDiameter": shaft_diam,
+            "shaftULperMM": shaft_ul_per_mm,
         }
     )
 
@@ -326,12 +334,21 @@ def save_to_file(
     directorypath.mkdir(parents=True, exist_ok=True)
     filepath = directorypath / f"{file_name}.json"
     if isinstance(data, BaseModel):
-        dict_basemodel = data.dict(by_alias=True)
+        # We have to rely on the json serialization of the
+        # pydantic model to properly convert special objects
+        # such as (pipetteModelType) to a string. However,
+        # we also want to add in a new key on top of the
+        # data in the pydantic model so we need to convert it
+        # back to a dictionary before saving to file.
+        json_basemodel = data.json(by_alias=True)
+        dict_basemodel = json.loads(json_basemodel)
         dict_basemodel["$otSharedSchema"] = schema_path
-        filepath.write_text(json.dumps(dict_basemodel), encoding="utf-8")
+        filepath.write_text(
+            json.dumps(dict_basemodel, ensure_ascii=False), encoding="utf-8"
+        )
     else:
         data["$otSharedSchema"] = schema_path
-        filepath.write_text(json.dumps(data), encoding="utf-8")
+        filepath.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
 def migrate_v1_to_v2() -> None:
@@ -401,6 +418,92 @@ def migrate_v1_to_v2() -> None:
         print(f"Quirks list for {key}: {items}")
 
 
+def migrate_new_blow_out_configs_v2() -> None:
+    pipette_volumes = {
+        1: ["p10", "p50", "p300", "p1000"],
+        2: ["p20", "p300", "p1000"],
+        3: ["p50", "p1000"],
+    }
+
+    for pipette_gen in range(1, 4):  # gen 1, gen 2, gen 3
+        print(f"\nTaking data for gen{pipette_gen} pipettes:")
+        # overwrite and pass in dict with user input for each gen
+        shaft_diameters = {
+            vol: float(input(f"Enter shaft diameter for gen{pipette_gen} {vol}: "))
+            for vol in pipette_volumes[pipette_gen]
+        }
+        fill_blowout_configs(pipette_gen, shaft_diameters, pipette_volumes[pipette_gen])
+
+
+def fill_blowout_configs(
+    pipette_gen: int, shaft_diameters: Dict[str, float], volumes: List[str]
+) -> None:
+    default_blowout_for_tip = {
+        "p50": {"t50": 1.5},
+        "p1000": {"t50": 3.2, "t200": 16, "t1000": 16},
+    }
+
+    general_config_files = Path(GENERAL_ROOT).glob("*")
+    for pipette_type in general_config_files:  # single, eight, 96-channel
+        pipette_type_str = str(pipette_type).split("/")[-1]
+        for volume in volumes:  # pipette max volume- p10, p20, p50, etc.
+            shaft_diameter = shaft_diameters[volume]
+            # calculate uL per mm, default blowout vol
+            ul_per_mm = math.pi * (shaft_diameter / 2) ** 2
+            # get path for every file version for the pipette gen at hand
+            volume_path = Path(pipette_type / volume)
+            for general_file_version in volume_path.glob(f"{str(pipette_gen)}_*.json"):
+                with open(general_file_version, "r") as file:
+                    general_config_dict = json.load(file)
+                general_config_dict["shaftDiameter"] = round(shaft_diameter, 3)
+                general_config_dict["shaftULperMM"] = round(ul_per_mm, 3)
+
+                # get file path to pass into save_to_file
+                gen_path = GENERAL_ROOT / pipette_type / volume
+                version_str = str(general_file_version).split("/")[-1][:-5]
+                save_to_file(gen_path, version_str, general_config_dict, GENERAL_SCHEMA)
+
+            # do the same for liquid data files
+            for liquid_file_version in Path(
+                LIQUID_ROOT / pipette_type_str / volume
+            ).glob(f"{str(pipette_gen)}_*.json"):
+                with open(liquid_file_version, "r") as file:
+                    liquid_config_dict = json.load(file)
+                    # gen 3 default blowout volumes change depending on tip volume
+                    if pipette_gen == 3:
+                        for tip in liquid_config_dict["supportedTips"]:
+                            default_blowout_volume = default_blowout_for_tip[volume][
+                                tip
+                            ]
+                            liquid_config_dict["supportedTips"][tip][
+                                "defaultBlowoutVolume"
+                            ] = round(default_blowout_volume, 3)
+                    # gen 1 and 2 pipettes only have 1 compatible tip per pipette size
+                    else:
+                        # calculate blowout distance from the last checked file for this pip size, bottom and
+                        # blowout positions don't change between revisions of the same pipette type
+                        blowout_distance = (
+                            general_config_dict["plungerPositionsConfigurations"][
+                                "bottom"
+                            ]
+                            - general_config_dict["plungerPositionsConfigurations"][
+                                "blowout"
+                            ]
+                        )
+                        default_blowout_volume = blowout_distance * ul_per_mm
+                        for tip in liquid_config_dict["supportedTips"]:
+                            liquid_config_dict["supportedTips"][tip][
+                                "defaultBlowoutVolume"
+                            ] = round(default_blowout_volume, 3)
+
+                    # get path to pass into save_to_file
+                    liquid_path = Path(LIQUID_ROOT / pipette_type_str / volume)
+                    version_str = str(liquid_file_version).split("/")[-1][:-5]
+                save_to_file(
+                    liquid_path, version_str, liquid_config_dict, LIQUID_SCHEMA
+                )
+
+
 def build_new_pipette_model_v2(
     pipette_functions_dict: Dict[str, Any], pipette_model_csv: str
 ) -> None:
@@ -421,8 +524,13 @@ def build_new_pipette_model_v2(
                 continue
     geometry_model = build_geometry_model_v2(top_level_pipette_model["geometry"])
     liquid_model = build_liquid_model_v2(
-        top_level_pipette_model["liquid"], pipette_functions_dict
+        top_level_pipette_model["liquid"],
+        pipette_functions_dict,
     )
+    liquid_model_dict = liquid_model.dict(by_alias=True)
+    liquid_model_dict["supportedTips"] = {
+        k.name: v for k, v in liquid_model_dict["supportedTips"].items()
+    }
     pipette_type = f"p{liquid_model.max_volume}"
     physical_model = build_physical_model_v2(
         {
@@ -437,6 +545,9 @@ def build_new_pipette_model_v2(
                 "pickUpTipConfigurations"
             ],
             "dropTipConfigurations": top_level_pipette_model["dropTipConfigurations"],
+            "partialTipConfigurations": _build_partial_tip_configurations(
+                top_level_pipette_model["general"]["channels"]
+            ),
         },
         pipette_type,
     )
@@ -454,7 +565,7 @@ def build_new_pipette_model_v2(
         GENERAL_ROOT / current_pipette_path, file_name, physical_model, GENERAL_SCHEMA
     )
     save_to_file(
-        LIQUID_ROOT / current_pipette_path, file_name, liquid_model, LIQUID_SCHEMA
+        LIQUID_ROOT / current_pipette_path, file_name, liquid_model_dict, LIQUID_SCHEMA
     )
 
 
@@ -474,6 +585,12 @@ def main() -> None:
         type=str,
         help="the csv filled with data to build a pipette model",
         default=None,
+    )
+    parser.add_argument(
+        "--migrate_blowout_configs",
+        type=bool,
+        help="If true, migrate new blowout configs to existing json files",
+        default=False,
     )
 
     args = parser.parse_args()
@@ -531,6 +648,8 @@ def main() -> None:
         build_new_pipette_model_v2(
             converted_pipette_functions_dict, args.path_to_pipette_model
         )
+    elif args.migrate_blowout_configs:
+        migrate_new_blow_out_configs_v2()
     else:
         print("Migrating schema v1 files...")
         migrate_v1_to_v2()
