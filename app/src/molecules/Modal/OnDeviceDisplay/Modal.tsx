@@ -52,7 +52,7 @@ export function Modal(props: ModalProps): JSX.Element {
     >
       <Flex
         backgroundColor={isError ? COLORS.red_two : COLORS.white}
-        border={isError ? `0.375rem solid ${COLORS.red_two}` : 'none'}
+        border={`0.375rem solid ${isError ? COLORS.red_two : COLORS.white}`}
         width={modalWidth}
         height="max-content"
         maxHeight="32.5rem"

@@ -135,7 +135,7 @@ export const LiquidsLabwareDetailsModal = (
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        height="24.70375rem"
+        height="23.70375rem"
         css={HIDE_SCROLLBAR}
         minWidth="10.313rem"
         overflowY="scroll"
@@ -146,7 +146,7 @@ export const LiquidsLabwareDetailsModal = (
       <Flex width="38.75rem">
         <Flex marginLeft={SPACING.spacing6}>
           <svg
-            viewBox="0.5 1.2 127 78"
+            viewBox="0.5 2.2 127 78"
             height="100%"
             width="100%"
             transform="scale(1, -1)"
