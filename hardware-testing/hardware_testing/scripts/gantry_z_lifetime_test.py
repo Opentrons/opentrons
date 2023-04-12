@@ -189,7 +189,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
     MAX_DISCONTINUITY = []
     DIRECTION_CHANGE_DISCONTINUITY = []
 
-    test_robot = input("Enter robot ID:\n\t>> ")
+    test_robot = 'dvt-2'# input("Enter robot ID:\n\t>> ")
     test_name = "gantry-z-lifetime-test"
     test_config = load.value
     test_tag = load.value
@@ -201,7 +201,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
         gripper = api.has_gripper()
 
         if load == GantryLoad.LOW_THROUGHPUT and (rm == None or lm == None):
-            input("Low throughput test requires two pipettes. Attach pipettes and press enter.\n")
+            # input("Low throughput test requires two pipettes. Attach pipettes and press enter.\n")
             continue
         else:
             break
@@ -239,6 +239,7 @@ async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None
                           total_stalls, '', lm, rm, gripper, '', OT3Axis.to_kind(AXES[i]),
                           MAX_SPEED[i], ACCEL[i], HOLD_CURRENT[i],
                           RUN_CURRENT[i], MAX_DISCONTINUITY[i], DIRECTION_CHANGE_DISCONTINUITY[i]]
+            print(f"CYCLE DATA: {cycle_data}\n")
             rm = ''
             lm = ''
             gripper = ''
@@ -265,6 +266,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
-    if not args.simulate:
-        input("Gantry-Z-Lifetime: Is the deck totally empty? (press ENTER to continue)")
+    # if not args.simulate:
+    #     input("Gantry-Z-Lifetime: Is the deck totally empty? (press ENTER to continue)")
     asyncio.run(_main(args.simulate, args.cycles, mount))
