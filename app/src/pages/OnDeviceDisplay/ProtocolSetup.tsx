@@ -49,6 +49,7 @@ import type { OnDeviceRouteParams } from '../../App/types'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { GripperData, PipetteData } from '@opentrons/api-client'
 import { getAreInstrumentsReady, getProtocolUsesGripper } from '../../organisms/ProtocolSetupInstruments/utils'
+import { Skeleton } from '../../atoms/Skeleton'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -209,6 +210,14 @@ function PrepareToRun({
 
   // get missing/unmatched modules and derive status
   const attachedModules = useAttachedModules()
+
+
+  if (mostRecentAnalysis == null ||
+    attachedInstruments == null ||
+    (protocolHasModules && attachedModules == null) ||
+    allPipettesCalibrationData == null) {
+    return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
+  }
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
@@ -404,6 +413,35 @@ export function ProtocolSetup(): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding="2rem 2.5rem">
       {setupComponentByScreen[setupScreen]}
+    </Flex>
+  )
+}
+
+interface ProtocolSetupSkeletonProps {
+  cancelAndClose: () => void
+}
+function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
+  return (
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacingXXL}
+    >
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
+          <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
+          <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
+        </Flex>
+        <Flex gridGap={SPACING.spacing5}>
+          <CloseButton onClose={() => props.cancelAndClose()} />
+          <PlayButton disabled onPlay={() => { }} />
+        </Flex>
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3} >
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+      </Flex>
     </Flex>
   )
 }
