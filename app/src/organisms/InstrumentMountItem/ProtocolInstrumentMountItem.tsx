@@ -8,24 +8,32 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
   Icon,
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
   BORDERS,
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
-import { getGripperDisplayName, getPipetteNameSpecs, PipetteName, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getPipetteNameSpecs,
+  PipetteName,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 
 import type { Mount } from '../../redux/pipettes/types'
-import type { InstrumentData, PipetteOffsetCalibration, GripperData } from '@opentrons/api-client'
+import type {
+  InstrumentData,
+  PipetteOffsetCalibration,
+  GripperData,
+} from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 
-export const MountButton = styled.button<{ isReady: boolean }>`
+export const MountButton = styled.div<{ isReady: boolean }>`
   display: flex;
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
@@ -38,20 +46,28 @@ export const MountButton = styled.button<{ isReady: boolean }>`
   &:active,
   &:focus {
     background-color: ${({ isReady }) =>
-    isReady ? COLORS.green_three_pressed : COLORS.yellow_three_pressed};
+      isReady ? COLORS.green_three_pressed : COLORS.yellow_three_pressed};
   }
 `
 interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
   attachedInstrument: InstrumentData | null
-  attachedCalibrationData: PipetteOffsetCalibration | GripperData['data']['calibratedOffset'] | null
+  attachedCalibrationData:
+    | PipetteOffsetCalibration
+    | GripperData['data']['calibratedOffset']
+    | null
   speccedName: PipetteName | GripperModel
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { mount, attachedInstrument, speccedName, attachedCalibrationData } = props
+  const {
+    mount,
+    attachedInstrument,
+    speccedName,
+    attachedCalibrationData,
+  } = props
 
   const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
     false
@@ -64,38 +80,54 @@ export function ProtocolInstrumentMountItem(
   const handleClick: React.MouseEventHandler = () => {
     console.log('button clicked', mount, attachedInstrument)
   }
-  const isAttachedWithCal = attachedInstrument != null && attachedCalibrationData != null
+  const isAttachedWithCal =
+    attachedInstrument != null && attachedCalibrationData != null
   return (
     <>
       <MountButton onClick={handleClick} isReady={isAttachedWithCal}>
-        <Flex
-          width="100%"
-          alignItems={ALIGN_CENTER}
-        >
+        <Flex width="100%" alignItems={ALIGN_CENTER}>
           <Flex
             flex="2"
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing2}
           >
             <MountLabel>{t('mount', { mount })}</MountLabel>
-            <SpeccedInstrumentName>{mount === 'extension' ? getGripperDisplayName(speccedName) : getPipetteNameSpecs(speccedName)?.displayName}</SpeccedInstrumentName>
+            <SpeccedInstrumentName>
+              {mount === 'extension'
+                ? getGripperDisplayName(speccedName as GripperModel)
+                : getPipetteNameSpecs(speccedName as PipetteName)?.displayName}
+            </SpeccedInstrumentName>
           </Flex>
 
-          <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3} justifyContent={JUSTIFY_FLEX_START}>
+          <Flex
+            flex="1"
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing3}
+            justifyContent={JUSTIFY_FLEX_START}
+          >
             <Icon
               size="1.5rem"
               name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
-              color={isAttachedWithCal ? COLORS.successEnabled : COLORS.warningEnabled} />
-            <CalibrationStatus color={isAttachedWithCal ? COLORS.green_one : COLORS.yellow_one}>{
-              isAttachedWithCal ? t('calibrated') : t('no_data')}
+              color={
+                isAttachedWithCal
+                  ? COLORS.successEnabled
+                  : COLORS.warningEnabled
+              }
+            />
+            <CalibrationStatus
+              color={isAttachedWithCal ? COLORS.green_one : COLORS.yellow_one}
+            >
+              {isAttachedWithCal ? t('calibrated') : t('no_data')}
             </CalibrationStatus>
           </Flex>
           <Flex flex="1">
             <SmallButton
               onClick={handleClick}
-              buttonText={attachedInstrument != null ? t('calibrate') : t('attach')}
-              buttonType='default'
-              buttonCategory='rounded'
+              buttonText={
+                attachedInstrument != null ? t('calibrate') : t('attach')
+              }
+              buttonType="default"
+              buttonCategory="rounded"
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             />
           </Flex>
@@ -140,5 +172,5 @@ const CalibrationStatus = styled.p`
   text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${({ color }) => color}
+  color: ${({ color }) => color};
 `

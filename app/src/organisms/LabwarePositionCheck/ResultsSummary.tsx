@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import styled from 'styled-components'
@@ -12,6 +13,7 @@ import {
   getVectorSum,
   IDENTITY_VECTOR,
   LabwareDefinition2,
+  ODD_MEDIA_QUERY_SPECS,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
@@ -149,6 +151,11 @@ export const ResultsSummary = (
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        css={css`
+          @media ${ODD_MEDIA_QUERY_SPECS} {
+            margin-top: 0;
+          }
+        `}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
         <PrimaryButton onClick={() => handleApplyOffsets(offsetsToApply)}>

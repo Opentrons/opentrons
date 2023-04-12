@@ -23,7 +23,13 @@ interface LargeButtonProps extends StyleProps {
 }
 
 export function LargeButton(props: LargeButtonProps): JSX.Element {
-  const { buttonType, buttonText, iconName, disabled = false, ...buttonProps } = props
+  const {
+    buttonType,
+    buttonText,
+    iconName,
+    disabled = false,
+    ...buttonProps
+  } = props
 
   const LARGE_BUTTON_PROPS_BY_TYPE: Record<
     LargeButtonTypes,

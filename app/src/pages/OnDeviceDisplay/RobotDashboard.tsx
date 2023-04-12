@@ -11,6 +11,8 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -50,21 +52,13 @@ export function RobotDashboard(): JSX.Element {
   return (
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
-        {t('run_again')}
-      </StyledText>
       <Flex
         width="100%"
-        height="14.375rem"
+        height="27.25rem"
         backgroundColor={COLORS.fundamentalsBackground}
+        borderRadius={BORDERS.radiusRoundEdge}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${String(SPACING.spacing4)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacing6)}`}
+        justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
         <img
@@ -90,15 +84,7 @@ export function RobotDashboard(): JSX.Element {
           {t('have_not_run_description')}
         </StyledText>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
-        marginTop="1.3125rem"
-      >
-        {DASHBOARD_ITEMS.map((card, index) => (
-          <MiniCardButton key={`miniCardButton_${index}`} {...card} />
-        ))}
-      </Flex>
+
       {/* temp button to robot dashboard until we can detect setup status */}
       <Flex
         alignSelf={ALIGN_FLEX_END}

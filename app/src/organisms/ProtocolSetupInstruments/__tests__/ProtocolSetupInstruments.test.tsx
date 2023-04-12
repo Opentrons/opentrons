@@ -12,12 +12,9 @@ import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_st
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '..'
+import { ProtocolSetupInstruments } from '..'
 import {
-  mockProtocolModuleInfo,
   mockRecentAnalysis,
-  mockUseModulesQueryClosed,
   mockUseModulesQueryClosing,
   mockUseModulesQueryOpen,
   mockUseModulesQueryOpening,
@@ -29,7 +26,6 @@ jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 
 const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -43,9 +39,6 @@ const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFuncti
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = jest.fn()
@@ -55,7 +48,7 @@ const mockCreateLiveCommand = jest.fn()
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolSetupLabware
+      <ProtocolSetupInstruments
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
       />
@@ -66,7 +59,7 @@ const render = () => {
   )
 }
 
-describe('ProtocolSetupLabware', () => {
+describe('ProtocolSetupInstruments', () => {
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
     when(mockUseMostRecentCompletedAnalysis)
@@ -75,9 +68,6 @@ describe('ProtocolSetupLabware', () => {
     when(mockGetDeckDefFromRobotType)
       .calledWith('OT-3 Standard')
       .mockReturnValue(ot3StandardDeckDef as any)
-    when(mockGetProtocolModulesInfo)
-      .calledWith(mockRecentAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
     mockUseModulesQuery.mockReturnValue({
       ...mockUseModulesQueryOpen,
       refetch: mockRefetch,
@@ -103,68 +93,8 @@ describe('ProtocolSetupLabware', () => {
   it('correctly navigates with the nav buttons', () => {
     const [{ getByRole, getAllByRole }] = render()
     getByRole('button', { name: 'continue' }).click()
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('lpc')
-    getAllByRole('button')[0].click()
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
-  })
-
-  it('should launch and close the deck map', () => {
-    const [{ getByRole, getByText, getByTestId }] = render()
-
-    getByRole('button', { name: 'Deck Map' }).click()
-    getByText('Map View')
-    getByTestId('ModalHeader_icon_close_Map View').click()
-    getByText('Labware')
-  })
-
-  it('sends a latch-close command when the labware latch is open and the button is clicked', () => {
-    const [{ getByText }] = render()
-    getByText('Labware Latch').click()
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/closeLabwareLatch',
-        params: {
-          moduleId: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
-        },
-      },
-    })
-  })
-
-  it('sends a latch-open command when the labware latch is closed and the button is clicked', () => {
-    mockUseModulesQuery.mockReturnValue({
-      ...mockUseModulesQueryClosed,
-      refetch: mockRefetch,
-    } as any)
-    const [{ getByText }] = render()
-    getByText('Labware Latch').click()
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/openLabwareLatch',
-        params: {
-          moduleId: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
-        },
-      },
-    })
-  })
-
-  it('shows opening transition states of the labware latch button', () => {
-    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryOpening as any)
-
-    const [{ getByText }] = render()
-    getByText('Opening...')
-  })
-
-  it('shows closing transition state of the labware latch button', () => {
-    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryClosing as any)
-
-    const [{ getByText }] = render()
-    getByText('Closing...')
-  })
-
-  it('defaults to open when latch status is unknown', () => {
-    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryUnknown as any)
-
-    const [{ getByText }] = render()
-    getByText('Open')
+    getAllByRole('button')[0].click()
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
   })
 })
