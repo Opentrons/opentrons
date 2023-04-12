@@ -20,6 +20,15 @@
       ],
       "type": "string"
     },
+    "system_server_address": {
+      "title": "System Server Address",
+      "description": "The base URL for accessing system server endpoints.",
+      "default": "http://localhost:32950",
+      "env_names": [
+        "ot_robot_server_system_server_address"
+      ],
+      "type": "string"
+    },
     "persistence_directory": {
       "title": "Persistence Directory",
       "description": "A directory for the server to store things persistently across boots. If this directory doesn't already exist, the server will create it. If this is the string `automatically_make_temporary`, the server will use a fresh temporary directory (effectively not persisting anything).\n\nNote that the `opentrons` library is also responsible for persisting certain things, and it has its own configuration.",
