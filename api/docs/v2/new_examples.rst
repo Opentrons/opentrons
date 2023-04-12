@@ -24,11 +24,18 @@ Moving 100 µL from one well to another:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
-
-        p300.transfer(100, plate['A1'], plate['B1'])
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
+        tiprack_1 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 2)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks = [tiprack_1])
+        p300.transfer(
+            volume = 100,
+            source = plate['A1'],
+            dest = plate['B1'])
 
 
 This accomplishes the same thing as the following basic commands:
@@ -41,13 +48,18 @@ This accomplishes the same thing as the following basic commands:
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
+        tiprack_1 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 2)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks=[tiprack_1])
 
         p300.pick_up_tip()
-        p300.aspirate(100, plate['A1'])
-        p300.dispense(100, plate['B1'])
+        p300.aspirate(volume = 100, location = plate['A1'])
+        p300.dispense(volume = 100, location = plate['B1'])
         p300.drop_tip()
 
 ******************************
@@ -66,17 +78,26 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
+        tiprack_1 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 2)
+        reservoir = protocol.load_labware(
+            load_name = 'usascientific_12_reservoir_22ml', location = 4)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks=[tiprack_1])
         # distribute 20uL from reservoir:A1 -> plate:row:1
         # distribute 20uL from reservoir:A2 -> plate:row:2
         # etc...
 
         # range() starts at 0 and stops before 8, creating a range of 0-7
         for i in range(8):
-            p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
+            p300.distribute(
+                volume = 200,
+                source = reservoir.wells()[i],
+                dest = plate.rows()[i])
 
 ******************************
 
