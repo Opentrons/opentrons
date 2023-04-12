@@ -18,11 +18,18 @@ max_overrun_distance_mm=10,
 speed_mm_per_s=1,
 sensor_threshold_pf=1.0)
 
-MOUNT = OT3Mount.RIGHT
-AXIS = OT3Axis.Z_R
+# MOUNT = OT3Mount.RIGHT
+# AXIS = OT3Axis.Z_L
 TRIALS = 5
 
-def force_record(stop_event, api, mount) -> int:
+def between_callback(stop_event, api):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(plunger_move(stop_event, api))
+    loop.close()
+
+async def plunger_move(stop_event, api) -> int:
 
     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
@@ -30,11 +37,11 @@ def force_record(stop_event, api, mount) -> int:
 
     for i in range(TRIALS):#while True:
         print("Move to bottom plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+        await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, bottom_pos)
         print("Move to top plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
+        await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, top_pos)
         print("Move to bottom plunger position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+        await helpers_ot3.move_plunger_absolute_ot3(api, OT3Mount.RIGHT, bottom_pos)
         plunger_cycles += 1
         if stop_event.is_set():
             break
@@ -46,28 +53,34 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
 
-    for current in current_list:
-        for i in range(TRIALS):
-            print(f"Trial {i+1}, Current: {current}\n")
-            stop_event = Event()
-            # final_position = await helpers_ot3.jog_mount_ot3(api, mount)
-            # print(f"Jogged the mount to deck coordinate: {final_position}")
+    if mount == OT3Mount.LEFT:
+        AXIS = OT3Axis.Z_L
+    else:
+        AXIS = OT3Axis.Z_R
 
-            await api.move_to(mount, Point(final_position[OT3Axis.X],
-                                final_position[OT3Axis.Y], final_position[AXIS]))
-            await helpers_ot3.update_pick_up_current(api, mount, current)
-            force_thread = Thread(target=force_record, args=(stop_event, current,
-                                                             i+1, test_robot, test_name, file_name))
-            force_thread.start()
-            tip_len = 57 # 50uL Tip
-            # tip_len = 85 # 1K tip
-            print("pick up tip in main\n")
-            await api.pick_up_tip(mount, tip_length=tip_len)
-            print("sleep...\n")
-            await asyncio.sleep(1)
-            stop_event.set()
-            force_thread.join()
-            await api.remove_tip(mount)
+    final_position = await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
+    print(f"Jogged the mount to deck coordinate: {final_position}")
+
+    stop_event = Event()
+
+    plunger_thread = Thread(target=between_callback, args=(stop_event, api))
+    plunger_thread.start()
+
+    for i in range(TRIALS):
+        print(f"Trial {i+1}\n")
+
+        await api.move_to(OT3Mount.LEFT, Point(final_position[OT3Axis.X],
+                            final_position[OT3Axis.Y], final_position[OT3Axis.Z_L]))
+        tip_len = 57 # 50uL Tip
+        # tip_len = 85 # 1K tip
+        print("pick up tip in main\n")
+        await api.pick_up_tip(OT3Mount.LEFT, tip_length=tip_len)
+        print("sleep...\n")
+        await asyncio.sleep(1)
+        await api.remove_tip(OT3Mount.LEFT)
+
+    stop_event.set()
+    plunger_thread.join()
 
 if __name__ == "__main__":
     mount_options = {
