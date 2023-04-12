@@ -11,6 +11,7 @@ import {
   useCreateRunMutation,
   useStopRunMutation,
   useDeleteRunMutation,
+  useDismissCurrentRunMutation,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
@@ -21,7 +22,6 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
 import { getIsOnDevice } from '../../../redux/config'
-import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
@@ -63,8 +63,8 @@ const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
 const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
   typeof useStopRunMutation
 >
-const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
-  typeof useCloseCurrentRun
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -92,7 +92,7 @@ describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   let mockCreateRun: jest.Mock
   let mockStopRun: jest.Mock
-  let mockCloseCurrentRun: jest.Mock
+  let mockDismissCurrentRun: jest.Mock
   let mockDeleteRun: jest.Mock
   let refetchPromise: Promise<void>
   let mockRefetch: jest.Mock
@@ -107,7 +107,7 @@ describe('PipetteWizardFlows', () => {
     }
     mockCreateRun = jest.fn()
     mockStopRun = jest.fn()
-    mockCloseCurrentRun = jest.fn()
+    mockDismissCurrentRun = jest.fn()
     mockDeleteRun = jest.fn()
     refetchPromise = Promise.resolve()
     mockRefetch = jest.fn(() => refetchPromise)
@@ -128,8 +128,8 @@ describe('PipetteWizardFlows', () => {
       chainRunCommands: mockChainRunCommands,
       isCommandMutationLoading: false,
     })
-    mockUseCloseCurrentRun.mockReturnValue({
-      closeCurrenRun: mockCloseCurrentRun,
+    mockUseDismissCurrentRunMutation.mockReturnValue({
+      dismissCurrenRun: mockDismissCurrentRun,
     } as any)
     mockUseRunStatus.mockReturnValue('idle')
     mockGetPipetteWizardSteps.mockReturnValue([
