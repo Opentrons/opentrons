@@ -45,7 +45,7 @@ interface PlayPauseButtonProps {
   onTogglePlayPause?: () => void
   /** default size 12.5rem */
   buttonSize?: string
-  /** default size 10rem */
+  /** default size 5rem */
   iconSize?: string
   runStatus?: RunStatus | null
 }
