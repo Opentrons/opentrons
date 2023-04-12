@@ -438,7 +438,7 @@ class OT3API(
 
     async def update_instrument_firmware(
         self, mount: Optional[OT3Mount] = None
-    ) -> None:
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Update the firmware on one or all instruments."""
         # check that mount is actually attached
         # TODO (ba, 2023-03-03) get_attached_instruments should probably return gripper as well, for now just add it
@@ -450,7 +450,7 @@ class OT3API(
         mounts = {mount} if mount else set(attached_instruments)
         subsystems = {subsystem_from_mount(mount) for mount in mounts}
         async for update_status in self.update_firmware(subsystems):
-            mod_log.debug(update_status)
+            yield update_status
 
     async def update_firmware(
         self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False

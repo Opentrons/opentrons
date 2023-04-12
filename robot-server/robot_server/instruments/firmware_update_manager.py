@@ -3,7 +3,7 @@ import asyncio
 from datetime import datetime
 from typing import Dict
 
-from anyio import fail_after
+from asyncio import Lock, Condition
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import UpdateState
@@ -14,6 +14,7 @@ from robot_server.instruments.instrument_models import (
     UpdateProgressData,
     MountTypesStr,
 )
+from robot_server.service.task_runner import TaskRunner
 
 
 class UpdateIdNotFound(KeyError):
@@ -23,12 +24,61 @@ class UpdateIdNotFound(KeyError):
 class InstrumentNotFound(ValueError):
     """Specified instrument not present."""
 
+class UpdateIdExists(ValueError):
+    """An update was specified with the same ID as a running one."""
+
 
 _UPDATE_STATUS_GETTER_TIMEOUT = 5  # seconds
 
 
 class UpdatePossiblyFailed(RuntimeError):
     """Error raised when the information from hardware controller points to a failed update."""
+
+class FirmwareUpdateManager:
+    """State storage and progress monitoring for instrument firmware updates."""
+
+    _running_updates: Dict[str, _UpdateProcess]
+    #: A store for any updates that are currently running
+    _management_lock: asyncio.Lock
+    #: A lock for accessing the store, mostly to avoid spurious toctou problems with it
+
+    _task_runner: TaskRunner
+
+    async def _get(self, update_id: str) -> _UpdateProcess:
+        async with self._management_lock:
+            try:
+                return self._running_updates[update_id]
+            except KeyError as e:
+                raise UpdateIdNotFound() from e
+
+    async def _emplace(self, update_id: str, mount: OT3Mount) -> _UpdateProcess:
+        async with self._management_lock:
+            if update_id in self._running_updates:
+                raise UpdateIdExists()
+            self._running_updates[update_id] = Update(mount)
+
+    def __init__(self, task_runner: TaskRunner) -> None:
+        self._running_updates = {}
+        self._task_runner = task_runner
+        self._management_lock = asyncio.Lock()
+
+    async def get_update_process_handle(self, update_id: str) -> UpdateProcessHandle:
+        pass
+
+    async def start_update_process(self, update_id: str, mount: OT3Mount) -> UpdateProcessHandle:
+        return await self._emplace(update_id, mount).get_handle()
+
+    async def complete_update_process(self, update_id: str) -> None:
+        pass
+
+class UpdateProcessHandle:
+    _read_condition: asyncio.Condition
+    pass
+
+class _UpdateProcess:
+    """State storage and routing for a firmware update."""
+    pass
+
 
 
 class UpdateProgressMonitor:
