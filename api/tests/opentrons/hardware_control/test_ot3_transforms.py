@@ -5,10 +5,6 @@ from opentrons.hardware_control import ot3api
 from opentrons.hardware_control.types import OT3Axis, OT3Mount
 from opentrons_shared_data.pipette import name_for_model
 
-import os
-
-os.environ["OT_API_FF_enableOT3HardwareController"] = "true"
-
 
 @pytest.mark.parametrize(
     "pipette_model", ["p1000_single_v3.3", "p1000_single_v3.3", "p50_multi_v3.3"]
@@ -36,7 +32,7 @@ async def test_transforms_roundtrip(pipette_model):
 @pytest.mark.parametrize(
     "pipette_model", ["p1000_single_v3.3", "p50_single_v3.3", "p1000_multi_v3.3"]
 )
-async def test_transform_values(pipette_model):
+async def test_transform_values(pipette_model, enable_ot3_hardware_controller):
     attached = {
         types.Mount.LEFT: {
             "model": pipette_model,
