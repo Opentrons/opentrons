@@ -4,10 +4,8 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
-import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { i18n } from '../../../../i18n'
-
 import { RunFailedModal } from '../RunFailedModal'
 
 jest.mock('@opentrons/react-api-client')
