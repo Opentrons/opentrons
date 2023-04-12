@@ -15,7 +15,7 @@ export function useRunCalibrationStatus(
   runId: string
 ): ProtocolCalibrationStatus {
   const deckCalStatus = useDeckCalibrationStatus(robotName)
-  const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
+  const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
   const runPipetteInfoValues = Object.values(runPipetteInfoByMount)
   const isOT3 = useIsOT3(robotName)
 

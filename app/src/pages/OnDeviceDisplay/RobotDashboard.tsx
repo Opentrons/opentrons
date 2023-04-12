@@ -51,12 +51,7 @@ export function RobotDashboard(): JSX.Element {
   console.table(sortedProtocols)
 
   return (
-    <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-      flexDirection={DIRECTION_COLUMN}
-    >
+    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {sortProtocols.length === 0 ? (
