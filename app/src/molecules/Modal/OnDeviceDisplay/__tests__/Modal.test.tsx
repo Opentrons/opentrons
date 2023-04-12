@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ModalHeader } from '../ModalHeader'
 import { Modal } from '../Modal'
 
@@ -44,5 +44,20 @@ describe('Modal', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('children')
     getByLabelText('modal_small')
+  })
+  it('presses the background overlay and calls onoutsideClick', () => {
+    const { getByLabelText } = render(props)
+    getByLabelText('BackgroundOverlay').click()
+    expect(props.onOutsideClick).toHaveBeenCalled()
+  })
+  it('renders red background when isError is true', () => {
+    props = {
+      ...props,
+      isError: true,
+    }
+    const { getByLabelText } = render(props)
+    expect(getByLabelText('modal_medium')).toHaveStyle(
+      `backgroundColor: ${COLORS.red_two}`
+    )
   })
 })
