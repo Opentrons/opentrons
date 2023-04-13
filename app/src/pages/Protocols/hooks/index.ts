@@ -90,7 +90,7 @@ export const useMissingProtocolHardware = (
   protocolId: string
 ): ProtocolHardware[] => {
   const requiredProtocolHardware = useRequiredProtocolHardware(protocolId)
-  return requiredProtocolHardware.filter(hardware => {
-    hardware.connected === true
-  })
+  return requiredProtocolHardware.filter(
+    hardware => hardware.connected === false
+  )
 }
