@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   LabwareRender,
@@ -11,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -143,6 +145,11 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        css={css`
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            margin-top: 0;
+          }
+        `}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
         <PrimaryButton onClick={props.confirmPlacement}>
