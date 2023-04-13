@@ -1,3 +1,5 @@
+export * from './ConfirmCancelRunModal'
 export * from './CurrentRunningProtocolCommand'
+export * from './RunFailedModal'
 export * from './RunningProtocolCommandList'
 export * from './RunningProtocolSkeleton'

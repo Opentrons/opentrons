@@ -29,5 +29,7 @@
     "partialTipSupported": false,
     "availableConfigurations": null
   },
-  "channels": 1
+  "channels": 1,
+  "shaftDiameter": 1.0,
+  "shaftULperMM": 0.785
 }

@@ -7,7 +7,6 @@ import {
   BORDERS,
   Btn,
   Flex,
-  styleProps,
   Icon,
   DIRECTION_ROW,
 } from '@opentrons/components'
@@ -37,18 +36,14 @@ interface SmallButtonProps extends StyleProps {
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
   const {
-    onClick,
     buttonType,
     buttonText,
     buttonCategory = 'default',
     disabled,
     iconPlacement,
     iconName,
+    ...buttonProps
   } = props
-  const buttonProps = {
-    onClick,
-    disabled,
-  }
 
   const SMALL_BUTTON_PROPS_BY_TYPE: Record<
     SmallButtonTypes,
@@ -107,10 +102,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       : BORDERS.size_four};
     box-shadow: none;
     padding: ${SPACING.spacing4} ${SPACING.spacing5};
-    text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
-    ${styleProps}
     &:focus {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
@@ -143,9 +136,10 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
   return (
     <Btn
-      {...buttonProps}
       css={SMALL_BUTTON_STYLE}
       aria-label={`SmallButton_${buttonType}`}
+      disabled={disabled}
+      {...buttonProps}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

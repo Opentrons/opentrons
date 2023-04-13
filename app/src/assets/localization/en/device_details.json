@@ -131,5 +131,7 @@
   "missing_module_plural": "missing {{num}} modules",
   "missing_pipette": "missing {{num}} pipette",
   "missing_pipettes_plural": "missing {{num}} pipettes",
-  "missing_both": "missing {{numMod}} module(s) and {{numPip}} pipette(s)"
+  "missing_both": "missing {{numMod}} module(s) and {{numPip}} pipette(s)",
+  "have_not_run": "No recent runs",
+  "have_not_run_description": "After you run some protocols, they will appear here."
 }
