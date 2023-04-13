@@ -343,26 +343,42 @@ class ModuleDefinition(BaseModel):
     """Module definition class."""
 
     otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
+
     moduleType: ModuleType = Field(
         ...,
         description="Module type (Temperature/Magnetic/Thermocycler)",
     )
+
     model: ModuleModel = Field(..., description="Model name of the module")
+
     labwareOffset: LabwareOffsetVector = Field(
         ...,
         description="Labware offset in x, y, z.",
     )
+
     dimensions: ModuleDimensions = Field(..., description="Module dimension")
+
     calibrationPoint: ModuleCalibrationPoint = Field(
         ...,
         description="Calibration point of module.",
     )
+
     displayName: str = Field(..., description="Display name.")
+
     quirks: List[str] = Field(..., description="Module quirks")
+
+    # In releases prior to https://github.com/Opentrons/opentrons/pull/11873 (v6.3.0),
+    # the matrices in slotTransforms were 3x3.
+    # After, they are 4x4, even though there was no schema version bump.
+    #
+    # Because old objects of this class, with the 3x3 matrices, were stored in robot-server's
+    # database, this field needs to stay typed loosely enough to support both sizes.
+    # We can fix this once Jira RSS-221 is resolved.
     slotTransforms: Dict[str, Any] = Field(
         ...,
         description="Dictionary of transforms for each slot.",
     )
+
     compatibleWith: List[ModuleModel] = Field(
         ...,
         description="List of module models this model is compatible with.",
