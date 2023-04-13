@@ -11,7 +11,9 @@ function FlexFormComponent(): JSX.Element {
       <div className={styles.flex_title}>
         <h1>{i18n.t('flex.header.title')}</h1>
         <Link to={'/'}>
-          <SecondaryButton tabIndex={0}>Cancel</SecondaryButton>
+          <SecondaryButton tabIndex={0}>
+            {i18n.t('flex.header.cancel_button')}
+          </SecondaryButton>
         </Link>
       </div>
       <p className={styles.required_fields}>

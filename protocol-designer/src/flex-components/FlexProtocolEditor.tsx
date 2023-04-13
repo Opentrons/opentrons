@@ -11,10 +11,11 @@ import {
 } from '@opentrons/components'
 import { Formik } from 'formik'
 import { i18n } from '../localization'
+import { Modules } from './FlexModules'
+import { FlexPipettes } from './FlexPipettes'
 import { FlexProtocolName } from './FlexProtocolName'
-import styles from './FlexComponents.css'
 import { StyledText } from './StyledText'
-import { RadioSelect } from './RadioSelect'
+import styles from './FlexComponents.css'
 
 const RoundTabs = (props: any): JSX.Element => {
   const { setCurrentTab, currentTab } = props
@@ -55,9 +56,9 @@ const selectComponent = (selectedTab: Number, props: any): any => {
     case 1:
       return <FlexProtocolName formProps={props} />
     case 2:
-      return <PipettesComponent formProps={props} />
+      return <FlexPipettes formProps={props} />
     case 3:
-      return <ModulesComponent />
+      return <Modules formProps={props} />
     default:
       return null
   }
@@ -150,31 +151,6 @@ function FlexProtocolEditorComponent(): JSX.Element {
       </Box>
     </Flex>
   )
-}
-
-const PipettesComponent = ({ formProps }: any): JSX.Element => {
-  const {
-    values: { pipetteSelectionData },
-  } = formProps
-  return (
-    <>
-      <RadioSelect
-        propsData={formProps}
-        pipetteName={'pipetteSelectionData.firstPipette'}
-        pipetteType={pipetteSelectionData.firstPipette}
-      />
-      <br />
-      <RadioSelect
-        propsData={formProps}
-        pipetteName={'pipetteSelectionData.secondPipette'}
-        pipetteType={pipetteSelectionData.secondPipette}
-      />
-    </>
-  )
-}
-
-const ModulesComponent = (): JSX.Element => {
-  return <h1>Modules Component</h1>
 }
 
 export const FlexProtocolEditor = FlexProtocolEditorComponent

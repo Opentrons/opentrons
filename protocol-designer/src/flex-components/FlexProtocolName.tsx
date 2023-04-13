@@ -9,7 +9,7 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
 
   return (
     <>
-      {i18n.t('flex.name_and_description.header')}
+      {i18n.t('flex.name_and_description.heading')}
 
       <FormGroup className={styles.form_group}>
         <label>Protocol Name</label>
