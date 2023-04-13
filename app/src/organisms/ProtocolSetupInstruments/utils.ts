@@ -69,7 +69,6 @@ export function getAreInstrumentsReady(
       loadedPipette,
       attachedInstruments
     )
-    console.log({loadedPipette, attachedInstruments})
     // const calibrationData =
     //   attachedPipetteMatch != null
     //     ? getCalibrationDataForPipetteMatch(
