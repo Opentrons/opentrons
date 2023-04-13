@@ -137,9 +137,9 @@ export function Toast(props: ToastProps): JSX.Element {
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.yellow_two : COLORS.errorEnabled}`,
+      color: `${showODDStyle ? COLORS.yellow_two : COLORS.warningEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.yellow_four : COLORS.errorBackgroundLight
+        showODDStyle ? COLORS.yellow_four : COLORS.warningBackgroundLight
       }`,
     },
   }
