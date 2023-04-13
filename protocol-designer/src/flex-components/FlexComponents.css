@@ -1,7 +1,7 @@
 @import '@opentrons/components';
 
 .pd_landing_page {
-  width: 50%;
+  width: 923px;
   text-align: center;
   margin: 86px auto auto;
 }
@@ -30,7 +30,8 @@
 
 .flex_header {
   position: relative;
-  margin-top: 3rem;
+  width: 923px;
+  margin: 86px auto auto;
 }
 
 .flex_header > * {
@@ -47,6 +48,11 @@
   justify-content: flex-end;
 }
 
+.editor_form {
+  width: 329px;
+  margin: 1rem;
+}
+
 .flex_round_tabs_button_wrapper {
   display: flex;
   justify-content: space-between;
@@ -60,4 +66,35 @@
 .flex_round_tabs_button_50p {
   width: 50%;
   margin: 1rem;
+}
+
+.textarea_input {
+  resize: none;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--c-light-gray);
+  border-radius: var(--bd-radius-form-field);
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  border: none;
+}
+
+.textarea_input:focus {
+  outline: none;
+}
+
+.textarea_input::placeholder {
+  color: var(--c-med-gray);
+}
+
+.textarea_input:focus-within {
+  background-color: var(--c-white);
+  box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
+}
+
+.form_group {
+  margin-bottom: 1rem;
+}
+
+.form_group > * {
+  margin: 0.5rem 0;
 }
