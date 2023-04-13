@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 import json
+import os
 
 from opentrons import __version__
 
@@ -27,6 +28,6 @@ def custom_openapi():
     return app.openapi_schema
 
 app.openapi = custom_openapi
-
+os.makedirs('docs/build', exist_ok=True)
 with open("docs/build/openapi.json", "w") as f:
     json.dump(custom_openapi(), f)
