@@ -1,8 +1,5 @@
 import * as React from 'react'
-
 import { FormGroup, InputField } from '@opentrons/components'
-
-import styles from './FlexComponents.css'
 
 function FlexProtocolNameComponent(formProps: any): JSX.Element {
   const { formProps: props } = formProps
