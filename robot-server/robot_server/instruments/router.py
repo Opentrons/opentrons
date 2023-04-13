@@ -22,6 +22,7 @@ from .instrument_models import (
     MountType,
     PipetteData,
     Pipette,
+    PipetteCalibrationData,
     GripperData,
     Gripper,
     AttachedInstrument,
@@ -34,6 +35,7 @@ instruments_router = APIRouter()
 def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
+        calibration_data = pipette_dict["pipette_offset"]
         return Pipette.construct(
             mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
@@ -43,6 +45,15 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
                 max_volume=pipette_dict["max_volume"],
+                calibratedOffset=PipetteCalibrationData.construct(
+                    offset=Vec3f(
+                        x=calibration_data.offset.x,
+                        y=calibration_data.offset.y,
+                        z=calibration_data.offset.z,
+                    ),
+                    source=calibration_data.source,
+                    last_modified=calibration_data.last_modified,
+                )
             ),
         )
 

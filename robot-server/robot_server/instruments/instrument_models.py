@@ -64,6 +64,14 @@ class GripperCalibrationData(BaseModel):
     last_modified: Optional[datetime] = None
 
 
+class PipetteCalibrationData(BaseModel):
+    """A pipette's calibration data."""
+
+    offset: Vec3f
+    source: SourceType
+    last_modified: Optional[datetime] = None
+
+
 class GripperData(BaseModel):
     """Data from attached gripper."""
 
