@@ -11,6 +11,9 @@ import { RecentProtocolRunCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
+jest.mock('../../../../pages/Protocols/hooks')
+jest.mock('../../../../organisms/Devices/hooks')
+
 const mockProtocolName = 'mockProtocol'
 const mockProtocolId = 'mockProtocolId'
 const mockLastRun = '2023-04-12T21:30:49.124108+00:00'
@@ -70,9 +73,6 @@ describe('RecentProtocolRunCard', () => {
       protocolId: mockProtocolId,
       lastRun: mockLastRun,
     }
-    when(mockUseMissingProtocolHardware)
-      .calledWith(mockProtocolId)
-      .mockReturnValue(mockPipette)
   })
 
   afterEach(() => {
@@ -81,6 +81,7 @@ describe('RecentProtocolRunCard', () => {
   })
 
   it('should render text', () => {
+    mockUseMissingProtocolHardware.mockReturnValue(mockPipette)
     const [{ getByText }] = render(props)
     const lastRunTime = formatDistance(new Date(mockLastRun), new Date(), {
       addSuffix: true,

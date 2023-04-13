@@ -37,7 +37,7 @@ export function RecentProtocolRunCard({
   const isSuccess = missingProtocolHardware.length === 0
 
   console.log(protocolId)
-  console.log(missingProtocolHardware)
+  console.log('missingProtocolHardware', missingProtocolHardware)
   console.log(missingProtocolHardware.length)
 
   const CARD_STYLE = css`
