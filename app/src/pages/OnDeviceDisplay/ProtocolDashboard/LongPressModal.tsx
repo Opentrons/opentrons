@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -11,7 +12,6 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -22,6 +22,7 @@ import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
@@ -37,6 +38,7 @@ export function LongPressModal(props: {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const { makeSnackbar } = useToaster()
 
   const pinned = pinnedProtocolIds.includes(protocol.id)
 
@@ -79,10 +81,12 @@ export function LongPressModal(props: {
       } else {
         pinnedProtocolIds.push(protocol.id)
         handlePinnedProtocolIds(pinnedProtocolIds)
+        makeSnackbar(t('pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocol.id)
       handlePinnedProtocolIds(pinnedProtocolIds)
+      makeSnackbar(t('unpinned_protocol'))
     }
   }
 

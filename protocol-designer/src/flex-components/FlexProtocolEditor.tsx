@@ -16,7 +16,7 @@ import styles from './FlexComponents.css'
 import { StyledText } from './StyledText'
 import { RadioSelect } from './RadioSelect'
 
-const RoundTabs = (props: any) => {
+const RoundTabs = (props: any): JSX.Element => {
   const { setCurrentTab, currentTab } = props
   const tabs = [
     {
@@ -42,7 +42,7 @@ const RoundTabs = (props: any) => {
             isCurrent={currentTab === id}
             onClick={() => setCurrentTab(id)}
           >
-            <StyledText as="h1">{name}</StyledText>
+            <StyledText>{name}</StyledText>
           </RoundTab>
         )
       })}
@@ -50,7 +50,7 @@ const RoundTabs = (props: any) => {
   )
 }
 
-const selectComponent = (selectedTab: Number, props: any) => {
+const selectComponent = (selectedTab: Number, props: any): any => {
   switch (selectedTab) {
     case 1:
       return <FlexProtocolName formProps={props} />
@@ -66,12 +66,12 @@ const selectComponent = (selectedTab: Number, props: any) => {
 function FlexProtocolEditorComponent(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(1)
 
-  const handleNext = (selectedTab: number) => {
+  const handleNext = (selectedTab: number): any => {
     const setTabNumber =
       selectedTab > 0 && selectedTab < 3 ? selectedTab + 1 : selectedTab
     setTab(setTabNumber)
   }
-  const handlePrevious = (selectedTab: number) => {
+  const handlePrevious = (selectedTab: number): any => {
     const setTabNumber =
       selectedTab > 1 && selectedTab <= 3 ? selectedTab - 1 : selectedTab
     setTab(setTabNumber)
@@ -121,10 +121,13 @@ function FlexProtocolEditorComponent(): JSX.Element {
           >
             {(props: any) => (
               <form onSubmit={props.handleSubmit}>
-                {selectComponent(selectedTab, props)}
+                <section className={styles.editor_form}>
+                  {selectComponent(selectedTab, props)}
+                </section>
                 <div className={styles.flex_round_tabs_button_wrapper}>
                   {selectedTab !== 1 && (
                     <NewPrimaryBtn
+                      tabIndex={5}
                       onClick={() => handlePrevious(selectedTab)}
                       className={styles.flex_round_tabs_button_50p}
                     >
@@ -132,6 +135,7 @@ function FlexProtocolEditorComponent(): JSX.Element {
                     </NewPrimaryBtn>
                   )}
                   <NewPrimaryBtn
+                    tabIndex={4}
                     type="submit"
                     onClick={() => handleNext(selectedTab)}
                     className={
@@ -163,7 +167,7 @@ const PipettesComponent = ({ formProps }: any) => {
   )
 }
 
-const ModulesComponent = () => {
+const ModulesComponent = (): JSX.Element => {
   return <h1>Modules Component</h1>
 }
 

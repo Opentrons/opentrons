@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import * as React from 'react'
 import { FormGroup, InputField } from '@opentrons/components'
 
@@ -6,7 +7,8 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
 
   return (
     <>
-      <FormGroup label="Protocol Name">
+      <FormGroup className={styles.form_group}>
+        <label>Protocol Name</label>
         <InputField
           autoFocus
           tabIndex={1}
@@ -17,10 +19,12 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
           name="fields.pndName"
         />
       </FormGroup>
-      <small>supporting text about any error handling goes here.</small>
+      {/* <small>supporting text about any error handling goes here.</small> */}
 
-      <FormGroup label="Organization/Author">
+      <FormGroup className={styles.form_group}>
+        <label>Organization/Author</label>
         <InputField
+          tabIndex={2}
           type="text"
           onChange={props.handleChange}
           onBlur={props.handleBlur}
@@ -28,19 +32,21 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
           name="fields.pndOrgAuthor"
         />
       </FormGroup>
-      <small>supporting text about any error handling goes here.</small>
+      {/* <small>supporting text about any error handling goes here.</small> */}
 
-      <FormGroup label="Description">
+      <FormGroup className={styles.form_group}>
+        <label>Description</label>
         <textarea
+          tabIndex={3}
+          className={styles.textarea_input}
           rows={4}
-          cols={195}
           onChange={props.handleChange}
           onBlur={props.handleBlur}
           value={props.values.fields.pndDescription}
           name="fields.pndDescription"
         />
       </FormGroup>
-      <small>supporting text about any error handling goes here.</small>
+      {/* <small>supporting text about any error handling goes here.</small> */}
     </>
   )
 }
