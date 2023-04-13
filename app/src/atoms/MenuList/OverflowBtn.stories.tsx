@@ -14,4 +14,5 @@ const Template: Story<React.ComponentProps<typeof OverflowBtn>> = args => (
 export const Basic = Template.bind({})
 Basic.args = {
   title: 'overflow btn with all the states',
+  isOnDevice: false,
 }

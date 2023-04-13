@@ -1,61 +1,90 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Btn, COLORS, SPACING } from '@opentrons/components'
+import { Btn, COLORS, Icon, SPACING } from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE } from '../buttons/OnDeviceDisplay/constants'
 
-const overflowButtonStyles = css`
-  border-radius: ${SPACING.spacing2};
-  max-height: ${SPACING.spacing6};
-
-  &:hover {
-    background-color: ${COLORS.lightGreyHover};
-  }
-  &:hover circle {
-    fill: ${COLORS.darkGreyHover};
-  }
-
-  &:active,
-  &:focus {
-    background-color: ${COLORS.lightGreyPressed};
-  }
-
-  &:active circle,
-  &:focus circle {
-    fill: ${COLORS.darkGreyPressed};
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
-    // focus-visible takes over focus background-color tried focus-only but didn't work
-    background-color: transparent;
-  }
-
-  &:focus-visible circle {
-    fill: ${COLORS.darkGreyHover};
-  }
-
-  &:disabled circle {
-    fill: ${COLORS.successDisabled};
-  }
-  &:disabled {
-    background-color: transparent;
-  }
-`
-
+interface OverflowBtnProps extends React.ComponentProps<typeof Btn> {
+  isOnDevice?: boolean
+}
+//  TODO(jr 4/13/23): should probably move this component to atoms/buttons
 export const OverflowBtn = React.forwardRef(
-  (props: React.ComponentProps<typeof Btn>, ref): JSX.Element | null => (
-    <Btn css={overflowButtonStyles} {...props} ref={ref}>
-      <svg
-        width="19"
-        height="31"
-        viewBox="0 0 19 31"
-        fill={COLORS.darkGreyEnabled}
-        xmlns="http://www.w3.org/2000/svg"
+  (
+    props: OverflowBtnProps,
+    ref: React.ForwardedRef<HTMLInputElement>
+  ): JSX.Element => {
+    return (
+      <Btn
+        css={css`
+          border-radius: ${SPACING.spacing2};
+          max-height: ${props.isOnDevice ? '100%' : SPACING.spacing6};
+
+          &:hover {
+            background-color: ${props.isOnDevice
+              ? COLORS.darkBlack_twenty
+              : COLORS.lightGreyHover};
+          }
+          &:hover circle {
+            fill: ${COLORS.darkBlackEnabled};
+          }
+
+          &:active,
+          &:focus {
+            background-color: ${props.isOnDevice
+              ? COLORS.darkBlack_twenty
+              : COLORS.lightGreyPressed};
+          }
+
+          &:active circle,
+          &:focus circle {
+            fill: ${COLORS.darkGreyPressed};
+          }
+
+          &:focus-visible {
+            box-shadow: ${props.isOnDevice
+              ? ODD_FOCUS_VISIBLE
+              : `0 0 0 3px ${COLORS.warningEnabled}`};
+            background-color: ${props.isOnDevice
+              ? COLORS.darkBlack_twenty
+              : 'transparent'};
+          }
+
+          &:focus-visible circle {
+            fill: ${COLORS.darkGreyHover};
+          }
+
+          &:disabled circle {
+            fill: ${COLORS.successDisabled};
+          }
+          &:disabled {
+            background-color: transparent;
+          }
+        `}
+        {...props}
+        ref={ref}
       >
-        <circle cx="9.5" cy="9.5" r="1.5" />
-        <circle cx="9.5" cy="15.5" r="1.5" />
-        <circle cx="9.5" cy="21.5" r="1.5" />
-      </svg>
-      {props.children}
-    </Btn>
-  )
+        {Boolean(props.isOnDevice) ? (
+          <Icon
+            name="overflow-btn-touchscreen"
+            height="48.23px"
+            width="40px"
+            color={COLORS.darkBlack_seventy}
+            aria-label="OverflowBtn_OnDeviceDisplay_icon"
+          />
+        ) : (
+          <svg
+            width="19"
+            height="31"
+            viewBox="0 0 19 31"
+            fill={COLORS.darkGreyEnabled}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="9.5" cy="9.5" r="1.5" />
+            <circle cx="9.5" cy="15.5" r="1.5" />
+            <circle cx="9.5" cy="21.5" r="1.5" />
+          </svg>
+        )}
+        {props?.children != null ? props.Children : null}
+      </Btn>
+    )
+  }
 )
