@@ -1,12 +1,13 @@
+import { render, screen } from '@testing-library/react'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import {
   mockAttachedPipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
 import { getIsGantryEmpty, getPipetteAnimations } from '../utils'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { FLOWS, SECTIONS } from '../constants'
-import { render, screen } from '@testing-library/react'
+
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const mockPipette: AttachedPipette = {
   ...mockAttachedPipette,
