@@ -37,7 +37,6 @@ Moving 100 µL from one well to another:
             source = plate['A1'],
             dest = plate['B1'])
 
-
 This accomplishes the same thing as the following basic commands:
 
 .. code-block:: python
@@ -95,9 +94,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
         # range() starts at 0 and stops before 8, creating a range of 0-7
         for i in range(8):
             p300.distribute(
-                volume = 200,
-                source = reservoir.wells()[i],
-                dest = plate.rows()[i])
+                volume = 200, source = reservoir.wells()[i], dest = plate.rows()[i])
 
 ******************************
 
@@ -115,18 +112,24 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
+        tiprack_1 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 2)
+        reservoir = protocol.load_labware(
+            load_name = 'usascientific_12_reservoir_22ml', location = 4)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks=[tiprack_1])
 
         p300.pick_up_tip()
 
         for well in reservoir.wells()[:4]:
-            p300.aspirate(35, well)
-            p300.air_gap(10)
+            p300.aspirate(volume = 35, location = well)
+            p300.air_gap(volume = 10)
         
-        p300.dispense(225, plate['A1'])
+        p300.dispense(volume = 225, location = plate['A1'])
 
         p300.return_tip()
 
@@ -146,12 +149,22 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1, tiprack_2])
-        p300.distribute(50, reservoir['A12'], plate.wells())  # dilutent
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
+        tiprack_1 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 2)
+        tiprack_2 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 3)
+        reservoir = protocol.load_labware(
+            load_name = 'usascientific_12_reservoir_22ml', location = 4)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right',
+            tip_racks=[tiprack_1, tiprack_2])
+        p300.distribute(
+            volume = 50,
+            source = reservoir['A12'],
+            dest = plate.wells()) # dilutent
 
         # loop through each row
         for i in range(8):
@@ -161,12 +174,12 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
             row = plate.rows()[i]
 
             # transfer 30uL of source to first well in column
-            p300.transfer(30, source, row[0], mix_after=(3, 25))
+            p300.transfer(
+                volume = 30, source = source, dest = row[0], mix_after = (3, 25))
 
             # dilute the sample down the column
             p300.transfer(
-                30, row[:11], row[1:],
-                mix_after=(3, 25))
+                volume = 30, source = row[:11], dest = row[1:], mix_after = (3, 25))
 
 ******************************
 
@@ -184,11 +197,18 @@ This example deposits various volumes of liquids into the same plate of wells an
     metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
-        tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-        tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-        reservoir = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
-        p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1, tiprack_2])
+        plate = protocol.load_labware(
+            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
+        tiprack_1 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 2)
+        tiprack_2 = protocol.load_labware(
+            load_name = 'opentrons_96_tiprack_300ul', location = 3)
+        reservoir = protocol.load_labware(
+            load_name = 'usascientific_12_reservoir_22ml', location = 4)
+        p300 = protocol.load_instrument(
+            instrument_name = 'p300_single',
+            mount = 'right', 
+            tip_racks=[tiprack_1, tiprack_2])
 
         # these uL values were created randomly for this example
         water_volumes = [
@@ -206,4 +226,5 @@ This example deposits various volumes of liquids into the same plate of wells an
             89, 90, 91, 92, 93, 94, 95, 96
           ]
 
-        p300.distribute(water_volumes, reservoir['A12'], plate.wells())
+        p300.distribute(
+            volume = water_volumes, source = reservoir['A12'], dest = plate.wells())
