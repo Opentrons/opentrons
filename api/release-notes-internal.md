@@ -29,7 +29,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot or restart the robot server
 - Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
 - Labware pick up failure with gripper
-- Cancelling a protocol might hang - fix is to restart
 
 ## Reasonably Sized New Things
 ### ODD
@@ -39,6 +38,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ### Robot Control
 - Motion configuration fixes from harware testing
 - Module calibration exists in the protocol engine; you can use a script to run it with any pipette for any module. The data will be saved for inspection, but will not be loaded during protocols.
+- Cancelling a run should work now. It should no longer stay in "stop requested" forever and require a restart.
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
