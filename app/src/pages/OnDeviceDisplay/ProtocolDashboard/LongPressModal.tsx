@@ -146,7 +146,7 @@ export function LongPressModal(props: {
               padding={SPACING.spacing5}
               onClick={handlePinClick}
             >
-              <Icon name="push-pin" size="1.875rem" color={COLORS.black} />
+              <Icon name="pin" size="1.875rem" color={COLORS.black} />
               <StyledText
                 fontSize="1.375rem"
                 lineHeight="1.5rem"

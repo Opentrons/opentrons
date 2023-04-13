@@ -94,6 +94,7 @@ const ProtocolHeader = (props: {
             fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
             lineHeight={TYPOGRAPHY.lineHeight48}
             onClick={toggleTruncate}
+            overflowWrap="anywhere"
           >
             {displayedTitle}
           </StyledText>
@@ -330,19 +331,19 @@ export function ProtocolDetails(): JSX.Element | null {
               : t('protocol_info:pin_protocol')
           }
           buttonType="secondary"
-          iconName="push-pin"
+          iconName="pin"
           onClick={handlePinClick}
-          width="30.375rem"
+          width="29.25rem"
         />
         <MediumButton
           buttonText={t('protocol_info:delete_protocol')}
           buttonType="alertSecondary"
-          iconName="delete"
+          iconName="trash"
           onClick={() => {
             deleteProtocol()
             history.goBack()
           }}
-          width="30.375rem"
+          width="29.25rem"
         />
       </Flex>
     </Flex>
