@@ -1,6 +1,8 @@
 """Instruments routes."""
+import asyncio
 from datetime import datetime
 from typing import Optional, List, Dict
+from typing_extensions import Final
 
 from fastapi import APIRouter, status, Depends
 from typing_extensions import Literal
@@ -25,6 +27,7 @@ from opentrons.types import Mount
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import UpdateState
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
@@ -39,9 +42,14 @@ from .instrument_models import (
     UpdateCreate,
     UpdateProgressData,
 )
-from .update_progress_monitor import (
-    UpdateProgressMonitor,
-    UpdateIdNotFound,
+from .firmware_update_manager import (
+    FirmwareUpdateManager,
+    UpdateIdNotFound as _UpdateIdNotFound,
+    UpdateIdExists as _UpdateIdExists,
+    UpdateFailed as _UpdateFailed,
+    InstrumentNotFound as _InstrumentNotFound,
+    UpdateInProgress as _UpdateInProgress,
+    UpdateProcessHandle,
 )
 from ..errors import ErrorDetails, ErrorBody
 from ..errors.global_errors import IDNotFound
@@ -51,24 +59,33 @@ from ..service.task_runner import TaskRunner, get_task_runner
 
 instruments_router = APIRouter()
 
-_update_monitor_accessor = AppStateAccessor[UpdateProgressMonitor](
-    "update_progress_monitor"
+_firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
+    "firmware_update_manager"
 )
 
-_UPDATE_STATUS_GETTER_TIMEOUT = 5  # seconds
+UPDATE_CREATE_TIMEOUT_S: Final = 5
 
 
-async def get_update_progress_monitor(
+async def get_firmware_update_manager(
     app_state: AppState = Depends(get_app_state),
     hardware_api: HardwareControlAPI = Depends(get_hardware),
-) -> UpdateProgressMonitor:
-    """Get an 'UpdateProgressMonitor' to track firmware update statuses."""
-    update_progress_monitor = _update_monitor_accessor.get_from(app_state)
+    task_runner: TaskRunner = Depends(get_task_runner),
+) -> FirmwareUpdateManager:
+    """Get an update manager to track firmware update statuses."""
+    update_manager = _firmware_update_manager_accessor.get_from(app_state)
 
-    if update_progress_monitor is None:
-        update_progress_monitor = UpdateProgressMonitor(hardware_api=hardware_api)
-        _update_monitor_accessor.set_on(app_state, update_progress_monitor)
-    return update_progress_monitor
+    if update_manager is None:
+        try:
+            ot3_hardware = ensure_ot3_hardware(hardware_api=hardware_api)
+        except HardwareNotSupportedError as e:
+            raise NotSupportedOnOT2(detail=str(e)).as_error(
+                status.HTTP_403_FORBIDDEN
+            ) from e
+        update_manager = FirmwareUpdateManager(
+            task_runner=task_runner, hw_handle=ot3_hardware
+        )
+        _firmware_update_manager_accessor.set_on(app_state, update_manager)
+    return update_manager
 
 
 class NoUpdateAvailable(ErrorDetails):
@@ -85,14 +102,18 @@ class UpdateInProgress(ErrorDetails):
     title: str = "An update is already in progress."
 
 
-class UpdateInfoNotFound(ErrorDetails):
-    """Error raised when there was no update progress information found."""
+class TimeoutStartingUpdate(ErrorDetails):
+    """Error raised when the update took too long to start."""
 
-    id: Literal["UpdateInfoNotFound"] = "UpdateInfoNotFound"
-    title: str = (
-        "No update progress info received from hardware control. "
-        "Cannot guarantee a successful update."
-    )
+    id: Literal["TimeoutStartingUpdate"] = "TimeoutStartingUpdate"
+    title: str = "Timeout Starting Update"
+
+
+class FirmwareUpdateFailed(ErrorDetails):
+    """An error if a firmware update failed for some reason."""
+
+    id: Literal["FirmwareUpdateFailed"] = "FirmwareUpdateFailed"
+    title: str = "Firmware Update Failed"
 
 
 def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pipette:
@@ -183,6 +204,29 @@ async def get_attached_instruments(
     )
 
 
+async def _create_and_remove_if_error(
+    manager: FirmwareUpdateManager,
+    update_id: str,
+    mount: OT3Mount,
+    created_at: datetime,
+    timeout: float,
+) -> ProcessSummary:
+    try:
+        handle = await manager.start_update_process(
+            update_process_id,
+            ot3_mount,
+            created_at,
+            UPDATE_CREATE_TIMEOUT_S,
+        )
+        return await handle.get_process_summary()
+    except Exception:
+        try:
+            await manager.complete_update_process(update_process_id)
+        except Exception:
+            pass
+        raise
+
+
 @instruments_router.post(
     path="/instruments/updates",
     summary="Initiate a firmware update on a specific instrument.",
@@ -194,6 +238,9 @@ async def get_attached_instruments(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[InstrumentNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[UpdateInProgress]},
         status.HTTP_412_PRECONDITION_FAILED: {"model": ErrorBody[NoUpdateAvailable]},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorBody[FirmwareUpdateFailed]
+        },
     },
 )
 async def update_firmware(
@@ -201,9 +248,8 @@ async def update_firmware(
     update_process_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     hardware: HardwareControlAPI = Depends(get_hardware),
-    task_runner: TaskRunner = Depends(get_task_runner),
-    update_progress_monitor: UpdateProgressMonitor = Depends(
-        get_update_progress_monitor
+    firmware_update_manager: FirmwareUpdateManager = Depends(
+        get_firmware_update_manager
     ),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Update the firmware of the OT3 instrument on the specified mount.
@@ -217,52 +263,47 @@ async def update_firmware(
         task_runner: Background task runner.
         update_progress_monitor: Update progress monitoring utility.
     """
-    try:
-        ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
-    except HardwareNotSupportedError as e:
-        raise NotSupportedOnOT2(detail=str(e)).as_error(
-            status.HTTP_403_FORBIDDEN
-        ) from e
 
     mount_to_update = request_body.data.mount
     ot3_mount = MountType.to_ot3_mount(mount_to_update)
-
     await hardware.cache_instruments()
-    attached_instrument = ot3_hardware.get_all_attached_instr()[ot3_mount]
-    if not attached_instrument:
+
+    try:
+        summary = await _create_and_remove_if_error(
+            firmware_update_manager,
+            update_process_id,
+            ot3_mount,
+            created_at,
+            UPDATE_CREATE_TIMEOUT_S,
+        )
+    except _InstrumentNotFound:
         raise InstrumentNotFound(
             detail=f"No instrument found on {mount_to_update} mount."
         ).as_error(status.HTTP_404_NOT_FOUND)
-
-    if ot3_hardware.get_firmware_update_progress().get(ot3_mount):
+    except _UpdateInProgress:
         raise UpdateInProgress(
             detail=f"{mount_to_update} is already either queued for update"
             f" or is currently updating"
         ).as_error(status.HTTP_409_CONFLICT)
-
-    # The hardware controller skips the update if the instrument is already up-to-date.
-    # So a wrong mount could end up confusing a client since there won't be any
-    # clear indication that it's wrong.
-    if not attached_instrument["fw_update_required"]:
-        raise NoUpdateAvailable(
-            detail=f"There is no update available for mount {mount_to_update}"
-        ).as_error(status.HTTP_412_PRECONDITION_FAILED)
-
-    task_runner.run(ot3_hardware.update_instrument_firmware, mount=ot3_mount)
-
-    try:
-        update_response = await update_progress_monitor.create(
-            update_id=update_process_id,
-            created_at=created_at,
-            mount=mount_to_update,
+    except _UpdateFailed as e:
+        raise FirmwareUpdateFailed(detail=str(e)).as_error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     except TimeoutError as e:
-        raise UpdateInfoNotFound(detail=str(e)).as_error(
+        raise TimeoutStartingUpdate(detail=str(e)).as_error(
             status.HTTP_408_REQUEST_TIMEOUT
         )
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=update_response),
+        content=SimpleBody.construct(
+            data=UpdateProgressData(
+                id=summary.details.update_id,
+                createdAt=summary.details.created_at,
+                mount=summary.details.mount,
+                updateStatus=summary.progress.state,
+                updateProgress=summary.progress.progress,
+            )
+        ),
         status_code=status.HTTP_201_CREATED,
     )
 
@@ -274,21 +315,45 @@ async def update_firmware(
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[IDNotFound]},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorBody[FirmwareUpdateFailed]
+        },
     },
 )
 async def get_firmware_update_status(
     update_id: str,
-    update_progress_monitor: UpdateProgressMonitor = Depends(
-        get_update_progress_monitor
+    firmware_update_manager: FirmwareUpdateManager = Depends(
+        get_firmware_update_manager
     ),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     """Get status of instrument firmware update."""
     try:
-        update_response = update_progress_monitor.get_progress_status(update_id)
-    except UpdateIdNotFound as e:
+        handle = firmware_update_manager.get_update_process_handle(update_id)
+        summary = await handle.get_process_summary()
+    except _UpdateIdNotFound as e:
         raise IDNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
+    except _UpdateFailed as e:
+        raise FirmwareUpdateFailed(detail=str(e)).as_error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    if summary.progress.state == UpdateState.done:
+        try:
+            await firmware_update_manager.complete_update_process(update_id)
+        except _UpdateIdNotFound:
+            # this access could theoretically race, and that's fine if we already got
+            # here.
+            pass
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=update_response),
+        content=SimpleBody.construct(
+            data=UpdateProgressData(
+                id=summary.details.update_id,
+                createdAt=summary.details.created_at,
+                mount=summary.details.mount,
+                updateStatus=summary.progress.state,
+                updateProgress=summary.progress.progress,
+            )
+        ),
         status_code=status.HTTP_200_OK,
     )

@@ -62,7 +62,6 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
     axis_convert,
-    mount_from_subsystem,
     sub_system_to_node_id,
     subsystem_from_mount,
 )
@@ -415,42 +414,29 @@ class OT3API(
                 pipette_subtypes[mount] = PipetteSubType.from_channels(pipette.channels)
         return pipette_subtypes
 
-    def get_firmware_update_progress(self) -> Dict[OT3Mount, InstrumentUpdateStatus]:
-        """Get the update progress for instruments currently updating."""
-        progress_updates: Dict[OT3Mount, InstrumentUpdateStatus] = {}
-        instruments = {
-            OT3SubSystem.pipette_left,
-            OT3SubSystem.pipette_right,
-            OT3SubSystem.gripper,
+    def get_firmware_update_progress(
+        self,
+    ) -> Dict[OT3SubSystem, UpdateStatus]:
+        """Get the update progress for all devices currently updating."""
+        return {
+            update.subsystem: update for update in self._backend.get_update_progress()
         }
-        for update_status in self._backend.get_update_progress():
-            # we only want instruments, this will drop core substystems
-            if update_status.subsystem in instruments:
-                mount = mount_from_subsystem(update_status.subsystem)
-                state = update_status.state
-                progress = update_status.progress
-                if not progress_updates.get(mount):
-                    progress_updates[mount] = InstrumentUpdateStatus(
-                        mount, state, progress
-                    )
-                progress_updates[mount].update(state, progress)
-        return progress_updates
 
     async def update_instrument_firmware(
-        self, mount: Optional[OT3Mount] = None
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+        self, mount: OT3Mount
+    ) -> AsyncIterator[InstrumentUpdateStatus]:
         """Update the firmware on one or all instruments."""
         # check that mount is actually attached
         # TODO (ba, 2023-03-03) get_attached_instruments should probably return gripper as well, for now just add it
         attached_instruments = self._pipette_handler.get_attached_instruments()
         attached_instruments[OT3Mount.GRIPPER] = self.attached_gripper  # type: ignore
         if mount and not attached_instruments.get(mount):
-            mod_log.debug(f"Can't update instrument, mount {mount} is not attached.")
+            mod_log.warn(f"Can't update instrument, mount {mount} is not attached.")
             return
-        mounts = {mount} if mount else set(attached_instruments)
-        subsystems = {subsystem_from_mount(mount) for mount in mounts}
-        async for update_status in self.update_firmware(subsystems):
-            yield update_status
+        subsystem = subsystem_from_mount(mount)
+        async for update_status in self.update_firmware({subsystem}):
+            status = update_status.pop()
+            yield InstrumentUpdateStatus(mount, status.state, status.progress)
 
     async def update_firmware(
         self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False

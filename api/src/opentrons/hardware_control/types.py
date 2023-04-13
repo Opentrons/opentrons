@@ -2,7 +2,6 @@ import enum
 import logging
 from dataclasses import dataclass
 from typing import (
-    NamedTuple,
     Optional,
     cast,
     Tuple,
@@ -330,24 +329,21 @@ class UpdateState(enum.Enum):
         return self.value
 
 
-class UpdateStatus(NamedTuple):
+@dataclass(frozen=True)
+class UpdateStatus:
     subsystem: OT3SubSystem
     state: UpdateState
     progress: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class InstrumentUpdateStatus:
     mount: OT3Mount
     status: UpdateState
     progress: int
 
-    def update(self, status: UpdateState, progress: int) -> None:
-        self.status = status
-        self.progress = progress
 
-
-@dataclass
+@dataclass(frozen=True)
 class InstrumentFWInfo:
     mount: OT3Mount
     update_required: bool

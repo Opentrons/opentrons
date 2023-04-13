@@ -45,21 +45,26 @@ from robot_server.instruments.router import (
     get_attached_instruments,
     update_firmware,
     get_firmware_update_status,
-    get_update_progress_monitor,
+    get_firmware_update_manager,
+    UPDATE_CREATE_TIMEOUT_S,
 )
-from robot_server.instruments.update_progress_monitor import (
-    UpdateProgressMonitor,
+from robot_server.instruments.firmware_update_manager import (
+    FirmwareUpdateManager,
     UpdateIdNotFound,
+    UpdateProcessHandle,
+    UpdateProcessSummary,
+    UpdateProgress,
+    ProcessDetails,
+    InstrumentNotFound,
+    UpdateInProgress,
+    UpdateFailed,
 )
 from robot_server.service.json_api import RequestModel
 from robot_server.service.task_runner import TaskRunner
 
+
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
-
-
-# TODO (spp, 2022-01-17): remove xfail once robot server CI test flow is set up to handle
-#  OT2 vs OT3 tests correctly
 
 
 @pytest.fixture()
@@ -75,9 +80,9 @@ def task_runner(decoy: Decoy) -> TaskRunner:
 
 
 @pytest.fixture
-def update_progress_monitor(decoy: Decoy) -> UpdateProgressMonitor:
+def firmware_update_manager(decoy: Decoy) -> FirmwareUpdateManager:
     """Get a mock UpdateProgressMonitor."""
-    return decoy.mock(cls=UpdateProgressMonitor)
+    return decoy.mock(cls=FirmwareUpdateManager)
 
 
 def get_sample_pipette_dict(
@@ -116,7 +121,6 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
         return None  # type: ignore[return-value]
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_instruments_empty(
     decoy: Decoy,
@@ -130,7 +134,6 @@ async def test_get_instruments_empty(
     assert result.status_code == 200
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
@@ -299,67 +302,69 @@ async def test_get_ot2_instruments(
     ]
 
 
-@pytest.mark.xfail
+def get_good_start_status(
+    mount: OT3Mount, update_id: str, created: datetime
+) -> UpdateProcessSummary:
+    return UpdateProcessSummary(
+        details=ProcessDetails(created_at=created, mount=mount, update_id=update_id),
+        progress=UpdateProgress(state=UpdateState.updating, progress=10),
+    )
+
+
+async def decoy_ok_fw_update_start(
+    decoy: Decoy,
+    firmware_update_manager: FirmwareUpdateManager,
+    update_id: str,
+    mount: OT3Mount,
+    created_at: datetime,
+    start_timeout_s: float,
+    first_summary: UpdateProcessSummary,
+) -> UpdateProcessHandle:
+    uph_decoy = decoy.decoy(spec=UpdateProcessHandle)
+    decoy.when(
+        firmware_update_manager.start_update_process(
+            update_id, mount, created_at, start_timeout_s
+        )
+    ).then_return(uph_decoy)
+    decoy.when(await uph_decoy.get_process_summary()).then_return(first_summary)
+
+
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
+    firmware_update_manager: FirmwareUpdateManager,
     task_runner: TaskRunner,
 ) -> None:
     """It should call hardware control's firmware update method and create update resource."""
     update_id = "update-id"
     update_resource_created_at = datetime(year=2023, month=1, day=1)
-
+    expected_status = get_good_start_status(
+        OT3Mount.LEFT, "update-id", update_resource_created_at
+    )
     expected_update_response = UpdateProgressData(
         id=update_id,
         createdAt=update_resource_created_at,
         mount="left",
-        updateStatus=UpdateState.updating,
-        updateProgress=42,
+        updateStatus=expected_status.progress.state,
+        updateProgress=expected_status.progress.progress,
     )
-
-    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
-        {
-            OT3Mount.LEFT: get_sample_pipette_dict(
-                name="p10_multi",
-                model=PipetteModel("abc"),
-                pipette_id="my-pipette-id",
-                fw_update_required=True,
-            ),
-            OT3Mount.RIGHT: get_sample_pipette_dict(
-                name="p20_multi_gen2",
-                model=PipetteModel("xyz"),
-                pipette_id="my-other-pipette-id",
-                fw_update_required=False,
-            ),
-        }
+    decoy_handle = await decoy_ok_fw_update_start(
+        decoy,
+        firmware_update_manager,
+        update_id,
+        OT3Mount.LEFT,
+        update_resource_created_at,
+        UPDATE_CREATE_TIMEOUT_S,
+        get_good_start_status(OT3Mount.LEFT, update_id, update_resource_created_at),
     )
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-        {  # The other mount is updating but that shouldn't block creation of
-            # the current mount's update resource.
-            OT3Mount.RIGHT: InstrumentUpdateStatus(
-                mount=OT3Mount.RIGHT,
-                status=UpdateState.updating,
-                progress=42,
-            ),
-        }
-    )
-    decoy.when(
-        await update_progress_monitor.create(
-            update_id=update_id,
-            created_at=update_resource_created_at,
-            mount="left",
-        )
-    ).then_return(expected_update_response)
 
     update_result = await update_firmware(
         request_body=RequestModel(data=UpdateCreate(mount="left")),
         update_process_id=update_id,
         created_at=update_resource_created_at,
         hardware=ot3_hardware_api,
-        task_runner=task_runner,
-        update_progress_monitor=update_progress_monitor,
+        firmware_update_manager=firmware_update_manager,
     )
 
     assert update_result.content.data == expected_update_response
@@ -373,36 +378,23 @@ async def test_update_instrument_firmware(
     )
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware_times_out(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
-    task_runner: TaskRunner,
+    firmware_update_manager: FirmwareUpdateManager,
 ) -> None:
     """It should raise an UpdateInfoNotAvailable error when timed out trying to fetch status."""
     update_id = "update-id"
     update_resource_created_at = datetime(year=2023, month=1, day=1)
-
-    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
-        {
-            OT3Mount.LEFT: get_sample_pipette_dict(
-                name="p10_multi",
-                model=PipetteModel("abc"),
-                pipette_id="my-pipette-id",
-                fw_update_required=True,
-            ),
-        }
-    )
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
     decoy.when(
-        await update_progress_monitor.create(
-            update_id=update_id,
-            created_at=update_resource_created_at,
-            mount="left",
+        firmware_update_manager.start_update_process(
+            update_id, mount, created_at, start_timeout_s
         )
-    ).then_raise(TimeoutError("tick tock"))
+    ).then_raise(TimeoutError)
+    decoy.when(
+        firmware_update_manager.complete_update_process("update-id")
+    ).then_return(None)
 
     with pytest.raises(ApiError) as exc_info:
         await update_firmware(
@@ -410,76 +402,49 @@ async def test_update_instrument_firmware_times_out(
             update_process_id=update_id,
             created_at=update_resource_created_at,
             hardware=ot3_hardware_api,
-            task_runner=task_runner,
-            update_progress_monitor=update_progress_monitor,
+            firmware_update_manager=firmware_update_manager,
         )
     assert exc_info.value.status_code == 408
-    assert exc_info.value.content["errors"][0]["id"] == "UpdateInfoNotFound"
+    assert exc_info.value.content["errors"][0]["id"] == "TimeoutStartingUpdate"
+    decoy.verify()
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware_without_instrument(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
-    task_runner: TaskRunner,
+    firmware_update_manager: FirmwareUpdateManager,
 ) -> None:
     """It should raise error when updating a mount with no instrument."""
     update_id = "update-id"
     update_resource_created_at = datetime(year=2023, month=1, day=1)
-    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
-        {
-            OT3Mount.LEFT: cast(InstrumentDict, {}),
-            OT3Mount.RIGHT: cast(InstrumentDict, {}),
-            OT3Mount.GRIPPER: cast(InstrumentDict, {}),
-        }
-    )
 
+    decoy.when(firmware_update_manager.start_update_process(decoy.ANYTHING)).then_raise(
+        InstrumentNotFound
+    )
     with pytest.raises(ApiError) as exc_info:
         await update_firmware(
             request_body=RequestModel(data=UpdateCreate(mount="left")),
             update_process_id=update_id,
             created_at=update_resource_created_at,
             hardware=ot3_hardware_api,
-            task_runner=task_runner,
-            update_progress_monitor=update_progress_monitor,
+            firmware_update_manager=firmware_update_manager,
         )
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "InstrumentNotFound"
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_update_instrument_firmware_with_conflicting_update(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
-    task_runner: TaskRunner,
+    firmware_update_manager: FirmwareUpdateManager,
 ) -> None:
     """It should raise an error when updating an instrument that is already updating."""
     update_id = "update-id"
     update_resource_created_at = datetime(year=2023, month=1, day=1)
-    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
-        {
-            OT3Mount.LEFT: get_sample_pipette_dict(
-                name="p10_multi",
-                model=PipetteModel("abc"),
-                pipette_id="my-pipette-id",
-                fw_update_required=True,
-            ),
-            OT3Mount.RIGHT: None,
-            OT3Mount.GRIPPER: None,
-        }
-    )
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-        {
-            OT3Mount.LEFT: InstrumentUpdateStatus(
-                mount=OT3Mount.LEFT,
-                status=UpdateState.updating,
-                progress=42,
-            ),
-        }
+    decoy.when(firmware_update_manager.start_update_process(decoy.ANYTHING)).then_raise(
+        UpdateInProgress
     )
     with pytest.raises(ApiError) as exc_info:
         await update_firmware(
@@ -487,97 +452,27 @@ async def test_update_instrument_firmware_with_conflicting_update(
             update_process_id=update_id,
             created_at=update_resource_created_at,
             hardware=ot3_hardware_api,
-            task_runner=task_runner,
-            update_progress_monitor=update_progress_monitor,
+            firmware_update_manager=firmware_update_manager,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "UpdateInProgress"
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
-async def test_update_instrument_firmware_without_update_available(
+async def test_update_task_immediate_failure(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
-    task_runner: TaskRunner,
-) -> None:
-    """It should raise an error when updating an instrument that has no update available."""
-    update_id = "update-id"
-    update_resource_created_at = datetime(year=2023, month=1, day=1)
-    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
-        {
-            OT3Mount.LEFT: get_sample_pipette_dict(
-                name="p10_multi",
-                model=PipetteModel("abc"),
-                pipette_id="my-pipette-id",
-                fw_update_required=False,
-            ),
-            OT3Mount.RIGHT: None,
-            OT3Mount.GRIPPER: None,
-        }
-    )
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
-    with pytest.raises(ApiError) as exc_info:
-        await update_firmware(
-            request_body=RequestModel(data=UpdateCreate(mount="left")),
-            update_process_id=update_id,
-            created_at=update_resource_created_at,
-            hardware=ot3_hardware_api,
-            task_runner=task_runner,
-            update_progress_monitor=update_progress_monitor,
-        )
-    assert exc_info.value.status_code == 412
-    assert exc_info.value.content["errors"][0]["id"] == "NoUpdateAvailable"
-
-
-@pytest.mark.xfail
-@pytest.mark.ot3_only
-async def test_update_task_error(
-    decoy: Decoy,
-    ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
-    task_runner: TaskRunner,
+    firmware_update_manager: FirmwareUpdateManager,
 ) -> None:
     """It should call hardware control's firmware update method and create update resource."""
     update_id = "update-id"
     update_resource_created_at = datetime(year=2023, month=1, day=1)
 
-    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
-        {
-            OT3Mount.LEFT: get_sample_pipette_dict(
-                name="p10_multi",
-                model=PipetteModel("abc"),
-                pipette_id="my-pipette-id",
-                fw_update_required=True,
-            ),
-            OT3Mount.RIGHT: get_sample_pipette_dict(
-                name="p20_multi_gen2",
-                model=PipetteModel("xyz"),
-                pipette_id="my-other-pipette-id",
-                fw_update_required=False,
-            ),
-        }
-    )
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-        {
-            OT3Mount.RIGHT: InstrumentUpdateStatus(
-                mount=OT3Mount.RIGHT,
-                status=UpdateState.updating,
-                progress=42,
-            ),
-        }
-    )
-
-    # TODO (spp, 2023-03-06): update this error if/when we add specific exception
-    #  catching if the task errors out.
     decoy.when(
-        task_runner.run(
-            ot3_hardware_api.update_instrument_firmware, mount=OT3Mount.LEFT
-        )
-    ).then_raise(RuntimeError("uh oh"))
+        firmware_update_manager.start_firmware_update(decoy.ANYTHING)
+    ).then_raise(UpdateFailed)
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ApiError):
         await update_firmware(
             request_body=RequestModel(data=UpdateCreate(mount="left")),
             update_process_id=update_id,
@@ -586,14 +481,15 @@ async def test_update_task_error(
             task_runner=task_runner,
             update_progress_monitor=update_progress_monitor,
         )
+    assert exc_info.value.status_code == 500
+    assert exc_info.value.content["errors"][0]["id"] == "FirmwareUpdateFailed"
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_firmware_update_status(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
+    firwmare_update_manager: FirmwareUpdateManager,
 ) -> None:
     """It should get firmware update status of specified update process."""
     expected_response = UpdateProgressData(
@@ -603,46 +499,56 @@ async def test_get_firmware_update_status(
         updateStatus=UpdateState.done,
         updateProgress=123,
     )
+    handle = decoy.Decoy(spec=UpdateProcessHandle)
 
-    decoy.when(update_progress_monitor.get_progress_status("update-id")).then_return(
-        expected_response
+    decoy.when(
+        firmware_update_manager.get_update_process_handle("shiny-new-update-id")
+    ).then_return(handle)
+    decoy.when(await handle.get_process_summary()).then_return(
+        UpdateProcessSummary(
+            details=ProcessDetails(
+                created_at=datetime(year=3000, month=12, day=1),
+                mount=OT3Mount.GRIPPER,
+                update_id="shiny-new-update-id",
+            ),
+            progress=UpdateProgress(state=UpdateState.done, progress=123),
+        )
     )
 
     update_status = await get_firmware_update_status(
-        update_id="update-id",
-        update_progress_monitor=update_progress_monitor,
+        update_id="shiny-new-update-id", firmware_update_manager=firmware_update_manager
     )
 
     assert update_status.content.data == expected_response
     assert update_status.status_code == 200
 
 
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_firmware_update_status_of_invalid_id(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
-    update_progress_monitor: UpdateProgressMonitor,
+    firmware_update_manager: FirmwareUpdateManager,
 ) -> None:
     """It should raise error when fetching status of an invalid update resource."""
     decoy.when(
-        update_progress_monitor.get_progress_status(update_id="imaginary-update-id")
-    ).then_raise(UpdateIdNotFound("womp womp.."))
+        firmware_update_manager.get_update_process_handle("imaginary-update-id")
+    ).then_raise(UpdateIdNotFound("womp womp..."))
 
     with pytest.raises(ApiError) as exc_info:
         await get_firmware_update_status(
             update_id="imaginary-update-id",
-            update_progress_monitor=update_progress_monitor,
+            firmware_update_manager=firmware_update_manager,
         )
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "InvalidUpdateId"
 
 
-async def test_get_update_progress_monitor_is_singleton(
+@pytest.mark.ot3_only
+async def test_get_firmware_update_manager_is_singleton(
     ot3_hardware_api: OT3API,
 ) -> None:
     """It should return the same instance of UpdateProgressMonitor in multiple calls."""
-    monitor1 = await get_update_progress_monitor(hardware_api=ot3_hardware_api)
-    monitor2 = await get_update_progress_monitor(hardware_api=ot3_hardware_api)
+    manager1 = await get_firmware_update_manager(hardware_api=ot3_hardware_api)
+    manager2 = await get_firmware_update_manager(hardware_api=ot3_hardware_api)
 
-    assert monitor1 == monitor2
+    assert manager1 is manager2
