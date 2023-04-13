@@ -49,6 +49,8 @@ export function ProtocolSetupInstruments({
         (i): i is GripperData => i.instrumentType === 'gripper'
       ) ?? null
     : null
+  console.log(allPipettesCalibrationData)
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -79,6 +81,13 @@ export function ProtocolSetupInstruments({
               i.mount === loadedPipette.mount &&
               i.instrumentName === loadedPipette.pipetteName
           ) ?? null
+        console.log(
+          allPipettesCalibrationData?.data.find(
+            cal =>
+              cal.mount === attachedPipetteMatch?.mount &&
+              cal.pipette === attachedPipetteMatch?.instrumentName
+          ) ?? null
+        )
         return (
           <ProtocolInstrumentMountItem
             key={loadedPipette.mount}

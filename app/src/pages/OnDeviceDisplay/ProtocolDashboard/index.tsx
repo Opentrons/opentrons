@@ -212,7 +212,7 @@ export function ProtocolDashboard(): JSX.Element {
 
               return (
                 <ProtocolCard
-                  key={protocol.key}
+                  key={protocol.id}
                   lastRun={lastRun}
                   protocol={protocol}
                 />

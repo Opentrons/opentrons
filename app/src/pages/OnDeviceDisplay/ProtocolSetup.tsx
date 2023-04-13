@@ -363,7 +363,9 @@ function PrepareToRun({
           status="general"
         />
         <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('liquids')}
+          onClickSetupStep={() => {
+            history.push(`/protocols/${runId}/summary`)
+          }}
           title={t('liquids')}
           status="general"
           detail={
