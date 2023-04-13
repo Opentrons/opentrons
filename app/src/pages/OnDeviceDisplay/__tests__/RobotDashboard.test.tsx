@@ -160,8 +160,8 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('Run again')
     getByText('yay mock protocol')
-    getByText('Missing 1 pipettes')
-    getByLabelText('icon_Missing 1 pipettes')
+    getByText('Missing 1 pipette')
+    getByLabelText('icon_Missing 1 pipette')
     expect(getByLabelText('RecentRunCard')).toHaveStyle(
       `background-color: ${COLORS.yellow_three}`
     )
@@ -194,8 +194,8 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('Run again')
     getByText('yay mock protocol')
-    getByText('Missing 1 modules and 1 pipettes')
-    getByLabelText('icon_Missing 1 modules and 1 pipettes')
+    getByText('Missing 1 module(s) and 1 pipette(s)')
+    getByLabelText('icon_Missing 1 module(s) and 1 pipette(s)')
     expect(getByLabelText('RecentRunCard')).toHaveStyle(
       `background-color: ${COLORS.yellow_three}`
     )

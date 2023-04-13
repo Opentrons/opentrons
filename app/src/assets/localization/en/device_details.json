@@ -127,7 +127,9 @@
   "no_recent_runs_description": "After you run some protocols, they will appear here.",
   "last_run_time": "last run {{number}}",
   "ready_to_run": "ready to run",
-  "missing_modules": "Missing {{num}} modules",
-  "missing_pipettes": "Missing {{num}} pipettes",
-  "missing_both": "Missing {{numMod}} modules and {{numPip}} pipettes"
+  "missing_module": "Missing {{num}} module",
+  "missing_module_plural": "Missing {{num}} modules",
+  "missing_pipette": "Missing {{num}} pipette",
+  "missing_pipettes_plural": "Missing {{num}} pipettes",
+  "missing_both": "Missing {{numMod}} module(s) and {{numPip}} pipette(s)"
 }

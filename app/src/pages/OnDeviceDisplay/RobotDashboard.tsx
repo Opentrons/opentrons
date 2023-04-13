@@ -121,12 +121,18 @@ function RecentRunCard(props: RecentRunCardProps): JSX.Element {
     missingProtocolPipetteType.length === 0 &&
     missingProtocolModuleType.length > 0
   ) {
-    chipText = t('missing_modules', { num: missingProtocolModuleType.length })
+    chipText = t('missing_module', {
+      num: missingProtocolModuleType.length,
+      count: missingProtocolModuleType.length,
+    })
   } else if (
     missingProtocolPipetteType.length > 0 &&
     missingProtocolModuleType.length === 0
   ) {
-    chipText = t('missing_pipettes', { num: missingProtocolPipetteType.length })
+    chipText = t('missing_pipette', {
+      num: missingProtocolPipetteType.length,
+      count: missingProtocolPipetteType.length,
+    })
   } else if (
     missingProtocolPipetteType.length > 0 &&
     missingProtocolModuleType.length > 0
