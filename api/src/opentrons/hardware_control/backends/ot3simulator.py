@@ -31,6 +31,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_tip_action_group,
     PipetteAction,
+    NODEID_SUBSYSTEM,
 )
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -56,6 +57,7 @@ from opentrons.hardware_control.types import (
     MotorStatus,
     PipetteSubType,
     UpdateStatus,
+    OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -483,9 +485,11 @@ class OT3Simulator:
         }
 
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> Dict[OT3SubSystem, int]:
         """Get the firmware version."""
-        return None
+        return {
+            NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
+        }
 
     @property
     def update_required(self) -> bool:

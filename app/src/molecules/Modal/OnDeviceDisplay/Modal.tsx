@@ -15,11 +15,13 @@ import type { ModalHeaderBaseProps, ModalSize } from './types'
 interface ModalProps {
   /** clicking anywhere outside of the modal closes it  */
   onOutsideClick: React.MouseEventHandler
+  /** modal content */
   children: React.ReactNode
   /** for small, medium, or large modal sizes, medium by default */
   modalSize?: ModalSize
   /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
+  /** an option for adding additional styles for an error modal */
   isError?: boolean
 }
 export function Modal(props: ModalProps): JSX.Element {
@@ -52,7 +54,7 @@ export function Modal(props: ModalProps): JSX.Element {
     >
       <Flex
         backgroundColor={isError ? COLORS.red_two : COLORS.white}
-        border={isError ? `0.375rem solid ${COLORS.red_two}` : 'none'}
+        border={`0.375rem solid ${isError ? COLORS.red_two : COLORS.white}`}
         width={modalWidth}
         height="max-content"
         maxHeight="32.5rem"
@@ -63,7 +65,6 @@ export function Modal(props: ModalProps): JSX.Element {
         aria-label={`modal_${modalSize}`}
         onClick={e => {
           e.stopPropagation()
-          onOutsideClick(e)
         }}
       >
         {header != null ? (

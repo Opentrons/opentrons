@@ -16,11 +16,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RunStatus,
 } from '@opentrons/api-client'
-import {
-  useRunQuery,
-  useModulesQuery,
-  usePipettesQuery,
-} from '@opentrons/react-api-client'
+import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -122,8 +118,6 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  // NOTE: we are polling pipettes, though not using their value directly here
-  usePipettesQuery({}, { refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
   React.useEffect(() => {
@@ -382,7 +376,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('run_details')
   const attachedModules =
-    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+    useModulesQuery({
+      refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: runStatus != null && START_RUN_STATUSES.includes(runStatus),
+    })?.data?.data ?? []
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()

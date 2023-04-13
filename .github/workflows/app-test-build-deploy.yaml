@@ -66,7 +66,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -125,7 +125,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -220,7 +220,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev libsystemd-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
