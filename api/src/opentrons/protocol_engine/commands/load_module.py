@@ -5,7 +5,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
+from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition, ModuleOffsetVector
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler
@@ -77,6 +77,11 @@ class LoadModuleResult(BaseModel):
         description="Hardware serial number of the connected module.",
     )
 
+    offsetVector: Optional[ModuleOffsetVector] = Field(
+        ...,
+        description="The Module Offset to be applied.",
+    )
+
 
 class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
     """The implementation of the load module command."""
@@ -97,6 +102,7 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
             serialNumber=loaded_module.serial_number,
             model=loaded_module.definition.model,
             definition=loaded_module.definition,
+            offsetVector=loaded_module.module_offset
         )
 
 

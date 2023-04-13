@@ -623,6 +623,7 @@ class LegacyCommandMapper:
                 serialNumber=module_load_info.module_serial,
                 definition=loaded_definition,
                 model=loaded_model,
+                offsetVector=None
             ),
         )
         self._command_count["LOAD_MODULE"] = count + 1
