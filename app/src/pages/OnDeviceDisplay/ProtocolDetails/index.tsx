@@ -32,6 +32,7 @@ import {
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
@@ -246,6 +247,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
+  const { makeSnackbar } = useToaster()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -270,14 +272,15 @@ export function ProtocolDetails(): JSX.Element | null {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
+        makeSnackbar(t('protocol_info:pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
+      makeSnackbar(t('protocol_info:unpinned_protocol'))
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
-    //  TODO(ew, 3/23/23): show user result via snackbar component
   }
 
   const handleRunProtocol = (): void => {

@@ -63,7 +63,6 @@ const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'SLOT_10_EXPANSION',
   'CALIBRATION_CUTOUTS',
 ]
-const EQUIPMENT_POLL_MS = 2000
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
@@ -100,7 +99,7 @@ export function ProtocolSetupLabware({
     mostRecentAnalysis != null
       ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
       : {}
-  const moduleQuery = useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
+  const moduleQuery = useModulesQuery()
   const attachedModules = moduleQuery?.data?.data ?? []
   const protocolModulesInfo =
     mostRecentAnalysis != null

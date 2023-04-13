@@ -166,9 +166,12 @@ class ProtocolEngine:
         return self._state_store.commands.get(command_id)
 
     async def wait_for_command(self, command_id: str) -> None:
-        """Wait for a command to be completed."""
+        """Wait for a command to be completed.
+
+        Will also return if the engine was stopped before it reached the command.
+        """
         await self._state_store.wait_for(
-            self._state_store.commands.get_is_complete,
+            self._state_store.commands.get_command_is_final,
             command_id=command_id,
         )
 
@@ -185,7 +188,9 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The completed command, whether it succeeded or failed.
+            The command. If the command completed, it will be succeeded or failed.
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
         command = self.add_command(request)
         await self.wait_for_command(command.id)
@@ -211,7 +216,7 @@ class ProtocolEngine:
             CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
-            condition=self._state_store.commands.get_all_complete
+            condition=self._state_store.commands.get_all_commands_final
         )
 
     async def finish(

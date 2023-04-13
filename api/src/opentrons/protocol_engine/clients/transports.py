@@ -107,6 +107,17 @@ class ChildThreadTransport(AbstractSyncTransport):
             error = command.error
             raise ProtocolEngineError(f"{error.errorType}: {error.detail}")
 
+        # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
+        #
+        # 1. The engine is paused.
+        # 2. The user's Python script calls this method to start a new command,
+        #    which remains `queued` because of the pause.
+        # 3. The engine is stopped.
+        #
+        # The returned command will be `queued`, so it won't have a result.
+        #
+        # We need to figure out a proper way to report this condition to callers
+        # so they correctly interpret it as an intentional stop, not an internal error.
         assert command.result is not None, f"Expected Command {command} to have result"
 
         return command.result

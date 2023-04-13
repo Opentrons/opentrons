@@ -3,6 +3,7 @@ import { COLORS } from './'
 
 // Font Sizes
 export const fontSize38 = '2.375rem' // 38px
+export const fontSize32 = '2rem' // 32px
 export const fontSize28 = '1.75rem' // 28px
 export const fontSize22 = '1.375rem' // 22px
 export const fontSize20 = '1.25rem' // 20px
@@ -25,6 +26,7 @@ export const fontWeightLight = 300
 
 // Line Heights
 export const lineHeight48 = '3rem' // 48px
+export const lineHeight42 = '2.625rem' // 42px
 export const lineHeight36 = '2.25rem' // 36px
 export const lineHeight28 = '1.75rem' // 28px
 export const lineHeight24 = '1.5rem' // 24px
