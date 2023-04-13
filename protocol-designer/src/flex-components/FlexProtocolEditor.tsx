@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useState } from 'react'
 import {
   RoundTab,
   Flex,
@@ -10,10 +10,11 @@ import {
   NewPrimaryBtn,
 } from '@opentrons/components'
 import { Formik } from 'formik'
-import { useState } from 'react'
 import { i18n } from '../localization'
 import { FlexProtocolName } from './FlexProtocolName'
 import styles from './FlexComponents.css'
+import { StyledText } from './StyledText'
+import { RadioSelect } from './RadioSelect'
 
 const RoundTabs = (props: any): JSX.Element => {
   const { setCurrentTab, currentTab } = props
@@ -41,7 +42,7 @@ const RoundTabs = (props: any): JSX.Element => {
             isCurrent={currentTab === id}
             onClick={() => setCurrentTab(id)}
           >
-            <h3>{name}</h3>
+            <StyledText>{name}</StyledText>
           </RoundTab>
         )
       })}
@@ -54,7 +55,7 @@ const selectComponent = (selectedTab: Number, props: any): any => {
     case 1:
       return <FlexProtocolName formProps={props} />
     case 2:
-      return <PipettesComponent />
+      return <PipettesComponent formProps={props} />
     case 3:
       return <ModulesComponent />
     default:
@@ -84,11 +85,17 @@ function FlexProtocolEditorComponent(): JSX.Element {
   const getInitialValues = {
     fields: {
       pndName: '',
-
       pndOrgAuthor: '',
-
       pndDescription: '',
     },
+    pipetteSelectionData: {
+      firstPipette: {
+
+      },
+      secondPipette: {
+
+      }
+    }
   }
 
   return (
@@ -149,8 +156,15 @@ function FlexProtocolEditorComponent(): JSX.Element {
   )
 }
 
-const PipettesComponent = (): JSX.Element => {
-  return <h1>Pipettes Component</h1>
+const PipettesComponent = ({ formProps }: any) => {
+  const { values: { pipetteSelectionData } } = formProps
+  return (
+    <>
+      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.firstPipette"} pipetteType={pipetteSelectionData.firstPipette} />
+      <br />
+      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.secondPipette"} pipetteType={pipetteSelectionData.secondPipette} />
+    </>
+  )
 }
 
 const ModulesComponent = (): JSX.Element => {
