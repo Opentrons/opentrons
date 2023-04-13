@@ -89,13 +89,9 @@ function FlexProtocolEditorComponent(): JSX.Element {
       pndDescription: '',
     },
     pipetteSelectionData: {
-      firstPipette: {
-
-      },
-      secondPipette: {
-
-      }
-    }
+      firstPipette: {},
+      secondPipette: {},
+    },
   }
 
   return (
@@ -156,13 +152,23 @@ function FlexProtocolEditorComponent(): JSX.Element {
   )
 }
 
-const PipettesComponent = ({ formProps }: any) => {
-  const { values: { pipetteSelectionData } } = formProps
+const PipettesComponent = ({ formProps }: any): JSX.Element => {
+  const {
+    values: { pipetteSelectionData },
+  } = formProps
   return (
     <>
-      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.firstPipette"} pipetteType={pipetteSelectionData.firstPipette} />
+      <RadioSelect
+        propsData={formProps}
+        pipetteName={'pipetteSelectionData.firstPipette'}
+        pipetteType={pipetteSelectionData.firstPipette}
+      />
       <br />
-      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.secondPipette"} pipetteType={pipetteSelectionData.secondPipette} />
+      <RadioSelect
+        propsData={formProps}
+        pipetteName={'pipetteSelectionData.secondPipette'}
+        pipetteType={pipetteSelectionData.secondPipette}
+      />
     </>
   )
 }
