@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 
 import {
@@ -93,6 +94,7 @@ function RecentRunCard(props: RecentRunCardProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
   const { protocolName, protocolId, lastRun } = props
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
+  const history = useHistory()
   const isSuccess = missingProtocolHardware.length === 0
 
   const CARD_STYLE = css`
@@ -142,6 +144,10 @@ function RecentRunCard(props: RecentRunCardProps): JSX.Element {
       numPip: missingProtocolPipetteType.length,
     })
   }
+  const handleCardClick = (): void => {
+    history.push(`protocols/${protocolId}`)
+  }
+
   return (
     <Flex
       aria-label="RecentRunCard"
@@ -152,6 +158,7 @@ function RecentRunCard(props: RecentRunCardProps): JSX.Element {
       backgroundColor={isSuccess ? COLORS.green_three : COLORS.yellow_three}
       width="25.8125rem"
       borderRadius={BORDERS.size_four}
+      onClick={handleCardClick}
     >
       {/* marginLeft is needed to cancel chip's padding */}
       <Flex marginLeft={`-${SPACING.spacing4}`}>

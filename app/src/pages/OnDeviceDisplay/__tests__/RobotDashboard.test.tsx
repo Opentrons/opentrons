@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { COLORS, renderWithProviders } from '@opentrons/components'
@@ -15,6 +16,15 @@ import { RobotDashboard } from '../RobotDashboard'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 
+const mockPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
@@ -33,7 +43,6 @@ const mockEmptyRecentRun = EmptyRecentRun as jest.MockedFunction<
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
 >
-
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -85,7 +94,7 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('mock EmptyRecentRun')
   })
-  it('should render a recent protocol with all the required info to run', () => {
+  it('should render a recent protocol with all the required info to run, clicking card goes to run history', () => {
     mockUseAllProtocolsQuery.mockReturnValue({
       data: {
         data: [mockProtocol],
@@ -100,9 +109,10 @@ describe('RobotDashboard', () => {
     getByText('Run again')
     getByText('yay mock protocol')
     getByLabelText('icon_Ready to run')
-    expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.green_three}`
-    )
+    const recentRunCard = getByLabelText('RecentRunCard')
+    expect(recentRunCard).toHaveStyle(`background-color: ${COLORS.green_three}`)
+    fireEvent.click(recentRunCard)
+    expect(mockPush).toHaveBeenCalledWith('protocols/mockProtocol1')
   })
   it('should render a recent protocol with required modules', () => {
     mockUseAllProtocolsQuery.mockReturnValue({
