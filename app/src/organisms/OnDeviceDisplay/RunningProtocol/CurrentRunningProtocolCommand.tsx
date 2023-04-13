@@ -84,7 +84,7 @@ interface CurrentRunningProtocolCommandProps {
   runTimerInfo: RunTimerInfo
   playRun: () => void
   pauseRun: () => void
-  stopRun: () => void
+  setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
   protocolName?: string
   currentRunCommandIndex?: number
@@ -96,7 +96,7 @@ export function CurrentRunningProtocolCommand({
   runTimerInfo,
   playRun,
   pauseRun,
-  stopRun,
+  setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
   protocolName,
   currentRunCommandIndex,
@@ -110,8 +110,7 @@ export function CurrentRunningProtocolCommand({
   // ToDo (kj:04/09/2023 Add confirm modal)
   // jira ticket RCORE-562 and RCORE-563
   const onStop = (): void => {
-    stopRun() // from useRunActionMutations
-    trackProtocolRunEvent({ name: 'runCancel' })
+    setShowConfirmCancelRunModal(true)
   }
 
   const onTogglePlayPause = (): void => {
