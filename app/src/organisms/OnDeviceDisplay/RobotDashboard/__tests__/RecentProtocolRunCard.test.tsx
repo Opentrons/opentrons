@@ -73,6 +73,7 @@ describe('RecentProtocolRunCard', () => {
       protocolId: mockProtocolId,
       lastRun: mockLastRun,
     }
+    mockUseMissingProtocolHardware.mockReturnValue(mockPipette)
   })
 
   afterEach(() => {
@@ -81,7 +82,6 @@ describe('RecentProtocolRunCard', () => {
   })
 
   it('should render text', () => {
-    mockUseMissingProtocolHardware.mockReturnValue(mockPipette)
     const [{ getByText }] = render(props)
     const lastRunTime = formatDistance(new Date(mockLastRun), new Date(), {
       addSuffix: true,
