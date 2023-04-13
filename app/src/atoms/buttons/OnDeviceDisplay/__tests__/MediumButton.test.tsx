@@ -54,7 +54,7 @@ describe('MediumButton', () => {
       `background-color: ${COLORS.red_three}`
     )
   })
-  it('renders the tertiary button', () => {
+  it('renders the tertiary high button', () => {
     props = {
       ...props,
       buttonType: 'tertiaryHigh',
@@ -62,7 +62,7 @@ describe('MediumButton', () => {
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
   })
-  it('renders the tertiary light button', () => {
+  it('renders the tertiary low light button', () => {
     props = {
       ...props,
       buttonType: 'tertiaryLowLight',
