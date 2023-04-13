@@ -89,6 +89,10 @@ class PipetteData(BaseModel):
     channels: ChannelCount = Field(..., description="Number of pipette channels.")
     min_volume: float = Field(..., description="Minimum pipette volume.")
     max_volume: float = Field(..., description="Maximum pipette volume.")
+    calibratedOffset: Optional[PipetteCalibrationData] = Field(
+        None, description="Calibrated pipette offset."
+    )
+
     # TODO (spp, 2022-12-20): update/ add fields according to client needs.
     #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 

@@ -47,13 +47,13 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
                 max_volume=pipette_dict["max_volume"],
                 calibratedOffset=PipetteCalibrationData.construct(
                     offset=Vec3f(
-                        x=calibration_data.offset.x,
-                        y=calibration_data.offset.y,
-                        z=calibration_data.offset.z,
+                        x=calibration_data["offset"].x,
+                        y=calibration_data["offset"].y,
+                        z=calibration_data["offset"].z,
                     ),
-                    source=calibration_data.source,
-                    last_modified=calibration_data.last_modified,
-                )
+                    source=calibration_data["source"],
+                    last_modified=calibration_data["last_modified"],
+                ),
             ),
         )
 

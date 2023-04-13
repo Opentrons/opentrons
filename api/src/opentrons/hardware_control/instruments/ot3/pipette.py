@@ -497,6 +497,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "name": self.name,
                 "model": self.model,
                 "pipette_id": self.pipette_id,
+                "pipette_offset": self.pipette_offset,
                 "has_tip": self.has_tip,
                 "working_volume": self.working_volume,
                 "aspirate_flow_rate": self.aspirate_flow_rate,
