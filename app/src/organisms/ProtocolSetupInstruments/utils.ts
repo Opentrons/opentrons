@@ -69,14 +69,16 @@ export function getAreInstrumentsReady(
       loadedPipette,
       attachedInstruments
     )
-    const calibrationData =
-      attachedPipetteMatch != null
-        ? getCalibrationDataForPipetteMatch(
-            attachedPipetteMatch,
-            allPipettesCalibrationData
-          )
-        : null
-    return attachedPipetteMatch != null && calibrationData != null
+    console.log({loadedPipette, attachedInstruments})
+    // const calibrationData =
+    //   attachedPipetteMatch != null
+    //     ? getCalibrationDataForPipetteMatch(
+    //         attachedPipetteMatch,
+    //         allPipettesCalibrationData
+    //       )
+    //     : null
+    return attachedPipetteMatch != null // TODO: check for presence of calibration data once instruments endpoint
+    // returns calibration data for pipettes
   })
   const isExtensionMountReady = getProtocolUsesGripper(analysis)
     ? getAttachedGripper(attachedInstruments) != null
