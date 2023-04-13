@@ -35,6 +35,7 @@ types-mock = "==4.0.1"
 sqlalchemy2-stubs = "==0.0.2a21"
 python-box = "==5.4.1"
 importlib-metadata = "==4.12.0"
+system-server = { editable = true, path = "../system-server" }
 
 [packages]
 opentrons = { editable = true, path = "../api" }

@@ -1816,6 +1816,10 @@
             ],
             "index": "pypi",
             "version": "==3.5.0"
+        },
+        "system-server": {
+            "editable": true,
+            "path": "./../system-server"
         }
     }
 }
