@@ -109,9 +109,9 @@ describe('RobotSettings RenameRobotSlideout', () => {
     const [{ getByRole, findByText }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, {
-      target: { value: 'aaaaaaaaaaaaaaaaa' },
+      target: { value: 'aaaaaaaaaaaaaaaaaa' },
     })
-    expect(input).toHaveValue('aaaaaaaaaaaaaaaaa')
+    expect(input).toHaveValue('aaaaaaaaaaaaaaaaaa')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
       'Oops! Robot name must follow the character count and limitations'
