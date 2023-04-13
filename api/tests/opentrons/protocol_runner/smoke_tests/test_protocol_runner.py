@@ -43,7 +43,7 @@ async def test_runner_with_python(
     python_protocol_file: Path,
     tempdeck_v1_def: ModuleDefinition,
 ) -> None:
-    """It should run a Python protocol on the AbstractRunner."""
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[python_protocol_file],
@@ -52,7 +52,7 @@ async def test_runner_with_python(
 
     subject = await create_simulating_runner(
         robot_type="OT-2 Standard",
-        protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
+        protocol_config=protocol_source.config,
     )
     result = await subject.run(protocol_source)
     commands_result = result.commands
@@ -120,7 +120,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
     )
 
     subject = await create_simulating_runner(
-        robot_type="OT-2 Standard", protocol_config=JsonProtocolConfig(schema_version=6)
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(protocol_source)
 
@@ -182,7 +182,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
     subject = await create_simulating_runner(
         robot_type="OT-2 Standard",
-        protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 13)),
+        protocol_config=protocol_source.config,
     )
     result = await subject.run(protocol_source)
 
@@ -241,7 +241,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     )
 
     subject = await create_simulating_runner(
-        robot_type="OT-2 Standard", protocol_config=JsonProtocolConfig(schema_version=5)
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
     result = await subject.run(protocol_source)
 

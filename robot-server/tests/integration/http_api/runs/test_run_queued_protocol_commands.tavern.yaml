@@ -1,11 +1,12 @@
-test_name: Make sure empty run commands execute protocol commands queue
+test_name: Make sure multiple commands can be queued and played on a basic run
 
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 
 stages:
-  - name: Create Empty Run
+  - name: Create empty run
     request:
       url: '{host:s}:{port:d}/runs'
       json:
@@ -83,7 +84,6 @@ stages:
     response:
       status_code: 200
       json:
-        # Check that `data` is identical to the original POSTed run.
         data:
           actions: []
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"

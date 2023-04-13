@@ -35,7 +35,7 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
     )
     subject = await create_simulating_runner(
         robot_type="OT-2 Standard",
-        protocol_config=PythonProtocolConfig(api_version=APIVersion(2, 13)),
+        protocol_config=protocol_source.config,
     )
     result = await subject.run(protocol_source)
     assert result.state_summary.errors == []

@@ -1,4 +1,4 @@
-"""Tests for the AbstractRunner class."""
+"""Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy, matchers
@@ -131,7 +131,7 @@ def legacy_subject(
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
 ) -> PythonAndLegacyRunner:
-    """Get a JsonRunner test subject with mocked dependencies."""
+    """Get a PythonAndLegacyRunner test subject with mocked dependencies."""
     return PythonAndLegacyRunner(
         protocol_engine=protocol_engine,
         hardware_api=hardware_api,

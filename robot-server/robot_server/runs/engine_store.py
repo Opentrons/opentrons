@@ -33,7 +33,7 @@ class EngineConflictError(RuntimeError):
 
 
 class RunnerEnginePair(NamedTuple):
-    """A stored AbstractRunner/ProtocolEngine pair."""
+    """A stored Runner/ProtocolEngine pair."""
 
     run_id: str
     runner: RunnerType

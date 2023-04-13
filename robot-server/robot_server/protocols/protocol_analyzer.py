@@ -1,7 +1,7 @@
 """Protocol analysis module."""
 import logging
 
-import opentrons.protocol_runner as protocol_runner
+from opentrons import protocol_runner
 
 from .protocol_store import ProtocolResource
 from .analysis_store import AnalysisStore
