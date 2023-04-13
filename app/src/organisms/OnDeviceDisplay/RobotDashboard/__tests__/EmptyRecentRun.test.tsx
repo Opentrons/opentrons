@@ -1,26 +1,24 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { EmptyRecentRun } from '../EmptyRecentRun'
 
+const PNG_FILE_NAME = 'Illustration@x2.png'
+
 const render = () => {
-  return renderWithProviders(
-    <MemoryRouter>
-      <EmptyRecentRun />
-    </MemoryRouter>,
-    {
-      i18nInstance: i18n,
-    }
-  )
+  return renderWithProviders(<EmptyRecentRun />, {
+    i18nInstance: i18n,
+  })
 }
 
 describe('EmptyRecentRun', () => {
   it('should render image and text', () => {
-    const [{ getByText, getByAltText }] = render()
+    const [{ getByText, getByAltText, getByRole }] = render()
     getByAltText('RobotDashboard no recent run protocols')
     getByText('No recent runs')
     getByText('After you run some protocols, they will appear here.')
+    const image = getByRole('img')
+    expect(image.getAttribute('src')).toEqual(PNG_FILE_NAME)
   })
 })
