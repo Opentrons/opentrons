@@ -11,7 +11,10 @@ import {
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,
 } from '@opentrons/discovery-client'
-import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
+import {
+  fetchSerialPortList,
+  SerialPortHttpAgent,
+} from '@opentrons/usb-bridge/node-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import {
@@ -155,7 +158,7 @@ export function registerDiscovery(
   })
 
   let usbHttpAgent: Agent
-  let destroyHttpAgent: () => void
+  // let destroyHttpAgent: () => void
 
   async function usbListener(
     _event: IpcMainInvokeEvent,
@@ -209,6 +212,7 @@ export function registerDiscovery(
           // TODO: extract and use within USB_DEVICE_ADDED
           fetchSerialPortList()
             .then((list: PortInfo[]) => {
+              log.debug('serialportlist', list)
               const ot3UsbSerialPort = list.find(
                 port =>
                   port.productId === DEFAULT_PRODUCT_ID &&
@@ -216,12 +220,21 @@ export function registerDiscovery(
               )
 
               // TODO: handle null case properly
-              const httpAgent = client.createHttpAgent?.(
-                ot3UsbSerialPort?.path ?? 'no path found'
-              )
+              // const httpAgent = client.createHttpAgent?.(
+              //   ot3UsbSerialPort?.path ?? 'no path found'
+              // )
+
+              const httpAgent = new SerialPortHttpAgent({
+                maxFreeSockets: 1,
+                maxSockets: 1,
+                maxTotalSockets: 1,
+                keepAlive: true,
+                keepAliveMsecs: 10000,
+                path: ot3UsbSerialPort?.path ?? '',
+              })
 
               usbHttpAgent = httpAgent as Agent
-              destroyHttpAgent = httpAgent?.destroy ?? (() => {})
+              // destroyHttpAgent = httpAgent?.destroy ?? (() => {})
 
               ipcMain.handle('usb:request', usbListener)
               client.start({
@@ -230,6 +243,7 @@ export function registerDiscovery(
                 manualAddresses: [
                   {
                     ip: 'opentrons-usb',
+                    // ip: '10.13.11.65',
                     port: DEFAULT_PORT,
                     agent: usbHttpAgent,
                   },
@@ -244,39 +258,41 @@ export function registerDiscovery(
       case USB_DEVICE_ADDED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
           // TODO: fetch serial ports as above
-          const ot3UsbSerialPort = client
-            .getSerialPorts?.()
-            .find(
-              port =>
-                port.productId === DEFAULT_PRODUCT_ID &&
-                port.vendorId === DEFAULT_VENDOR_ID
-            )
-
-          // TODO: handle null case properly
-          const httpAgent = client.createHttpAgent?.(
-            ot3UsbSerialPort?.path ?? 'no path found'
-          )
-
-          destroyHttpAgent = httpAgent?.destroy ?? (() => {})
-
-          ipcMain.handle('usb:request', usbListener)
-          client.start({
-            healthPollInterval: FAST_POLL_INTERVAL_MS,
-            serialPortPollInterval: FAST_POLL_INTERVAL_MS,
-            manualAddresses: [
-              {
-                ip: 'opentrons-usb.com',
-                port: DEFAULT_PORT,
-                agent: usbHttpAgent,
-              },
-            ],
-          })
+          // const ot3UsbSerialPort = client
+          //   .getSerialPorts?.()
+          //   .find(
+          //     port =>
+          //       port.productId === DEFAULT_PRODUCT_ID &&
+          //       port.vendorId === DEFAULT_VENDOR_ID
+          //   )
+          // // TODO: handle null case properly
+          // const httpAgent = client.createHttpAgent?.(
+          //   ot3UsbSerialPort?.path ?? 'no path found'
+          // )
+          // destroyHttpAgent = httpAgent?.destroy ?? (() => {})
+          // ipcMain.handle('usb:request', usbListener)
+          // client.start({
+          //   healthPollInterval: FAST_POLL_INTERVAL_MS,
+          //   serialPortPollInterval: FAST_POLL_INTERVAL_MS,
+          //   manualAddresses: [
+          //     {
+          //       ip: 'opentrons-usb.com',
+          //       port: DEFAULT_PORT,
+          //       agent: usbHttpAgent,
+          //     },
+          //   ],
+          // })
         }
         break
       case USB_DEVICE_REMOVED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          destroyHttpAgent?.()
+          // destroyHttpAgent?.()
           ipcMain.removeHandler('usb:request')
+          client.start({
+            healthPollInterval: FAST_POLL_INTERVAL_MS,
+            serialPortPollInterval: FAST_POLL_INTERVAL_MS,
+            manualAddresses: [],
+          })
         }
         break
     }
