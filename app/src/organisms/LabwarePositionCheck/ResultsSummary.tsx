@@ -12,7 +12,6 @@ import {
   getVectorSum,
   IDENTITY_VECTOR,
   LabwareDefinition2,
-  ODD_MEDIA_QUERY_SPECS,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
@@ -24,6 +23,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
@@ -151,7 +151,7 @@ export const ResultsSummary = (
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         css={css`
-          @media ${ODD_MEDIA_QUERY_SPECS} {
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
             margin-top: 0;
           }
         `}

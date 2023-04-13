@@ -6,7 +6,6 @@ import {
   Flex,
   COLORS,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
   Icon,
   DIRECTION_COLUMN,
@@ -24,13 +23,13 @@ import {
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 
-import type { Mount } from '../../redux/pipettes/types'
 import type {
   InstrumentData,
   PipetteOffsetCalibration,
   GripperData,
 } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
+import type { Mount } from '../../redux/pipettes/types'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
@@ -166,7 +165,7 @@ export function ProtocolInstrumentMountItem(
 const MountLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
 `
@@ -174,7 +173,7 @@ const MountLabel = styled.p`
 const SpeccedInstrumentName = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
 `
@@ -182,7 +181,7 @@ const SpeccedInstrumentName = styled.p`
 const CalibrationStatus = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   color: ${({ color }) => color};

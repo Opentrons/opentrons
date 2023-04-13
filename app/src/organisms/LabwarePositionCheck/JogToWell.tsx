@@ -15,6 +15,7 @@ import {
   ALIGN_FLEX_START,
   PrimaryButton,
   SecondaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -22,7 +23,6 @@ import {
   getVectorDifference,
   getVectorSum,
   PipetteName,
-  ODD_MEDIA_QUERY_SPECS,
 } from '@opentrons/shared-data'
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
@@ -150,7 +150,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         css={css`
-          @media ${ODD_MEDIA_QUERY_SPECS} {
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
             margin-top: 0;
           }
         `}

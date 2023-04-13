@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -20,7 +21,6 @@ import {
   LabwareDefinition2,
   THERMOCYCLER_MODULE_TYPE,
   getModuleType,
-  ODD_MEDIA_QUERY_SPECS,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
@@ -146,7 +146,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         css={css`
-          @media ${ODD_MEDIA_QUERY_SPECS} {
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
             margin-top: 0;
           }
         `}
