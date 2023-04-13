@@ -1,7 +1,7 @@
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, Iterator, AsyncGenerator
 
 import pytest
 import requests
@@ -9,11 +9,14 @@ import requests
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 from .dev_server import DevServer
+from .system_server_mock import DevSystemServer
 
 
 # Must match our Tavern config in common.yaml.
 _SESSION_SERVER_HOST = "http://localhost"
 _SESSION_SERVER_PORT = "31950"
+
+_SESSION_SYSTEM_SERVER_PORT = 32950
 
 
 def pytest_tavern_beta_before_every_test_run(
@@ -24,6 +27,7 @@ def pytest_tavern_beta_before_every_test_run(
     for stage in test_dict["stages"]:
         headers = stage["request"].get("headers", {})
         headers.setdefault("Opentrons-Version", "*")
+        headers.setdefault("authenticationBearer", "mock_token")
         stage["request"].update({"headers": headers})
 
 
@@ -38,6 +42,7 @@ def pytest_tavern_beta_after_every_response(
 def request_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
+    session.headers.update({"authenticationBearer": "placeholder-token"})
     return session
 
 
@@ -70,6 +75,33 @@ def run_server(
             f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
             json={"target": "robot"},
         )
+
+        yield
+
+@pytest.fixture(scope="session")
+def run_mock_system_server(
+    request_session: requests.Session,
+) -> Iterator[None]:
+    with DevSystemServer(
+        port=_SESSION_SYSTEM_SERVER_PORT,
+    ) as system_server:
+        system_server.start()
+        time.sleep(0.5)
+
+        if False:
+            # Wait for a bit to get started by polling it
+            from requests.exceptions import ConnectionError
+
+            while True:
+                try:
+                    request_session.get(
+                        f"{_SESSION_SERVER_HOST}:{system_server.port}/system/authorize"
+                    )
+                except ConnectionError:
+                    pass
+                else:
+                    break
+                time.sleep(0.5)
 
         yield
 
