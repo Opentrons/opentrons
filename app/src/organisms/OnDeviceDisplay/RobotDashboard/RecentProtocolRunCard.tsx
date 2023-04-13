@@ -39,6 +39,7 @@ export function RecentProtocolRunCard({
   console.log(protocolId)
   console.log('missingProtocolHardware', missingProtocolHardware)
   console.log(missingProtocolHardware.length)
+  console.log('isSuccess', isSuccess)
 
   const CARD_STYLE = css`
     &:active {
@@ -58,9 +59,23 @@ export function RecentProtocolRunCard({
     overflow: hidden;
   `
 
+  // switch below
+  // const countHardwareType = (hwType: 'pipette' | 'module'): number => {
+  //   return missingProtocolHardwareType.reduce((acc, hardwareType) => {
+  //     if (hardwareType === hwType) {
+  //       return acc + 1
+  //     }
+  //     return acc
+  //   }, 0)
+  // }
+
+  // const missingPipettes = countHardwareType('pipette')
+  // const missing = countHardwareType('pipette')
+
   const missingProtocolHardwareType = missingProtocolHardware.map(
     hardware => hardware.hardwareType
   )
+
   const missingProtocolPipetteType = missingProtocolHardwareType.filter(
     type => type === 'pipette'
   )
