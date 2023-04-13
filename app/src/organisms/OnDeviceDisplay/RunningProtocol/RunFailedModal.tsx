@@ -48,7 +48,7 @@ export function RunFailedModal({
 
   if (errors == null) return null
   const modalHeader: ModalHeaderBaseProps = {
-    title: 'Run failed',
+    title: t('run_failed_modal_title'),
     iconName: 'ot-alert',
     iconColor: COLORS.white,
   }
