@@ -19,15 +19,15 @@ const RoundTabs = (props: any): JSX.Element => {
   const { setCurrentTab, currentTab } = props
   const tabs = [
     {
-      name: i18n.t('flex.name_and_description.title'),
+      name: i18n.t('flex.name_and_description.name'),
       id: 1,
     },
     {
-      name: i18n.t('flex.pipettes_selection.title'),
+      name: i18n.t('flex.pipettes_selection.name'),
       id: 2,
     },
     {
-      name: i18n.t('flex.modules_selection.title'),
+      name: i18n.t('flex.modules_selection.name'),
       id: 3,
     },
   ]

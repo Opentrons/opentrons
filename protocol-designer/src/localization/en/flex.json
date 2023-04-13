@@ -16,12 +16,17 @@
     "go_to_liquids_page": "Create protocol, on to liquids"
   },
   "name_and_description": {
-    "title": "Protocol Name and description"
+    "name": "Protocol Name and description",
+    "heading": "Protocol Name and description",
+    "choose_name": "Choose a name for your protocol.*",
+    "add_more_information": "Add more information, if you like (you can change this later)."
   },
   "pipettes_selection": {
-    "title": "Pipette Selection"
+    "name": "Pipette Selection",
+    "heading": "Pipettes"
   },
   "modules_selection": {
-    "title": "Module Selection"
+    "name": "Module Selection",
+    "heading": "Additional items?"
   }
 }

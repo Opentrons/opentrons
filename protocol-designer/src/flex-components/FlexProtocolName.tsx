@@ -4,12 +4,15 @@ import * as React from 'react'
 import { FormGroup, InputField } from '@opentrons/components'
 
 import styles from './FlexComponents.css'
+import { i18n } from '../localization'
 
 function FlexProtocolNameComponent(formProps: any): JSX.Element {
   const { formProps: props } = formProps
 
   return (
     <>
+      {i18n.t('flex.name_and_description.header')}
+
       <FormGroup className={styles.form_group}>
         <label>Protocol Name</label>
         <InputField
