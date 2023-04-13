@@ -125,7 +125,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].disabledBackgroundColor};
+      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
       color: ${COLORS.darkBlack_sixty};
     }
   `

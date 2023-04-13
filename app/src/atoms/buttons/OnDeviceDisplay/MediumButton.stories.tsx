@@ -19,7 +19,7 @@ export default {
         type: 'text',
       },
       defaultValue: undefined,
-    }
+    },
   },
 } as Meta
 
