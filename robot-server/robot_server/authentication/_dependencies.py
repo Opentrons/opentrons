@@ -41,7 +41,7 @@ async def _get_system_server_client() -> ClientSession:
 
 
 @call_once
-def _get_system_server_address() -> str:
+async def _get_system_server_address() -> str:
     """Dependency to get the system server address from the settings file."""
     return get_settings().system_server_address
 
@@ -51,7 +51,6 @@ async def check_auth_token_header(
         None, description="Authentication token for the client."
     ),
     version: int = Depends(get_requested_version),
-    system_server_addr: str = Depends(_get_system_server_address),
 ) -> None:
     """Get the request's auth token header and verify authenticity."""
     if version < _AUTH_TOKEN_MIN_VERSION:
@@ -61,6 +60,7 @@ async def check_auth_token_header(
         raise AuthenticationFailed(detail="No token provided.").as_error(
             status.HTTP_403_FORBIDDEN
         )
+    system_server_addr = await _get_system_server_address()
 
     # Don't get the client until checking the version header so we're sure that
     # the server should actually exist.
