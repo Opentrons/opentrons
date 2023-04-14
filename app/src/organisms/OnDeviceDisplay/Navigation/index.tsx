@@ -64,36 +64,30 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing3}
         >
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <NavigationLink to="/dashboard">
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSize32}
-                fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-                lineHeight={TYPOGRAPHY.lineHeight42}
-                color={COLORS.darkBlackEnabled}
-              >
-                {robotName}
-              </StyledText>
-            </NavigationLink>
-          </Flex>
+          <NavigationLink to="/dashboard">
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize32}
+              fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+              lineHeight={TYPOGRAPHY.lineHeight42}
+              color={COLORS.darkBlackEnabled}
+            >
+              {robotName}
+            </StyledText>
+          </NavigationLink>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              marginRight={TYPOGRAPHY.fontSize32}
-            >
-              <NavigationLink key={name} to={navLinkTo as string}>
-                <StyledText
-                  fontSize={TYPOGRAPHY.fontSize32}
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  lineHeight={TYPOGRAPHY.lineHeight42}
-                  color={COLORS.darkBlack_seventy}
-                >
-                  {name}
-                </StyledText>
-              </NavigationLink>
-            </Flex>
+            <NavigationLink key={name} to={navLinkTo as string}>
+              <StyledText
+                fontSize={TYPOGRAPHY.fontSize32}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                lineHeight={TYPOGRAPHY.lineHeight42}
+                color={COLORS.darkBlack_seventy}
+                marginRight={TYPOGRAPHY.fontSize32}
+              >
+                {name}
+              </StyledText>
+            </NavigationLink>
           ))}
         </Flex>
         <Flex alignItems={ALIGN_END}>
