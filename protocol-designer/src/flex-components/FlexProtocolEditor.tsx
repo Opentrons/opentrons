@@ -8,13 +8,24 @@ import {
   BORDERS,
   SPACING,
   NewPrimaryBtn,
+  CheckboxField
 } from '@opentrons/components'
+import {
+  getIncompatiblePipetteNames,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 import { Formik } from 'formik'
+import reduce from 'lodash/reduce'
 import { i18n } from '../localization'
 import { FlexProtocolName } from './FlexProtocolName'
 import styles from './FlexComponents.css'
 import { StyledText } from './StyledText'
 import { RadioSelect } from './RadioSelect'
+import { useSelector } from 'react-redux'
+import { getLabwareDefsByURI } from '../labware-defs/selectors'
+import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
+
 
 const RoundTabs = (props: any): JSX.Element => {
   const { setCurrentTab, currentTab } = props
@@ -90,10 +101,12 @@ function FlexProtocolEditorComponent(): JSX.Element {
     },
     pipetteSelectionData: {
       firstPipette: {
-
+        mount: "",
+        tipRackList: []
       },
       secondPipette: {
-
+        mount: "",
+        tipRackList: []
       }
     }
   }
@@ -158,13 +171,75 @@ function FlexProtocolEditorComponent(): JSX.Element {
 
 const PipettesComponent = ({ formProps }: any) => {
   const { values: { pipetteSelectionData } } = formProps
+
+
+  const allLabware = useSelector(getLabwareDefsByURI)
+  type Values<T> = T[keyof T]
+
+
+  const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
+    allLabware,
+    (acc, def: Values<typeof allLabware>) => {
+      if (def.metadata.displayCategory !== 'tipRack') return acc
+      return [
+        ...acc,
+        {
+          name: getLabwareDisplayName(def),
+          value: getLabwareDefURI(def),
+        },
+      ]
+    },
+    []
+  )
+
+
+  // console.log("tiprackOptions", tiprackOptions)
+  // console.log("allLabware", allLabware);
+
+
   return (
     <>
-      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.firstPipette"} pipetteType={pipetteSelectionData.firstPipette} />
+      <StyledText as={"h1"}>Pipettes</StyledText>
+      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.firstPipette.mount"} pipetteType={pipetteSelectionData.firstPipette.mount} />
       <br />
-      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.secondPipette"} pipetteType={pipetteSelectionData.secondPipette} />
+      {/* <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.secondPipette"} pipetteType={pipetteSelectionData.secondPipette} /> */}
+
+      <TipRackOptions propsData={formProps} tiprackOptionsProps={tiprackOptions} />
     </>
   )
+}
+
+
+const TipRackOptions = ({ propsData, tiprackOptionsProps }: any) => {
+  const [selected, setSelected] = useState<Array<any>>([])
+
+  // values.pipetteSelectionData.firstPipette.tipRackList
+
+
+  const handleNameChange = (setFieldValue: (pipetteSelectionData: string, value: any) => void) => {
+    console.log("setFieldValue",selected,)
+    setFieldValue("pipetteSelectionData.firstPipette.tipRackList", selected)
+  };
+  console.log("propsData",propsData.values)
+  return <>
+    {
+      tiprackOptionsProps.map(({ name, value }: any, index: number) => {
+        const isChecked = selected.some(obj => obj.hasOwnProperty(name));;
+        return <CheckboxField
+          key={index}
+          label={name}
+          name={name}
+          onChange={(e: any) => {
+            const { name, checked } = e.currentTarget
+            const pushData = { [name]: checked }
+            setSelected([...selected, pushData])
+            handleNameChange(propsData.setFieldValue)
+          }}
+          value={isChecked}
+        ></CheckboxField>
+      })
+    }
+  </>
 }
 
 const ModulesComponent = (): JSX.Element => {
