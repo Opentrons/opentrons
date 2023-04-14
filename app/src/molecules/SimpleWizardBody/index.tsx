@@ -9,8 +9,8 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
@@ -30,7 +30,7 @@ const HEADER_STYLE = css`
   margin-top: ${SPACING.spacing5};
   margin-bottom: ${SPACING.spacing3};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;
     font-weight: 700;
   }
@@ -42,9 +42,9 @@ const SUBHEADER_STYLE = css`
   text-align: ${TYPOGRAPHY.textAlignCenter};
   height: 1.75rem;
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
-    font-size: 1.75rem;
-    line-height: 2.25rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: ${TYPOGRAPHY.fontSize28};
+    line-height: ${TYPOGRAPHY.lineHeight36};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
   }
@@ -54,7 +54,7 @@ const BUTTON_STYLE = css`
   padding-right: ${SPACING.spacing6};
   padding-bottom: ${SPACING.spacing6};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding-bottom: ${SPACING.spacing6};
   }
 `

@@ -43,6 +43,8 @@ from .ot3utils import (
     create_tip_action_group,
     PipetteAction,
     sub_system_to_node_id,
+    NODEID_SUBSYSTEM,
+    USBTARGET_SUBSYSTEM,
 )
 
 try:
@@ -87,6 +89,13 @@ from opentrons_hardware.firmware_bindings.constants import (
     USBTarget,
     FirmwareTarget,
 )
+from opentrons_hardware.hardware_control import status_bar
+
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
+from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
+    BinaryMessageDefinition,
+    DoorSwitchStateInfo,
+)
 from opentrons_hardware import firmware_update
 
 
@@ -104,6 +113,8 @@ from opentrons.hardware_control.types import (
     PipetteSubType,
     UpdateStatus,
     mount_to_subsystem,
+    DoorState,
+    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -123,6 +134,12 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
 )
+from opentrons_hardware.hardware_control.rear_panel_settings import (
+    get_door_state,
+    set_deck_light,
+    get_deck_light_state,
+)
+
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
@@ -209,6 +226,7 @@ class OT3Controller:
         self._update_required = False
         self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
+        self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -229,9 +247,18 @@ class OT3Controller:
         self._initialized = value
 
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> Dict[OT3SubSystem, int]:
         """Get the firmware version."""
-        return None
+        subsystem_map: Dict[Union[NodeId, USBTarget], OT3SubSystem] = deepcopy(
+            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], USBTARGET_SUBSYSTEM)
+        )
+        subsystem_map.update(
+            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], NODEID_SUBSYSTEM)
+        )
+        return {
+            subsystem_map[node.application_for()]: device.version
+            for node, device in self._network_info.device_info.items()
+        }
 
     @property
     def update_required(self) -> bool:
@@ -599,6 +626,9 @@ class OT3Controller:
             A dictionary containing the new positions of each axis
         """
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
+        assert (
+            OT3Axis.G not in checked_axes
+        ), "Please home G axis using gripper_home_jaw()"
         if not checked_axes:
             return {}
 
@@ -612,8 +642,6 @@ class OT3Controller:
             if runner
         ]
         positions = await asyncio.gather(*coros)
-        if OT3Axis.G in checked_axes:
-            await self.gripper_home_jaw(self._configuration.grip_jaw_home_duty_cycle)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -918,13 +946,17 @@ class OT3Controller:
         nodes = {axis_to_node(ax) for ax in axes}
         await set_enable_motor(self._messenger, nodes)
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
-        return None
+        if rails is not None:
+            await set_deck_light(1 if rails else 0, self._usb_messenger)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {}
+        return {
+            "rails": await get_deck_light_state(self._usb_messenger),
+            "button": False,
+        }
 
     def pause(self) -> None:
         """Pause the controller activity."""
@@ -1090,6 +1122,8 @@ class OT3Controller:
         plunger_speed: float,
         threshold_pascals: float,
         log_pressure: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
@@ -1103,6 +1137,8 @@ class OT3Controller:
             mount_speed,
             threshold_pascals,
             log_pressure,
+            auto_zero_sensor,
+            num_baseline_reads,
             sensor_id,
         )
         for node, point in positions.items():
@@ -1186,3 +1222,27 @@ class OT3Controller:
             await self._gpio_dev.activate_nsync_out()
         else:
             self._gpio_dev.activate_nsync_out()
+
+    async def door_state(self) -> DoorState:
+        door_open = await get_door_state(self._usb_messenger)
+        return DoorState.OPEN if door_open else DoorState.CLOSED
+
+    def add_door_state_listener(self, callback: Callable[[DoorState], None]) -> None:
+        def _door_listener(msg: BinaryMessageDefinition) -> None:
+            door_state = (
+                DoorState.OPEN
+                if cast(DoorSwitchStateInfo, msg).door_open.value
+                else DoorState.CLOSED
+            )
+            callback(door_state)
+
+        if self._usb_messenger is not None:
+            self._usb_messenger.add_listener(
+                _door_listener,
+                lambda message_id: bool(
+                    message_id == BinaryMessageId.door_switch_state_info
+                ),
+            )
+
+    def status_bar_interface(self) -> status_bar.StatusBar:
+        return self._status_bar

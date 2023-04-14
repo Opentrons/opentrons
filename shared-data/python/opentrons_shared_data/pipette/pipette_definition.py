@@ -130,6 +130,11 @@ class SupportedTipsDefinition(BaseModel):
         description="The default tip overlap associated with this tip type.",
         alias="defaultTipOverlapDictionary",
     )
+    default_blowout_volume: Optional[float] = Field(
+        ...,
+        description="The default volume for a blowout command with this tip type.",
+        alias="defaultBlowoutVolume",
+    )
 
 
 class MotorConfigurations(BaseModel):
@@ -234,6 +239,14 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     )
     channels: PipetteChannelType = Field(
         ..., description="The maximum number of channels on the pipette."
+    )
+    shaft_diameter: float = Field(
+        ..., description="The diameter of the pipette shaft.", alias="shaftDiameter"
+    )
+    shaft_ul_per_mm: float = Field(
+        ...,
+        description="The conversion rate between uL dispensed and mm of motor movement.",
+        alias="shaftULperMM",
     )
 
     @validator("pipette_type", pre=True)

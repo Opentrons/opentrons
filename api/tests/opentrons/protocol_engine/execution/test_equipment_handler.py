@@ -357,7 +357,7 @@ async def test_load_labware_on_module(
         state_store.labware.get_definition_by_uri(matchers.IsA(str))
     ).then_return(minimal_labware_def)
 
-    decoy.when(state_store.modules.get_model("module-id")).then_return(
+    decoy.when(state_store.modules.get_requested_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     decoy.when(state_store.modules.get_location("module-id")).then_return(
@@ -441,7 +441,7 @@ def test_find_offset_id_of_labware_on_module(
     subject: EquipmentHandler,
 ) -> None:
     """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.modules.get_model("input-module-id")).then_return(
+    decoy.when(state_store.modules.get_requested_model("input-module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     decoy.when(state_store.modules.get_location("input-module-id")).then_return(

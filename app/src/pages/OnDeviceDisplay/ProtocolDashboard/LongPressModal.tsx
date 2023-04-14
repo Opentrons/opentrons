@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -11,21 +12,19 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
+import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
+import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
-import { TooManyPinsModal } from './TooManyPinsModal'
 
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
-
-// What is the maximum number of protocols one can pin? This many.
-const MAXIMUM_PINNED_PROTOCOLS = 8
 
 export function LongPressModal(props: {
   longpress: UseLongPressResult
@@ -35,8 +34,9 @@ export function LongPressModal(props: {
   const history = useHistory()
   const host = useHost()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const { makeSnackbar } = useToaster()
 
   const pinned = pinnedProtocolIds.includes(protocolId)
 
@@ -62,14 +62,6 @@ export function LongPressModal(props: {
   const handleCloseModal = (): void => {
     longpress.setIsLongPressed(false)
   }
-
-  // TODO const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
-
-  // const handleDeleteClick = (): void => {
-  //   longpress.setIsLongPressed(false)
-  //   // TODO: deleteProtocol()
-  //   console.log(`deleted protocol with id ${protocolId}`)
-  //   history.goBack()
 
   const handleDeleteClick = (): void => {
     if (host != null) {
@@ -103,10 +95,12 @@ export function LongPressModal(props: {
       } else {
         pinnedProtocolIds.push(protocolId)
         handlePinnedProtocolIds(pinnedProtocolIds)
+        makeSnackbar(t('pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
       handlePinnedProtocolIds(pinnedProtocolIds)
+      makeSnackbar(t('unpinned_protocol'))
     }
   }
 
@@ -119,13 +113,19 @@ export function LongPressModal(props: {
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
+
     longpress.setIsLongPressed(false)
   }
 
   return (
     <>
       {showMaxPinsAlert ? (
-        <TooManyPinsModal longpress={longpress} />
+        <SmallModalChildren
+          header={t('too_many_pins_header')}
+          subText={t('too_many_pins_body')}
+          buttonText={t('shared:close')}
+          handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
+        />
       ) : (
         <ModalShell
           borderRadius={BORDERS.size_three}
@@ -162,7 +162,7 @@ export function LongPressModal(props: {
               onClick={handlePinClick}
               as="button"
             >
-              <Icon name="push-pin" size="1.875rem" color={COLORS.black} />
+              <Icon name="pin" size="1.875rem" color={COLORS.black} />
               <StyledText
                 fontSize="1.375rem"
                 lineHeight="1.5rem"

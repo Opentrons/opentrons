@@ -4,6 +4,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useInstrumentsQuery,
+  useRunQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
@@ -15,6 +21,7 @@ import {
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
@@ -26,7 +33,6 @@ import {
 import { ProtocolSetup } from '../ProtocolSetup'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
@@ -37,6 +43,8 @@ jest.mock('../../../organisms/ProtocolSetupModules')
 jest.mock('../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../organisms/ProtocolSetupLiquids')
+jest.mock('@opentrons/react-api-client')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -68,7 +76,19 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
-
+const mockProtocolSetupLiquids = ProtocolSetupLiquids as jest.MockedFunction<
+  typeof ProtocolSetupLiquids
+>
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
+  typeof useProtocolQuery
+>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
+const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
+  typeof useAllPipetteOffsetCalibrationsQuery
+>
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
@@ -83,15 +103,44 @@ const render = (path = '/') => {
 }
 
 const RUN_ID = 'my-run-id'
+const PROTOCOL_ID = 'my-protocol-id'
+const PROTOCOL_NAME = 'Mock Protocol Name'
 const CREATED_AT = 'top of the hour'
+const mockGripperData = {
+  instrumentModel: 'gripper_v1',
+  instrumentType: 'gripper',
+  mount: 'extension',
+  serialNumber: 'ghi789',
+}
+const mockRightPipetteData = {
+  instrumentModel: 'p300_single_v2',
+  instrumentType: 'p300',
+  mount: 'right',
+  serialNumber: 'abc123',
+}
+const mockLeftPipetteData = {
+  instrumentModel: 'p1000_single_v2',
+  instrumentType: 'p1000',
+  mount: 'left',
+  serialNumber: 'def456',
+}
+const mockEmptyAnalysis = ({
+  modules: [],
+  labware: [],
+  pipettes: [],
+  commands: [],
+} as unknown) as CompletedProtocolAnalysis
 
 const mockPlay = jest.fn()
 
 describe('ProtocolSetup', () => {
   beforeEach(() => {
-    when(mockUseAttachedModules).calledWith().mockReturnValue([])
+    mockUseAttachedModules.mockReturnValue([])
     mockProtocolSetupModules.mockReturnValue(
       <div>Mock ProtocolSetupModules</div>
+    )
+    mockProtocolSetupLiquids.mockReturnValue(
+      <div>Mock ProtocolSetupLiquids</div>
     )
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     when(mockUseRunControls)
@@ -109,21 +158,12 @@ describe('ProtocolSetup', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
-      .mockReturnValue(({
-        modules: [],
-        labware: [],
-      } as unknown) as CompletedProtocolAnalysis)
+      .mockReturnValue(mockEmptyAnalysis)
     when(mockUseRunCreatedAtTimestamp)
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
     when(mockGetProtocolModulesInfo)
-      .calledWith(
-        ({
-          modules: [],
-          labware: [],
-        } as unknown) as CompletedProtocolAnalysis,
-        ot3StandardDeckDef as any
-      )
+      .calledWith(mockEmptyAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue([])
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith([], [])
@@ -131,6 +171,24 @@ describe('ProtocolSetup', () => {
     when(mockGetDeckDefFromRobotType)
       .calledWith('OT-3 Standard')
       .mockReturnValue(ot3StandardDeckDef as any)
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID, { staleTime: Infinity })
+      .mockReturnValue({ data: { data: { protocolId: PROTOCOL_ID } } } as any)
+    when(mockUseProtocolQuery)
+      .calledWith(PROTOCOL_ID, { staleTime: Infinity })
+      .mockReturnValue({
+        data: { data: { metadata: { protocolName: PROTOCOL_NAME } } },
+      } as any)
+    when(mockUseInstrumentsQuery)
+      .calledWith()
+      .mockReturnValue({
+        data: {
+          data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
+        },
+      } as any)
+    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .calledWith()
+      .mockReturnValue({ data: { data: [] } } as any)
   })
 
   afterEach(() => {
@@ -139,12 +197,12 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render text, image, and buttons', () => {
-    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
     getByText('Prepare to Run')
     getByText(`Run: ${CREATED_AT}`)
     getByText(`Status: ${RUN_STATUS_IDLE}`)
     getByText('Instruments')
-    expect(queryByText('Modules')).toBeNull()
+    getByText('Modules')
     getByText('Labware')
     getByText('Labware Position Check')
     getByText('Liquids')
@@ -177,5 +235,12 @@ describe('ProtocolSetup', () => {
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
     queryByText('Modules')?.click()
     getByText('Mock ProtocolSetupModules')
+  })
+
+  it('should launch protocol setup liquids screen when click liquids', () => {
+    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
+    getByText('Liquids').click()
+    getByText('Mock ProtocolSetupLiquids')
   })
 })

@@ -19,8 +19,11 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_START,
   ALIGN_FLEX_END,
+  PrimaryButton,
+  TEXT_ALIGN_LEFT,
+  JUSTIFY_FLEX_START,
+  ALIGN_STRETCH,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
@@ -67,7 +70,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
       },
     ],
     title: 'Z-axis',
-    subtitle: 'Shift + Arrow keys',
+    subtitle: 'Shift + Arrow Keys',
   },
   [HORIZONTAL_PLANE]: {
     controls: [
@@ -114,9 +117,11 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
 }
 
 const DIRECTION_CONTROL_LAYOUT = css`
+  flex: 1;
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   grid-gap: ${SPACING.spacing4};
+  min-width: 313px;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_COLUMN};
@@ -127,7 +132,7 @@ const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing3};
-  width: 9.75rem;
+  min-width: 9.8125rem;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_ROW};
@@ -137,10 +142,17 @@ const PLANE_BUTTONS_STYLE = css`
 
 const DEFAULT_BUTTON_STYLE = css`
   display: flex;
-  justify-content: ${JUSTIFY_CENTER};
+  border: 1px ${COLORS.white} solid;
+  justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
+  grid-gap: ${SPACING.spacing3};
+  padding: ${SPACING.spacing3};
+
+  &:focus {
+    background-color: ${COLORS.white};
+  }
 
   &:hover {
     background-color: ${COLORS.white};
@@ -156,7 +168,7 @@ const DEFAULT_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: inherit;
+    background-color: ${COLORS.white};
     color: ${COLORS.errorDisabled};
   }
 `
@@ -165,6 +177,11 @@ const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blueEnabled};
   border: 1px ${COLORS.blueEnabled} solid;
+
+  &:hover {
+    color: ${COLORS.bluePressed};
+    border: 1px ${COLORS.bluePressed} solid;
+  }
 `
 
 interface DirectionControlProps {
@@ -209,12 +226,18 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   name={
                     plane === 'vertical' ? 'vertical-plane' : 'horizontal-plane'
                   }
-                  width="1.2rem"
-                  marginRight={SPACING.spacing3}
+                  height="1.375rem"
+                  flex="1 0 auto"
                 />
-                <Flex flexDirection={DIRECTION_COLUMN}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  flex="1 1 auto"
+                >
                   {title}
                   <StyledText
+                    textAlign={TEXT_ALIGN_LEFT}
+                    alignSelf={ALIGN_STRETCH}
                     color={COLORS.darkGreyEnabled}
                     css={TYPOGRAPHY.labelRegular}
                   >
@@ -296,7 +319,7 @@ const ARROW_BUTTON_STYLES = css`
   }
 
   &:disabled {
-    background-color: inherit;
+    background-color: ${COLORS.white};
     color: ${COLORS.darkGreyDisabled};
   }
 

@@ -537,6 +537,16 @@ def _migrate22to23(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate23to24(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 24 of the feature flags file.
+
+    - flips the rearPanelIntegration config element default to true.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["rearPanelIntegration"] = True
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -561,6 +571,7 @@ _MIGRATIONS = [
     _migrate20to21,
     _migrate21to22,
     _migrate22to23,
+    _migrate23to24,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

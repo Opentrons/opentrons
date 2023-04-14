@@ -6,10 +6,11 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { LevelPipette } from './LevelPipette'
 
 import type {
@@ -42,6 +43,7 @@ export interface ConfirmPipetteProps {
   setConfirmPipetteLevel: React.Dispatch<React.SetStateAction<boolean>>
   tryAgain: () => void
   exit: () => void
+  nextStep: () => void
   toCalibrationDashboard: () => void
   isDisabled: boolean
 }
@@ -50,7 +52,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const {
     success,
     mount,
-    tryAgain,
+    nextStep,
     wrongWantedPipette,
     actualPipette,
     setConfirmPipetteLevel,
@@ -106,14 +108,16 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const isWrongWantedPipette = wrongWantedPipette != null
 
   return !confirmPipetteLevel &&
-    wrongWantedPipette &&
+    (wrongWantedPipette != null || (props.wantedPipette != null && success)) &&
     actualPipette != null &&
     actualPipette.channels === 8 ? (
     <LevelPipette
       mount={mount}
       pipetteModelName={actualPipette.name}
-      back={tryAgain}
-      confirm={() => setConfirmPipetteLevel(true)}
+      confirm={() => {
+        nextStep()
+        setConfirmPipetteLevel(true)
+      }}
     />
   ) : (
     <SimpleWizardBody

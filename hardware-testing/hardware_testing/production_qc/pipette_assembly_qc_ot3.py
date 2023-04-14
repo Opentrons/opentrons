@@ -18,7 +18,7 @@ from hardware_testing.drivers.pressure_fixture import (
     PressureFixture,
     SimPressureFixture,
 )
-from hardware_testing.measure.pressure.config import (
+from hardware_testing.measure.pressure.config import (  # type: ignore[import]
     PRESSURE_FIXTURE_TIP_VOLUME,
     PRESSURE_FIXTURE_ASPIRATE_VOLUME,
     PRESSURE_FIXTURE_EVENT_CONFIGS as PRESSURE_CFG,
@@ -109,8 +109,21 @@ TEMP_THRESH = [20, 40]
 HUMIDITY_THRESH = [10, 90]
 
 # THRESHOLDS: capacitive sensor
-CAP_THRESH_OPEN_AIR = [0.0, 10.0]
-CAP_THRESH_PROBE = [0.0, 20.0]
+CAP_THRESH_OPEN_AIR = {
+    1: [1.0, 8.0],
+    8: [5.0, 20.0],
+    96: [0.0, 10.0],
+}
+CAP_THRESH_PROBE = {
+    1: [1.0, 10.0],
+    8: [5.0, 20.0],
+    96: [0.0, 20.0],
+}
+CAP_THRESH_SQUARE = {
+    1: [0.0, 1000.0],
+    8: [0.0, 1000.0],
+    96: [0.0, 1000.0],
+}
 CAP_PROBE_DISTANCE = 50.0
 CAP_PROBE_SECONDS = 5.0
 CAP_PROBE_SETTINGS = CapacitivePassSettings(
@@ -149,7 +162,7 @@ def _get_tips_used_for_droplet_test(
         tip_columns = COLUMNS[:num_trials]
         return [f"{c}1" for c in tip_columns]
     elif pipette_channels == 8:
-        return [f"A{r}" for r in range(num_trials)]
+        return [f"A{r + 1}" for r in range(num_trials)]
     raise RuntimeError(f"unexpected number of channels: {pipette_channels}")
 
 
@@ -239,6 +252,7 @@ async def _pick_up_tip(
         tip_volume = pip.working_volume
     tip_length = helpers_ot3.get_default_tip_length(int(tip_volume))
     await api.pick_up_tip(mount, tip_length=tip_length)
+    await api.move_rel(mount, Point(z=tip_length))
     return actual
 
 
@@ -334,6 +348,7 @@ async def _read_pressure_and_check_results(
     tag: PressureEvent,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
+    channels: int = 1,
 ) -> bool:
     pressure_event_config: PressureEventConfig = PRESSURE_CFG[tag]
     if not api.is_simulator:
@@ -353,7 +368,7 @@ async def _read_pressure_and_check_results(
             and delay_time > 0
         ):
             await asyncio.sleep(pressure_event_config.sample_delay)
-    _samples_channel_1 = [s[0] for s in _samples]
+    _samples_channel_1 = [s[c] for s in _samples for c in range(channels)]
     _samples_channel_1.sort()
     _samples_clipped = _samples_channel_1[1:-1]
     _samples_min = min(_samples_clipped)
@@ -395,40 +410,51 @@ async def _fixture_check_pressure(
     accumulate_raw_data_cb: Callable,
 ) -> bool:
     results = []
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_vol = int(pip.working_volume)
+    pip_channels = int(pip.channels.value)
     # above the fixture
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb
+        api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # insert into the fixture
     await api.move_rel(mount, Point(z=-test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.INSERT, write_cb, accumulate_raw_data_cb
+        api,
+        fixture,
+        PressureEvent.INSERT,
+        write_cb,
+        accumulate_raw_data_cb,
+        pip_channels,
     )
     results.append(r)
     # aspirate 50uL
-    pip = api.hardware_pipettes[mount.to_mount()]
-    assert pip
-    pip_vol = int(pip.working_volume)
     await api.aspirate(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     if pip_vol == 50:
         asp_evt = PressureEvent.ASPIRATE_P50
     else:
         asp_evt = PressureEvent.ASPIRATE_P1000
     r = await _read_pressure_and_check_results(
-        api, fixture, asp_evt, write_cb, accumulate_raw_data_cb
+        api, fixture, asp_evt, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     # dispense
     await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.DISPENSE, write_cb, accumulate_raw_data_cb
+        api,
+        fixture,
+        PressureEvent.DISPENSE,
+        write_cb,
+        accumulate_raw_data_cb,
+        pip_channels,
     )
     results.append(r)
     # retract out of fixture
     await api.move_rel(mount, Point(z=test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
-        api, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb
+        api, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb, pip_channels
     )
     results.append(r)
     return False not in results
@@ -500,7 +526,7 @@ async def _read_pipette_sensor_repeatedly_and_average(
             else:
                 raise ValueError(f"unexpected sensor type: {sensor_type}")
         except helpers_ot3.SensorResponseBad:
-            continue
+            return -999999999999.0
         readings.append(r)
     readings.sort()
     readings = readings[1:-1]
@@ -580,7 +606,7 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 0.0 or pip_enc != 0.0:
+    if pip_pos != 0.0 or abs(pip_enc) > 0.01:
         print(
             f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing"
         )
@@ -606,7 +632,10 @@ async def _test_diagnostics_capacitive(
     print("testing capacitance")
     capacitive_open_air_pass = True
     capacitive_probe_attached_pass = True
+    capacitive_square_pass = True
     capacitive_probing_pass = True
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
 
     async def _read_cap() -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
@@ -616,8 +645,8 @@ async def _test_diagnostics_capacitive(
     capacitance_open_air = await _read_cap()
     print(f"open-air capacitance: {capacitance_open_air}")
     if (
-        capacitance_open_air < CAP_THRESH_OPEN_AIR[0]
-        or capacitance_open_air > CAP_THRESH_OPEN_AIR[1]
+        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels.value][0]
+        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels.value][1]
     ):
         capacitive_open_air_pass = False
         print(f"FAIL: open-air capacitance ({capacitance_open_air}) is not correct")
@@ -634,8 +663,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_probe = await _read_cap()
     print(f"probe capacitance: {capacitance_with_probe}")
     if (
-        capacitance_with_probe < CAP_THRESH_PROBE[0]
-        or capacitance_with_probe > CAP_THRESH_PROBE[1]
+        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels.value][0]
+        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels.value][1]
     ):
         capacitive_probe_attached_pass = False
         print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
@@ -644,6 +673,26 @@ async def _test_diagnostics_capacitive(
             "capacitive-probe",
             capacitance_with_probe,
             _bool_to_pass_fail(capacitive_probe_attached_pass),
+        ]
+    )
+
+    if not api.is_simulator:
+        _get_operator_answer_to_question(
+            'touch a SQUARE to the probe, enter "y" when touching'
+        )
+    capacitance_with_square = await _read_cap()
+    print(f"square capacitance: {capacitance_with_square}")
+    if (
+        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels.value][0]
+        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels.value][1]
+    ):
+        capacitive_square_pass = False
+        print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
+    write_cb(
+        [
+            "capacitive-square",
+            capacitance_with_square,
+            _bool_to_pass_fail(capacitive_square_pass),
         ]
     )
 
@@ -737,7 +786,7 @@ async def _test_diagnostics_pressure(
         print(f"FAIL: sealed pressure ({pressure_compress}) is not correct")
     write_cb(
         [
-            "pressure-sealed",
+            "pressure-compressed",
             pressure_compress,
             _bool_to_pass_fail(pressure_compress_pass),
         ]
@@ -796,18 +845,6 @@ async def _test_plunger_positions(
     print("homing the plunger")
     await api.home([OT3Axis.of_main_tool_actuator(mount)])
     return blow_out_passed and drop_tip_passed
-
-
-async def _reduce_speeds_and_accelerations(
-    api: OT3API, axes: List[OT3Axis], factor: float
-) -> None:
-    new_robot_cfg = {}
-    for ax in axes:
-        cfg = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
-        cfg.max_speed *= factor
-        cfg.acceleration *= factor
-        new_robot_cfg[ax] = cfg
-    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, new_robot_cfg)
 
 
 @dataclass
@@ -895,10 +932,6 @@ async def _main(test_config: TestConfig) -> None:
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_multi_v3.4",
     )
-    # FIXME: remove reducing speeds/accelerations once stall detection bug is fixed
-    await _reduce_speeds_and_accelerations(
-        api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L], SPEED_REDUCTION_PERCENTAGE
-    )
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
     for mount, pipette in pips.items():
@@ -951,8 +984,17 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["TEST-THRESHOLDS"])
         csv_cb.write(["temperature"] + [str(t) for t in TEMP_THRESH])
         csv_cb.write(["humidity"] + [str(t) for t in HUMIDITY_THRESH])
-        csv_cb.write(["capacitive-open-air"] + [str(t) for t in CAP_THRESH_OPEN_AIR])
-        csv_cb.write(["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE])
+        csv_cb.write(
+            ["capacitive-open-air"]
+            + [str(t) for t in CAP_THRESH_OPEN_AIR[pipette_channels]]
+        )
+        csv_cb.write(
+            ["capacitive-probe"] + [str(t) for t in CAP_THRESH_PROBE[pipette_channels]]
+        )
+        csv_cb.write(
+            ["capacitive-square"]
+            + [str(t) for t in CAP_THRESH_SQUARE[pipette_channels]]
+        )
         csv_cb.write(
             ["pressure-microliters-aspirated", PRESSURE_ASPIRATE_VOL[pipette_volume]]
         )
@@ -1039,6 +1081,8 @@ async def _main(test_config: TestConfig) -> None:
         print(f"CSV: {csv_props.name}")
         print("homing")
         await api.home()
+        # disengage x,y for replace the new pipette
+        await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
     print("done")
 
 

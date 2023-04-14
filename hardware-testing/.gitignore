@@ -1,3 +1,5 @@
 .pulled-data/*
 *.tar.gz
+*.zip
+.hardware-testing-description
 ot3-firmware/

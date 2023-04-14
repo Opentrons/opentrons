@@ -9,6 +9,7 @@ import {
   SPACING,
   COLORS,
   POSITION_ABSOLUTE,
+  AlertPrimaryButton,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
@@ -21,7 +22,6 @@ import {
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Modal } from '../../molecules/Modal'

@@ -39,7 +39,7 @@ export function getTotalVolumePerLiquidId(
     .flatMap(labware => Object.values(labware.volumeByWell))
     .reduce((prev, curr) => prev + curr, 0)
 
-  return totalVolume
+  return parseFloat(totalVolume.toFixed(1))
 }
 
 export function getTotalVolumePerLiquidLabwarePair(

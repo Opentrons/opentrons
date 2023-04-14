@@ -1,8 +1,12 @@
 import * as React from 'react'
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  PrimaryButton,
+} from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import { PrimaryButton } from '../../atoms/buttons'
 import { ModalShell } from '../Modal'
 import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
