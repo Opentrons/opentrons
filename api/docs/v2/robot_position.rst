@@ -143,7 +143,7 @@ To prepare code written for Jupyter notebook so it can be run in the app, you ne
         plate = protocol.load_labware(
             load_name = 'nest_96_wellplate_200ul_flat', location = 3)
         p300 = protocol.load_instrument(
-            instrument_name = 'p300_single_gen2', 'left', tip_racks=[tiprack])
+            instrument_name = 'p300_single_gen2', mount = 'left', tip_racks=[tiprack])
         p300.pick_up_tip()
         p300.return_tip()
 		
