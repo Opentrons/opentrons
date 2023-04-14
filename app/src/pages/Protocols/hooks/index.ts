@@ -32,6 +32,12 @@ interface ProtocolModule {
 
 export type ProtocolHardware = ProtocolPipette | ProtocolModule
 
+/**
+ * Returns an array of ProtocolHardware objects that are required by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required hardware is being retrieved.
+ * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID.
+ */
 export const useRequiredProtocolHardware = (
   protocolId: string
 ): ProtocolHardware[] => {
@@ -73,6 +79,12 @@ export const useRequiredProtocolHardware = (
   return [...requiredPipettes, ...requiredModules]
 }
 
+/**
+ * Returns an array of LabwareSetupItem objects that are required by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required labware setup items are being retrieved.
+ * @returns {LabwareSetupItem[]} An array of LabwareSetupItem objects that are required by the given protocol ID.
+ */
 export const useRequiredProtocolLabware = (
   protocolId: string
 ): LabwareSetupItem[] => {
@@ -86,6 +98,14 @@ export const useRequiredProtocolLabware = (
   return [...onDeckItems, ...offDeckItems]
 }
 
+/**
+ * Returns an array of ProtocolHardware objects that are required by the given protocol ID,
+ * but not currently connected.
+ *
+ * @param {string} protocolId The ID of the protocol for which required but missing hardware is being retrieved.
+ * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID,
+ * but not currently connected.
+ */
 export const useMissingProtocolHardware = (
   protocolId: string
 ): ProtocolHardware[] => {
