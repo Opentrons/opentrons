@@ -24,6 +24,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
 import type { RouteProps } from '../../../App/types'
+import { Portal } from '../../../App/portal'
 
 const NavigationLink = styled(NavLink)`
   color: ${COLORS.black};
@@ -47,87 +48,86 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
 
   return (
     <>
-      {showNavMenu ? (
-        <NavigationMenu
-          onClick={() => setNavMenu(false)}
-          robotName={robotName}
-        />
-      ) : (
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginBottom={SPACING.spacing5}
+      >
         <Flex
           flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginBottom={SPACING.spacing5}
+          alignItems={ALIGN_FLEX_START}
+          justifyContent={JUSTIFY_CENTER}
+          gridGap={SPACING.spacing3}
         >
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_FLEX_START}
-            justifyContent={JUSTIFY_CENTER}
-            gridGap={SPACING.spacing3}
-          >
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <NavigationLink
               to="/dashboard"
               onClick={() => setCurrentNav('dashboard')}
             >
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText
-                  fontSize={TYPOGRAPHY.fontSize32}
-                  fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-                  lineHeight={TYPOGRAPHY.lineHeight42}
-                  color={COLORS.darkBlackEnabled}
-                >
-                  {robotName}
-                </StyledText>
-                {currentNav === 'dashboard' ? (
-                  <Box
-                    borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
-                    width={SPACING.spacingXXL}
-                    alignSelf={ALIGN_CENTER}
-                    aria-label="NavLink_dashboard"
-                  />
-                ) : null}
-              </Flex>
+              <StyledText
+                fontSize={TYPOGRAPHY.fontSize32}
+                fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                lineHeight={TYPOGRAPHY.lineHeight42}
+                color={COLORS.darkBlackEnabled}
+              >
+                {robotName}
+              </StyledText>
             </NavigationLink>
+            {currentNav === 'dashboard' ? (
+              <Box
+                borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
+                width={SPACING.spacingXXL}
+                alignSelf={ALIGN_CENTER}
+                aria-label="NavLink_dashboard"
+              />
+            ) : null}
           </Flex>
-          <Flex flexDirection={DIRECTION_ROW}>
-            {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW}>
+          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={TYPOGRAPHY.fontSize32}
+            >
               <NavigationLink
                 key={name}
                 to={navLinkTo as string}
                 onClick={() => setCurrentNav(name as NavRoutes)}
               >
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  marginRight={TYPOGRAPHY.fontSize32}
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize32}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  lineHeight={TYPOGRAPHY.lineHeight42}
+                  color={COLORS.darkBlack_seventy}
                 >
-                  <StyledText
-                    fontSize={TYPOGRAPHY.fontSize32}
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    lineHeight={TYPOGRAPHY.lineHeight42}
-                    color={COLORS.darkBlack_seventy}
-                  >
-                    {name}
-                  </StyledText>
-                  {currentNav === name ? (
-                    <Box
-                      borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
-                      width={SPACING.spacingXXL}
-                      alignSelf={ALIGN_CENTER}
-                      aria-label={`NavLink_${name}`}
-                    />
-                  ) : null}
-                </Flex>
+                  {name}
+                </StyledText>
               </NavigationLink>
-            ))}
-          </Flex>
-          <Flex alignItems={ALIGN_END}>
-            <OverflowBtn
-              isOnDevice={true}
-              onClick={() => setNavMenu(true)}
-              aria-label="Navigation_OverflowBtn"
-            />
-          </Flex>
+              {currentNav === name ? (
+                <Box
+                  borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
+                  width={SPACING.spacingXXL}
+                  alignSelf={ALIGN_CENTER}
+                  aria-label={`NavLink_${name}`}
+                />
+              ) : null}
+            </Flex>
+          ))}
         </Flex>
+        <Flex alignItems={ALIGN_END}>
+          <OverflowBtn
+            isOnDevice={true}
+            onClick={() => setNavMenu(true)}
+            aria-label="Navigation_OverflowBtn"
+          />
+        </Flex>
+      </Flex>
+      {showNavMenu && (
+        <NavigationMenu
+          onClick={() => setNavMenu(false)}
+          robotName={robotName}
+        />
       )}
     </>
   )

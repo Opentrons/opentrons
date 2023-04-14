@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { restartRobot } from '../../../redux/robot-admin'
