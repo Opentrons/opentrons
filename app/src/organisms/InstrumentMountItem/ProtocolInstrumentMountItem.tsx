@@ -61,12 +61,7 @@ export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const {
-    mount,
-    attachedInstrument,
-    speccedName,
-    attachedCalibrationData,
-  } = props
+  const { mount, attachedInstrument, speccedName } = props
 
   const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
     false
@@ -90,8 +85,9 @@ export function ProtocolInstrumentMountItem(
       attachedInstrument
     )
   }
-  const isAttachedWithCal =
-    attachedInstrument != null && attachedCalibrationData != null
+  // TODO: check for presence of calibration data once instruments endpoint
+  // returns calibration data for pipettes
+  const isAttachedWithCal = attachedInstrument != null
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
