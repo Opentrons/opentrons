@@ -1,7 +1,7 @@
 """Gravimetric."""
 from inspect import getsource
 from statistics import stdev
-from typing import Optional, Tuple, List, Any
+from typing import Optional, Tuple, List, Dict, Any
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
@@ -541,6 +541,14 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             actual_asp_list_all = []
             actual_disp_list_all = []
             ui.print_title(f"{volume} uL")
+
+            trial_asp_dict: Dict[int, List[float]] = {
+                trial: [] for trial in range(cfg.trials)
+            }
+            trial_disp_dict: Dict[int, List[float]] = {
+                trial: [] for trial in range(cfg.trials)
+            }
+
             for channel in range(cfg.pipette_channels):
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
@@ -603,8 +611,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
 
                     actual_asp_list_channel.append(asp_with_evap)
                     actual_disp_list_channel.append(disp_with_evap)
+
+                    trial_asp_dict[trial].append(asp_with_evap)
+                    trial_disp_dict[trial].append(disp_with_evap)
+
                     aspirate_data_list.append(aspirate_data)
                     dispense_data_list.append(dispense_data)
+
                     report.store_trial(
                         test_report,
                         trial,
@@ -666,6 +679,36 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 )
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
+
+            for trial in range(cfg.trials):
+                trial_asp_list = trial_asp_dict[trial]
+                trial_disp_list = trial_disp_dict[trial]
+
+                aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
+                    trial_asp_list, volume
+                )
+                dispense_average, dispense_cv, dispense_d = _calculate_stats(
+                    trial_disp_list, volume
+                )
+
+                report.store_volume_per_trial(
+                    report=test_report,
+                    mode="aspirate",
+                    volume=volume,
+                    trial=trial,
+                    average=aspirate_average,
+                    cv=aspirate_cv,
+                    d=aspirate_d,
+                )
+                report.store_volume_per_trial(
+                    report=test_report,
+                    mode="dispense",
+                    volume=volume,
+                    trial=trial,
+                    average=dispense_average,
+                    cv=dispense_cv,
+                    d=dispense_d,
+                )
 
             ui.print_header(f"{volume} uL channel all CALCULATIONS")
             aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(

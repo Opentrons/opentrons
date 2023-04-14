@@ -103,8 +103,13 @@ def create_csv_test_report(
             for trial in range(cfg.trials)
         ]
 
-    # get list of channels 1 indexed prefaced by 'all'
-    channels = ["all"] + list(range(1, cfg.pipette_channels + 1))  # type: ignore[arg-type]
+    # Get label for different volume stores, "channel_all", "channel_1" through channel count,
+    # and "trial_1" through trial count
+    volume_stat_type = (
+        ["channel_all"]
+        + [f"channel_{c+1}" for c in range(cfg.pipette_channels)]
+        + [f"trial_{t+1}" for t in range(cfg.trials)]
+    )
 
     report = CSVReport(
         test_name=cfg.name,
@@ -131,9 +136,9 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{m}-{round(v, 2)}-channel_{c}-{i}", [float])
+                    CSVLine(f"volume-{m}-{round(v, 2)}-{s}-{i}", [float])
                     for v in volumes
-                    for c in channels
+                    for s in volume_stat_type
                     for m in ["aspirate", "dispense"]
                     for i in [
                         "average",
@@ -268,6 +273,35 @@ def store_volume_per_channel(
         "VOLUMES",
         f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-humidity-pipette-avg",
         [round(humidity, 2)],
+    )
+
+
+def store_volume_per_trial(
+    report: CSVReport,
+    mode: str,
+    volume: float,
+    trial: int,
+    average: float,
+    cv: float,
+    d: float,
+) -> None:
+    """Report volume."""
+    assert mode in ["aspirate", "dispense"]
+    vol_in_tag = str(round(volume, 2))
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-average",
+        [round(average, 2)],
+    )
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-cv",
+        [round(cv * 100.0, 2)],
+    )
+    report(
+        "VOLUMES",
+        f"volume-{mode}-{vol_in_tag}-trial_{trial + 1}-d",
+        [round(d * 100.0, 2)],
     )
 
 
