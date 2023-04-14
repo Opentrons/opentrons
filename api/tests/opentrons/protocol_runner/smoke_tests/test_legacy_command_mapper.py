@@ -18,12 +18,11 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     DeckPoint,
 )
-from opentrons.protocol_reader import ProtocolReader, PythonProtocolConfig
+from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.protocols.api_support.types import APIVersion
 
 
 async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Command]:

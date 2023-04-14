@@ -8,8 +8,6 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to check that
 everything was loaded and run as expected.
 """
-import pytest
-
 from datetime import datetime
 from decoy import matchers
 from pathlib import Path
@@ -27,18 +25,10 @@ from opentrons.protocol_engine import (
     commands,
     DeckPoint,
 )
-from opentrons.protocol_reader import (
-    ProtocolReader,
-    JsonProtocolConfig,
-    PythonProtocolConfig,
-)
+from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
-from opentrons.protocols.api_support.types import APIVersion
 
 
-# TODO (tz, 6-17-22): API version 3.x in-development.
-# Currently parsing protocol versions less then MAX_SUPPORTED_VERSION
-@pytest.mark.xfail(strict=True)
 async def test_runner_with_python(
     python_protocol_file: Path,
     tempdeck_v1_def: ModuleDefinition,
@@ -104,7 +94,10 @@ async def test_runner_with_python(
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0,
+            tipLength=51.83,
+            tipDiameter=5.23,
+            position=DeckPoint(x=14.38, y=74.24, z=64.69),
         ),
     )
 

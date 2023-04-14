@@ -8,12 +8,8 @@ from pathlib import Path
 
 from opentrons.protocol_engine import ModuleModel, commands
 
-from opentrons.protocol_reader import (
-    ProtocolReader,
-    PythonProtocolConfig,
-)
+from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
-from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture()

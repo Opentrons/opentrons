@@ -12,9 +12,8 @@ from typing import List
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import DeckSlotLocation, LoadedLabware
-from opentrons.protocol_reader import ProtocolReader, PythonProtocolConfig
+from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
-from opentrons.protocols.api_support.types import APIVersion
 
 
 FIXTURE_LABWARE_DEF = load_shared_data("labware/fixtures/2/fixture_96_plate.json")

@@ -105,7 +105,7 @@ def use_mock_extract_labware_definitions(
 
 
 @pytest.fixture
-def json_subject(
+def json_runner_subject(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -123,7 +123,7 @@ def json_subject(
 
 
 @pytest.fixture
-def legacy_subject(
+def legacy_python_runner_subject(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -143,7 +143,7 @@ def legacy_subject(
 
 
 @pytest.fixture
-def live_subject(
+def live_runner_subject(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -195,9 +195,9 @@ async def test_create_protocol_runner(
 @pytest.mark.parametrize(
     "subject",
     [
-        (lazy_fixture("json_subject")),
-        (lazy_fixture("legacy_subject")),
-        (lazy_fixture("live_subject")),
+        (lazy_fixture("json_runner_subject")),
+        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("live_runner_subject")),
     ],
 )
 async def test_play_starts_run(
@@ -215,9 +215,9 @@ async def test_play_starts_run(
 @pytest.mark.parametrize(
     "subject",
     [
-        (lazy_fixture("json_subject")),
-        (lazy_fixture("legacy_subject")),
-        (lazy_fixture("live_subject")),
+        (lazy_fixture("json_runner_subject")),
+        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("live_runner_subject")),
     ],
 )
 async def test_pause(
@@ -234,9 +234,9 @@ async def test_pause(
 @pytest.mark.parametrize(
     "subject",
     [
-        (lazy_fixture("json_subject")),
-        (lazy_fixture("legacy_subject")),
-        (lazy_fixture("live_subject")),
+        (lazy_fixture("json_runner_subject")),
+        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("live_runner_subject")),
     ],
 )
 async def test_stop(
@@ -257,9 +257,9 @@ async def test_stop(
 @pytest.mark.parametrize(
     "subject",
     [
-        (lazy_fixture("json_subject")),
-        (lazy_fixture("legacy_subject")),
-        (lazy_fixture("live_subject")),
+        (lazy_fixture("json_runner_subject")),
+        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("live_runner_subject")),
     ],
 )
 async def test_stop_when_run_never_started(
@@ -284,16 +284,16 @@ async def test_run_json_runner(
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    json_subject: JsonRunner,
+    json_runner_subject: JsonRunner,
 ) -> None:
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
     )
 
-    assert json_subject.was_started() is False
-    await json_subject.run()
-    assert json_subject.was_started() is True
+    assert json_runner_subject.was_started() is False
+    await json_runner_subject.run()
+    assert json_runner_subject.was_started() is True
 
     decoy.verify(
         await hardware_api.home(),
@@ -309,7 +309,7 @@ async def test_load_json_runner(
     json_translator: JsonTranslator,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    json_subject: JsonRunner,
+    json_runner_subject: JsonRunner,
 ) -> None:
     """It should load a JSON protocol file."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -351,7 +351,7 @@ async def test_load_json_runner(
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
-    await json_subject.load(json_protocol_source)
+    await json_runner_subject.load(json_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -386,7 +386,7 @@ async def test_load_legacy_python(
     legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    legacy_subject: PythonAndLegacyRunner,
+    legacy_python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -434,7 +434,7 @@ async def test_load_legacy_python(
         )
     ).then_return(legacy_context)
 
-    await legacy_subject.load(legacy_protocol_source)
+    await legacy_python_runner_subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -452,7 +452,7 @@ async def test_load_python_with_pe_papi_core(
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
     protocol_engine: ProtocolEngine,
-    legacy_subject: PythonAndLegacyRunner,
+    legacy_python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
     legacy_protocol_source = ProtocolSource(
@@ -493,7 +493,7 @@ async def test_load_python_with_pe_papi_core(
         )
     ).then_return(legacy_context)
 
-    await legacy_subject.load(legacy_protocol_source)
+    await legacy_python_runner_subject.load(legacy_protocol_source)
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
 
@@ -505,7 +505,7 @@ async def test_load_legacy_json(
     legacy_executor: LegacyExecutor,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    legacy_subject: PythonAndLegacyRunner,
+    legacy_python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -548,7 +548,7 @@ async def test_load_legacy_json(
         )
     ).then_return(legacy_context)
 
-    await legacy_subject.load(legacy_protocol_source)
+    await legacy_python_runner_subject.load(legacy_protocol_source)
 
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
@@ -566,16 +566,16 @@ async def test_run_python_runner(
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    legacy_subject: PythonAndLegacyRunner,
+    legacy_python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
     )
 
-    assert legacy_subject.was_started() is False
-    await legacy_subject.run()
-    assert legacy_subject.was_started() is True
+    assert legacy_python_runner_subject.was_started() is False
+    await legacy_python_runner_subject.run()
+    assert legacy_python_runner_subject.was_started() is True
 
     decoy.verify(
         await hardware_api.home(),
@@ -590,16 +590,16 @@ async def test_run_live_runner(
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    live_subject: LiveRunner,
+    live_runner_subject: LiveRunner,
 ) -> None:
     """It should run a protocol to completion."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
         False, True
     )
 
-    assert live_subject.was_started() is False
-    await live_subject.run()
-    assert live_subject.was_started() is True
+    assert live_runner_subject.was_started() is False
+    await live_runner_subject.run()
+    assert live_runner_subject.was_started() is True
 
     decoy.verify(
         await hardware_api.home(),
