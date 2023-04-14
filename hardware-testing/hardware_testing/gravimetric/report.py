@@ -131,7 +131,7 @@ def create_csv_test_report(
             CSVSection(
                 title="VOLUMES",
                 lines=[
-                    CSVLine(f"volume-{m}-{round(v, 2)}-channel-{c}-{i}", [float])
+                    CSVLine(f"volume-{m}-{round(v, 2)}-channel_{c}-{i}", [float])
                     for v in volumes
                     for c in channels
                     for m in ["aspirate", "dispense"]
@@ -148,7 +148,7 @@ def create_csv_test_report(
                 title="TRIALS",
                 lines=[
                     CSVLine(
-                        f"trial-{t + 1}-{m}-{round(v, 2)}-ul-channel-{c + 1}", [float]
+                        f"trial-{t + 1}-{m}-{round(v, 2)}-ul-channel_{c + 1}", [float]
                     )
                     for v in volumes
                     for c in range(cfg.pipette_channels)
@@ -219,14 +219,14 @@ def store_volume_all(
     vol_in_tag = str(round(volume, 2))
     report(
         "VOLUMES",
-        f"volume-{mode}-{vol_in_tag}-channel-all-average",
+        f"volume-{mode}-{vol_in_tag}-channel_all-average",
         [round(average, 2)],
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel-all-cv", [round(cv * 100.0, 2)]
+        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-cv", [round(cv * 100.0, 2)]
     )
     report(
-        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel-all-d", [round(d * 100.0, 2)]
+        "VOLUMES", f"volume-{mode}-{vol_in_tag}-channel_all-d", [round(d * 100.0, 2)]
     )
 
 
@@ -246,27 +246,27 @@ def store_volume_per_channel(
     vol_in_tag = str(round(volume, 2))
     report(
         "VOLUMES",
-        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-average",
+        f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-average",
         [round(average, 2)],
     )
     report(
         "VOLUMES",
-        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-cv",
+        f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-cv",
         [round(cv * 100.0, 2)],
     )
     report(
         "VOLUMES",
-        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-d",
+        f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-d",
         [round(d * 100.0, 2)],
     )
     report(
         "VOLUMES",
-        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-celsius-pipette-avg",
+        f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-celsius-pipette-avg",
         [round(celsius, 2)],
     )
     report(
         "VOLUMES",
-        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-humidity-pipette-avg",
+        f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-humidity-pipette-avg",
         [round(humidity, 2)],
     )
 
@@ -277,9 +277,9 @@ def get_volume_results_all(
     """Get volume results."""
     assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
-    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-all-average"]
-    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-all-cv"]
-    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-all-d"]
+    average = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel_all-average"]
+    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel_all-cv"]
+    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel_all-d"]
     return average.data[0], cv.data[0], d.data[0]  # type: ignore[union-attr]
 
 
@@ -290,10 +290,10 @@ def get_volume_results_per_channel(
     assert mode in ["aspirate", "dispense"]
     vol_in_tag = str(round(volume, 2))
     average = report["VOLUMES"][
-        f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-average"
+        f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-average"
     ]
-    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-cv"]
-    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel-{channel + 1}-d"]
+    cv = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-cv"]
+    d = report["VOLUMES"][f"volume-{mode}-{vol_in_tag}-channel_{channel + 1}-d"]
     return average.data[0], cv.data[0], d.data[0]  # type: ignore[union-attr]
 
 
@@ -309,12 +309,12 @@ def store_trial(
     vol_in_tag = str(round(volume, 2))
     report(
         "TRIALS",
-        f"trial-{trial + 1}-aspirate-{vol_in_tag}-ul-channel-{channel + 1}",
+        f"trial-{trial + 1}-aspirate-{vol_in_tag}-ul-channel_{channel + 1}",
         [aspirate],
     )
     report(
         "TRIALS",
-        f"trial-{trial + 1}-dispense-{vol_in_tag}-ul-channel-{channel + 1}",
+        f"trial-{trial + 1}-dispense-{vol_in_tag}-ul-channel_{channel + 1}",
         [dispense],
     )
 

@@ -18,7 +18,7 @@ def _git(*args: str) -> str:
 def _build_git_description_string() -> str:
     if IS_ROBOT:
         raise RuntimeError("unable to run git describe on robot")
-    description = _git("describe")
+    description = _git("describe").replace('-', '_')
     mods = _git("ls-files", "-m").replace("\n", " ")
     if not mods:
         return description

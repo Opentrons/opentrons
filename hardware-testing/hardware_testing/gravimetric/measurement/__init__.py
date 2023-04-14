@@ -85,7 +85,7 @@ def create_measurement_tag(
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-channel-{channel + 1}-trial-{trial + 1}"
+    return f"{t}-{vol_in_tag}-ul-channel_{channel + 1}-trial-{trial + 1}"
 
 
 class UnstableMeasurementError(Exception):
