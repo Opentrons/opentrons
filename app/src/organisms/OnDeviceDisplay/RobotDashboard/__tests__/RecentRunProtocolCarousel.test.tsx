@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
@@ -7,7 +6,6 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { RecentProtocolRunCard, RecentRunProtocolCarousel } from '..'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { Runs } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../RecentProtocolRunCard')

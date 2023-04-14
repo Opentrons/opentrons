@@ -37,6 +37,10 @@ export function RecentProtocolRunCard({
   const isSuccess = missingProtocolHardware.length === 0
 
   const CARD_STYLE = css`
+    /* display: -webkit-box; */
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
     &:active {
       background-color: ${isSuccess
         ? COLORS.green_three_pressed
@@ -48,7 +52,7 @@ export function RecentProtocolRunCard({
   `
 
   const PROTOCOL_TEXT_STYLE = css`
-    display: -webkit-box;
+    /* display: -webkit-box; */
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
