@@ -12,11 +12,12 @@ export const OverflowBtn = React.forwardRef(
     props: OverflowBtnProps,
     ref: React.ForwardedRef<HTMLInputElement>
   ): JSX.Element => {
+    const { isOnDevice = false } = props
     return (
       <Btn
         css={css`
           border-radius: ${SPACING.spacing2};
-          max-height: ${props.isOnDevice ? '100%' : SPACING.spacing6};
+          max-height: ${isOnDevice ? '100%' : SPACING.spacing6};
 
           &:hover {
             background-color: ${props.isOnDevice
@@ -62,7 +63,7 @@ export const OverflowBtn = React.forwardRef(
         {...props}
         ref={ref}
       >
-        {Boolean(props.isOnDevice) ? (
+        {Boolean(isOnDevice) ? (
           <Icon
             name="overflow-btn-touchscreen"
             height="48.23px"

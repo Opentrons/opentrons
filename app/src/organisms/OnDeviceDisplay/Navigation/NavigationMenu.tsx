@@ -11,6 +11,7 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   SPACING,
+  SIZE_2,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -29,7 +30,7 @@ interface NavigationMenuProps {
 export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
-  const { toggleLights } = useLights()
+  const { lightsOn, toggleLights } = useLights()
   const dispatch = useDispatch<Dispatch>()
 
   return (
@@ -52,7 +53,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           <Icon
             name="reset-position"
             aria-label="reset-position_icon"
-            size="2rem"
+            size={SIZE_2}
             color={COLORS.black}
           />
           <StyledText
@@ -72,7 +73,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         >
           <Icon
             name="restart"
-            size="2rem"
+            size={SIZE_2}
             color={COLORS.black}
             aria-label="restart_icon"
           />
@@ -93,7 +94,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         >
           <Icon
             name="light"
-            size="2rem"
+            size={SIZE_2}
             color={COLORS.black}
             aria-label="light_icon"
           />
@@ -105,7 +106,10 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
-            {i18n.format(t('lights_on'), 'capitalize')}
+            {i18n.format(
+              t(lightsOn ? 'lights_off' : 'lights_on'),
+              'capitalize'
+            )}
           </StyledText>
         </Flex>
       </Flex>

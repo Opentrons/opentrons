@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { restartRobot } from '../../../redux/robot-admin'
@@ -54,11 +54,20 @@ describe('NavigationMenu', () => {
     expect(mockRestartRobot).toHaveBeenCalled()
   })
 
-  it('should render the lights menu item and clicking it, calls useLights', () => {
+  it('should render the lights menu item with lights off and clicking it, calls useLights', () => {
     const { getByText, getByLabelText } = render(props)
     const lights = getByText('Lights on')
     getByLabelText('light_icon')
     fireEvent.click(lights)
     expect(mockToggleLights).toHaveBeenCalled()
+  })
+
+  it('should render the lights menu item with lights on', () => {
+    mockUseLights.mockReturnValue({
+      lightsOn: true,
+      toggleLights: mockToggleLights,
+    })
+    const { getByText } = render(props)
+    getByText('Lights off')
   })
 })

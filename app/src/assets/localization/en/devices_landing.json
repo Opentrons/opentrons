@@ -39,5 +39,6 @@
   "this_robot_has_connected_and_power_on_module": "This robot has a connected and powered on {{moduleName}}",
   "forget_unavailable_robot": "Forget unavailable robot",
   "looking_for_robots": "Looking for robots",
-  "lights_on": "lights on"
+  "lights_on": "lights on",
+  "lights_off": "lights off"
 }

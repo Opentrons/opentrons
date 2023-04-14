@@ -5,7 +5,6 @@ import styled from 'styled-components'
 
 import {
   Flex,
-  Icon,
   COLORS,
   SPACING,
   DIRECTION_ROW,
@@ -14,6 +13,9 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   ALIGN_END,
+  TYPOGRAPHY,
+  Box,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -26,20 +28,22 @@ import type { RouteProps } from '../../../App/types'
 const NavigationLink = styled(NavLink)`
   color: ${COLORS.black};
   display: flex;
-  grid-gap: 0.5rem;
+  grid-gap: ${SPACING.spacing3};
 
   &.active {
     color: ${COLORS.blueEnabled};
   }
 `
+type NavRoutes = 'dashboard' | 'All Protocols' | 'Instruments' | 'Settings'
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
-  const [showNavMenu, setNavMenu] = React.useState(false)
+  const [showNavMenu, setNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+  const [currentNav, setCurrentNav] = React.useState<NavRoutes>('dashboard')
 
   return (
     <>
@@ -59,30 +63,60 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_FLEX_START}
             justifyContent={JUSTIFY_CENTER}
-            gridGap="0.5rem"
+            gridGap={SPACING.spacing3}
           >
-            <NavigationLink to="/dashboard">
-              <StyledText
-                fontSize="1.625rem"
-                fontWeight="700"
-                lineHeight="1.9375rem"
-              >
-                {robotName}
-              </StyledText>
+            <NavigationLink
+              to="/dashboard"
+              onClick={() => setCurrentNav('dashboard')}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize32}
+                  fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                  lineHeight={TYPOGRAPHY.lineHeight42}
+                  color={COLORS.darkBlackEnabled}
+                >
+                  {robotName}
+                </StyledText>
+                {currentNav === 'dashboard' ? (
+                  <Box
+                    borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
+                    width={SPACING.spacingXXL}
+                    alignSelf={ALIGN_CENTER}
+                    aria-label="NavLink_dashboard"
+                  />
+                ) : null}
+              </Flex>
             </NavigationLink>
-            <Icon name="wifi" size="2rem" />
           </Flex>
           <Flex flexDirection={DIRECTION_ROW}>
             {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-              <NavigationLink key={name} to={navLinkTo as string}>
-                <StyledText
-                  fontSize="1.625rem"
-                  fontWeight="600"
-                  lineHeight="1.9375rem"
-                  marginRight="2.75rem"
+              <NavigationLink
+                key={name}
+                to={navLinkTo as string}
+                onClick={() => setCurrentNav(name as NavRoutes)}
+              >
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  marginRight={TYPOGRAPHY.fontSize32}
                 >
-                  {name}
-                </StyledText>
+                  <StyledText
+                    fontSize={TYPOGRAPHY.fontSize32}
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    lineHeight={TYPOGRAPHY.lineHeight42}
+                    color={COLORS.darkBlack_seventy}
+                  >
+                    {name}
+                  </StyledText>
+                  {currentNav === name ? (
+                    <Box
+                      borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
+                      width={SPACING.spacingXXL}
+                      alignSelf={ALIGN_CENTER}
+                      aria-label={`NavLink_${name}`}
+                    />
+                  ) : null}
+                </Flex>
               </NavigationLink>
             ))}
           </Flex>
