@@ -1,6 +1,7 @@
 """OT-3 Module Calibration Script."""
 import argparse
 from traceback import print_exc
+from typing import Optional
 import requests
 
 
@@ -43,14 +44,57 @@ def _home_z(ip_addr: str) -> None:
     requests.post(headers=HEADERS, url=url, json=home_z, params=PARAMS)
 
 
+def _create_run(ip_addr: str) -> Optional[str]:
+    """Create an empty run."""
+    print(f"Creating new run.")
+    url = f"{BASE_URL.format(ip_addr)}/runs"
+    res = requests.post(headers=HEADERS, url=url)
+    if res.status_code != 201:
+        return None
+    run_id = res.json()["data"]["id"]
+    return run_id
+
+
+def _cancel_run(ip_addr: str, run_id: str) -> bool:
+    """Cancel the run."""
+    print(f"Canceling run {run_id}")
+    stop = {"data": {"actionType": "stop"}}
+    url = f"{BASE_URL.format(ip_addr)}/runs/{run_id}/actions"
+    res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=stop)
+    return res.status_code == 201
+
+
 def _main(args: argparse.Namespace) -> None:
     base_url = f"{BASE_URL.format(args.host)}"
 
-    # create an empty run
-    res = requests.post(headers=HEADERS, url=f"{base_url}/runs")
-    run_id = res.json()["data"]["id"]
+    # Collect all runs
+    res = requests.get(headers=HEADERS, url=f"{base_url}/runs")
+    runs = res.json()["data"]
+    active_run = None
+    for run in runs:
+        if run["current"]:
+            active_run = run
+            break
+
+    if active_run:
+        choice = input("There is a run in progress, do you want to cancel it? y/n\n")
+        if choice.lower() in "no":
+            print("Not canceling existing run, exiting.\n")
+            exit(1)
+
+        # Cancel the run
+        run_id = active_run["id"]
+        if not _cancel_run(args.host, run_id):
+            print("Could not cancel run.")
+            exit(1)
+
+    # Create a new run
+    run_id = _create_run(args.host)
+    if not run_id:
+        print("Could not create run.")
+        exit(1)
+
     url = f"{base_url}/runs/{run_id}/commands"
-    print(f"Created run {run_id}")
 
     # Home the instrument axis so we are at a known state
     _home_z(args.host)
@@ -63,7 +107,11 @@ def _main(args: argparse.Namespace) -> None:
             "params": {"model": args.model, "location": {"slotName": args.slot}},
         }
     }
-    res = requests.post(headers=HEADERS, url=url, json=load_module, params=PARAMS)
+    res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=load_module)
+    print(res.json())
+    if res.status_code != 201:
+        print("Error loading module")
+        exit(1)
     module_id = res.json()["data"]["result"]["moduleId"]
 
     # load the calibration labware for the specific module
@@ -79,7 +127,10 @@ def _main(args: argparse.Namespace) -> None:
             },
         }
     }
-    res = requests.post(headers=HEADERS, url=url, json=load_labware, params=PARAMS)
+    res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=load_labware)
+    if res.status_code != 201:
+        print("Error loading labware")
+        exit(1)
     labware_id = res.json()["data"]["result"]["labwareId"]
 
     # calibrate the module
@@ -95,7 +146,7 @@ def _main(args: argparse.Namespace) -> None:
         }
     }
 
-    res = requests.post(headers=HEADERS, url=url, json=calibrate_module, params=PARAMS)
+    res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=calibrate_module)
     if res.status_code != 201 or not res.json()["data"].get("result"):
         error = res.json()["data"]["error"]
         error_type = error.get("errorType")
@@ -138,5 +189,4 @@ if __name__ == "__main__":
     except Exception:
         print("Unhandled exception")
         print_exc()
-    finally:
         _home_z(args.host)
