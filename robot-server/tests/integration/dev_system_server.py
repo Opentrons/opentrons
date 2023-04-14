@@ -1,5 +1,5 @@
 from __future__ import annotations
-from aiohttp import web 
+from aiohttp import web
 from typing import Optional
 from types import TracebackType
 import sys
@@ -7,17 +7,15 @@ import signal
 import subprocess
 from multiprocessing import Process
 
+
 class DevSystemServer:
-    def __init__(
-        self,
-        port: int
-    ) -> None:
+    def __init__(self, port: int) -> None:
         self.proc = None
         self.port = port
-    
+
     def __enter__(self) -> DevSystemServer:
         return self
-    
+
     def __exit__(
         self,
         exc_type: Optional[BaseException],
@@ -25,15 +23,13 @@ class DevSystemServer:
         exc_tb: Optional[TracebackType],
     ) -> None:
         self.stop()
-    
+
     def __del__(self):
         self.stop()
-    
+
     def start(self) -> None:
         """Run the server in another process."""
-        env = {
-            "OT_SYSTEM_SERVER_persistence_directory": "automatically_make_temporary"
-        }
+        env = {"OT_SYSTEM_SERVER_persistence_directory": "automatically_make_temporary"}
         self.proc = subprocess.Popen(
             [
                 sys.executable,

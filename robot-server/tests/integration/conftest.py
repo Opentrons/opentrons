@@ -9,7 +9,7 @@ import requests
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 from .dev_server import DevServer
-from .system_server_mock import DevSystemServer
+from .dev_system_server import DevSystemServer
 
 
 # Must match our Tavern config in common.yaml.
@@ -19,15 +19,40 @@ _SESSION_SERVER_PORT = "31950"
 _SESSION_SYSTEM_SERVER_PORT = 32950
 
 
+def get_auth_token() -> str:
+    """Obtains an auth token from the system server on startup."""
+    session = requests.Session()
+    base_url = f"{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
+
+    registration: str = session.post(
+        url=f"{base_url}/system/register",
+        params={
+            "subject": "ot_integration_tests",
+            "agent": "pytest",
+            "agentId": "pytest123",
+        },
+    ).json()["token"]
+
+    token: str = session.post(
+        url=f"{base_url}/system/authorize",
+        headers={
+            "authenticationBearer": registration,
+        },
+    ).json()["token"]
+
+    return token
+
+
 def pytest_tavern_beta_before_every_test_run(
     test_dict: Dict[str, Any],
     variables: Any,
 ) -> None:
     """Add Opentrons-Version header to requests that don't specify it."""
+    token = get_auth_token()
     for stage in test_dict["stages"]:
         headers = stage["request"].get("headers", {})
         headers.setdefault("Opentrons-Version", "*")
-        headers.setdefault("authenticationBearer", "mock_token")
+        headers.setdefault("authenticationBearer", token)
         stage["request"].update({"headers": headers})
 
 
@@ -39,16 +64,17 @@ def pytest_tavern_beta_after_every_response(
 
 
 @pytest.fixture(scope="session")
-def request_session() -> requests.Session:
+def request_session(run_mock_system_server: object) -> requests.Session:
     session = requests.Session()
     session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
-    session.headers.update({"authenticationBearer": "placeholder-token"})
+    session.headers.update({"authenticationBearer": get_auth_token()})
     return session
 
 
 @pytest.fixture(scope="session")
 def run_server(
     request_session: requests.Session,
+    run_mock_system_server: object,
     server_temp_directory: str,
 ) -> Iterator[None]:
     """Run the robot server in a background process."""
@@ -78,30 +104,29 @@ def run_server(
 
         yield
 
+
 @pytest.fixture(scope="session")
-def run_mock_system_server(
-    request_session: requests.Session,
-) -> Iterator[None]:
+def run_mock_system_server() -> Iterator[None]:
     with DevSystemServer(
         port=_SESSION_SYSTEM_SERVER_PORT,
     ) as system_server:
         system_server.start()
-        time.sleep(0.5)
 
-        if False:
-            # Wait for a bit to get started by polling it
-            from requests.exceptions import ConnectionError
+        session = requests.Session()
 
-            while True:
-                try:
-                    request_session.get(
-                        f"{_SESSION_SERVER_HOST}:{system_server.port}/system/authorize"
-                    )
-                except ConnectionError:
-                    pass
-                else:
-                    break
-                time.sleep(0.5)
+        # Wait for a bit to get started by polling it
+        from requests.exceptions import ConnectionError
+
+        while True:
+            try:
+                session.get(
+                    f"{_SESSION_SERVER_HOST}:{system_server.port}/system/authorize"
+                )
+            except ConnectionError:
+                pass
+            else:
+                break
+            time.sleep(0.5)
 
         yield
 
