@@ -23,3 +23,10 @@ class InvalidRequest(ErrorDetails):
 
     id: Literal["InvalidRequest"] = "InvalidRequest"
     title: str = "Invalid Request"
+
+
+class IDNotFound(ErrorDetails):
+    """An error returned when an ID is specified incorrectly."""
+
+    id: Literal["IDNotFound"] = "IDNotFound"
+    title: str = "ID Not Found"
