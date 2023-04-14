@@ -4,6 +4,7 @@ include ../scripts/push.mk
 include ../scripts/python.mk
 
 SHX := npx shx
+REDOC := npx @redocly/cli
 
 # Path of source package
 SRC_PATH = robot_server
@@ -196,4 +197,4 @@ term:
 docs:
 	$(python) -m robot_server.spec_generator
 	$(SHX) mkdir -p docs/dist/http
-	$(pipenv) run redoc-cli build docs/build/openapi.json -o docs/dist/http/api_reference.html
+	$(REDOC) build-docs docs/build/openapi.json -o docs/dist/http/api_reference.html
