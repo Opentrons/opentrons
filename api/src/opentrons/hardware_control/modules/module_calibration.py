@@ -1,10 +1,11 @@
 from datetime import datetime
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional
 from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.calibration_storage.ot3.module_offset import (
     get_module_offset,
+    load_all_module_offsets,
     save_module_calibration,
 )
 from opentrons.calibration_storage.types import SourceType
@@ -78,3 +79,28 @@ def save_module_calibration_offset(
     """Save the calibration offset for a given module."""
     if module_id:
         save_module_calibration(offset, mount, slot, module, module_id, instrument_id)
+
+
+def load_all_module_calibrations() -> List[ModuleCalibrationOffset]:
+    """Loads all the module calibration stored on the robot."""
+    module_calibrations: List[ModuleCalibrationOffset] = []
+    module_offset_data = load_all_module_offsets()
+    for data in module_offset_data:
+        module_calibrations.append(
+            ModuleCalibrationOffset(
+                slot=data.slot,
+                module=data.module,
+                module_id=data.module_id,
+                mount=data.mount,
+                offset=data.offset,
+                last_modified=data.lastModified,
+                instrument_id=data.instrument_id,
+                source=data.source,
+                status=CalibrationStatus(
+                    markedAt=data.status.markedAt,
+                    markedBad=data.status.markedBad,
+                    source=data.status.source,
+                ),
+            )
+        )
+    return module_calibrations
