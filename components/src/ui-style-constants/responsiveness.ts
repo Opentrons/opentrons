@@ -1,1 +1,1 @@
-export const touchscreenMediaQuerySpecs = '(hover: none) and (width: 1024px)'
+export const touchscreenMediaQuerySpecs = '(height: 600px) and (width: 1024px)'

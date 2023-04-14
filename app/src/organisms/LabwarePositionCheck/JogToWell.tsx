@@ -115,7 +115,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacingM}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
-              <React.Fragment>
+              <>
                 <LabwareRender
                   definition={labwareDef}
                   wellStroke={wellStroke}
@@ -128,7 +128,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   labwareDef={labwareDef}
                   pipetteName={pipetteName}
                 />
-              </React.Fragment>
+              </>
             )}
           </RobotWorkSpace>
           <img

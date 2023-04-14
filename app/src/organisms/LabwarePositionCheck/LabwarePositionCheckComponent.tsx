@@ -49,7 +49,7 @@ interface LabwarePositionCheckModalProps {
   caughtError?: Error
 }
 
-export const LabwarePositionCheckInner = (
+export const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
@@ -291,16 +291,11 @@ export const LabwarePositionCheckInner = (
   )
   return (
     <Portal level="top">
-      {Boolean(isOnDevice) ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="100%"
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
+      {isOnDevice ? (
+        <ModalShell >
           {wizardHeader}
           {modalContent}
-        </Flex>
+        </ModalShell>
       ) : (
         <ModalShell width="47rem" header={wizardHeader}>
           {modalContent}
@@ -314,7 +309,7 @@ export const LabwarePositionCheckInner = (
 // until the robot analysis loads (which requires a stable run), other components that
 // rendered nearby will cause the run to be periodically polled for updates
 // and we don't need those polls causing unnecessary rerenders to the LPC flow
-export const LabwarePositionCheckComponent = React.memo(
-  LabwarePositionCheckInner,
-  ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
-)
+// export const LabwarePositionCheckComponent = React.memo(
+//   LabwarePositionCheckInner,
+//   ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
+// )

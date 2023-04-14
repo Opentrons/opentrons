@@ -368,16 +368,11 @@ export const PipetteWizardFlows = (
 
   return (
     <Portal level="top">
-      {Boolean(isOnDevice) ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="100%"
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.fundamentalsBackground}
-        >
+      {isOnDevice ? (
+        <ModalShell>
           {wizardHeader}
           {modalContent}
-        </Flex>
+        </ModalShell>
       ) : (
         <ModalShell
           width="47rem"

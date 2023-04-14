@@ -230,7 +230,7 @@ export const GripperWizard = (
 
   return (
     <Portal level="top">
-      {Boolean(isOnDevice) ? (
+      {isOnDevice ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
           width="100%"

@@ -1,8 +1,7 @@
 import * as React from 'react'
-
+import styled from 'styled-components'
 import {
   Box,
-  Flex,
   StyleProps,
   COLORS,
   SPACING,
@@ -14,36 +13,9 @@ import {
   OVERFLOW_AUTO,
   POSITION_STICKY,
   BORDERS,
+  RESPONSIVENESS,
+  styleProps,
 } from '@opentrons/components'
-
-const BASE_STYLE = {
-  position: POSITION_ABSOLUTE,
-  alignItems: ALIGN_CENTER,
-  justifyContent: JUSTIFY_CENTER,
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-} as const
-
-const MODAL_STYLE = {
-  backgroundColor: COLORS.white,
-  position: POSITION_RELATIVE,
-  overflowY: OVERFLOW_AUTO,
-  maxHeight: '100%',
-  width: '100%',
-  margin: SPACING.spacing5,
-  borderRadius: BORDERS.radiusSoftCorners,
-  boxShadow: BORDERS.smallDropShadow,
-} as const
-
-const FULL_PAGE_STYLE = {
-  overflowY: OVERFLOW_AUTO,
-  height: '100%',
-  width: '100%',
-} as const
 
 const HEADER_STYLE = {
   backgroundColor: COLORS.white,
@@ -93,36 +65,65 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
   } = props
 
   return (
-    <Flex
-      position={POSITION_FIXED}
-      left="0"
-      right="0"
-      top="0"
-      bottom="0"
-      zIndex="1"
-      backgroundColor={COLORS.backgroundOverlay}
-      cursor="default"
+    <Overlay
       onClick={e => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
       }}
     >
-      <Flex {...BASE_STYLE} zIndex={zIndex}>
-        <Box
-          {...(fullPage ? FULL_PAGE_STYLE : MODAL_STYLE)}
-          // apply background color style prop only to full page - omitting width, margin, etc
-          {...(fullPage
-            ? { backgroundColor: styleProps.backgroundColor ?? COLORS.white }
-            : styleProps)}
-          onClick={e => {
-            e.stopPropagation()
-          }}
+      <ContentArea zIndex={zIndex}>
+        <ModalArea
+          isFullPage={fullPage}
+          onClick={e => { e.stopPropagation() }}
+          {...styleProps}
         >
           {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
           {children}
           {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
-        </Box>
-      </Flex>
-    </Flex>
+        </ModalArea>
+      </ContentArea>
+    </Overlay>
   )
 }
+
+const Overlay = styled.div`
+  position: ${POSITION_FIXED};
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  background-color: ${COLORS.backgroundOverlay};
+  cursor: default
+`
+const ContentArea = styled.div<{ zIndex: string | number }>`
+  display: flex;
+  position: ${POSITION_ABSOLUTE};
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: ${({ zIndex }) => zIndex};
+`
+
+const ModalArea = styled.div<{ isFullPage: boolean, backgroundColor?: string} & StyleProps>`
+  backgroundColor: ${COLORS.white};
+  position: ${POSITION_RELATIVE};
+  overflowY: ${OVERFLOW_AUTO};
+  maxHeight: 100%;
+  width: 100%;
+  margin: ${SPACING.spacing5};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  box-shadow: ${BORDERS.smallDropShadow};
+  height: ${({isFullPage}) => isFullPage ? '100%' : 'auto'};
+  background-color: ${COLORS.white};
+  ${styleProps};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+
+  }
+`

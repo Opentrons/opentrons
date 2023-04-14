@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   LabwareRender,
@@ -13,6 +13,7 @@ import {
   SPACING,
   PrimaryButton,
   RESPONSIVENESS,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -22,11 +23,15 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   getModuleType,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { StyledText } from '../../atoms/text'
 import { CheckLabwareStep } from './types'
 import { NeedHelpLink } from '../CalibrationPanels'
+import { getIsOnDevice } from '../../redux/config'
+import { useSelector } from 'react-redux'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -52,6 +57,7 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const { location, moduleId, labwareDef, protocolData, header, body } = props
+  const isOnDevice = useSelector(getIsOnDevice)
 
   if (protocolData == null) return null
   return (
@@ -59,9 +65,9 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing6}
-      minHeight="25rem"
+      minHeight="29.5rem"
     >
-      <Flex gridGap={SPACING.spacingL}>
+      <ResponsiveTwoUpPanel>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
@@ -72,7 +78,8 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         </Flex>
         <Box flex="1">
           <RobotWorkSpace
-            deckDef={standardDeckDef as any}
+            height="100%"
+            deckDef={ot3DeckDef as any}
             viewBox={DECK_MAP_VIEWBOX}
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             id="LabwarePositionCheck_deckMap"
@@ -92,7 +99,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                     def={getModuleDef2(location.moduleModel)}
                     innerProps={
                       getModuleType(location.moduleModel) ===
-                      THERMOCYCLER_MODULE_TYPE
+                        THERMOCYCLER_MODULE_TYPE
                         ? { lidMotorState: 'open' }
                         : {}
                     }
@@ -126,7 +133,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                         def={getModuleDef2(module.model)}
                         innerProps={
                           getModuleType(module.model) ===
-                          THERMOCYCLER_MODULE_TYPE
+                            THERMOCYCLER_MODULE_TYPE
                             ? { lidMotorState: 'open' }
                             : {}
                         }
@@ -139,23 +146,43 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
             }}
           </RobotWorkSpace>
         </Box>
-      </Flex>
-      <Flex
-        width="100%"
-        marginTop={SPACING.spacing6}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        css={css`
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            margin-top: 0;
-          }
-        `}
-      >
-        <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <PrimaryButton onClick={props.confirmPlacement}>
-          {t('shared:confirm_placement')}
-        </PrimaryButton>
-      </Flex>
-    </Flex>
+      </ResponsiveTwoUpPanel>
+      {isOnDevice ? (
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={ALIGN_CENTER}
+        >
+          <SmallButton
+            onClick={props.confirmPlacement}
+            buttonType='default'
+            buttonText={t('shared:confirm_placement')} />
+        </Flex>
+      ) : (
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing6}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
+          <NeedHelpLink href={LPC_HELP_LINK_URL} />
+          <PrimaryButton onClick={props.confirmPlacement}>
+            {t('shared:confirm_placement')}
+          </PrimaryButton>
+        </Flex>
+
+      )
+      }
+    </Flex >
   )
 }
+
+const ResponsiveTwoUpPanel = styled.div`
+  display: flex;
+  grid-gap: ${SPACING.spacingL};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: 0;
+    max-height: 20rem;
+  }
+`
