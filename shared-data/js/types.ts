@@ -381,7 +381,6 @@ export interface ProtocolMetadata {
   category?: string | null
   subcategory?: string | null
   tags?: string[]
-  referencedRunIds?: string[]
   [key: string]: unknown
 }
 export interface PendingProtocolAnalysis {

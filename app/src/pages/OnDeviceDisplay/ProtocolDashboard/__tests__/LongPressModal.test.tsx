@@ -70,7 +70,7 @@ describe('Long Press Modal', () => {
     when(mockGetProtocol)
       .calledWith(MOCK_HOST_CONFIG, 'mockProtocol1')
       .mockResolvedValue({
-        data: { data: { metadata: { referencedRunIds: ['1', '2'] } } },
+        data: { links: { referencingRunIds: [{ id: '1' }, { id: '2' }] } },
       } as any)
     const { result } = renderHook(() => useLongPress())
     result.current.isLongPressed = true

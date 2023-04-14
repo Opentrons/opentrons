@@ -130,7 +130,7 @@ describe('ODDProtocolDetails', () => {
     when(mockGetProtocol)
       .calledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
       .mockResolvedValue({
-        data: { data: { metadata: { referencedRunIds: ['1', '2'] } } },
+        data: { links: { referencingRunIds: [{ id: '1' }, { id: '2' }] } },
       } as any)
     const [{ getByText }] = render()
     const deleteButton = getByText('Delete protocol').closest('button')

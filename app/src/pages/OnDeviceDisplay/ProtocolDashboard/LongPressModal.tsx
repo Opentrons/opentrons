@@ -66,14 +66,15 @@ export function LongPressModal(props: {
   const handleDeleteClick = (): void => {
     if (host != null) {
       getProtocol(host, protocolId)
-        .then(response => response.data.data)
-        .then(protocol => {
-          const referencedRunIds = protocol.metadata.referencedRunIds
-          return referencedRunIds ?? []
-        })
-        .then(referencedRunIds =>
-          Promise.all(referencedRunIds?.map(runId => deleteRun(host, runId)))
+        .then(
+          response =>
+            response.data.links.referencingRunIds.map(({ id }) => id) ?? []
         )
+        .then(referencingRunIds => {
+          return Promise.all(
+            referencingRunIds?.map(runId => deleteRun(host, runId))
+          )
+        })
         .then(() => deleteProtocol(host, protocolId))
         .then(() => longpress.setIsLongPressed(false))
         .catch((e: Error) => {
