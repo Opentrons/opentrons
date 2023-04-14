@@ -25,26 +25,9 @@ export function request<ResData, ReqData = null>(
   config: HostConfig,
   params?: AxiosRequestConfig['params']
 ): ResponsePromise<ResData> {
-  const { hostname, port } = config
-  const headers = { ...DEFAULT_HEADERS }
-  const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
-
-  return axios.request({ headers, method, baseURL, url, data, params })
-}
-
-export function appShellRequest<ResData, ReqData = null>(
-  method: Method,
-  url: string,
-  data: ReqData,
-  config: HostConfig,
-  params?: AxiosRequestConfig['params']
-): ResponsePromise<ResData> {
   const { hostname, port, requestor = axios.request } = config
   const headers = { ...DEFAULT_HEADERS }
-  // TODO: construct baseUrl from discovery-client values
-  const baseURL = `http://${hostname ?? 'opentrons.com'}:${
-    port ?? DEFAULT_PORT
-  }`
+  const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
 
   return requestor<ResData>({ headers, method, baseURL, url, data, params })
 }

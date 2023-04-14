@@ -24,6 +24,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../redux/discovery'
+import { appShellRequestor } from '../../../redux/shell/remote'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
@@ -93,12 +94,24 @@ export function DevicesLanding(): JSX.Element {
             })}
           >
             {healthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+              <ApiHostProvider
+                key={robot.name}
+                hostname={robot.ip ?? null}
+                requestor={
+                  robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined
+                }
+              >
                 <RobotCard robot={robot} />
               </ApiHostProvider>
             ))}
             {unhealthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+              <ApiHostProvider
+                key={robot.name}
+                hostname={robot.ip ?? null}
+                requestor={
+                  robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined
+                }
+              >
                 <RobotCard robot={robot} />
               </ApiHostProvider>
             ))}

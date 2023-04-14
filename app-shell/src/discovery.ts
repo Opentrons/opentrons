@@ -169,7 +169,7 @@ export function registerDiscovery(
         httpAgent: usbHttpAgent,
         ...config,
       })
-      return response.data
+      return { data: response.data }
     } catch (e) {
       log.debug(`usbListener error ${JSON.stringify(e)}`)
     }

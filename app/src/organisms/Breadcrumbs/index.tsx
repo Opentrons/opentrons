@@ -16,10 +16,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import {
   useRobot,
@@ -28,10 +25,8 @@ import {
 import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
 import { getStoredProtocol } from '../../redux/protocol-storage'
-import { remote } from '../../redux/shell/remote'
+import { appShellRequestor } from '../../redux/shell/remote'
 
-import type { AxiosRequestConfig } from 'axios'
-import type { ResponsePromise } from '@opentrons/api-client'
 import type { DesktopRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
 
@@ -75,7 +70,6 @@ const CrumbLinkInactive = styled(Flex)`
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
-  const { data: instruments = [] } = useInstrumentsQuery()
   const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
 
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
@@ -150,17 +144,8 @@ function BreadcrumbsComponent(): JSX.Element | null {
           </Flex>
         )
       })}
-      {instruments.map(
-        (instrument: { instrumentName: string }) => instrument?.instrumentName
-      )}
     </Flex>
   ) : null
-}
-
-function appShellRequestor<Data>(
-  config: AxiosRequestConfig
-): ResponsePromise<Data> {
-  return remote.ipcRenderer.invoke('usb:request', config)
 }
 
 export function Breadcrumbs(): JSX.Element | null {
@@ -168,7 +153,10 @@ export function Breadcrumbs(): JSX.Element | null {
   const robot = useRobot(robotName)
 
   return (
-    <ApiHostProvider hostname={robot?.ip ?? null} requestor={appShellRequestor}>
+    <ApiHostProvider
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined}
+    >
       <BreadcrumbsComponent />
     </ApiHostProvider>
   )

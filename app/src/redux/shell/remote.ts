@@ -1,6 +1,8 @@
 // access main process remote modules via attachments to `global`
 import assert from 'assert'
 
+import type { AxiosRequestConfig } from 'axios'
+import type { ResponsePromise } from '@opentrons/api-client'
 import type { Remote } from './types'
 
 const emptyRemote: Remote = {} as any
@@ -20,3 +22,9 @@ export const remote: Remote = new Proxy(emptyRemote, {
     return global.APP_SHELL_REMOTE[propName] as Remote
   },
 })
+
+export function appShellRequestor<Data>(
+  config: AxiosRequestConfig
+): ResponsePromise<Data> {
+  return remote.ipcRenderer.invoke('usb:request', config)
+}

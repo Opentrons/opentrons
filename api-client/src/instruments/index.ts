@@ -1,1 +1,0 @@
-export { getInstruments } from './getInstruments'

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { CalibrationTaskList } from '../../../organisms/CalibrationTaskList'
+import { appShellRequestor } from '../../../redux/shell/remote'
 import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'
 import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePipOffset'
 import { useDashboardCalibrateTipLength } from './hooks/useDashboardCalibrateTipLength'
@@ -25,7 +26,11 @@ export function CalibrationDashboard(): JSX.Element {
     DashboardDeckCalWizard,
   ] = useDashboardCalibrateDeck(robotName)
   return (
-    <ApiHostProvider key={robot?.name} hostname={robot?.ip ?? null}>
+    <ApiHostProvider
+      key={robot?.name}
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined}
+    >
       <CalibrationTaskList
         robotName={robotName}
         deckCalLauncher={dashboardDeckCalLauncher}

@@ -18,6 +18,7 @@ import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAnd
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../redux/discovery'
+import { appShellRequestor } from '../../../redux/shell/remote'
 
 import type { DesktopRouteParams } from '../../../App/types'
 
@@ -31,7 +32,11 @@ export function DeviceDetails(): JSX.Element | null {
   if (robot == null && isScanning) return null
 
   return robot != null ? (
-    <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+    <ApiHostProvider
+      key={robot.name}
+      hostname={robot.ip ?? null}
+      requestor={robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined}
+    >
       <Box
         minWidth="36rem"
         height="100%"
