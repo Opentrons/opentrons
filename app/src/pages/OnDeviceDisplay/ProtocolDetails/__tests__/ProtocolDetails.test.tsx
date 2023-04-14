@@ -139,7 +139,10 @@ describe('ODDProtocolDetails', () => {
     await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
-    expect(mockDeleteProtocol).toHaveBeenCalledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
+    expect(mockDeleteProtocol).toHaveBeenCalledWith(
+      MOCK_HOST_CONFIG,
+      'fakeProtocolId'
+    )
   })
   it('renders the navigation buttons', () => {
     mockHardware.mockReturnValue(<div>Mock Hardware</div>)
