@@ -269,7 +269,7 @@ class LiveRunner(AbstractRunner):
         self._hardware_api = hardware_api
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    def set_task_queue_wait(self) -> None:
+    def prepare(self) -> None:
         """Set the task queue to wait until all commands are executed."""
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
@@ -287,7 +287,7 @@ class LiveRunner(AbstractRunner):
         return RunResult(commands=commands, state_summary=run_data)
 
 
-RunnerType = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]
+AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]
 
 
 def create_protocol_runner(
@@ -300,7 +300,7 @@ def create_protocol_runner(
     legacy_file_reader: Optional[LegacyFileReader] = None,
     legacy_context_creator: Optional[LegacyContextCreator] = None,
     legacy_executor: Optional[LegacyExecutor] = None,
-) -> RunnerType:
+) -> AnyRunner:
     """Create a protocol runner."""
     if protocol_config:
         if (

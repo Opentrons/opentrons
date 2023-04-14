@@ -3,7 +3,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import List, cast, Optional, Union
+from typing import List, cast, Optional, Union, Type
 
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
@@ -26,8 +26,7 @@ from opentrons.protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     LiveRunner,
-    AbstractRunner,
-    RunnerType,
+    AnyRunner,
 )
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
@@ -176,7 +175,7 @@ async def test_create_protocol_runner(
     legacy_context_creator: LegacyContextCreator,
     legacy_executor: LegacyExecutor,
     config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
-    runner_type: RunnerType,
+    runner_type: Type[AnyRunner],
 ) -> None:
     """It should return protocol runner type depending on the config."""
     assert isinstance(
@@ -188,7 +187,7 @@ async def test_create_protocol_runner(
             json_file_reader=json_file_reader,
             json_translator=json_translator,
         ),
-        runner_type,  # type: ignore[arg-type]
+        runner_type,
     )
 
 
@@ -204,7 +203,7 @@ async def test_play_starts_run(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
-    subject: AbstractRunner,
+    subject: AnyRunner,
 ) -> None:
     """It should start a protocol run with play."""
     subject.play()
@@ -223,7 +222,7 @@ async def test_play_starts_run(
 async def test_pause(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
-    subject: AbstractRunner,
+    subject: AnyRunner,
 ) -> None:
     """It should pause a protocol run with pause."""
     subject.pause()
@@ -243,7 +242,7 @@ async def test_stop(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    subject: AbstractRunner,
+    subject: AnyRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
@@ -266,7 +265,7 @@ async def test_stop_when_run_never_started(
     decoy: Decoy,
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
-    subject: AbstractRunner,
+    subject: AnyRunner,
 ) -> None:
     """It should clean up rather than halt if the runner was never started."""
     decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)

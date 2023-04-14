@@ -10,7 +10,7 @@ from .protocol_runner import (
     JsonRunner,
     PythonAndLegacyRunner,
     LiveRunner,
-    RunnerType,
+    AnyRunner,
 )
 from .create_simulating_runner import create_simulating_runner
 
@@ -22,5 +22,5 @@ __all__ = [
     "JsonRunner",
     "PythonAndLegacyRunner",
     "LiveRunner",
-    "RunnerType",
+    "AnyRunner",
 ]

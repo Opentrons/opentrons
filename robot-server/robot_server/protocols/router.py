@@ -46,8 +46,8 @@ from .dependencies import (
     get_protocol_reader,
     get_protocol_store,
     get_analysis_store,
-    get_protocol_directory,
     get_protocol_analyzer,
+    get_protocol_directory,
     get_file_reader_writer,
     get_file_hasher,
 )

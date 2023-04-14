@@ -6,7 +6,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import (
-    RunnerType,
+    AnyRunner,
     JsonRunner,
     PythonAndLegacyRunner,
     RunResult,
@@ -36,7 +36,7 @@ class RunnerEnginePair(NamedTuple):
     """A stored Runner/ProtocolEngine pair."""
 
     run_id: str
-    runner: RunnerType
+    runner: AnyRunner
     engine: ProtocolEngine
 
 
@@ -67,7 +67,7 @@ class EngineStore:
         return self._runner_engine_pair.engine
 
     @property
-    def runner(self) -> RunnerType:
+    def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
         assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
@@ -155,8 +155,8 @@ class EngineStore:
                 protocol is not None
             ), "A Python or JSON protocol should have a protocol source file."
             await runner.load(protocol.source)
-        else:  # Why does linter not like `else:`..?
-            runner.set_task_queue_wait()
+        else:
+            runner.prepare()
 
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
