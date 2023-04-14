@@ -52,6 +52,9 @@ jobs:
       - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.7'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
       - uses: './.github/actions/python/setup'
         with:
           project: 'robot-server'
