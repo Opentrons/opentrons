@@ -14,7 +14,6 @@ import {
   JUSTIFY_CENTER,
   ALIGN_END,
   TYPOGRAPHY,
-  Box,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
@@ -24,18 +23,6 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
 import type { RouteProps } from '../../../App/types'
-import { Portal } from '../../../App/portal'
-
-const NavigationLink = styled(NavLink)`
-  color: ${COLORS.black};
-  display: flex;
-  grid-gap: ${SPACING.spacing3};
-
-  &.active {
-    color: ${COLORS.blueEnabled};
-  }
-`
-type NavRoutes = 'dashboard' | 'All Protocols' | 'Instruments' | 'Settings'
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
@@ -44,8 +31,25 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
-  const [currentNav, setCurrentNav] = React.useState<NavRoutes>('dashboard')
+  const NavigationLink = styled(NavLink)`
+    color: ${COLORS.black};
+    display: flex;
+    grid-gap: ${SPACING.spacing3};
+    border-bottom: 0.3125rem solid transparent;
+    height: 3.5rem;
 
+    &.active {
+      border-bottom: 0.3125rem solid transparent;
+      border-image: linear-gradient(
+        to right,
+        white 33.3%,
+        ${COLORS.highlightPurple_one} 33.3%,
+        ${COLORS.highlightPurple_one} 66.6%,
+        white 66.6%
+      );
+      border-image-slice: 1;
+    }
+  `
   return (
     <>
       <Flex
@@ -61,10 +65,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           gridGap={SPACING.spacing3}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <NavigationLink
-              to="/dashboard"
-              onClick={() => setCurrentNav('dashboard')}
-            >
+            <NavigationLink to="/dashboard">
               <StyledText
                 fontSize={TYPOGRAPHY.fontSize32}
                 fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
@@ -74,14 +75,6 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
                 {robotName}
               </StyledText>
             </NavigationLink>
-            {currentNav === 'dashboard' ? (
-              <Box
-                borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
-                width={SPACING.spacingXXL}
-                alignSelf={ALIGN_CENTER}
-                aria-label="NavLink_dashboard"
-              />
-            ) : null}
           </Flex>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW}>
@@ -90,11 +83,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               marginRight={TYPOGRAPHY.fontSize32}
             >
-              <NavigationLink
-                key={name}
-                to={navLinkTo as string}
-                onClick={() => setCurrentNav(name as NavRoutes)}
-              >
+              <NavigationLink key={name} to={navLinkTo as string}>
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSize32}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -104,14 +93,6 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
                   {name}
                 </StyledText>
               </NavigationLink>
-              {currentNav === name ? (
-                <Box
-                  borderBottom={`0.3125rem solid ${COLORS.highlightPurple_one}`}
-                  width={SPACING.spacingXXL}
-                  alignSelf={ALIGN_CENTER}
-                  aria-label={`NavLink_${name}`}
-                />
-              ) : null}
             </Flex>
           ))}
         </Flex>
