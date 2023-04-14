@@ -204,8 +204,8 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('Run again')
     getByText('yay mock protocol')
-    getByText('Missing 1 module(s) and 1 pipette(s)')
-    getByLabelText('icon_Missing 1 module(s) and 1 pipette(s)')
+    getByText('Missing hardware')
+    getByLabelText('icon_Missing hardware')
     expect(getByLabelText('RecentRunCard')).toHaveStyle(
       `background-color: ${COLORS.yellow_three}`
     )
