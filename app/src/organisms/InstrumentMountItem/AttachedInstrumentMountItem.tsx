@@ -16,7 +16,7 @@ import type { InstrumentData } from '@opentrons/api-client'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 import { LabeledMount } from './LabeledMount'
 
-interface InstrumentMountItemProps {
+interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'
   attachedInstrument: InstrumentData | null
   setWizardProps: (
@@ -27,8 +27,8 @@ interface InstrumentMountItemProps {
   ) => void
 }
 
-export function InstrumentMountItem(
-  props: InstrumentMountItemProps
+export function AttachedInstrumentMountItem(
+  props: AttachedInstrumentMountItemProps
 ): JSX.Element {
   const history = useHistory()
   const { mount, attachedInstrument, setWizardProps } = props

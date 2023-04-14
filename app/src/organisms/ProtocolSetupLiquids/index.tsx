@@ -44,7 +44,7 @@ export function ProtocolSetupLiquids({
   return (
     <>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
+        <BackButton onClick={() => setSetupScreen('lpc')}>
           {t('liquids')}
         </BackButton>
         <Flex gridGap={SPACING.spacingXXL}>

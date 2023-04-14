@@ -4,10 +4,10 @@ import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import detachPipette from '../../assets/images/change-pip/single-channel-detach-pipette.png'
 import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { BODY_STYLE } from './constants'
+import { BODY_STYLE, SECTIONS } from './constants'
+import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
@@ -26,10 +26,16 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     isFetching,
     setFetching,
     isOnDevice,
+    flowType,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const pipetteWizardStep = {
+    mount,
+    flowType,
+    section: SECTIONS.DETACH_PIPETTE,
+  }
   const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
-
+  const channel = attachedPipettes[mount]?.modelSpecs.channels
   let bodyText: React.ReactNode = <div></div>
   if (isFetching) {
     bodyText = (
@@ -74,16 +80,14 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             height="14.375rem"
             backgroundSize={BACKGROUND_SIZE}
           />
-        ) : (
+        ) : is96ChannelPipette ? (
           <img
-            src={!is96ChannelPipette ? detachPipette : detach96Pipette}
+            src={detach96Pipette}
             width="100%"
-            alt={
-              !is96ChannelPipette
-                ? 'Detach pipette'
-                : 'Unscrew 96 channel pipette'
-            }
+            alt={'Unscrew 96 channel pipette'}
           />
+        ) : (
+          getPipetteAnimations({ pipetteWizardStep, channel })
         )
       }
       bodyText={bodyText}

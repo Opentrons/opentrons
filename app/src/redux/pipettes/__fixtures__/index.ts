@@ -52,6 +52,7 @@ export const mockGen3P1000PipetteSpecs: any = {
   displayName: 'Flex 1-Channel 1000 μL',
   name: 'p1000_single_gen3',
   backCompatNames: ['p1000_single'],
+  channels: 1,
 }
 
 export const mockGen3P1000Pipette8ChannelSpecs: any = {

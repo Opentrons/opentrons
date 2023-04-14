@@ -1,7 +1,14 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import { useConditionalConfirm } from '@opentrons/components'
+import {
+  useConditionalConfirm,
+  Flex,
+  DIRECTION_COLUMN,
+  COLORS,
+  POSITION_ABSOLUTE,
+} from '@opentrons/components'
+import { useSelector } from 'react-redux'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
 import { IntroScreen } from './IntroScreen'
@@ -9,6 +16,7 @@ import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice } from '../../redux/config'
 import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
@@ -46,6 +54,7 @@ export const LabwarePositionCheckInner = (
 ): JSX.Element | null => {
   const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
   const [fatalError, setFatalError] = React.useState<string | null>(null)
   const [
@@ -266,27 +275,37 @@ export const LabwarePositionCheckInner = (
       />
     )
   }
+  const wizardHeader = (
+    <WizardHeader
+      title={t('labware_position_check_title')}
+      currentStep={currentStepIndex}
+      totalSteps={totalStepCount}
+      onExit={() => {
+        if (fatalError != null) {
+          handleCleanUpAndClose()
+        } else if (!showConfirmation && !isExiting) {
+          confirmExitLPC()
+        }
+      }}
+    />
+  )
   return (
     <Portal level="top">
-      <ModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={t('labware_position_check_title')}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={() => {
-              if (fatalError != null) {
-                handleCleanUpAndClose()
-              } else if (!showConfirmation && !isExiting) {
-                confirmExitLPC()
-              }
-            }}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {Boolean(isOnDevice) ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.white}
+        >
+          {wizardHeader}
+          {modalContent}
+        </Flex>
+      ) : (
+        <ModalShell width="47rem" header={wizardHeader}>
+          {modalContent}
+        </ModalShell>
+      )}
     </Portal>
   )
 }
