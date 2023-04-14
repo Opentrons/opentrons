@@ -233,7 +233,7 @@ async def _create_and_remove_if_error(
     " if a firmware update is available for it.",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[AttachedInstrument]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[UpdateProgressData]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[InstrumentNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[UpdateInProgress]},
         status.HTTP_412_PRECONDITION_FAILED: {"model": ErrorBody[NoUpdateAvailable]},

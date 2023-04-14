@@ -359,4 +359,5 @@ class RunUpdate:
             except asyncio.TimeoutError:
                 pass
             if task.done():
+                _ = task.result()
                 break

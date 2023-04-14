@@ -368,23 +368,27 @@ class OT3Controller:
         update_details = {
             target: update_info[1] for target, update_info in firmware_updates.items()
         }
-        updater = firmware_update.RunUpdate(
-            can_messenger=self._messenger,
-            usb_messenger=self._usb_messenger,
-            update_details=update_details,
-            retry_count=3,
-            timeout_seconds=20,
-            erase=True,
-        )
+        try:
+            updater = firmware_update.RunUpdate(
+                can_messenger=self._messenger,
+                usb_messenger=self._usb_messenger,
+                update_details=update_details,
+                retry_count=3,
+                timeout_seconds=20,
+                erase=True,
+            )
 
-        # start the updates and yield progress to caller
-        async for target, status_element in updater.run_updates():
-            progress = self._update_tracker.update(target, status_element)
-            yield progress
-
+            # start the updates and yield progress to caller
+            async for target, status_element in updater.run_updates():
+                progress = self._update_tracker.update(target, status_element)
+                yield progress
+        except Exception:
+            log.exception("Update failed")
+            raise
+        finally:
+            self._update_tracker = None
         # refresh the device_info cache and reset internal states
         await self._network_info.probe()
-        self._update_tracker = None
         self.update_required = False
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:

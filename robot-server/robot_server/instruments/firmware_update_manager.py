@@ -9,6 +9,7 @@ from concurrent.futures import TimeoutError as FuturesTimeoutError
 from asyncio import Lock, Queue, wait_for, QueueEmpty
 from dataclasses import dataclass
 from enum import Enum, auto
+import logging
 
 from opentrons.hardware_control.types import (
     UpdateState,
@@ -17,6 +18,8 @@ from opentrons.hardware_control.types import (
     OT3Mount,
 )
 from robot_server.service.task_runner import TaskRunner
+
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -137,6 +140,7 @@ class _UpdateProcess:
                 )
             await self._status_queue.put(_UpdateProgressPacket(100, UpdateState.done))
         except Exception as e:
+            log.exception('Failed to update firmware')
             await self._status_queue.put(_UpdateErrorPacket(e))
 
     def get_handle(self) -> "UpdateProcessHandle":
