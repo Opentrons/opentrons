@@ -76,20 +76,27 @@ export function RecentProtocolRunCard({
 
   let chipText: string = t('ready_to_run')
   if (countMissingPipettes === 0 && countMissingModules > 0) {
-    chipText = t('missing_module', {
-      num: countMissingModules,
-      count: countMissingModules,
-    })
+    if (countMissingModules === 1) {
+      chipText = t('missing_module', {
+        num: countMissingModules,
+      })
+    } else {
+      chipText = t('missing_module_plural', {
+        num: countMissingModules,
+      })
+    }
   } else if (countMissingPipettes > 0 && countMissingModules === 0) {
-    chipText = t('missing_pipette', {
-      num: countMissingPipettes,
-      count: countMissingPipettes,
-    })
+    if (countMissingPipettes === 1) {
+      chipText = t('missing_pipette', {
+        num: countMissingPipettes,
+      })
+    } else {
+      chipText = t('missing_pipettes_plural', {
+        num: countMissingPipettes,
+      })
+    }
   } else if (countMissingPipettes > 0 && countMissingModules > 0) {
-    chipText = t('missing_both', {
-      numMod: countMissingModules,
-      numPip: countMissingPipettes,
-    })
+    chipText = t('missing_both')
   }
   const handleCardClick = (): void => {
     history.push(`protocols/${protocolId}`)
