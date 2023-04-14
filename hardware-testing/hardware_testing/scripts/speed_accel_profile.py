@@ -74,21 +74,21 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 800,
                 'MAX': 3000,
-                'INC': 200}},
+                'INC': 400}},
         'Y': {
             'SPEED': {
                 'MIN': 450,
                 'MAX': 800,
-                'INC': 50},
+                'INC': 100},
             'ACCEL': {
                 'MIN': 800,
                 'MAX': 2200,
-                'INC': 200}},
+                'INC': 400}},
         'L': {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 140,
-                'INC': 10},
+                'INC': 30},
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
@@ -97,7 +97,7 @@ TEST_PARAMETERS = {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 140,
-                'INC': 10},
+                'INC': 30},
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
@@ -148,7 +148,7 @@ TEST_PARAMETERS = {
                 'MAX': 800,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
+                'MIN': 300,
                 'MAX': 1800,
                 'INC': 200}},
         'Y': {
