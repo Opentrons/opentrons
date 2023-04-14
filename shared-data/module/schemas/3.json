@@ -80,13 +80,14 @@
         "temperatureModuleType",
         "magneticModuleType",
         "thermocyclerModuleType",
-        "heaterShakerModuleType"
+        "heaterShakerModuleType",
+        "magneticBlockModuleType"
       ],
       "type": "string"
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlockModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
