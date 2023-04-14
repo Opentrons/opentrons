@@ -58,6 +58,12 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'robot-server'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
       - name: 'Build docs'
         run: |
           make -C robot-server docs
