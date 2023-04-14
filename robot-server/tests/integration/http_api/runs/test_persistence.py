@@ -1,6 +1,5 @@
 from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
 from datetime import datetime
-from pathlib import Path
 
 import anyio
 import pytest
@@ -102,14 +101,12 @@ async def test_runs_persist_via_actions_router(
     """Test that runs commands and state
     are persisted when calling play action through dev server restart."""
     client, server = client_and_server
-    await client.post_protocol([Path("./tests/integration/protocols/simple.py")])
-
-    protocols = (await client.get_protocols()).json()["data"]
-    protocol_id = protocols[0]["id"]
+    # await client.post_protocol([Path("./tests/integration/protocols/simple.py")])
+    #
+    # protocols = (await client.get_protocols()).json()["data"]
+    # protocol_id = protocols[0]["id"]
     # create a run
-    create_run_response = await client.post_run(
-        req_body={"data": {"protocolId": protocol_id}}
-    )
+    create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
 
     # persist the run by hitting the actions router
@@ -232,14 +229,9 @@ async def test_runs_completed_started_at_persist_via_actions_router(
 ) -> None:
     """Test that startedAt and completedAt are be persisted via play action."""
     client, server = client_and_server
-    await client.post_protocol([Path("./tests/integration/protocols/simple.py")])
-
-    protocols = (await client.get_protocols()).json()["data"]
 
     # create a run
-    create_run_response = await client.post_run(
-        req_body={"data": {"protocolId": protocols[0]["id"]}}
-    )
+    create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]
 
     # persist the run by hitting the actions router

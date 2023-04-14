@@ -13,6 +13,7 @@ from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_
 from opentrons.protocol_runner import (
     RunResult,
     LiveRunner,
+    JsonRunner,
 )
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
@@ -57,6 +58,34 @@ async def test_create_engine(subject: EngineStore) -> None:
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
     assert isinstance(subject.runner, LiveRunner)
+    assert isinstance(subject.engine, ProtocolEngine)
+
+
+async def test_create_engine_with_protocol(
+    decoy: Decoy,
+    subject: EngineStore,
+    json_protocol_source: ProtocolSource,
+) -> None:
+    """It should create an engine for a run with protocol.
+
+    Tests only basic engine & runner creation with creation result.
+    Loading of protocols/ live run commands is tested in integration test.
+    """
+    protocol = ProtocolResource(
+        protocol_id="my cool protocol",
+        protocol_key=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        source=json_protocol_source,
+    )
+
+    result = await subject.create(
+        run_id="run-id",
+        labware_offsets=[],
+        protocol=protocol,
+    )
+    assert subject.current_run_id == "run-id"
+    assert isinstance(result, StateSummary)
+    assert isinstance(subject.runner, JsonRunner)
     assert isinstance(subject.engine, ProtocolEngine)
 
 
@@ -130,15 +159,7 @@ async def test_clear_engine_not_stopped_or_idle(
     subject: EngineStore, json_protocol_source: ProtocolSource
 ) -> None:
     """It should raise a conflict if the engine is not stopped."""
-    protocol_resource = ProtocolResource(
-        protocol_id="123",
-        created_at=datetime.now(),
-        source=json_protocol_source,
-        protocol_key=None,
-    )
-    await subject.create(
-        run_id="run-id", labware_offsets=[], protocol=protocol_resource
-    )
+    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
     subject.runner.play()
 
     with pytest.raises(EngineConflictError):

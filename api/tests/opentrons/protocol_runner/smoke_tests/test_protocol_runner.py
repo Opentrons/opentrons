@@ -13,7 +13,6 @@ from decoy import matchers
 from pathlib import Path
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
     DeckSlotLocation,

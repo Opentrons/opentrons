@@ -277,6 +277,7 @@ class LiveRunner(AbstractRunner):
         self,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
+        assert protocol_source is None
         await self._hardware_api.home()
         self.play()
         self._task_queue.start()
