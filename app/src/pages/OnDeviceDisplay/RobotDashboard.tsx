@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -18,7 +17,7 @@ import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
-  RecentProtocolRunCard,
+  RecentRunProtocolCarousel,
 } from '../../organisms/OnDeviceDisplay/RobotDashboard'
 import { sortProtocols } from './ProtocolDashboard/utils'
 
@@ -38,44 +37,31 @@ export function RobotDashboard(): JSX.Element {
     MAXIMUM_RECENT_RUN_PROTOCOLS
   )
   return (
-    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+    <>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {sortedProtocols.length === 0 ? (
-          <>
-            <EmptyRecentRun />
-          </>
-        ) : (
-          <>
-            <StyledText
-              fontSize={TYPOGRAPHY.fontSize20}
-              lineHeight={TYPOGRAPHY.lineHeight28}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {t('run_again')}
-            </StyledText>
-            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
-              {sortedProtocols.map(protocol => {
-                const protocolId = protocol.id
-                const lastRun = runs.data?.data.find(
-                  run => run.protocolId === protocolId
-                )?.createdAt
-                return (
-                  <React.Fragment key={protocol.id}>
-                    <RecentProtocolRunCard
-                      lastRun={lastRun}
-                      protocolId={protocolId}
-                      protocolName={
-                        protocol.metadata.protocolName ?? protocol.files[0].name
-                      }
-                    />
-                  </React.Fragment>
-                )
-              })}
-            </Flex>
-          </>
-        )}
+      <Flex
+        padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+        flexDirection={DIRECTION_COLUMN}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          {sortedProtocols.length === 0 ? (
+            <>
+              <EmptyRecentRun />
+            </>
+          ) : (
+            <>
+              <StyledText
+                fontSize={TYPOGRAPHY.fontSize20}
+                lineHeight={TYPOGRAPHY.lineHeight28}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              >
+                {t('run_again')}
+              </StyledText>
+              <RecentRunProtocolCarousel sortedProtocols={sortedProtocols} />
+            </>
+          )}
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }
