@@ -140,6 +140,7 @@ class StateStore(StateView, ActionHandler):
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
+            module_calibration_offsets: Module offsets to preload.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()

@@ -2,9 +2,7 @@
 from typing import Dict
 from opentrons.hardware_control.modules.module_calibration import (
     load_all_module_calibrations,
-    load_module_calibration_offset,
 )
-from opentrons.hardware_control.modules.types import ModuleType
 from opentrons_shared_data.module import load_definition
 
 from ..types import ModuleModel, ModuleDefinition, ModuleOffsetVector

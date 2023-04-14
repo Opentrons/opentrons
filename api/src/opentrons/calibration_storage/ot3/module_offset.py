@@ -5,7 +5,7 @@ from pathlib import Path
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.hardware_control.types import OT3Mount
 from pydantic import ValidationError
-from typing import Dict, List, Optional, Union, no_type_check
+from typing import List, Optional, Union, no_type_check
 from dataclasses import asdict
 
 from opentrons import config, types
