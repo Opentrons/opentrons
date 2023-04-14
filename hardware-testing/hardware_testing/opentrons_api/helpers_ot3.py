@@ -626,7 +626,6 @@ async def get_capacitance_ot3(
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
-    # FIXME: allow SensorId to specify which sensor on the device to read from
     if not channel or channel == "primary":
         capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
     elif channel == "secondary":

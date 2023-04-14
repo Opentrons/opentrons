@@ -32,8 +32,8 @@ const mockRoutes = [
     Component: mockComponent,
     exact: true,
     name: 'Instruments',
-    navLinkTo: '/attach-instruments',
-    path: '/attach-instruments',
+    navLinkTo: '/instruments',
+    path: '/instruments',
   },
   {
     Component: mockComponent,
@@ -70,7 +70,7 @@ describe('Navigation', () => {
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
     const instruments = getByRole('link', { name: 'Instruments' })
-    expect(instruments).toHaveAttribute('href', '/attach-instruments')
+    expect(instruments).toHaveAttribute('href', '/instruments')
 
     const settings = getByRole('link', { name: 'Settings' })
     expect(settings).toHaveAttribute('href', '/robot-settings')

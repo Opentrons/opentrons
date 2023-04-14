@@ -28,6 +28,7 @@ const mockAttachedPipettesNotEmpty: AttachedPipettesByMount = {
   left: mockPipette,
   right: null,
 }
+
 describe('getPipetteWizardSteps', () => {
   it('returns the correct array of info when the flow is calibrate single channel', () => {
     const mockCalibrateFlowSteps = [
@@ -292,7 +293,6 @@ describe('getPipetteWizardSteps', () => {
       )
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
-  //  TODO(jr, 12/5/22): fix this test when the calibrate steps are added
   it('returns the corect array of info for calibrate pipette 96 channel', () => {
     const mockCalibrateFlowSteps = [
       {

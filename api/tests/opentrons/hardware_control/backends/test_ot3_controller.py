@@ -32,6 +32,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     OT3AxisMap,
     MotorStatus,
+    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -982,7 +983,7 @@ async def test_update_firmware_update_required(
 async def test_update_firmware_up_to_date(
     controller: OT3Controller,
     fw_update_info: Dict[NodeId, str],
-):
+) -> None:
     """Test that updates are not started if they are not required."""
     with mock.patch(
         "opentrons_hardware.firmware_update.RunUpdate.run_updates"
@@ -1003,7 +1004,7 @@ async def test_update_firmware_specified_nodes(
     controller: OT3Controller,
     fw_node_info: Dict[NodeId, DeviceInfoCache],
     fw_update_info: Dict[NodeId, str],
-):
+) -> None:
     """Test that updates are started if nodes are NOT out-of-date when nodes are specified."""
     for node_cache in fw_node_info.values():
         node_cache.shortsha = "978abcde"
@@ -1046,7 +1047,7 @@ async def test_update_firmware_invalid_specified_node(
     controller: OT3Controller,
     fw_node_info: Dict[NodeId, DeviceInfoCache],
     fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
-):
+) -> None:
     """Test that only nodes in device_info_cache are updated when nodes are specified."""
     check_fw_update_return = {
         NodeId.head: (1, "/some/path/head.hex"),
@@ -1082,7 +1083,7 @@ async def test_update_firmware_progress(
     controller: OT3Controller,
     fw_node_info: Dict[NodeId, DeviceInfoCache],
     fw_update_info: Dict[FirmwareUpdateType, UpdateInfo],
-):
+) -> None:
     """Test that the progress is reported for nodes updating."""
     controller._network_info._device_info_cache = fw_node_info
 
@@ -1119,3 +1120,40 @@ async def test_update_firmware_progress(
         assert not controller.update_required
         assert controller._update_tracker is None
         probe.assert_called_once()
+
+
+@pytest.mark.parametrize("versions", [(1, 2, 3), (1, 1, 1), (1, 2, 2)])
+def test_fw_versions(controller: OT3Controller, versions: Tuple[int, int, int]) -> None:
+    info = {
+        NodeId.head: DeviceInfoCache(
+            NodeId.head,
+            versions[0],
+            "12345678",
+            None,
+            PCBARevision(None),
+            subidentifier=0,
+        ),
+        NodeId.gantry_y: DeviceInfoCache(
+            NodeId.gantry_y,
+            versions[1],
+            "12345678",
+            None,
+            PCBARevision(None),
+            subidentifier=0,
+        ),
+        NodeId.pipette_right_bootloader: DeviceInfoCache(
+            NodeId.pipette_right_bootloader,
+            versions[2],
+            "12345678",
+            None,
+            PCBARevision(None),
+            subidentifier=2,
+        ),
+    }
+
+    controller._network_info._device_info_cache = info
+    assert controller.fw_version == {
+        OT3SubSystem.head: versions[0],
+        OT3SubSystem.gantry_y: versions[1],
+        OT3SubSystem.pipette_right: versions[2],
+    }

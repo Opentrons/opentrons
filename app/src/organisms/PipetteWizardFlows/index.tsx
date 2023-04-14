@@ -7,6 +7,7 @@ import {
   useConditionalConfirm,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
+  COLORS,
 } from '@opentrons/components'
 import {
   LEFT,
@@ -29,7 +30,10 @@ import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { getIsOnDevice } from '../../redux/config'
-import { useAttachedPipettes } from '../Devices/hooks'
+import {
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+} from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -84,7 +88,8 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-
+  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
+  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
@@ -240,7 +245,6 @@ export const PipetteWizardFlows = (
         closeFlow()
       }
     }
-
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
@@ -254,6 +258,7 @@ export const PipetteWizardFlows = (
         totalStepCount={totalStepCount}
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
+        hasCalData={hasCalData}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -302,7 +307,11 @@ export const PipetteWizardFlows = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(t('recalibrate_pipette', { mount: mount }))
+        wizardTitle = startCase(
+          t(hasCalData ? 'recalibrate_pipette' : 'calibrate_pipette', {
+            mount: mount,
+          })
+        )
       } else {
         wizardTitle = t('calibrate_96_channel')
       }
@@ -347,46 +356,45 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
-  return isOnDevice ? (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      position={POSITION_ABSOLUTE}
-    >
-      <WizardHeader
-        exitDisabled={isRobotMoving || isFetchingPipettes}
-        title={wizardTitle}
-        currentStep={currentStepIndex}
-        totalSteps={totalStepCount}
-        onExit={exitWizardButton}
-      />
-      {modalContent}
-    </Flex>
-  ) : (
+  const wizardHeader = (
+    <WizardHeader
+      exitDisabled={isRobotMoving || isFetchingPipettes}
+      title={wizardTitle}
+      currentStep={currentStepIndex}
+      totalSteps={totalStepCount}
+      onExit={exitWizardButton}
+    />
+  )
+
+  return (
     <Portal level="top">
-      <ModalShell
-        width="47rem"
-        height={
-          //  changing modal height for now on BeforeBeginning 96 channel attach flow
-          //  until we do design qa to normalize the modal sizes
-          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-          selectedPipette === NINETY_SIX_CHANNEL &&
-          flowType === FLOWS.ATTACH
-            ? '70%'
-            : 'auto'
-        }
-        header={
-          <WizardHeader
-            exitDisabled={isRobotMoving || isFetchingPipettes}
-            title={wizardTitle}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={exitWizardButton}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {Boolean(isOnDevice) ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.fundamentalsBackground}
+        >
+          {wizardHeader}
+          {modalContent}
+        </Flex>
+      ) : (
+        <ModalShell
+          width="47rem"
+          height={
+            //  changing modal height for now on BeforeBeginning 96 channel attach flow
+            //  until we do design qa to normalize the modal sizes
+            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+            selectedPipette === NINETY_SIX_CHANNEL &&
+            flowType === FLOWS.ATTACH
+              ? '70%'
+              : 'auto'
+          }
+          header={wizardHeader}
+        >
+          {modalContent}
+        </ModalShell>
+      )}
     </Portal>
   )
 }

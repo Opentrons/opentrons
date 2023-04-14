@@ -1,3 +1,5 @@
+:og:description: A guide to creating your first Python protocol and running it on an Opentrons robot.
+
 .. _tutorial:
 
 ########

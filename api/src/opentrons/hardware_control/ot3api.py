@@ -385,10 +385,11 @@ class OT3API(
         Return the firmware version of the connected hardware.
         """
         from_backend = self._backend.fw_version
-        if from_backend is None:
+        uniques = set(version for version in from_backend.values())
+        if not from_backend:
             return "unknown"
         else:
-            return from_backend
+            return ", ".join(str(version) for version in uniques)
 
     @property
     def fw_version(self) -> str:
