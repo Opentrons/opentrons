@@ -8,6 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
+  SIZE_2,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import type { ModalHeaderBaseProps } from './types'
@@ -23,7 +24,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
       color={isError ? COLORS.white : COLORS.black}
       height="6.25rem"
       width="100%"
-      padding={SPACING.spacing6}
+      padding={isError ? SPACING.spacing5 : SPACING.spacing6}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
@@ -34,7 +35,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
             aria-label={`icon_${iconName}`}
             name={iconName}
             color={isError ? COLORS.white : iconColor}
-            size={SPACING.spacing6}
+            size={SIZE_2}
             alignSelf={ALIGN_CENTER}
             marginRight={SPACING.spacing4}
           />

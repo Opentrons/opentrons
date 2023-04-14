@@ -167,5 +167,10 @@
   "initial_liquids_num": "{{num}} initial liquids",
   "opening": "Opening...",
   "closing": "Closing...",
+  "calibration": "Calibration",
+  "mount": "{{mount}} Mount",
+  "no_data": "No data",
+  "attach": "attach",
+  "calibration_status": "calibration status",
   "total_vol": "total volume"
 }

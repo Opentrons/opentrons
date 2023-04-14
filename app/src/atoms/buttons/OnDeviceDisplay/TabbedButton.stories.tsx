@@ -14,5 +14,6 @@ export const Tabbed = TabbedButtonTemplate.bind({})
 Tabbed.args = {
   foreground: true,
   children: 'Button text',
+  disabled: false,
   title: 'tabbed button',
 }

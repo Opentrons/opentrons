@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -20,6 +21,7 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -33,6 +35,7 @@ import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
+  RunFailedModal,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
@@ -46,7 +49,7 @@ const Bullet = styled.div`
   height: 0.5rem;
   width: 0.5rem;
   border-radius: 50%;
-  z-index: 10;
+  z-index: 2;
   background: ${(props: BulletProps) =>
     props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_forty};
   transform: ${(props: BulletProps) =>
@@ -61,6 +64,9 @@ export function RunningProtocol(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
   const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
+  )
+  const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
+    false
   )
   const [
     showConfirmCancelRunModal,
@@ -86,6 +92,11 @@ export function RunningProtocol(): JSX.Element {
   const { playRun, pauseRun } = useRunActionMutations(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
 
+  const errors = runRecord?.data.errors
+  const failedCommand = robotSideAnalysis?.commands.find(
+    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+  )
+
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -104,8 +115,23 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_FAILED) {
+      setShowRunFailedModal(true)
+    }
+  }, [runStatus])
+
   return (
     <>
+      {showRunFailedModal ? (
+        <RunFailedModal
+          runId={runId}
+          setShowRunFailedModal={setShowRunFailedModal}
+          failedStep={currentRunCommandIndex}
+          failedCommand={failedCommand}
+          errors={errors}
+        />
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
