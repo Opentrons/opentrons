@@ -416,6 +416,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette.starting_tip = tipracks[0][cfg.starting_tip]
     print(f"starting on tip {cfg.starting_tip}")
 
+    if cfg.increment:
+        pipette_tag += "-increment"
+    elif cfg.user_volumes:
+        pipette_tag += "-user-volume"
+    else:
+        pipette_tag += "-qc"
+
     # GET TEST VOLUMES
     test_volumes = _get_volumes(ctx, cfg)
     print("test volumes:")
