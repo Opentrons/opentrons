@@ -301,8 +301,10 @@ export function ProtocolDetails(): JSX.Element | null {
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
         .then(() => deleteProtocol(host, protocolId))
+        .then(() => history.goBack())
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
+          history.goBack()
         })
     } else {
       console.error(
