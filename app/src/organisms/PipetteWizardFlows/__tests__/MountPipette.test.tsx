@@ -15,6 +15,7 @@ import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { CheckPipetteButton } from '../CheckPipetteButton'
 import { MountPipette } from '../MountPipette'
+
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../CheckPipetteButton')
@@ -22,6 +23,7 @@ jest.mock('../CheckPipetteButton')
 const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
   typeof CheckPipetteButton
 >
+
 const render = (props: React.ComponentProps<typeof MountPipette>) => {
   return renderWithProviders(<MountPipette {...props} />, {
     i18nInstance: i18n,
@@ -53,14 +55,12 @@ describe('MountPipette', () => {
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
-    const { getByText, getByAltText, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByLabelText } = render(props)
     getByText('Connect and secure pipette')
     getByText(
       'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
-
-    getByAltText('Screw pattern')
-
+    getByTestId('Pipette_Attach_1_8_L.webm')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
