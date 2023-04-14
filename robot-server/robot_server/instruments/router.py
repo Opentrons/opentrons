@@ -1,7 +1,6 @@
 """Instruments routes."""
-import asyncio
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 from typing_extensions import Final
 
 from fastapi import APIRouter, status, Depends
@@ -27,7 +26,7 @@ from opentrons.types import Mount
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import UpdateState
+from opentrons.hardware_control.types import UpdateState, OT3Mount
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
@@ -49,7 +48,7 @@ from .firmware_update_manager import (
     UpdateFailed as _UpdateFailed,
     InstrumentNotFound as _InstrumentNotFound,
     UpdateInProgress as _UpdateInProgress,
-    UpdateProcessHandle,
+    UpdateProcessSummary,
 )
 from ..errors import ErrorDetails, ErrorBody
 from ..errors.global_errors import IDNotFound
@@ -210,18 +209,18 @@ async def _create_and_remove_if_error(
     mount: OT3Mount,
     created_at: datetime,
     timeout: float,
-) -> ProcessSummary:
+) -> UpdateProcessSummary:
     try:
         handle = await manager.start_update_process(
-            update_process_id,
-            ot3_mount,
+            update_id,
+            mount,
             created_at,
             UPDATE_CREATE_TIMEOUT_S,
         )
         return await handle.get_process_summary()
     except Exception:
         try:
-            await manager.complete_update_process(update_process_id)
+            await manager.complete_update_process(update_id)
         except Exception:
             pass
         raise
@@ -239,7 +238,7 @@ async def _create_and_remove_if_error(
         status.HTTP_409_CONFLICT: {"model": ErrorBody[UpdateInProgress]},
         status.HTTP_412_PRECONDITION_FAILED: {"model": ErrorBody[NoUpdateAvailable]},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
-            "model": ErrorBody[FirmwareUpdateFailed]
+            "model": ErrorBody[Union[FirmwareUpdateFailed, UpdateInProgress]]
         },
     },
 )
@@ -260,10 +259,8 @@ async def update_firmware(
         update_process_id: Generated ID to assign to the update resource.
         created_at: Timestamp to attach to created update resource.
         hardware: hardware controller instance.
-        task_runner: Background task runner.
-        update_progress_monitor: Update progress monitoring utility.
+        firmware_update_manager: Injected manager for firmware updates.
     """
-
     mount_to_update = request_body.data.mount
     ot3_mount = MountType.to_ot3_mount(mount_to_update)
     await hardware.cache_instruments()
@@ -293,13 +290,19 @@ async def update_firmware(
         raise TimeoutStartingUpdate(detail=str(e)).as_error(
             status.HTTP_408_REQUEST_TIMEOUT
         )
+    except _UpdateIdExists:
+        raise UpdateInProgress(
+            detail="An update is already ongoing with this ID."
+        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(
             data=UpdateProgressData(
                 id=summary.details.update_id,
                 createdAt=summary.details.created_at,
-                mount=summary.details.mount,
+                mount=MountType.from_ot3_mount(
+                    summary.details.mount
+                ).value_as_literal(),
                 updateStatus=summary.progress.state,
                 updateProgress=summary.progress.progress,
             )
@@ -326,7 +329,11 @@ async def get_firmware_update_status(
         get_firmware_update_manager
     ),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
-    """Get status of instrument firmware update."""
+    """Get status of instrument firmware update.
+
+    update_id: the ID to get the status of
+    firmware_update_manager: The firmware update manage rcontrolling the update processes.
+    """
     try:
         handle = firmware_update_manager.get_update_process_handle(update_id)
         summary = await handle.get_process_summary()
@@ -350,7 +357,9 @@ async def get_firmware_update_status(
             data=UpdateProgressData(
                 id=summary.details.update_id,
                 createdAt=summary.details.created_at,
-                mount=summary.details.mount,
+                mount=MountType.from_ot3_mount(
+                    summary.details.mount
+                ).value_as_literal(),
                 updateStatus=summary.progress.state,
                 updateProgress=summary.progress.progress,
             )

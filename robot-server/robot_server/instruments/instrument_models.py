@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import enum
 from typing_extensions import Literal
-from typing import Optional, TypeVar, Union, Generic
+from typing import Optional, TypeVar, Union, Generic, cast
 from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -35,6 +35,10 @@ class MountType(enum.Enum):
     LEFT = "left"
     RIGHT = "right"
     EXTENSION = "extension"
+
+    def value_as_literal(self) -> MountTypesStr:
+        """Get a response-model-compatible literal value instead of a string."""
+        return cast(MountTypesStr, self.value)
 
     @staticmethod
     def from_hw_mount(mount: Mount) -> MountType:

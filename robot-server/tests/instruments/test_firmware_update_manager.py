@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, AsyncIterator, Union
+from typing import TYPE_CHECKING, AsyncIterator, Union, Any
 from decoy import Decoy
 
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -18,7 +18,6 @@ from opentrons.hardware_control.types import (
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.service.task_runner import TaskRunner
-from robot_server.instruments.instrument_models import UpdateProgressData
 from robot_server.instruments.firmware_update_manager import (
     FirmwareUpdateManager,
     InstrumentNotFound,
@@ -84,12 +83,29 @@ def get_sample_pipette_dict(
     return pipette_dict
 
 
+def get_default_pipette_dict() -> PipetteDict:
+    """Get a pipette dict with a normal setup to save some typing."""
+    return get_sample_pipette_dict(
+        "p10_multi", PipetteModel("abc"), "my-pipette-id", True
+    )
+
+
+def mock_right_present_no_updates(ot3_hardware_api: OT3API, decoy: Decoy) -> OT3API:
+    """Set up a hardware controller for update testing."""
+    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
+    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
+        {OT3Mount.RIGHT: get_default_pipette_dict()}
+    )
+    return ot3_hardware_api
+
+
 def build_firmware_progress_injector(
     decoy: Decoy, ot3_hardware_api: OT3API, mount: OT3Mount
 ) -> "asyncio.Queue[Union[Exception, UpdateStatus]]":
+    """Utility function to get a queue to inject progress updates."""
     queue: "asyncio.Queue[Union[Exception, UpdateStatus]]" = asyncio.Queue()
 
-    async def _inject() -> AsyncIterator[InstrumentUpdateStatus]:
+    async def _inject(*_: Any, **__: Any) -> AsyncIterator[InstrumentUpdateStatus]:
         while True:
             item = await queue.get()
             if isinstance(item, Exception):
@@ -109,6 +125,7 @@ async def test_start_update(
 ) -> None:
     """It should create an update resource and save to memory."""
     created_at = datetime(year=2023, month=12, day=2)
+    mock_right_present_no_updates(ot3_hardware_api, decoy)
     inject_queue = build_firmware_progress_injector(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
@@ -138,11 +155,10 @@ async def test_create_update_resource_without_update_progress(
 ) -> None:
     """It should fail to create resource when there is no update progress from HC."""
     created_at = datetime(year=2023, month=12, day=2)
+    mock_right_present_no_updates(ot3_hardware_api, decoy)
     # We'll build a queue so the status requests waits infinitely, and we'll never put
     # anything in it so it times out
-    inject_queue = build_firmware_progress_injector(
-        decoy, ot3_hardware_api, OT3Mount.RIGHT
-    )
+    _ = build_firmware_progress_injector(decoy, ot3_hardware_api, OT3Mount.RIGHT)
 
     subject = FirmwareUpdateManager(hw_handle=ot3_hardware_api, task_runner=task_runner)
 
@@ -161,6 +177,7 @@ async def test_get_completed_update_progress(
 ) -> None:
     """It should provide a valid status for an existent resource with no status from hardware API."""
     created_at = datetime(year=2023, month=12, day=2)
+    mock_right_present_no_updates(ot3_hardware_api, decoy)
     inject_queue = build_firmware_progress_injector(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
@@ -198,6 +215,7 @@ async def test_start_update_on_missing_instrument(
 ) -> None:
     """It should raise error if instrument is no longer attached."""
     created_at = datetime(year=2023, month=12, day=2)
+    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return({})
     decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
         {OT3Mount.RIGHT: None}
     )
@@ -218,8 +236,9 @@ async def test_start_update_on_missing_instrument(
 async def test_start_update_with_same_id_twice(
     decoy: Decoy, ot3_hardware_api: OT3API, task_runner: TaskRunner
 ) -> None:
-    """It should raise an error if an update is created twice"""
+    """It should raise an error if an update is created twice."""
     created_at = datetime(year=2023, month=12, day=2)
+    mock_right_present_no_updates(ot3_hardware_api, decoy)
     inject_queue = build_firmware_progress_injector(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
@@ -230,9 +249,7 @@ async def test_start_update_with_same_id_twice(
     )
 
     subject = FirmwareUpdateManager(hw_handle=ot3_hardware_api, task_runner=task_runner)
-    handle = await subject.start_update_process(
-        "update-id-1", OT3Mount.RIGHT, created_at, 1
-    )
+    _ = await subject.start_update_process("update-id-1", OT3Mount.RIGHT, created_at, 1)
     with pytest.raises(UpdateIdExists):
         await subject.start_update_process(
             "update-id-1",
@@ -265,6 +282,9 @@ async def test_start_update_while_update_in_progress(
             )
         }
     )
+    decoy.when(ot3_hardware_api.get_all_attached_instr()).then_return(
+        {OT3Mount.RIGHT: get_default_pipette_dict()}
+    )
 
     subject = FirmwareUpdateManager(hw_handle=ot3_hardware_api, task_runner=task_runner)
     with pytest.raises(UpdateInProgress):
@@ -279,28 +299,27 @@ async def test_update_failure(
 ) -> None:
     """It should raise error if an instrument completes update process but still requires update."""
     created_at = datetime(year=2023, month=12, day=2)
-    decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
-        {
-            OT3SubSystem.pipette_right: UpdateStatus(
-                subsystem=OT3SubSystem.pipette_right,
-                state=UpdateState.updating,
-                progress=42,
-            ),
-        }
-    )
+    mock_right_present_no_updates(ot3_hardware_api, decoy)
     inject_queue = build_firmware_progress_injector(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
-    await inject_queue.put(RuntimeError("Oh no! Something went wrong!"))
+    await inject_queue.put(
+        UpdateStatus(OT3SubSystem.pipette_right, UpdateState.updating, 2)
+    )
 
     subject = FirmwareUpdateManager(hw_handle=ot3_hardware_api, task_runner=task_runner)
+    handle = await subject.start_update_process(
+        update_id="update-id",
+        created_at=created_at,
+        mount=OT3Mount.RIGHT,
+        start_timeout_s=1,
+    )
+    assert (await handle.get_progress()) == UpdateProgress(UpdateState.updating, 2)
+    await inject_queue.put(RuntimeError("Oh no! Something went wrong!"))
+    # Need a yield to let the update task pull the inject queue
+    await asyncio.sleep(0)
     with pytest.raises(UpdateFailed):
-        await subject.start_update_process(
-            update_id="update-id",
-            created_at=created_at,
-            mount=OT3Mount.RIGHT,
-            start_timeout_s=1,
-        )
+        await handle.get_progress()
 
 
 @pytest.mark.ot3_only
@@ -312,6 +331,7 @@ async def test_immediate_update_failure(
     inject_queue = build_firmware_progress_injector(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
+    mock_right_present_no_updates(ot3_hardware_api, decoy)
     await inject_queue.put(
         UpdateStatus(
             subsystem=OT3SubSystem.pipette_right,
