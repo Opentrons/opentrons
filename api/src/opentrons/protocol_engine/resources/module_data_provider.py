@@ -20,4 +20,8 @@ class ModuleDataProvider:
         """Get the module calibration offset"""
 
         data = load_module_calibration_offset(module_type, module_id, slot)
-        return ModuleOffsetVector.parse_obj(data.offset)
+        return ModuleOffsetVector(
+            x = data.offset.x,
+            y = data.offset.y,
+            z = data.offset.z,
+        )

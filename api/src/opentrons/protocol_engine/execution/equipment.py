@@ -288,12 +288,10 @@ class EquipmentHandler:
             )
 
         # load the module calibration offsets
-        module_offset: Optional[ModuleOffsetVector] = None
-        if module_id:
-            module_type = model.as_type()
-            slot = location.slotName.as_int()
-            module_offset = self._module_data_provider.get_module_calibration_offset(module_id, module_type, slot)
-
+        module_type = model.as_type()
+        slot = location.slotName.as_int()
+        module_serial = attached_module.serial_number
+        module_offset = self._module_data_provider.get_module_calibration_offset(module_serial, module_type, slot)
         return LoadedModuleData(
             module_id=self._model_utils.ensure_id(module_id),
             serial_number=attached_module.serial_number,

@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition, ModuleOffsetVector
@@ -77,10 +77,8 @@ class LoadModuleResult(BaseModel):
         description="Hardware serial number of the connected module.",
     )
 
-    offsetVector: Optional[ModuleOffsetVector] = Field(
-        ...,
-        description="The Module Offset to be applied.",
-    )
+    # This is an internal value we dont want serialized, so use PrivateAttr
+    _offset_vector: Optional[ModuleOffsetVector] = PrivateAttr()
 
 
 class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
@@ -102,7 +100,7 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
             serialNumber=loaded_module.serial_number,
             model=loaded_module.definition.model,
             definition=loaded_module.definition,
-            offsetVector=loaded_module.module_offset
+            _offset_vector=loaded_module.module_offset
         )
 
 
