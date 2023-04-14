@@ -37,31 +37,29 @@ export function RobotDashboard(): JSX.Element {
     MAXIMUM_RECENT_RUN_PROTOCOLS
   )
   return (
-    <>
+    <Flex
+      padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+      flexDirection={DIRECTION_COLUMN}
+    >
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex
-        padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
-        flexDirection={DIRECTION_COLUMN}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          {sortedProtocols.length === 0 ? (
-            <>
-              <EmptyRecentRun />
-            </>
-          ) : (
-            <>
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSize20}
-                lineHeight={TYPOGRAPHY.lineHeight28}
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {t('run_again')}
-              </StyledText>
-              <RecentRunProtocolCarousel sortedProtocols={sortedProtocols} />
-            </>
-          )}
-        </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        {sortedProtocols.length === 0 ? (
+          <>
+            <EmptyRecentRun />
+          </>
+        ) : (
+          <>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize20}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('run_again')}
+            </StyledText>
+            <RecentRunProtocolCarousel sortedProtocols={sortedProtocols} />
+          </>
+        )}
       </Flex>
-    </>
+    </Flex>
   )
 }
