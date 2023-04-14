@@ -193,6 +193,49 @@ class EstopButtonDetectionChange(utils.BinarySerializable):
 
 
 @dataclass
+class AuxPresentDetectionChange(utils.BinarySerializable):
+    """Sent from the rear panel when a aux device is connected or disconnected."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.aux_present_detection_change
+    )
+    length: utils.UInt16Field = utils.UInt16Field(2)
+    aux1_detected: utils.UInt8Field = utils.UInt8Field(0)
+    aux2_detected: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class AuxPresentRequest(utils.BinarySerializable):
+    """Sent from the host to request any what aux ports are connected."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.aux_present_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class AuxIDResposne(utils.BinarySerializable):
+    """Sent from the rear panel when requested, only used for board testing."""
+
+    # each value should return false if they are in their default state
+    # or true if they are pulled in the opposite way
+
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.aux_id_response)
+    length: utils.UInt16Field = utils.UInt16Field(2)
+    aux1_id_state: utils.UInt8Field = utils.UInt8Field(0)
+    aux2_id_state: utils.UInt8Field = utils.UInt8Field(0)
+
+
+@dataclass
+class AuxIDRequest(utils.BinarySerializable):
+    """Sent from the host during testing to request aux_id pin state."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.aux_id_request)
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
 class DoorSwitchStateRequest(utils.BinarySerializable):
     """Request the version information from the device."""
 
@@ -305,6 +348,10 @@ BinaryMessageDefinition = Union[
     EstopButtonDetectionChange,
     DoorSwitchStateRequest,
     DoorSwitchStateInfo,
+    AuxPresentDetectionChange,
+    AuxPresentRequest,
+    AuxIDRequest,
+    AuxIDResposne,
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,
