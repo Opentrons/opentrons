@@ -336,15 +336,12 @@ class UpdateStatus(NamedTuple):
     progress: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class InstrumentUpdateStatus:
     mount: OT3Mount
     status: UpdateState
     progress: int
 
-    def update(self, status: UpdateState, progress: int) -> None:
-        self.status = status
-        self.progress = progress
 
 
 @dataclass

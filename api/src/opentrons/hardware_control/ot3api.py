@@ -62,7 +62,6 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
     axis_convert,
-    mount_from_subsystem,
     sub_system_to_node_id,
     subsystem_from_mount,
 )
@@ -415,26 +414,13 @@ class OT3API(
                 pipette_subtypes[mount] = PipetteSubType.from_channels(pipette.channels)
         return pipette_subtypes
 
-    def get_firmware_update_progress(self) -> Dict[OT3Mount, InstrumentUpdateStatus]:
-        """Get the update progress for instruments currently updating."""
-        progress_updates: Dict[OT3Mount, InstrumentUpdateStatus] = {}
-        instruments = {
-            OT3SubSystem.pipette_left,
-            OT3SubSystem.pipette_right,
-            OT3SubSystem.gripper,
+    def get_firmware_update_progress(
+        self,
+    ) -> Dict[OT3SubSystem, UpdateStatus]:
+        """Get the update progress for all devices currently updating."""
+        return {
+            update.subsystem: update for update in self._backend.get_update_progress()
         }
-        for update_status in self._backend.get_update_progress():
-            # we only want instruments, this will drop core substystems
-            if update_status.subsystem in instruments:
-                mount = mount_from_subsystem(update_status.subsystem)
-                state = update_status.state
-                progress = update_status.progress
-                if not progress_updates.get(mount):
-                    progress_updates[mount] = InstrumentUpdateStatus(
-                        mount, state, progress
-                    )
-                progress_updates[mount].update(state, progress)
-        return progress_updates
 
     async def update_instrument_firmware(
         self, mount: Optional[OT3Mount] = None
