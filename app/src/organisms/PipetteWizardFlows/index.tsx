@@ -373,7 +373,7 @@ export const PipetteWizardFlows = (
           flexDirection={DIRECTION_COLUMN}
           width="100%"
           position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.white}
         >
           {wizardHeader}
           {modalContent}
