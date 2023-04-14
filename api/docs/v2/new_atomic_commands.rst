@@ -44,7 +44,7 @@ Before any liquid handling can be done, your pipette must have a tip on it. The 
 
 .. code-block:: python
 
-   pipette.pick_up_tip(tiprack['A1'])
+   pipette.pick_up_tip(location = tiprack['A1'])
 
 If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call
 
@@ -65,7 +65,7 @@ If no location is specified, the OT-2 will drop the tip in the fixed trash in sl
 .. code-block:: python
 
     pipette.pick_up_tip()
-    pipette.drop_tip(tiprack['A1'])  # drop back in A1 of the tiprack
+    pipette.drop_tip(location = tiprack['A1'])  # drop back in A1 of the tiprack
     pipette.pick_up_tip()
     pipette.drop_tip()  # drop in the fixed trash on the deck
 
@@ -81,7 +81,7 @@ To return the tip to the original location, you can call :py:meth:`.InstrumentCo
 
 .. code-block:: python
 
-    pipette.pick_up_tip(tiprack['A3'])
+    pipette.pick_up_tip(location = tiprack['A3'])
     pipette.return_tip()
 
 .. note:
@@ -289,7 +289,7 @@ To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:
 .. code-block:: python
 
     # dispense 50uL to plate:B1 at twice the normal rate
-    pipette.dispense(volume = 50, plate['B1'], rate = 2.0)
+    pipette.dispense(volume = 50, location = plate['B1'], rate = 2.0)
     
     # dispense 50uL to current position at the normal rate
     pipette.dispense(volume = 50)
@@ -329,7 +329,7 @@ When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location 
     pipette.blow_out()
     
     # blow out in current plate:B3            
-    pipette.blow_out(plate['B3'])
+    pipette.blow_out(location = plate['B3'])
 
 .. versionadded:: 2.0
 
@@ -353,13 +353,13 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
     pipette.touch_tip(v_offset = -2)
     
     # touch tip within plate:B1
-    pipette.touch_tip(plate['B1'])
+    pipette.touch_tip(location = plate['B1'])
     
     # touch tip within plate:B1 at 100 mm/s
-    pipette.touch_tip(plate['B1'], speed=100)
+    pipette.touch_tip(location = plate['B1'], speed = 100)
     
     # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
-    pipette.touch_tip(plate['B1'],radius = 0.75, v_offset = -2)
+    pipette.touch_tip(location = plate['B1'],radius = 0.75, v_offset = -2)
 
 
 .. versionadded:: 2.0
@@ -408,7 +408,7 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 
 .. code-block:: python
 
-    pipette.aspirate(volume = 100, plate['B4'])
+    pipette.aspirate(volume = 100, location = plate['B4'])
     pipette.air_gap(volume = 20)
     pipette.drop_tip()
 

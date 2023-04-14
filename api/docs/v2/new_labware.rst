@@ -16,9 +16,9 @@ In the example given in the :ref:`overview-section-v2` section, we loaded labwar
 .. code-block:: python
 
     plate = protocol.load_labware(
-        load_labware = 'corning_96_wellplate_360ul_flat', location ='2')
+        load_name = 'corning_96_wellplate_360ul_flat', location ='2')
     tiprack = protocol.load_labware(
-        load_labware = 'opentrons_96_tiprack_300ul', location = '1')
+        load_name = 'opentrons_96_tiprack_300ul', location = '1')
 
 
 which informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
@@ -308,7 +308,7 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
     def run(protocol):
         plate = protocol.load_labware(
             load_name = 'nest_12_reservoir_15ml', location = '1')
-        length = plate['A1'].length	# 8.2
+        length = plate['A1'].length # 8.2
 
 
 Width
@@ -324,7 +324,7 @@ Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defi
     def run(protocol):
         plate = protocol.load_labware(
             load_name = 'nest_12_reservoir_15ml', location = '1')
-        width = plate['A1'].width	# 71.2
+        width = plate['A1'].width # 71.2
 
 
 

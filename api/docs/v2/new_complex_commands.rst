@@ -153,14 +153,18 @@ This example below transfers 100 µL from well ``'A1'`` to well ``'B1'`` using t
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100, plate.wells_by_name()['A1'], plate.wells_by_name()['B1'])
+        volume = 100,
+        source = plate.wells_by_name()['A1'],
+        destination = plate.wells_by_name()['B1'])
 
 When you are using a multi-channel pipette, you can transfer the entire column (8 wells) in the plate to another using:
 
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100, plate.wells_by_name()['A1'], plate.wells_by_name()['A2'])
+        volume = 100,
+        source = plate.wells_by_name()['A1'],
+        desintation = plate.wells_by_name()['A2'])
 
 .. note::
         
@@ -181,7 +185,9 @@ Volumes larger than the pipette's ``max_volume`` (see :ref:`defaults`) will auto
 .. code-block:: python
 
     pipette.transfer(
-        volume = 700, plate.wells_by_name()['A2'], plate.wells_by_name()['B2'])
+        volume = 700,
+        source = plate.wells_by_name()['A2'],
+        destination = plate.wells_by_name()['B2'])
 
 will have the steps...
 
@@ -206,7 +212,9 @@ from where well ``A1``'s contents are transferred to well ``A2``, well ``B1``'s 
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100, plate.columns_by_name()['1'], plate.columns_by_name()['2'])
+        volume = 100,
+        source = plate.columns_by_name()['1'],
+        destination = plate.columns_by_name()['2'])
 
 will have the steps...
 
@@ -242,7 +250,9 @@ You can transfer from a single source to multiple destinations, and the other wa
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100, plate.wells_by_name()['A1'], plate.columns_by_name()['2'])
+        volume = 100,
+        source = plate.wells_by_name()['A1'], 
+        destination = plate.columns_by_name()['2'])
 
 
 will have the steps...

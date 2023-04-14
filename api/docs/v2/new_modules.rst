@@ -256,8 +256,8 @@ Here are some examples of where the magnets will move when using the different p
 
   .. code-block:: python
 
-      mag_mod.engage(height_from_base=13.5)  # 13.5 mm
-      mag_mod.engage(offset=-2)              # 15.5 mm
+      mag_mod.engage(height_from_base = 13.5)  # 13.5 mm
+      mag_mod.engage(offset = -2)              # 15.5 mm
 
 Note that ``offset`` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
@@ -420,7 +420,7 @@ For instance, a PCR prep protocol might define and execute a profile like this:
             {'temperature': 57, 'hold_time_seconds': 30},
             {'temperature': 72, 'hold_time_seconds': 60}
         ]
-        tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
+        tc_mod.execute_profile(steps = profile, repetitions = 20, block_max_volume = 32)
 
 In terms of the actions that the Thermocycler performs, this would be equivalent to nesting ``set_block_temperature`` commands in a ``for`` loop:
 
@@ -428,11 +428,11 @@ In terms of the actions that the Thermocycler performs, this would be equivalent
 
         for i in range(20):
             tc_mod.set_block_temperature(
-                temperature = 95, hold_time_seconds=30, block_max_volume=32)
+                temperature = 95, hold_time_seconds = 30, block_max_volume = 32)
             tc_mod.set_block_temperature(
-                temperature = 57, hold_time_seconds=30, block_max_volume=32)
+                temperature = 57, hold_time_seconds = 30, block_max_volume = 32)
             tc_mod.set_block_temperature(
-                temperature = 72, hold_time_seconds=60, block_max_volume=32)
+                temperature = 72, hold_time_seconds = 60, block_max_volume = 32)
             
 However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
@@ -561,11 +561,11 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
     hs_mod.set_target_temperature(celsius = 75)
     pipette.pick_up_tip()   
-    pipette.aspirate(volume = 50, plate['A1'])
-    pipette.dispense(volume = 50, plate['B1'])
+    pipette.aspirate(volume = 50, location = plate['A1'])
+    pipette.dispense(volume = 50, location = plate['B1'])
     pipette.drop_tip()
     hs_mod.wait_for_temperature()
-    protocol.delay(minutes=1)
+    protocol.delay(minutes = 1)
     hs_mod.deactivate_heater()
 
 This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
@@ -577,8 +577,8 @@ Additionally, if you want to pipette while the module holds at a target for a ce
     hs_mod.set_and_wait_for_temperature(celsius = 75)
     start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
-    pipette.aspirate(volume = 50, plate['A1'])
-    pipette.dispense(volume = 50, plate['B1'])
+    pipette.aspirate(volume = 50, location = plate['A1'])
+    pipette.dispense(volume = 50, location = plate['B1'])
     pipette.drop_tip()
     # delay for the difference between now and 60 seconds after the reference time
     protocol.delay(max(0, start_time+60 - time.monotonic()))
