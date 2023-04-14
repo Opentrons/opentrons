@@ -175,7 +175,8 @@ function PrepareToRun({
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const attachedInstruments = undefined
+  // const { data: attachedInstruments } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
   } = useAllPipetteOffsetCalibrationsQuery()
@@ -212,18 +213,19 @@ function PrepareToRun({
 
   if (
     mostRecentAnalysis == null ||
-    attachedInstruments == null ||
+    // attachedInstruments == null ||
     (protocolHasModules && attachedModules == null) ||
     allPipettesCalibrationData == null
   ) {
     return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
   }
 
-  const areInstrumentsReady = getAreInstrumentsReady(
-    mostRecentAnalysis,
-    attachedInstruments,
-    allPipettesCalibrationData
-  )
+  const areInstrumentsReady = true
+  // getAreInstrumentsReady(
+  //   mostRecentAnalysis,
+  //   attachedInstruments,
+  //   allPipettesCalibrationData
+  // )
   const speccedInstrumentCount =
     mostRecentAnalysis.pipettes.length +
     (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
@@ -312,7 +314,10 @@ function PrepareToRun({
           </Flex>
           <Flex gridGap={SPACING.spacing5}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
+            <PlayButton
+              disabled={false}
+              // disabled={!isReadyToRun}
+              onPlay={onPlay} />
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing4}>
@@ -371,8 +376,8 @@ function PrepareToRun({
           detail={
             liquidsInProtocol.length < 0
               ? t('initial_liquids_num', {
-                  num: liquidsInProtocol.length,
-                })
+                num: liquidsInProtocol.length,
+              })
               : t('liquids_not_in_setup')
           }
         />
@@ -443,7 +448,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing5}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => {}} />
+          <PlayButton disabled onPlay={() => { }} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>

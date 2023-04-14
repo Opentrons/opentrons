@@ -100,7 +100,7 @@ export function ProtocolInstrumentMountItem(
             <MountLabel>{t('mount', { mount })}</MountLabel>
             <SpeccedInstrumentName>
               {mount === 'extension'
-                ? getGripperDisplayName(speccedName as GripperModel)
+                ? "Gripper" // getGripperDisplayName(speccedName as GripperModel)
                 : getPipetteNameSpecs(speccedName as PipetteName)?.displayName}
             </SpeccedInstrumentName>
           </Flex>
