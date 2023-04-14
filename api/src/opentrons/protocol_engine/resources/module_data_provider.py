@@ -1,5 +1,9 @@
 """Module data resource provider."""
-from opentrons.hardware_control.modules.module_calibration import load_module_calibration_offset
+from typing import Dict
+from opentrons.hardware_control.modules.module_calibration import (
+    load_all_module_calibrations,
+    load_module_calibration_offset,
+)
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons_shared_data.module import load_definition
 
@@ -16,12 +20,15 @@ class ModuleDataProvider:
         return ModuleDefinition.parse_obj(data)
 
     @staticmethod
-    def get_module_calibration_offset(module_id: str, module_type: ModuleType, slot: int) -> ModuleOffsetVector:
-        """Get the module calibration offset"""
-
-        data = load_module_calibration_offset(module_type, module_id, slot)
-        return ModuleOffsetVector(
-            x = data.offset.x,
-            y = data.offset.y,
-            z = data.offset.z,
-        )
+    def load_module_calibrations() -> Dict[str, ModuleOffsetVector]:
+        """Load the module calibration offsets."""
+        module_calibrations: Dict[str, ModuleOffsetVector] = dict()
+        calibration_data = load_all_module_calibrations()
+        for calibration in calibration_data:
+            # NOTE module_id is really the module serial number, change this
+            module_calibrations[calibration.module_id] = ModuleOffsetVector(
+                x=calibration.offset.x,
+                y=calibration.offset.y,
+                z=calibration.offset.z,
+            )
+        return module_calibrations

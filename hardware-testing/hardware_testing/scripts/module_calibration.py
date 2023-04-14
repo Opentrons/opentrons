@@ -108,7 +108,6 @@ def _main(args: argparse.Namespace) -> None:
         }
     }
     res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=load_module)
-    print(res.json())
     if res.status_code != 201:
         print("Error loading module")
         exit(1)
