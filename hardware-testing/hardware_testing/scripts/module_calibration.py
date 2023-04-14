@@ -46,13 +46,13 @@ def _home_z(ip_addr: str) -> None:
 
 def _create_run(ip_addr: str) -> Optional[str]:
     """Create an empty run."""
-    print(f"Creating new run.")
+    print("Creating new run.")
     url = f"{BASE_URL.format(ip_addr)}/runs"
     res = requests.post(headers=HEADERS, url=url)
     if res.status_code != 201:
         return None
-    run_id = res.json()["data"]["id"]
-    return run_id
+    # get the run id
+    return res.json()["data"]["id"]
 
 
 def _cancel_run(ip_addr: str, run_id: str) -> bool:
