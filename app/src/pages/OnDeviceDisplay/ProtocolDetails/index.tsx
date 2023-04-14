@@ -302,18 +302,14 @@ export function ProtocolDetails(): JSX.Element | null {
           Promise.all(referencedRunIds?.map(runId => deleteRun(host, runId)))
         )
         .then(() => deleteProtocol(host, protocolId))
-        .then(() => longpress.setIsLongPressed(false))
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
-          longpress.setIsLongPressed(false)
         })
     } else {
       console.error(
         'could not delete resources because the robot host is unknown'
       )
-      longpress.setIsLongPressed(false)
     }
-  }
   }
 
   if (protocolRecord == null) return null

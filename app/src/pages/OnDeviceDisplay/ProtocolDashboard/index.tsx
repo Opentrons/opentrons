@@ -305,7 +305,7 @@ export function ProtocolCard(props: {
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
         {longpress.isLongPressed && (
-          <LongPressModal longpress={longpress} protocol={protocol} />
+          <LongPressModal longpress={longpress} protocolId={protocol.id} />
         )}
       </Flex>
     </Flex>
