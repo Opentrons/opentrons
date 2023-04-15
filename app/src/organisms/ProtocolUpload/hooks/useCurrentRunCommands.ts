@@ -7,6 +7,13 @@ import type {
   GetCommandsParams,
 } from '@opentrons/api-client'
 
+/**
+ * A hook that retrieves the summary of commands for the currently selected run.
+ *
+ * @param {GetCommandsParams} [params] - Optional parameters to filter the commands.
+ * @param {UseQueryOptions<CommandsData>} [options] - Optional options for the underlying `useQuery` hook.
+ * @returns {RunCommandSummary[] | null} An array of `RunCommandSummary` objects, or null if the data is not available.
+ */
 export function useCurrentRunCommands(
   params?: GetCommandsParams,
   options?: UseQueryOptions<CommandsData>
