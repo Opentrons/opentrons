@@ -34,6 +34,12 @@ export interface RunControls {
   isResetRunLoading: boolean
 }
 
+/**
+ * React hook that provides controls for interacting with a run.
+ * @param {string | null} runId - The id of the run to interact with.
+ * @param {(createRunResponse: Run) => unknown} [onCloneRunSuccess] - Callback function that will be called after a successful cloneRun.
+ * @returns {RunControls} - An object containing functions for playing, pausing, stopping, resetting the run, as well as boolean flags indicating loading states for the different actions.
+ */
 export function useRunControls(
   runId: string | null,
   onCloneRunSuccess?: (createRunResponse: Run) => unknown
@@ -65,6 +71,15 @@ export function useRunControls(
 }
 
 const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
+
+/**
+ * Returns the current status of the run with the specified ID.
+ *
+ * @param {string|null} runId - The ID of the run.
+ * @param {Object} [options] - Optional options for the `useQuery` hook.
+ * @param {number} [options.refetchInterval=15000] - The interval at which the query will be automatically re-fetched.
+ * @returns {string|null} - The current status of the run.
+ */
 export function useRunStatus(
   runId: string | null,
   options?: UseQueryOptions<Run>
@@ -101,6 +116,13 @@ export function useRunStatus(
   return adjustedRunStatus
 }
 
+/**
+ * Returns the current status of the current run.
+ *
+ * @param {Object} [options] - Optional options for the `useQuery` hook.
+ * @param {number} [options.refetchInterval=15000] - The interval at which the query will be automatically refetched.
+ * @returns {string|null} - The current status of the current run.
+ */
 export function useCurrentRunStatus(
   options?: UseQueryOptions<Run>
 ): RunStatus | null {
