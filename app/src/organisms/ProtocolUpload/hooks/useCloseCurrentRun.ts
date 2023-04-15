@@ -7,6 +7,12 @@ import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-c
 
 type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
 
+/**
+ * Returns an object containing a callback function to close the current run and a boolean indicating whether
+ * the current run is currently being closed/dismissed.
+ *
+ * @returns An object containing a `closeCurrentRun` function and an `isClosingCurrentRun` boolean.
+ */
 export function useCloseCurrentRun(): {
   closeCurrentRun: CloseCallback
   isClosingCurrentRun: boolean
