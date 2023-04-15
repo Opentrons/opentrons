@@ -19,6 +19,12 @@ export interface LabwareDefAndDate {
   filename?: string
 }
 
+/**
+ * Returns an array of labware definitions and their modified dates
+ * @param {LabwareSort} sortBy - The method of sorting the labware definitions
+ * @param {LabwareFilter} filterBy - The category to filter the labware definitions by
+ * @returns {LabwareDefAndDate[]} An array of labware definitions and their modified dates
+ */
 export function useAllLabware(
   sortBy: LabwareSort,
   filterBy: LabwareFilter
@@ -59,6 +65,10 @@ export function useAllLabware(
   return fullLabwareList
 }
 
+/**
+ * A custom React hook that provides access to the current labware failure message, as well as a function to clear the failure.
+ * @returns An object containing the labware failure message and a function to clear the failure.
+ */
 export function useLabwareFailure(): {
   labwareFailureMessage: string | null
   clearLabwareFailure: () => unknown

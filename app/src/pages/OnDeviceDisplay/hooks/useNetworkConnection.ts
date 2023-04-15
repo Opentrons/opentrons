@@ -22,6 +22,12 @@ export interface NetworkConnection {
 
 const CONNECTION_POLL_MS = 10000 // Note: (kj:02/02/2023) temp value
 
+/**
+ * Returns an object representing the network connection status for a given robot.
+ *
+ * @param {string} robotName The name of the robot for which network connection status is being retrieved.
+ * @returns {NetworkConnection} An object representing the network connection status for the given robot.
+ */
 export function useNetworkConnection(robotName: string): NetworkConnection {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
