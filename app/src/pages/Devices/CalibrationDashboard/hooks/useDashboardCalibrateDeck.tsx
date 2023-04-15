@@ -27,6 +27,15 @@ export type DashboardCalDeckInvoker = (
   props?: DashboardCalDeckInvokerProps
 ) => void
 
+/**
+ * A hook that returns an array containing a function to start a deck calibration
+ * session and a JSX element representing the deck calibration wizard modal.
+ *
+ * @param {string} robotName - The name of the robot for which to calibrate the deck.
+ *
+ * @returns {[DashboardCalDeckInvoker, JSX.Element | null]} An array containing a function to start
+ * the deck calibration session and a JSX element representing the deck calibration wizard modal.
+ */
 export function useDashboardCalibrateDeck(
   robotName: string
 ): [DashboardCalDeckInvoker, JSX.Element | null] {

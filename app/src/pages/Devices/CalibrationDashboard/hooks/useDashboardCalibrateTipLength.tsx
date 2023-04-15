@@ -38,6 +38,14 @@ export type DashboardCalTipLengthInvoker = (
   props: DashboardTipLengthCalInvokerProps
 ) => void
 
+/**
+ * Returns a tuple containing an invoker function for starting the tip length calibration wizard
+ * and the JSX element that renders the wizard.
+ *
+ * @param {string} robotName - The name of the robot.
+ * @returns {[DashboardCalTipLengthInvoker, JSX.Element | null]} Tuple containing the invoker function
+ * and the JSX element that renders the wizard.
+ */
 export function useDashboardCalibrateTipLength(
   robotName: string
 ): [DashboardCalTipLengthInvoker, JSX.Element | null] {

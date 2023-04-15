@@ -117,6 +117,12 @@ export interface RunTimestamps {
 }
 
 const DEFAULT_RUN_QUERY_REFETCH_INTERVAL = 5000
+
+/**
+ * Hook that returns timestamps for a given run, including when it started, paused, stopped, and completed.
+ * @param {string | null} runId - The ID of the run to get timestamps for.
+ * @returns {RunTimestamps} An object containing timestamps for the run.
+ */
 export function useRunTimestamps(runId: string | null): RunTimestamps {
   const runStatus = useRunStatus(runId)
   const { actions = [], errors = [] } =
@@ -174,6 +180,11 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
   }
 }
 
+/**
+ * Hook that returns any errors associated with a given run.
+ * @param {string | null} runId - The ID of the run to get errors for.
+ * @returns {RunData['errors']} An array of errors associated with the run.
+ */
 export function useRunErrors(runId: string | null): RunData['errors'] {
   const { data: runRecord } = useRunQuery(runId, {
     refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,

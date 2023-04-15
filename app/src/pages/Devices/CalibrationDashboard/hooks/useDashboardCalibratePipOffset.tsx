@@ -34,6 +34,14 @@ export type DashboardCalOffsetInvoker = (
   props: DashboardOffsetCalInvokerProps
 ) => void
 
+/**
+ * A hook that returns an array with a function to start a pipette offset calibration session and a JSX element that renders the calibration wizard.
+ *
+ * @param {string} robotName - The name of the robot to use.
+ * @param {(() => unknown) | null} onComplete - An optional callback to be called when the calibration is complete.
+ *
+ * @returns {[DashboardCalOffsetInvoker, JSX.Element | null]} An array with a function to start a pipette offset calibration session and a JSX element that renders the calibration wizard.
+ */
 export function useDashboardCalibratePipOffset(
   robotName: string,
   onComplete: (() => unknown) | null = null
