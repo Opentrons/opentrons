@@ -13,6 +13,14 @@ export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string
 }
+
+/**
+ * Returns an array of offset candidates for analysis, based on the provided analysis output and robot IP.
+ *
+ * @param {ProtocolAnalysisOutput | null} analysisOutput - The analysis output object, or null if no analysis has been performed.
+ * @param {string | null} robotIp - The IP address of the robot, or null if unknown.
+ * @returns {OffsetCandidate[]} An array of offset candidate objects.
+ */
 export function useOffsetCandidatesForAnalysis(
   analysisOutput: ProtocolAnalysisOutput | null,
   robotIp: string | null

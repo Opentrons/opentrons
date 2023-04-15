@@ -6,6 +6,13 @@ import {
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
 import type { TFunction } from 'i18next'
 
+/**
+ * Returns the display location for a given `LabwareOffsetLocation`.
+ *
+ * @param {LabwareOffsetLocation} location - The labware offset location.
+ * @param {TFunction} t - The translation function.
+ * @returns {string} The display location.
+ */
 export function getDisplayLocation(
   location: LabwareOffsetLocation,
   t: TFunction

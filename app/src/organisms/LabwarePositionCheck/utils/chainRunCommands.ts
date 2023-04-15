@@ -1,6 +1,13 @@
 import { CreateCommand } from '@opentrons/shared-data'
 import { CreateRunCommand } from '../types'
 
+/**
+ * Runs an array of commands in sequence by chaining them together.
+ * @param {CreateCommand[]} commands - An array of CreateCommand objects to be executed.
+ * @param {CreateRunCommand} createRunCommand - Function that creates a command to be run.
+ * @param {function} onAllSuccess - Function to be executed when all commands have successfully completed.
+ * @returns {void}
+ */
 export const chainRunCommands = (
   commands: CreateCommand[],
   createRunCommand: CreateRunCommand,

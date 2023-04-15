@@ -7,6 +7,13 @@ export interface ModuleIdFromRun {
   moduleIdFromRun: string
 }
 
+/**
+ * Calculates the module ID from a run for a given module.
+ *
+ * @param {AttachedModule} module - The module for which to calculate the module ID.
+ * @param {string | null} runId - The ID of the run to use for the calculation, or null to use the most recent completed run.
+ * @returns {ModuleIdFromRun} - An object containing the calculated module ID.
+ */
 export function useModuleIdFromRun(
   module: AttachedModule,
   runId: string | null

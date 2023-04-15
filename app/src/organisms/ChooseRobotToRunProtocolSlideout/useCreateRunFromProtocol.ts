@@ -32,6 +32,13 @@ export interface UseCreateRun {
   reset: () => void
 }
 
+/**
+ * A hook that creates a new run from a protocol.
+ * @param {Object} options - An object containing options to be passed to the `useCreateRunMutation` hook.
+ * @param {Object|null} hostOverride - An object containing a custom host configuration, or null to use the default host configuration.
+ * @param {Array} labwareOffsets - An array containing labware offset data.
+ * @returns {UseCreateRun} An object containing the necessary properties and methods to create a new run from a protocol.
+ */
 export function useCreateRunFromProtocol(
   options: UseCreateRunMutationOptions,
   hostOverride?: HostConfig | null,

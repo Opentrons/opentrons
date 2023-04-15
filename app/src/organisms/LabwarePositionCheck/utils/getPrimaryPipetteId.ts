@@ -3,6 +3,16 @@ import type { LoadedPipette } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol'
 import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
+/**
+ * Given a dictionary of pipettes and a list of commands, returns the ID of the
+ * primary pipette to be used in the protocol.
+ *
+ * @param {Object.<string, LoadedPipette>} pipettesById - Dictionary of pipettes
+ * @param {Array.<RunTimeCommand>} commands - List of commands
+ * @returns {string} The ID of the primary pipette
+ * @throws {Error} If both left and right pipettes are not found, or if the
+ * left or right pipette specs cannot be found
+ */
 export const getPrimaryPipetteId = (
   pipettesById: { [id: string]: LoadedPipette },
   commands: RunTimeCommand[]

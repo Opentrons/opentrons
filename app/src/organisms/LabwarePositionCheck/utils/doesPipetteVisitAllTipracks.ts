@@ -4,6 +4,15 @@ import { getTipracksVisited } from '../../Devices/ProtocolRun/utils/getTipracksV
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LoadedLabware } from '@opentrons/shared-data'
 
+/**
+ * Determines if a given pipette visits all available tipracks based on a list of labware, labware definitions, and runtime commands.
+ *
+ * @param {string} pipetteId - The ID of the pipette being used.
+ * @param {LoadedLabware[]} labware - An array of loaded labware objects.
+ * @param {Record<string, LabwareDefinition2>} labwareDefinitions - An object containing labware definition URIs and their corresponding LabwareDefinition2 objects.
+ * @param {RunTimeCommand[]} commands - An array of runtime commands being executed.
+ * @returns {boolean} - True if the pipette visits all available tipracks; false otherwise.
+ */
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
   labware: LoadedLabware[],

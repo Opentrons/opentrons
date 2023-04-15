@@ -7,6 +7,12 @@ import thermoModuleGen2Closed from '../../assets/images/thermocycler_gen_2_close
 import thermoModuleGen2Opened from '../../assets/images/thermocycler_gen_2_opened.png'
 import type { AttachedModule } from '../../redux/modules/types'
 
+/**
+ * Returns the image URL of the attached module for display in a card.
+ *
+ * @param {AttachedModule} attachedModule - The module object to get the image URL for.
+ * @returns {string} The image URL for the module.
+ */
 export function getModuleCardImage(attachedModule: AttachedModule): string {
   //  TODO(jr, 9/22/22): add images for V1 of magneticModule and temperatureModule
   switch (attachedModule.moduleModel) {
