@@ -101,6 +101,8 @@ class MessageId(int, Enum):
     pipette_info_response = 0x307
     gripper_info_response = 0x308
     set_serial_number = 0x30A
+    get_motor_usage_request = 0x30B
+    get_motor_usage_response = 0x30C
 
     stop_request = 0x00
 
