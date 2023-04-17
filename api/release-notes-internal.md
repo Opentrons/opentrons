@@ -49,6 +49,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
 - Firmware update for all devices attached when the robot turns on
+- Cancelling a protocol run. We're pretty sure we fixed this so definitely tell us if it's not.
 
 ### ODD
 - Protocol execution
