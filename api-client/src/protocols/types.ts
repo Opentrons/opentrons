@@ -18,7 +18,7 @@ export interface ProtocolMetadata {
 }
 
 export interface Protocol {
-  links: {
+  links?: {
     referencingRunIds: [
       {
         id: string
