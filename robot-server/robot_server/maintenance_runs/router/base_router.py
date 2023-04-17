@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional, Union
+from typing import Optional
 from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status
@@ -22,10 +22,9 @@ from robot_server.service.json_api import (
     PydanticResponse,
     Body,
 )
-from ...runs import EngineStore
 
-from ...runs.run_models import RunNotFoundError
-from ...runs.dependencies import get_engine_store as get_regular_engine_store
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.dependencies import get_protocol_run_has_been_played
 
 from ..maintenance_run_models import (
     MaintenanceRun,
@@ -133,7 +132,7 @@ async def get_run_data_from_url(
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[MaintenanceRun]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunAlreadyActive, ProtocolRunIsActive]]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[ProtocolRunIsActive]},
     },
 )
 async def create_run(
@@ -143,7 +142,7 @@ async def create_run(
     ),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    regular_engine_store: EngineStore = Depends(get_regular_engine_store)  # <- suggest a better name
+    protocol_run_has_been_played: bool = Depends(get_protocol_run_has_been_played),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new run.
 
@@ -152,27 +151,21 @@ async def create_run(
         run_data_manager: Current and historical run data management.
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
-        regular_engine_store: Engine store associated with regular protocol runs.
+        protocol_run_has_been_played: Whether a protocol run has been played yet.
     """
-    protocol_run_state = regular_engine_store.engine.state_view
-    if protocol_run_state.commands.has_been_played():
-        raise ProtocolRunIsActive(detail="Cannot create maintenance run when "
-                                         "a protocol run is active.").as_error(
-            status.HTTP_409_CONFLICT
-        )
+    if protocol_run_has_been_played:
+        raise ProtocolRunIsActive(
+            detail="Cannot create maintenance run when " "a protocol run is active."
+        ).as_error(status.HTTP_409_CONFLICT)
 
     offsets = request_body.data.labwareOffsets if request_body is not None else []
-    try:
-        run_data = await run_data_manager.create(
-            run_id=run_id,
-            created_at=created_at,
-            labware_offsets=offsets,
-        )
-    except EngineConflictError as e:
-        raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    run_data = await run_data_manager.create(
+        run_id=run_id,
+        created_at=created_at,
+        labware_offsets=offsets,
+    )
 
     log.info(f'Created an empty run "{run_id}"".')
-
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=run_data),
         status_code=status.HTTP_201_CREATED,

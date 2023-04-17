@@ -56,7 +56,9 @@ async def test_create_engine_uses_robot_type(
     assert subject.engine.state_view.config.robot_type == robot_type
 
 
-async def test_create_engine_with_labware_offsets(subject: MaintenanceEngineStore) -> None:
+async def test_create_engine_with_labware_offsets(
+    subject: MaintenanceEngineStore,
+) -> None:
     """It should create an engine for a run with labware offsets."""
     labware_offset = pe_types.LabwareOffsetCreate(
         definitionUri="namespace/load_name/version",
@@ -80,16 +82,6 @@ async def test_create_engine_with_labware_offsets(subject: MaintenanceEngineStor
     ]
 
 
-async def test_archives_state_if_engine_already_exists(subject: MaintenanceEngineStore) -> None:
-    """It should not create more than one engine / runner pair."""
-    await subject.create(run_id="run-id-1", labware_offsets=[])
-
-    with pytest.raises(EngineConflictError):
-        await subject.create(run_id="run-id-2", labware_offsets=[])
-
-    assert subject.current_run_id == "run-id-1"
-
-
 async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(run_id="run-id", labware_offsets=[])
@@ -106,7 +98,9 @@ async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
         subject.runner
 
 
-async def test_clear_engine_not_stopped_or_idle(subject: MaintenanceEngineStore) -> None:
+async def test_clear_engine_not_stopped_or_idle(
+    subject: MaintenanceEngineStore,
+) -> None:
     """It should raise a conflict if the engine is not stopped."""
     await subject.create(run_id="run-id", labware_offsets=[])
     subject.runner.play()

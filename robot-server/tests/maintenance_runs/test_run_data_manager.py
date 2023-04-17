@@ -162,9 +162,9 @@ async def test_create_engine_error(
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
-    decoy.when(await mock_maintenance_engine_store.create(run_id, labware_offsets=[])).then_raise(
-        EngineConflictError("oh no")
-    )
+    decoy.when(
+        await mock_maintenance_engine_store.create(run_id, labware_offsets=[])
+    ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(EngineConflictError):
         await subject.create(
@@ -184,9 +184,9 @@ async def test_get_current_run(
     run_id = "hello world"
 
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(run_id)
-    decoy.when(mock_maintenance_engine_store.engine.state_view.get_summary()).then_return(
-        engine_state_summary
-    )
+    decoy.when(
+        mock_maintenance_engine_store.engine.state_view.get_summary()
+    ).then_return(engine_state_summary)
 
     result = subject.get(run_id=run_id)
 
@@ -215,7 +215,9 @@ async def test_get_run_not_current(
     """It should raise a RunNotCurrentError."""
     run_id = "hello world"
 
-    decoy.when(mock_maintenance_engine_store.current_run_id).then_return("not-current-id")
+    decoy.when(mock_maintenance_engine_store.current_run_id).then_return(
+        "not-current-id"
+    )
     with pytest.raises(RunNotCurrentError):
         subject.get(run_id=run_id)
 

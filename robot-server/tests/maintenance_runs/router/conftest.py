@@ -3,8 +3,12 @@ import pytest
 from decoy import Decoy
 
 from robot_server.runs.engine_store import EngineStore
-from robot_server.maintenance_runs.maintenance_engine_store import MaintenanceEngineStore
-from robot_server.maintenance_runs.maintenance_run_data_manager import MaintenanceRunDataManager
+from robot_server.maintenance_runs.maintenance_engine_store import (
+    MaintenanceEngineStore,
+)
+from robot_server.maintenance_runs.maintenance_run_data_manager import (
+    MaintenanceRunDataManager,
+)
 from opentrons.protocol_engine import ProtocolEngine
 
 

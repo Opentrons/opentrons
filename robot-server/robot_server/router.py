@@ -6,7 +6,7 @@ from .errors import LegacyErrorResponse
 from .health import health_router
 from .protocols import protocols_router
 from .runs import runs_router
-from .maintenance_runs import maintenance_runs_router
+from .maintenance_runs.router import maintenance_runs_router
 from .commands import commands_router
 from .modules import modules_router
 from .instruments import instruments_router

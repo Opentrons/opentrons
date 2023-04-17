@@ -85,11 +85,12 @@ class MaintenanceEngineStore:
 
         Returns:
             The initial equipment and status summary of the engine.
-
-        Raises:
-            EngineConflictError: The current runner/engine pair is not idle, so
-            a new set may not be created.
         """
+        # Because we will be clearing engine store before creating a new one,
+        # the runner-engine pair should be None at this point.
+        assert self._runner_engine_pair is None, (
+            "There is an active maintenance run" " that was not deleted correctly."
+        )
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -98,9 +99,6 @@ class MaintenanceEngineStore:
             ),
         )
         runner = LiveRunner(protocol_engine=engine, hardware_api=self._hardware_api)
-
-        if self._runner_engine_pair is not None:
-            raise EngineConflictError("Another run is currently active.")
 
         # TODO (spp): set live runner start func
 

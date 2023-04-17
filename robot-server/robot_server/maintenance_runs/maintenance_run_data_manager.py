@@ -11,7 +11,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from .maintenance_engine_store import MaintenanceEngineStore, EngineConflictError
+from .maintenance_engine_store import MaintenanceEngineStore
 from .maintenance_run_models import MaintenanceRun
 
 
@@ -87,16 +87,9 @@ class MaintenanceRunDataManager:
 
         Returns:
             The run resource.
-
-        Raise:
-            EngineConflictError: There is a currently active run that cannot
-                be superceded by this new run.
         """
         if self._engine_store.current_run_id is not None:
-            raise EngineConflictError(
-                "A maintenance run is already active. "
-                "Delete it before creating a new one. "
-            )
+            await self._engine_store.clear()
 
         state_summary = await self._engine_store.create(
             run_id=run_id, labware_offsets=labware_offsets
