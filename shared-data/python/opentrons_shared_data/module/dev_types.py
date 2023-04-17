@@ -24,7 +24,7 @@ ModuleType = Union[
     TemperatureModuleType,
     ThermocyclerModuleType,
     HeaterShakerModuleType,
-    MagneticBlockModuleType,
+    MagneticBlockType,
 ]
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
@@ -38,7 +38,7 @@ ModuleModel = Union[
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
-    MagneticBlockModuleModel,
+    MagneticBlockModel,
 ]
 
 ModuleSlotTransform = TypedDict(
