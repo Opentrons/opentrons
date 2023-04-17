@@ -102,7 +102,7 @@ async def get_current_run_engine_from_url(
 
 
 @commands_router.post(
-    path="/runs/{runId}/commands",
+    path="/maintenance_runs/{runId}/commands",
     summary="Enqueue a command",
     description=textwrap.dedent(
         """
@@ -190,7 +190,7 @@ async def create_run_command(
 
 
 @commands_router.get(
-    path="/runs/{runId}/commands",
+    path="/maintenance_runs/{runId}/commands",
     summary="Get a list of all protocol commands in the run",
     description=(
         "Get a list of all commands in the run and their statuses. "
@@ -284,7 +284,7 @@ async def get_run_commands(
 
 
 @commands_router.get(
-    path="/runs/{runId}/commands/{commandId}",
+    path="/maintenance_runs/{runId}/commands/{commandId}",
     summary="Get full details about a specific command in the run",
     description=(
         "Get a command along with any associated payload, result, and "
