@@ -172,7 +172,9 @@ class OT3Controller:
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
-    async def build(cls, config: OT3Config, use_usb_bus: bool = False) -> OT3Controller:
+    async def build(
+        cls, config: OT3Config, use_usb_bus: bool = False, check_updates: bool = True
+    ) -> OT3Controller:
         """Create the OT3Controller instance.
 
         Args:
@@ -191,13 +193,16 @@ class OT3Controller:
                     "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
                 )
                 raise e
-        return cls(config, driver=driver, usb_driver=usb_driver)
+        return cls(
+            config, driver=driver, usb_driver=usb_driver, check_updates=check_updates
+        )
 
     def __init__(
         self,
         config: OT3Config,
         driver: AbstractCanDriver,
         usb_driver: Optional[SerialUsbDriver] = None,
+        check_updates: bool = True,
     ) -> None:
         """Construct.
 
@@ -215,6 +220,7 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._check_updates = check_updates
         self._update_required = False
         self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
@@ -244,7 +250,7 @@ class OT3Controller:
 
     @property
     def update_required(self) -> bool:
-        return self._update_required
+        return self._update_required and self._check_updates
 
     @update_required.setter
     def update_required(self, value: bool) -> None:

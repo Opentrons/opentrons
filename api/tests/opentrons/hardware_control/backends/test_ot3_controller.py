@@ -868,6 +868,7 @@ async def test_update_required_flag(
         # raise FirmwareUpdateRequired if the _update_required flag is set
         controller._update_required = True
         controller._initialized = True
+        controller._check_updates = True
         with pytest.raises(FirmwareUpdateRequired):
             await controller.home(axes)
 
@@ -879,11 +880,8 @@ async def test_update_required_bypass_firmware_update(controller: OT3Controller)
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.firmware_update.utils.load_firmware_manifest"
     ):
-        try:
-            async for status_element in controller.update_firmware({}):
-                pass
-        except FirmwareUpdateRequired:
-            assert False, "update_firmware raised an exception."
+        async for status_element in controller.update_firmware({}):
+            pass
 
 
 async def test_update_required_flag_false(controller: OT3Controller):
@@ -896,21 +894,22 @@ async def test_update_required_flag_false(controller: OT3Controller):
 
     # update_required is false so dont raise FirmwareUpdateRequired
     controller._update_required = False
+    controller._initialized = True
+    controller._check_updates = True
+    await controller.update_to_default_current_settings(GantryLoad.LOW_THROUGHPUT)
 
-    async def fake_umpe(
-        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ):
-        return {node: (0.223, 0.323, False, True) for node in nodes}
+    async def fake_src(
+        can_messenger: CanMessenger,
+        current_settings: Dict[NodeId, float],
+        use_tip_motor_message_for: List[NodeId],
+    ) -> None:
+        return None
 
     with patch(
-        "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
-        fake_umpe,
+        "opentrons.hardware_control.backends.ot3controller.set_run_current",
+        fake_src,
     ):
-        try:
-            async for status_element in controller.update_firmware({}):
-                pass
-        except FirmwareUpdateRequired:
-            assert False, "update_motor_estimation raised an exception."
+        await controller.set_active_current({OT3Axis.X: 2})
 
 
 async def test_update_required_flag_initialized(controller: OT3Controller):
@@ -921,24 +920,51 @@ async def test_update_required_flag_initialized(controller: OT3Controller):
             {node: MotorStatus(motor_ok=False, encoder_ok=True)}
         )
 
-    # update_required is true, but initlaized is false so dont raise FirmwareUpdateRequired
+    # update_required is true, but initialized is false so dont raise FirmwareUpdateRequired
     controller._update_required = True
     controller._initialized = False
+    controller._check_updates = True
+    await controller.update_to_default_current_settings(GantryLoad.LOW_THROUGHPUT)
 
-    async def fake_umpe(
-        can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ):
-        return {node: (0.223, 0.323, False, True) for node in nodes}
+    async def fake_src(
+        can_messenger: CanMessenger,
+        current_settings: Dict[NodeId, float],
+        use_tip_motor_message_for: List[NodeId],
+    ) -> None:
+        return None
 
     with patch(
-        "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
-        fake_umpe,
+        "opentrons.hardware_control.backends.ot3controller.set_run_current",
+        fake_src,
     ):
-        try:
-            async for status_element in controller.update_firmware({}):
-                pass
-        except FirmwareUpdateRequired:
-            assert False, "update_motor_estimation raised an exception."
+        await controller.set_active_current({OT3Axis.X: 2})
+
+
+async def test_update_required_flag_disabled(controller: OT3Controller):
+    """Do not raise FirmwareUpdateRequired if check_updates is False."""
+    controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
+    for node in controller._present_devices:
+        controller._motor_status.update(
+            {node: MotorStatus(motor_ok=False, encoder_ok=True)}
+        )
+    # update_required and initialized are true, but not check_updates, no exception
+    controller._update_required = True
+    controller._initialized = False
+    controller._check_updates = False
+    await controller.update_to_default_current_settings(GantryLoad.LOW_THROUGHPUT)
+
+    async def fake_src(
+        can_messenger: CanMessenger,
+        current_settings: Dict[NodeId, float],
+        use_tip_motor_message_for: List[NodeId],
+    ) -> None:
+        return None
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.set_run_current",
+        fake_src,
+    ):
+        await controller.set_active_current({OT3Axis.X: 2})
 
 
 async def test_update_firmware_update_required(

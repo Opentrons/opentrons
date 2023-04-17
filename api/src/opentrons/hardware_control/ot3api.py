@@ -288,7 +288,9 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await OT3Controller.build(checked_config, use_usb_bus)
+        backend = await OT3Controller.build(
+            checked_config, use_usb_bus, check_updates=update_firmware
+        )
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
@@ -311,9 +313,7 @@ class OT3API(
         api_instance._update_door_state(door_state)
         backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
-        # set the initialized flag based on wether firmware updates are enabled or not
-        # this way we dont raise `FirmwareUpdateRequired` exception when updates are disabled.
-        backend.initialized = update_firmware
+        backend.initialized = True
         return api_instance
 
     @classmethod
