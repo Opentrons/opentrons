@@ -1,7 +1,7 @@
 {
   "$otSharedSchema": "module/schemas/3",
-  "moduleType": "magneticBlockModuleType",
-  "model": "magneticBlockModuleV1",
+  "moduleType": "magneticBlockType",
+  "model": "magneticBlockV1",
   "labwareOffset": {
     "x": 0,
     "y": 0,
