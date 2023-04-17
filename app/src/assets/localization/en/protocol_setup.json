@@ -168,9 +168,11 @@
   "opening": "Opening...",
   "closing": "Closing...",
   "calibration": "Calibration",
-  "mount": "{{mount}} Mount",
-  "no_data": "No data",
+  "mount": "{{mount}} mount",
+  "no_data": "no data",
   "attach": "attach",
   "calibration_status": "calibration status",
-  "total_vol": "total volume"
+  "total_vol": "total volume",
+  "calibrated": "calibrated",
+  "calibrate": "calibrate"
 }
