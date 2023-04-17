@@ -88,9 +88,9 @@ class MaintenanceEngineStore:
         """
         # Because we will be clearing engine store before creating a new one,
         # the runner-engine pair should be None at this point.
-        assert self._runner_engine_pair is None, (
-            "There is an active maintenance run" " that was not deleted correctly."
-        )
+        assert (
+            self._runner_engine_pair is None
+        ), "There is an active maintenance run that was not cleared correctly."
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -98,6 +98,9 @@ class MaintenanceEngineStore:
                 block_on_door_open=feature_flags.enable_door_safety_switch(),
             ),
         )
+
+        # Using LiveRunner as the runner to allow for future refactor of maintenance runs
+        # See https://opentrons.atlassian.net/browse/RSS-226
         runner = LiveRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         # TODO (spp): set live runner start func
