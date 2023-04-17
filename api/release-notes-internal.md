@@ -38,7 +38,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ### Robot Control
 - Motion configuration fixes from harware testing
 - Module calibration exists in the protocol engine; you can use a script to run it with any pipette for any module. The data will be saved for inspection, but will not be loaded during protocols.
-- Cancelling a run should work now. It should no longer stay in "stop requested" forever and require a restart.
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
@@ -48,6 +47,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
 - Firmware update for all devices attached when the robot turns on
+- Cancelling a protocol run. We're pretty sure we fixed this so definitely tell us if it's not.
 
 ### ODD
 - Protocol execution
