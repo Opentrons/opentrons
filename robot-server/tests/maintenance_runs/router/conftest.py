@@ -2,7 +2,6 @@
 import pytest
 from decoy import Decoy
 
-from robot_server.runs.engine_store import EngineStore
 from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
 )
@@ -16,12 +15,6 @@ from opentrons.protocol_engine import ProtocolEngine
 def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a mock MaintenanceEngineStore interface."""
     return decoy.mock(cls=MaintenanceEngineStore)
-
-
-@pytest.fixture()
-def mock_engine_store(decoy: Decoy) -> EngineStore:
-    """Get a mock MaintenanceEngineStore interface associated with a Protocol Run."""
-    return decoy.mock(cls=EngineStore)
 
 
 @pytest.fixture()
