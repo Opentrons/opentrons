@@ -110,7 +110,7 @@ describe('RecentProtocolRunCard', () => {
   it('should render missing chip (module and pipette) when missing a pipette and a module', () => {
     mockUseMissingProtocolHardware.mockReturnValue(missingBoth)
     const [{ getByText }] = render(props)
-    getByText('Missing 1 module(s) and 1 pipette(s)')
+    getByText('Missing hardware')
   })
 
   it('when tapping a card, a mock function is called', () => {
