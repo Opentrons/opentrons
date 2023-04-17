@@ -103,7 +103,7 @@ export function ProtocolSetupInstruments({
         <ProtocolInstrumentMountItem
           key="extension"
           mount="extension"
-          speccedName={'attachedGripperMatch?.instrumentModel' as GripperModel}
+          speccedName={attachedGripperMatch?.instrumentModel as GripperModel}
           attachedInstrument={attachedGripperMatch}
           attachedCalibrationData={
             attachedGripperMatch?.data.calibratedOffset ?? null
