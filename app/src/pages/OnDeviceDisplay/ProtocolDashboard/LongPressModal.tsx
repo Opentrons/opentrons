@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useQueryClient } from 'react-query'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -33,6 +34,7 @@ export function LongPressModal(props: {
   const { longpress, protocolId } = props
   const history = useHistory()
   const host = useHost()
+  const queryClient = useQueryClient()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -76,6 +78,13 @@ export function LongPressModal(props: {
           )
         })
         .then(() => deleteProtocol(host, protocolId))
+        .then(() =>
+          queryClient
+            .invalidateQueries([host, 'protocols'])
+            .catch((e: Error) =>
+              console.error(`error invalidating runs query: ${e.message}`)
+            )
+        )
         .then(() => longpress.setIsLongPressed(false))
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
