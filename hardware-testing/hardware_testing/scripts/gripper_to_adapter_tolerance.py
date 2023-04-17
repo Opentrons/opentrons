@@ -9,6 +9,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 
 
 RETRACT_HEIGHT_REL_MM = 20
+UNGRIP_WIDTH = 87.0
 
 
 async def _main(
@@ -36,21 +37,25 @@ async def _main(
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, gripper="GRPV1120230403A01"
     )
+
+    async def _ungrip() -> None:
+        await api.hold_jaw_width(UNGRIP_WIDTH)
+
     print("homing...")
     await api.home()
-    await api.ungrip()
+    await _ungrip()
     ui.print_title("JOG TO LABWARE CENTER")
     while True:
         await helpers_ot3.jog_mount_ot3(api, OT3Mount.GRIPPER)
         _get_ready("about to GRIP")
         await api.grip(force)
         _get_ready("about to UNGRIP")
-        await api.ungrip()
+        await _ungrip()
         if _get_answer("does it look good"):
             break
     labware_center = await api.gantry_position(OT3Mount.GRIPPER)
     print(f"labware center: {labware_center}")
-    await api.ungrip()
+    await _ungrip()
     await api.home([OT3Axis.Z_G])
 
     async def _move_to(offset: Point) -> None:
@@ -62,7 +67,7 @@ async def _main(
         )
 
     async def _pick_up(offset: Point, check: bool = False) -> bool:
-        await api.ungrip()
+        await _ungrip()
         await _move_to(offset)
         await api.grip(force)
         await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
@@ -73,7 +78,7 @@ async def _main(
 
     async def _drop(offset: Point, check: bool = False) -> bool:
         await _move_to(offset + Point(z=drop_offset))
-        await api.ungrip()
+        await _ungrip()
         await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
         if check:
             return _get_answer("good drop")
@@ -103,18 +108,17 @@ async def _main(
                     picked_up = await _pick_up(
                         offset if check_pick_up else Point(), check=check_pick_up
                     )
-                    if picked_up:
-                        use_offset = (axis == OT3Axis.X and check_pick_up)
-                        dropped_off = await _drop(
-                            offset if use_offset else Point(),
-                            check=check_drop
-                        )
-                    else:
+                    if not picked_up:
                         dropped_off = False
-                        await api.ungrip()
+                        await _ungrip()
+                    elif check_pick_up and axis == OT3Axis.Y:
+                        # if pick-up is off along X, we don't want to re-center for drop
+                        dropped_off = await _drop(Point(), check=check_drop)
+                    else:
+                        dropped_off = await _drop(offset, check=check_drop)
                     result = picked_up if check_pick_up else dropped_off
                     if not result:
-                        await api.ungrip()
+                        await _ungrip()
                         await api.home([OT3Axis.Z_G])
                         break
                     elif t + 1 == trials:
