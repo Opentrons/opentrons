@@ -14,4 +14,7 @@ const Template: Story<React.ComponentProps<typeof MenuItem>> = args => (
 export const Primary = Template.bind({})
 Primary.args = {
   children: 'Example menu btn',
+  isAlert: false,
+  isOnDevice: false,
+  disabled: false,
 }
