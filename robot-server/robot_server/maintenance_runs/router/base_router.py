@@ -125,10 +125,10 @@ async def get_run_data_from_url(
         """
         Create a new maintenance run to track robot interaction.
 
-        If a maintenance run already exists, it will be cleared 
+        If a maintenance run already exists, it will be cleared
         and a new one will be created.
-        
-        Will raise an error if a protocol run exists and is not idle. 
+
+        Will raise an error if a protocol run exists and is not idle.
         """
     ),
     status_code=status.HTTP_201_CREATED,
