@@ -140,7 +140,7 @@ class _UpdateProcess:
                 )
             await self._status_queue.put(_UpdateProgressPacket(100, UpdateState.done))
         except Exception as e:
-            log.exception('Failed to update firmware')
+            log.exception("Failed to update firmware")
             await self._status_queue.put(_UpdateErrorPacket(e))
 
     def get_handle(self) -> "UpdateProcessHandle":
