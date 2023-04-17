@@ -86,35 +86,42 @@ async def _main(
         check_drop = action == "drop"
         max_error = max_error_pick_up if check_pick_up else max_error_drop
         if axis == OT3Axis.X:
-            offset = Point(x=max_error * -1)
             step_pnt = Point(x=step)
         else:
-            offset = Point(y=max_error * -1)
             step_pnt = Point(y=step)
         good_offsets = []
-        while offset.x <= max_error and offset.y <= max_error:
-            ui.print_header(
-                f"{action.upper()}: X={round(offset.x, 1)}, Y={round(offset.y, 1)}"
-            )
-            for t in range(trials):
-                print(f"trial {t + 1}/{trials}")
-                _get_ready("about to use gripper")
-                picked_up = await _pick_up(
-                    offset if check_pick_up else Point(), check=check_pick_up
+        for direction in [-1.0, 1.0]:
+            offset = Point()
+            while abs(offset.x) <= max_error and abs(offset.y) <= max_error:
+                ui.print_header(
+                    f"{action.upper()}: X={round(offset.x, 2)}, Y={round(offset.y, 2)}"
                 )
-                if picked_up:
-                    dropped_off = await _drop(
-                        offset if check_drop else Point(), check=check_drop
+                result = False
+                for t in range(trials):
+                    print(f"trial {t + 1}/{trials}")
+                    _get_ready("about to use gripper")
+                    picked_up = await _pick_up(
+                        offset if check_pick_up else Point(), check=check_pick_up
                     )
-                else:
-                    dropped_off = False
-                    await api.ungrip()
-                result = picked_up if check_pick_up else dropped_off
-                if not result:
+                    if picked_up:
+                        use_offset = (axis == OT3Axis.X and check_pick_up)
+                        dropped_off = await _drop(
+                            offset if use_offset else Point(),
+                            check=check_drop
+                        )
+                    else:
+                        dropped_off = False
+                        await api.ungrip()
+                    result = picked_up if check_pick_up else dropped_off
+                    if not result:
+                        await api.ungrip()
+                        await api.home([OT3Axis.Z_G])
+                        break
+                    elif t + 1 == trials:
+                        good_offsets.append(offset.x if axis == OT3Axis.X else offset.y)
+                if not result and not ui.get_user_answer("test remaining offsets"):
                     break
-                elif t + 1 == trials:
-                    good_offsets.append(offset.x if axis == OT3Axis.X else offset.y)
-            offset += step_pnt
+                offset += step_pnt * direction
         print(good_offsets)
         return good_offsets
 
@@ -126,22 +133,22 @@ async def _main(
     good_pick_up_x = []
     good_pick_up_y = []
     if test_drop:
-        good_drop_x = await _test("drop", OT3Axis.X)
         good_drop_y = await _test("drop", OT3Axis.Y)
+        good_drop_x = await _test("drop", OT3Axis.X)
     if test_pick_up:
-        good_pick_up_x = await _test("pick-up", OT3Axis.X)
         good_pick_up_y = await _test("pick-up", OT3Axis.Y)
+        good_pick_up_x = await _test("pick-up", OT3Axis.X)
     ui.print_title("RESULTS")
     if test_drop:
-        ui.print_header("DROP-X")
-        print(good_drop_x)
         ui.print_header("DROP-Y")
         print(good_drop_y)
+        ui.print_header("DROP-X")
+        print(good_drop_x)
     if test_pick_up:
         ui.print_header("PICK-UP-Y")
-        print(good_pick_up_x)
-        ui.print_header("PICK-UP-Y")
         print(good_pick_up_y)
+        ui.print_header("PICK-UP-X")
+        print(good_pick_up_x)
 
 
 if __name__ == "__main__":
