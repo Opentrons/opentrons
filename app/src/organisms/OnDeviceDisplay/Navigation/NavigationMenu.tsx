@@ -51,8 +51,8 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           onClick={() => dispatch(home(robotName, ROBOT))}
         >
           <Icon
-            name="reset-position"
-            aria-label="reset-position_icon"
+            name="home-gantry"
+            aria-label="home-gantry_icon"
             size={SIZE_2}
             color={COLORS.black}
           />

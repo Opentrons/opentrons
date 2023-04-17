@@ -4,6 +4,7 @@ import { Btn, COLORS, Icon, SPACING } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../buttons/OnDeviceDisplay/constants'
 
 interface OverflowBtnProps extends React.ComponentProps<typeof Btn> {
+  /** optional boolean to specify if button is being rendered on touchscreen or not */
   isOnDevice?: boolean
 }
 //  TODO(jr 4/13/23): should probably move this component to atoms/buttons
