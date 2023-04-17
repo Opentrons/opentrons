@@ -15,7 +15,7 @@ from robot_server.hardware import get_hardware, get_robot_type
 from .maintenance_engine_store import MaintenanceEngineStore
 from .maintenance_run_data_manager import MaintenanceRunDataManager
 
-_engine_store_accessor = AppStateAccessor[MaintenanceEngineStore]("engine_store")
+_engine_store_accessor = AppStateAccessor[MaintenanceEngineStore]("maintenance_engine_store")
 
 
 async def get_maintenance_engine_store(
