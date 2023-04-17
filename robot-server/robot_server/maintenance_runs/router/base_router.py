@@ -1,6 +1,6 @@
-"""Base router for /runs endpoints.
+"""Base router for /maintenance_runs endpoints.
 
-Contains routes dealing primarily with `Run` models.
+Contains routes dealing primarily with `Maintenance Run` models.
 """
 import logging
 from datetime import datetime
@@ -102,7 +102,7 @@ async def get_run_data_from_url(
         get_maintenance_run_data_manager
     ),
 ) -> MaintenanceRun:
-    """Get the data of a run.
+    """Get the data of a maintenance run.
 
     Args:
         runId: Run ID pulled from URL.
@@ -125,8 +125,10 @@ async def get_run_data_from_url(
         """
         Create a new maintenance run to track robot interaction.
 
-        When too many runs already exist, old ones will be automatically deleted
-        to make room for the new one.
+        If a maintenance run already exists, it will be cleared 
+        and a new one will be created.
+        
+        Will raise an error if a protocol run exists and is not idle. 
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -144,11 +146,11 @@ async def create_run(
     created_at: datetime = Depends(get_current_time),
     protocol_run_has_been_played: bool = Depends(get_protocol_run_has_been_played),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
-    """Create a new run.
+    """Create a new maintenance run.
 
     Arguments:
         request_body: Optional request body with run creation data.
-        run_data_manager: Current and historical run data management.
+        run_data_manager: Current run data management.
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
         protocol_run_has_been_played: Whether a protocol run has been played yet.
@@ -221,7 +223,7 @@ async def get_current_run(
 async def get_run(
     run_data: MaintenanceRun = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
-    """Get a run by its ID.
+    """Get a maintenance run by its ID.
 
     Args:
         run_data: Data of the run specified in the runId url parameter.
@@ -247,11 +249,11 @@ async def remove_run(
         get_maintenance_run_data_manager
     ),
 ) -> PydanticResponse[SimpleEmptyBody]:
-    """Delete a run by its ID.
+    """Delete a maintenance run by its ID.
 
     Arguments:
         runId: Run ID pulled from URL.
-        run_data_manager: Current and historical run data management.
+        run_data_manager: Current run data management.
     """
     try:
         await run_data_manager.delete(runId)

@@ -114,7 +114,7 @@ class MaintenanceEngineStore:
         return engine.state_view.get_summary()
 
     async def clear(self) -> RunResult:
-        """Remove the persisted ProtocolEngine.
+        """Remove the ProtocolEngine.
 
         Raises:
             EngineConflictError: The current runner/engine pair is not idle, so

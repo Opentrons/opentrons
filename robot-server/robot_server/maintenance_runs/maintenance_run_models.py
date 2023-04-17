@@ -1,4 +1,4 @@
-"""Request and response models for run resources."""
+"""Request and response models for maintenance run resources."""
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -21,7 +21,7 @@ from robot_server.maintenance_runs.maintenance_action_models import MaintenanceR
 from robot_server.service.json_api import ResourceModel
 
 
-# TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
+# TODO(mc, 2022-02-01): since the `/maintenance_runs/:run_id/commands` response is now paginated,
 # this summary model is a lot less useful. Remove and replace with full `Command`
 # models once problematically large objects like full labware and module definitions
 # are no longer part of the public command.result API

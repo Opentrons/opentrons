@@ -1,4 +1,4 @@
-"""Router for /runs commands endpoints."""
+"""Router for /maintenance_runs commands endpoints."""
 import textwrap
 from datetime import datetime
 from typing import Optional, Union
@@ -86,12 +86,11 @@ async def get_current_run_engine_from_url(
     runId: str,
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
 ) -> ProtocolEngine:
-    """Get run protocol engine.
+    """Get current run protocol engine.
 
     Args:
         runId: Run ID to associate the command with.
         engine_store: Engine store to pull current run ProtocolEngine.
-        run_store: Run data storage.
     """
     if runId != engine_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
@@ -191,11 +190,11 @@ async def create_run_command(
 
 @commands_router.get(
     path="/maintenance_runs/{runId}/commands",
-    summary="Get a list of all protocol commands in the run",
+    summary="Get a list of all commands in the run",
     description=(
         "Get a list of all commands in the run and their statuses. "
         "This endpoint returns command summaries. Use "
-        "`GET /runs/{runId}/commands/{commandId}` to get all "
+        "`GET /maintenance_runs/{runId}/commands/{commandId}` to get all "
         "information available for a given command."
     ),
     responses={

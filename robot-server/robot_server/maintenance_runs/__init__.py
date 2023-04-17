@@ -1,13 +1,12 @@
-"""Run creation and management.
+"""Maintenance Run creation and management.
 
 A "run" is a logical container for a user's interaction with a robot,
 usually (but not always) with a well-defined start point and end point.
-Examples of "runs" include:
 
-- A run to execute a specific protocol
-- A run to complete a specific calibration procedure
-- A long running, "default" run to perform one-off actions, like toggling
-  the frame lights on
+A maintenance run is a special type of run that is used for running
+maintenance procedures like instrument attach/detach/calibration and LPC.
+A maintenance run doesn't have a protocol associated with it, but is issued individual
+commands and actions over HTTP.
 """
 from .router import maintenance_runs_router
 from .maintenance_engine_store import MaintenanceEngineStore, EngineConflictError

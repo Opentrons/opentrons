@@ -1,4 +1,4 @@
-"""Router for /runs endpoints dealing with labware offsets and definitions."""
+"""Router for /maintenance_runs endpoints dealing with labware offsets and definitions."""
 import logging
 from typing import Union
 
@@ -20,12 +20,12 @@ labware_router = APIRouter()
 
 
 @labware_router.post(
-    path="/runs/{runId}/labware_offsets",
-    summary="Add a labware offset to a run",
+    path="/maintenance_runs/{runId}/labware_offsets",
+    summary="Add a labware offset to a maintenance run",
     description=(
         "Add a labware offset to an existing run, returning the created offset."
         "\n\n"
-        "There is no matching `GET /runs/{runId}/labware_offsets` endpoint."
+        "There is no matching `GET /maintenance_runs/{runId}/labware_offsets` endpoint."
         " To read the list of labware offsets currently on the run,"
         " see the run's `labwareOffsets` field."
     ),
@@ -41,7 +41,7 @@ async def add_labware_offset(
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
     run: MaintenanceRun = Depends(get_run_data_from_url),
 ) -> PydanticResponse[SimpleBody[LabwareOffset]]:
-    """Add a labware offset to a run.
+    """Add a labware offset to a maintenance run.
 
     Args:
         request_body: New labware offset request data from request body.
@@ -65,8 +65,8 @@ async def add_labware_offset(
 # TODO(mc, 2022-02-28): add complementary GET endpoint
 # https://github.com/Opentrons/opentrons/issues/9427
 @labware_router.post(
-    path="/runs/{runId}/labware_definitions",
-    summary="Add a labware definition to a run",
+    path="/maintenance_runs/{runId}/labware_definitions",
+    summary="Add a labware definition to a maintenance run",
     description=(
         "Add a labware definition to a run, returning the added definition's URI."
     ),

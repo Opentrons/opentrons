@@ -27,7 +27,7 @@ class MaintenanceRunActionCreate(BaseModel):
 
 
 class MaintenanceRunAction(ResourceModel):
-    """Run control action model.
+    """Maintenance Run control action model.
 
     A RunAction resource represents a client-provided command to
     the run in order to control the execution of the run itself.

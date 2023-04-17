@@ -1,4 +1,4 @@
-"""Manage current and historical run data."""
+"""Manage current maintenance run data."""
 from datetime import datetime
 from typing import List, Optional
 
@@ -54,14 +54,13 @@ class RunNotCurrentError(ValueError):
 
 
 class MaintenanceRunDataManager:
-    """Collaborator to manage current and historical run data.
+    """Collaborator to manage current run data.
 
-    Provides a facade to both an MaintenanceEngineStore (current run) and a RunStore
-    (historical runs). Returns `Run` response models to the router.
+    Provides a facade to a MaintenanceEngineStore.
+    Returns `MaintenanceRun` response models to the router.
 
     Args:
         engine_store: In-memory store of the current run's ProtocolEngine.
-        run_store: Persistent database of current and historical run data.
     """
 
     def __init__(self, engine_store: MaintenanceEngineStore) -> None:
@@ -105,9 +104,6 @@ class MaintenanceRunDataManager:
     def get(self, run_id: str) -> MaintenanceRun:
         """Get a maintenance run resource.
 
-        This method will pull from the current run or the historical runs,
-        depending on if `run_id` refers to the current run.
-
         Args:
             run_id: The identifier of the run to return.
 
@@ -115,7 +111,7 @@ class MaintenanceRunDataManager:
             The run resource.
 
         Raises:
-            RunNotFoundError: The given run identifier does not exist.
+            RunNotCurrentError: The given run identifier does not exist.
         """
         current = run_id == self._engine_store.current_run_id
         if not current:
@@ -131,7 +127,7 @@ class MaintenanceRunDataManager:
         )
 
     async def delete(self, run_id: str) -> None:
-        """Delete a current or historical run.
+        """Delete a maintenance run.
 
         Args:
             run_id: The identifier of the run to remove.
@@ -139,7 +135,7 @@ class MaintenanceRunDataManager:
         Raises:
             EngineConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
-            RunNotFoundError: The given run identifier was not found in the database.
+            RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
@@ -150,7 +146,7 @@ class MaintenanceRunDataManager:
         cursor: Optional[int],
         length: int,
     ) -> CommandSlice:
-        """Get a slice of run commands.
+        """Get a slice of maintenance run commands.
 
         Args:
             run_id: ID of the run.
@@ -158,7 +154,7 @@ class MaintenanceRunDataManager:
             length: Length of slice to return.
 
         Raises:
-            RunNotFoundError: The given run identifier was not found in the database.
+            RunNotCurrentError: The given run identifier doesn't belong to a current run.
         """
         if run_id != self._engine_store.current_run_id:
             raise RunNotCurrentError(f"{run_id} is not the current maintenance run")
