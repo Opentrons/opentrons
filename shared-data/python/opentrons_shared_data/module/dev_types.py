@@ -31,7 +31,7 @@ MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
 TemperatureModuleModel = Literal["temperatureModuleV1", "temperatureModuleV2"]
 ThermocyclerModuleModel = Literal["thermocyclerModuleV1", "thermocyclerModuleV2"]
 HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
-MagneticBlockModuleModel = Literal["magneticBlockModuleV1"]
+MagneticBlockModel = Literal["magneticBlockV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,
