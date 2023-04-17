@@ -260,10 +260,11 @@ class PipetteHandlerProvider:
                     "aspirate",
                 )
             }
+            pipette_offsets = instr.pipette_offset
             result["pipette_offset"] = {
-                "offset": instr_dict["pipette_offset"].offset,
-                "source": instr_dict["pipette_offset"].source,
-                "last_modified": instr_dict["pipette_offset"].last_modified,
+                "offset": pipette_offsets.offset,
+                "source": pipette_offsets.source,
+                "last_modified": pipette_offsets.last_modified,
             }
         return cast(PipetteDict, result)
 

@@ -249,6 +249,12 @@ class PipetteHandlerProvider(Generic[MountType]):
                 alvl: self.plunger_speed(instr, fr, "aspirate")
                 for alvl, fr in instr.config.default_aspirate_flow_rates.items()
             }
+            pipette_offsets = instr.pipette_offset
+            result["pipette_offset"] = {
+                "offset": pipette_offsets.offset,
+                "source": pipette_offsets.source,
+                "last_modified": pipette_offsets.last_modified,
+            }
         return cast(PipetteDict, result)
 
     @property
