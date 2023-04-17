@@ -453,7 +453,7 @@ If there are multiple source wells, the pipette will never combine their volumes
     pipette.distribute(
         volume = 30,
         source = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
-        dest = plate.rows()['A'])
+        dest = plate.rows_by_name()['A'])
 
 will have the steps...
 
