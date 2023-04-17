@@ -99,11 +99,11 @@ export function ProtocolSetupInstruments({
           />
         )
       })}
-      {usesGripper && attachedGripperMatch != null ? (
+      {usesGripper ? (
         <ProtocolInstrumentMountItem
           key="extension"
           mount="extension"
-          speccedName={attachedGripperMatch?.instrumentModel as GripperModel}
+          speccedName={'gripperV1' as GripperModel}
           attachedInstrument={attachedGripperMatch}
           attachedCalibrationData={
             attachedGripperMatch?.data.calibratedOffset ?? null
