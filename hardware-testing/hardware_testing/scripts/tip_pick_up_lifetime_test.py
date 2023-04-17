@@ -265,8 +265,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                     await api.pick_up_tip(mount, tip_len)
                     total_pick_ups += 1
                     ### check tip presence after tip pick up
-                    tip_presence_pick_up = True
-                    if(tip_presence_pick_up):
+                    tip_presence_pick_up = await api.get_tip_status(mount)
+                    keys = list(tip_presence_pick_up.keys())
+                    if(tip_presence_pick_up[keys[0]]):
                         print("\t>> Tip detected!\n")
                     else:
                         print("\t>> Tip not detected!\n")
@@ -286,8 +287,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                     ### check tip presence after tip drop
                     print("Dropping tip...\n")
                     await api.drop_tip(mount)
-                    tip_presence_eject = False
-                    if(tip_presence_eject):
+                    tip_presence_eject = await api.get_tip_status(mount)
+                    keys = list(tip_presence_eject.keys())
+                    if(tip_presence_eject[keys[0]]):
                         print("\t>> Tip detected after ejecting tip!\n")
                         print("\t>> Canceling script...\n")
                         total_failures += 1

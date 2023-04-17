@@ -1269,6 +1269,11 @@ class OT3API(
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
 
+    async def get_tip_status(self, mount: Union[top_types.Mount, OT3Mount]) -> Dict[OT3Axis, bool]:
+        checked_mount = OT3Mount.from_mount(mount)
+        res = await self._backend.get_tip_status(checked_mount)
+        return {ax: val for ax, val in res.items()}
+
     @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10

@@ -73,6 +73,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
+from opentrons_hardware.hardware_control.tip_presence import get_tip_status
 from opentrons_hardware.hardware_control.network import NetworkInfo
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
@@ -806,6 +807,13 @@ class OT3Controller:
         motor_nodes = self._motor_nodes()
         assert motor_nodes, "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, motor_nodes)
+        return {node_to_axis(node): bool(val) for node, val in res.items()}
+
+    async def get_tip_status(self, mount: OT3Mount) -> bool:
+        """Get the tip state of the pipette."""
+        subsystem = mount_to_subsystem(mount)
+        node_id = sub_system_to_node_id(subsystem)
+        res = await get_tip_status(self._messenger, node_id)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
     @staticmethod
