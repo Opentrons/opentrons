@@ -14,7 +14,6 @@ import {
   JUSTIFY_CENTER,
   ALIGN_END,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
