@@ -193,8 +193,10 @@ change-left:
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
 
+
 .PHONY: docs
 docs:
-	$(python) -m robot_server.spec_generator
+	$(SHX) mkdir -p docs/build/
+	$(python) ./scripts/spec_generator.py docs/build/openapi.json
 	$(SHX) mkdir -p docs/dist/http
 	$(REDOC) build-docs docs/build/openapi.json -o docs/dist/http/api_reference.html
