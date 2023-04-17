@@ -20,9 +20,9 @@ import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 interface RecentProtocolRunCardProps {
   /** protocol name that was run recently */
   protocolName: string
-  /** protocol id  */
+  /** protocol id that was run recently  */
   protocolId: string
-  /** last run */
+  /** the time that this recent run was created  */
   lastRun?: string
 }
 
@@ -34,11 +34,11 @@ export function RecentProtocolRunCard({
   const { t, i18n } = useTranslation('device_details')
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
-  const isSuccess = missingProtocolHardware.length === 0
+  const isReadyToBeReRun = missingProtocolHardware.length === 0
 
   const CARD_STYLE = css`
     &:active {
-      background-color: ${isSuccess
+      background-color: ${isReadyToBeReRun
         ? COLORS.green_three_pressed
         : COLORS.yellow_three_pressed};
     }
@@ -82,7 +82,7 @@ export function RecentProtocolRunCard({
       })
     } else {
       chipText = t('missing_module_plural', {
-        num: countMissingModules,
+        count: countMissingModules,
       })
     }
   } else if (countMissingPipettes > 0 && countMissingModules === 0) {
@@ -92,7 +92,7 @@ export function RecentProtocolRunCard({
       })
     } else {
       chipText = t('missing_pipettes_plural', {
-        num: countMissingPipettes,
+        count: countMissingPipettes,
       })
     }
   } else if (countMissingPipettes > 0 && countMissingModules > 0) {
@@ -109,15 +109,19 @@ export function RecentProtocolRunCard({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing5}
       gridGap={SPACING.spacing5}
-      backgroundColor={isSuccess ? COLORS.green_three : COLORS.yellow_three}
+      backgroundColor={
+        isReadyToBeReRun ? COLORS.green_three : COLORS.yellow_three
+      }
       width="25.8125rem"
       borderRadius={BORDERS.size_four}
       onClick={handleCardClick}
     >
       {/* marginLeft is needed to cancel chip's padding */}
-      <Flex marginLeft={`-${SPACING.spacing4}`}>
+      {/* <Flex marginLeft={`-${SPACING.spacing4}`}> */}
+      <Flex>
         <Chip
-          type={isSuccess ? 'success' : 'warning'}
+          paddingLeft="0"
+          type={isReadyToBeReRun ? 'success' : 'warning'}
           background={false}
           text={i18n.format(chipText, 'capitalize')}
         />

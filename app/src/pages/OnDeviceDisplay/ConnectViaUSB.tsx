@@ -18,7 +18,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 // import { PrimaryButton } from '../../atoms/buttons'
-import usbImage from '../../assets/images/OnDeviceDisplay/usb@x2.png'
+import usbImage from '../../assets/images/on-device-display/usb@x2.png'
 
 // Note: kj 12/06/2022 The commented-out lines will be activated when the check function is ready
 export function ConnectViaUSB(): JSX.Element {

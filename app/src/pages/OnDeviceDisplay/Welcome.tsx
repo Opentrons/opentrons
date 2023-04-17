@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-import screenImage from '../../assets/images/OnDeviceDisplay/odd_abstract@x2.png'
+import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'Get started setting up a robot'
 

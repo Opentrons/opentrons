@@ -12,7 +12,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 
-import abstractImage from '../../../assets/images/OnDeviceDisplay/Illustration@x2.png'
+import abstractImage from '../../../assets/images/on-device-display/empty_recent_protocol_run.png'
 
 export function EmptyRecentRun(): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -28,7 +28,7 @@ export function EmptyRecentRun(): JSX.Element {
       <Flex marginBottom={SPACING.spacing4}>
         <img
           src={abstractImage}
-          alt="RobotDashboard no recent run protocols"
+          alt="There is no recent run protocol"
           width="284px"
           height="166px"
         />

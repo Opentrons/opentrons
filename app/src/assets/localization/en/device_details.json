@@ -128,9 +128,9 @@
   "last_run_time": "last run {{number}}",
   "ready_to_run": "ready to run",
   "missing_module": "missing {{num}} module",
-  "missing_module_plural": "missing {{num}} modules",
+  "missing_module_plural": "missing {{count}} modules",
   "missing_pipette": "missing {{num}} pipette",
-  "missing_pipettes_plural": "missing {{num}} pipettes",
+  "missing_pipettes_plural": "missing {{count}} pipettes",
   "missing_both": "missing hardware",
   "have_not_run": "No recent runs",
   "have_not_run_description": "After you run some protocols, they will appear here."
