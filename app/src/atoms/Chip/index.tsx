@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import {
+  BORDERS,
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,
@@ -14,57 +15,86 @@ import { StyledText } from '../text'
 
 import type { IconName } from '@opentrons/components'
 
-export type ChipType = 'success' | 'warning' | 'error' | 'informing'
+export type ChipType = 'basic' | 'success' | 'warning' | 'neutral'
 
-// Note: When the DS is coming out, we may need to define ChipType like Banner
 interface ChipProps {
-  /** name constant of the text color and the icon color to display */
-  type: ChipType
+  /** Display background color? */
+  background?: boolean
+  /** Chip icon */
+  iconName?: IconName
   /** Chip content */
   text: string
-  /** Chip icon */
-  iconName: IconName
+  /** name constant of the text color and the icon color to display */
+  type: ChipType
 }
 
 const CHIP_PROPS_BY_TYPE: Record<
   ChipType,
-  { textColor: string; iconColor: string }
+  {
+    backgroundColor: string
+    borderRadius: string
+    iconColor?: string
+    iconName?: IconName
+    textColor: string
+  }
 > = {
-  success: {
-    textColor: COLORS.successText,
-    iconColor: COLORS.successEnabled,
+  basic: {
+    backgroundColor: COLORS.darkBlack_twenty,
+    borderRadius: BORDERS.size_one,
+    textColor: COLORS.darkBlack_ninety,
   },
-  error: {
-    textColor: COLORS.errorText,
-    iconColor: COLORS.errorEnabled,
+  neutral: {
+    backgroundColor: COLORS.darkBlack_twenty,
+    borderRadius: BORDERS.size_six,
+    iconColor: COLORS.darkBlack_ninety,
+    textColor: COLORS.darkBlack_seventy,
+  },
+  success: {
+    backgroundColor: COLORS.green_three,
+    borderRadius: BORDERS.size_six,
+    iconColor: COLORS.green_one,
+    iconName: 'ot-check',
+    textColor: COLORS.green_one,
   },
   warning: {
-    textColor: COLORS.warningText,
-    iconColor: COLORS.warningEnabled,
-  },
-  informing: {
-    textColor: COLORS.darkGreyEnabled,
-    iconColor: COLORS.darkGreyEnabled,
+    backgroundColor: COLORS.yellow_three,
+    borderRadius: BORDERS.size_six,
+    iconColor: COLORS.yellow_two,
+    textColor: COLORS.yellow_one,
   },
 }
 
 // ToDo (kj:02/09/2023) replace hard-coded values when the DS is out
-export function Chip({ type, text, iconName }: ChipProps): JSX.Element {
+export function Chip({
+  background,
+  iconName,
+  type,
+  text,
+}: ChipProps): JSX.Element {
+  const backgroundColor =
+    background === false && type !== 'basic'
+      ? COLORS.transparent
+      : CHIP_PROPS_BY_TYPE[type].backgroundColor
+  const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
   return (
     <Flex
+      alignItems={ALIGN_CENTER}
+      backgroundColor={backgroundColor}
+      borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-      backgroundColor={COLORS.white}
-      borderRadius="1.9375rem"
-      alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing3}
+      data-testid={`Chip_${type}`}
     >
-      <Icon
-        name={iconName}
-        color={CHIP_PROPS_BY_TYPE[type].iconColor}
-        aria-label={`icon_${text}`}
-        size="1.5rem"
-      />
+      {type !== 'basic' && (
+        <Icon
+          name={icon}
+          color={CHIP_PROPS_BY_TYPE[type].iconColor}
+          aria-label={`icon_${text}`}
+          size="1.5rem"
+          data-testid="RenderResult_icon"
+        />
+      )}
       <StyledText
         fontSize="1.25rem"
         lineHeight="1.6875rem"

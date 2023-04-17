@@ -25,26 +25,19 @@ export interface BaseStep {
 }
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface DetachProbeStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PROBE
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface AttachProbeStep extends BaseStep {
   section: typeof SECTIONS.ATTACH_PROBE
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface ResultsStep extends BaseStep {
   section: typeof SECTIONS.RESULTS
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
+  recalibrate?: boolean
 }
 export interface MountPipetteStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_PIPETTE
@@ -83,7 +76,6 @@ export interface PipetteWizardStepProps {
   attachedPipettes: AttachedPipettesByMount
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
-  robotName: string
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
 }

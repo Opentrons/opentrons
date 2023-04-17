@@ -180,3 +180,7 @@ def default_pipette_offset() -> List[float]:
 
 def default_gripper_calibration_offset() -> List[float]:
     return gripper_config.DEFAULT_GRIPPER_CALIBRATION_OFFSET
+
+
+def default_module_calibration_offset() -> List[float]:
+    return defaults_ot3.DEFAULT_MODULE_OFFSET

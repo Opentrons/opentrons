@@ -372,8 +372,8 @@ def test_get_tip_length_gets_length_from_definition(
         definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
     )
 
-    length = subject.get_tip_length("tip-rack-id")
-    assert length == tip_rack_def.parameters.tipLength
+    length = subject.get_tip_length("tip-rack-id", 12.3)
+    assert length == tip_rack_def.parameters.tipLength - 12.3  # type: ignore[operator]
 
 
 def test_get_tip_drop_z_offset() -> None:
@@ -813,14 +813,14 @@ def test_get_calibration_coordinates() -> None:
         "locations": {
             "orderedSlots": [
                 {
-                    "id": "2",
+                    "id": "1",
                     "position": [2, 2, 0.0],
                     "boundingBox": {
                         "xDimension": 4.0,
                         "yDimension": 6.0,
                         "zDimension": 0,
                     },
-                    "displayName": "Slot 2",
+                    "displayName": "Slot 1",
                 }
             ]
         }
@@ -828,9 +828,9 @@ def test_get_calibration_coordinates() -> None:
 
     subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
 
-    result = subject.get_calibration_coordinates(current_z_position=3.0)
+    result = subject.get_calibration_coordinates(offset=Point(y=1, z=2))
 
-    assert result == Point(x=4, y=5, z=3)
+    assert result == Point(x=4, y=6, z=2)
 
 
 def test_get_by_slot() -> None:

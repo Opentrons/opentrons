@@ -1,4 +1,5 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +12,6 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { getCalibrationForPipette } from '../../redux/calibration'
-import { getAttachedPipettes } from '../../redux/pipettes'
 import {
   home,
   move,
@@ -28,6 +28,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
+import { useAttachedPipettes } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'
@@ -72,11 +73,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
   const [wantedName, setWantedName] = React.useState<string | null>(null)
   const [confirmExit, setConfirmExit] = React.useState(false)
+  const [currentStepCount, setCurrentStepCount] = React.useState(0)
   // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use in operator to type narrow
   const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
-  const attachedPipette = useSelector(
-    (state: State) => getAttachedPipettes(state, robotName)[mount]
-  )
+  const attachedPipette = useAttachedPipettes()[mount]
   const actualPipette = attachedPipette?.modelSpecs || null
   const actualPipetteOffset = useSelector((state: State) =>
     attachedPipette?.id
@@ -125,39 +125,30 @@ export function ChangePipette(props: Props): JSX.Element | null {
     displayCategory:
       actualPipette?.displayCategory || wantedPipette?.displayCategory || null,
   }
-  const [instructionStepPage, instructionSetStepPage] = React.useState<number>(
-    0
-  )
 
-  const eightChannel = wantedPipette?.channels === 8
+  let direction
+  if (currentStepCount === 0) {
+    direction = actualPipette != null ? DETACH : ATTACH
+  } else {
+    direction = wantedPipette != null ? ATTACH : DETACH
+  }
+  let eightChannel = wantedPipette?.channels === 8
+  // if the user selects a single channel but attaches and accepts an 8 channel
+  if (actualPipette != null && currentStepCount >= 3 && direction === ATTACH) {
+    eightChannel = actualPipette?.channels === 8
+  }
 
-  const direction = actualPipette ? DETACH : ATTACH
-  const isSelectPipetteStep =
-    direction === ATTACH && wantedName === null && wizardStep === INSTRUCTIONS
+  const isButtonDisabled =
+    movementStatus === HOMING || movementStatus === MOVING
 
   const exitModal = (
     <ExitModal
       back={() => setConfirmExit(false)}
-      exit={
-        movementStatus !== HOMING && movementStatus !== MOVING
-          ? homePipAndExit
-          : () => console.log('Gantry is moving')
-      }
+      isDisabled={isButtonDisabled}
+      exit={homePipAndExit}
       direction={direction}
     />
   )
-
-  //  this is the logic for the Instructions page that renders 3 pages within the component
-  let instructionsCurrentStep: number = SINGLE_CHANNEL_STEPS
-  if (wizardStep === INSTRUCTIONS) {
-    if (instructionStepPage === 0) {
-      instructionsCurrentStep = 1
-    } else if (instructionStepPage === 1) {
-      instructionsCurrentStep = 2
-    } else if (instructionStepPage === 2) {
-      instructionsCurrentStep = 3
-    }
-  }
 
   const success =
     // success if we were trying to detach and nothing's attached
@@ -174,13 +165,15 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   let exitWizardHeader
   let wizardTitle: string =
-    actualPipette?.displayName != null && wantedPipette === null
+    actualPipette?.displayName != null &&
+    wantedPipette === null &&
+    direction === DETACH
       ? t('detach_pipette', {
           pipette: actualPipette.displayName,
-          mount: mount[0].toUpperCase() + mount.slice(1),
+          mount: capitalize(mount),
         })
       : t('attach_pipette')
-  let currentStep: number = 0
+
   let contents: JSX.Element | null = null
 
   if (movementStatus === MOVING) {
@@ -208,32 +201,28 @@ export function ChangePipette(props: Props): JSX.Element | null {
   } else if (wizardStep === INSTRUCTIONS) {
     const noPipetteSelectedAttach =
       direction === ATTACH && wantedPipette === null
-    const attachWizardHeader = noPipetteSelectedAttach
-      ? t('attach_pipette')
-      : t('attach_pipette_type', {
-          pipetteName: wantedPipette?.displayName ?? '',
-        })
-
-    const detachWizardHeader = noPipetteDetach
-      ? t('detach')
-      : t('detach_pipette', {
-          pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
-          mount: mount[0].toUpperCase() + mount.slice(1),
-        })
 
     let title
-    if (instructionStepPage === 2) {
+    if (currentStepCount === 3) {
       title = t('attach_pipette_type', {
         pipetteName: wantedPipette?.displayName ?? '',
       })
     } else if (actualPipette?.displayName != null) {
-      title = detachWizardHeader
+      title = noPipetteDetach
+        ? t('detach')
+        : t('detach_pipette', {
+            pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
+            mount: capitalize(mount),
+          })
     } else {
-      title = attachWizardHeader
+      title = noPipetteSelectedAttach
+        ? t('attach_pipette')
+        : t('attach_pipette_type', {
+            pipetteName: wantedPipette?.displayName ?? '',
+          })
     }
 
     exitWizardHeader = confirmExit ? undefined : () => setConfirmExit(true)
-    currentStep = instructionsCurrentStep
     wizardTitle = title
 
     contents = confirmExit ? (
@@ -247,14 +236,15 @@ export function ChangePipette(props: Props): JSX.Element | null {
           setWantedName,
           confirm: () => setWizardStep(CONFIRM),
           back: () => setWizardStep(CLEAR_DECK),
-          stepPage: instructionStepPage,
-          setStepPage: instructionSetStepPage,
+          currentStepCount,
+          nextStep: () => setCurrentStepCount(currentStepCount + 1),
+          prevStep: () => setCurrentStepCount(currentStepCount - 1),
           totalSteps: eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS,
           title:
             actualPipette?.displayName != null
               ? t('detach_pipette', {
                   pipette: actualPipette.displayName,
-                  mount: mount[0].toUpperCase() + mount.slice(1),
+                  mount: capitalize(mount),
                 })
               : t('attach_pipette'),
         }}
@@ -267,28 +257,13 @@ export function ChangePipette(props: Props): JSX.Element | null {
       history.push(`/devices/${robotName}/robot-settings/calibration/dashboard`)
     }
 
-    let wizardCurrentStep: number = 0
-    //  if success is true OR the wrong pipette was attached and wanted and it is not on the LevelPipette screen
-    if (success || (wrongWantedPipette != null && confirmPipetteLevel)) {
-      wizardCurrentStep = eightChannel
-        ? EIGHT_CHANNEL_STEPS
-        : SINGLE_CHANNEL_STEPS
-      //  if wrong pipette is attached and wanted and is an 8 channel on the LevelPipette screen
-    } else if (wrongWantedPipette != null && !confirmPipetteLevel) {
-      wizardCurrentStep = EIGHT_CHANNEL_STEPS - 1
-      //  if in error state
-    } else {
-      wizardCurrentStep = SINGLE_CHANNEL_STEPS - 1
-    }
-
-    currentStep = wizardCurrentStep
     exitWizardHeader =
       success || confirmExit ? undefined : () => setConfirmExit(true)
 
     let wizardTitleConfirmPipette
     if (wantedPipette == null && actualPipette == null) {
       wizardTitleConfirmPipette = t('detach_pipette_from_mount', {
-        mount: mount[0].toUpperCase() + mount.slice(1),
+        mount: capitalize(mount),
       })
     } else if (wantedPipette == null && actualPipette != null) {
       wizardTitleConfirmPipette = t('detach')
@@ -311,9 +286,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
           success,
           attachedWrong: attachedIncorrectPipette,
           tryAgain: () => {
-            setWantedName(null)
             setWizardStep(INSTRUCTIONS)
+            setCurrentStepCount(currentStepCount - 1)
           },
+          nextStep: () => setCurrentStepCount(currentStepCount + 1),
           wrongWantedPipette: wrongWantedPipette,
           setWrongWantedPipette: setWrongWantedPipette,
           setConfirmPipetteLevel: setConfirmPipetteLevel,
@@ -321,6 +297,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           exit: homePipAndExit,
           actualPipetteOffset: actualPipetteOffset,
           toCalibrationDashboard: toCalDashboard,
+          isDisabled: isButtonDisabled,
         }}
       />
     )
@@ -329,14 +306,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     <ModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
-        currentStep={
-          // TODO (BC, 2022-09-13): the logic that calculates the current step is very complex, reduce it to a util for clarity and testing
-          !success && wizardStep === CONFIRM
-            ? null
-            : isSelectPipetteStep
-            ? 0
-            : currentStep
-        }
+        currentStep={currentStepCount}
         title={wizardTitle}
         onExit={exitWizardHeader}
       />

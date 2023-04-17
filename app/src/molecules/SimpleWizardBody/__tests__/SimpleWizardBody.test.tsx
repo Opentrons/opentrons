@@ -1,11 +1,16 @@
 import * as React from 'react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { Skeleton } from '../../../atoms/Skeleton'
+import { getIsOnDevice } from '../../../redux/config'
 import { SimpleWizardBody } from '..'
 
 jest.mock('../../../atoms/Skeleton')
+jest.mock('../../../redux/config')
 
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
+>
 
 const render = (props: React.ComponentProps<typeof SimpleWizardBody>) => {
   return renderWithProviders(<SimpleWizardBody {...props} />)[0]
@@ -20,6 +25,7 @@ describe('SimpleWizardBody', () => {
       subHeader: 'subheader',
       isSuccess: false,
     }
+    mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information when it is not success', () => {
     const { getByText, getByLabelText } = render(props)
@@ -27,7 +33,13 @@ describe('SimpleWizardBody', () => {
     getByText('subheader')
     getByLabelText('ot-alert')
   })
-
+  it('renders the correct information for on device display', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByLabelText } = render(props)
+    getByText('header')
+    getByText('subheader')
+    getByLabelText('ot-alert')
+  })
   it('renders the correct information when it is success', () => {
     props = {
       ...props,

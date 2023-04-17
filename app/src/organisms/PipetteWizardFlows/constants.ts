@@ -1,3 +1,6 @@
+import { css } from 'styled-components'
+import { TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
+
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
   ATTACH_PROBE: 'ATTACH_PROBE',
@@ -29,8 +32,9 @@ export const CALIBRATION_PROBE = {
 export const HEX_SCREWDRIVER = {
   loadName: 'hex_screwdriver',
   displayName: HEX_SCREWDRIVER_DISPLAY_NAME,
+  //  TODO(jr, 4/3/23): add this subtitle to i18n
   subtitle:
-    'Provided with robot. Using another size can strip the instruments’s screws.',
+    'Provided with the robot. Using another size can strip the instruments’s screws.',
 }
 export const PIPETTE = {
   loadName: 'gen3_pipette',
@@ -44,3 +48,12 @@ export const NINETY_SIX_CHANNEL_MOUNTING_PLATE = {
   loadName: 'mounting_plate_96_channel',
   displayName: NINETY_SIX_CHANNEL_MOUNTING_PLATE_DISPLAY_NAME,
 }
+
+export const BODY_STYLE = css`
+  ${TYPOGRAPHY.pRegular};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: 1.275rem;
+    line-height: 1.75rem;
+  }
+`

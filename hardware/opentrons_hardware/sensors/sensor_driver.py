@@ -26,7 +26,7 @@ from opentrons_hardware.sensors.types import (
 )
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
-    PollSensorInformation,
+    BaselineSensorInformation,
     WriteSensorInformation,
     SensorThresholdInformation,
 )
@@ -85,12 +85,12 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        poll_for_ms: int,
+        number_of_reads: int,
         timeout: int = 1,
     ) -> Optional[SensorReturnType]:
         """Poll the given sensor."""
-        poll = PollSensorInformation(sensor.sensor, poll_for_ms)
-        sensor_data = await self._scheduler.run_poll(
+        poll = BaselineSensorInformation(sensor.sensor, number_of_reads)
+        sensor_data = await self._scheduler.run_baseline(
             poll, can_messenger, timeout, sensor.expected_responses
         )
         if not sensor_data:
@@ -260,4 +260,4 @@ class LogListener:
             ).to_float()
             self.response_queue.put_nowait(data)
             current_time = round((time.time() - self.start_time), 3)
-            self.csv_writer.writerow([data, current_time])  # type: ignore
+            self.csv_writer.writerow([current_time, data])  # type: ignore

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { COLORS } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
+import { COLORS, PrimaryButton } from '@opentrons/components'
 import { ModalShell } from '../Modal'
 import { WizardHeader } from '../WizardHeader'
 import { SimpleWizardBody } from './index'

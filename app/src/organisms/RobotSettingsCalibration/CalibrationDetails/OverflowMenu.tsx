@@ -13,7 +13,11 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import { isOT3Pipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteCalibrationMutation,
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+} from '@opentrons/react-api-client'
 
 import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -21,16 +25,13 @@ import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
-import {
-  usePipetteOffsetCalibrations,
-  useRunStatuses,
-  useTipLengthCalibrations,
-} from '../../../organisms/Devices/hooks'
+import { useRunStatuses } from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
+import type { SelectablePipettes } from '../../PipetteWizardFlows/types'
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
@@ -67,9 +68,10 @@ export function OverflowMenu({
   const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robotName)
+  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
+    ?.data
 
-  const tipLengthCalibrations = useTipLengthCalibrations(robotName)
+  const tipLengthCalibrations = useAllTipLengthCalibrationsQuery().data?.data
   const { isRunRunning: isRunning } = useRunStatuses()
   const [
     showPipetteWizardFlows,
@@ -84,6 +86,10 @@ export function OverflowMenu({
     cal => cal.pipette === serialNumber && cal.uri === tiprackDefURI
   )
 
+  const calibrationPresent =
+    calType === 'pipetteOffset'
+      ? applicablePipetteOffsetCal != null
+      : applicableTipLengthCal != null
   const handleRecalibrate = (e: React.MouseEvent): void => {
     e.preventDefault()
     if (
@@ -125,6 +131,10 @@ export function OverflowMenu({
   }, [isRunning, updateRobotStatus])
 
   const { deleteCalibration } = useDeleteCalibrationMutation()
+  const [
+    selectedPipette,
+    setSelectedPipette,
+  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
   const handleDeleteCalibration = (e: React.MouseEvent): void => {
     e.preventDefault()
@@ -154,7 +164,7 @@ export function OverflowMenu({
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
-        aria-label="CalibrationOverflowMenu_button"
+        aria-label={`CalibrationOverflowMenu_button_${calType}`}
         onClick={handleOverflowClick}
       />
       {showPipetteWizardFlows ? (
@@ -162,9 +172,8 @@ export function OverflowMenu({
           flowType={FLOWS.CALIBRATE}
           mount={mount}
           closeFlow={() => setShowPipetteWizardFlows(false)}
-          robotName={robotName}
-          //  TODO(jr/12/1/22): only single mount pipettes can be calibrated here for now
-          selectedPipette={SINGLE_MOUNT_PIPETTES}
+          selectedPipette={selectedPipette}
+          setSelectedPipette={setSelectedPipette}
         />
       ) : null}
       {showOverflowMenu ? (
@@ -186,11 +195,14 @@ export function OverflowMenu({
             </MenuItem>
           ) : (
             <>
-              <MenuItem onClick={handleDownload}>
+              <MenuItem onClick={handleDownload} disabled={!calibrationPresent}>
                 {t('download_calibration_data')}
               </MenuItem>
               <Divider />
-              <MenuItem onClick={handleDeleteCalibration}>
+              <MenuItem
+                onClick={handleDeleteCalibration}
+                disabled={!calibrationPresent}
+              >
                 {t('robot_calibration:delete_calibration_data')}
               </MenuItem>
             </>

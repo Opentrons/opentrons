@@ -18,9 +18,11 @@ import numpy as np
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    FirmwareTarget,
     PipetteType,
     SensorId,
     PipetteTipActionType,
+    USBTarget,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -65,6 +67,25 @@ SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
     OT3SubSystem.pipette_left: NodeId.pipette_left,
     OT3SubSystem.pipette_right: NodeId.pipette_right,
     OT3SubSystem.gripper: NodeId.gripper,
+}
+
+NODEID_SUBSYSTEM: Dict[NodeId, OT3SubSystem] = {
+    NodeId.gantry_x: OT3SubSystem.gantry_x,
+    NodeId.gantry_x_bootloader: OT3SubSystem.gantry_x,
+    NodeId.gantry_y: OT3SubSystem.gantry_y,
+    NodeId.gantry_y_bootloader: OT3SubSystem.gantry_y,
+    NodeId.head: OT3SubSystem.head,
+    NodeId.head_bootloader: OT3SubSystem.head,
+    NodeId.pipette_left: OT3SubSystem.pipette_left,
+    NodeId.pipette_left_bootloader: OT3SubSystem.pipette_left,
+    NodeId.pipette_right: OT3SubSystem.pipette_right,
+    NodeId.pipette_right_bootloader: OT3SubSystem.pipette_right,
+    NodeId.gripper: OT3SubSystem.gripper,
+    NodeId.gripper_bootloader: OT3SubSystem.gripper,
+}
+
+USBTARGET_SUBSYSTEM: Dict[USBTarget, OT3SubSystem] = {
+    USBTarget.rear_panel: OT3SubSystem.rear_panel
 }
 
 
@@ -162,7 +183,7 @@ def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
     node_to_subsystem = {
         node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
-    return node_to_subsystem[node_id]
+    return node_to_subsystem[node_id.application_for()]
 
 
 def get_current_settings(
@@ -361,32 +382,58 @@ def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
     return _update_state_lookup[state]
 
 
+subsystem_to_mount = {
+    OT3SubSystem.pipette_left: OT3Mount.LEFT,
+    OT3SubSystem.pipette_right: OT3Mount.RIGHT,
+    OT3SubSystem.gripper: OT3Mount.GRIPPER,
+}
+
+
+def mount_from_subsystem(subsystem: OT3SubSystem) -> OT3Mount:
+    return subsystem_to_mount[subsystem]
+
+
+def subsystem_from_mount(mount: OT3Mount) -> OT3SubSystem:
+    mount_to_subsystem = {
+        ot3mount: subsystem for subsystem, ot3mount in subsystem_to_mount.items()
+    }
+    return mount_to_subsystem[mount]
+
+
 class UpdateProgress:
     """Class to keep track of Update progress."""
 
-    def __init__(self, nodes: Set[NodeId]):
-        self._tracker: Dict[OT3SubSystem, UpdateStatus] = {}
+    def __init__(self, targets: Set[FirmwareTarget]):
+        self._tracker: Dict[FirmwareTarget, UpdateStatus] = {}
         self._total_progress = 0
-        for node in nodes:
-            subsystem = node_id_to_subsystem(node)
-            self._tracker[subsystem] = UpdateStatus(subsystem, UpdateState.queued, 0)
+        for target in targets:
+            subsystem = (
+                node_id_to_subsystem(NodeId(target))
+                if isinstance(target, NodeId)
+                else OT3SubSystem.rear_panel
+            )
+            self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
 
-    def get_progress(self) -> Tuple[Set[UpdateStatus], int]:
+    @property
+    def targets(self) -> Set[FirmwareTarget]:
+        """Gets the set of update Targets queued or updating."""
+        return set(self._tracker)
+
+    def get_progress(self) -> Set[UpdateStatus]:
         """Gets the update status and total progress"""
-        return set(self._tracker.values()), self._total_progress
+        return set(self._tracker.values())
 
     def update(
-        self, node_id: NodeId, status_element: StatusElement
-    ) -> Tuple[Set[UpdateStatus], int]:
+        self, target: FirmwareTarget, status_element: StatusElement
+    ) -> Set[UpdateStatus]:
         """Update internal states/progress of firmware updates."""
         fw_update_status, progress = status_element
-        subsystem = node_id_to_subsystem(node_id)
+        subsystem = (
+            node_id_to_subsystem(NodeId(target))
+            if isinstance(target, NodeId)
+            else OT3SubSystem.rear_panel
+        )
         state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)
-        self._tracker[subsystem] = UpdateStatus(subsystem, state, progress)
-        # calculate the total progress of all updates
-        progress_sum = 0
-        for update_status in self._tracker.values():
-            progress_sum += update_status.progress
-        self._total_progress = int(progress_sum / len(self._tracker))
-        return set(self._tracker.values()), self._total_progress
+        self._tracker[target] = UpdateStatus(subsystem, state, progress)
+        return set(self._tracker.values())

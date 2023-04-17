@@ -6,10 +6,11 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { LevelPipette } from './LevelPipette'
 
 import type {
@@ -42,14 +43,16 @@ export interface ConfirmPipetteProps {
   setConfirmPipetteLevel: React.Dispatch<React.SetStateAction<boolean>>
   tryAgain: () => void
   exit: () => void
+  nextStep: () => void
   toCalibrationDashboard: () => void
+  isDisabled: boolean
 }
 
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const {
     success,
     mount,
-    tryAgain,
+    nextStep,
     wrongWantedPipette,
     actualPipette,
     setConfirmPipetteLevel,
@@ -105,14 +108,16 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const isWrongWantedPipette = wrongWantedPipette != null
 
   return !confirmPipetteLevel &&
-    wrongWantedPipette &&
+    (wrongWantedPipette != null || (props.wantedPipette != null && success)) &&
     actualPipette != null &&
     actualPipette.channels === 8 ? (
     <LevelPipette
       mount={mount}
       pipetteModelName={actualPipette.name}
-      back={tryAgain}
-      confirm={() => setConfirmPipetteLevel(true)}
+      confirm={() => {
+        nextStep()
+        setConfirmPipetteLevel(true)
+      }}
     />
   ) : (
     <SimpleWizardBody
@@ -150,6 +155,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     exit,
     setWrongWantedPipette,
     wrongWantedPipette,
+    isDisabled,
   } = props
   const { t } = useTranslation(['change_pipette', 'shared'])
 
@@ -159,10 +165,11 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
         <SecondaryButton
           marginRight={SPACING.spacing3}
           onClick={() => setWrongWantedPipette(actualPipette)}
+          disabled={isDisabled}
         >
           {t('use_attached_pipette')}
         </SecondaryButton>
-        <PrimaryButton onClick={tryAgain}>
+        <PrimaryButton onClick={tryAgain} disabled={isDisabled}>
           {t('detach_try_again')}
         </PrimaryButton>
       </>
@@ -170,7 +177,11 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
   } else if (!actualPipette) {
     return (
       <>
-        <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+        <SecondaryButton
+          marginRight={SPACING.spacing3}
+          onClick={exit}
+          disabled={isDisabled}
+        >
           {t('cancel_attachment')}
         </SecondaryButton>
         <CheckPipettesButton robotName={robotName}>
@@ -181,12 +192,17 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
   }
   return (
     <>
-      <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+      <SecondaryButton
+        marginRight={SPACING.spacing3}
+        onClick={exit}
+        disabled={isDisabled}
+      >
         {t('leave_attached')}
       </SecondaryButton>
       <PrimaryButton
         onClick={tryAgain}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
+        disabled={isDisabled}
       >
         {t('shared:try_again')}
       </PrimaryButton>

@@ -5,6 +5,7 @@ by default. Please do not unconditionally import things outside the python stand
 library.
 """
 from enum import Enum, unique
+from typing import Union
 
 
 @unique
@@ -29,6 +30,46 @@ class NodeId(int, Enum):
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
+
+    def is_bootloader(self) -> bool:
+        """Whether this node ID is a bootloader."""
+        return bool(self.value & 0xF == 0xF)
+
+    def bootloader_for(self) -> "NodeId":
+        """The associated bootloader node ID for the node.
+
+        This is safe to call on any node id, including ones that are already bootloaders.
+        """
+        return NodeId(self.value | 0xF)
+
+    def application_for(self) -> "NodeId":
+        """The associated core node ID for the node (i.e. head, not head_l).
+
+        This is safe to call on any node ID, including non-core application node IDs like
+        head_l. It will always give the code node ID.
+        """
+        # in c this would be & ~0xf but in python that gives 0x10 for some reason
+        # so let's write out the whole byte
+        return NodeId(self.value & 0xF0)
+
+
+# make these negative numbers so there is no chance they overlap with NodeId
+@unique
+class USBTarget(int, Enum):
+    """List of firmware targets connected over usb."""
+
+    rear_panel = -1
+
+    def is_bootloader(self) -> bool:
+        """Whether this is a bootloader id (always false)."""
+        return False
+
+    def application_for(self) -> "USBTarget":
+        """The corresponding application id."""
+        return self
+
+
+FirmwareTarget = Union[NodeId, USBTarget]
 
 
 @unique
@@ -117,6 +158,8 @@ class MessageId(int, Enum):
 
     attached_tools_request = 0x700
     tools_detected_notification = 0x701
+    tip_presence_notification = 0x702
+    get_tip_status_request = 0x703
 
     fw_update_initiate = 0x60
     fw_update_data = 0x61
@@ -152,6 +195,7 @@ class MessageId(int, Enum):
     bind_sensor_output_response = 0x8B
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
+    baseline_sensor_response = 0x8E
 
 
 @unique

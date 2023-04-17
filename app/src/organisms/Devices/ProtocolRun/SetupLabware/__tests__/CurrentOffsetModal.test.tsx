@@ -5,7 +5,6 @@ import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
-import { RUN_ID_1 } from '../../../../RunTimeControl/__fixtures__'
 import { useLPCDisabledReason } from '../../../hooks'
 import { CurrentOffsetsModal } from '../CurrentOffsetsModal'
 import { getLatestCurrentOffsets } from '../utils'
@@ -84,10 +83,20 @@ describe('CurrentOffsetsModal', () => {
     props = {
       currentOffsets: mockCurrentOffsets,
       commands: protocolWithTC.commands,
+      labware: Object.entries(protocolWithTC.labware).map(([id, labware]) => ({
+        id,
+        ...labware,
+        loadName: 'fakeLoadName',
+        definitionUri: labware.definitionId,
+        location: 'offDeck',
+      })),
+      modules: Object.entries(protocolWithTC.modules).map(([id, module]) => ({
+        id,
+        ...module,
+        location: { slotName: '1' },
+        serialNumber: 'fakeserial',
+      })),
       onCloseClick: jest.fn(),
-      runId: RUN_ID_1,
-      handleRelaunchLPC: jest.fn(),
-      robotName: 'otie',
     }
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(
@@ -107,16 +116,12 @@ describe('CurrentOffsetsModal', () => {
       },
     ])
   })
-  it('renders the correct text and buttons CTA work', () => {
+  it('renders the correct text', () => {
     const { getByText } = render(props)
     getByText('Applied Labware Offset data')
     getByText('location')
     getByText('labware')
     getByText('labware offset data')
-    getByText('cancel').click()
-    expect(props.onCloseClick).toHaveBeenCalled()
-    getByText('run labware position check').click()
-    expect(props.handleRelaunchLPC).toHaveBeenCalled()
   })
 
   it('renders 1 offset with the correct information', () => {
@@ -131,10 +136,5 @@ describe('CurrentOffsetsModal', () => {
     expect(getByText('Table View')).toBeTruthy()
     expect(getByText('Jupyter Notebook')).toBeTruthy()
     expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
-  })
-  it('renders the LPC button as disabled when there is a disabled reason', () => {
-    mockUseLPCDisabledReason.mockReturnValue('mockDisabledReason')
-    const { getByText } = render(props)
-    expect(getByText('run labware position check')).toBeDisabled()
   })
 })

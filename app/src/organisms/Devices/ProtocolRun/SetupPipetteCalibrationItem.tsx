@@ -88,7 +88,8 @@ export function SetupPipetteCalibrationItem({
     button = pipetteMismatchInfo
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
-    button = (
+    // remove the button for attach until flex pipette flows work in run setup
+    button = !isOT3 ? (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <TertiaryButton
           as={RRDLink}
@@ -98,7 +99,7 @@ export function SetupPipetteCalibrationItem({
           {t('attach_pipette_cta')}
         </TertiaryButton>
       </Flex>
-    )
+    ) : undefined
   } else {
     button = (
       <>

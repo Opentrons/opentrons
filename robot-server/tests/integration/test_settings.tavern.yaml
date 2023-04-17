@@ -54,11 +54,11 @@ stages:
             description: !re_search 'Opentrons-internal setting to test new hardware'
             restart_required: true
             value: !anything
-          - id: enableOT3FirmwareUpdates
+          - id: rearPanelIntegration
             old_id: Null
-            title: Enable experimental OT-3 firmware updates
-            description: !re_search 'This is an Opentrons-internal setting to test new firmware updates.'
-            restart_required: true
+            title: 'Enable robots with the new usb connected rear-panel board.'
+            description: !re_search 'This is an Opentrons-internal setting to test new rear-panel.'
+            restart_required: false
             value: !anything
         links: !anydict
 

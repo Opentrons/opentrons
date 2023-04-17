@@ -31,7 +31,7 @@ def enable_ot3_hardware_controller() -> bool:
     return advs.get_setting_with_env_overload("enableOT3HardwareController")
 
 
-def enable_ot3_firmware_updates() -> bool:
-    """Whether to enable firmware updates for the OT-3 subsystems."""
+def rear_panel_integration() -> bool:
+    """Whether to enable usb connected rear_panel for the OT-3."""
 
-    return advs.get_setting_with_env_overload("enableOT3FirmwareUpdates")
+    return advs.get_setting_with_env_overload("rearPanelIntegration")

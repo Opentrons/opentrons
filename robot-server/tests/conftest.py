@@ -1,22 +1,24 @@
+import asyncio
 import signal
 import subprocess
 import time
 import sys
-import tempfile
-import os
 import json
+import os
 import pathlib
 import requests
-import pytest
-
+import tempfile
 from datetime import datetime, timezone
-from fastapi import routing
 from mock import MagicMock
-from starlette.testclient import TestClient
+from pathlib import Path
 from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
-from pathlib import Path
+
 from sqlalchemy.engine import Engine as SQLEngine
+
+import pytest
+from fastapi import routing
+from starlette.testclient import TestClient
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -37,6 +39,8 @@ from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
+from .integration.robot_client import RobotClient
+from robot_server.health.router import ComponentVersions, get_versions
 
 test_router = routing.APIRouter()
 
@@ -91,6 +95,16 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
+def versions() -> MagicMock:
+    m = MagicMock(spec=get_versions)
+    m.return_value = ComponentVersions(
+        api_version="someTestApiVersion",
+        system_version="someTestSystemVersion",
+    )
+    return m
+
+
+@pytest.fixture
 def _override_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
     async def get_hardware_override() -> HardwareControlAPI:
         """Override for the get_hardware() FastAPI dependency."""
@@ -113,9 +127,21 @@ def _override_sql_engine_with_mock() -> Iterator[None]:
 
 
 @pytest.fixture
+def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
+    async def get_version_override() -> ComponentVersions:
+        """Override for the get_versions() FastAPI dependency."""
+        return cast(ComponentVersions, await versions())
+
+    app.dependency_overrides[get_versions] = get_version_override
+    yield
+    del app.dependency_overrides[get_versions]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
+    _override_version_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
@@ -134,18 +160,28 @@ def api_client_no_errors(
 
 
 @pytest.fixture(scope="session")
-def request_session() -> requests.Session:
-    session = requests.Session()
-    session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
-    return session
-
-
-@pytest.fixture(scope="session")
 def server_temp_directory() -> Iterator[str]:
     new_dir = tempfile.mkdtemp()
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
     yield new_dir
+
+
+@pytest.fixture()
+def clean_server_state() -> Iterator[None]:
+    # async fn that does the things below
+    # make a robot client
+    # delete protocols
+    async def _clean_server_state() -> None:
+        port = "31950"
+        async with RobotClient.make(
+            host="http://localhost", port=port, version="*"
+        ) as robot_client:
+            await _delete_all_runs(robot_client)
+            await _delete_all_protocols(robot_client)
+
+    yield
+    asyncio.run(_clean_server_state())
 
 
 @pytest.fixture(scope="session")
@@ -200,6 +236,22 @@ def run_server(
         yield proc
         proc.send_signal(signal.SIGTERM)
         proc.wait()
+
+
+async def _delete_all_runs(robot_client: RobotClient) -> None:
+    """Delete all runs on the robot server."""
+    response = await robot_client.get_runs()
+    run_ids = [r["id"] for r in response.json()["data"]]
+    for run_id in run_ids:
+        await robot_client.delete_run(run_id)
+
+
+async def _delete_all_protocols(robot_client: RobotClient) -> None:
+    """Delete all protocols on the robot server"""
+    response = await robot_client.get_protocols()
+    protocol_ids = [p["id"] for p in response.json()["data"]]
+    for protocol_id in protocol_ids:
+        await robot_client.delete_protocol(protocol_id)
 
 
 @pytest.fixture
@@ -259,20 +311,6 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),
     )
-
-
-@pytest.fixture
-def set_disable_fast_analysis(
-    request_session: requests.Session,
-) -> Iterator[None]:
-    """For integration tests that need to set then clear the
-    enableHttpProtocolSessions feature flag"""
-    url = "http://localhost:31950/settings"
-    data = {"id": "disableFastProtocolUpload", "value": True}
-    request_session.post(url, json=data)
-    yield None
-    data["value"] = None
-    request_session.post(url, json=data)
 
 
 @pytest.fixture

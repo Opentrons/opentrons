@@ -1,3 +1,5 @@
+:og:description: A comprehensive reference of classes and methods that make up the Opentrons Python Protocol API.
+
 .. _protocol-api-reference:
 
 API Version 2 Reference
@@ -11,7 +13,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands, commands
+   :exclude-members: location_cache, cleanup, clear_commands, commands, move_labware
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:

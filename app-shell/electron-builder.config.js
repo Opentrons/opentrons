@@ -30,6 +30,12 @@ module.exports = async () => ({
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
   electronVersion: '21.3.1',
   npmRebuild: false,
+  releaseInfo: {
+    releaseNotesFile:
+      project === 'robot-stack'
+        ? 'release-notes.md'
+        : 'release-notes-internal.md',
+  },
   files: [
     '**/*',
     'build/br-premigration-wheels',
@@ -89,5 +95,4 @@ module.exports = async () => ({
   publish: project === 'ot3' ? ot3PublishConfig : robotStackPublishConfig,
   generateUpdatesFilesForAllChannels: true,
   beforePack: path.join(__dirname, './scripts/before-pack.js'),
-  afterSign: path.join(__dirname, './scripts/after-sign.js'),
 })

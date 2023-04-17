@@ -8,6 +8,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -19,7 +20,7 @@ export function SearchNetwork(): JSX.Element {
       height="22rem"
       backgroundColor="#D6D6D6"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius="12px"
+      borderRadius={BORDERS.size_three}
       width="100%"
     >
       <Flex

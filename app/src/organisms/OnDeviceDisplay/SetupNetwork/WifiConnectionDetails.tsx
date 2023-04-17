@@ -15,10 +15,12 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   JUSTIFY_CENTER,
+  PrimaryButton,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton, TertiaryButton } from '../../../atoms/buttons'
+import { TertiaryButton } from '../../../atoms/buttons'
 import {
   getNetworkInterfaces,
   fetchStatus,
@@ -114,16 +116,16 @@ const DisplayConnectionStatus = ({
       flexDirection={DIRECTION_ROW}
       padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
       backgroundColor={
-        connected ? COLORS.successBackgroundMed : COLORS.greyDisabled
+        connected ? COLORS.successBackgroundMed : COLORS.light_two
       }
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      borderRadius="12px"
+      borderRadius={BORDERS.size_three}
     >
       <Icon
         name="ot-check"
         size="2.5rem"
-        color={connected ? COLORS.successEnabled : COLORS.greyDisabled}
+        color={connected ? COLORS.successEnabled : COLORS.light_two}
       />
       <StyledText
         marginLeft={SPACING.spacing5}
@@ -166,7 +168,7 @@ const DisplayConnectedNetworkInfo = ({
       paddingY={SPACING.spacing5}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.darkGreyDisabled}
-      borderRadius="0.75rem"
+      borderRadius={BORDERS.size_three}
     >
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon name="wifi" size="2.4rem" />

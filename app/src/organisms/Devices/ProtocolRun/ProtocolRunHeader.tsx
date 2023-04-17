@@ -16,11 +16,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RunStatus,
 } from '@opentrons/api-client'
-import {
-  useRunQuery,
-  useModulesQuery,
-  usePipettesQuery,
-} from '@opentrons/react-api-client'
+import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -28,7 +24,6 @@ import {
   Icon,
   IconName,
   useHoverTooltip,
-  useInterval,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
@@ -39,6 +34,8 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  PrimaryButton,
+  SecondaryButton,
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
@@ -47,7 +44,6 @@ import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
@@ -63,7 +59,6 @@ import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
-import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
 import {
@@ -77,6 +72,7 @@ import {
   useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { Run } from '@opentrons/api-client'
@@ -98,31 +94,6 @@ interface ProtocolRunHeaderProps {
   robotName: string
   runId: string
   makeHandleJumpToStep: (index: number) => () => void
-}
-
-function RunTimer({
-  runStatus,
-  startedAt,
-  stoppedAt,
-  completedAt,
-}: {
-  runStatus: string | null
-  startedAt: string | null
-  stoppedAt: string | null
-  completedAt: string | null
-}): JSX.Element {
-  const [now, setNow] = React.useState(Date())
-  useInterval(() => setNow(Date()), 500, true)
-
-  const endTime =
-    runStatus === RUN_STATUS_STOP_REQUESTED && stoppedAt != null
-      ? stoppedAt
-      : completedAt ?? now
-
-  const runTime =
-    startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
-
-  return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
 }
 
 export function ProtocolRunHeader({
@@ -147,8 +118,6 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  // NOTE: we are polling pipettes, though not using their value directly here
-  usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
   React.useEffect(() => {
@@ -407,7 +376,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('run_details')
   const attachedModules =
-    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+    useModulesQuery({
+      refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: runStatus != null && START_RUN_STATUSES.includes(runStatus),
+    })?.data?.data ?? []
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -505,7 +477,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       trackProtocolRunEvent({ name: 'runPause' })
     }
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
-    buttonIconName = null
+    buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
   } else if (runStatus != null && START_RUN_STATUSES.includes(runStatus)) {
     buttonIconName = 'play'
@@ -562,7 +534,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
             name={buttonIconName}
             size={SIZE_1}
             marginRight={SPACING.spacing3}
-            spin={isProtocolAnalyzing}
+            spin={
+              isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
+            }
           />
         ) : null}
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>

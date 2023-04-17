@@ -27,8 +27,10 @@
   "robot_configuration": "robot configuration",
   "robot_is_busy": "{{robotName}} is busy",
   "robot_is_busy_with_protocol": "{{robotName}} is busy with {{protocolName}} in {{runStatus}} state. Do you want to clear it and proceed?",
+  "start_setup": "Start setup",
   "run_protocol": "Run protocol",
   "show_in_folder": "Show in folder",
+  "start_setup": "Start setup",
   "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed.",
   "unavailable_robot_not_listed_plural": "{{count}} unavailable robots are not listed.",
   "unavailable_or_busy_robot_not_listed": "{{count}} unavailable or busy robot is not listed.",
@@ -47,5 +49,7 @@
   "send_protocol_to_ot3": "Send protocol to an OT-3",
   "slot": "Slot {{slotName}}",
   "successfully_sent": "Successfully sent",
-  "unsuccessfully_sent": "Unsuccessfully sent"
+  "unsuccessfully_sent": "Unsuccessfully sent",
+  "liquid_name": "liquid name",
+  "total_volume": "total volume"
 }

@@ -34,7 +34,6 @@ describe('RobotDashboard', () => {
   it('should render text, image, and buttons', () => {
     const [{ getByText }] = render()
     getByText('mock Navigation')
-    getByText('Run again')
   })
 
   // Note test cases will be added when RobotDashboard screen is ready

@@ -32,7 +32,6 @@ describe('DetachProbe', () => {
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
@@ -49,12 +48,12 @@ describe('DetachProbe', () => {
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected', () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Remove Calibration Probe')
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
+    getByText('Remove calibration probe')
     getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
+      'Unlatch the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
-    getByAltText('Remove probe')
+    getByTestId('Pipette_Detach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
     expect(props.handleCleanUp).toHaveBeenCalled()

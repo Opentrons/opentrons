@@ -3,7 +3,7 @@
 import ast
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Sequence, Union
 
 import anyio
 
@@ -105,7 +105,7 @@ class FileIdentifier:
     """File identifier interface."""
 
     @staticmethod
-    async def identify(files: List[BufferedFile]) -> List[IdentifiedFile]:
+    async def identify(files: Sequence[BufferedFile]) -> Sequence[IdentifiedFile]:
         """Identify the type and extract basic information from each file.
 
         This is intended to take ≲1 second per protocol on an OT-2, so it can extract

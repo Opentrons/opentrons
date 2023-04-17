@@ -1,3 +1,5 @@
+:og:description: Building block commands are the smallest individual actions that Opentrons robots can perform.
+
 .. _v2-atomic-commands:
 
 #######################

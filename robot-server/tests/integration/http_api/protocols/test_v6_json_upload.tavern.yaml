@@ -3,6 +3,7 @@ test_name: Upload and analyze a JSONv6 protocol
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 
 stages:
   - name: Upload simple v6 protocol
@@ -68,6 +69,8 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+        links: 
+          referencingRunIds: []
   - name: Get protocol analysis by ID
     request:
       url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
@@ -283,7 +286,7 @@ stages:
                 result:
                   position: { 'x': 146.88, 'y': 246.24, 'z': 64.69 }
                   tipVolume: 10.0
-                  tipLength: 39.2
+                  tipLength: 35.910000000000004
                   tipDiameter: 3.27
                 startedAt: !anystr
                 completedAt: !anystr
@@ -565,6 +568,7 @@ test_name: Upload and analyze a JSONv6 protocol, with liquids
 marks:
   - usefixtures:
       - run_server
+      - clean_server_state
 
 stages:
   - name: Upload simple v6 protocol

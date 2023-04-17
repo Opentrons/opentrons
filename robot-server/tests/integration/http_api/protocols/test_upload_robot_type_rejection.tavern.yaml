@@ -3,6 +3,7 @@ test_name: Make sure an OT-2 server rejects OT-3 protocols.
 marks:
   - usefixtures:
     - run_server
+    - clean_server_state
   - parametrize:
       key: protocol_file_path
       vals:

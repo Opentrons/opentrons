@@ -14,6 +14,7 @@ import {
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
+import { CreateCommand, LEFT } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -52,30 +53,40 @@ export const BeforeBeginning = (
     proceed,
     createRun,
     flowType,
-    attachedGripper,
     isCreateLoading,
     isRobotMoving,
-    // chainRunCommands,
-    // setIsBetweenCommands,
+    chainRunCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
     createRun({})
   }, [])
 
-  if (attachedGripper == null) return null
+  let commandsOnProceed: CreateCommand[] = [
+    {
+      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+      },
+    },
+  ]
+  if (
+    flowType === GRIPPER_FLOW_TYPES.ATTACH ||
+    flowType === GRIPPER_FLOW_TYPES.RECALIBRATE
+  ) {
+    commandsOnProceed = [
+      { commandType: 'home' as const, params: {} },
+      ...commandsOnProceed,
+    ]
+  }
+
   const handleOnClick = (): void => {
-    // setIsBetweenCommands(true)
-    // chainRunCommands([
-    //   {
-    //     commandType: 'home' as const,
-    //     params: {},
-    //   },
-    // ]).then(() => {
-    //   setIsBetweenCommands(false)
-    //   proceed()
-    // })
-    proceed()
+    chainRunCommands(commandsOnProceed, true)
+      .then(() => {
+        proceed()
+      })
+      .catch(() => {})
   }
 
   const equipmentInfoByLoadName: {
@@ -86,7 +97,7 @@ export const BeforeBeginning = (
       displayName: t('t10_torx_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
-    opentrons_gripper: { displayName: t('gripper') },
+    [GRIPPER_LOADNAME]: { displayName: t('gripper') },
   }
 
   const { bodyI18nKey, equipmentLoadNames } = INFO_BY_FLOW_TYPE[flowType]

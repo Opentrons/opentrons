@@ -131,6 +131,7 @@ async def test_send(subject: SerialUsbDriver, test_port_host: SerialEmulator) ->
     m = Ack()
     length = await subject.write(m)
     assert length == 4
+    await asyncio.sleep(0.5)
 
     recieved = test_port_host.read()
 
