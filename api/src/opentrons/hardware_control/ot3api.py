@@ -92,6 +92,7 @@ from .types import (
     GripperProbe,
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
+    UpdateState,
     UpdateStatus,
     StatusBarState,
 )
@@ -285,6 +286,7 @@ class OT3API(
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
         use_usb_bus: bool = False,
+        update_firmware: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -292,7 +294,9 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await OT3Controller.build(checked_config, use_usb_bus)
+        backend = await OT3Controller.build(
+            checked_config, use_usb_bus, check_updates=update_firmware
+        )
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance._cache_instruments()
@@ -300,8 +304,13 @@ class OT3API(
         await api_instance.set_status_bar_state(StatusBarState.IDLE)
 
         # check for and start firmware updates if required
-        async for _ in api_instance.update_firmware():
-            pass
+        if update_firmware:
+            mod_log.info("Checking for firmware updates")
+            async for progress in api_instance.update_firmware():
+                for update in progress:
+                    if update.state == UpdateState.updating:
+                        mod_log.info(update)
+            mod_log.info("Done with firmware updates")
 
         await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
