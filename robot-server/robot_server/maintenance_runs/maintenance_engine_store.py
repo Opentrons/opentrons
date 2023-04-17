@@ -1,4 +1,5 @@
 """In-memory storage of ProtocolEngine instances."""
+from datetime import datetime
 from typing import List, NamedTuple, Optional
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -27,6 +28,7 @@ class RunnerEnginePair(NamedTuple):
     """A stored ProtocolRunner/ProtocolEngine pair."""
 
     run_id: str
+    created_at: datetime
     runner: LiveRunner
     engine: ProtocolEngine
 
@@ -52,13 +54,13 @@ class MaintenanceEngineStore:
 
     @property
     def engine(self) -> ProtocolEngine:
-        """Get the "current" persisted ProtocolEngine."""
+        """Get the "current" ProtocolEngine."""
         assert self._runner_engine_pair is not None, "Engine not yet created."
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> LiveRunner:
-        """Get the "current" persisted ProtocolRunner."""
+        """Get the "current" ProtocolRunner."""
         assert self._runner_engine_pair is not None, "Runner not yet created."
         return self._runner_engine_pair.runner
 
@@ -71,17 +73,24 @@ class MaintenanceEngineStore:
             else None
         )
 
+    @property
+    def current_run_created_at(self) -> datetime:
+        """Get the run creation datetime."""
+        assert self._runner_engine_pair is not None, "Run not yet created."
+        return self._runner_engine_pair.created_at
+
     async def create(
         self,
         run_id: str,
+        created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
+            created_at: Run creation datetime
             labware_offsets: Labware offsets to create the engine with.
-            protocol: The protocol to load the runner with, if any.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -110,6 +119,7 @@ class MaintenanceEngineStore:
 
         self._runner_engine_pair = RunnerEnginePair(
             run_id=run_id,
+            created_at=created_at,
             runner=runner,
             engine=engine,
         )

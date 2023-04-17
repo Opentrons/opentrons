@@ -85,9 +85,15 @@ async def test_create(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_maintenance_engine_store.create(run_id=run_id, labware_offsets=[])
+        await mock_maintenance_engine_store.create(
+            run_id=run_id,
+            labware_offsets=[],
+            created_at=created_at,
+        )
     ).then_return(engine_state_summary)
-
+    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
+        created_at
+    )
     result = await subject.create(
         run_id=run_id,
         created_at=created_at,
@@ -129,8 +135,12 @@ async def test_create_with_options(
         await mock_maintenance_engine_store.create(
             run_id=run_id,
             labware_offsets=[labware_offset],
+            created_at=created_at,
         )
     ).then_return(engine_state_summary)
+    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
+        created_at
+    )
 
     result = await subject.create(
         run_id=run_id,
@@ -163,8 +173,15 @@ async def test_create_engine_error(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_maintenance_engine_store.create(run_id, labware_offsets=[])
+        await mock_maintenance_engine_store.create(
+            run_id,
+            labware_offsets=[],
+            created_at=created_at,
+        )
     ).then_raise(EngineConflictError("oh no"))
+    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
+        created_at
+    )
 
     with pytest.raises(EngineConflictError):
         await subject.create(
@@ -187,6 +204,9 @@ async def test_get_current_run(
     decoy.when(
         mock_maintenance_engine_store.engine.state_view.get_summary()
     ).then_return(engine_state_summary)
+    decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
+        datetime(2023, 1, 1)
+    )
 
     result = subject.get(run_id=run_id)
 

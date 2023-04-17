@@ -19,12 +19,11 @@ def _build_run(
     run_id: str,
     created_at: datetime,
     state_summary: Optional[StateSummary],
-    current: bool,
 ) -> MaintenanceRun:
     # TODO(mc, 2022-05-16): improve persistence strategy
     # such that this default summary object is not needed
     state_summary = state_summary or StateSummary.construct(
-        status=EngineStatus.STOPPED,
+        status=EngineStatus.IDLE,
         errors=[],
         labware=[],
         labwareOffsets=[],
@@ -42,7 +41,7 @@ def _build_run(
         labwareOffsets=state_summary.labwareOffsets,
         pipettes=state_summary.pipettes,
         modules=state_summary.modules,
-        current=current,
+        current=True,
         completedAt=state_summary.completedAt,
         startedAt=state_summary.startedAt,
         liquids=state_summary.liquids,
@@ -91,14 +90,15 @@ class MaintenanceRunDataManager:
             await self._engine_store.clear()
 
         state_summary = await self._engine_store.create(
-            run_id=run_id, labware_offsets=labware_offsets
+            run_id=run_id,
+            created_at=created_at,
+            labware_offsets=labware_offsets,
         )
 
         return _build_run(
             run_id=run_id,
             created_at=created_at,
             state_summary=state_summary,
-            current=True,
         )
 
     def get(self, run_id: str) -> MaintenanceRun:
@@ -113,17 +113,17 @@ class MaintenanceRunDataManager:
         Raises:
             RunNotCurrentError: The given run identifier does not exist.
         """
-        current = run_id == self._engine_store.current_run_id
-        if not current:
+        current_id = self._engine_store.current_run_id
+        if current_id != run_id:
             raise RunNotCurrentError("Cannot get the summary of a non-current run.")
+        created_at = self._engine_store.current_run_created_at
         state_summary = self._get_state_summary(run_id=run_id)
 
         # store created_at at engine level
         return _build_run(
             run_id=run_id,
-            created_at=datetime(2023, 1, 1),
+            created_at=created_at,
             state_summary=state_summary,
-            current=current,
         )
 
     async def delete(self, run_id: str) -> None:
@@ -181,7 +181,7 @@ class MaintenanceRunDataManager:
             command_id: ID of the command.
 
         Raises:
-            RunNotFoundError: The given run identifier was not found.
+            RunNotCurrentError: The given run identifier doesn't belong to the current run.
             CommandNotFoundError: The given command identifier was not found.
         """
         if run_id != self._engine_store.current_run_id:

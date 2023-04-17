@@ -33,7 +33,9 @@ def subject(decoy: Decoy) -> MaintenanceEngineStore:
 
 async def test_create_engine(subject: MaintenanceEngineStore) -> None:
     """It should create an engine for a run."""
-    result = await subject.create(run_id="run-id", labware_offsets=[])
+    result = await subject.create(
+        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 1, 1)
+    )
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
@@ -51,7 +53,9 @@ async def test_create_engine_uses_robot_type(
     hardware_api = decoy.mock(cls=HardwareControlAPI)
     subject = MaintenanceEngineStore(hardware_api=hardware_api, robot_type=robot_type)
 
-    await subject.create(run_id="run-id", labware_offsets=[])
+    await subject.create(
+        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 4, 1)
+    )
 
     assert subject.engine.state_view.config.robot_type == robot_type
 
@@ -69,6 +73,7 @@ async def test_create_engine_with_labware_offsets(
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[labware_offset],
+        created_at=datetime(2023, 1, 1),
     )
 
     assert result.labwareOffsets == [
@@ -84,7 +89,9 @@ async def test_create_engine_with_labware_offsets(
 
 async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
     """It should clear a stored engine entry."""
-    await subject.create(run_id="run-id", labware_offsets=[])
+    await subject.create(
+        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 5, 1)
+    )
     await subject.runner.run()
     result = await subject.clear()
 
@@ -102,7 +109,9 @@ async def test_clear_engine_not_stopped_or_idle(
     subject: MaintenanceEngineStore,
 ) -> None:
     """It should raise a conflict if the engine is not stopped."""
-    await subject.create(run_id="run-id", labware_offsets=[])
+    await subject.create(
+        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 6, 1)
+    )
     subject.runner.play()
 
     with pytest.raises(EngineConflictError):
@@ -111,7 +120,9 @@ async def test_clear_engine_not_stopped_or_idle(
 
 async def test_clear_idle_engine(subject: MaintenanceEngineStore) -> None:
     """It should successfully clear engine if idle (not started)."""
-    await subject.create(run_id="run-id", labware_offsets=[])
+    await subject.create(
+        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 7, 1)
+    )
     assert subject.engine is not None
     assert subject.runner is not None
 
