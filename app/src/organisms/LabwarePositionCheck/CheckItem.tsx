@@ -306,8 +306,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      minHeight="25.5rem"
-      height="25.5rem"
+      minHeight="29.5rem"
     >
       {initialPosition != null ? (
         <JogToWell

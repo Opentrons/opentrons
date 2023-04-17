@@ -23,7 +23,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      minHeight="25rem"
+      minHeight="29.5rem"
     >
       <Icon
         name="ot-spinner"

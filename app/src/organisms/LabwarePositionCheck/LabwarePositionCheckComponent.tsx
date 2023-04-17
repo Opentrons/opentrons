@@ -292,7 +292,7 @@ export const LabwarePositionCheckComponent = (
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell >
+        <ModalShell fullPage>
           {wizardHeader}
           {modalContent}
         </ModalShell>

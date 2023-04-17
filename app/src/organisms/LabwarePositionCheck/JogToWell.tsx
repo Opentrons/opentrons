@@ -16,6 +16,9 @@ import {
   PrimaryButton,
   SecondaryButton,
   RESPONSIVENESS,
+  POSITION_ABSOLUTE,
+  TYPOGRAPHY,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -28,6 +31,7 @@ import {
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
 import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
@@ -36,6 +40,10 @@ import type { Jog } from '../../molecules/JogControls'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
 import type { VectorOffset } from '@opentrons/api-client'
+import { getIsOnDevice } from '../../redux/config'
+import { useSelector } from 'react-redux'
+import { Portal } from '../../App/portal'
+import { ModalShell } from '../../molecules/Modal'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =
@@ -69,6 +77,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
     initialPosition
   )
+  const isOnDevice = useSelector(getIsOnDevice)
+  const [showFullJogControls, setShowFullJogControls] = React.useState(false)
   React.useEffect(() => {
     //  NOTE: this will perform a "null" jog when the jog controls mount so
     //  if a user reaches the "confirm exit" modal (unmounting this component)
@@ -99,7 +109,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing6}
-      minHeight="25rem"
+      minHeight="29.5rem"
     >
       <Flex gridGap={SPACING.spacingL}>
         <Flex
@@ -139,32 +149,83 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           />
         </Flex>
       </Flex>
-      <JogControls
-        jog={(axis, direction, step, _onSuccess) =>
-          handleJog(axis, direction, step, setJoggedPosition)
-        }
-      />
-      <Flex
-        width="100%"
-        marginTop={SPACING.spacing6}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        css={css`
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            margin-top: 0;
-          }
-        `}
-      >
-        <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <Flex gridGap={SPACING.spacing3}>
-          <SecondaryButton onClick={handleGoBack}>
-            {t('shared:go_back')}
-          </SecondaryButton>
-          <PrimaryButton onClick={handleConfirmPosition}>
-            {t('shared:confirm_position')}
-          </PrimaryButton>
+      {isOnDevice ? (
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing6}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
+          <SmallButton buttonType="tertiaryLowLight" buttonText={t('shared:go_back')} onClick={handleGoBack} />
+          <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+            <SmallButton buttonType="alt" buttonText={t('move_pipette')} onClick={() => { setShowFullJogControls(true) }} />
+            <SmallButton buttonType='default' buttonText={t('shared:confirm_position')} onClick={handleConfirmPosition} />
+          </Flex>
+          <Portal level="top">
+            {showFullJogControls ? (
+              <ModalShell
+                width="60rem"
+                height="33.5rem"
+                padding={SPACING.spacing6}
+                display="flex"
+                flexDirection={DIRECTION_COLUMN}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                header={(
+                  <StyledText
+                    as="h4"
+                    css={css`
+                    font-weight: ${TYPOGRAPHY.fontWeightBold};
+                    font-size: ${TYPOGRAPHY.fontSize28};
+                    line-height: ${TYPOGRAPHY.lineHeight36};
+                  `}
+                  >{t('move_to_a1_position')}</StyledText>
+                )}
+                footer={(
+                  <SmallButton
+                    width="100%"
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                    buttonType='default'
+                    buttonText={t('shared:close')}
+                    onClick={() => { setShowFullJogControls(false) }} />
+                )}
+              >
+                <JogControls
+                  jog={
+                    (axis, direction, step, _onSuccess) =>
+                      handleJog(axis, direction, step, setJoggedPosition)
+                  }
+                  touchScreenMode={true}
+                />
+              </ModalShell>
+            ) : null}
+          </Portal>
         </Flex>
-      </Flex>
-    </Flex>
+      ) : (
+        <>
+          <JogControls
+            jog={
+              (axis, direction, step, _onSuccess) =>
+                handleJog(axis, direction, step, setJoggedPosition)
+            }
+          />
+          <Flex
+            width="100%"
+            marginTop={SPACING.spacing6}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}>
+            <NeedHelpLink href={LPC_HELP_LINK_URL} />
+            <Flex gridGap={SPACING.spacing3}>
+              <SecondaryButton onClick={handleGoBack}>
+                {t('shared:go_back')}
+              </SecondaryButton>
+              <PrimaryButton onClick={handleConfirmPosition}>
+                {t('shared:confirm_position')}
+              </PrimaryButton>
+            </Flex>
+          </Flex>
+        </>
+      )
+      }
+    </Flex >
   )
 }

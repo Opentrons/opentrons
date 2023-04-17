@@ -16,20 +16,6 @@ import {
   RESPONSIVENESS,
   styleProps,
 } from '@opentrons/components'
-
-const HEADER_STYLE = {
-  backgroundColor: COLORS.white,
-  position: POSITION_STICKY,
-  top: 0,
-} as const
-
-const FOOTER_STYLE = {
-  backgroundColor: COLORS.white,
-  position: POSITION_STICKY,
-  bottom: 0,
-  boxShadow: '0px 3px 6px 0px #0000003B',
-} as const
-
 export interface ModalShellProps extends StyleProps {
   /** Optional close on outside click **/
   onOutsideClick?: React.MouseEventHandler
@@ -77,9 +63,9 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
           onClick={e => { e.stopPropagation() }}
           {...styleProps}
         >
-          {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
+          {header != null ? <Header>{header}</Header> : null}
           {children}
-          {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
+          {footer != null ? <Footer>{footer}</Footer> : null}
         </ModalArea>
       </ContentArea>
     </Overlay>
@@ -108,22 +94,28 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   width: 100%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
+  padding: 1rem;
 `
 
 const ModalArea = styled.div<{ isFullPage: boolean, backgroundColor?: string} & StyleProps>`
-  backgroundColor: ${COLORS.white};
   position: ${POSITION_RELATIVE};
-  overflowY: ${OVERFLOW_AUTO};
-  maxHeight: 100%;
+  overflow-y: ${OVERFLOW_AUTO};
+  max-height: 100%;
   width: 100%;
-  margin: ${SPACING.spacing5};
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({isFullPage}) => isFullPage ? '100%' : 'auto'};
   background-color: ${COLORS.white};
   ${styleProps};
+`
 
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-
-  }
+const Footer = styled.div`
+  background-color: ${COLORS.white};
+  position: ${POSITION_STICKY};
+  bottom: 0;
+`
+const Header = styled.div`
+  background-color: ${COLORS.white};
+  position: ${POSITION_STICKY};
+  top: 0;
 `

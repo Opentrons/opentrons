@@ -9,8 +9,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { DirectionControl } from './DirectionControl'
-import { StepSizeControl } from './StepSizeControl'
+import { DirectionControl, TouchDirectionControl } from './DirectionControl'
+import { StepSizeControl, TouchStepSizeControl } from './StepSizeControl'
 import {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
@@ -31,6 +31,7 @@ export interface JogControlsProps extends StyleProps {
   auxiliaryControl?: React.ReactNode | null
   directionControlButtonColor?: string
   initialPlane?: Plane
+  touchScreenMode?: boolean
 }
 
 export {
@@ -49,19 +50,26 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     auxiliaryControl = null,
     initialPlane = HORIZONTAL_PLANE,
+    touchScreenMode = false,
     ...styleProps
   } = props
   const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
     stepSizes[0]
   )
 
-  return (
-    <Flex
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignSelf={ALIGN_STRETCH}
-      gridGap={SPACING.spacing3}
-      {...styleProps}
-    >
+  const controls = touchScreenMode ? (
+    <>
+      <TouchStepSizeControl {...{ currentStepSize, setCurrentStepSize, stepSizes }} />
+      <TouchDirectionControl
+        planes={planes}
+        jog={jog}
+        stepSize={currentStepSize}
+        buttonColor={directionControlButtonColor}
+        initialPlane={initialPlane}
+      />
+    </>
+  ) : (
+    <>
       <Flex
         alignItems={ALIGN_CENTER}
         css={css`
@@ -74,7 +82,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
         <StepSizeControl
           {...{ currentStepSize, setCurrentStepSize, stepSizes }}
         />
-      </Flex>
+      </Flex >
       <Flex
         alignItems={ALIGN_CENTER}
         css={css`
@@ -92,6 +100,16 @@ export function JogControls(props: JogControlsProps): JSX.Element {
           initialPlane={initialPlane}
         />
       </Flex>
+    </>
+  )
+  return (
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignSelf={ALIGN_STRETCH}
+      gridGap={SPACING.spacing3}
+      {...styleProps}
+    >
+      {controls}
       {auxiliaryControl}
     </Flex>
   )
