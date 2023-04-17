@@ -261,7 +261,7 @@ async def remove_run(
     except EngineConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
 
-    except RunNotFoundError as e:
+    except RunNotCurrentError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(

@@ -139,6 +139,10 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
+        else:
+            raise RunNotCurrentError(
+                f"Cannot delete {run_id} since it is not the current maintenance run."
+            )
 
     def get_commands_slice(
         self,

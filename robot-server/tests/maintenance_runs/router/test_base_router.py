@@ -22,6 +22,7 @@ from robot_server.maintenance_runs.maintenance_run_models import (
 from robot_server.maintenance_runs.maintenance_engine_store import EngineConflictError
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
+    RunNotCurrentError,
 )
 
 from robot_server.maintenance_runs.router.base_router import (
@@ -250,10 +251,8 @@ async def test_delete_run_with_bad_id(
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
     """It should 404 if the run ID does not exist."""
-    key_error = RunNotFoundError(run_id="run-id")
-
     decoy.when(await mock_maintenance_run_data_manager.delete("run-id")).then_raise(
-        key_error
+        RunNotCurrentError("uh oh")
     )
 
     with pytest.raises(ApiError) as exc_info:
