@@ -1,10 +1,11 @@
 import * as React from 'react'
+
 import { Flex, DIRECTION_COLUMN, SPACING, Box } from '@opentrons/components'
-import { i18n } from '../localization'
+import { i18n } from '../../localization'
 import { StyledText } from './StyledText'
 import { css } from 'styled-components'
-import { MiniCard } from '../../../app/src/molecules/MiniCard'
-import OT3_PNG from '../../../app/src/assets/images/OT3.png'
+import { MiniCard } from '../../../../app/src/molecules/MiniCard'
+import OT3_PNG from '../../../../app/src/assets/images/OT3.png'
 import styles from './FlexComponents.css'
 
 function FlexModulesComponent({ formProps }: any): JSX.Element {
