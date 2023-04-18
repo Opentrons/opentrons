@@ -15,7 +15,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - This release will work best on a DVT robot frame with a programmed rear-panel board. If that doesn't apply, edit `/data/feature_flags.json` and turn `rearPanelIntegration` to `false` or the robot server won't start.
 - This release is compatible with EVT pipettes and gripper only if they have received the tool ID rework.
 - This release is compatible with DVT pipettes and gripper.
-- This release is _not_ compatible with DVT module caddies.
+- This release should be used with DVT module caddies. This might introduce a slight LPC offset change if the previous offsets for labware on modules were measured while using EVT caddies.
 - This release should be used with pipette bootloaders of at least v7.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
