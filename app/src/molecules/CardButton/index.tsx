@@ -52,6 +52,14 @@ const CARD_BUTTON_STYLE = css`
   }
 `
 
+const CARD_BUTTON_TEXT_STYLE = css`
+  word-wrap: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+`
+
 interface CardButtonProps {
   /**  Header text should be less than 2 words.  */
   title: string
@@ -97,13 +105,14 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           {title}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacing2}>
+      <Flex marginTop={SPACING.spacing2} width="100%">
         <StyledText
           fontSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
+          css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}
         </StyledText>
