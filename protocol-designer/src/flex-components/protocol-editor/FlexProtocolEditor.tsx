@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { Formik } from 'formik'
 import { i18n } from '../../localization'
-import { FlexModules } from '../FlexModules'
+import { FlexModules } from './FlexModules'
 import { FlexProtocolName } from './FlexProtocolName'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
