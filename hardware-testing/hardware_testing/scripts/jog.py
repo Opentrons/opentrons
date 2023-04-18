@@ -204,7 +204,7 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     tip_length = {"T1K": 85.7, "T50": 57.9}
-    pipette_model = hw_api._pipette_handler.hardware_instruments[mount].name
+    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.RIGHT]['pipette_id']
     pipette = _get_pipette_from_mount(hw_api, mount)
     dial_data = {"Tip": None, "Tip Height": None, "Motor Current": None}
     m_current = 0.2

@@ -224,11 +224,11 @@ async def update_pickup_tip_speed(api, mount, speed) -> None:
 
 async def _main() -> None:
     today = datetime.date.today()
-    tips_to_use = 8
+    tips_to_use = 12
     slot_loc = {
         "A1": (13.42, 394.92, 110),
         "A2": (177.32, 394.92, 110),
-        "A3": (341.03, 394.92, 110),
+        "A3": (341.03, 394.0, 110),
         "B1": (13.42, 288.42, 110),
         "B2": (177.32, 288.92, 110),
         "B3": (341.03, 288.92, 110),
@@ -243,8 +243,18 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     tip_length = {"T1K": 85.7, "T200": 48.35, "T50": 47.9}
-    pipette_model = hw_api._pipette_handler.hardware_instruments[mount].name
-    dial_data = {"Tip": None, "Tip Height": None, "Motor Current": None}
+    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.RIGHT]['pipette_id']
+    dial_data = {"Ch1": None,
+                "Ch2": None,
+                "Ch3": None,
+                "Ch4": None,
+                "Ch5": None,
+                "Ch6": None,
+                "Ch7": None,
+                "Ch8": None,
+                "Motor Current": None,
+                "Trial": None,
+                "pipette_model": None}
     m_current = float(input("motor_current in amps: "))
     pick_up_speed = float(input("pick up tip speed in mm/s: "))
     details = [pipette_model, m_current]
@@ -261,6 +271,7 @@ async def _main() -> None:
     print(test_f)
     await home_ot3(hw_api, [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.X, OT3Axis.Y])
     await hw_api.home_plunger(mount)
+    await hw_api.set_lights(rails = True)
     plunger_pos = get_plunger_positions_ot3(hw_api, mount)
     home_position = await hw_api.current_position_ot3(mount)
     start_time = time.perf_counter()
@@ -364,28 +375,49 @@ async def _main() -> None:
         print("Move to Tiprack")
         current_position = await hw_api.current_position_ot3(mount)
         dial_loc = await jog(hw_api, current_position, cp)
+        dial_loc = [
+            dial_loc[OT3Axis.X],
+            dial_loc[OT3Axis.Y],
+            dial_loc[OT3Axis.by_mount(mount)],
+        ]
         tip_offset = 0
+        measurements = ''
+        tips = 8
+        trial = 1
+        for tip in range(1, tips+1):
 
-        for tips in range(1, tips+1):
-            await asyncio.sleep(1)
-            tip_measurement = gauge.read()
-            await asyncio.sleep(2)
-            d_str = f"{m_current}, {pipette_model}, {tip_measurement}, Tip \n"
-            data.append_data_to_file(test_n, test_f, d_str)
-            dial_loc = [
-                dial_loc[OT3Axis.X],
-                dial_loc[OT3Axis.Y],
-                dial_loc[OT3Axis.by_mount(mount)],
-            ]
             await hw_api.move_to(
                 mount,
                 Point(
                     dial_loc[0],
-                    dial_loc[2] + tip_offset,
+                    dial_loc[1] + tip_offset,
+                    dial_loc[2],
+                ),
+            )
+            await asyncio.sleep(1)
+            tip_measurement = gauge.read()
+            await asyncio.sleep(2)
+            measurements += str(tip_measurement) + ','
+
+            await hw_api.move_to(
+                mount,
+                Point(
+                    dial_loc[0],
+                    dial_loc[1] + tip_offset,
                     home_with_tip_position[OT3Axis.by_mount(mount)],
                 ),
             )
             tip_offset += 9
+            await hw_api.move_to(
+                mount,
+                Point(
+                    dial_loc[0],
+                    dial_loc[1] + tip_offset,
+                    home_with_tip_position[OT3Axis.by_mount(mount)],
+                ),
+            )
+        d_str = f"{measurements} {pipette_model} , {trial}, {m_current} \n"
+        data.append_data_to_file(test_n, test_f, d_str)
 
     if args.trough:
         await hw_api.move_to(
@@ -419,7 +451,7 @@ async def _main() -> None:
             mount,
             Point(
                 slot_loc["A3"][0] + 50,
-                slot_loc["A3"][1] - 20,
+                slot_loc["A3"][1],
                 home_with_tip_position[OT3Axis.by_mount(mount)],
             ),
             critical_point=CriticalPoint.TIP,
@@ -439,6 +471,8 @@ async def _main() -> None:
         expected_liquid_height=args.expected_liquid_height,
         log_pressure=args.log_pressure,
         aspirate_while_sensing=False,
+        auto_zero_sensor = True,
+        num_baseline_reads = 10,
         data_file=lp_file_name,
     )
     tip_count = 0
@@ -447,7 +481,8 @@ async def _main() -> None:
     try:
 
         for tip in range(2, tips_to_use + 1):
-            tip_count += 1
+            trial = tip
+            tip_count += 8
             y_offset -= 9
             if tip_count % 8 == 0:
                 y_offset = 0
@@ -500,7 +535,6 @@ async def _main() -> None:
                 force_thread.join()  # Thread Finished
                 await hw_api.remove_tip(mount)
                 await hw_api.home_z(mount, allow_home_other=False)
-                print("I'm here")
                 # await hw_api.move_to(
                 #     mount,
                 #     Point(
@@ -574,6 +608,7 @@ async def _main() -> None:
                 enc_record(file_name, test_details)
                 # Home Z
                 await hw_api.home([OT3Axis.by_mount(mount)])
+                #--------------------------Dial Indicator-----------------------
                 # Move over to the dial indicator
                 await hw_api.move_to(
                     mount,
@@ -583,25 +618,41 @@ async def _main() -> None:
                         home_with_tip_position[OT3Axis.by_mount(mount)] ,
                     ),
                 )
-                # Move over to the dial indicator
-                await hw_api.move_to(
-                    mount,
-                    Point(dial_loc[0], dial_loc[1], dial_loc[2]),
-                )
-                await asyncio.sleep(3)
-                tip_measurement = gauge.read()
-                d_str = f"{m_current}, {pipette_model}, {tip_measurement}, Tip \n"
+                tip_offset = 0
+                measurements = ''
+                tips = 8
+                for t in range(1, tips+1):
+                    # Move over to the dial indicator
+                    await hw_api.move_to(
+                        mount,
+                        Point(dial_loc[0],
+                        dial_loc[1] + tip_offset,
+                        dial_loc[2]),
+                    )
+                    await asyncio.sleep(3)
+                    tip_measurement = gauge.read()
+                    measurements += str(tip_measurement) + ','
+                    await asyncio.sleep(1)
+                    # Move over to the dial indicator
+                    await hw_api.move_to(
+                        mount,
+                        Point(
+                            dial_loc[0],
+                            dial_loc[1] + tip_offset,
+                            home_with_tip_position[OT3Axis.by_mount(mount)] ,
+                        ),
+                    )
+                    tip_offset += 9
+                    await hw_api.move_to(
+                        mount,
+                        Point(
+                            dial_loc[0],
+                            dial_loc[1] + tip_offset,
+                            home_with_tip_position[OT3Axis.by_mount(mount)] ,
+                        ),
+                    )
+                d_str = f"{measurements} {pipette_model} , {trial}, {m_current} \n"
                 data.append_data_to_file(test_n, test_f, d_str)
-                await asyncio.sleep(1)
-                # Move over to the dial indicator
-                await hw_api.move_to(
-                    mount,
-                    Point(
-                        dial_loc[0],
-                        dial_loc[1],
-                        home_with_tip_position[OT3Axis.by_mount(mount)] ,
-                    ),
-                )
                 # -----------------------Aspirate-----------------------------------
                 await hw_api.move_to(
                     mount,
@@ -618,7 +669,7 @@ async def _main() -> None:
                 # Move the plunger to the top position
                 await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
                 # Liquid Probe
-                liquid_height = await hw_api.liquid_probe(
+                liquid_height, enc_liquid_height = await hw_api.liquid_probe(
                     mount, probe_settings=liquid_probe_settings
                 )
 
@@ -644,7 +695,7 @@ async def _main() -> None:
                     critical_point=CriticalPoint.TIP,
                 )
                 # Aspirate
-                await hw_api.aspirate(mount)
+                await hw_api.aspirate(mount, volume = 50)
                 cur_pos = await hw_api.current_position_ot3(
                     mount, critical_point=CriticalPoint.TIP
                 )
@@ -702,7 +753,7 @@ async def _main() -> None:
                     mount,
                     Point(
                         slot_loc["A3"][0] + 50,
-                        slot_loc["A3"][1] - 20,
+                        slot_loc["A3"][1],
                         home_with_tip_position[OT3Axis.by_mount(mount)] ,
                     ),
                     critical_point=CriticalPoint.TIP,
@@ -827,19 +878,19 @@ if __name__ == "__main__":
     parser.add_argument("--fg_jog", action="store_true")
     parser.add_argument("--trough", action="store_true")
     parser.add_argument("--tiprack", action="store_true")
-    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="right")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
-    parser.add_argument("--fg", action="store_true", default=True)
+    parser.add_argument("--fg", action="store_true")
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
     parser.add_argument("--max_z_distance", type=float, default=40)
     parser.add_argument("--min_z_distance", type=float, default=5)
-    parser.add_argument("--mount_speed", type=float, default=11)
-    parser.add_argument("--plunger_speed", type=float, default=21)
+    parser.add_argument("--mount_speed", type=float, default=5)
+    parser.add_argument("--plunger_speed", type=float, default=7)
     parser.add_argument(
-        "--sensor_threshold", type=float, default=160, help="Threshold in Pascals"
+        "--sensor_threshold", type=float, default=100, help="Threshold in Pascals"
     )
     parser.add_argument("--expected_liquid_height", type=int, default=0)
     parser.add_argument("--log_pressure", action="store_true")
