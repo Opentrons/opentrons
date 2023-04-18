@@ -18,8 +18,8 @@
     "labwareInterfaceYDimension": 86
   },
   "cornerOffsetFromSlot": {
-    "x": 14.375,
-    "y": 11.375,
+    "x": -4.125,
+    "y": -4.125,
     "z": 0
   },
   "calibrationPoint": {
