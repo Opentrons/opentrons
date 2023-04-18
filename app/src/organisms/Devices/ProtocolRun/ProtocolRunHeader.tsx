@@ -158,7 +158,7 @@ export function ProtocolRunHeader({
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
 
-  const { pause } = useRunControls(runId, onResetSuccess)
+  const { pause, play } = useRunControls(runId, onResetSuccess)
 
   const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(
     false
@@ -294,7 +294,9 @@ export function ProtocolRunHeader({
           </Flex>
         </Box>
       ) : null}
-      <RunProgressMeter {...{ makeHandleJumpToStep, runId, robotName }} />
+      <RunProgressMeter
+        {...{ makeHandleJumpToStep, runId, robotName, resumeRunHandler: play }}
+      />
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}
