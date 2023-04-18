@@ -1,24 +1,13 @@
 import * as React from 'react'
-import { RadioSelect } from './RadioSelect'
+import { i18n } from '../localization'
+import { StyledText } from './StyledText'
 
 function FlexPipettesComponent({ formProps }: any): JSX.Element {
-  const {
-    values: { pipetteSelectionData },
-  } = formProps
-
   return (
     <>
-      <RadioSelect
-        propsData={formProps}
-        pipetteName={'pipetteSelectionData.firstPipette'}
-        pipetteType={pipetteSelectionData.firstPipette}
-      />
-      <br />
-      <RadioSelect
-        propsData={formProps}
-        pipetteName={'pipetteSelectionData.secondPipette'}
-        pipetteType={pipetteSelectionData.secondPipette}
-      />
+      <StyledText as="h2">
+        {i18n.t('flex.pipettes_selection.heading')}
+      </StyledText>
     </>
   )
 }

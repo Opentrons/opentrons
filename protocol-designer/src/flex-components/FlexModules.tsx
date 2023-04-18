@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { i18n } from '../localization'
+import { StyledText } from './StyledText'
 
-function ModulesComponent({ formProps }: any): JSX.Element {
+function FlexModulesComponent({ formProps }: any): JSX.Element {
   return (
     <>
-      <h1>{i18n.t('flex.modules_selection.heading')}</h1>
+      <StyledText as="h2">
+        {i18n.t('flex.modules_selection.heading')}
+      </StyledText>
     </>
   )
 }
 
-export const Modules = ModulesComponent
+export const FlexModules = FlexModulesComponent

@@ -11,11 +11,12 @@ import {
 } from '@opentrons/components'
 import { Formik } from 'formik'
 import { i18n } from '../localization'
-import { Modules } from './FlexModules'
-import { FlexPipettes } from './FlexPipettes'
+import { FlexModules } from './FlexModules'
+// import { FlexPipettes } from './FlexPipettes'
 import { FlexProtocolName } from './FlexProtocolName'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
+import { RadioSelect } from './RadioSelect'
 
 const RoundTabs = (props: any): JSX.Element => {
   const { setCurrentTab, currentTab } = props
@@ -43,7 +44,7 @@ const RoundTabs = (props: any): JSX.Element => {
             isCurrent={currentTab === id}
             onClick={() => setCurrentTab(id)}
           >
-            <StyledText>{name}</StyledText>
+            <StyledText as="h4">{name}</StyledText>
           </RoundTab>
         )
       })}
@@ -56,9 +57,10 @@ const selectComponent = (selectedTab: Number, props: any): any => {
     case 1:
       return <FlexProtocolName formProps={props} />
     case 2:
-      return <FlexPipettes formProps={props} />
+      return <PipettesComponent formProps={props} />
+    // return <FlexPipettes formProps={props} />
     case 3:
-      return <Modules formProps={props} />
+      return <FlexModules formProps={props} />
     default:
       return null
   }
@@ -128,7 +130,9 @@ function FlexProtocolEditorComponent(): JSX.Element {
                       onClick={() => handlePrevious(selectedTab)}
                       className={styles.flex_round_tabs_button_50p}
                     >
-                      {i18n.t('flex.round_tabs.previous')}
+                      <StyledText as="h3">
+                        {i18n.t('flex.round_tabs.previous')}
+                      </StyledText>
                     </NewPrimaryBtn>
                   )}
                   <NewPrimaryBtn
@@ -141,7 +145,7 @@ function FlexProtocolEditorComponent(): JSX.Element {
                         : styles.flex_round_tabs_button_100p
                     }
                   >
-                    {nextButton}
+                    <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>
                 </div>
               </form>
@@ -150,6 +154,27 @@ function FlexProtocolEditorComponent(): JSX.Element {
         }
       </Box>
     </Flex>
+  )
+}
+
+const PipettesComponent = ({ formProps }: any): JSX.Element => {
+  const {
+    values: { pipetteSelectionData },
+  } = formProps
+  return (
+    <>
+      <RadioSelect
+        propsData={formProps}
+        pipetteName={'pipetteSelectionData.firstPipette'}
+        pipetteType={pipetteSelectionData.firstPipette}
+      />
+      <br />
+      <RadioSelect
+        propsData={formProps}
+        pipetteName={'pipetteSelectionData.secondPipette'}
+        pipetteType={pipetteSelectionData.secondPipette}
+      />
+    </>
   )
 }
 

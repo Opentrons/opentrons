@@ -19,7 +19,11 @@
     "name": "Protocol Name and description",
     "heading": "Protocol Name and description",
     "choose_name": "Choose a name for your protocol.*",
-    "add_more_information": "Add more information, if you like (you can change this later)."
+    "protocol_name": "Protocol Name",
+    "supporting_error_text": "supporting text about any error handling goes here.",
+    "add_more_information": "Add more information, if you like (you can change this later).",
+    "organization_author": "Organization/Author",
+    "protocol_description": "Description"
   },
   "pipettes_selection": {
     "name": "Pipette Selection",
