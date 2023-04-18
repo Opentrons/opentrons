@@ -419,3 +419,68 @@ class LightAnimationTypeField(utils.UInt8Field):
         except ValueError:
             action = str(self.value)
         return f"{self.__class__.__name__}(value={action})"
+
+
+class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
+    """A struct for an individual motor usage key, length, value field."""
+
+    NUM_BYTES = 12
+    FORMAT = f"{NUM_BYTES}s"
+
+    @property
+    def value(self) -> bytes:
+        """The value."""
+        val = b""
+        val = val + self.key.to_bytes(2, "big")
+        val = val + self.length.to_bytes(2, "big")
+        val = val + self.usage_value.to_bytes(8, "big")
+        return val
+
+    @value.setter
+    def value(self, val: bytes) -> None:
+        self._key, self._length, self._usage_value = self._parse(val)
+
+    @classmethod
+    def _usage_field_from_bytes(cls, data: bytes, start: int, end: int) -> int:
+        try:
+            present_bytes = data[start:end]
+        except IndexError:
+            present_bytes = b"\x00"
+        return int.from_bytes(present_bytes, "big")
+
+    @classmethod
+    def _parse(cls, data: bytes) -> Tuple[int, int, int]:
+        key = cls._usage_field_from_bytes(data, 0, 2)
+        length = cls._usage_field_from_bytes(data, 2, 4)
+        usage_value = cls._usage_field_from_bytes(data, 4, 12)
+        return key, length, usage_value
+
+    @classmethod
+    def build(cls, data: bytes) -> "MotorUsageTypeField":
+        """Create a Motor Usage Type Field from bytes"""
+        return cls(*cls._parse(data))
+
+    def __init__(self, key: int, length: int, usage_value: int) -> None:
+        """Build."""
+        self._key = key
+        self._length = length
+        self._usage_value = usage_value
+
+    @property
+    def key(self) -> int:
+        """Key that describes what kind of usage this is"""
+        return self._key
+
+    @property
+    def length(self) -> int:
+        """Length of the usage data value field"""
+        return self._length
+
+    @property
+    def usage_value(self) -> int:
+        """Value for this particular type of usage"""
+        return self._usage_value
+
+    def __repr__(self) -> str:
+        """Repr."""
+        return f"{self.__class__.__name__}(key={self.key}, length={self.length}, usage_data={self.usage_value})"
