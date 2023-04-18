@@ -336,6 +336,17 @@ class UpdateStatus:
     progress: int
 
 
+@dataclass
+class OT3SubSystemState:
+    ok: bool
+    current_fw_version: int
+    next_fw_version: int
+    fw_update_needed: bool
+    current_fw_sha: str
+    pcba_revision: str
+    update_state: Union[UpdateStatus, None]
+
+
 @dataclass(frozen=True)
 class InstrumentUpdateStatus:
     mount: OT3Mount

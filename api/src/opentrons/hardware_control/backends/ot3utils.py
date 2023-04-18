@@ -22,6 +22,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteType,
     SensorId,
     PipetteTipActionType,
+    USBTarget,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -67,6 +68,14 @@ SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
     OT3SubSystem.pipette_right: NodeId.pipette_right,
     OT3SubSystem.gripper: NodeId.gripper,
 }
+
+NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
+
+SUBSYSTEM_USB: Dict[OT3SubSystem, USBTarget] = {
+    OT3SubSystem.rear_panel: USBTarget.rear_panel
+}
+
+USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -160,10 +169,31 @@ def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
 
 def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
     """Convert a NodeId to a Subsystem"""
-    node_to_subsystem = {
-        node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
-    }
-    return node_to_subsystem[node_id.application_for()]
+    return NODEID_SUBSYSTEM[node_id.application_for()]
+
+
+def usb_to_subsystem(target: USBTarget) -> OT3SubSystem:
+    return USB_SUBSYSTEM[target]
+
+
+def subsystem_to_usb(subsystem: OT3SubSystem) -> USBTarget:
+    return SUBSYSTEM_USB[subsystem]
+
+
+def target_to_subsystem(target: FirmwareTarget) -> OT3SubSystem:
+    if isinstance(target, USBTarget):
+        return usb_to_subsystem(target)
+    elif isinstance(target, NodeId):
+        return node_id_to_subsystem(target)
+    else:
+        raise KeyError(target)
+
+
+def subsystem_to_target(subsystem: OT3SubSystem) -> FirmwareTarget:
+    try:
+        return sub_system_to_node_id(subsystem)
+    except KeyError:
+        return subsystem_to_usb(subsystem)
 
 
 def get_current_settings(

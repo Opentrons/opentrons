@@ -239,7 +239,6 @@ def _update_details_for_device(
 
 
 def _update_type_for_device(
-    attached_pipettes: Dict[NodeId, PipetteType],
     version_cache: DeviceInfoCache,
 ) -> Tuple[FirmwareUpdateType, str]:
     try:
@@ -250,14 +249,6 @@ def _update_type_for_device(
         )
         return (FirmwareUpdateType.unknown_no_revision, "")
     except ValueError:
-        # This means we did not have a valid pipette type in the version cache, so fall back to the passed-in
-        # attached_pipettes data.
-        # TODO: Delete this fallback when all pipettes have subidentifiers in their bootloaders.
-        if version_cache.target in attached_pipettes:
-            pipette_type = attached_pipettes[cast(NodeId, version_cache.target)]
-            return FirmwareUpdateType.from_pipette(pipette_type), _revision_for_pipette(
-                version_cache, pipette_type
-            )
         log.error(
             f"Target {version_cache.target.name} has no known subtype and cannot be updated"
         )
@@ -266,13 +257,12 @@ def _update_type_for_device(
 
 
 def _update_types_from_devices(
-    attached_pipettes: Dict[NodeId, PipetteType],
     devices: Iterable[DeviceInfoCache],
 ) -> Iterator[Tuple[DeviceInfoCache, FirmwareUpdateType, str]]:
     for version_cache in devices:
         log.debug(f"Checking firmware update for {version_cache.target.name}")
         # skip pipettes that dont have a PipetteType
-        update_type, rev = _update_type_for_device(attached_pipettes, version_cache)
+        update_type, rev = _update_type_for_device(version_cache)
         yield (version_cache, update_type, rev)
 
 
@@ -345,11 +335,8 @@ def _info_for_required_updates(
             yield version_cache.target, update_info.version, update_info.files_by_revision, rev
 
 
-# TODO: When we're confident that all pipettes report their type in the device info subidentifier
-# field, both in application and bootloader, we can remove the attached_pipettes from this codepath.
 def check_firmware_updates(
     device_info: Dict[FirmwareTarget, DeviceInfoCache],
-    attached_pipettes: Dict[NodeId, PipetteType],
     targets: Optional[Set[FirmwareTarget]] = None,
     force: bool = False,
 ) -> Dict[FirmwareTarget, Tuple[int, str]]:
@@ -361,7 +348,7 @@ def check_firmware_updates(
         log.error("Could not load the known firmware.")
         return
     devices_to_check = _devices_to_check(device_info, targets)
-    update_types = _update_types_from_devices(attached_pipettes, devices_to_check)
+    update_types = _update_types_from_devices(devices_to_check)
     update_info = _info_for_required_updates(force, known_firmware, update_types)
     update_files = _update_files_from_types(update_info)
     return {

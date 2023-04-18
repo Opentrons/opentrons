@@ -1,8 +1,9 @@
 """Utilities for managing the CANbus network on the OT3."""
 import asyncio
 from dataclasses import dataclass
+from itertools import chain
 import logging
-from typing import Any, Dict, Set, Optional, Union
+from typing import Any, Dict, Set, Optional, Union, cast
 from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -44,10 +45,11 @@ class DeviceInfoCache:
     flags: Any
     revision: PCBARevision
     subidentifier: int
+    ok: bool
 
     def __repr__(self) -> str:
         """Readable representation of the device info."""
-        return f"<{self.__class__.__name__}: node={self.target}, version={self.version}, sha={self.shortsha}>"
+        return f"<{self.__class__.__name__}: node={self.target}, version={self.version}, sha={self.shortsha}, ok={self.ok}>"
 
 
 class NetworkInfo:
@@ -66,17 +68,24 @@ class NetworkInfo:
         """
         self._can_network_info = CanNetworkInfo(can_messenger)
         self._usb_network_info = UsbNetworkInfo(usb_messenger)
-        self._device_info_cache: Dict[FirmwareTarget, DeviceInfoCache] = dict()
 
     @property
     def device_info(self) -> Dict[FirmwareTarget, DeviceInfoCache]:
         """Dictionary containing known devices and their device info."""
-        return self._device_info_cache
+        return {
+            k: v
+            for k, v in chain(
+                self._can_network_info.device_info.items(),
+                self._usb_network_info.device_info.items(),
+            )
+        }
 
     @property
     def targets(self) -> Set[FirmwareTarget]:
         """Set of usb devices on the network."""
-        return set(self._device_info_cache)
+        return cast(Set[FirmwareTarget], self._can_network_info.nodes).union(
+            self._usb_network_info.targets
+        )
 
     async def probe(
         self, expected: Optional[Set[FirmwareTarget]] = None, timeout: float = 1.0
@@ -109,7 +118,6 @@ class NetworkInfo:
         device_info.update(
             {target: cache for (target, cache) in usb_device_info.items()}
         )
-        self._device_info_cache = device_info
         return device_info
 
 
@@ -237,8 +245,12 @@ class CanNetworkInfo:
                     message, arbitration_id
                 )
                 if device_info_cache:
-                    nodes[NodeId(device_info_cache.target)] = device_info_cache
-            if expected_nodes and expected_nodes.issubset(nodes):
+                    nodes[
+                        NodeId(device_info_cache.target).application_for()
+                    ] = device_info_cache
+            if expected_nodes and expected_nodes.issubset(
+                {node.application_for() for node in nodes}
+            ):
                 event.set()
 
         self._can_messenger.add_listener(listener)
@@ -278,6 +290,7 @@ def _parse_usb_device_info_response(
                     message.revision.revision, message.revision.tertiary
                 ),
                 subidentifier=message.subidentifier.value,
+                ok=True,
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")
@@ -299,7 +312,7 @@ def _parse_can_device_info_response(
             return None
         try:
             return DeviceInfoCache(
-                target=node,
+                target=node.application_for(),
                 version=int(message.payload.version.value),
                 shortsha=message.payload.shortsha.value.decode(),
                 flags=message.payload.flags.value,
@@ -307,6 +320,7 @@ def _parse_can_device_info_response(
                     message.payload.revision.revision, message.payload.revision.tertiary
                 ),
                 subidentifier=message.payload.subidentifier.value,
+                ok=(not node.is_bootloader()),
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")

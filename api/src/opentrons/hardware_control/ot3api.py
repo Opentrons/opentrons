@@ -93,6 +93,7 @@ from .types import (
     LiquidNotFound,
     UpdateStatus,
     StatusBarState,
+    OT3SubSystemState,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -294,7 +295,6 @@ class OT3API(
         backend = await OT3Controller.build(checked_config, use_usb_bus)
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
-        await api_instance._cache_instruments()
 
         await api_instance.set_status_bar_state(StatusBarState.IDLE)
 
@@ -397,46 +397,11 @@ class OT3API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
-    def _get_pipette_subtypes(self) -> Dict[OT3Mount, PipetteSubType]:
-        """Get attached pipette subtypes.
-
-        The PipetteSubType is a direct map of PipetteChannelType (single, multi, 96).
-        This is needed because unlike the rest of the subsystems, the pipettes have different firmware that gets
-        installed based on the PipetteChannelType.
-        """
-        # Get the attached instruments so we can get determine the PipetteSubType attached.
-        pipette_subtypes: Dict[OT3Mount, PipetteSubType] = dict()
-        attached_instruments = self._pipette_handler.get_attached_instruments()
-        for mount, _ in attached_instruments.items():
-            # we can exclude the gripper here since we can use the OT3SubSystem to map to NodeId directly.
-            if self._pipette_handler.has_pipette(mount):
-                pipette = self._pipette_handler.get_pipette(mount)
-                pipette_subtypes[mount] = PipetteSubType.from_channels(pipette.channels)
-        return pipette_subtypes
-
     def get_firmware_update_progress(
         self,
     ) -> Dict[OT3SubSystem, UpdateStatus]:
         """Get the update progress for all devices currently updating."""
-        return {
-            update.subsystem: update for update in self._backend.get_update_progress()
-        }
-
-    async def update_instrument_firmware(
-        self, mount: OT3Mount
-    ) -> AsyncIterator[InstrumentUpdateStatus]:
-        """Update the firmware on one or all instruments."""
-        # check that mount is actually attached
-        # TODO (ba, 2023-03-03) get_attached_instruments should probably return gripper as well, for now just add it
-        attached_instruments = self._pipette_handler.get_attached_instruments()
-        attached_instruments[OT3Mount.GRIPPER] = self.attached_gripper  # type: ignore
-        if mount and not attached_instruments.get(mount):
-            mod_log.warn(f"Can't update instrument, mount {mount} is not attached.")
-            return
-        subsystem = subsystem_from_mount(mount)
-        async for update_status in self.update_firmware({subsystem}):
-            status = update_status.pop()
-            yield InstrumentUpdateStatus(mount, status.state, status.progress)
+        return self._backend.get_update_progress()
 
     async def update_firmware(
         self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False
@@ -449,15 +414,12 @@ class OT3API(
                 targets.add(USBTarget.rear_panel)
             else:
                 targets.add(sub_system_to_node_id(subsystem))
-        # get the attached pipette subtypes so we can determine which binary to install for pipettes
-        pipettes = self._get_pipette_subtypes()
         # start the updates and yield the progress
-        async for update_status in self._backend.update_firmware(
-            pipettes, targets, force
-        ):
+        async for update_status in self._backend.update_firmware(targets, force):
             yield update_status
+
         # refresh Instrument cache
-        await self._cache_instruments()
+        await self.cache_instruments()
 
     # Incidentals (i.e. not motion) API
 
@@ -622,7 +584,6 @@ class OT3API(
             else:
                 self._pipette_handler.hardware_instruments[pipette_mount] = None
 
-        await self._backend.probe_network()
         await self.refresh_positions()
 
     async def _configure_instruments(self) -> None:
@@ -2066,3 +2027,7 @@ class OT3API(
             except KeyError:
                 pass
         return ret
+
+    @property
+    def attached_subsystems(self) -> Dict[OT3SubSystem, SubSystemState]:
+        pass

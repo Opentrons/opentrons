@@ -52,6 +52,17 @@ class NodeId(int, Enum):
         # so let's write out the whole byte
         return NodeId(self.value & 0xF0)
 
+    def central_for(self) -> "NodeId":
+        """The associated 'central' NodeId.
+
+        If this is a node id representing a subtarget application (i.e. head_l), this will be the
+        application. If it represents a bootloader, it will be the bootloader.
+        """
+        if self.is_bootloader():
+            return NodeId(self.value)
+        else:
+            return self.application_for()
+
 
 # make these negative numbers so there is no chance they overlap with NodeId
 @unique
