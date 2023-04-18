@@ -374,6 +374,13 @@ def _get_operator_name(is_simulating: bool) -> str:
         return "simulation"
 
 
+def _get_robot_serial(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("ROBOT SERIAL NUMBER:").strip()
+    else:
+        return "simulation-serial-number"
+
+
 def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -459,10 +466,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
     test_report.set_operator(_get_operator_name(ctx.is_simulating()))
+    serial_number = _get_robot_serial(ctx.is_simulating())
     test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
-        robot="ot3",
+        robot=serial_number,
         pipette=pipette_tag,
         scale=recorder.serial_number,
         environment="None",
