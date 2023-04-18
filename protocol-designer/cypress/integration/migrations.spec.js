@@ -8,6 +8,7 @@ const semver = require('semver')
 describe('Protocol fixtures migrate and match snapshots', () => {
   beforeEach(() => {
     cy.visit('/')
+    cy.get('button').contains('Create new OT-2 protocol').click()
     cy.closeAnnouncementModal()
   })
 
