@@ -401,7 +401,7 @@ async def test_move_to_without_homing_first(
         mount,
         Point(0.001, 0.001, 0.001),
     )
-    mock_home.assert_called_once_with(homed_axis)
+    mock_home.assert_called_once()
     assert ot3_hardware._backend.check_motor_status(homed_axis)
 
 

@@ -1,9 +1,11 @@
 import json
 import logging
+import os
+from pathlib import Path
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.hardware_control.types import OT3Mount
 from pydantic import ValidationError
-from typing import Optional, Union, no_type_check
+from typing import List, Optional, Union, no_type_check
 from dataclasses import asdict
 
 from opentrons import config, types
@@ -98,3 +100,19 @@ def get_module_offset(
             f"Malformed calibrations for {module_id} on slot {slot}. Please factory reset your calibrations."
         )
         return None
+
+
+def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
+    """Load all module offsets from the disk."""
+
+    calibrations: List[v1.ModuleOffsetModel] = []
+    files = os.listdir(config.get_opentrons_path("module_calibration_dir"))
+    for file in files:
+        try:
+            calibrations.append(v1.ModuleOffsetModel(**io.read_cal_file(Path(file))))
+        except (json.JSONDecodeError, ValidationError):
+            log.warning(
+                f"Malformed module calibrations for {file}. Please factory reset your calibrations."
+            )
+            continue
+    return calibrations

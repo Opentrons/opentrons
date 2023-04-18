@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
-  useDeleteProtocolMutation,
+  useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
@@ -41,6 +41,7 @@ import { Liquids } from './Liquids'
 
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 const ProtocolHeader = (props: {
   title: string
@@ -248,6 +249,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
+  const host = useHost()
   const { makeSnackbar } = useToaster()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
@@ -288,7 +290,28 @@ export function ProtocolDetails(): JSX.Element | null {
     createRun({ protocolId })
   }
 
-  const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
+  const handleDeleteClick = (): void => {
+    if (host != null) {
+      getProtocol(host, protocolId)
+        .then(
+          response =>
+            response.data.links?.referencingRunIds.map(({ id }) => id) ?? []
+        )
+        .then(referencingRunIds =>
+          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
+        )
+        .then(() => deleteProtocol(host, protocolId))
+        .then(() => history.goBack())
+        .catch((e: Error) => {
+          console.error(`error deleting resources: ${e.message}`)
+          history.goBack()
+        })
+    } else {
+      console.error(
+        'could not delete resources because the robot host is unknown'
+      )
+    }
+  }
 
   if (protocolRecord == null) return null
   const displayName =
@@ -339,10 +362,7 @@ export function ProtocolDetails(): JSX.Element | null {
           buttonText={t('protocol_info:delete_protocol')}
           buttonType="alertSecondary"
           iconName="trash"
-          onClick={() => {
-            deleteProtocol()
-            history.goBack()
-          }}
+          onClick={handleDeleteClick}
           width="29.25rem"
         />
       </Flex>

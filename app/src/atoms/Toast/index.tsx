@@ -117,7 +117,7 @@ export function Toast(props: ToastProps): JSX.Element {
     }
   } = {
     [ERROR_TOAST]: {
-      iconName: 'alert-circle',
+      iconName: 'ot-alert',
       color: `${showODDStyle ? COLORS.yellow_two : COLORS.errorEnabled}`,
       backgroundColor: `${
         showODDStyle ? COLORS.yellow_four : COLORS.errorBackgroundLight
@@ -129,16 +129,18 @@ export function Toast(props: ToastProps): JSX.Element {
       backgroundColor: COLORS.darkGreyDisabled,
     },
     [SUCCESS_TOAST]: {
-      iconName: 'check-circle',
+      iconName: 'ot-check',
       color: `${showODDStyle ? COLORS.green_two : COLORS.successEnabled}`,
       backgroundColor: `${
         showODDStyle ? COLORS.green_four : COLORS.successBackgroundLight
       }`,
     },
     [WARNING_TOAST]: {
-      iconName: 'alert-circle',
-      color: COLORS.warningEnabled,
-      backgroundColor: COLORS.warningBackgroundLight,
+      iconName: 'ot-alert',
+      color: `${showODDStyle ? COLORS.yellow_two : COLORS.warningEnabled}`,
+      backgroundColor: `${
+        showODDStyle ? COLORS.yellow_four : COLORS.warningBackgroundLight
+      }`,
     },
   }
 
@@ -184,7 +186,9 @@ export function Toast(props: ToastProps): JSX.Element {
       borderColor={toastStyleByType[type].color}
       borderWidth={showODDStyle ? BORDERS.size_one : SPACING.spacingXXS}
       border={BORDERS.styleSolid}
+      boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
+      onClick={closeText.length > 0 ? onClose : undefined}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
@@ -210,7 +214,7 @@ export function Toast(props: ToastProps): JSX.Element {
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
           width={showODDStyle ? SPACING.spacing6 : SPACING.spacing4}
-          marginRight={showODDStyle ? SPACING.spacing3 : SPACING.spacing3}
+          marginRight={SPACING.spacing3}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
@@ -233,6 +237,7 @@ export function Toast(props: ToastProps): JSX.Element {
               lineHeight={
                 showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
               }
+              marginRight={showODDStyle ? SPACING.spacing2 : undefined}
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
@@ -263,12 +268,13 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText.length > 0 && (
-        <Link onClick={onClose} role="button" height={SPACING.spacing5}>
+        <Link role="button" height={SPACING.spacing5}>
           <StyledText
             color={COLORS.darkBlack_hundred}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             whiteSpace="nowrap"
           >
             {closeText}

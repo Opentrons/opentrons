@@ -1,0 +1,79 @@
+# This workflow builds HTTP API docs when either:
+#
+# * A commit is tagged like "docs@foo".
+#
+# * Someone pushes, to any branch, a commit that touches any of:
+#   * The parts of the robot-server/ project that are used by the docs.
+#   * The docs source themselves (none yet).
+#   * The CI/makefile tooling used to build the docs.
+
+name: 'HTTP API docs build'
+
+on:
+  push:
+    tags:
+      - 'docs@*'
+    branches:
+      # We don't want to do any filtering based on branch name.
+      # But because we specified `tags`, we need to specify `branches` too,
+      # or else GitHub will only run this workflow for tag matches
+      # and not for path matches.
+      - '**'
+    paths:
+      - 'robot-server/**'
+      - '.github/workflows/http-docs-build.yaml'
+      - '.github/actions/python/**'
+      - '.github/actions/webstack/deploy-to-sandbox/**'
+      - '.github/workflows/utils.js'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: HTTP API reference build
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-python@v3'
+        with:
+          python-version: '3.7'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'robot-server'
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: 'Build docs'
+        run: |
+          make -C robot-server docs
+      - name: 'Deploy docs to sandbox'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
+        uses: './.github/actions/webstack/deploy-to-sandbox'
+        with:
+          domain: 'docs.opentrons.com'
+          distPath: './robot-server/docs/dist'
+          destPrefix: ${{ env.OT_BRANCH }}
