@@ -39,6 +39,7 @@ export const IntroScreen = (props: {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const handleClickStartLPC = (): void => {
     const prepCommands = getPrepCommands(protocolData)
+    console.log('PC', prepCommands)
     chainRunCommands(prepCommands, false)
       .then(() => proceed())
       .catch((e: Error) => {
