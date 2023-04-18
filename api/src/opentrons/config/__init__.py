@@ -281,7 +281,7 @@ CONFIG_ELEMENTS = (
     ConfigElement(
         "module_calibration_dir",
         "Module Calibration Directory",
-        Path("robot") / "calibrations" / "modules",
+        Path("robot") / "modules",
         ConfigElementType.DIR,
         "The dir where module calibration is stored",
     ),
