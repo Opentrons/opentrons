@@ -41,6 +41,7 @@ from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
 from .integration.robot_client import RobotClient
 from robot_server.health.router import ComponentVersions, get_versions
+from robot_server.authentication import check_auth_token_header
 
 test_router = routing.APIRouter()
 
@@ -138,10 +139,22 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
+def _override_auth_with_mock(versions: MagicMock) -> Iterator[None]:
+    async def check_auth_token_header_override() -> None:
+        """Override for the check_auth_token_header() FastAPI dependency."""
+        return None
+
+    app.dependency_overrides[check_auth_token_header] = check_auth_token_header_override
+    yield
+    del app.dependency_overrides[check_auth_token_header]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
+    _override_auth_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
@@ -150,7 +163,9 @@ def api_client(
 
 @pytest.fixture
 def api_client_no_errors(
-    _override_hardware_with_mock: None, _override_sql_engine_with_mock: None
+    _override_hardware_with_mock: None,
+    _override_sql_engine_with_mock: None,
+    _override_auth_with_mock: None,
 ) -> TestClient:
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
