@@ -57,17 +57,19 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
     snapshot: Snapshot,
 ) -> None:
     port = "15555"
+    system_server_port = "17777"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost", port=port, version="*", system_server_port=system_server_port,
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port, persistence_directory=snapshot.db_path) as server:
+        with DevServer(port=port, persistence_directory=snapshot.db_path, system_server_port=system_server_port) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
+            await robot_client.get_auth_token()
             all_protocols = (await robot_client.get_protocols()).json()["data"]
 
             assert len(all_protocols) == snapshot.expected_protocol_count

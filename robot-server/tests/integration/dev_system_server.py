@@ -5,13 +5,12 @@ from types import TracebackType
 import sys
 import signal
 import subprocess
-from multiprocessing import Process
 
 
 class DevSystemServer:
-    def __init__(self, port: int) -> None:
+    def __init__(self, port: str) -> None:
         self.proc = None
-        self.port = port
+        self.port = str(port)
 
     def __enter__(self) -> DevSystemServer:
         return self
@@ -36,7 +35,7 @@ class DevSystemServer:
                 "-m",
                 "system_server",
                 "--port",
-                f"{self.port}",
+                self.port,
             ],
             env=env,
             stdin=subprocess.DEVNULL,

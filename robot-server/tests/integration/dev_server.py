@@ -7,6 +7,8 @@ import tempfile
 from types import TracebackType
 from typing import Optional
 
+from .dev_system_server import DevSystemServer
+
 
 class DevServer:
     def __init__(
@@ -16,9 +18,12 @@ class DevServer:
         persistence_directory: Optional[Path] = None,
         maximum_runs: Optional[int] = None,
         maximum_unused_protocols: Optional[int] = None,
+        system_server_port: str = "32950",
     ) -> None:
         """Initialize a dev server."""
         self.port: str = port
+
+        self.system_server = DevSystemServer(system_server_port)
 
         self.ot_api_config_dir: Path = (
             ot_api_config_dir
@@ -53,6 +58,7 @@ class DevServer:
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
             "OT_API_CONFIG_DIR": str(self.ot_api_config_dir),
             "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
+            "OT_ROBOT_SERVER_system_server_address": str(f"http://localhost:{self.system_server.port}")
         }
         if self.maximum_runs is not None:
             env["OT_ROBOT_SERVER_maximum_runs"] = str(self.maximum_runs)
@@ -88,8 +94,10 @@ class DevServer:
             stdout=None,
             stderr=None,
         )
+        self.system_server.start()
 
     def stop(self) -> None:
         """Stop the robot server."""
         self.proc.send_signal(signal.SIGTERM)
         self.proc.wait()
+        self.system_server.stop()

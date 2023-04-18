@@ -9,6 +9,7 @@ from typing import Any, AsyncGenerator, BinaryIO, Dict, List, Optional, Tuple, U
 import httpx
 from httpx import Response
 
+from uuid import uuid4
 
 STARTUP_WAIT = 20
 SHUTDOWN_WAIT = 20
@@ -28,16 +29,18 @@ class RobotClient:
         worker_executor: concurrent.futures.ThreadPoolExecutor,
         host: str,
         port: str,
+        system_server_port: str,
     ) -> None:
         """Initialize the client."""
         self.base_url: str = f"{host}:{port}"
+        self.system_server_base_url: str = f"{host}:{system_server_port}"
         self.httpx_client: httpx.AsyncClient = httpx_client
         self.worker_executor: concurrent.futures.ThreadPoolExecutor = worker_executor
 
     @staticmethod
     @contextlib.asynccontextmanager
     async def make(
-        host: str, port: str, version: str
+        host: str, port: str, version: str, system_server_port: str,
     ) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
@@ -53,6 +56,7 @@ class RobotClient:
                     worker_executor=worker_executor,
                     host=host,
                     port=port,
+                    system_server_port=system_server_port,
                 )
 
     async def alive(self) -> bool:
@@ -154,6 +158,30 @@ class RobotClient:
 
         response.raise_for_status()
         return response
+
+    async def get_auth_token(self) -> None:
+        """Retrieves an auth token from the system server.
+        
+        The token will automatically be added to future requests to the robot-server."""
+        async with httpx.AsyncClient() as system_client:
+            registration = await system_client.post(
+                url=f"{self.system_server_base_url}/system/register",
+                params={
+                    "subject": str(uuid4()),
+                    "agent": str(uuid4()),
+                    "agentId": str(uuid4()),
+                })
+            registration.raise_for_status()
+            authentication = await system_client.post(
+                url=f"{self.system_server_base_url}/system/authorize",
+                headers={
+                    "authenticationBearer": registration.json()['token']
+                }
+            )
+            authentication.raise_for_status()
+            #new_headers = self.httpx_client.headers.update({'authenticationBearer': authentication.json()['token']})
+            #self.httpx_client.headers(new_headers)
+            self.httpx_client.headers['authenticationBearer'] = authentication.json()['token']
 
     async def get_runs(self) -> Response:
         """GET /runs."""
