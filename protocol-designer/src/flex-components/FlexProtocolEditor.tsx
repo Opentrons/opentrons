@@ -60,15 +60,15 @@ const RoundTabs = (props: any): JSX.Element => {
       id: 1,
     },
     {
-      name: `First ${i18n.t('flex.pipettes_selection.title')}`,
+      name: `First ${i18n.t('flex.pipettes_selection.name')}`,
       id: 2,
     },
     {
-      name: `Second ${i18n.t('flex.pipettes_selection.title')}`,
+      name: `Second ${i18n.t('flex.pipettes_selection.name')}`,
       id: 3,
     },
     {
-      name: i18n.t('flex.modules_selection.title'),
+      name: i18n.t('flex.modules_selection.name'),
       id: 4,
     },
   ]
