@@ -26,7 +26,14 @@ export interface RobotWorkSpaceProps extends StyleProps {
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
-  const { children, deckDef, deckLayerBlocklist = [], viewBox, id, ...styleProps } = props
+  const {
+    children,
+    deckDef,
+    deckLayerBlocklist = [],
+    viewBox,
+    id,
+    ...styleProps
+  } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
@@ -59,7 +66,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     )
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
-return (
+  return (
     <Svg
       className={cx(styles.robot_work_space, props.className)}
       viewBox={viewBox || wholeDeckViewBox}

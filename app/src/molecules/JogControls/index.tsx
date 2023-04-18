@@ -59,7 +59,9 @@ export function JogControls(props: JogControlsProps): JSX.Element {
 
   const controls = touchScreenMode ? (
     <>
-      <TouchStepSizeControl {...{ currentStepSize, setCurrentStepSize, stepSizes }} />
+      <TouchStepSizeControl
+        {...{ currentStepSize, setCurrentStepSize, stepSizes }}
+      />
       <TouchDirectionControl
         planes={planes}
         jog={jog}
@@ -82,7 +84,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
         <StepSizeControl
           {...{ currentStepSize, setCurrentStepSize, stepSizes }}
         />
-      </Flex >
+      </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
         css={css`

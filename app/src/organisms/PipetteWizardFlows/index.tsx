@@ -2,13 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
-import {
-  Flex,
-  useConditionalConfirm,
-  DIRECTION_COLUMN,
-  POSITION_ABSOLUTE,
-  COLORS,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,

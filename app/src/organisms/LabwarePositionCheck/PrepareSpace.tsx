@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   LabwareRender,
@@ -79,7 +79,15 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         <Box flex="1">
           <RobotWorkSpace
             height="100%"
-            deckDef={ot3DeckDef as any}
+            deckDef={
+              protocolData.labware.some(
+                l =>
+                  l.loadName === 'opentrons_1_trash_850ml_fixed' ||
+                  l.loadName === 'opentrons_1_trash_1100ml_fixed'
+              )
+                ? (ot3DeckDef as any)
+                : (ot2DeckDef as any)
+            }
             viewBox={DECK_MAP_VIEWBOX}
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             id="LabwarePositionCheck_deckMap"
@@ -99,7 +107,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                     def={getModuleDef2(location.moduleModel)}
                     innerProps={
                       getModuleType(location.moduleModel) ===
-                        THERMOCYCLER_MODULE_TYPE
+                      THERMOCYCLER_MODULE_TYPE
                         ? { lidMotorState: 'open' }
                         : {}
                     }
@@ -133,7 +141,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                         def={getModuleDef2(module.model)}
                         innerProps={
                           getModuleType(module.model) ===
-                            THERMOCYCLER_MODULE_TYPE
+                          THERMOCYCLER_MODULE_TYPE
                             ? { lidMotorState: 'open' }
                             : {}
                         }
@@ -155,8 +163,9 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         >
           <SmallButton
             onClick={props.confirmPlacement}
-            buttonType='default'
-            buttonText={t('shared:confirm_placement')} />
+            buttonType="default"
+            buttonText={t('shared:confirm_placement')}
+          />
         </Flex>
       ) : (
         <Flex
@@ -170,10 +179,8 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
             {t('shared:confirm_placement')}
           </PrimaryButton>
         </Flex>
-
-      )
-      }
-    </Flex >
+      )}
+    </Flex>
   )
 }
 

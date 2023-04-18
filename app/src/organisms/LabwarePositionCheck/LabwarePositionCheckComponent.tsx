@@ -1,13 +1,7 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import {
-  useConditionalConfirm,
-  Flex,
-  DIRECTION_COLUMN,
-  COLORS,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import { useSelector } from 'react-redux'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
@@ -49,7 +43,7 @@ interface LabwarePositionCheckModalProps {
   caughtError?: Error
 }
 
-export const LabwarePositionCheckComponent = (
+export const LabwarePositionCheckInner = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
@@ -309,7 +303,7 @@ export const LabwarePositionCheckComponent = (
 // until the robot analysis loads (which requires a stable run), other components that
 // rendered nearby will cause the run to be periodically polled for updates
 // and we don't need those polls causing unnecessary rerenders to the LPC flow
-// export const LabwarePositionCheckComponent = React.memo(
-//   LabwarePositionCheckInner,
-//   ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
-// )
+export const LabwarePositionCheckComponent = React.memo(
+  LabwarePositionCheckInner,
+  ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
+)

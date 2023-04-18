@@ -15,10 +15,7 @@ import {
   ALIGN_FLEX_START,
   PrimaryButton,
   SecondaryButton,
-  RESPONSIVENESS,
-  POSITION_ABSOLUTE,
   TYPOGRAPHY,
-  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -156,10 +153,24 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
         >
-          <SmallButton buttonType="tertiaryLowLight" buttonText={t('shared:go_back')} onClick={handleGoBack} />
+          <SmallButton
+            buttonType="tertiaryLowLight"
+            buttonText={t('shared:go_back')}
+            onClick={handleGoBack}
+          />
           <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
-            <SmallButton buttonType="alt" buttonText={t('move_pipette')} onClick={() => { setShowFullJogControls(true) }} />
-            <SmallButton buttonType='default' buttonText={t('shared:confirm_position')} onClick={handleConfirmPosition} />
+            <SmallButton
+              buttonType="alt"
+              buttonText={t('move_pipette')}
+              onClick={() => {
+                setShowFullJogControls(true)
+              }}
+            />
+            <SmallButton
+              buttonType="default"
+              buttonText={t('shared:confirm_position')}
+              onClick={handleConfirmPosition}
+            />
           </Flex>
           <Portal level="top">
             {showFullJogControls ? (
@@ -170,29 +181,33 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                 display="flex"
                 flexDirection={DIRECTION_COLUMN}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                header={(
+                header={
                   <StyledText
                     as="h4"
                     css={css`
-                    font-weight: ${TYPOGRAPHY.fontWeightBold};
-                    font-size: ${TYPOGRAPHY.fontSize28};
-                    line-height: ${TYPOGRAPHY.lineHeight36};
-                  `}
-                  >{t('move_to_a1_position')}</StyledText>
-                )}
-                footer={(
+                      font-weight: ${TYPOGRAPHY.fontWeightBold};
+                      font-size: ${TYPOGRAPHY.fontSize28};
+                      line-height: ${TYPOGRAPHY.lineHeight36};
+                    `}
+                  >
+                    {t('move_to_a1_position')}
+                  </StyledText>
+                }
+                footer={
                   <SmallButton
                     width="100%"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonType='default'
+                    buttonType="default"
                     buttonText={t('shared:close')}
-                    onClick={() => { setShowFullJogControls(false) }} />
-                )}
+                    onClick={() => {
+                      setShowFullJogControls(false)
+                    }}
+                  />
+                }
               >
                 <JogControls
-                  jog={
-                    (axis, direction, step, _onSuccess) =>
-                      handleJog(axis, direction, step, setJoggedPosition)
+                  jog={(axis, direction, step, _onSuccess) =>
+                    handleJog(axis, direction, step, setJoggedPosition)
                   }
                   touchScreenMode={true}
                 />
@@ -203,16 +218,16 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       ) : (
         <>
           <JogControls
-            jog={
-              (axis, direction, step, _onSuccess) =>
-                handleJog(axis, direction, step, setJoggedPosition)
+            jog={(axis, direction, step, _onSuccess) =>
+              handleJog(axis, direction, step, setJoggedPosition)
             }
           />
           <Flex
             width="100%"
             marginTop={SPACING.spacing6}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}>
+            alignItems={ALIGN_CENTER}
+          >
             <NeedHelpLink href={LPC_HELP_LINK_URL} />
             <Flex gridGap={SPACING.spacing3}>
               <SecondaryButton onClick={handleGoBack}>
@@ -224,8 +239,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
             </Flex>
           </Flex>
         </>
-      )
-      }
-    </Flex >
+      )}
+    </Flex>
   )
 }

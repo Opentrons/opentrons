@@ -23,8 +23,8 @@ import type { StepSize } from './types'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
 const JUMP_SIZE_ICON_STYLE = css`
-    flex-shrink: 0;
-  `
+  flex-shrink: 0;
+`
 
 const stepSizeTranslationKeyByStep: { [stepSize: number]: string } = {
   0.1: 'tiny',
@@ -91,7 +91,6 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
   const { t } = useTranslation(['robot_calibration'])
 
-
   const increaseStepSize: () => void = () => {
     const i = stepSizes.indexOf(currentStepSize)
     if (i < stepSizes.length - 1) setCurrentStepSize(stepSizes[i + 1])
@@ -108,7 +107,6 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     setCurrentStepSize(Number(event.currentTarget.value) as StepSize)
     event.currentTarget.blur()
   }
-
 
   return (
     <ControlContainer title={t('jump_size')}>
@@ -184,16 +182,18 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
           <SmallButton
             key={index}
             buttonType={currentStepSize === stepSize ? 'default' : 'alt'}
-            onClick={() => { setCurrentStepSize(stepSize) }}
-            buttonText={(
-              <Flex flexDirection={DIRECTION_COLUMN} >
+            onClick={() => {
+              setCurrentStepSize(stepSize)
+            }}
+            buttonText={
+              <Flex flexDirection={DIRECTION_COLUMN}>
                 {t(stepSizeTranslationKeyByStep[stepSize])}
                 <StyledText
                   color={COLORS.darkGreyEnabled}
                   css={TYPOGRAPHY.labelRegular}
                 >{`${stepSize} mm`}</StyledText>
               </Flex>
-            )}
+            }
           />
         )
       })}

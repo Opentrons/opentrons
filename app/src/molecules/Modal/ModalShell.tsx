@@ -58,7 +58,9 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       <ContentArea zIndex={zIndex}>
         <ModalArea
           isFullPage={fullPage}
-          onClick={e => { e.stopPropagation() }}
+          onClick={e => {
+            e.stopPropagation()
+          }}
           {...styleProps}
         >
           {header != null ? <Header>{header}</Header> : null}
@@ -78,10 +80,8 @@ const Overlay = styled.div`
   bottom: 0;
   z-index: 1;
   background-color: ${COLORS.backgroundOverlay};
-  cursor: default
-  
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.darkBlack_sixty}
+  cursor: default @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.darkBlack_sixty};
   }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
@@ -99,14 +99,16 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   padding: 1rem;
 `
 
-const ModalArea = styled.div<{ isFullPage: boolean, backgroundColor?: string} & StyleProps>`
+const ModalArea = styled.div<
+  { isFullPage: boolean; backgroundColor?: string } & StyleProps
+>`
   position: ${POSITION_RELATIVE};
   overflow-y: ${OVERFLOW_AUTO};
   max-height: 100%;
   width: 100%;
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: ${BORDERS.smallDropShadow};
-  height: ${({isFullPage}) => isFullPage ? '100%' : 'auto'};
+  height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
   ${styleProps};
 `

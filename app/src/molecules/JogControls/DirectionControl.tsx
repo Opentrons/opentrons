@@ -294,11 +294,11 @@ const ARROW_GRID_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     max-width: 415px;
     grid-gap: ${SPACING.spacingM};
-  grid-template-areas:
-    '.         .         ArrowUp   ArrowUp   .          .         '
-    'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
-    'ArrowLeft ArrowLeft ArrowDown ArrowDown ArrowRight ArrowRight'
-    '.         .         ArrowDown ArrowDown .          .         '
+    grid-template-areas:
+      '.         .         ArrowUp   ArrowUp   .          .         '
+      'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
+      'ArrowLeft ArrowLeft ArrowDown ArrowDown ArrowRight ArrowRight'
+      '.         .         ArrowDown ArrowDown .          .         ';
   }
 `
 const ARROW_BUTTON_STYLES = css`
@@ -382,7 +382,9 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
   )
 }
 
-export function TouchDirectionControl(props: DirectionControlProps): JSX.Element {
+export function TouchDirectionControl(
+  props: DirectionControlProps
+): JSX.Element {
   const { planes, jog, stepSize, initialPlane } = props
   const [currentPlane, setCurrentPlane] = React.useState<Plane>(
     initialPlane ?? planes[0]
@@ -406,7 +408,9 @@ export function TouchDirectionControl(props: DirectionControlProps): JSX.Element
               <SmallButton
                 key={plane}
                 buttonType={currentPlane === plane ? 'default' : 'alt'}
-                onClick={() => { setCurrentPlane(plane) }}
+                onClick={() => {
+                  setCurrentPlane(plane)
+                }}
                 buttonText={CONTROLS_CONTENTS_BY_PLANE[plane].title}
               />
             )

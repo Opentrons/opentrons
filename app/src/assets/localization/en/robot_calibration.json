@@ -58,6 +58,7 @@
   "jog_pipette_to_touch_cross": "Jog the pipette until the tip is precisely centered above the cross in slot {{slotName}}.",
   "jog_nozzle_to_block": "Jog the pipette until the nozzle is barely touching (less than 0.1 mm) the block in slot {{slotName}}.",
   "jog_nozzle_to_trash": "Jog the pipette until the nozzle is barely touching (less than 0.1 mm) the flat surface of the trash bin.",
+  "jog_too_far_or_bend_tip": "Jog too far or bend a tip?",
   "jump_size": "jump size",
   "large": "Large",
   "last_calibrated": "Last calibrated",
