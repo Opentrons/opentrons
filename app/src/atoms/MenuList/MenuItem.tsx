@@ -15,34 +15,33 @@ interface ButtonProps {
 }
 
 export const MenuItem: BtnComponent = styled.button<ButtonProps>`
-  align-items: ${props => (props.isOnDevice ? ALIGN_CENTER : 'auto')};
-  text-align: ${props =>
-    props.isOnDevice ? TYPOGRAPHY.textAlignCenter : TYPOGRAPHY.textAlignLeft};
-  font-size: ${props =>
-    props.isOnDevice ? TYPOGRAPHY.fontSize28 : TYPOGRAPHY.fontSizeP};
-  background-color: ${props =>
-    props.isAlert ? COLORS.errorEnabled : COLORS.transparent};
-  color: ${props => (props.isAlert ? COLORS.white : COLORS.darkBlackEnabled)};
-  padding: ${props =>
-    props.isOnDevice
+  align-items: ${({ isOnDevice }) => (isOnDevice ? ALIGN_CENTER : 'auto')};
+  text-align: ${({ isOnDevice }) =>
+    isOnDevice ? TYPOGRAPHY.textAlignCenter : TYPOGRAPHY.textAlignLeft};
+  font-size: ${({ isOnDevice }) =>
+    isOnDevice ? TYPOGRAPHY.fontSize28 : TYPOGRAPHY.fontSizeP};
+  background-color: ${({ isAlert }) =>
+    isAlert ? COLORS.errorEnabled : COLORS.transparent};
+  color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.darkBlackEnabled)};
+  padding: ${({ isOnDevice }) =>
+    isOnDevice
       ? `1.625rem 1.5rem`
       : `${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem`};
-  height: ${props => (props.isOnDevice ? '4.875rem' : 'auto')};
-  line-height: ${props =>
-    props.isOnDevice ? TYPOGRAPHY.lineHeight36 : 'auto'};
+  height: ${({ isOnDevice }) => (isOnDevice ? '4.875rem' : 'auto')};
+  line-height: ${({ isOnDevice }) =>
+    isOnDevice ? TYPOGRAPHY.lineHeight36 : 'auto'};
 
   &:hover,
   &:active {
-    background-color: ${props =>
-      props.isOnDevice ? COLORS.darkBlack_twenty : COLORS.lightBlue};
+    background-color: ${({ isOnDevice }) =>
+      isOnDevice ? COLORS.darkBlack_twenty : COLORS.lightBlue};
   }
 
-
-  &:disabled,
-  &.disabled {
+  &:disabled {
     background-color: ${COLORS.transparent};
-    color: ${props =>
-      props.isOnDevice
+    color: ${({ isOnDevice }) =>
+      isOnDevice
         ? COLORS.darkBlack_sixty
-        : `${COLORS.black} ${COLORS.opacity50HexCode}`};
+        : `${COLORS.black}${COLORS.opacity50HexCode}`};
+  }
 `
