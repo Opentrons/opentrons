@@ -2551,16 +2551,13 @@ class OT3API(
         probe: Optional[InstrumentProbeType] = None,
     ) -> float:
         """Search for and return liquid level height.
-
         This function begins by moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
-
         If the move is completed without the specified threshold being triggered, a
         LiquidNotFound error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
-
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
@@ -2593,6 +2590,9 @@ class OT3API(
             max_speeds = self.config.motion_settings.default_max_speed
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
             await self._move(target_pos, speed=speed, acquire_lock=True)
+
+        # if not aspirate_while_sensing, plunger should be at bottom, since
+        #  this expects to be called after pick_up_tip
 
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         await self._backend.liquid_probe(
