@@ -340,11 +340,11 @@ class MoveStopCondition(int, Enum):
     gripper_force = 0x8
     stall = 0x10
 
+
 @unique
 class MotorUsageValueType(int, Enum):
     """Type of motor Usage value types."""
+
     linear_motor_distance = 0x0
     left_gear_motor_distance = 0x1
     right_gear_motor_distance = 0x2
-
-
