@@ -10,6 +10,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
 )
 from opentrons.hardware_control.types import GripperJawState
 from opentrons.protocol_engine.types import Vec3f
@@ -53,11 +54,12 @@ def get_sample_pipette_dict(
         "min_volume": 1,
         "max_volume": 1,
         "channels": 1,
-        "pipette_offset": {
-            "offset": Point(x=1, y=2, z=3),
-            "source": SourceType.default,
-            "last_modified": None,
-        },
+        "pipette_offset": PipetteOffsetByPipetteMount(
+            offset=Point(x=1, y=2, z=3),
+            source=SourceType.default,
+            status=CalibrationStatus(markedBad=False),
+            last_modified=None,
+        ),
     }
     return pipette_dict
 

@@ -216,6 +216,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
                 "back_compat_names",
+                "pipette_offset"
             ]
 
             instr_dict = instr.as_dict()
@@ -250,11 +251,6 @@ class PipetteHandlerProvider(Generic[MountType]):
                 for alvl, fr in instr.config.default_aspirate_flow_rates.items()
             }
             pipette_offsets = instr.pipette_offset
-            result["pipette_offset"] = {
-                "offset": pipette_offsets.offset,
-                "source": pipette_offsets.source,
-                "last_modified": pipette_offsets.last_modified,
-            }
         return cast(PipetteDict, result)
 
     @property
