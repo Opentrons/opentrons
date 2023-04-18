@@ -23,9 +23,9 @@
     "z": 0
   },
   "calibrationPoint": {
-    "x": 63.875,
-    "y": 42.875,
-    "z": 53.5
+    "x": 0,
+    "y": 0,
+    "z": 0
   },
   "config": {},
   "displayName": "Magnetic Block GEN1",
