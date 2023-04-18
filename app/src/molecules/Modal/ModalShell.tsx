@@ -17,6 +17,8 @@ import {
   styleProps,
 } from '@opentrons/components'
 export interface ModalShellProps extends StyleProps {
+  /** Modal content */
+  children: React.ReactNode
   /** Optional close on outside click **/
   onOutsideClick?: React.MouseEventHandler
   /** Optional sticky header */
@@ -25,8 +27,6 @@ export interface ModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
-  /** Modal content */
-  children: React.ReactNode
 }
 
 /**
@@ -81,6 +81,10 @@ const Overlay = styled.div`
   z-index: 1;
   background-color: ${COLORS.backgroundOverlay};
   cursor: default
+  
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.darkBlack_sixty}
+  }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;

@@ -131,7 +131,7 @@ export function PinnedProtocol(props: {
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (
-        <LongPressModal longpress={longpress} protocol={protocol} />
+        <LongPressModal longpress={longpress} protocolId={protocol.id} />
       )}
     </Flex>
   )
