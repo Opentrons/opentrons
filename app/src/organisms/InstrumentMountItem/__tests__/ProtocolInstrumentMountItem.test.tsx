@@ -42,6 +42,17 @@ describe('ProtocolInstrumentMountItem', () => {
     getByText('Flex 8-Channel 1000 μL')
     getByText('Attach')
   })
+  it('renders the correct information when there is no pipette attached for 96 channel', () => {
+    props = {
+      ...props,
+      speccedName: 'p1000_96',
+    }
+    const { getByText } = render(props)
+    getByText('Left + right mount')
+    getByText('No data')
+    getByText('Flex 96-Channel 1000 μL')
+    getByText('Attach')
+  })
   it('renders the correct information when there is a pipette attached with cal data', () => {
     props = {
       ...props,

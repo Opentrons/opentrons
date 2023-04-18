@@ -85,6 +85,7 @@ export function ProtocolInstrumentMountItem(
       attachedInstrument
     )
   }
+  const is96ChannelPipette = speccedName === 'p1000_96'
   // TODO: check for presence of calibration data once instruments endpoint
   // returns calibration data for pipettes
   const isAttachedWithCal = attachedInstrument != null
@@ -98,7 +99,10 @@ export function ProtocolInstrumentMountItem(
             gridGap={SPACING.spacing2}
           >
             <MountLabel>
-              {i18n.format(t('mount', { mount }), 'capitalize')}
+              {i18n.format(
+                is96ChannelPipette ? t('96_mount') : t('mount', { mount }),
+                'capitalize'
+              )}
             </MountLabel>
             <SpeccedInstrumentName>
               {mount === 'extension'

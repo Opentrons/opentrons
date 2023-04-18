@@ -174,5 +174,6 @@
   "calibration_status": "calibration status",
   "total_vol": "total volume",
   "calibrated": "calibrated",
-  "calibrate": "calibrate"
+  "calibrate": "calibrate",
+  "96_mount": "left + right mount"
 }
