@@ -166,5 +166,6 @@
   "liquids_not_in_setup": "Liquids not in setup",
   "initial_liquids_num": "{{num}} initial liquids",
   "opening": "Opening...",
-  "closing": "Closing..."
+  "closing": "Closing...",
+  "labware_location": "Labware Location"
 }
