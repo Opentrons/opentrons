@@ -215,6 +215,7 @@ class PipetteHandlerProvider:
                 "default_aspirate_flow_rates",
                 "default_blow_out_flow_rates",
                 "default_dispense_flow_rates",
+                "pipette_offset",
             ]
 
             instr_dict = instr.as_dict()
@@ -259,12 +260,6 @@ class PipetteHandlerProvider:
                     instr._active_tip_settings.default_aspirate_flowrate,
                     "aspirate",
                 )
-            }
-            pipette_offsets = instr.pipette_offset
-            result["pipette_offset"] = {
-                "offset": pipette_offsets.offset,
-                "source": pipette_offsets.source,
-                "last_modified": pipette_offsets.last_modified,
             }
         return cast(PipetteDict, result)
 

@@ -22,11 +22,10 @@ from .instrument_models import (
     MountType,
     PipetteData,
     Pipette,
-    PipetteCalibrationData,
+    InstrumentCalibrationData,
     GripperData,
     Gripper,
     AttachedInstrument,
-    GripperCalibrationData,
 )
 
 instruments_router = APIRouter()
@@ -45,7 +44,7 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
                 max_volume=pipette_dict["max_volume"],
-                calibratedOffset=PipetteCalibrationData.construct(
+                calibratedOffset=InstrumentCalibrationData.construct(
                     offset=Vec3f(
                         x=calibration_data["offset"].x,
                         y=calibration_data["offset"].y,
@@ -67,7 +66,7 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
         serialNumber=gripper_dict["gripper_id"],
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
-            calibratedOffset=GripperCalibrationData.construct(
+            calibratedOffset=InstrumentCalibrationData.construct(
                 offset=Vec3f(
                     x=calibration_data.offset.x,
                     y=calibration_data.offset.y,

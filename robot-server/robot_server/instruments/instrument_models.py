@@ -56,16 +56,8 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     data: InstrumentDataT
 
 
-class GripperCalibrationData(BaseModel):
-    """A gripper's calibration data."""
-
-    offset: Vec3f
-    source: SourceType
-    last_modified: Optional[datetime] = None
-
-
-class PipetteCalibrationData(BaseModel):
-    """A pipette's calibration data."""
+class InstrumentCalibrationData(BaseModel):
+    """A instrument's calibration data."""
 
     offset: Vec3f
     source: SourceType
@@ -78,7 +70,7 @@ class GripperData(BaseModel):
     jawState: str = Field(..., description="Gripper Jaw state.")
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
-    calibratedOffset: Optional[GripperCalibrationData] = Field(
+    calibratedOffset: Optional[InstrumentCalibrationData] = Field(
         None, description="Calibrated gripper offset."
     )
 
@@ -89,7 +81,7 @@ class PipetteData(BaseModel):
     channels: ChannelCount = Field(..., description="Number of pipette channels.")
     min_volume: float = Field(..., description="Minimum pipette volume.")
     max_volume: float = Field(..., description="Maximum pipette volume.")
-    calibratedOffset: Optional[PipetteCalibrationData] = Field(
+    calibratedOffset: Optional[InstrumentCalibrationData] = Field(
         None, description="Calibrated pipette offset."
     )
 

@@ -1,5 +1,4 @@
 from __future__ import annotations
-from datetime import datetime
 
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
@@ -10,6 +9,7 @@ from typing_extensions import TypedDict, Literal
 
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
@@ -22,9 +22,8 @@ from opentrons_shared_data.gripper import (
     GripperDefinition,
 )
 
-from opentrons.calibration_storage import types as cal_top_types
 from opentrons.drivers.types import MoveSplit
-from opentrons.types import Mount, Point
+from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
 from opentrons.hardware_control.types import GripperJawState
 
@@ -71,18 +70,12 @@ class InstrumentDict(TypedDict):
     fw_next_version: Optional[int]
 
 
-class PipetteOffsetDict(TypedDict):
-    offset: Point
-    source: cal_top_types.SourceType
-    last_modified: Optional[datetime]
-
-
 class PipetteDict(InstrumentDict):
     name: PipetteName
     model: PipetteModel
     back_compat_names: List[PipetteName]
     pipette_id: str
-    pipette_offset: PipetteOffsetDict
+    pipette_offset: PipetteOffsetByPipetteMount
     min_volume: float
     max_volume: float
     channels: ChannelCount
