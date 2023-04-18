@@ -25,17 +25,3 @@ Primary.args = {
     </>
   ),
 }
-
-export const IsOnDevice = Template.bind({})
-IsOnDevice.args = {
-  isOnDevice: true,
-  children: (
-    <>
-      <MenuItem isOnDevice={true}>{menuBtn}</MenuItem>
-      <MenuItem isOnDevice={true}>{menuBtn}</MenuItem>
-      <MenuItem isOnDevice={true} isAlert={true}>
-        {menuBtn}
-      </MenuItem>
-    </>
-  ),
-}

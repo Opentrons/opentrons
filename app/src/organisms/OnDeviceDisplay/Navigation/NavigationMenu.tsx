@@ -27,7 +27,6 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     <MenuList onClick={onClick} isOnDevice={true}>
       <MenuItem
         key="home-gantry"
-        isOnDevice={true}
         onClick={() => dispatch(home(robotName, ROBOT))}
       >
         <Flex>
@@ -41,11 +40,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           </StyledText>
         </Flex>
       </MenuItem>
-      <MenuItem
-        key="restart"
-        isOnDevice={true}
-        onClick={() => dispatch(restartRobot(robotName))}
-      >
+      <MenuItem key="restart" onClick={() => dispatch(restartRobot(robotName))}>
         <Flex>
           <Icon
             name="restart"
@@ -58,7 +53,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           </StyledText>
         </Flex>
       </MenuItem>
-      <MenuItem key="light" isOnDevice={true} onClick={toggleLights}>
+      <MenuItem key="light" onClick={toggleLights}>
         <Flex>
           <Icon
             name="light"

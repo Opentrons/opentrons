@@ -15,6 +15,11 @@ export const Primary = Template.bind({})
 Primary.args = {
   children: 'Example menu btn',
   isAlert: false,
-  isOnDevice: false,
   disabled: false,
+}
+
+Primary.parameters = {
+  viewport: {
+    defaultViewport: 'onDeviceDisplay',
+  },
 }
