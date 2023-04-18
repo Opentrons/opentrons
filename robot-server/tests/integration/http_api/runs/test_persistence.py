@@ -26,18 +26,28 @@ def port() -> str:
 
 
 @pytest.fixture
-async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, None]:
+def system_server_port() -> str:
+    """Get a port to run the dev system server on."""
+    return "17777"
+
+
+@pytest.fixture
+async def client_and_server(
+    port: str, system_server_port: str
+) -> AsyncGenerator[ClientServerFixture, None]:
     """Get a dev server and a client to that server."""
     async with RobotClient.make(
         host="http://localhost",
         port=port,
         version="*",
+        system_server_port=system_server_port,
     ) as client:
         assert await client.wait_until_dead(), "Server is running and must not be."
 
-        with DevServer(port=port) as server:
+        with DevServer(port=port, system_server_port=system_server_port) as server:
             server.start()
             assert await client.wait_until_alive(), "Server never became available."
+            await client.get_auth_token()
 
             yield ClientServerFixture(client=client, server=server)
 

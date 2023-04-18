@@ -53,14 +53,19 @@ async def poll_until_run_succeeds(robot_client: RobotClient, run_id: str) -> Any
 async def robot_client(
     session_server_host: str,
     session_server_port: str,
+    session_system_server_port: str,
 ) -> AsyncGenerator[RobotClient, None]:
     """Return a client for a running dev server."""
     async with RobotClient.make(
-        host=session_server_host, port=session_server_port, version="*"
+        host=session_server_host,
+        port=session_server_port,
+        version="*",
+        system_server_port=session_system_server_port,
     ) as robot_client:
         assert (
             await robot_client.wait_until_alive()
         ), "Dev Robot never became available."
+        await robot_client.get_auth_token()
         yield robot_client
 
 

@@ -22,19 +22,27 @@ async def test_protocols_auto_delete(
     num_to_expect: int,
 ) -> None:
     port = "15555"
+    system_server_port = "33533"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost",
+        port=port,
+        version="*",
+        system_server_port=system_server_port,
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
         with DevServer(
-            port=port, maximum_unused_protocols=num_to_configure_as_maximum
+            port=port,
+            maximum_unused_protocols=num_to_configure_as_maximum,
+            system_server_port=system_server_port,
         ) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
+
+            await robot_client.get_auth_token()
 
             uploaded_protocol_ids = await _upload_protocols(
                 robot_client=robot_client, num_protocols=num_to_upload

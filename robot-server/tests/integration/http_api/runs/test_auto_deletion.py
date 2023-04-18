@@ -19,17 +19,27 @@ async def test_runs_auto_delete(
     num_to_expect: int,
 ) -> None:
     port = "15555"
+    system_server_port = "17777"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost",
+        port=port,
+        version="*",
+        system_server_port=system_server_port,
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port, maximum_runs=num_to_configure_as_maximum) as server:
+        with DevServer(
+            port=port,
+            maximum_runs=num_to_configure_as_maximum,
+            system_server_port=system_server_port,
+        ) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
+
+            await robot_client.get_auth_token()
 
             created_run_ids = await _create_runs(
                 robot_client=robot_client, num_runs=num_to_upload

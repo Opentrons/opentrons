@@ -13,12 +13,18 @@ from tests.integration.protocol_files import get_py_protocol, get_bundled_data
 
 
 async def test_upload_protocols_with_bundled_data(
-    session_server_host: str, session_server_port: str
+    session_server_host: str,
+    session_server_port: str,
+    session_system_server_port: str,
 ) -> None:
     """Test uploading data files with protocol."""
     async with RobotClient.make(
-        host=session_server_host, port=session_server_port, version="*"
+        host=session_server_host,
+        port=session_server_port,
+        version="*",
+        system_server_port=session_system_server_port,
     ) as robot_client:
+        await robot_client.get_auth_token()
         with get_py_protocol(secrets.token_urlsafe(16)) as protocol:
             with get_bundled_data(".csv") as csv:
                 with get_bundled_data(".txt") as txt:

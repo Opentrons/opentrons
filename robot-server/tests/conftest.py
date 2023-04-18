@@ -1,17 +1,12 @@
 import asyncio
-import signal
-import subprocess
-import time
-import sys
 import json
 import os
 import pathlib
-import requests
 import tempfile
 from datetime import datetime, timezone
 from mock import MagicMock
 from pathlib import Path
-from typing import Any, Callable, Generator, Iterator, cast
+from typing import Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
 
 from sqlalchemy.engine import Engine as SQLEngine
@@ -189,9 +184,14 @@ def clean_server_state() -> Iterator[None]:
     # delete protocols
     async def _clean_server_state() -> None:
         port = "31950"
+        system_server_port = "32950"
         async with RobotClient.make(
-            host="http://localhost", port=port, version="*"
+            host="http://localhost",
+            port=port,
+            version="*",
+            system_server_port=system_server_port,
         ) as robot_client:
+            await robot_client.get_auth_token()
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
 

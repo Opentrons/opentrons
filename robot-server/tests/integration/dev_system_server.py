@@ -1,5 +1,4 @@
 from __future__ import annotations
-from aiohttp import web
 from typing import Optional
 from types import TracebackType
 import sys
@@ -9,7 +8,7 @@ import subprocess
 
 class DevSystemServer:
     def __init__(self, port: str) -> None:
-        self.proc = None
+        self.proc: Optional[subprocess.Popen[bytes]] = None
         self.port = str(port)
 
     def __enter__(self) -> DevSystemServer:
@@ -23,7 +22,7 @@ class DevSystemServer:
     ) -> None:
         self.stop()
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.stop()
 
     def start(self) -> None:

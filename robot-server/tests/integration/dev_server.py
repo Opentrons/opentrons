@@ -58,7 +58,9 @@ class DevServer:
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
             "OT_API_CONFIG_DIR": str(self.ot_api_config_dir),
             "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
-            "OT_ROBOT_SERVER_system_server_address": str(f"http://localhost:{self.system_server.port}")
+            "OT_ROBOT_SERVER_system_server_address": str(
+                f"http://localhost:{self.system_server.port}"
+            ),
         }
         if self.maximum_runs is not None:
             env["OT_ROBOT_SERVER_maximum_runs"] = str(self.maximum_runs)

@@ -20,18 +20,23 @@ async def test_protocols_and_analyses_persist(
     server restarts.
     """
     port = "15555"
+    system_server_port = "12345"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost",
+        port=port,
+        version="*",
+        system_server_port=system_server_port,
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
+        with DevServer(port=port, system_server_port=system_server_port) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
+            await robot_client.get_auth_token()
             # Must not be so high that the server runs out of room and starts
             # auto-deleting old protocols.
             protocols_to_create = 5
@@ -86,17 +91,26 @@ async def test_protocol_labware_files_persist() -> None:
     Test that labware files are persisted on server restart.
     """
     port = "15556"
+    system_server_port = "12348"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost",
+        port=port,
+        version="*",
+        system_server_port=system_server_port,
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
+        with DevServer(
+            port=port,
+            system_server_port=system_server_port,
+        ) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
+
+            await robot_client.get_auth_token()
 
             protocol = await robot_client.post_protocol(
                 [
