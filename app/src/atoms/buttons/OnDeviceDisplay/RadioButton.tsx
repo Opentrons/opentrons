@@ -38,16 +38,18 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
   const availableButtonStyles = css`
     background: ${COLORS.foundationalBlue};
+
     &:active {
-      background-color: '#94afd4';
+      background-color: #94afd4;
     }
   `
 
   const selectedButtonStyles = css`
     background: ${COLORS.blueEnabled};
     color: ${COLORS.white};
+
     &:active {
-      background-color: '#045dd0';
+      background-color: #045dd0;
     }
   `
 
@@ -65,18 +67,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
     ${isSelected ? selectedButtonStyles : availableButtonStyles}
     ${disabled && disabledButtonStyles}
-    &:hover {
-      background: ${COLORS.green_four};
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
-    }
-    &:focus {
-      background: ${COLORS.green_four};
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
-    }
 
-    &:disabled {
-      background-color: ${COLORS.darkBlack_twenty};
-      color: ${COLORS.darkBlack_sixty};
+    &:focus-visible {
+      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
     }
   `
 
@@ -90,7 +83,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         type="radio"
         value={buttonValue}
       />
-      <SettingButtonLabel role='label' htmlFor={buttonLabel}>
+      <SettingButtonLabel role="label" htmlFor={buttonLabel}>
         <StyledText
           fontSize={isLarge ? TYPOGRAPHY.fontSize28 : TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
