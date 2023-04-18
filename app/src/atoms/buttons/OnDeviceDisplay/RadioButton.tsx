@@ -14,7 +14,7 @@ import type { StyleProps } from '@opentrons/components'
 interface RadioButtonProps extends StyleProps {
   buttonLabel: string
   buttonValue: string | number
-  onClick: () => void
+  onChange: React.ChangeEventHandler<HTMLInputElement>
   disabled?: boolean
   isSelected?: boolean
   size?: 'large' | 'small'
@@ -26,7 +26,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     buttonValue,
     disabled = false,
     isSelected = false,
-    onClick,
+    onChange,
     size,
   } = props
 
@@ -79,7 +79,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         checked={isSelected}
         disabled={disabled}
         id={buttonLabel}
-        onChange={onClick}
+        onChange={onChange}
         type="radio"
         value={buttonValue}
       />
