@@ -3,13 +3,17 @@ import {
   RoundTab,
   Flex,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Box,
   COLORS,
   BORDERS,
   SPACING,
   NewPrimaryBtn,
-  CheckboxField
+  CheckboxField,
+  RadioGroup,
+  OutlineButton
 } from '@opentrons/components'
+import cx from 'classnames'
 import {
   getIncompatiblePipetteNames,
   getLabwareDefURI,
@@ -22,9 +26,28 @@ import { FlexProtocolName } from './FlexProtocolName'
 import styles from './FlexComponents.css'
 import { StyledText } from './StyledText'
 import { RadioSelect } from './RadioSelect'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getLabwareDefsByURI } from '../labware-defs/selectors'
 import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
+import { createCustomTiprackDef } from '../labware-defs/actions'
+
+const blockedTipRackListForFlex: string[] = [
+  '(Retired) Eppendorf epT.I.P.S. 96 Tip Rack 1000 µL',
+  '(Retired) Eppendorf epT.I.P.S. 96 Tip Rack 10 µL',
+  '(Retired) GEB 96 Tip Rack 1000 µL',
+  '(Retired) GEB 96 Tip Rack 10 µL',
+  'Opentrons 96 Filter Tip Rack 10 µL',
+  'Opentrons 96 Filter Tip Rack 20 µL',
+  'Opentrons 96 Tip Rack 1000 µL',
+  'Opentrons 96 Tip Rack 10 µL',
+  'Opentrons 96 Tip Rack 20 µL',
+  'Opentrons 96 Tip Rack 300 µL',
+  '(Retired) TipOne 96 Tip Rack 200 µL',
+];
+
+
+
+const customTiprackOption: { name: string, value: string } = { name: "Custom Tiprack", value: "custome_tiprack" };
 
 
 const RoundTabs = (props: any): JSX.Element => {
@@ -35,12 +58,16 @@ const RoundTabs = (props: any): JSX.Element => {
       id: 1,
     },
     {
-      name: i18n.t('flex.pipettes_selection.title'),
+      name: `First ${i18n.t('flex.pipettes_selection.title')}`,
       id: 2,
     },
     {
-      name: i18n.t('flex.modules_selection.title'),
+      name: `Second ${i18n.t('flex.pipettes_selection.title')}`,
       id: 3,
+    },
+    {
+      name: i18n.t('flex.modules_selection.title'),
+      id: 4,
     },
   ]
 
@@ -66,8 +93,10 @@ const selectComponent = (selectedTab: Number, props: any): any => {
     case 1:
       return <FlexProtocolName formProps={props} />
     case 2:
-      return <PipettesComponent formProps={props} />
+      return <FirstPipettesComponent formProps={props} />
     case 3:
+      return <SecondPipettesComponent formProps={props} />
+    case 4:
       return <ModulesComponent />
     default:
       return null
@@ -93,20 +122,34 @@ function FlexProtocolEditorComponent(): JSX.Element {
       ? i18n.t('flex.round_tabs.go_to_liquids_page')
       : i18n.t('flex.round_tabs.next')
 
+  const mountSide: any = [{
+    name: "Left Mount",
+    value: "left"
+  },
+  {
+    name: "Right Mount",
+    value: "right",
+  }]
+
   const getInitialValues = {
     fields: {
       pndName: '',
       pndOrgAuthor: '',
       pndDescription: '',
     },
+    mountSide,
     pipetteSelectionData: {
       firstPipette: {
-        mount: "",
-        tipRackList: []
+        pipetteName: "",
+        mount: "left",
+        tipRackList: [],
+        isSelected: false,
       },
       secondPipette: {
+        pipetteName: "",
         mount: "",
-        tipRackList: []
+        tipRackList: [],
+        isSelected: false,
       }
     }
   }
@@ -169,18 +212,169 @@ function FlexProtocolEditorComponent(): JSX.Element {
   )
 }
 
-const PipettesComponent = ({ formProps }: any) => {
+const FirstPipettesComponent = ({ formProps }: any) => {
   const { values: { pipetteSelectionData } } = formProps
+  let tiprackOptions = getFlexTiprackOptions()
+  tiprackOptions.push(customTiprackOption)
+  const is96ChannelSelected = checkSelectedPipette(pipetteSelectionData.firstPipette.pipetteName)
+  let className = cx({ disable_mount_option: is96ChannelSelected });
+  return (
+    <>
+      <StyledText as={"h1"}>Pipettes</StyledText>
+      {
+        <>
+          <StyledText as={"p"}>Note: 96-channel take up both mounts and requires a tiprack adapter</StyledText>
+          <RadioSelect
+            propsData={formProps}
+            pipetteName={"pipetteSelectionData.firstPipette.pipetteName"}
+            pipetteType={pipetteSelectionData.firstPipette.pipetteName} />
+          <hr />
+          <Flex className={styles[className]}>
+            <SelectPipetteMount propsData={formProps} pipetteName={"firstPipette"} />
+          </Flex>
+          {
+            channel96SelectionNote(is96ChannelSelected)
+          }
+          <hr />
+          <TipRackOptions
+            propsData={formProps}
+            tiprackOptionsProps={tiprackOptions}
+            pipetteName={"firstPipette"} />
+        </>
+      }
+    </>
+  )
+}
+
+// Second Pipette
+const SecondPipettesComponent = ({ formProps }: any) => {
+  const { values: { pipetteSelectionData } } = formProps
+  let tiprackOptions = getFlexTiprackOptions()
+  tiprackOptions.push(customTiprackOption)
+
+  const is96ChannelSelected = checkSelectedPipette(pipetteSelectionData.secondPipette.pipetteName)
+  let className = cx({ disable_mount_option: is96ChannelSelected });
+
+  return (
+    <>
+      <StyledText as={"h1"}>Pipettes</StyledText>
+      {
+        <>
+          <RadioSelect
+            propsData={formProps}
+            pipetteName={"pipetteSelectionData.secondPipette.pipetteName"}
+            pipetteType={pipetteSelectionData.secondPipette.pipetteName} />
+          <hr />
+          <Flex className={styles[className]}>
+            <SelectPipetteMount propsData={formProps} pipetteName={"secondPipette"} />
+          </Flex>
+          {
+            channel96SelectionNote(is96ChannelSelected)
+          }
+          <hr />
+          <TipRackOptions
+            propsData={formProps}
+            tiprackOptionsProps={tiprackOptions}
+            pipetteName={"secondPipette"} />
+        </>
+      }
+    </>
+  )
+}
+
+const SelectPipetteMount = ({ propsData, pipetteName }: any) => {
+  const { values: { pipetteSelectionData } } = propsData
+  return <>
+    {
+      <RadioGroup
+        inline={styles.pipette_slection_mount}
+        name={`pipetteSelectionData.${pipetteName}.mount`}
+        value={pipetteSelectionData[pipetteName].mount}
+        options={propsData.values.mountSide}
+        onChange={propsData.handleChange} />
+    }
+  </>
+}
+
+const TipRackOptions = ({ propsData, tiprackOptionsProps, pipetteName }: any) => {
+  const { values: { pipetteSelectionData } } = propsData
+  const dispatch = useDispatch()
+  const [selected, setSelected] = useState<Array<any>>([])
+  const [customTipRack, setCustomTipRack] = useState()
+  const handleNameChange = (selected: any) => {
+    propsData.setFieldValue(`pipetteSelectionData.${pipetteName}.tipRackList`, selected);
+  };
+
+  return <>
+    {
+      tiprackOptionsProps.map(({ name, value }: any, index: number) => {
+        const isChecked = selected.includes(name);
+        return <CheckboxField
+          key={index}
+          label={name}
+          name={name}
+          value={isChecked}
+          onChange={(e: any) => {
+            const { name, checked } = e.currentTarget
+            if (checked) {
+              if (name !== "Custom Tiprack") {
+                let tiprackCheckedData = [...selected, ...[name]]
+                setSelected(tiprackCheckedData)
+                handleNameChange(tiprackCheckedData)
+              } else {
+                setCustomTipRack(true)
+              }
+            } else {
+              const indexToRemove = selected.indexOf(name);
+              if (indexToRemove !== -1) {
+                selected.splice(indexToRemove, 1);
+              }
+              setSelected(selected)
+              handleNameChange(selected)
+              if (name === "Custom Tiprack") {
+                setCustomTipRack(false)
+              }
+            }
+          }}
+        ></CheckboxField>
+      })
+    }
+    {customTipRack && <OutlineButton Component="label" className={styles.custom_tiprack_upload_file}>
+      {i18n.t('button.upload_custom_tip_rack')}
+      <input type="file" onChange={e => {
+        console.log("uploaded file name", e?.target?.files?.[0]?.name)
+        dispatch(createCustomTiprackDef(e))
+      }} />
+    </OutlineButton>}
+  </>
+}
+
+const ModulesComponent = (): JSX.Element => {
+  return <h1>Modules Component</h1>
+}
+
+export const FlexProtocolEditor = FlexProtocolEditorComponent
 
 
+
+
+function checkSelectedPipette(pipetteName: any) {
+  return pipetteName === "p1000_96"
+}
+
+function channel96SelectionNote(is96ChannelSelected: boolean) {
+  return is96ChannelSelected && <StyledText as={'p'}>Note: 96 Channel occupies both the mount.</StyledText>
+}
+
+function getFlexTiprackOptions() {
   const allLabware = useSelector(getLabwareDefsByURI)
   type Values<T> = T[keyof T]
 
-
-  const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
+  let tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc, def: Values<typeof allLabware>) => {
-      if (def.metadata.displayCategory !== 'tipRack') return acc
+      if (def.metadata.displayCategory !== 'tipRack')
+        return acc
       return [
         ...acc,
         {
@@ -191,59 +385,7 @@ const PipettesComponent = ({ formProps }: any) => {
     },
     []
   )
-
-
-  // console.log("tiprackOptions", tiprackOptions)
-  // console.log("allLabware", allLabware);
-
-
-  return (
-    <>
-      <StyledText as={"h1"}>Pipettes</StyledText>
-      <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.firstPipette.mount"} pipetteType={pipetteSelectionData.firstPipette.mount} />
-      <br />
-      {/* <RadioSelect propsData={formProps} pipetteName={"pipetteSelectionData.secondPipette"} pipetteType={pipetteSelectionData.secondPipette} /> */}
-
-      <TipRackOptions propsData={formProps} tiprackOptionsProps={tiprackOptions} />
-    </>
-  )
+  tiprackOptions = tiprackOptions.filter(({ name }): any => !blockedTipRackListForFlex.includes(name))
+  return tiprackOptions
 }
 
-
-const TipRackOptions = ({ propsData, tiprackOptionsProps }: any) => {
-  const [selected, setSelected] = useState<Array<any>>([])
-
-  // values.pipetteSelectionData.firstPipette.tipRackList
-
-
-  const handleNameChange = (setFieldValue: (pipetteSelectionData: string, value: any) => void) => {
-    console.log("setFieldValue",selected,)
-    setFieldValue("pipetteSelectionData.firstPipette.tipRackList", selected)
-  };
-  console.log("propsData",propsData.values)
-  return <>
-    {
-      tiprackOptionsProps.map(({ name, value }: any, index: number) => {
-        const isChecked = selected.some(obj => obj.hasOwnProperty(name));;
-        return <CheckboxField
-          key={index}
-          label={name}
-          name={name}
-          onChange={(e: any) => {
-            const { name, checked } = e.currentTarget
-            const pushData = { [name]: checked }
-            setSelected([...selected, pushData])
-            handleNameChange(propsData.setFieldValue)
-          }}
-          value={isChecked}
-        ></CheckboxField>
-      })
-    }
-  </>
-}
-
-const ModulesComponent = (): JSX.Element => {
-  return <h1>Modules Component</h1>
-}
-
-export const FlexProtocolEditor = FlexProtocolEditorComponent

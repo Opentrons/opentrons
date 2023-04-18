@@ -34,7 +34,7 @@
   margin: 86px auto auto;
 }
 
-.flex_header > * {
+.flex_header>* {
   margin: 1rem 2.5rem;
 }
 
@@ -95,6 +95,28 @@
   margin-bottom: 1rem;
 }
 
-.form_group > * {
+.form_group>* {
   margin: 0.5rem 0;
+}
+
+
+
+/* Pipette Selection Module */
+.pipette_slection_mount {
+  display: flex;
+}
+
+.custom_tiprack_upload_file {
+  margin: 5px 0;
+}
+
+.custom_tiprack_upload_file input {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}
+
+.disable_mount_option {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
 }

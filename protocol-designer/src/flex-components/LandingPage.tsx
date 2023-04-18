@@ -35,14 +35,14 @@ function ButtonGroup(props: any): any {
   const { nav } = props
   return Boolean(nav)
     ? nav.map((item: any, index: string) => {
-        return (
-          <Link to={item.link} key={index}>
-            <OutlineButton className={styles.flex_landing_button}>
-              {item.innerText}
-            </OutlineButton>
-          </Link>
-        )
-      })
+      return (
+        <Link to={item.link} key={index}>
+          <OutlineButton className={styles.flex_landing_button}>
+            {item.innerText}
+          </OutlineButton>
+        </Link>
+      )
+    })
     : null
 }
 
