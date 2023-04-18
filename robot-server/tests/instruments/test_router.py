@@ -55,7 +55,7 @@ def get_sample_pipette_dict(
         "max_volume": 1,
         "channels": 1,
         "pipette_offset": {
-            "offset": {"x": 1, "y": 2, "z": 3},
+            "offset": Point(x=1, y=2, z=3),
             "source": SourceType.default,
             "last_modified": None,
         },

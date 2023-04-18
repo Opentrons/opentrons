@@ -36,7 +36,6 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
         calibration_data = pipette_dict["pipette_offset"]
-        print(calibration_data)
         return Pipette.construct(
             mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
