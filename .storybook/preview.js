@@ -6,7 +6,7 @@ import { i18n } from '../app/src/i18n'
 export const customViewports = {
   onDeviceDisplay: {
     name: 'Touchscreen',
-    hover: 'none',
+    type: 'tablet',
     styles: {
       width: '1024px',
       height: '600px',

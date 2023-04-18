@@ -9,14 +9,14 @@ import {
 } from '@opentrons/components'
 
 interface ButtonProps extends StyleProps {
+  /** optional isAlert boolean to turn the background red, only seen in ODD */
   isAlert?: boolean
 }
 export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
-  background-color: ${({ isAlert }) =>
-    isAlert ? COLORS.errorEnabled : COLORS.transparent};
-  color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.darkBlackEnabled)};
+  background-color: ${COLORS.transparent};
+  color: ${COLORS.darkBlackEnabled};
   padding: ${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem;
 
   &:hover,
@@ -42,12 +42,15 @@ export const MenuItem = styled.button<ButtonProps>`
     line-height: ${TYPOGRAPHY.lineHeight36};
     &:hover,
     &:active {
-      background-color: ${COLORS.darkBlack_twenty};
+      background-color: ${({ isAlert }) =>
+        isAlert ? COLORS.errorEnabled : COLORS.darkBlack_twenty};
     }
 
     &:disabled {
-      background-color: ${COLORS.transparent};
-      color: ${COLORS.darkBlack_sixty};
+      background-color: ${({ isAlert }) =>
+        isAlert ? COLORS.errorEnabled : COLORS.transparent};
+      color: ${({ isAlert }) =>
+        isAlert ? COLORS.white : COLORS.darkBlack_sixty};
     }
   }
 `
