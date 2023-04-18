@@ -1,10 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  Box,
   StyleProps,
   COLORS,
-  SPACING,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
   ALIGN_CENTER,

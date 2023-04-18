@@ -38,7 +38,6 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
       borderRadius={BORDERS.size_three}
       onOutsideClick={onClick}
       width="18.0625rem"
-      isOnDeviceDisplay
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
