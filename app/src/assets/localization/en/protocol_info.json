@@ -80,5 +80,5 @@
   "oldest_updates": "Oldest updates",
   "nothing_here_yet": "No protocols to show!",
   "send_a_protocol_to_store": "Send a protocol from the Opentrons app to get started.",
-  "intervention_modal_learn_more": "Learn more about user interventions"
+  "manual_steps_learn_more": "Learn more about manual steps"
 }
