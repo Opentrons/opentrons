@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react'
 import { FormGroup, InputField } from '@opentrons/components'
-import { i18n } from '../localization'
+import { i18n } from '../../localization'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 

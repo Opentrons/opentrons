@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { SecondaryButton } from '@opentrons/components'
 import { Link } from 'react-router-dom'
-import { i18n } from '../localization'
-import { FlexProtocolEditor } from './FlexProtocolEditor'
+import { i18n } from '../../localization'
+import { FlexProtocolEditorComponent } from './FlexProtocolEditor'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 
@@ -22,7 +22,7 @@ function FlexFormComponent(): JSX.Element {
       <StyledText as="h5" className={styles.required_fields}>
         {i18n.t('flex.header.required_fields')}
       </StyledText>
-      <FlexProtocolEditor />
+      <FlexProtocolEditorComponent />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { i18n } from '../localization'
-import { StyledText } from './StyledText'
+import { StyledText } from './protocol-editor/StyledText'
 
 function FlexModulesComponent({ formProps }: any): JSX.Element {
   return (

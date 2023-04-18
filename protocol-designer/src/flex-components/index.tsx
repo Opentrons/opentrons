@@ -4,8 +4,8 @@ import '../css/reset.css'
 
 import { createBrowserRouter } from 'react-router-dom'
 import { ProtocolEditor } from '../components/ProtocolEditor'
-import { FlexForm } from './FlexForm'
 import { LandingPage } from './LandingPage'
+import { FlexForm } from './protocol-editor'
 
 export const router = createBrowserRouter([
   {

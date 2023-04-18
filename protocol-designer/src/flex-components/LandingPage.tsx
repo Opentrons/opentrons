@@ -2,8 +2,13 @@ import * as React from 'react'
 import { Icon, OutlineButton } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import { i18n } from '../localization'
-import { StyledText } from './StyledText'
-import styles from './FlexComponents.css'
+import { StyledText } from './protocol-editor/StyledText'
+import styles from './protocol-editor/FlexComponents.css'
+
+interface Props {
+  innerText: string
+  link: string
+}
 
 function LandingPageComponent(): JSX.Element {
   const navData: Props[] = [
@@ -38,20 +43,15 @@ function ButtonGroup(props: any): any {
   const { nav } = props
   return Boolean(nav)
     ? nav.map((item: any, index: string) => {
-        return (
-          <Link to={item.link} key={index}>
-            <OutlineButton className={styles.flex_landing_button}>
-              <StyledText as="h4">{item.innerText}</StyledText>
-            </OutlineButton>
-          </Link>
-        )
-      })
+      return (
+        <Link to={item.link} key={index}>
+          <OutlineButton className={styles.flex_landing_button}>
+            <StyledText as="h4">{item.innerText}</StyledText>
+          </OutlineButton>
+        </Link>
+      )
+    })
     : null
-}
-
-export interface Props {
-  innerText: string
-  link: string
 }
 
 export const LandingPage = LandingPageComponent
