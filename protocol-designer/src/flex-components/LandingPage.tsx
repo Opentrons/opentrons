@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Icon, OutlineButton } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import { i18n } from '../localization'
+import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 
 function LandingPageComponent(): JSX.Element {
@@ -18,12 +19,14 @@ function LandingPageComponent(): JSX.Element {
 
   return (
     <div className={styles.pd_landing_page}>
-      <h1>{i18n.t('flex.landing_page.welcome')}</h1>
+      <StyledText as="h1">{i18n.t('flex.landing_page.welcome')}</StyledText>
       <Icon name={'ot-flex-logo'} className={styles.ot_flex_logo} />
       <div className={styles.flex_landing_buttons_wrapper}>
         <ButtonGroup nav={navData} />
         <OutlineButton Component="label" className={styles.flex_landing_button}>
-          {i18n.t('flex.landing_page.import_protocol')}
+          <StyledText as="h4">
+            {i18n.t('flex.landing_page.import_protocol')}
+          </StyledText>
           <input type="file" />
         </OutlineButton>
       </div>
@@ -35,14 +38,14 @@ function ButtonGroup(props: any): any {
   const { nav } = props
   return Boolean(nav)
     ? nav.map((item: any, index: string) => {
-      return (
-        <Link to={item.link} key={index}>
-          <OutlineButton className={styles.flex_landing_button}>
-            {item.innerText}
-          </OutlineButton>
-        </Link>
-      )
-    })
+        return (
+          <Link to={item.link} key={index}>
+            <OutlineButton className={styles.flex_landing_button}>
+              <StyledText as="h4">{item.innerText}</StyledText>
+            </OutlineButton>
+          </Link>
+        )
+      })
     : null
 }
 

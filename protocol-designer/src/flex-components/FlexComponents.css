@@ -1,9 +1,9 @@
 @import '@opentrons/components';
 
 .pd_landing_page {
-  width: 923px;
+  width: 655px;
   text-align: center;
-  margin: 86px auto auto;
+  margin: 114px auto auto;
 }
 
 .ot_flex_logo {
@@ -13,13 +13,13 @@
 }
 
 .flex_landing_buttons_wrapper {
-  width: 50%;
+  width: 367px;
   margin: auto;
 }
 
 .flex_landing_button {
-  margin: 0.75rem 0;
-  height: 3rem;
+  margin: 0.5rem 0;
+  height: 2rem;
   width: 100%;
 }
 
@@ -30,8 +30,8 @@
 
 .flex_header {
   position: relative;
-  width: 923px;
-  margin: 86px auto auto;
+  width: 919px;
+  margin: 1.5rem auto auto;
 }
 
 .flex_header>* {
@@ -43,13 +43,18 @@
   justify-content: space-between;
 }
 
+.cancel_button {
+  width: 109px;
+  height: 25px;
+  padding: 0 !important;
+}
+
 .required_fields {
   display: flex;
   justify-content: flex-end;
 }
 
 .editor_form {
-  width: 329px;
   margin: 1rem;
 }
 
@@ -66,6 +71,10 @@
 .flex_round_tabs_button_50p {
   width: 50%;
   margin: 1rem;
+}
+
+.flex_sub_heading {
+  margin-top: 27px;
 }
 
 .textarea_input {
@@ -92,11 +101,13 @@
 }
 
 .form_group {
+  width: 329px;
+  margin-top: 12px;
   margin-bottom: 1rem;
 }
 
 .form_group>* {
-  margin: 0.5rem 0;
+  margin-bottom: 5px;
 }
 
 

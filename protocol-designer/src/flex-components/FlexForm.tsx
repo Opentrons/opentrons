@@ -3,20 +3,25 @@ import { SecondaryButton } from '@opentrons/components'
 import { Link } from 'react-router-dom'
 import { i18n } from '../localization'
 import { FlexProtocolEditor } from './FlexProtocolEditor'
+import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 
 function FlexFormComponent(): JSX.Element {
   return (
     <div className={styles.flex_header}>
       <div className={styles.flex_title}>
-        <h1>{i18n.t('flex.header.title')}</h1>
+        <StyledText as="h1">{i18n.t('flex.header.title')}</StyledText>
         <Link to={'/'}>
-          <SecondaryButton tabIndex={0}>Cancel</SecondaryButton>
+          <SecondaryButton className={styles.cancel_button} tabIndex={0}>
+            <StyledText as="h3">
+              {i18n.t('flex.header.cancel_button')}
+            </StyledText>
+          </SecondaryButton>
         </Link>
       </div>
-      <p className={styles.required_fields}>
+      <StyledText as="h5" className={styles.required_fields}>
         {i18n.t('flex.header.required_fields')}
-      </p>
+      </StyledText>
       <FlexProtocolEditor />
     </div>
   )
