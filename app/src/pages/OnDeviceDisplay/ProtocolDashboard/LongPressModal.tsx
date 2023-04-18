@@ -72,9 +72,9 @@ export function LongPressModal(props: {
           response =>
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
-        .then(referencingRuns => {
+        .then(referencingRunIds => {
           return Promise.all(
-            referencingRuns?.map(runId => deleteRun(host, runId))
+            referencingRunIds?.map(runId => deleteRun(host, runId))
           )
         })
         .then(() => deleteProtocol(host, protocolId))

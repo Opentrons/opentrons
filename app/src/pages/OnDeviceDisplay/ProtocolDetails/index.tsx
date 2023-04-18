@@ -297,8 +297,8 @@ export function ProtocolDetails(): JSX.Element | null {
           response =>
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
-        .then(referencingRuns =>
-          Promise.all(referencingRuns?.map(runId => deleteRun(host, runId)))
+        .then(referencingRunIds =>
+          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
         .then(() => deleteProtocol(host, protocolId))
         .then(() => history.goBack())

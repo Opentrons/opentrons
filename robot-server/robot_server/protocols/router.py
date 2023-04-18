@@ -332,7 +332,7 @@ async def get_protocol_by_id(
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
-    referencingRuns = protocol_store.get_referencing_run_ids(protocolId)
+    referencing_run_ids = protocol_store.get_referencing_run_ids(protocolId)
 
     data = Protocol.construct(
         id=protocolId,
@@ -349,8 +349,8 @@ async def get_protocol_by_id(
 
     links = ProtocolLinks.construct(
         referencingRuns=[
-            RunLink.construct(id=runId, href=f"/runs/{runId}")
-            for runId in referencingRuns
+            RunLink.construct(id=run_id, href=f"/runs/{run_id}")
+            for run_id in referencing_run_ids
         ]
     )
 
