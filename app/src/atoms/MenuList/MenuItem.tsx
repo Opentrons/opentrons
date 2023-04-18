@@ -5,11 +5,13 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   RESPONSIVENESS,
+  StyleProps,
 } from '@opentrons/components'
 
-export const MenuItem = styled.button<{
+interface ButtonProps extends StyleProps {
   isAlert?: boolean
-}>`
+}
+export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${({ isAlert }) =>
