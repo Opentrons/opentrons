@@ -1,0 +1,56 @@
+test_name: Invalid authentication token handling.
+marks:
+  - usefixtures:
+      - run_server
+stages: 
+  - name: Invalid auth token with version 2
+    request:
+      url: '{host:s}:{port:d}/instruments'
+      method: GET
+      headers:
+        Opentrons-Version: 2
+        authenticationBearer: invalid_token
+    response:
+      status_code: 200
+
+  - name: Invalid auth token with version 3
+    request:
+      url: '{host:s}:{port:d}/instruments'
+      method: GET
+      headers:
+        Opentrons-Version: 3
+        authenticationBearer: invalid_token
+    response:
+      status_code: 200
+
+  - name: Invalid auth token with version 4
+    request:
+      url: '{host:s}:{port:d}/instruments'
+      method: GET
+      headers:
+        Opentrons-Version: 4
+        authenticationBearer: invalid_token
+    response:
+      status_code: 200
+
+  - name: Invalid auth token with version 5
+    request:
+      url: '{host:s}:{port:d}/instruments'
+      method: GET
+      headers:
+        Opentrons-Version: 5
+        authenticationBearer: invalid_token
+    response:
+      status_code: 403
+
+  - name: Missing auth token with version 5
+    request:
+      url: '{host:s}:{port:d}/instruments'
+      method: GET
+      headers:
+        Opentrons-Version: 5
+        authenticationBearer: ''
+    response:
+      status_code: 403
+
+    
