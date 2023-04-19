@@ -22,7 +22,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.DETACH_PROBE }
-  const channel = attachedPipettes[mount]?.modelSpecs.channels
+  const channel = attachedPipettes[mount]?.data.channels
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   return (

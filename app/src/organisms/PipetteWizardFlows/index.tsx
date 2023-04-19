@@ -27,7 +27,7 @@ import { useRunStatus } from '../RunTimeControl/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import {
   useAttachedPipetteCalibrations,
-  useAttachedPipettes,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
@@ -65,7 +65,7 @@ export const PipetteWizardFlows = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-  const attachedPipettes = useAttachedPipettes()
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(
@@ -322,8 +322,8 @@ export const PipetteWizardFlows = (
           ? t('attach_96_channel')
           : t('attach_96_channel_plus_detach', {
               pipetteName:
-                attachedPipettes.left?.modelSpecs.displayName ??
-                attachedPipettes.right?.modelSpecs.displayName,
+                attachedPipettes[LEFT]?.displayName ??
+                attachedPipettes[RIGHT]?.displayName,
             })
       }
       break

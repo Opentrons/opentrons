@@ -55,7 +55,7 @@ export const BeforeBeginning = (
   React.useEffect(() => {
     createRun({})
   }, [])
-  const pipetteId = attachedPipettes[mount]?.id
+  const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -107,7 +107,7 @@ export const BeforeBeginning = (
         commandType: 'loadPipette' as const,
         params: {
           // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.name,
+          pipetteName: attachedPipettes[mount]?.instrumentName,
           pipetteId: pipetteId,
           mount: mount,
         },

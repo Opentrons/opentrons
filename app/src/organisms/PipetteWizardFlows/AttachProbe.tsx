@@ -50,12 +50,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const pipetteId = attachedPipettes[mount]?.id
-  const displayName = attachedPipettes[mount]?.modelSpecs.displayName
-  const is8Channel = attachedPipettes[mount]?.modelSpecs.channels === 8
+  const pipetteId = attachedPipettes[mount]?.serialNumber
+  const displayName = attachedPipettes[mount]?.displayName
+  const is8Channel = attachedPipettes[mount]?.data.channels === 8
   //  hard coding calibration slot number for now in case it changes
   //  in the future
   const calSlotNum = '2'
+
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
     chainRunCommands(
