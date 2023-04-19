@@ -72,7 +72,7 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
 #  OT2 vs OT3 tests correclty
-@pytest.mark.xfail
+# @pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_instruments_empty(
     decoy: Decoy,
