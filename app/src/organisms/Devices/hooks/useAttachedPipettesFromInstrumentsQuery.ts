@@ -12,7 +12,6 @@ export type AttachedPipettesFromInstrumentsQuery = {
 
 export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromInstrumentsQuery {
   const { data: attachedInstruments } = useInstrumentsQuery()
-
   return (attachedInstruments?.data ?? []).reduce(
     (acc, instrumentData) => {
       if (instrumentData.instrumentType !== 'pipette') {
