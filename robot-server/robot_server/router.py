@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, status
 
 from .constants import V1_TAG
-from .errors import LegacyErrorResponse
+from .errors import LegacyErrorResponse, ErrorBody
 from .health import health_router
 from .protocols import protocols_router
 from .runs import runs_router
@@ -17,7 +17,7 @@ from .service.pipette_offset.router import router as pip_os_router
 from .service.labware.router import router as labware_router
 from .service.tip_length.router import router as tl_router
 from .service.notifications.router import router as notifications_router
-from .authentication import check_auth_token_header
+from .authentication import check_auth_token_header, AuthenticationFailed
 
 router = APIRouter()
 
@@ -28,7 +28,8 @@ router.include_router(
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": LegacyErrorResponse,
-        }
+        },
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
     },
 )
 
@@ -47,64 +48,97 @@ router.include_router(
     router=runs_router,
     tags=["Run Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=protocols_router,
     tags=["Protocol Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=commands_router,
     tags=["Simple Commands"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=modules_router,
     tags=["Attached Modules"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=instruments_router,
     tags=["Attached instruments"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=deprecated_session_router,
     tags=["Session Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=labware_router,
     tags=["Labware Calibration Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=pip_os_router,
     tags=["Pipette Offset Calibration Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=tl_router,
     tags=["Tip Length Calibration Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=notifications_router,
     tags=["Notification Server Management"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )
 
 router.include_router(
     router=system_router,
     tags=["System Control"],
     dependencies=[Depends(check_version_header), Depends(check_auth_token_header)],
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
+    },
 )

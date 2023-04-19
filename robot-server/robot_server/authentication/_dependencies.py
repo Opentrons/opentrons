@@ -19,13 +19,6 @@ class AuthenticationFailed(ErrorDetails):
     title: str = "Authentication Bearer authentication failed."
 
 
-class SystemServerConnectionError(ErrorDetails):
-    """An error if the system server cannot be found, and is required."""
-
-    id: Literal["SystemServerConnectionError"] = "SystemServerConnectionError"
-    title: str = "System Server connection error, cannot authenticate."
-
-
 @call_once
 async def _get_system_server_client() -> ClientSession:
     """Get a singleton client connection to the system server."""
@@ -35,9 +28,7 @@ async def _get_system_server_client() -> ClientSession:
         # class.
         return ClientSession()  # type: ignore
     except Exception as e:
-        raise SystemServerConnectionError(detail=str(e)).as_error(
-            status.HTTP_403_FORBIDDEN
-        )
+        raise AuthenticationFailed(detail=str(e)).as_error(status.HTTP_403_FORBIDDEN)
 
 
 @call_once
@@ -57,7 +48,7 @@ async def check_auth_token_header(
         return
 
     if authenticationBearer is None:
-        raise AuthenticationFailed(detail="No token provided.").as_error(
+        raise AuthenticationFailed(detail="No authentication token provided.").as_error(
             status.HTTP_403_FORBIDDEN
         )
     system_server_addr = await _get_system_server_address()
@@ -77,6 +68,4 @@ async def check_auth_token_header(
                 status.HTTP_403_FORBIDDEN
             )
     except ClientConnectionError as e:
-        raise SystemServerConnectionError(detail=str(e)).as_error(
-            status.HTTP_403_FORBIDDEN
-        )
+        raise AuthenticationFailed(detail=str(e)).as_error(status.HTTP_403_FORBIDDEN)
