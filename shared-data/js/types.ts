@@ -19,6 +19,7 @@ import {
   LEFT,
   RIGHT,
   GRIPPER_V1,
+  GRIPPER_V1_1,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
@@ -204,7 +205,7 @@ export type ModuleModel =
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
 
-export type GripperModel = typeof GRIPPER_V1
+export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
 
 export type ModuleModelWithLegacy =
   | ModuleModel
