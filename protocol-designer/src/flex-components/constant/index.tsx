@@ -3,7 +3,12 @@ import { i18n } from "../../localization";
 export * from './colors'
 export * from './typography'
 
-export const navPillsNameTabList = [
+interface NavPillTab {
+    name: string;
+    id: number;
+}
+
+export const navPillsNameTabList: NavPillTab[] = [
     {
         name: i18n.t('flex.name_and_description.name'),
         id: 1,
@@ -20,9 +25,9 @@ export const navPillsNameTabList = [
         name: i18n.t('flex.modules_selection.name'),
         id: 4,
     },
-]
+];
 
-export const navPillTabListLength = navPillsNameTabList.length 
+export const navPillTabListLength = navPillsNameTabList.length
 
 // Unsupported tiprack list for the flex robot
 export const blockedTipRackListForFlex: string[] = [
@@ -40,7 +45,7 @@ export const blockedTipRackListForFlex: string[] = [
 ];
 
 // Custom tiprack option object
-export const customTiprackOption: { name: string, value: string } = { name: "Custom Tiprack", value: "custome_tiprack" };
+export const customTiprackOption: { name: string, value: string, namespace: string } = { name: "Custom Tiprack", value: "custom_tiprack", namespace:"custom_tiprack" };
 
 // constant LEFT/RIGHT Mount Side
 export const mountSide: any = [{
@@ -52,3 +57,4 @@ export const mountSide: any = [{
     value: "right",
 }]
 
+export const pipetteNameBlocklist: string[] = ['p10_single', 'p10_multi', 'p50_single', 'p50_multi', 'p300_single', 'p300_multi', 'p1000_single']

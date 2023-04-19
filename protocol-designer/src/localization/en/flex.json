@@ -32,5 +32,8 @@
   "modules_selection": {
     "name": "Module Selection",
     "heading": "Additional items?"
+  },
+  "pipette_selection": {
+    "pipette_96_selection_note":"Note: 96-channel take up both mounts and requires a tiprack adapter"
   }
 }
