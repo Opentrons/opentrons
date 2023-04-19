@@ -44,7 +44,7 @@ def test_get_virtual_pipette_static_config() -> None:
 
 def test_get_pipette_static_config() -> None:
     """It should return config data given a PipetteDict."""
-    pipette_dict: PipetteDict = {  # type: ignore[typeddict-item]
+    pipette_dict: PipetteDict = {
         "name": "p300_single_gen2",
         "min_volume": 20,
         "max_volume": 300,

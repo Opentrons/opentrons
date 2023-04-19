@@ -9,7 +9,6 @@ from typing_extensions import TypedDict, Literal
 
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
@@ -75,7 +74,6 @@ class PipetteDict(InstrumentDict):
     model: PipetteModel
     back_compat_names: List[PipetteName]
     pipette_id: str
-    pipette_offset: Optional[PipetteOffsetByPipetteMount]
     min_volume: float
     max_volume: float
     channels: ChannelCount
