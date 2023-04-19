@@ -130,8 +130,24 @@
   user-select: none;
 }
 
+.module_section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.module_section > * {
+  margin-right: 3rem;
+  height: 6rem;
+}
+
 .mini_card {
-  width: 222px;
+  width: 16.1rem;
+  min-width: 16.1rem;
+}
+
+.module_options {
+  flex: 0 1 4.75rem;
 }
 
 .line_separator {

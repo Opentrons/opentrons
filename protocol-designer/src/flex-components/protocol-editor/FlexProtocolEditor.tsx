@@ -20,25 +20,25 @@ import { SelectPipetteOption } from './SelectPipette'
 
 interface InitialValues {
   fields: {
-    pndName: string;
-    pndOrgAuthor: string;
-    pndDescription: string;
-  };
-  mountSide: string;
+    pndName: string
+    pndOrgAuthor: string
+    pndDescription: string
+  }
+  mountSide: string
   pipetteSelectionData: {
     firstPipette: {
-      pipetteName: string;
-      mount: string;
-      tipRackList: any[];
-      isSelected: boolean;
-    };
+      pipetteName: string
+      mount: string
+      tipRackList: any[]
+      isSelected: boolean
+    }
     secondPipette: {
-      pipetteName: string;
-      mount: string;
-      tipRackList: any[];
-      isSelected: boolean;
-    };
-  };
+      pipetteName: string
+      mount: string
+      tipRackList: any[]
+      isSelected: boolean
+    }
+  }
 }
 
 const getInitialValues: InitialValues = {
@@ -50,54 +50,76 @@ const getInitialValues: InitialValues = {
   mountSide,
   pipetteSelectionData: {
     firstPipette: {
-      pipetteName: "",
-      mount: "left",
+      pipetteName: '',
+      mount: 'left',
       tipRackList: [],
       isSelected: false,
     },
     secondPipette: {
-      pipetteName: "",
-      mount: "right",
+      pipetteName: '',
+      mount: 'right',
       tipRackList: [],
       isSelected: false,
-    }
-  }
+    },
+  },
 }
-
 
 interface Props {
-  selectedTab: number;
+  selectedTab: number
 }
 
+const newDummyFormPropsForTesting = {
+  moduleType: 'heaterShakerModuleType',
+  moduleOnDeck: {
+    id: 'eded7d07-e12f-4742-be64-16a0a4dbb878:heaterShakerModuleType',
+    model: 'heaterShakerModuleV1',
+    type: 'heaterShakerModuleType',
+    slot: '1',
+    moduleState: {
+      type: 'heaterShakerModuleType',
+      targetTemp: null,
+      targetSpeed: null,
+      latchOpen: null,
+    },
+  },
+  supportedModuleSlot: '1',
+}
 
 const selectComponent = (selectedTab: Number, props: any): any => {
   switch (selectedTab) {
     case 0:
       return <FlexProtocolName formProps={props} />
     case 1:
-      return <SelectPipetteOption formProps={props} pipetteName={"firstPipette"} />
+      return (
+        <SelectPipetteOption formProps={props} pipetteName={'firstPipette'} />
+      )
     case 2:
-      return <SelectPipetteOption formProps={props} pipetteName={"secondPipette"} />
+      return (
+        <SelectPipetteOption formProps={props} pipetteName={'secondPipette'} />
+      )
     case 3:
-      return <FlexModules formProps={props} />
+      return <FlexModules formProps={newDummyFormPropsForTesting} />
     default:
       return null
   }
 }
-
 
 function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
   // Next button click
   const handleNext = ({ selectedTab }: Props) => {
     const setTabNumber =
-      selectedTab >= 0 && selectedTab < navPillTabListLength - 1 ? selectedTab + 1 : selectedTab
+      selectedTab >= 0 && selectedTab < navPillTabListLength - 1
+        ? selectedTab + 1
+        : selectedTab
     setTab(setTabNumber)
   }
   // Previous button click
   const handlePrevious = ({ selectedTab }: Props) => {
     const setTabNumber =
-      selectedTab > 0 && selectedTab <= navPillTabListLength ? selectedTab - 1 : selectedTab
+      selectedTab > 0 && selectedTab <= navPillTabListLength
+        ? selectedTab - 1
+        : selectedTab
     setTab(setTabNumber)
   }
 
