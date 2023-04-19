@@ -57,7 +57,7 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
 
 
 class InstrumentCalibrationData(BaseModel):
-    """A instrument's calibration data."""
+    """An instrument's calibration data."""
 
     offset: Vec3f
     source: SourceType
