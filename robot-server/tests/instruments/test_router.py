@@ -54,12 +54,6 @@ def get_sample_pipette_dict(
         "min_volume": 1,
         "max_volume": 1,
         "channels": 1,
-        "pipette_offset": PipetteOffsetByPipetteMount(
-            offset=Point(x=1, y=2, z=3),
-            source=SourceType.default,
-            status=CalibrationStatus(markedBad=False),
-            last_modified=None,
-        ),
     }
     return pipette_dict
 
@@ -220,11 +214,6 @@ async def test_get_ot2_instruments(
                 channels=1,
                 min_volume=1,
                 max_volume=1,
-                calibratedOffset=InstrumentCalibrationData(
-                    offset=Vec3f(x=1.0, y=2.0, z=3.0),
-                    source=SourceType.default,
-                    last_modified=None,
-                ),
             ),
         )
     ]

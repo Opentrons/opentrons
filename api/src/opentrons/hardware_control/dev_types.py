@@ -75,7 +75,7 @@ class PipetteDict(InstrumentDict):
     model: PipetteModel
     back_compat_names: List[PipetteName]
     pipette_id: str
-    pipette_offset: PipetteOffsetByPipetteMount
+    pipette_offset: Optional[PipetteOffsetByPipetteMount]
     min_volume: float
     max_volume: float
     channels: ChannelCount
