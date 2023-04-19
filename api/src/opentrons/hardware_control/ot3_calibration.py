@@ -683,6 +683,8 @@ async def calibrate_gripper_jaw(
     two offsets into the `gripper_pin_offsets_mean` func.
     """
     try:
+        if not hcapi._gripper_handler.check_ready_for_jaw_move():
+            await hcapi.home_gripper_jaw()
         await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
         hcapi.add_gripper_probe(probe)
         await hcapi.grip(GRIPPER_GRIP_FORCE)
