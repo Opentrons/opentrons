@@ -14,7 +14,10 @@ export const getGripperDef = (
     case GRIPPER_V1_1:
       return gripperV1_1 as GripperDefinition
     default:
-      throw new Error(`Invalid gripper model ${gripperModel as string}`)
+      console.warn(
+        `Could not find a gripper with model ${gripperModel}, falling back to most recent definition: ${GRIPPER_V1_1}`
+      )
+      return gripperV1_1 as GripperDefinition
   }
 }
 
