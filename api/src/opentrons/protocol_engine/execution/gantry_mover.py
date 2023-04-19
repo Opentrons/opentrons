@@ -24,10 +24,15 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
 }
 
-# Max height of the gantry at home position without any tips. This is the same value returned by the OT3Simulator,
-# which uses machine to deck transform math with the default carriage and mount values from config.defaults_ot3.py.
-# This height was validated by peaking at the non-virtual simulation values for GEN3 single and multi P50s and
-# single, multi and 96-channel P1000 pipettes on both the left and right mounts.
+# The height of the bottom of the pipette nozzle at home position without any tips.
+# We rely on this being the same for every OT-3 pipette.
+#
+# We found this number by peeking at the height that OT3Simulator returns for these pipettes:
+#   * Single- and 8-Channel P50 GEN3
+#   * Single-, 8-, and 96-channel P1000 GEN3
+#
+# That OT3Simulator return value is what Protocol Engine uses for simulation when Protocol Engine
+# is configured to not virtualize pipettes, so this number should match it.
 VIRTUAL_MAX_OT3_HEIGHT = 248.0
 
 
