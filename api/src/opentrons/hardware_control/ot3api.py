@@ -1725,7 +1725,7 @@ class OT3API(
     def get_instrument_offset(
         self, mount: OT3Mount
     ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount, None]:
-        """Get Pipette calibration data."""
+        """Get instrument calibration data."""
         # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
         #  PipetteDict because the dict is shared with OT2 pipettes which have
         #  different offset type. Once we figure out if we want the calibration data
