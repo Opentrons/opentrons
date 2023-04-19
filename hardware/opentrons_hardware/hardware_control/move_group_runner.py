@@ -269,9 +269,9 @@ class MoveGroupRunner:
             )
             return HomeRequest(payload=home_payload)
         else:
-            stop_cond = step.stop_condition
+            stop_cond = step.stop_condition.value
             if self._ignore_stalls:
-                stop_cond32 += MoveStopCondition.ignore_stalls
+                stop_cond += MoveStopCondition.ignore_stalls.value
             linear_payload = AddLinearMoveRequestPayload(
                 request_stop_condition=MoveStopConditionField(stop_cond),
                 group_id=UInt8Field(group),

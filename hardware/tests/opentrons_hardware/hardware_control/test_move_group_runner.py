@@ -316,6 +316,57 @@ async def test_single_send_setup_commands(
     )
 
 
+@pytest.mark.parametrize(
+    "stop_condition",
+    [
+        MoveStopCondition.none,
+        MoveStopCondition.sync_line,
+        MoveStopCondition.stall,
+        MoveStopCondition.limit_switch,
+    ],
+)
+async def test_send_ignore_stalls_requests(
+    mock_can_messenger: AsyncMock,
+    stop_condition: MoveStopCondition,
+) -> None:
+    """
+    All of the moves sent should have the ignore_stalls as part of
+    their stop condition.
+    """
+    move_group = [
+        [
+            {
+                NodeId.head: MoveGroupSingleAxisStep(
+                    distance_mm=float64(246),
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    stop_condition=MoveStopConditionField(stop_condition),
+                )
+            }
+        ]
+    ]
+    subject = MoveGroupRunner(move_groups=move_group, ignore_stalls=True)
+    await subject.prep(can_messenger=mock_can_messenger)
+    step = move_group[0][0].get(NodeId.head)
+    assert isinstance(step, MoveGroupSingleAxisStep)
+    request_stop_condition = MoveStopConditionField(
+        stop_condition.value + MoveStopCondition.ignore_stalls.value
+    )
+    mock_can_messenger.send.assert_any_call(
+        node_id=NodeId.head,
+        message=AddLinearMoveRequest(
+            payload=AddLinearMoveRequestPayload(
+                group_id=UInt8Field(0),
+                seq_id=UInt8Field(0),
+                request_stop_condition=request_stop_condition,
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
+            )
+        ),
+    )
+
+
 async def test_multi_send_setup_commands(
     mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
 ) -> None:

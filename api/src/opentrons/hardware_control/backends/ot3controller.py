@@ -538,7 +538,7 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True if ff.disable_stall_detection() else False
+            ignore_stalls=True if ff.disable_stall_detection() else False,
         )
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
