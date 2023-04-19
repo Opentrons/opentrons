@@ -8,9 +8,10 @@ from hardware_testing.data.csv_report import CSVReport, CSVSection
 from . import (
     test_plunger,
     test_jaws,
+    test_capacitance,
     test_pressure,
-    test_tip_sensor,
     test_environmental_sensor,
+    test_tip_sensor,
     test_droplets,
     test_partial_pickup,
 )
@@ -21,9 +22,10 @@ class TestSection(enum.Enum):
 
     PLUNGER = "PLUNGER"
     JAWS = "JAWS"
+    CAPACITANCE = "CAPACITANCE"
     PRESSURE = "PRESSURE"
-    TIP_SENSOR = "TIP-SENSOR"
     ENVIRONMENT_SENSOR = "ENVIRONMENT-SENSOR"
+    TIP_SENSOR = "TIP-SENSOR"
     DROPLETS = "DROPLETS"
     PARTIAL_PICKUP = "PARTIAL_PICKUP"
 
@@ -46,16 +48,20 @@ TESTS = [
         test_jaws.run,
     ),
     (
+        TestSection.CAPACITANCE,
+        test_capacitance.run,
+    ),
+    (
         TestSection.PRESSURE,
         test_pressure.run,
     ),
     (
-        TestSection.TIP_SENSOR,
-        test_tip_sensor.run,
-    ),
-    (
         TestSection.ENVIRONMENT_SENSOR,
         test_environmental_sensor.run,
+    ),
+    (
+        TestSection.TIP_SENSOR,
+        test_tip_sensor.run,
     ),
     (
         TestSection.DROPLETS,
@@ -80,13 +86,16 @@ def build_report(test_name: str) -> CSVReport:
                 title=TestSection.JAWS.value, lines=test_jaws.build_csv_lines()
             ),
             CSVSection(
+                title=TestSection.CAPACITANCE.value, lines=test_capacitance.build_csv_lines()
+            ),
+            CSVSection(
                 title=TestSection.PRESSURE.value, lines=test_pressure.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.TIP_SENSOR.value, lines=test_tip_sensor.build_csv_lines()
+                title=TestSection.ENVIRONMENT_SENSOR.value, lines=test_environmental_sensor.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.ENVIRONMENT_SENSOR.value, lines=test_environmental_sensor.build_csv_lines()
+                title=TestSection.TIP_SENSOR.value, lines=test_tip_sensor.build_csv_lines()
             ),
             CSVSection(
                 title=TestSection.DROPLETS.value, lines=test_droplets.build_csv_lines()
