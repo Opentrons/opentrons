@@ -12,6 +12,7 @@ from opentrons.util.linal import solve_attitude
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
+from opentrons.hardware_control.instruments.ot3.gripper_handler import GripError
 import json
 
 from opentrons_shared_data.deck import (
@@ -683,7 +684,9 @@ async def calibrate_gripper_jaw(
     two offsets into the `gripper_pin_offsets_mean` func.
     """
     try:
-        if not hcapi._gripper_handler.check_ready_for_jaw_move():
+        try:
+            hcapi._gripper_handler.check_ready_for_jaw_move()
+        except GripError:
             await hcapi.home_gripper_jaw()
         await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
         hcapi.add_gripper_probe(probe)
