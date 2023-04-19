@@ -22,29 +22,53 @@ def starting_calibration_data(
 
     Adds dummy data to a temporary directory to test delete commands against.
     """
-    from opentrons.calibration_storage import save_robot_deck_attitude
 
     if robot_model == "OT-3 Standard":
-        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
+        from opentrons.calibration_storage import save_robot_belt_attitude
+
+        save_robot_belt_attitude(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+            "pip1",
+        )
     else:
-        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack")
+        from opentrons.calibration_storage import save_robot_deck_attitude
+
+        save_robot_deck_attitude(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+            "pip1",
+            "mytiprack",
+        )
 
 
 def test_save_deck_attitude(ot_config_tempdir: Any, robot_model: "RobotModel") -> None:
     """
     Test saving deck attitude calibrations.
     """
-    from opentrons.calibration_storage import (
-        get_robot_deck_attitude,
-        save_robot_deck_attitude,
-    )
-
-    assert get_robot_deck_attitude() is None
     if robot_model == "OT-3 Standard":
-        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1")
+        from opentrons.calibration_storage import (
+            get_robot_belt_attitude,
+            save_robot_belt_attitude,
+        )
+
+        assert get_robot_belt_attitude() is None
+        save_robot_belt_attitude(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+            "pip1",
+        )
+        assert get_robot_belt_attitude() != {}
     else:
-        save_robot_deck_attitude([[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack")
-    assert get_robot_deck_attitude() != {}
+        from opentrons.calibration_storage import (
+            get_robot_deck_attitude,
+            save_robot_deck_attitude,
+        )
+
+        assert get_robot_deck_attitude() is None
+        save_robot_deck_attitude(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+            "pip1",
+            "mytiprack",
+        )
+        assert get_robot_deck_attitude() != {}
 
 
 def test_get_deck_calibration(
@@ -53,25 +77,27 @@ def test_get_deck_calibration(
     """
     Test ability to get a deck calibration model.
     """
-    from opentrons.calibration_storage import get_robot_deck_attitude
-
-    # needed for proper type checking unfortunately
-    from opentrons.calibration_storage.ot3.models.v1 import (
-        DeckCalibrationModel as OT3DeckCalModel,
-    )
-    from opentrons.calibration_storage.ot2.models.v1 import (
-        DeckCalibrationModel as OT2DeckCalModel,
-    )
-
-    robot_deck = get_robot_deck_attitude()
     if robot_model == "OT-3 Standard":
-        assert robot_deck == OT3DeckCalModel(
+        # needed for proper type checking unfortunately
+        from opentrons.calibration_storage.ot3.models.v1 import (
+            BeltCalibrationModel as OT3BeltCalModel,
+        )
+        from opentrons.calibration_storage import get_robot_belt_attitude
+
+        robot_belt = get_robot_belt_attitude()
+        assert robot_belt == OT3BeltCalModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-            lastModified=robot_deck.lastModified,
-            source=robot_deck.source,
+            lastModified=robot_belt.lastModified,
+            source=robot_belt.source,
             pipetteCalibratedWith="pip1",
         )
     else:
+        from opentrons.calibration_storage.ot2.models.v1 import (
+            DeckCalibrationModel as OT2DeckCalModel,
+        )
+        from opentrons.calibration_storage import get_robot_deck_attitude
+
+        robot_deck = get_robot_deck_attitude()
         assert robot_deck == OT2DeckCalModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             last_modified=robot_deck.last_modified,

@@ -25,8 +25,8 @@ from opentrons_shared_data.deck import (
 from .robot_calibration import RobotCalibration, DeckCalibration
 from opentrons.calibration_storage import types
 from opentrons.calibration_storage.ot3.deck_attitude import (
-    save_robot_deck_attitude,
-    get_robot_deck_attitude,
+    save_robot_belt_attitude,
+    get_robot_belt_attitude,
 )
 from opentrons.config.robot_configs import (
     default_deck_calibration,
@@ -816,51 +816,54 @@ async def calibrate_belts(
     try:
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
         belt_attitude = await _determine_transform_matrix(hcapi, mount)
-        save_attitude_matrix(belt_attitude, pip_id)
+        save_belt_attitude_matrix(belt_attitude, pip_id)
         return belt_attitude
     finally:
         await hcapi.remove_tip(mount)
 
 
 # test this!
-def apply_deck_transform(
+def apply_machine_transform(
     belt_attitude: types.AttitudeMatrix,
 ) -> types.AttitudeMatrix:
     belt_attitude_arr = np.array(belt_attitude)
-    deck_transform_arr = np.array(defaults_ot3.DEFAULT_DECK_TRANSFORM)
-    deck_attitude_arr = np.dot(belt_attitude_arr, deck_transform_arr)  # type: ignore[no-untyped-call]
+    machine_attitude_arr = np.array(defaults_ot3.DEFAULT_DECK_TRANSFORM)
+    deck_attitude_arr = np.dot(belt_attitude_arr, machine_attitude_arr)  # type: ignore[no-untyped-call]
     deck_attitude = deck_attitude_arr.round(4).tolist()
     return deck_attitude  # type: ignore[no-any-return]
 
 
-def save_attitude_matrix(
+def save_belt_attitude_matrix(
     belt_attitude: types.AttitudeMatrix,
     pipette_id: str,
 ) -> None:
-    deck_attitude = apply_deck_transform(belt_attitude)
-    save_robot_deck_attitude(
-        deck_attitude,
+    save_robot_belt_attitude(
+        belt_attitude,
         pipette_id,
     )
 
 
 def load_attitude_matrix() -> DeckCalibration:
-    calibration_data = get_robot_deck_attitude()
+    calibration_data = (
+        get_robot_belt_attitude()
+    )
 
     if calibration_data:
         return DeckCalibration(
-            attitude=calibration_data.attitude,
-            source=calibration_data.source,
+            attitude=apply_machine_transform(calibration_data.attitude),
+            source=calibration_data.source,  # ensure meta data refers to belt calibration data
             status=types.CalibrationStatus(**calibration_data.status.dict()),
+            belt_attitude=calibration_data.attitude,
             last_modified=calibration_data.last_modified,
             pipette_calibrated_with=calibration_data.pipette_calibrated_with,
         )
     else:
-        # load default if deck calibration data do not exist
+        # load default if deck calibration data does not exist
         return DeckCalibration(
-            attitude=default_deck_calibration(),
+            attitude=apply_machine_transform(default_deck_calibration()),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
+            belt_attitude=default_deck_calibration(),
         )
 
 

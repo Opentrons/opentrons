@@ -28,6 +28,7 @@ class DeckCalibration:
     attitude: types.AttitudeMatrix
     source: types.SourceType
     status: types.CalibrationStatus
+    belt_attitude: Optional[types.AttitudeMatrix] = None
     last_modified: Optional[datetime] = None
     pipette_calibrated_with: Optional[str] = None
     tiprack: Optional[str] = None

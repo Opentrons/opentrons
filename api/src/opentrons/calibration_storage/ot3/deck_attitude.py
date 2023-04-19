@@ -34,7 +34,7 @@ def delete_robot_deck_attitude() -> None:
 
 
 @no_type_check
-def save_robot_deck_attitude(
+def save_robot_belt_attitude(
     transform: local_types.AttitudeMatrix,
     pip_id: Optional[str],
     source: Optional[local_types.SourceType] = None,
@@ -51,7 +51,7 @@ def save_robot_deck_attitude(
     else:
         cal_status_model = v1.CalibrationStatus()
 
-    gantry_calibration = v1.DeckCalibrationModel(
+    gantry_calibration = v1.BeltCalibrationModel(
         attitude=transform,
         pipetteCalibratedWith=pip_id,
         lastModified=utc_now(),
@@ -59,25 +59,25 @@ def save_robot_deck_attitude(
         status=cal_status_model,
     )
     # convert to schema + validate json conversion
-    io.save_to_file(robot_dir, "deck_calibration", gantry_calibration)
+    io.save_to_file(robot_dir, "belt_calibration", gantry_calibration)
 
 
 # Get Deck Calibration
 
 
 @no_type_check
-def get_robot_deck_attitude() -> Optional[v1.DeckCalibrationModel]:
-    deck_calibration_path = (
-        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
+def get_robot_belt_attitude() -> Optional[v1.BeltCalibrationModel]:
+    belt_calibration_path = (
+        config.get_opentrons_path("robot_calibration_dir") / "belt_calibration.json"
     )
     try:
-        return v1.DeckCalibrationModel(**io.read_cal_file(deck_calibration_path))
+        return v1.BeltCalibrationModel(**io.read_cal_file(belt_calibration_path))
     except FileNotFoundError:
-        log.warning("Deck calibration not found.")
+        log.warning("Belt calibration not found.")
         pass
     except (json.JSONDecodeError, ValidationError):
         log.warning(
-            "Deck calibration is malformed. Please factory reset your calibrations."
+            "Belt calibration is malformed. Please factory reset your calibrations."
         )
         pass
     return None

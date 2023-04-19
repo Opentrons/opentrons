@@ -221,7 +221,9 @@ class OT3API(
         # use RobotCalibrationProvider.set_robot_calibration
         self._robot_calibration.deck_calibration = robot_calibration.deck_calibration
 
-    def reset_robot_calibration(self) -> None:
+    def reset_robot_calibration(
+        self,
+    ) -> None:  # remove, add inheritance like OT2. Follow OT2
         RobotCalibrationProvider.reset_robot_calibration(self)
 
     @property
