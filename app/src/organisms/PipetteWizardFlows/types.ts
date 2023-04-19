@@ -2,7 +2,7 @@ import { SECTIONS, FLOWS } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { PipetteMount } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { AttachedPipettesByMount } from '../../redux/pipettes/types'
+import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
@@ -73,7 +73,7 @@ export interface PipetteWizardStepProps {
   ) => Promise<unknown>
   isRobotMoving: boolean
   runId: string
-  attachedPipettes: AttachedPipettesByMount
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
   selectedPipette: SelectablePipettes

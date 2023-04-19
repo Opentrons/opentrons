@@ -3,15 +3,11 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachProbe } from '../DetachProbe'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 
@@ -23,10 +19,7 @@ const render = (props: React.ComponentProps<typeof DetachProbe>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('DetachProbe', () => {
   let props: React.ComponentProps<typeof DetachProbe>
   beforeEach(() => {
@@ -37,7 +30,7 @@ describe('DetachProbe', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       handleCleanUp: jest.fn(),
       errorMessage: null,

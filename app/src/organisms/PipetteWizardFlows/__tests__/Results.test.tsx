@@ -7,16 +7,11 @@ import {
 } from '@opentrons/shared-data'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
-
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -29,10 +24,7 @@ const render = (props: React.ComponentProps<typeof Results>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
   let pipettePromise: Promise<void>
@@ -46,7 +38,7 @@ describe('Results', () => {
       chainRunCommands: jest.fn(),
       isRobotMoving: false,
       runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       flowType: FLOWS.CALIBRATE,
