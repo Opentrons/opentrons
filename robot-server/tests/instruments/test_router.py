@@ -10,7 +10,6 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
 )
 from opentrons.hardware_control.types import GripperJawState
 from opentrons.protocol_engine.types import Vec3f
