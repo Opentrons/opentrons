@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { css } from 'styled-components'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { SPACING } from '@opentrons/components'
 import { FLOWS, SECTIONS } from './constants'
 
 import attachLeft18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
@@ -66,6 +67,7 @@ export function getPipetteAnimations(
   return (
     <video
       css={css`
+        padding-top: ${SPACING.spacing2};
         max-width: 100%;
         max-height: ${section === SECTIONS.ATTACH_PROBE ||
         section === SECTIONS.DETACH_PROBE

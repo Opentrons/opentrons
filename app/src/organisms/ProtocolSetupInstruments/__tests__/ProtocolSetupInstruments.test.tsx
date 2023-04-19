@@ -10,8 +10,8 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolSetupInstruments } from '..'
 import { mockRecentAnalysis } from '../__fixtures__'
+import { ProtocolSetupInstruments } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock(
@@ -89,7 +89,7 @@ describe('ProtocolSetupInstruments', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Instruments')
     getByText('Location')
-    getByText('calibration status')
+    getByText('Calibration Status')
     getByRole('button', { name: 'continue' })
   })
 

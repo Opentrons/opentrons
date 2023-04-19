@@ -45,7 +45,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
-  let buttonText: string = t('shared:exit')
+  let buttonText: string = i18n.format(t('shared:exit'), 'capitalize')
   let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {

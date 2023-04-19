@@ -87,7 +87,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteProbeVid = (
-    <Flex marginTop={isOnDevice ? '-5rem' : '-7.6rem'} height="10.2rem">
+    <Flex
+      marginTop={isOnDevice ? '-5rem' : '-7.6rem'}
+      height="10.2rem"
+      paddingTop={SPACING.spacing2}
+    >
       <video
         css={css`
           max-width: 100%;

@@ -64,6 +64,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
+    getByText('Exit')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.proceed).toHaveBeenCalled()
