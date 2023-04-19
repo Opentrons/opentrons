@@ -1528,6 +1528,7 @@ class OT3API(
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
+            await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
             await self.move_to(mount, start_pos) # self._move(target_up)
 
     async def _motor_pick_up_tip(
