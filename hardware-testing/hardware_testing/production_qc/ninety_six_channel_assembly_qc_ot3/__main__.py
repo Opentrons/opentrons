@@ -19,7 +19,7 @@ async def _main(cfg: TestConfig) -> None:
     )
     mount = OT3Mount.LEFT
     await api.home()
-    home_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     attach_pos = attach_pos._replace(z=home_pos.z)
     if not api.hardware_pipettes[mount.to_mount()]:
@@ -69,14 +69,18 @@ if __name__ == "__main__":
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
         parser.add_argument(f"--only-{s.value.lower()}", action="store_true")
     args = parser.parse_args()
-    _t_sections = {s: f for s, f in TESTS if getattr(args, f"only_{s.value.lower()}")}
+    _t_sections = {
+        s: f
+        for s, f in TESTS
+        if getattr(args, f"only_{s.value.lower().replace('-', '_')}")
+    }
     if _t_sections:
         assert (
             len(list(_t_sections.keys())) < 2
         ), 'use "--only" for just one test, not multiple tests'
     else:
         _t_sections = {
-            s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
+            s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower().replace('-', '_')}")
         }
     _config = TestConfig(simulate=args.simulate, tests=_t_sections)
     asyncio.run(_main(_config))
