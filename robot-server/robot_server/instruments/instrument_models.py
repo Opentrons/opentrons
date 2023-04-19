@@ -11,7 +11,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.types import Mount
 from opentrons.calibration_storage.types import SourceType
-from opentrons.hardware_control.types import OT3Mount, UpdateState
+from opentrons.hardware_control.types import OT3Mount, SubSystem
 from opentrons.protocol_engine.types import Vec3f
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
@@ -68,6 +68,14 @@ class MountType(enum.Enum):
 
 
 MountTypesStr = Literal["left", "right", "extension"]
+SubSystemStr = Literal["pipette_left", "pipette_right", "gripper"]
+def name_for_subsystem(subsystem: Literal[SubSystem.pipette_right, SubSystem.pipette_left, SubSystem.gripper]) -> SubSystemStr:
+    if subsystem is SubSystem.pipette_right:
+        return 'pipette_right'
+    if subsystem is SubSystem.pipette_left:
+        return 'pipette_left'
+    if subsystem is SubSystem.gripper:
+        return 'gripper'
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
@@ -86,10 +94,9 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     firmwareUpdateRequired: Optional[bool] = Field(
         None, description="Whether the instrument requires a firmware update."
     )
-    nextAvailableFirmwareVersion: Optional[int] = Field(
+    subsystemName: Optional[SubSystemStr] = Field(
         None,
-        description="The latest firmware version available for the instrument"
-        " on the robot.",
+        description="The subsystem corresponding to this pipette.",
     )
     data: InstrumentDataT
 
@@ -141,23 +148,3 @@ class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
 
 
 AttachedInstrument = Union[Pipette, Gripper]
-
-
-class UpdateCreate(BaseModel):
-    """Request data for updating instruments."""
-
-    mount: MountTypesStr = Field(..., description="Mount of the instrument to update.")
-
-
-class UpdateProgressData(BaseModel):
-    """Model for status of firmware update progress."""
-
-    id: str = Field(..., description="Unique ID for the update process.")
-    createdAt: datetime = Field(..., description="When the update was posted.")
-    mount: MountTypesStr = Field(..., description="The mount that is being updated.")
-    updateStatus: UpdateState = Field(
-        ..., description="Whether an update is queued, in progress or completed. "
-    )
-    updateProgress: int = Field(
-        ..., description="Progress of the update depicted as an integer from 0 to 100."
-    )

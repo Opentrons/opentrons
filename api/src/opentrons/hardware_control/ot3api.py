@@ -63,7 +63,6 @@ from .backends.ot3utils import (
     get_system_constraints,
     axis_convert,
     sub_system_to_node_id,
-    subsystem_from_mount,
 )
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
@@ -79,7 +78,7 @@ from .types import (
     HardwareAction,
     InstrumentUpdateStatus,
     MotionChecks,
-    OT3SubSystem,
+    SubSystem,
     PipetteSubType,
     PauseType,
     OT3Axis,
@@ -93,7 +92,7 @@ from .types import (
     LiquidNotFound,
     UpdateStatus,
     StatusBarState,
-    OT3SubSystemState,
+    SubSystemState,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -399,18 +398,18 @@ class OT3API(
 
     def get_firmware_update_progress(
         self,
-    ) -> Dict[OT3SubSystem, UpdateStatus]:
+    ) -> Dict[SubSystem, UpdateStatus]:
         """Get the update progress for all devices currently updating."""
         return self._backend.get_update_progress()
 
     async def update_firmware(
-        self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False
+        self, subsystems: Optional[Set[SubSystem]] = None, force: bool = False
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
         targets: Set[FirmwareTarget] = set()
         for subsystem in subsystems:
-            if subsystem is OT3SubSystem.rear_panel:
+            if subsystem is SubSystem.rear_panel:
                 targets.add(USBTarget.rear_panel)
             else:
                 targets.add(sub_system_to_node_id(subsystem))
@@ -2029,5 +2028,5 @@ class OT3API(
         return ret
 
     @property
-    def attached_subsystems(self) -> Dict[OT3SubSystem, SubSystemState]:
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         pass

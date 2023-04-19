@@ -111,8 +111,8 @@ from opentrons.hardware_control.types import (
     UpdateStatus,
     mount_to_subsystem,
     DoorState,
-    OT3SubSystemState,
-    OT3SubSystem,
+    SubSystemState,
+    SubSystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -243,7 +243,7 @@ class OT3Controller:
         return self._initialized
 
     @property
-    def subsystems(self) -> Dict[OT3SubSystem, OT3SubSystemState]:
+    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
         return self._subsystem_manager.subsystems
 
     @initialized.setter

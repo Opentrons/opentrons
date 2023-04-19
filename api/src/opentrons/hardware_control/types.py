@@ -280,7 +280,7 @@ class OT3Axis(enum.Enum):
             raise KeyError(self)
 
 
-class OT3SubSystem(enum.Enum):
+class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
 
     This is a complete list of unique firmware nodes in the ot3.
@@ -296,6 +296,16 @@ class OT3SubSystem(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+    @classmethod
+    def of_mount(cls: SubSystem, mount: Union[top_types.Mount, OT3Mount]) -> Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]:
+        return {
+            Mount.LEFT: cls.pipette_left,
+            Mount.RIGHT: cls.pipette_right,
+            OT3Mount.LEFT: cls.pipette_left,
+            OT3Mount.RIGHT: cls.pipette_right,
+            OT3Mount.GRIPPER: cls.gripper
+        }[mount]
 
 
 class PipetteSubType(enum.Enum):
@@ -331,13 +341,13 @@ class UpdateState(enum.Enum):
 
 @dataclass(frozen=True)
 class UpdateStatus:
-    subsystem: OT3SubSystem
+    subsystem: SubSystem
     state: UpdateState
     progress: int
 
 
 @dataclass
-class OT3SubSystemState:
+class SubSystemState:
     ok: bool
     current_fw_version: int
     next_fw_version: int
@@ -345,42 +355,6 @@ class OT3SubSystemState:
     current_fw_sha: str
     pcba_revision: str
     update_state: Union[UpdateStatus, None]
-
-
-@dataclass(frozen=True)
-class InstrumentUpdateStatus:
-    mount: OT3Mount
-    status: UpdateState
-    progress: int
-
-
-@dataclass(frozen=True)
-class InstrumentFWInfo:
-    mount: OT3Mount
-    update_required: bool
-    current_version: int
-    next_version: Optional[int]
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: mount={self.mount} needs_update={self.update_required} version={self.current_version} -> {self.next_version}>"
-
-
-_subsystem_mount_lookup = {
-    OT3Mount.LEFT: OT3SubSystem.pipette_left,
-    OT3Mount.RIGHT: OT3SubSystem.pipette_right,
-    OT3Mount.GRIPPER: OT3SubSystem.gripper,
-}
-
-
-def mount_to_subsystem(mount: OT3Mount) -> OT3SubSystem:
-    return _subsystem_mount_lookup[mount]
-
-
-def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
-    mount_lookup = {
-        subsystem: mount for mount, subsystem in _subsystem_mount_lookup.items()
-    }
-    return mount_lookup[subsystem]
 
 
 BCAxes = Union[Axis, OT3Axis]

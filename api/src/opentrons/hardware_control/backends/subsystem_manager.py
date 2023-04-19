@@ -16,7 +16,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ToolType,
 )
 
-from ..types import OT3SubSystem, OT3SubSystemState, UpdateStatus, UpdateState
+from ..types import SubSystem, SubSystemState, UpdateStatus, UpdateState
 from .ot3utils import subsystem_to_target, target_to_subsystem
 
 
@@ -50,7 +50,7 @@ class SubsystemManager:
     _present_tools: tools.types.ToolSummary
     _refreshed: asyncio.Event
     _updates_required: Dict[FirmwareTarget, FirmwareUpdateRequirements]
-    _updates_ongoing: Dict[OT3SubSystem, UpdateStatus]
+    _updates_ongoing: Dict[SubSystem, UpdateStatus]
 
     @classmethod
     async def build(
@@ -85,7 +85,7 @@ class SubsystemManager:
             self._expected_core_targets.add(USBTarget.rear_panel)
 
     @property
-    def device_info(self) -> Dict[OT3SubSystem, network.DeviceInfoCache]:
+    def device_info(self) -> Dict[SubSystem, network.DeviceInfoCache]:
         return {
             target_to_subsystem(target): info
             for target, info in self._network_info.device_info.items()
@@ -100,9 +100,9 @@ class SubsystemManager:
         return self._present_tools
 
     @property
-    def subsystems(self) -> Dict[OT3SubSystem, OT3SubSystemState]:
+    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
         return {
-            subsystem: OT3SubSystemState(
+            subsystem: SubSystemState(
                 ok=info.ok,
                 current_fw_version=info.version,
                 next_fw_version=self._updates_required[
@@ -142,13 +142,13 @@ class SubsystemManager:
         """Returns True if there is data unread since the last call to is_new."""
         return self._refreshed.is_set()
 
-    def get_update_progress(self) -> Dict[OT3SubSystem, UpdateStatus]:
+    def get_update_progress(self) -> Dict[SubSystem, UpdateStatus]:
         """Returns a set of UpdateStatus of the updates."""
         return {k: v for k, v in self._updates_ongoing.items()}
 
     async def update_firmware(
         self,
-        subsystems: Optional[Set[OT3SubSystem]] = None,
+        subsystems: Optional[Set[SubSystem]] = None,
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
@@ -244,7 +244,7 @@ class SubsystemManager:
 
     @contextmanager
     def _update_ongoing_for(
-        self, subsystem: OT3SubSystem
+        self, subsystem: SubSystem
     ) -> Callable[Dict[UpdateStatus], None]:
         target = subsystem_to_target(subsystem)
         if target in self._updates_ongoing:

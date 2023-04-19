@@ -7,7 +7,7 @@ from opentrons.hardware_control.types import (
     OT3AxisKind,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
+    SubSystem,
     OT3Mount,
     InstrumentProbeType,
     PipetteSubType,
@@ -60,19 +60,19 @@ PipetteAction = Literal["clamp", "home"]
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
 
-SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
-    OT3SubSystem.gantry_x: NodeId.gantry_x,
-    OT3SubSystem.gantry_y: NodeId.gantry_y,
-    OT3SubSystem.head: NodeId.head,
-    OT3SubSystem.pipette_left: NodeId.pipette_left,
-    OT3SubSystem.pipette_right: NodeId.pipette_right,
-    OT3SubSystem.gripper: NodeId.gripper,
+SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
+    SubSystem.gantry_x: NodeId.gantry_x,
+    SubSystem.gantry_y: NodeId.gantry_y,
+    SubSystem.head: NodeId.head,
+    SubSystem.pipette_left: NodeId.pipette_left,
+    SubSystem.pipette_right: NodeId.pipette_right,
+    SubSystem.gripper: NodeId.gripper,
 }
 
 NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
 
-SUBSYSTEM_USB: Dict[OT3SubSystem, USBTarget] = {
-    OT3SubSystem.rear_panel: USBTarget.rear_panel
+SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {
+    SubSystem.rear_panel: USBTarget.rear_panel
 }
 
 USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
@@ -162,25 +162,25 @@ def axis_is_node(axis: OT3Axis) -> bool:
         return False
 
 
-def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
+def sub_system_to_node_id(sub_sys: SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
     return SUBSYSTEM_NODEID[sub_sys]
 
 
-def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
+def node_id_to_subsystem(node_id: NodeId) -> "SubSystem":
     """Convert a NodeId to a Subsystem"""
     return NODEID_SUBSYSTEM[node_id.application_for()]
 
 
-def usb_to_subsystem(target: USBTarget) -> OT3SubSystem:
+def usb_to_subsystem(target: USBTarget) -> SubSystem:
     return USB_SUBSYSTEM[target]
 
 
-def subsystem_to_usb(subsystem: OT3SubSystem) -> USBTarget:
+def subsystem_to_usb(subsystem: SubSystem) -> USBTarget:
     return SUBSYSTEM_USB[subsystem]
 
 
-def target_to_subsystem(target: FirmwareTarget) -> OT3SubSystem:
+def target_to_subsystem(target: FirmwareTarget) -> SubSystem:
     if isinstance(target, USBTarget):
         return usb_to_subsystem(target)
     elif isinstance(target, NodeId):
@@ -189,7 +189,7 @@ def target_to_subsystem(target: FirmwareTarget) -> OT3SubSystem:
         raise KeyError(target)
 
 
-def subsystem_to_target(subsystem: OT3SubSystem) -> FirmwareTarget:
+def subsystem_to_target(subsystem: SubSystem) -> FirmwareTarget:
     try:
         return sub_system_to_node_id(subsystem)
     except KeyError:
@@ -392,24 +392,6 @@ def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
     return _update_state_lookup[state]
 
 
-subsystem_to_mount = {
-    OT3SubSystem.pipette_left: OT3Mount.LEFT,
-    OT3SubSystem.pipette_right: OT3Mount.RIGHT,
-    OT3SubSystem.gripper: OT3Mount.GRIPPER,
-}
-
-
-def mount_from_subsystem(subsystem: OT3SubSystem) -> OT3Mount:
-    return subsystem_to_mount[subsystem]
-
-
-def subsystem_from_mount(mount: OT3Mount) -> OT3SubSystem:
-    mount_to_subsystem = {
-        ot3mount: subsystem for subsystem, ot3mount in subsystem_to_mount.items()
-    }
-    return mount_to_subsystem[mount]
-
-
 class UpdateProgress:
     """Class to keep track of Update progress."""
 
@@ -420,7 +402,7 @@ class UpdateProgress:
             subsystem = (
                 node_id_to_subsystem(NodeId(target))
                 if isinstance(target, NodeId)
-                else OT3SubSystem.rear_panel
+                else SubSystem.rear_panel
             )
             self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
 
@@ -441,7 +423,7 @@ class UpdateProgress:
         subsystem = (
             node_id_to_subsystem(NodeId(target))
             if isinstance(target, NodeId)
-            else OT3SubSystem.rear_panel
+            else SubSystem.rear_panel
         )
         state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)

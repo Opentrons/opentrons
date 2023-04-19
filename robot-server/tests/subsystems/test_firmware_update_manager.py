@@ -12,7 +12,7 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     InstrumentUpdateStatus,
     UpdateState,
-    OT3SubSystem,
+    SubSystem,
     UpdateStatus,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -130,7 +130,7 @@ async def test_start_update(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
     await inject_queue.put(
-        UpdateStatus(OT3SubSystem.pipette_right, UpdateState.updating, 2)
+        UpdateStatus(SubSystem.pipette_right, UpdateState.updating, 2)
     )
 
     expected_data = UpdateProcessSummary(
@@ -183,7 +183,7 @@ async def test_get_completed_update_progress(
     )
     await inject_queue.put(
         UpdateStatus(
-            subsystem=OT3SubSystem.pipette_right, state=UpdateState.done, progress=100
+            subsystem=SubSystem.pipette_right, state=UpdateState.done, progress=100
         )
     )
     subject = FirmwareUpdateManager(hw_handle=ot3_hardware_api, task_runner=task_runner)
@@ -244,7 +244,7 @@ async def test_start_update_with_same_id_twice(
     )
     await inject_queue.put(
         UpdateStatus(
-            subsystem=OT3SubSystem.pipette_right, state=UpdateState.done, progress=100
+            subsystem=SubSystem.pipette_right, state=UpdateState.done, progress=100
         )
     )
 
@@ -270,13 +270,13 @@ async def test_start_update_while_update_in_progress(
     )
     await inject_queue.put(
         UpdateStatus(
-            subsystem=OT3SubSystem.pipette_right, state=UpdateState.done, progress=100
+            subsystem=SubSystem.pipette_right, state=UpdateState.done, progress=100
         )
     )
     decoy.when(ot3_hardware_api.get_firmware_update_progress()).then_return(
         {
-            OT3SubSystem.pipette_right: UpdateStatus(
-                subsystem=OT3SubSystem.pipette_right,
+            SubSystem.pipette_right: UpdateStatus(
+                subsystem=SubSystem.pipette_right,
                 state=UpdateState.updating,
                 progress=10,
             )
@@ -304,7 +304,7 @@ async def test_update_failure(
         decoy, ot3_hardware_api, OT3Mount.RIGHT
     )
     await inject_queue.put(
-        UpdateStatus(OT3SubSystem.pipette_right, UpdateState.updating, 2)
+        UpdateStatus(SubSystem.pipette_right, UpdateState.updating, 2)
     )
 
     subject = FirmwareUpdateManager(hw_handle=ot3_hardware_api, task_runner=task_runner)
@@ -334,7 +334,7 @@ async def test_immediate_update_failure(
     mock_right_present_no_updates(ot3_hardware_api, decoy)
     await inject_queue.put(
         UpdateStatus(
-            subsystem=OT3SubSystem.pipette_right,
+            subsystem=SubSystem.pipette_right,
             state=UpdateState.updating,
             progress=42,
         )

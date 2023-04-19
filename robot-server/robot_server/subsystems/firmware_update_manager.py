@@ -13,9 +13,7 @@ import logging
 
 from opentrons.hardware_control.types import (
     UpdateState,
-    subsystem_to_mount,
-    OT3SubSystem,
-    OT3Mount,
+    SubSystem,
 )
 from robot_server.service.task_runner import TaskRunner
 
@@ -25,16 +23,8 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-class UpdateIdNotFound(KeyError):
+class UpdateNotFound(KeyError):
     """Specified update ID not present."""
-
-
-class InstrumentNotFound(ValueError):
-    """Specified instrument not present."""
-
-
-class UpdateIdExists(ValueError):
-    """An update was specified with the same ID as a running one."""
 
 
 class UpdateFailed(RuntimeError):
@@ -83,19 +73,18 @@ class _UpdateProcess:
     _update_id: str
 
     def __init__(
-        self, hw_handle: "OT3API", mount: OT3Mount, created_at: datetime, update_id: str
+        self, hw_handle: "OT3API", subsystem: SubSystem, created_at: datetime
     ) -> None:
         self._status_queue = Queue()
         self._hw_handle = hw_handle
-        self._mount = mount
+        self._subsystem = subsystem
         self._status_cache = None
         self._status_cache_lock = Lock()
         self._created_at = created_at
-        self._update_id = update_id
         in_progress = self._hw_handle.get_firmware_update_progress()
 
         def _mounts_in_subsystem_list(
-            subsystem: Iterable[OT3SubSystem],
+            subsystem: Iterable[SubSystem],
         ) -> Iterator[OT3Mount]:
             for subsys in subsystem:
                 try:
