@@ -40,6 +40,8 @@ export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
 
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
+export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
+export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1]
 
 // pipette display categories
 export const GEN3: 'GEN3' = 'GEN3'
