@@ -948,7 +948,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _check_stalls: bool = True,
+        _expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -988,7 +988,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            check_stalls=_check_stalls,
+            expect_stalls=_expect_stalls,
         )
 
     async def move_rel(
@@ -999,7 +999,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _check_stalls: bool = True,
+        _expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -1034,7 +1034,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            check_stalls=_check_stalls,
+            expect_stalls=_expect_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -1094,7 +1094,7 @@ class OT3API(
         max_speeds: Optional[OT3AxisMap[float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
-        check_stalls: bool = True,
+        expect_stalls: bool = False,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
@@ -1127,9 +1127,7 @@ class OT3API(
                 await self._backend.move(
                     origin,
                     moves[0],
-                    MoveStopCondition.stall
-                    if check_stalls and not ff.disable_stall_detection()
-                    else MoveStopCondition.none,
+                    MoveStopCondition.stall if expect_stalls else MoveStopCondition.none
                 )
             except Exception:
                 self._log.exception("Move failed")
@@ -1515,11 +1513,11 @@ class OT3API(
                 target_down = target_position_from_relative(
                     mount, press.relative_down, self._current_position
                 )
-                await self._move(target_down, speed=press.speed, check_stalls=False)
+                await self._move(target_down, speed=press.speed, expect_stalls=False)
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
-            await self._move(target_up, check_stalls=False)
+            await self._move(target_up, expect_stalls=False)
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec

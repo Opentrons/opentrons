@@ -25,7 +25,7 @@ from typing import (
     Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.config import ot3_pipette_config, gripper_config, feature_flags as ff
 from .ot3utils import (
     UpdateProgress,
     axis_convert,
@@ -536,7 +536,10 @@ class OT3Controller:
         """
         group = create_move_group(origin, moves, self._motor_nodes(), stop_condition)
         move_group, _ = group
-        runner = MoveGroupRunner(move_groups=[move_group])
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if ff.disable_stall_detection() else False
+        )
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 

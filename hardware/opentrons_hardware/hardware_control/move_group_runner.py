@@ -75,7 +75,12 @@ _Completions = List[_CompletionPacket]
 class MoveGroupRunner:
     """A move command scheduler."""
 
-    def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
+    def __init__(
+        self,
+        move_groups: MoveGroups,
+        start_at_index: int = 0,
+        ignore_stalls: bool = False,
+    ) -> None:
         """Constructor.
 
         Args:
@@ -84,6 +89,7 @@ class MoveGroupRunner:
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
+        self._ignore_stalls = ignore_stalls
         self._is_prepped: bool = False
 
     @staticmethod
@@ -263,8 +269,11 @@ class MoveGroupRunner:
             )
             return HomeRequest(payload=home_payload)
         else:
+            stop_cond = step.stop_condition
+            if self._ignore_stalls:
+                stop_cond32 += MoveStopCondition.ignore_stalls
             linear_payload = AddLinearMoveRequestPayload(
-                request_stop_condition=MoveStopConditionField(step.stop_condition),
+                request_stop_condition=MoveStopConditionField(stop_cond),
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
