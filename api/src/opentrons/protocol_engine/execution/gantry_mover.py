@@ -24,8 +24,10 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
 }
 
-# Max height of the gantry at home position without any tips.
-# Same value returned by simulating Hardware API.
+# Max height of the gantry at home position without any tips. This is the same value returned by the OT3Simulator,
+# which uses machine to deck transform math with the default carriage and mount values from config.defaults_ot3.py.
+# This height was validated by peaking at the non-virtual simulation values for GEN3 single and multi P50s and
+# single, multi and 96-channel P1000 pipettes on both the left and right mounts.
 VIRTUAL_MAX_OT3_HEIGHT = 248.0
 
 
