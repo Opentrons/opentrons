@@ -20,6 +20,7 @@ from opentrons.protocol_engine.execution.gantry_mover import (
     HardwareGantryMover,
     VirtualGantryMover,
     create_gantry_mover,
+    VIRTUAL_MAX_OT3_HEIGHT,
 )
 
 
@@ -379,12 +380,13 @@ async def test_virtual_get_position_default(
     assert result == Point(x=0, y=0, z=0)
 
 
-def test_virtual_get_max_travel_z(
+def test_virtual_get_max_travel_z_ot2(
     decoy: Decoy,
     mock_state_view: StateView,
     virtual_subject: VirtualGantryMover,
 ) -> None:
-    """It should get the max travel z height with the state store."""
+    """It should get the max travel z height with the state store for an OT-2."""
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
     decoy.when(
         mock_state_view.pipettes.get_instrument_max_height_ot2("pipette-id")
     ).then_return(42)
@@ -393,6 +395,20 @@ def test_virtual_get_max_travel_z(
     result = virtual_subject.get_max_travel_z("pipette-id")
 
     assert result == 22.0
+
+
+def test_virtual_get_max_travel_z_ot3(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    virtual_subject: VirtualGantryMover,
+) -> None:
+    """It should get the max travel z height with the state store."""
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
+    decoy.when(mock_state_view.tips.get_tip_length("pipette-id")).then_return(48)
+
+    result = virtual_subject.get_max_travel_z("pipette-id")
+
+    assert result == VIRTUAL_MAX_OT3_HEIGHT - 48.0
 
 
 async def test_virtual_move_relative(

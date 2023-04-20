@@ -53,7 +53,7 @@ describe('NameRobot', () => {
     const [{ getByText, getByRole, queryByRole }] = render()
     getByText('Name your robot')
     getByText('Don’t worry, you can always change this in your settings.')
-    getByText('Up to 35 characters using letters and numbers only.')
+    getByText('Up to 17 characters using letters and numbers only.')
     getByRole('textbox')
     getByRole('button', { name: 'Confirm' })
     // keyboard
