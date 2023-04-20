@@ -98,7 +98,7 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   width: 100%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
-  padding: 1rem;
+  padding: ${SPACING.spacing4};
 `
 
 const ModalArea = styled.div<
