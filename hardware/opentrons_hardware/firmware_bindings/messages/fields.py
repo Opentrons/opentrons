@@ -425,7 +425,7 @@ class LightAnimationTypeField(utils.UInt8Field):
 class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
     """A struct for an individual motor usage key, length, value field."""
 
-    NUM_BYTES = 12
+    NUM_BYTES = 11
     FORMAT = f"{NUM_BYTES}s"
 
     @property
@@ -433,7 +433,7 @@ class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
         """The value."""
         val = b""
         val = val + self.key.to_bytes(2, "big")
-        val = val + self.length.to_bytes(2, "big")
+        val = val + self.length.to_bytes(1, "big")
         val = val + self.usage_value.to_bytes(8, "big")
         return val
 
@@ -452,8 +452,8 @@ class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
     @classmethod
     def _parse(cls, data: bytes) -> Tuple[int, int, int]:
         key = cls._usage_field_from_bytes(data, 0, 2)
-        length = cls._usage_field_from_bytes(data, 2, 4)
-        usage_value = cls._usage_field_from_bytes(data, 4, 12)
+        length = cls._usage_field_from_bytes(data, 1, 3)
+        usage_value = cls._usage_field_from_bytes(data, 3, 11)
         if length < 8:
             usage_value = usage_value >> (8-length)*8
         return key, length, usage_value
