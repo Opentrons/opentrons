@@ -816,6 +816,8 @@ class OT3Controller:
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
         motor_nodes = self._motor_nodes()
+        print("motor_nodes")
+        print(motor_nodes)
         assert motor_nodes, "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}

@@ -414,6 +414,35 @@ async def move_plunger_absolute_ot3(
             await _move_coro
 
 
+async def move_tip_motor_relative_ot3(
+    api: OT3API,
+    distance: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+) -> None:
+    """Move 96ch tip-motor (Q) to an absolute position."""
+    if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
+        raise RuntimeError(f"No pipette found on LEFT mount")
+    if distance < 0:
+        action = "home"
+    else:
+        action = "clamp"
+    _move_coro = api._backend.tip_action(
+        axes=[OT3Axis.Q],
+        distance=distance,
+        speed=speed,
+        tip_action=action,
+    )
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with api._backend.restore_current():
+            await api._backend.set_active_current(
+                {OT3Axis.Q: motor_current}  # type: ignore[dict-item]
+            )
+            await _move_coro
+
+
 async def move_plunger_relative_ot3(
     api: OT3API,
     mount: OT3Mount,

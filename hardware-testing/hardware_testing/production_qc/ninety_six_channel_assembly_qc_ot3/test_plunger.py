@@ -14,13 +14,13 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
 
 PLUNGER_MAX_SKIP_MM = 0.1
-SPEEDS_TO_TEST = [5, 10, 15, 20, 30, 50]
+SPEEDS_TO_TEST = [5, 10, 15, 20, 25, 30]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
-    0.8: SPEEDS_TO_TEST,
+    0.5: SPEEDS_TO_TEST,
+    0.75: SPEEDS_TO_TEST,
     1.0: SPEEDS_TO_TEST,
-    1.25: SPEEDS_TO_TEST,
     1.5: SPEEDS_TO_TEST,
-    2.0: SPEEDS_TO_TEST,
+    2.2: SPEEDS_TO_TEST,
 }
 
 
@@ -62,10 +62,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     default_current = settings.run_current
     default_speed = settings.max_speed
-    _, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
+    _, _, blow_out, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
     async def _save_result(tag: str) -> bool:
         est, enc, aligned = await _is_plunger_still_aligned_with_encoder(api)
+        print(f"Estimate: {est}")
+        print(f"Encoder: {enc}")
         result = CSVResult.from_bool(aligned)
         report(section, tag, [est, enc, result])
         return aligned
@@ -81,21 +83,20 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             await api.home([ax])
             print(f"lowering run-current to {current} amps")
             await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                api, ax, run_current=current
+                api, ax, run_current=current,
             )
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, ax, default_max_speed=speed
             )
-            # await api._backend.set_active_current({z_ax: current})
             # MOVE DOWN
-            print(f"moving down {drop_tip} mm at {speed} mm/sec")
+            print(f"moving down {blow_out} mm at {speed} mm/sec")
             await _save_result(_get_test_tag(current, speed, "down", "start"))
-            await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip, speed=speed)
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, blow_out, speed=speed, motor_current=current)
             down_passed = await _save_result(_get_test_tag(current, speed, "down", "end"))
             # MOVE UP
-            print(f"moving up {drop_tip} mm at {speed} mm/sec")
+            print(f"moving up {blow_out} mm at {speed} mm/sec")
             await _save_result(_get_test_tag(current, speed, "up", "start"))
-            await helpers_ot3.move_plunger_absolute_ot3(api, mount, 0, speed=speed)
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, 0, speed=speed, motor_current=current)
             up_passed = await _save_result(_get_test_tag(current, speed, "up", "end"))
             # RESET CURRENTS AND HOME
             print("homing...")
@@ -105,6 +106,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, ax, default_max_speed=default_speed
             )
+            await api._backend.set_active_current({OT3Axis.P_L: default_current})
             await api.home([ax])
             if not down_passed or not up_passed and not api.is_simulator:
                 print(f"current {current} failed")
