@@ -70,7 +70,7 @@ stages:
             - id: '{analysis_id}'
               status: completed
         links: 
-          referencingRunIds: []
+          referencingRuns: []
   - name: Get protocol analysis by ID
     request:
       url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'

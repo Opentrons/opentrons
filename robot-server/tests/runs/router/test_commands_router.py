@@ -18,10 +18,10 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
 )
 
-from robot_server.runs.run_store import RunStore, RunNotFoundError, CommandNotFoundError
+from robot_server.runs.run_store import RunStore, CommandNotFoundError
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.runs.run_models import RunCommandSummary
+from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
 from robot_server.runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,

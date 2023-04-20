@@ -4,11 +4,11 @@ import {
   getLabwareDefURI,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
-  useTipLengthCalibrations,
   useStoredProtocolAnalysis,
 } from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -37,7 +37,6 @@ export interface PipetteInfo {
 }
 
 export function useRunPipetteInfoByMount(
-  robotName: string,
   runId: string
 ): {
   [mount in Mount]: PipetteInfo | null
@@ -49,7 +48,8 @@ export function useRunPipetteInfoByMount(
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations =
     useAttachedPipetteCalibrations() ?? EMPTY_MOUNTS
-  const tipLengthCalibrations = useTipLengthCalibrations() ?? []
+  const tipLengthCalibrations =
+    useAllTipLengthCalibrationsQuery()?.data?.data ?? []
 
   if (protocolData == null) {
     return EMPTY_MOUNTS

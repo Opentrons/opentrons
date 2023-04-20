@@ -24,7 +24,6 @@ class GravimetricConfig:
     mix: bool
     inspect: bool
     user_volumes: bool
-    stable: bool
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]

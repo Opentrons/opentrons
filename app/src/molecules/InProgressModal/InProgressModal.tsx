@@ -9,9 +9,9 @@ import {
   SPACING,
   Flex,
   Icon,
+  RESPONSIVENESS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { getIsOnDevice } from '../../redux/config'
 
@@ -27,15 +27,15 @@ const DESCRIPTION_STYLE = css`
   margin-top: ${SPACING.spacing5};
   margin-bottom: ${SPACING.spacing3};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
-    font-weight: 700;
-    font-size: 2rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
+    font-size: ${TYPOGRAPHY.fontSize32};
     margin-top: ${SPACING.spacing6};
     margin-bottom: ${SPACING.spacing2};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
     text-align: ${TYPOGRAPHY.textAlignCenter};
-    line-height: 2.625rem;
+    line-height: ${TYPOGRAPHY.lineHeight42};
   }
 `
 export function InProgressModal(props: Props): JSX.Element {
@@ -47,7 +47,7 @@ export function InProgressModal(props: Props): JSX.Element {
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
-      height="24.625rem"
+      height={isOnDevice ? '31.5625rem' : '24.625rem'}
       padding={SPACING.spacing6}
     >
       {alternativeSpinner ?? (

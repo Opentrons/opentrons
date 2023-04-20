@@ -101,6 +101,8 @@ class MessageId(int, Enum):
     pipette_info_response = 0x307
     gripper_info_response = 0x308
     set_serial_number = 0x30A
+    get_motor_usage_request = 0x30B
+    get_motor_usage_response = 0x30C
 
     stop_request = 0x00
 
@@ -159,6 +161,7 @@ class MessageId(int, Enum):
     attached_tools_request = 0x700
     tools_detected_notification = 0x701
     tip_presence_notification = 0x702
+    get_tip_status_request = 0x703
 
     fw_update_initiate = 0x60
     fw_update_data = 0x61

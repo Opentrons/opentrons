@@ -33,6 +33,8 @@
   "open_a_protocol": "Open a protocol to get started",
   "open_api_docs": "Open Python API Documentation",
   "organization_and_author": "Organization/Author",
+  "pinned_protocol": "Pinned protocol",
+  "pinned_protocols": "Pinned Protocols",
   "protocol_title": "Protocol - {{protocol_name}}",
   "protocol_upload_failed": "Protocol upload failed. Fix the error and try again",
   "required_type_title": "Type",
@@ -43,6 +45,7 @@
   "too_many_pins_header": "You've hit your max!",
   "too_many_pins_body": "Remove a protocol in order to add more protocols to your pinned list.",
   "unpin_protocol": "Unpin protocol",
+  "unpinned_protocol": "Unpinned protocol",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
   "upload_and_simulate": "Open a protocol to run on {{robot_name}}",
   "exit_modal_heading": "Confirm Close Protocol",
@@ -51,7 +54,7 @@
   "exit_modal_body": "Are you sure you want to close this protocol?",
   "robot_name_last_run": "{{robot_name}}’s last run",
   "rerunning_protocol_modal_title": "See How Rerunning a Protocol Works",
-  "protocol_name_title": "Protocol name",
+  "protocol_name_title": "Protocol Name",
   "run_timestamp_title": "Run timestamp",
   "labware_offset_data_title": "Labware Offset data",
   "timestamp": "+{{index}}",
@@ -75,6 +78,7 @@
   "import_new_protocol": "Import a Protocol",
   "most_recent_updates": "Most recent updates",
   "oldest_updates": "Oldest updates",
-  "nothing_here_yet": "Nothing here yet!",
-  "send_a_protocol_to_store": "Send a protocol to store on your OT-3 or run a protocol from desktop app. "
+  "nothing_here_yet": "No protocols to show!",
+  "send_a_protocol_to_store": "Send a protocol from the Opentrons app to get started.",
+  "intervention_modal_learn_more": "Learn more about user interventions"
 }
