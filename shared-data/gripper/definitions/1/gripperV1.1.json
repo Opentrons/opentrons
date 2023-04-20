@@ -5,9 +5,9 @@
   "displayName": "Gripper V1.1",
   "gripForceProfile": {
     "polynomial": [
-      [0, 3.64726],
-      [1, 1.37251],
-      [2, 0.02215]
+      [0, 3.47784],
+      [1, 1.37276],
+      [2, 0.02030]
     ],
     "defaultGripForce": 15.0,
     "defaultHomeForce": 12.0,
