@@ -11,8 +11,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 
-from opentrons.config.types import CapacitivePassSettings
-from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 
 from opentrons.hardware_control.types import CriticalPoint
 
