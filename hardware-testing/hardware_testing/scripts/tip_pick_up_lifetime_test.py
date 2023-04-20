@@ -22,7 +22,7 @@ def convert(seconds):
     hours, seconds = divmod(seconds, 60*60)
     minutes, seconds = divmod(seconds, 60)
 
-    return "%d:%d:%02d:%02d" % (weeks, hours, minutes, seconds)
+    return "%02d:%02d:%02d:%02d" % (weeks, hours, minutes, seconds)
 
 def getch():
     """
@@ -192,7 +192,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     test_name = "tip-pick-up-lifetime-test"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
-    header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tips',
+    header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
                 'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
@@ -333,6 +333,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
                         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
                         if tip_presence_eject_flag == True:
+                            await api.home()
                             sys.exit()
 
                     ### adjust row increment
