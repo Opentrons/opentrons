@@ -9,21 +9,17 @@ import {
   SINGLE_MOUNT_PIPETTES,
   RIGHT,
 } from '@opentrons/shared-data'
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useHost,
-  useCreateRunMutation,
-  useStopRunMutation,
-  useDismissCurrentRunMutation,
-  useDeleteRunMutation,
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { useChainRunCommands } from '../../resources/runs/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import {
   useAttachedPipetteCalibrations,
@@ -76,7 +72,7 @@ export const PipetteWizardFlows = (
     attachedPipettes
   )
   const host = useHost()
-  const [runId, setRunId] = React.useState<string>('')
+  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
@@ -90,29 +86,22 @@ export const PipetteWizardFlows = (
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
     )
   }
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
-    runId
-  )
+  const {
+    chainRunCommands,
+    isCommandMutationLoading,
+  } = useChainMaintenanceCommands(maintenanceRunId)
 
-  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation(
+  const {
+    createMaintenanceRun,
+    isLoading: isCreateLoading,
+  } = useCreateMaintenanceRunMutation(
     {
       onSuccess: response => {
-        setRunId(response.data.id)
+        setMaintenanceRunId(response.data.id)
       },
     },
     host
   )
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
-  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
-    onSuccess: () => {
-      dismissCurrentRun(runId)
-      if (currentStep.section === SECTIONS.DETACH_PROBE) {
-        proceed()
-      } else {
-        closeFlow()
-      }
-    },
-  })
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -133,22 +122,29 @@ export const PipetteWizardFlows = (
     closeFlow()
   }
 
-  const runStatus = useRunStatus(runId)
-  const { deleteRun } = useDeleteRunMutation({
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => {
       handleClose()
     },
   })
 
-  React.useEffect(() => {
-    if (runId != null && runStatus === RUN_STATUS_STOPPED) deleteRun(runId)
-  }, [runStatus, runId, deleteRun])
-
-  // TODO (sb, 3/21/23) temp update to stop homing on exit of a flow, readd home when RSS bug is fixed
   const handleCleanUpAndClose = (): void => {
     setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
-    runId != null ? stopRun(runId) : handleClose()
+    if (maintenanceRunId == null) handleClose()
+    else {
+      chainRunCommands(
+        [
+          {
+            commandType: 'home' as const,
+            params: {},
+          },
+        ],
+        false
+      ).then(() => {
+        deleteMaintenanceRun(maintenanceRunId)
+      })
+    }
   }
   const {
     confirm: confirmExit,
@@ -159,18 +155,18 @@ export const PipetteWizardFlows = (
   const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    if (isCommandMutationLoading || isStopLoading || isExiting) {
+    if (isCommandMutationLoading || isExiting) {
       setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
-  }, [isCommandMutationLoading, isStopLoading, isExiting])
+  }, [isCommandMutationLoading, isExiting])
 
   const calibrateBaseProps = {
     chainRunCommands,
     isRobotMoving,
     proceed,
-    runId,
+    maintenanceRunId,
     goBack,
     attachedPipettes,
     setShowErrorMessage,
@@ -208,7 +204,7 @@ export const PipetteWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createRun={createRun}
+        createMaintenanceRun={createMaintenanceRun}
         isCreateLoading={isCreateLoading}
       />
     )

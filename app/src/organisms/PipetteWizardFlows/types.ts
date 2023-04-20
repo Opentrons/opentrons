@@ -72,7 +72,7 @@ export interface PipetteWizardStepProps {
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  runId: string
+  maintenanceRunId: string
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null

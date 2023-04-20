@@ -8,13 +8,11 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import {
-  useCreateRunMutation,
-  useStopRunMutation,
-  useDeleteRunMutation,
-  useDismissCurrentRunMutation,
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import { useChainRunCommands } from '../../../resources/runs/hooks'
+import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
@@ -61,21 +59,16 @@ const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
 const mockGetPipetteWizardSteps = getPipetteWizardSteps as jest.MockedFunction<
   typeof getPipetteWizardSteps
 >
-const mockUseChainRunCommands = useChainRunCommands as jest.MockedFunction<
-  typeof useChainRunCommands
+const mockUseChainMaintenanceCommands = useChainMaintenanceCommands as jest.MockedFunction<
+  typeof useChainMaintenanceCommands
 >
-const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
-  typeof useCreateRunMutation
+const mockUseCreateMaintenanceRunMutation = useCreateMaintenanceRunMutation as jest.MockedFunction<
+  typeof useCreateMaintenanceRunMutation
 >
-const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
-  typeof useDeleteRunMutation
+const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
+  typeof useDeleteMaintenanceRunMutation
 >
-const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
-  typeof useStopRunMutation
->
-const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
-  typeof useDismissCurrentRunMutation
->
+
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
@@ -102,10 +95,8 @@ const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
 } as any
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
-  let mockCreateRun: jest.Mock
-  let mockStopRun: jest.Mock
-  let mockDismissCurrentRun: jest.Mock
-  let mockDeleteRun: jest.Mock
+  let mockCreateMaintenanceRun: jest.Mock
+  let mockDeleteMaintenanceRun: jest.Mock
   let mockChainRunCommands: jest.Mock
   beforeEach(() => {
     props = {
@@ -119,30 +110,24 @@ describe('PipetteWizardFlows', () => {
       left: {},
       right: {},
     } as any)
-    mockCreateRun = jest.fn()
-    mockStopRun = jest.fn()
-    mockDismissCurrentRun = jest.fn()
-    mockDeleteRun = jest.fn()
+    mockCreateMaintenanceRun = jest.fn()
+    mockDeleteMaintenanceRun = jest.fn()
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
     mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
-    mockUseDeleteRunMutation.mockReturnValue({
-      deleteRun: mockDeleteRun,
+    mockUseDeleteMaintenanceRunMutation.mockReturnValue({
+      deleteMaintenanceRun: mockDeleteMaintenanceRun,
     } as any)
     mockExitModal.mockReturnValue(<div>mock exit modal</div>)
-    mockUseCreateRunMutation.mockReturnValue({
-      createRun: mockCreateRun,
+    mockUseCreateMaintenanceRunMutation.mockReturnValue({
+      createMaintenanceRun: mockCreateMaintenanceRun,
     } as any)
-    mockUseChainRunCommands.mockReturnValue({
+    mockUseChainMaintenanceCommands.mockReturnValue({
       chainRunCommands: mockChainRunCommands,
       isCommandMutationLoading: false,
     })
-    mockUseDismissCurrentRunMutation.mockReturnValue({
-      dismissCurrenRun: mockDismissCurrentRun,
-    } as any)
     mockUseRunStatus.mockReturnValue('idle')
     mockGetPipetteWizardSteps.mockReturnValue([
       {
@@ -204,7 +189,7 @@ describe('PipetteWizardFlows', () => {
         ],
         false
       )
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
     // second page
     getByText('Step 1 / 3')
@@ -243,7 +228,6 @@ describe('PipetteWizardFlows', () => {
       //   false
       // )
       //  TODO(jr, 11/2/22): wire this up when stop run logic is figured out
-      expect(mockStopRun).toHaveBeenCalled()
     })
     //  last page
     //  TODO(jr, 11/2/22): wire this up when stop run logic is figured out
@@ -277,7 +261,7 @@ describe('PipetteWizardFlows', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
     // second page
     getByText('Attach calibration probe')
@@ -376,7 +360,7 @@ describe('PipetteWizardFlows', () => {
         ],
         false
       )
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
   })
   it('renders the correct information, calling the correct commands for the attach flow 96 channel', async () => {
@@ -436,7 +420,7 @@ describe('PipetteWizardFlows', () => {
         ],
         false
       )
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
     // page 2
     getByText('Unscrew z-axis carriage')
@@ -503,7 +487,7 @@ describe('PipetteWizardFlows', () => {
         ],
         false
       )
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
   })
   it('renders the correct information, calling the correct commands for the attach flow 96 channel with gantry not empty', async () => {
@@ -565,7 +549,7 @@ describe('PipetteWizardFlows', () => {
         ],
         false
       )
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
   })
   it('renders the correct information, calling the correct commands for the 96-channel calibration flow', async () => {
@@ -601,7 +585,7 @@ describe('PipetteWizardFlows', () => {
         ],
         false
       )
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
     // second page
     getByText('Step 1 / 3')
@@ -681,7 +665,7 @@ describe('PipetteWizardFlows', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
-      expect(mockCreateRun).toHaveBeenCalled()
+      expect(mockCreateMaintenanceRun).toHaveBeenCalled()
     })
     // page 2
     getByText('Unscrew z-axis carriage')
