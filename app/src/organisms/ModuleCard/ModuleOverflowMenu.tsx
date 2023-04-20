@@ -67,28 +67,26 @@ export const ModuleOverflowMenu = (
 
   return (
     <Flex position={POSITION_RELATIVE}>
-      <MenuList
-        buttons={[
-          menuOverflowItemsByModuleType[module.moduleType].map(
-            (item: any, index: number) => {
-              return (
-                <React.Fragment key={`${index}_${String(module.moduleType)}`}>
-                  <MenuItem
-                    key={`${index}_${String(module.moduleModel)}`}
-                    onClick={() => item.onClick(item.isSecondary)}
-                    data-testid={`module_setting_${String(module.moduleModel)}`}
-                    disabled={item.disabledReason || isDisabled}
-                    whiteSpace="nowrap"
-                  >
-                    {item.setSetting}
-                  </MenuItem>
-                  {item.menuButtons}
-                </React.Fragment>
-              )
-            }
-          ),
-        ]}
-      />
+      <MenuList>
+        {menuOverflowItemsByModuleType[module.moduleType].map(
+          (item: any, index: number) => {
+            return (
+              <React.Fragment key={`${index}_${String(module.moduleType)}`}>
+                <MenuItem
+                  key={`${index}_${String(module.moduleModel)}`}
+                  onClick={() => item.onClick(item.isSecondary)}
+                  data-testid={`module_setting_${String(module.moduleModel)}`}
+                  disabled={item.disabledReason || isDisabled}
+                  whiteSpace="nowrap"
+                >
+                  {item.setSetting}
+                </MenuItem>
+                {item.menuButtons}
+              </React.Fragment>
+            )
+          }
+        )}
+      </MenuList>
     </Flex>
   )
 }

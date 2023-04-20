@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot
+from numpy import array, dot, add
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -25,11 +25,15 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
     get_west_slot,
 )
+from opentrons.protocol_engine.commands.calibration.calibrate_module import (
+    CalibrateModuleResult,
+)
 from opentrons.types import DeckSlotName, MountType
 
 from ..types import (
     LoadedModule,
     ModuleModel,
+    ModuleOffsetVector,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
@@ -126,19 +130,25 @@ class ModuleState:
     substate_by_module_id: Dict[str, ModuleSubStateType]
     """Information about each module that's specific to the module type."""
 
+    module_offset_by_serial: Dict[str, ModuleOffsetVector]
+    """Information about each modules offsets."""
+
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
     """Module state container."""
 
     _state: ModuleState
 
-    def __init__(self) -> None:
+    def __init__(
+        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None
+    ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
             slot_by_module_id={},
             requested_model_by_id={},
             hardware_by_module_id={},
             substate_by_module_id={},
+            module_offset_by_serial=module_calibration_offsets or {},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -165,6 +175,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 slot_name=command.params.location.slotName,
                 requested_model=command.params.model,
                 module_live_data=None,
+            )
+
+        if isinstance(command.result, CalibrateModuleResult):
+            self._update_module_calibration(
+                module_id=command.params.moduleId,
+                module_offset=command.result.moduleOffset,
             )
 
         if isinstance(
@@ -250,6 +266,14 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
             )
+
+    def _update_module_calibration(
+        self, module_id: str, module_offset: ModuleOffsetVector
+    ) -> None:
+        module = self._state.hardware_by_module_id.get(module_id)
+        if module:
+            module_serial = module.serial_number
+            self._state.module_offset_by_serial[module_serial] = module_offset
 
     def _handle_heater_shaker_commands(
         self,
@@ -617,6 +641,13 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+
+        # add the calibrated module offset if there is one
+        module_serial = self.get_serial_number(module_id)
+        offset = self._state.module_offset_by_serial.get(module_serial)
+        if offset is not None:
+            module_offset = array((offset.x, offset.y, offset.z, 1))
+            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],

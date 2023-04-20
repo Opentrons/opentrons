@@ -651,7 +651,7 @@
     },
     "channels": 8,
     "minVolume": 1,
-    "maxVolume": 50,
+    "maxVolume": 1000,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
       "homePosition": 230.15,

@@ -1,3 +1,5 @@
+:og:description: How to choose the right Python API version for your protocol. 
+
 .. _v2-versioning:
 
 Versioning

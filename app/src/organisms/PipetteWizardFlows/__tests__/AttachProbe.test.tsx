@@ -49,12 +49,12 @@ describe('AttachProbe', () => {
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
-    getByAltText('Attach probe')
+    getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
@@ -97,14 +97,14 @@ describe('AttachProbe', () => {
       ...props,
       isRobotMoving: true,
     }
-    const { getByText, getByAltText } = render(props)
+    const { getByText, getByTestId } = render(props)
     getByText(
       'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
     )
     getByText(
       'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
     )
-    getByAltText('Pipette is calibrating')
+    getByTestId('Pipette_Probing_1.webm')
   })
 
   it('renders the error modal screen when errorMessage is true', () => {
@@ -122,12 +122,12 @@ describe('AttachProbe', () => {
       ...props,
       isOnDevice: true,
     }
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach calibration probe')
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
-    getByAltText('Attach probe')
+    getByTestId('Pipette_Attach_Probe_1.webm')
     getByRole('button', { name: 'Begin calibration' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [

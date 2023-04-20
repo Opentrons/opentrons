@@ -1,3 +1,5 @@
+:og:description: The Opentrons Python Protocol API is a Python framework that makes it easy to write automated biology lab protocols that use Opentrons robots and hardware modules.
+
 =======
 Welcome
 =======
