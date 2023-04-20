@@ -588,7 +588,7 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         """
         consumed = _GetMotorUsageResponsePayloadBase.get_size()
         superdict = asdict(_GetMotorUsageResponsePayloadBase.build(data))
-        num_elements = superdict.pop("num_elements")
+        num_elements = superdict["num_elements"]
         message_index = superdict.pop("message_index")
 
         usage_values: List[MotorUsageTypeField] = []
