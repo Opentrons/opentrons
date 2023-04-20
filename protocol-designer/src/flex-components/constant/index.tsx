@@ -44,13 +44,27 @@ export const blockedTipRackListForFlex: string[] = [
 export const customTiprackOption: { name: string, value: string, namespace: string } = { name: "Custom Tiprack", value: "custom_tiprack", namespace: "custom_tiprack" };
 
 // constant LEFT/RIGHT Mount Side
-export const mountSide: any = [{
-    name: "Left Mount",
-    value: "left"
-},
-{
-    name: "Right Mount",
-    value: "right",
-}]
+export const mountSide: any = [
+    {
+        name: "Left Mount",
+        value: "left"
+    },
+    {
+        name: "Right Mount",
+        value: "right",
+    }
+]
 
 export const pipetteNameBlocklist: string[] = ['p10_single', 'p10_multi', 'p50_single', 'p50_multi', 'p300_single', 'p300_multi', 'p1000_single']
+
+interface pipetteSlot {
+    firstPipette: string;
+    secondPipette: string;
+}
+
+export const pipetteSlot: pipetteSlot = {
+    firstPipette: "firstPipette",
+    secondPipette: "secondPipette"
+}
+
+export const blockMount: string[] = ["p1000_96"]

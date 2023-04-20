@@ -5,7 +5,7 @@ import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { DropdownOption, Flex, RadioGroup, OutlineButton, CheckboxField } from '@opentrons/components'
 import { reduce } from 'lodash'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
-import { blockedTipRackListForFlex, customTiprackOption, fontSize14 } from '../constant'
+import { blockMount, blockedTipRackListForFlex, customTiprackOption, fontSize14, pipetteSlot } from '../constant'
 import { StyledText } from './StyledText'
 import { RadioSelect } from './RadioSelect'
 import { i18n } from '../../localization'
@@ -23,9 +23,12 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({ formPr
     const is96ChannelSelected = checkSelectedPipette(pipetteSelectionData[pipetteName].pipetteName)
     let className = cx({ disable_mount_option: is96ChannelSelected });
 
+    const pipetteHeaderText = pipetteSlot.firstPipette === pipetteName
+        ? i18n.t('flex.pipette_selection.choose_first_pipette')
+        : i18n.t('flex.pipette_selection.choose_second_pipette')
     return (
         <>
-            <StyledText as={"h1"}>Pipettes</StyledText>
+            <StyledText as={"h1"}>{pipetteHeaderText}</StyledText>
             {
                 <>
                     <StyledText as={"p"}>{i18n.t('flex.pipette_selection.pipette_96_selection_note')}</StyledText>
@@ -51,11 +54,11 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({ formPr
 }
 
 function checkSelectedPipette(pipetteName: any) {
-    return pipetteName === "p1000_96"
+    return blockMount.includes(pipetteName)
 }
 
 function channel96SelectionNote(is96ChannelSelected: boolean) {
-    return is96ChannelSelected && <StyledText as={'p'}>Note: 96 Channel occupies both the mount.</StyledText>
+    return is96ChannelSelected && <StyledText as={'p'}>{i18n.t("flex.pipette_selection.pippette_ocuupies_both_mount")}</StyledText>
 }
 
 const SelectPipetteMount = ({ propsData, pipetteName }: any) => {

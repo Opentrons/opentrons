@@ -14,7 +14,7 @@ import { FlexModules } from './FlexModules'
 import { FlexProtocolName } from './FlexProtocolName'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
-import { mountSide, navPillTabListLength } from '../constant'
+import { mountSide, navPillTabListLength, pipetteSlot } from '../constant'
 import { RoundTabs } from './RoundTab'
 import { SelectPipetteOption } from './SelectPipette'
 
@@ -87,9 +87,10 @@ const newDummyFormPropsForTesting = {
 
 const selectComponent = (selectedTab: number, props: any): any => {
   function comp(selectedTab: number) {
+    const { firstPipette, secondPipette } = pipetteSlot
     return selectedTab == 1
-      ? <SelectPipetteOption formProps={props} pipetteName={'firstPipette'} />
-      : <SelectPipetteOption formProps={props} pipetteName={'secondPipette'} />
+      ? <SelectPipetteOption formProps={props} pipetteName={firstPipette} />
+      : <SelectPipetteOption formProps={props} pipetteName={secondPipette} />
   }
 
   switch (selectedTab) {
@@ -109,7 +110,7 @@ const selectComponent = (selectedTab: number, props: any): any => {
 
 function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
-  
+
   // Next button click
   const handleNext = ({ selectedTab }: Props) => {
     const setTabNumber =
