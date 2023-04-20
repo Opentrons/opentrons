@@ -11,6 +11,7 @@ import {
   Icon,
   Btn,
   BORDERS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/OnDeviceDisplay/constants'
@@ -105,13 +106,16 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           {title}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacing2} width="100%">
+      <Flex
+        marginTop={SPACING.spacing2}
+        width="100%"
+        justifyContent={JUSTIFY_CENTER}
+      >
         <StyledText
           fontSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
-          textAlign={TYPOGRAPHY.textAlignCenter}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}
