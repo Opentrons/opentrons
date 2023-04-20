@@ -13,6 +13,7 @@ import {
   BORDERS,
   RESPONSIVENESS,
   styleProps,
+  SPACING,
 } from '@opentrons/components'
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
@@ -50,6 +51,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
 
   return (
     <Overlay
+      aria-label="BackgroundOverlay_ModalShell"
       onClick={e => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
@@ -81,8 +83,8 @@ const Overlay = styled.div`
   z-index: 1;
   background-color: ${COLORS.backgroundOverlay};
   cursor: default;
-  
-   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.darkBlack_sixty};
   }
 `

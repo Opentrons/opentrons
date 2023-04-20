@@ -22,7 +22,7 @@ import { ControlContainer } from './ControlContainer'
 
 import type { StepSize } from './types'
 
-const JUMP_SIZE_SUBTITLE = "- / +"
+const JUMP_SIZE_SUBTITLE = '- / +'
 const JUMP_SIZE_ICON_STYLE = css`
   flex-shrink: 0;
 `

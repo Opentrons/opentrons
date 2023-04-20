@@ -23,7 +23,6 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       borderRadius={BORDERS.size_three}
       width="18.0625rem"
       onOutsideClick={onClick}
-      isOnDeviceDisplay
     >
       <Flex
         boxShadow={BORDERS.shadowSmall}
