@@ -19,8 +19,6 @@ interface SelectPipetteOptionProps {
 
 export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({ formProps, pipetteName }) => {
     const { values: { pipetteSelectionData } } = formProps
-    let tiprackOptions = getFlexTiprackOptions()
-    tiprackOptions.push(customTiprackOption)
 
     const is96ChannelSelected = checkSelectedPipette(pipetteSelectionData[pipetteName].pipetteName)
     let className = cx({ disable_mount_option: is96ChannelSelected });
@@ -45,7 +43,6 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({ formPr
                     <hr />
                     <TipRackOptions
                         propsData={formProps}
-                        tiprackOptionsProps={tiprackOptions}
                         pipetteName={pipetteName} />
                 </>
             }
@@ -100,13 +97,15 @@ function getFlexTiprackOptions() {
 }
 
 
-const TipRackOptions = ({ propsData, tiprackOptionsProps, pipetteName }: any) => {
+const TipRackOptions = ({ propsData, pipetteName }: any) => {
+    let tiprackOptions = getFlexTiprackOptions()
+    tiprackOptions.push(customTiprackOption)
     const { values: { pipetteSelectionData } } = propsData
     const tipRackListDataFromProps = pipetteSelectionData[pipetteName].tipRackList
     const [selected, setSelected] = useState<Array<any>>([])
     const [customTipRack, setCustomTipRack] = useState(false)
-    const customTiprackFilteredData = [...tiprackOptionsProps].filter((i: any) => i.namespace !== 'opentrons' && i.namespace !== 'custom_tiprack')
-    const opentronsFlexTiprackData = [...tiprackOptionsProps].filter((i: any) => i.namespace === 'opentrons' || i.namespace === 'custom_tiprack')
+    const customTiprackFilteredData = [...tiprackOptions].filter((i: any) => i.namespace !== 'opentrons' && i.namespace !== customTiprackOption.value)
+    const opentronsFlexTiprackData = [...tiprackOptions].filter((i: any) => i.namespace === 'opentrons' || i.namespace === customTiprackOption.value)
 
     const handleNameChange = (selected: any) => {
         propsData.setFieldValue(`pipetteSelectionData.${pipetteName}.tipRackList`, selected);
@@ -139,7 +138,7 @@ const TipRackOptions = ({ propsData, tiprackOptionsProps, pipetteName }: any) =>
                             }
                             setSelected(selected)
                             handleNameChange(selected)
-                            if (name === "Custom Tiprack") {
+                            if (name === customTiprackOption.name) {
                                 setCustomTipRack(false)
                             }
                         }

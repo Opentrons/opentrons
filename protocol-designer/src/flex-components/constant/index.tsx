@@ -5,25 +5,21 @@ export * from './typography'
 
 interface NavPillTab {
     name: string;
-    id: number;
+    navPillPage: number[];
 }
 
 export const navPillsNameTabList: NavPillTab[] = [
     {
         name: i18n.t('flex.name_and_description.name'),
-        id: 1,
+        navPillPage: [0],
     },
     {
-        name: `First ${i18n.t('flex.pipettes_selection.name')}`,
-        id: 2,
-    },
-    {
-        name: `Second ${i18n.t('flex.pipettes_selection.name')}`,
-        id: 3,
+        name: i18n.t('flex.pipettes_selection.name'),
+        navPillPage: [1, 2],
     },
     {
         name: i18n.t('flex.modules_selection.name'),
-        id: 4,
+        navPillPage: [3],
     },
 ];
 
@@ -45,7 +41,7 @@ export const blockedTipRackListForFlex: string[] = [
 ];
 
 // Custom tiprack option object
-export const customTiprackOption: { name: string, value: string, namespace: string } = { name: "Custom Tiprack", value: "custom_tiprack", namespace:"custom_tiprack" };
+export const customTiprackOption: { name: string, value: string, namespace: string } = { name: "Custom Tiprack", value: "custom_tiprack", namespace: "custom_tiprack" };
 
 // constant LEFT/RIGHT Mount Side
 export const mountSide: any = [{

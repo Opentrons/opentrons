@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     RoundTab,
 } from '@opentrons/components'
@@ -11,13 +11,14 @@ interface RoundTabsProps {
 }
 
 export const RoundTabs: React.FC<RoundTabsProps> = ({ setCurrentTab, currentTab }) => {
+
     return (
         <>
-            {navPillsNameTabList.map(({ name }, index) => {
+            {navPillsNameTabList.map(({ name, navPillPage }, index) => {
                 return (
                     <RoundTab
                         key={index}
-                        isCurrent={currentTab === index}
+                        isCurrent={navPillPage.includes(currentTab)}
                         onClick={() => setCurrentTab(index)}
                     >
                         <StyledText as="h4">{name}</StyledText>
