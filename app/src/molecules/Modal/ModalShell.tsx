@@ -80,7 +80,9 @@ const Overlay = styled.div`
   bottom: 0;
   z-index: 1;
   background-color: ${COLORS.backgroundOverlay};
-  cursor: default @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  cursor: default;
+  
+   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.darkBlack_sixty};
   }
 `
