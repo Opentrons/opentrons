@@ -7,7 +7,6 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 
 from robot_server.errors import ApiError
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.service.json_api import (
     RequestModel,
     SimpleEmptyBody,
@@ -18,11 +17,11 @@ from robot_server.service.json_api import (
 from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
+    MaintenanceRunNotFoundError,
 )
 from robot_server.maintenance_runs.maintenance_engine_store import EngineConflictError
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
-    RunNotCurrentError,
 )
 
 from robot_server.maintenance_runs.router.base_router import (
@@ -145,7 +144,7 @@ async def test_get_run_with_missing_id(
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
     """It should 404 if the run ID does not exist."""
-    not_found_error = RunNotFoundError(run_id="run-id")
+    not_found_error = MaintenanceRunNotFoundError(run_id="run-id")
 
     decoy.when(mock_maintenance_run_data_manager.get(run_id="run-id")).then_raise(
         not_found_error
@@ -252,7 +251,7 @@ async def test_delete_run_with_bad_id(
 ) -> None:
     """It should 404 if the run ID does not exist."""
     decoy.when(await mock_maintenance_run_data_manager.delete("run-id")).then_raise(
-        RunNotCurrentError("uh oh")
+        MaintenanceRunNotFoundError("uh oh")
     )
 
     with pytest.raises(ApiError) as exc_info:

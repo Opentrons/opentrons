@@ -15,7 +15,6 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -24,14 +23,17 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from ..maintenance_run_models import MaintenanceRunCommandSummary
-from ..maintenance_run_data_manager import MaintenanceRunDataManager, RunNotCurrentError
+from ..maintenance_run_models import (
+    MaintenanceRunCommandSummary,
+    MaintenanceRunNotFoundError,
+)
+from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..maintenance_engine_store import MaintenanceEngineStore
 from ..dependencies import (
     get_maintenance_engine_store,
     get_maintenance_run_data_manager,
 )
-from .base_router import RunNotFound, RunStopped
+from .base_router import RunNotFound
 
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
@@ -93,9 +95,10 @@ async def get_current_run_engine_from_url(
         engine_store: Engine store to pull current run ProtocolEngine.
     """
     if runId != engine_store.current_run_id:
-        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-            status.HTTP_409_CONFLICT
-        )
+        raise RunNotFound(
+            detail=f"Run {runId} not found. "
+            f"Note that only one maintenance run can exist at a time."
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     return engine_store.engine
 
@@ -117,9 +120,7 @@ async def get_current_run_engine_from_url(
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
-        },
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[CommandNotAllowed]},
     },
 )
 async def create_run_command(
@@ -236,7 +237,7 @@ async def get_run_commands(
             cursor=cursor,
             length=pageLength,
         )
-    except RunNotFoundError as e:
+    except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
@@ -312,7 +313,7 @@ async def get_run_command(
     """
     try:
         command = run_data_manager.get_command(run_id=runId, command_id=commandId)
-    except RunNotCurrentError as e:
+    except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     except CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e

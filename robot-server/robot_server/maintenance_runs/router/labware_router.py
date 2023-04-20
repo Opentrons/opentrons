@@ -1,7 +1,5 @@
 """Router for /maintenance_runs endpoints dealing with labware offsets and definitions."""
 import logging
-from typing import Union
-
 from fastapi import APIRouter, Depends, status
 
 from opentrons.protocol_engine import LabwareOffsetCreate, LabwareOffset
@@ -13,7 +11,7 @@ from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResp
 from ..maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
 from ..maintenance_engine_store import MaintenanceEngineStore
 from ..dependencies import get_maintenance_engine_store
-from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
+from .base_router import RunNotFound, RunNotIdle, get_run_data_from_url
 
 log = logging.getLogger(__name__)
 labware_router = APIRouter()
@@ -33,7 +31,7 @@ labware_router = APIRouter()
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[LabwareOffset]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
 )
 async def add_labware_offset(
@@ -48,11 +46,6 @@ async def add_labware_offset(
         engine_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    if run.current is False:
-        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
-            status.HTTP_409_CONFLICT
-        )
-
     added_offset = engine_store.engine.add_labware_offset(request_body.data)
     log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
 
@@ -74,7 +67,7 @@ async def add_labware_offset(
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[MaintenanceRun]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
 )
 async def add_labware_definition(
@@ -89,11 +82,6 @@ async def add_labware_definition(
         engine_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    if run.current is False:
-        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
-            status.HTTP_409_CONFLICT
-        )
-
     uri = engine_store.engine.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
 

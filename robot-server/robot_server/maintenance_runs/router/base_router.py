@@ -23,15 +23,15 @@ from robot_server.service.json_api import (
     Body,
 )
 
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.dependencies import get_protocol_run_has_been_played
 
 from ..maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunCreate,
+    MaintenanceRunNotFoundError,
 )
 from ..maintenance_engine_store import EngineConflictError
-from ..maintenance_run_data_manager import MaintenanceRunDataManager, RunNotCurrentError
+from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..dependencies import get_maintenance_run_data_manager
 
 
@@ -110,10 +110,8 @@ async def get_run_data_from_url(
     """
     try:
         run_data = run_data_manager.get(runId)
-    except RunNotFoundError as e:
+    except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
-    except RunNotCurrentError as e:
-        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return run_data
 
@@ -128,7 +126,7 @@ async def get_run_data_from_url(
         If a maintenance run already exists, it will be cleared
         and a new one will be created.
 
-        Will raise an error if a protocol run exists and is not idle.
+        Will raise an error if a *protocol* run exists and is not idle.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -217,7 +215,6 @@ async def get_current_run(
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[MaintenanceRun]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
 async def get_run(
@@ -260,8 +257,7 @@ async def remove_run(
 
     except EngineConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
-
-    except RunNotCurrentError as e:
+    except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(

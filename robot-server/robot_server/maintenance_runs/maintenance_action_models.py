@@ -32,8 +32,8 @@ class MaintenanceRunAction(ResourceModel):
     A RunAction resource represents a client-provided command to
     the run in order to control the execution of the run itself.
 
-    This is different than a protocol command, which represents an individual
-    robotic procedure to execute as part of a protocol.
+    This is different than a run command, which represents an individual
+    robotic procedure to execute.
     """
 
     id: str = Field(..., description="A unique identifier to reference the command.")

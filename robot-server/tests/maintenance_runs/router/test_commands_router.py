@@ -24,12 +24,11 @@ from robot_server.maintenance_runs.maintenance_engine_store import (
 )
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
-    RunNotCurrentError,
 )
 from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRunCommandSummary,
+    MaintenanceRunNotFoundError,
 )
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.maintenance_runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
@@ -60,7 +59,7 @@ async def test_get_current_run_engine_from_url_not_current(
     decoy: Decoy,
     mock_maintenance_engine_store: MaintenanceEngineStore,
 ) -> None:
-    """It should 409 if you try to add commands to non-current run."""
+    """It should 404 if you try to add commands to non-current/non-existent run."""
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(
         "some-other-run-id"
     )
@@ -71,8 +70,8 @@ async def test_get_current_run_engine_from_url_not_current(
             engine_store=mock_maintenance_engine_store,
         )
 
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
 
 
 async def test_create_run_command(
@@ -289,7 +288,7 @@ async def test_get_run_commands_not_found(
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
 ) -> None:
     """It should 404 if the run is not found."""
-    not_found_error = RunNotFoundError("oh no")
+    not_found_error = MaintenanceRunNotFoundError("oh no")
 
     decoy.when(
         mock_maintenance_run_data_manager.get_commands_slice(
@@ -342,7 +341,7 @@ async def test_get_run_command_by_id(
     "exception",
     [
         CommandDoesNotExistError("oh no"),
-        RunNotCurrentError("oh no"),
+        MaintenanceRunNotFoundError("oh no"),
     ],
 )
 async def test_get_run_command_missing(

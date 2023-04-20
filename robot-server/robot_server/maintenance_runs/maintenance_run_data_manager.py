@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
 )
 
 from .maintenance_engine_store import MaintenanceEngineStore
-from .maintenance_run_models import MaintenanceRun
+from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
 
 def _build_run(
@@ -115,7 +115,7 @@ class MaintenanceRunDataManager:
         """
         current_id = self._engine_store.current_run_id
         if current_id != run_id:
-            raise RunNotCurrentError("Cannot get the summary of a non-current run.")
+            raise MaintenanceRunNotFoundError(run_id=run_id)
         created_at = self._engine_store.current_run_created_at
         state_summary = self._get_state_summary(run_id=run_id)
 
@@ -140,9 +140,7 @@ class MaintenanceRunDataManager:
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
         else:
-            raise RunNotCurrentError(
-                f"Cannot delete {run_id} since it is not the current maintenance run."
-            )
+            raise MaintenanceRunNotFoundError(run_id=run_id)
 
     def get_commands_slice(
         self,
@@ -161,7 +159,7 @@ class MaintenanceRunDataManager:
             RunNotCurrentError: The given run identifier doesn't belong to a current run.
         """
         if run_id != self._engine_store.current_run_id:
-            raise RunNotCurrentError(f"{run_id} is not the current maintenance run")
+            raise MaintenanceRunNotFoundError(run_id=run_id)
         the_slice = self._engine_store.engine.state_view.commands.get_slice(
             cursor=cursor, length=length
         )
@@ -189,7 +187,7 @@ class MaintenanceRunDataManager:
             CommandNotFoundError: The given command identifier was not found.
         """
         if run_id != self._engine_store.current_run_id:
-            raise RunNotCurrentError(f"{run_id} is not the current maintenance run")
+            raise MaintenanceRunNotFoundError(run_id=run_id)
         return self._engine_store.engine.state_view.commands.get(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:

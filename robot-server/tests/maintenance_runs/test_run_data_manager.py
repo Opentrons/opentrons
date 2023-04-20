@@ -23,9 +23,11 @@ from robot_server.maintenance_runs.maintenance_engine_store import (
 )
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
-    RunNotCurrentError,
 )
-from robot_server.maintenance_runs.maintenance_run_models import MaintenanceRun
+from robot_server.maintenance_runs.maintenance_run_models import (
+    MaintenanceRun,
+    MaintenanceRunNotFoundError,
+)
 
 from opentrons.protocol_engine import Liquid
 
@@ -232,13 +234,13 @@ async def test_get_run_not_current(
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
 ) -> None:
-    """It should raise a RunNotCurrentError."""
+    """It should raise a MaintenanceRunNotFoundError."""
     run_id = "hello world"
 
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(
         "not-current-id"
     )
-    with pytest.raises(RunNotCurrentError):
+    with pytest.raises(MaintenanceRunNotFoundError):
         subject.get(run_id=run_id)
 
 
