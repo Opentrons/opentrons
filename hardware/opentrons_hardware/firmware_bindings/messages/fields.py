@@ -453,6 +453,8 @@ class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
         key = cls._usage_field_from_bytes(data, 0, 2)
         length = cls._usage_field_from_bytes(data, 2, 4)
         usage_value = cls._usage_field_from_bytes(data, 4, 12)
+        if length < 8:
+            usage_value = usage_value >> (8-length)*8
         return key, length, usage_value
 
     @classmethod
