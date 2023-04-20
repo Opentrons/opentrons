@@ -490,3 +490,11 @@ export interface GripperDefinition {
     jawWidth: { min: number; max: number }
   }
 }
+
+export interface PipetteGeneralSpecs {
+  displayName: string
+  model: string
+  displayCategory: string
+  backCompatNames: string[]
+  channels: 1 | 8 | 96
+}

@@ -1,8 +1,13 @@
+import groupBy from 'lodash/groupBy'
 import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
 import { OT3_PIPETTES } from './constants'
 
-import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+  PipetteGeneralSpecs,
+} from './types'
 
 type SortableProps = 'maxVolume' | 'channels'
 
@@ -20,6 +25,7 @@ const ALL_PIPETTE_NAMES: PipetteName[] = (Object.keys(
 export function getPipetteNameSpecs(
   name: PipetteName
 ): PipetteNameSpecs | null {
+  console.log(getGeneralPipetteSpecsFromName(name))
   const config = pipetteNameSpecs[name] as
     | Omit<PipetteNameSpecs, 'name'>
     | undefined
@@ -32,11 +38,81 @@ export function getPipetteNameSpecs(
 export function getPipetteModelSpecs(
   model: PipetteModel
 ): PipetteModelSpecs | null | undefined {
+  console.log(getGeneralPipetteSpecsFromModel(model))
+
   const modelSpecificFields = pipetteModelSpecs.config[model]
   const modelFields =
     modelSpecificFields &&
     getPipetteNameSpecs(modelSpecificFields.name as PipetteName)
   return modelFields && { ...modelFields, ...modelSpecificFields, model }
+}
+
+export function getGeneralPipetteSpecsFromModel(
+  model: PipetteModel
+): string | null {
+  const pipetteDetails = model.split('_')
+
+  let pipetteChannels = 'single_channel'
+  if (pipetteDetails[1] === '96') pipetteChannels = 'ninety_six_channel'
+  else if (pipetteDetails[1] === 'multi') pipetteChannels = 'eight_channel'
+
+  const pipetteModel = pipetteDetails[0]
+
+  const pipetteVersion = pipetteDetails[2]
+  const versionDetails = pipetteVersion.slice(1).split('.')
+  const majorVersion = versionDetails[0]
+  const minorVersion = versionDetails.length > 1 ? versionDetails[1] : '0'
+
+  const path = `../pipette/definitions/2/general/${pipetteChannels}/${pipetteModel}/${majorVersion}_${minorVersion}.json`
+  // const match = (require as any).context(
+  //   path,
+  //   true, // traverse subdirectories
+  //   /\.json$/, // import filter
+  //   'sync' // load every definition into one synchronous chunk
+  // )
+  return path
+}
+
+export function getGeneralPipetteSpecsFromName(
+  name: PipetteName
+): PipetteGeneralSpecs | null {
+  if (name == null) return null
+  const pipetteSchemaV2DefsContext = (require as any).context(
+    `../pipette/definitions/2/general/`,
+    true, // traverse subdirectories
+    /\.json$/, // import filter
+    'sync' // load every definition into one synchronous chunk
+  )
+
+  const allDefs = pipetteSchemaV2DefsContext
+    .keys()
+    .map((name: string) => pipetteSchemaV2DefsContext(name))
+
+  const groups = groupBy(
+    allDefs,
+    d => `${d.model}/${d.channels}/${d.displayCategory}`
+  )
+
+  const pipetteDetails = name.split('_')
+  const pipetteModel = pipetteDetails[0]
+  let pipetteChannels = pipetteDetails[1]
+  if (pipetteDetails[1] === 'single') pipetteChannels = '1'
+  else if (pipetteDetails[1] === 'multi') pipetteChannels = '8'
+
+  let displayCategory = ''
+  if (pipetteDetails != null && pipetteDetails.length > 2) {
+    displayCategory = pipetteDetails[2]
+    displayCategory = displayCategory?.toUpperCase()
+  } else if (groups[`${pipetteModel}/${pipetteChannels}/GEN1`] != null) {
+    displayCategory = 'GEN1'
+  } else {
+    displayCategory = 'GEN3'
+  }
+  const correctGroup =
+    groups[`${pipetteModel}/${pipetteChannels}/${displayCategory}`]
+  const highestMatchingVersion =
+    correctGroup != null ? correctGroup[correctGroup.length - 1] : null
+  return highestMatchingVersion
 }
 
 export function getAllPipetteNames(...sortBy: SortableProps[]): PipetteName[] {

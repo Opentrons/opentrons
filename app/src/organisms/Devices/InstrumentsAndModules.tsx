@@ -49,12 +49,14 @@ export function InstrumentsAndModules({
       refetchInterval: EQUIPMENT_POLL_MS,
     }
   )?.data ?? { left: undefined, right: undefined }
+  console.log('pipettes', attachedPipettes)
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
   const { data: attachedInstruments } = useInstrumentsQuery()
+  console.log('instruments:', attachedInstruments)
   // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
   // { refetchInterval: EQUIPMENT_POLL_MS, },
   const extensionInstrument =
