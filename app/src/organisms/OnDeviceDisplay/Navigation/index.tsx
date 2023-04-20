@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   Flex,
@@ -31,13 +31,16 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
   const NavigationLink = styled(NavLink)`
-    color: ${COLORS.black};
+    color: ${COLORS.darkBlack_seventy};
     display: flex;
     grid-gap: ${SPACING.spacing3};
     border-bottom: 0.3125rem solid transparent;
     height: 3.5rem;
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 
     &.active {
+      color: ${COLORS.black};
+      font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
       border-bottom: 0.3125rem solid transparent;
       border-image: linear-gradient(
         to right,
@@ -64,26 +67,13 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           gridGap={SPACING.spacing3}
         >
           <NavigationLink to="/dashboard">
-            <StyledText
-              fontSize={TYPOGRAPHY.fontSize32}
-              fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-              lineHeight={TYPOGRAPHY.lineHeight42}
-              color={COLORS.darkBlackEnabled}
-            >
-              {robotName}
-            </StyledText>
+            <StyledText as="h3">{robotName}</StyledText>
           </NavigationLink>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
             <NavigationLink key={name} to={navLinkTo as string}>
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSize32}
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                lineHeight={TYPOGRAPHY.lineHeight42}
-                color={COLORS.darkBlack_seventy}
-                marginRight={TYPOGRAPHY.fontSize32}
-              >
+              <StyledText as="h3" marginRight={TYPOGRAPHY.fontSize32}>
                 {name}
               </StyledText>
             </NavigationLink>
