@@ -34,7 +34,7 @@
   margin: 1.5rem auto auto;
 }
 
-.flex_header>* {
+.flex_header > * {
   margin: 1rem 2.5rem;
 }
 
@@ -106,11 +106,9 @@
   margin-bottom: 1rem;
 }
 
-.form_group>* {
+.form_group > * {
   margin-bottom: 5px;
 }
-
-
 
 /* Pipette Selection Module */
 .pipette_slection_mount {
@@ -154,4 +152,29 @@
   color: #5181FF;
   padding-left: 10px;
   cursor: pointer;
+}
+.module_section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.module_section > * {
+  margin-right: 3rem;
+  height: 6rem;
+}
+
+.mini_card {
+  width: 16.1rem;
+  min-width: 16.1rem;
+}
+
+.module_options {
+  flex: 0 1 4.75rem;
+}
+
+.line_separator {
+  border-bottom: 1px solid var(--c-light-gray);
+  margin: 32px 0 45px;
+  width: 100%;
 }

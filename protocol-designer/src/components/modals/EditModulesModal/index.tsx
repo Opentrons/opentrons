@@ -216,6 +216,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
 const EditModulesModalComponent = (
   props: EditModulesModalComponentProps
 ): JSX.Element => {
+  console.log(props)
   const { moduleType, onCloseClick, supportedModuleSlot } = props
   const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
