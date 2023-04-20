@@ -232,6 +232,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
+    MAGNETIC_BLOCK_V1 = "heaterShakerModuleV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -243,6 +244,8 @@ class ModuleModel(str, Enum):
             return ModuleType.THERMOCYCLER
         elif ModuleModel.is_heater_shaker_module_model(self):
             return ModuleType.HEATER_SHAKER
+        elif ModuleModel.is_magnetic_module_model(self):
+            return ModuleType.MAGNETIC_BLOCK
 
         assert False, f"Invalid ModuleModel {self}"
 
