@@ -60,6 +60,8 @@ class PipetteConfig:
     default_dispense_flow_rates: Dict[str, float]
     model: PipetteModel
     default_tipracks: List[LabwareUri]
+    # shaft_ul_per_mm: float
+    # default_blowout_volume: float
 
 
 # Notes:
@@ -215,6 +217,8 @@ def load(
         ),
         model=pipette_model,
         default_tipracks=cfg["defaultTipracks"],
+        # default_blowout_volume=cfg["defaultBlowOutVolume"],
+        # shaft_ul_per_mm=cfg["shaftUlPerMm"]
     )
 
     return res

@@ -81,7 +81,7 @@ Quirk = NewType("Quirk", str)
 
 ChannelCount = Literal[1, 8, 96]
 
-UlPerMmAction = Literal["aspirate", "dispense"]
+UlPerMmAction = Literal["aspirate", "dispense", "blowout"]
 
 
 class PipetteConfigElement(TypedDict):
@@ -133,6 +133,8 @@ class PipetteNameSpec(TypedDict):
     defaultAspirateFlowRate: PipetteConfigElementWithPerApiLevelValue
     defaultDispenseFlowRate: PipetteConfigElementWithPerApiLevelValue
     defaultBlowOutFlowRate: PipetteConfigElementWithPerApiLevelValue
+    defaultBlowOutVolume: float
+    shaftUlPerMm: float
     smoothieConfigs: SmoothieConfigs
     defaultTipracks: List[LabwareUri]
 
