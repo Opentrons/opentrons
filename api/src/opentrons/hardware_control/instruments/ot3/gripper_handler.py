@@ -101,6 +101,8 @@ class GripperHandler:
 
     def get_gripper_dict(self) -> Optional[GripperDict]:
         if not self._gripper:
+            # TODO (spp, 2023-04-19): Should this raise an error if fetching info of
+            #  gripper that's not attached, like we do with pipettes?
             return None
         else:
             return self._gripper.as_dict()

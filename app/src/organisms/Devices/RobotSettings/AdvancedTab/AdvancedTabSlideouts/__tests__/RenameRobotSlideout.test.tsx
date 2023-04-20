@@ -63,10 +63,10 @@ describe('RobotSettings RenameRobotSlideout', () => {
 
     getByText('Rename Robot')
     getByText(
-      'Please enter 35 characters max using valid inputs: letters and numbers'
+      'Please enter 17 characters max using valid inputs: letters and numbers'
     )
     getByText('Robot Name')
-    getByText('35 characters max')
+    getByText('17 characters max')
     getByRole('textbox')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     expect(renameButton).toBeInTheDocument()
@@ -97,7 +97,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('mockInput@@@')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Please enter 35 characters max using valid inputs: letters and numbers'
+      'Oops! Robot name must follow the character count and limitations'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
@@ -105,16 +105,16 @@ describe('RobotSettings RenameRobotSlideout', () => {
     })
   })
 
-  it('button should be disabled and render the error message when a user types more than 36 characters', async () => {
+  it('button should be disabled and render the error message when a user types more than 17 characters', async () => {
     const [{ getByRole, findByText }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, {
-      target: { value: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' },
+      target: { value: 'aaaaaaaaaaaaaaaaaa' },
     })
-    expect(input).toHaveValue('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    expect(input).toHaveValue('aaaaaaaaaaaaaaaaaa')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Please enter 35 characters max using valid inputs: letters and numbers'
+      'Oops! Robot name must follow the character count and limitations'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
@@ -131,7 +131,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('Hello world123')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Please enter 35 characters max using valid inputs: letters and numbers'
+      'Oops! Robot name must follow the character count and limitations'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
@@ -148,7 +148,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue(' ')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Please enter 35 characters max using valid inputs: letters and numbers'
+      'Oops! Robot name must follow the character count and limitations'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
