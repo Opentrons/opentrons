@@ -232,7 +232,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
-    MAGNETIC_BLOCK_V1 = "heaterShakerModuleV1"
+    MAGNETIC_BLOCK_V1 = "magneticBlockV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
