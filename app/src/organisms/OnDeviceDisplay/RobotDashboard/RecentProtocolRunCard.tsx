@@ -54,6 +54,7 @@ export function RecentProtocolRunCard({
     -webkit-line-clamp: 5;
     overflow: hidden;
     width: 100%;
+    height: max-content;
   `
 
   const missingProtocolHardwareType = missingProtocolHardware.map(
@@ -102,6 +103,7 @@ export function RecentProtocolRunCard({
     history.push(`protocols/${protocolId}`)
   }
 
+  console.log(protocolName)
   return (
     <Flex
       aria-label="RecentRunCard"
