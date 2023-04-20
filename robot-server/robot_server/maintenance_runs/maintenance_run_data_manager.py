@@ -20,8 +20,6 @@ def _build_run(
     created_at: datetime,
     state_summary: Optional[StateSummary],
 ) -> MaintenanceRun:
-    # TODO(mc, 2022-05-16): improve persistence strategy
-    # such that this default summary object is not needed
     state_summary = state_summary or StateSummary.construct(
         status=EngineStatus.IDLE,
         errors=[],
@@ -53,7 +51,7 @@ class RunNotCurrentError(ValueError):
 
 
 class MaintenanceRunDataManager:
-    """Collaborator to manage current run data.
+    """Collaborator to manage current maintenance run data.
 
     Provides a facade to a MaintenanceEngineStore.
     Returns `MaintenanceRun` response models to the router.
@@ -119,7 +117,6 @@ class MaintenanceRunDataManager:
         created_at = self._engine_store.current_run_created_at
         state_summary = self._get_state_summary(run_id=run_id)
 
-        # store created_at at engine level
         return _build_run(
             run_id=run_id,
             created_at=created_at,

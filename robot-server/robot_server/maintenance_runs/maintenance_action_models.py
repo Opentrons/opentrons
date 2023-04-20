@@ -29,11 +29,11 @@ class MaintenanceRunActionCreate(BaseModel):
 class MaintenanceRunAction(ResourceModel):
     """Maintenance Run control action model.
 
-    A RunAction resource represents a client-provided command to
+    A MaintenanceRunAction resource represents a client-provided command to
     the run in order to control the execution of the run itself.
 
     This is different than a run command, which represents an individual
-    robotic procedure to execute.
+    robotic procedure to be executed.
     """
 
     id: str = Field(..., description="A unique identifier to reference the command.")
