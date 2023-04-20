@@ -10,16 +10,15 @@ import {
   COLORS,
 } from '@opentrons/components'
 import {
-  useCreateRunMutation,
-  useStopRunMutation,
+  useCreateMaintenanceCommandMutation,
+  useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
 import {
-  useChainRunCommands,
-  useCreateRunCommandMutation,
+  useChainMaintenanceCommands,
 } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
@@ -32,7 +31,7 @@ import { ExitConfirmation } from './ExitConfirmation'
 
 import type { GripperWizardFlowType } from './types'
 import type { AxiosError } from 'axios'
-import type { Run, CreateRunData, InstrumentData } from '@opentrons/api-client'
+import type { InstrumentData, MaintenanceRun } from '@opentrons/api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 
 interface MaintenanceRunManagerProps {
@@ -44,22 +43,20 @@ export function GripperWizardFlows(
   props: MaintenanceRunManagerProps
 ): JSX.Element {
   const { flowType, closeFlow, attachedGripper } = props
-  const [runId, setRunId] = React.useState<string>('')
+  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
-  } = useChainRunCommands(runId)
+  } = useChainMaintenanceCommands(maintenanceRunId)
   const {
-    createRunCommand,
+    createMaintenanceCommand,
     isLoading: isCommandLoading,
-  } = useCreateRunCommandMutation(runId)
-  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation({
+  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
+  
+  const { createMaintenanceRun, isLoading: isCreateLoading } = useCreateMaintenanceRunMutation({
     onSuccess: response => {
-      setRunId(response.data.id)
+      setMaintenanceRunId(response.data.id)
     },
-  })
-  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
-    onSuccess: closeFlow,
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const handleCleanUpAndClose = (): void => {
@@ -67,44 +64,42 @@ export function GripperWizardFlows(
     chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(
       () => {
         setIsExiting(false)
-        if (runId !== '') stopRun(runId)
+        closeFlow()
       }
     )
-    if (runId !== '') stopRun(runId)
   }
 
   return (
     <GripperWizard
       flowType={flowType}
-      runId={runId}
+      maintenanceRunId={maintenanceRunId}
       attachedGripper={attachedGripper}
-      createRun={createRun}
+      createMaintenanceRun={createMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
         isChainCommandMutationLoading ||
         isCommandLoading ||
-        isStopLoading ||
         isExiting
       }
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
-      createRunCommand={createRunCommand}
+      createRunCommand={createMaintenanceCommand}
     />
   )
 }
 
 interface GripperWizardProps {
   flowType: GripperWizardFlowType
-  runId: string
+  maintenanceRunId: string
   attachedGripper: InstrumentData | null
-  createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  createMaintenanceRun: UseMutateFunction<MaintenanceRun, AxiosError<any>, void, unknown>
   isCreateLoading: boolean
   isRobotMoving: boolean
   handleCleanUpAndClose: () => void
-  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  chainRunCommands: ReturnType<typeof useChainMaintenanceCommands>['chainRunCommands']
   createRunCommand: ReturnType<
-    typeof useCreateRunCommandMutation
-  >['createRunCommand']
+    typeof useCreateMaintenanceCommandMutation
+  >['createMaintenanceCommand']
 }
 
 export const GripperWizard = (
@@ -112,8 +107,8 @@ export const GripperWizard = (
 ): JSX.Element | null => {
   const {
     flowType,
-    runId,
-    createRun,
+    maintenanceRunId,
+    createMaintenanceRun,
     handleCleanUpAndClose,
     chainRunCommands,
     attachedGripper,
@@ -153,7 +148,7 @@ export const GripperWizard = (
 
   const sharedProps = {
     flowType,
-    runId,
+    maintenanceRunId,
     isCreateLoading,
     isRobotMoving,
     attachedGripper,
@@ -178,7 +173,7 @@ export const GripperWizard = (
       <BeforeBeginning
         {...currentStep}
         {...sharedProps}
-        createRun={createRun}
+        createMaintenanceRun={createMaintenanceRun}
       />
     )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {
