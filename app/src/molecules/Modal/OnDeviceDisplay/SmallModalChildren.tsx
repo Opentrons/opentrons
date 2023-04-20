@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -10,24 +9,25 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { ModalShell } from '../../../molecules/Modal'
+import { Modal } from '.'
 
-export function TooManyPinsModal(props: {
+interface SmallModalChildrenProps {
   handleCloseMaxPinsAlert: () => void
-}): JSX.Element {
-  const { handleCloseMaxPinsAlert } = props
-  const { t } = useTranslation(['protocol_info', 'shared'])
+  header: string
+  subText: string
+  buttonText: string
+}
+export function SmallModalChildren(
+  props: SmallModalChildrenProps
+): JSX.Element {
+  const { handleCloseMaxPinsAlert, header, subText, buttonText } = props
 
   return (
-    <ModalShell
-      borderRadius={BORDERS.size_three}
-      onOutsideClick={handleCloseMaxPinsAlert}
-      width="32.375rem"
-    >
+    <Modal onOutsideClick={handleCloseMaxPinsAlert} modalSize="small">
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}
-        padding={SPACING.spacingXXL}
+        width="100%"
       >
         <StyledText
           color={COLORS.darkBlackEnabled}
@@ -36,7 +36,7 @@ export function TooManyPinsModal(props: {
           lineHeight={TYPOGRAPHY.lineHeight36}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
-          {t('too_many_pins_header')}
+          {header}
         </StyledText>
         <StyledText
           color={COLORS.darkBlack_ninety}
@@ -45,8 +45,9 @@ export function TooManyPinsModal(props: {
           lineHeight={TYPOGRAPHY.lineHeight28}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
-          {t('too_many_pins_body')}
+          {subText}
         </StyledText>
+
         <Flex
           backgroundColor={COLORS.blueEnabled}
           borderRadius={BORDERS.size_three}
@@ -63,10 +64,10 @@ export function TooManyPinsModal(props: {
             textAlign={TYPOGRAPHY.textAlignCenter}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
-            {t('shared:close')}
+            {buttonText}
           </StyledText>
         </Flex>
       </Flex>
-    </ModalShell>
+    </Modal>
   )
 }

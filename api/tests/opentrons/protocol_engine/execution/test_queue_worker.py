@@ -1,4 +1,6 @@
 """Tests for the command QueueWorker in opentrons.protocol_engine."""
+from typing import Generator
+
 import pytest
 from decoy import Decoy, matchers
 
@@ -34,14 +36,22 @@ def subject(
 
 @pytest.fixture(autouse=True)
 async def queue_commands(decoy: Decoy, state_store: StateStore) -> None:
-    """Load the command queue with 2 queued commands, then stop."""
-    decoy.when(
-        await state_store.wait_for(condition=state_store.commands.get_next_queued)
-    ).then_return("command-id-1", "command-id-2")
+    """Load the command queue with 2 queued commands, then stop.
 
-    decoy.when(state_store.commands.get_stop_requested()).then_return(
-        False, False, True
-    )
+    When state_store.wait_for(...) is called, return "command-id-1" the first time,
+    return "command-id-2" the second time, and raise RunStoppedError the third time.
+    """
+
+    def get_next_to_execute() -> Generator[str, None, None]:
+        yield "command-id-1"
+        yield "command-id-2"
+        raise RunStoppedError()
+
+    get_next_to_execute_results = get_next_to_execute()
+
+    decoy.when(
+        await state_store.wait_for(condition=state_store.commands.get_next_to_execute)
+    ).then_do(lambda *args, **kwargs: next(get_next_to_execute_results))
 
 
 async def test_start_processes_commands(
@@ -51,14 +61,6 @@ async def test_start_processes_commands(
     subject: QueueWorker,
 ) -> None:
     """It should pull commands off the queue and execute them."""
-    decoy.when(
-        await state_store.wait_for(condition=state_store.commands.get_next_queued)
-    ).then_return("command-id-1", "command-id-2")
-
-    decoy.when(state_store.commands.get_stop_requested()).then_return(
-        False, False, True
-    )
-
     subject.start()
 
     decoy.verify(
@@ -129,7 +131,7 @@ async def test_engine_stopped_exception_breaks_loop_gracefully(
 ) -> None:
     """It should `join` gracefully if a RunStoppedError is raised."""
     decoy.when(
-        await state_store.wait_for(condition=state_store.commands.get_next_queued)
+        await state_store.wait_for(condition=state_store.commands.get_next_to_execute)
     ).then_raise(RunStoppedError("oh no"))
 
     subject.start()

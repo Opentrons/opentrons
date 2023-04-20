@@ -1,15 +1,22 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
-import { Flex, TYPOGRAPHY, COLORS, SPACING } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
+import {
+  Flex,
+  TYPOGRAPHY,
+  COLORS,
+  SPACING,
+  RESPONSIVENESS,
+} from '@opentrons/components'
+import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import attachProbe from '../../assets/images/change-pip/attach-stem.png'
-import pipetteCalibrating from '../../assets/images/change-pip/pipette-is-calibrating.png'
-import { BODY_STYLE } from './constants'
+import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import { BODY_STYLE, SECTIONS } from './constants'
+import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
@@ -20,8 +27,8 @@ const IN_PROGRESS_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   text-align: ${TYPOGRAPHY.textAlignCenter};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
-    font-size: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
     margin-top: ${SPACING.spacing2};
   }
@@ -38,8 +45,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     errorMessage,
     setShowErrorMessage,
     isOnDevice,
+    selectedPipette,
+    flowType,
   } = props
-  const { t } = useTranslation('pipette_wizard_flows')
+  const { t, i18n } = useTranslation('pipette_wizard_flows')
+  const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
   const pipetteId = attachedPipettes[mount]?.id
   const displayName = attachedPipettes[mount]?.modelSpecs.displayName
   const is8Channel = attachedPipettes[mount]?.modelSpecs.channels === 8
@@ -75,16 +85,31 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })
   }
 
-  const pipetteCalibratingImage = (
-    <Flex marginTop={isOnDevice ? '-5rem' : '-7.6rem'} height="10.2rem">
-      <img src={pipetteCalibrating} alt="Pipette is calibrating" />
+  const pipetteProbeVid = (
+    <Flex
+      marginTop={isOnDevice ? '-5rem' : '-7.6rem'}
+      height="10.2rem"
+      paddingTop={SPACING.spacing2}
+    >
+      <video
+        css={css`
+          max-width: 100%;
+          max-height: 100%;
+        `}
+        autoPlay={true}
+        loop={true}
+        controls={false}
+        data-testid={is8Channel ? pipetteProbe8 : pipetteProbe1}
+      >
+        <source src={is8Channel ? pipetteProbe8 : pipetteProbe1} />
+      </video>
     </Flex>
   )
 
   if (isRobotMoving)
     return (
       <InProgressModal
-        alternativeSpinner={isExiting ? null : pipetteCalibratingImage}
+        alternativeSpinner={isExiting ? null : pipetteProbeVid}
         description={t('pipette_calibrating', {
           pipetteName: displayName,
         })}
@@ -107,14 +132,20 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     />
   ) : (
     <GenericWizardTile
-      header={t('attach_probe')}
-      //  TODO(Jr, 10/26/22): replace image with correct one!
-      rightHandBody={<img src={attachProbe} width="100%" alt="Attach probe" />}
+      header={i18n.format(t('attach_probe'), 'capitalize')}
+      rightHandBody={getPipetteAnimations({
+        pipetteWizardStep,
+        channel: is8Channel ? 8 : 1,
+      })}
       bodyText={
-        is8Channel ? (
+        is8Channel || selectedPipette === NINETY_SIX_CHANNEL ? (
           <Trans
             t={t}
-            i18nKey={'install_probe_8_channel'}
+            i18nKey={
+              is8Channel
+                ? 'install_probe_8_channel'
+                : 'install_probe_96_channel'
+            }
             components={{
               strong: <strong />,
               block: <StyledText css={BODY_STYLE} />,

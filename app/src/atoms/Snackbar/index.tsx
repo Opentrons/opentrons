@@ -49,7 +49,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       css={OPEN_STYLE}
       alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.size_three}
-      boxShadow={BORDERS.smallDropShadowODD}
+      boxShadow={BORDERS.shadowSmall}
       backgroundColor={COLORS.darkBlack_hundred}
       maxWidth="29.25rem"
       padding={`${SPACING.spacingM} ${SPACING.spacing5}`}

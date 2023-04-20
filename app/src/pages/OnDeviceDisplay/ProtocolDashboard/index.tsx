@@ -1,27 +1,26 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import { format, formatDistance } from 'date-fns'
 import {
   ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  Btn,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  OVERFLOW_HIDDEN,
   SPACING,
   TYPOGRAPHY,
-  useSwipe,
+  useLongPress,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
+import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../../atoms/text'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
@@ -30,35 +29,16 @@ import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../../redux/config'
-import { PinnedProtocol } from './PinnedProtocol'
-import { ProtocolRow } from './ProtocolRow'
+import { LongPressModal } from './LongPressModal'
+import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 
 import imgSrc from '../../../assets/images/odd/abstract@x2.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
+import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-
-// How many pinned protocols fit horizontally on the ODD?
-const PINNED_PROTOCOLS_IN_VIEW = 2
-
-const Table = styled('table')`
-  ${TYPOGRAPHY.labelRegular}
-  border-collapse: collapse;
-  table-layout: auto;
-  width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
-  text-align: left;
-`
-const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
-`
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
@@ -77,7 +57,7 @@ export function ProtocolDashboard(): JSX.Element {
   // We want an array of protocols in the same order as the
   // array of IDs we stored. There are many ways to sort
   // the pinned protocols. This way is mine.
-  let pinnedProtocols: ProtocolResource[] = []
+  const pinnedProtocols: ProtocolResource[] = []
   // Also, while we're here...
   // It's possible (here in the early days while running a simulator, anyway)
   // to lose protocols locally but still have their IDs in the pinned config.
@@ -133,190 +113,137 @@ export function ProtocolDashboard(): JSX.Element {
     }
   }
 
-  const swipe = useSwipe()
-
-  // The pinned protocols are displayed as a horizontal carousel. There can
-  // be more pinned than can be shown at once, so the user can swipe through
-  // them to "spin" the carousel. This can be simulated via css by sliding
-  // divs around, giving negative absolute coordinates, etc., but that can
-  // be dicey to get right on a full browser. We've got electron on a tiny
-  // touch screen. So let's be more clever than that. Instead of moving things
-  // on the screen, how about we just re-order the array? Every swipe, take items
-  // off the front and move them to the back. From the user's POV, the effect is
-  // the same: things that were offscreen to the right are now in view. To
-  // simplify further, I have it so they can just keep swiping to keep spinning
-  // the carousel.
-  if (pinnedProtocols.length > PINNED_PROTOCOLS_IN_VIEW) {
-    if (swipe.swipeType === 'swipe-left') {
-      const inView = pinnedProtocols.slice(0, PINNED_PROTOCOLS_IN_VIEW)
-      const outOfView = pinnedProtocols.slice(PINNED_PROTOCOLS_IN_VIEW)
-      pinnedProtocols = [...outOfView, ...inView]
-      dispatch(
-        updateConfigValue(
-          'protocols.pinnedProtocolIds',
-          pinnedProtocols.map(p => p.id)
-        )
-      )
-      swipe.setSwipeType('')
-    } else if (swipe.swipeType === 'swipe-right') {
-      const lastView = pinnedProtocols.slice(0 - PINNED_PROTOCOLS_IN_VIEW)
-      const outOfView = pinnedProtocols.slice(
-        0,
-        pinnedProtocols.length - PINNED_PROTOCOLS_IN_VIEW
-      )
-      pinnedProtocols = [...lastView, ...outOfView]
-      dispatch(
-        updateConfigValue(
-          'protocols.pinnedProtocolIds',
-          pinnedProtocols.map(p => p.id)
-        )
-      )
-      swipe.setSwipeType('')
-    }
-  }
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
       minHeight="25rem"
+      padding={SPACING.spacing6}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
-        <Flex flexDirection={DIRECTION_COLUMN} height="15rem">
+        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
           <StyledText
-            fontSize="1.25rem"
-            lineHeight="1.5rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+            marginBottom="0.5rem"
           >
-            Pinned Protocols
+            {t('pinned_protocols')}
           </StyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_FLEX_START}
-            gridGap={SPACING.spacing3}
-            ref={swipe.ref}
-            overflow={OVERFLOW_HIDDEN}
-          >
-            {pinnedProtocols.map(protocol => {
-              return <PinnedProtocol key={protocol.key} protocol={protocol} />
-            })}
-          </Flex>
+          <PinnedProtocolCarousel pinnedProtocols={pinnedProtocols} />
         </Flex>
       )}
       {sortedProtocols.length > 0 ? (
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader>
-                <Flex flexDirection="row" alignItems="center">
-                  <Btn onClick={handleSortByName}>
-                    <StyledText
-                      fontSize="1.25rem"
-                      lineHeight="1.6875rem"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {t('protocol_name_title')}
-                    </StyledText>
-                  </Btn>
-                  {sortBy === 'alphabetical' || sortBy === 'reverse' ? (
-                    <Icon
-                      name={
-                        sortBy === 'alphabetical'
-                          ? 'chevron-down'
-                          : 'chevron-up'
-                      }
-                      size="1rem"
-                    />
-                  ) : null}
-                </Flex>
-              </TableHeader>
-              <TableHeader>
-                <Flex flexDirection="row" alignItems="center">
-                  <Btn onClick={handleSortByLastRun}>
-                    <StyledText
-                      fontSize="1.25rem"
-                      lineHeight="1.6875rem"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {t('last_run')}
-                    </StyledText>
-                  </Btn>
-                  {sortBy === 'recentRun' || sortBy === 'oldRun' ? (
-                    <Icon
-                      name={
-                        sortBy === 'recentRun' ? 'chevron-down' : 'chevron-up'
-                      }
-                      size="1rem"
-                    />
-                  ) : null}
-                </Flex>
-              </TableHeader>
-              <TableHeader>
-                <Flex flexDirection="row" alignItems="center">
-                  <Btn onClick={handleSortByDate}>
-                    <StyledText
-                      fontSize="1.25rem"
-                      lineHeight="1.6875rem"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {t('date_added')}
-                    </StyledText>
-                  </Btn>
-                  {sortBy === 'recentCreated' || sortBy === 'oldCreated' ? (
-                    <Icon
-                      name={
-                        sortBy === 'recentCreated'
-                          ? 'chevron-down'
-                          : 'chevron-up'
-                      }
-                      size="1rem"
-                    />
-                  ) : null}
-                </Flex>
-              </TableHeader>
-            </tr>
-          </thead>
-
-          <tbody>
+        <>
+          <Flex
+            alignItems="center"
+            backgroundColor={COLORS.white}
+            flexDirection={DIRECTION_ROW}
+            paddingBottom={SPACING.spacing4}
+            paddingTop={SPACING.spacing4}
+            position="sticky"
+            top="0px"
+            width="100%"
+          >
+            <Flex width="32.3125rem">
+              <SmallButton
+                buttonText={t('protocol_name_title')}
+                buttonType={
+                  sortBy === 'alphabetical' || sortBy === 'reverse'
+                    ? 'alt'
+                    : 'tertiaryLowLight'
+                }
+                iconName={
+                  sortBy === 'alphabetical' || sortBy === 'reverse'
+                    ? sortBy === 'alphabetical'
+                      ? 'arrow-down'
+                      : 'arrow-up'
+                    : undefined
+                }
+                iconPlacement="endIcon"
+                onClick={handleSortByName}
+              />
+            </Flex>
+            <Flex justifyContent="center" width="12rem">
+              <SmallButton
+                buttonText={t('last_run')}
+                buttonType={
+                  sortBy === 'recentRun' || sortBy === 'oldRun'
+                    ? 'alt'
+                    : 'tertiaryLowLight'
+                }
+                iconName={
+                  sortBy === 'recentRun' || sortBy === 'oldRun'
+                    ? sortBy === 'recentRun'
+                      ? 'arrow-down'
+                      : 'arrow-up'
+                    : undefined
+                }
+                iconPlacement="endIcon"
+                onClick={handleSortByLastRun}
+              />
+            </Flex>
+            <Flex justifyContent="center" width="17rem">
+              <SmallButton
+                buttonText={t('date_added')}
+                buttonType={
+                  sortBy === 'recentCreated' || sortBy === 'oldCreated'
+                    ? 'alt'
+                    : 'tertiaryLowLight'
+                }
+                iconName={
+                  sortBy === 'recentCreated' || sortBy === 'oldCreated'
+                    ? sortBy === 'recentCreated'
+                      ? 'arrow-down'
+                      : 'arrow-up'
+                    : undefined
+                }
+                iconPlacement="endIcon"
+                onClick={handleSortByDate}
+              />
+            </Flex>
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN}>
             {sortedProtocols.map(protocol => {
               const lastRun = runs.data?.data.find(
                 run => run.protocolId === protocol.id
               )?.createdAt
 
               return (
-                <ProtocolRow
+                <ProtocolCard
                   key={protocol.key}
                   lastRun={lastRun}
                   protocol={protocol}
                 />
               )
             })}
-          </tbody>
-        </Table>
+          </Flex>
+        </>
       ) : (
         <>
           {pinnedProtocols.length === 0 && (
             <Flex
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_CENTER}
               alignItems={ALIGN_CENTER}
-              height="27.75rem"
-              backgroundColor={COLORS.medGreyEnabled}
+              backgroundColor={COLORS.darkBlack_twenty}
+              flexDirection={DIRECTION_COLUMN}
+              height="27.25rem"
+              justifyContent={JUSTIFY_CENTER}
             >
               <img title={t('nothing_here_yet')} src={imgSrc} />
               <StyledText
-                fontSize="2rem"
-                lineHeight="2.75rem"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                fontSize={TYPOGRAPHY.fontSize32}
+                fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                lineHeight={TYPOGRAPHY.lineHeight42}
+                marginTop={SPACING.spacing4}
+                marginBottom={SPACING.spacing3}
               >
                 {t('nothing_here_yet')}
               </StyledText>
               <StyledText
-                fontSize="1.25rem"
-                lineHeight="1.6875rem"
+                fontSize={TYPOGRAPHY.fontSize28}
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
+                lineHeight={TYPOGRAPHY.lineHeight36}
               >
                 {t('send_a_protocol_to_store')}
               </StyledText>
@@ -324,6 +251,63 @@ export function ProtocolDashboard(): JSX.Element {
           )}
         </>
       )}
+    </Flex>
+  )
+}
+
+export function ProtocolCard(props: {
+  protocol: ProtocolResource
+  lastRun?: string
+}): JSX.Element {
+  const { protocol, lastRun } = props
+  const history = useHistory()
+  const { t } = useTranslation('protocol_info')
+  const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
+  const longpress = useLongPress()
+
+  const handleProtocolClick = (
+    longpress: UseLongPressResult,
+    protocolId: string
+  ): void => {
+    if (longpress.isLongPressed !== true) {
+      history.push(`/protocols/${protocolId}`)
+    }
+  }
+
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      backgroundColor={COLORS.light_one}
+      borderRadius={BORDERS.size_four}
+      fontSize={TYPOGRAPHY.fontSize22}
+      lineHeight={TYPOGRAPHY.lineHeight28}
+      marginBottom={SPACING.spacing3}
+      onClick={() => handleProtocolClick(longpress, protocol.id)}
+      padding={SPACING.spacing5}
+      ref={longpress.ref}
+    >
+      <Flex width="30.8125rem" overflowWrap="anywhere">
+        <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {protocolName}
+        </StyledText>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
+        <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          {lastRun != null
+            ? formatDistance(new Date(lastRun), new Date(), {
+                addSuffix: true,
+              }).replace('about ', '')
+            : t('no_history')}
+        </StyledText>
+      </Flex>
+      <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
+        <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          {format(new Date(protocol.createdAt), 'Pp')}
+        </StyledText>
+        {longpress.isLongPressed && (
+          <LongPressModal longpress={longpress} protocolId={protocol.id} />
+        )}
+      </Flex>
     </Flex>
   )
 }

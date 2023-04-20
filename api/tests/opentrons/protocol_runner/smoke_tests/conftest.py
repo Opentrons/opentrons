@@ -92,11 +92,11 @@ def python_protocol_file(tmp_path: Path) -> Path:
             """
             # my protocol
             metadata = {
-                "apiLevel": "3.0",
+                "apiLevel": "2.14",
             }
             def run(ctx):
-                pipette = ctx.load_pipette(
-                    pipette_name="p300_single",
+                pipette = ctx.load_instrument(
+                    instrument_name="p300_single",
                     mount="left",
                 )
                 tip_rack = ctx.load_labware(

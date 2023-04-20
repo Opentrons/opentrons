@@ -18,7 +18,7 @@ import { getIsOnDevice } from '../../redux/config'
 
 interface WizardHeaderProps {
   title: string
-  onExit?: (() => void) | null
+  onExit?: React.MouseEventHandler | null
   totalSteps?: number
   currentStep?: number | null
   exitDisabled?: boolean
