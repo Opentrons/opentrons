@@ -14,10 +14,6 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 >
 describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('returns attached pipettes', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: {
