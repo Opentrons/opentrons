@@ -1,4 +1,4 @@
-"""Router for /runs commands endpoints."""
+"""Router for /maintenance_runs commands endpoints."""
 import textwrap
 from datetime import datetime
 from typing import Optional, Union
@@ -11,8 +11,8 @@ from pydantic import BaseModel, Field
 from opentrons.protocol_engine import (
     ProtocolEngine,
     commands as pe_commands,
-    errors as pe_errors,
 )
+from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -23,13 +23,17 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from ..run_models import RunCommandSummary
-from ..run_data_manager import RunDataManager
-from ..engine_store import EngineStore
-from ..run_store import RunStore, CommandNotFoundError
-from ..run_models import RunNotFoundError
-from ..dependencies import get_engine_store, get_run_data_manager, get_run_store
-from .base_router import RunNotFound, RunStopped
+from ..maintenance_run_models import (
+    MaintenanceRunCommandSummary,
+    MaintenanceRunNotFoundError,
+)
+from ..maintenance_run_data_manager import MaintenanceRunDataManager
+from ..maintenance_engine_store import MaintenanceEngineStore
+from ..dependencies import (
+    get_maintenance_engine_store,
+    get_maintenance_run_data_manager,
+)
+from .base_router import RunNotFound
 
 
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
@@ -82,66 +86,41 @@ class CommandCollectionLinks(BaseModel):
 
 async def get_current_run_engine_from_url(
     runId: str,
-    engine_store: EngineStore = Depends(get_engine_store),
-    run_store: RunStore = Depends(get_run_store),
+    engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
 ) -> ProtocolEngine:
-    """Get run protocol engine.
+    """Get current run protocol engine.
 
     Args:
         runId: Run ID to associate the command with.
         engine_store: Engine store to pull current run ProtocolEngine.
-        run_store: Run data storage.
     """
-    if not run_store.has(runId):
-        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
-
     if runId != engine_store.current_run_id:
-        raise RunStopped(detail=f"Run {runId} is not the current run").as_error(
-            status.HTTP_409_CONFLICT
-        )
+        raise RunNotFound(
+            detail=f"Run {runId} not found. "
+            f"Note that only one maintenance run can exist at a time."
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     return engine_store.engine
 
 
 @commands_router.post(
-    path="/runs/{runId}/commands",
+    path="/maintenance_runs/{runId}/commands",
     summary="Enqueue a command",
     description=textwrap.dedent(
         """
-        Add a single command to the run. You can add commands to a run
-        for two reasons:
+        Add a single command to the maintenance run.
 
-        - Setup commands (`data.source == "setup"`)
-        - Protocol commands (`data.source == "protocol"`)
-
-        Setup commands may be enqueued before the run has been started.
-        You could use setup commands to prepare a module or
-        run labware calibration procedures.
-
-        Protocol commands may be enqueued anytime using this endpoint.
-        You can create a protocol purely over HTTP using protocol commands.
-        If you are running a protocol from a file(s), then you will likely
-        not need to enqueue protocol commands using this endpoint.
-
-        Once enqueued, setup commands will execute immediately with priority,
-        while protocol commands will wait until a `play` action is issued.
-        A play action may be issued while setup commands are still queued,
-        in which case all setup commands will finish executing before
-        the run moves on to protocol commands.
-
-        If you are running a protocol file(s), use caution with this endpoint,
-        as added commands may interfere with commands added by the protocol
+        These commands will execute immediately and in the order they are
+        enqueued. The execution of these commands cannot be paused,
+        but a maintenance run can be deleted at any point, as long as there
+        are no commands running.
         """
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
-        },
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[CommandNotAllowed]},
     },
 )
 async def create_run_command(
@@ -190,16 +169,12 @@ async def create_run_command(
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
-    command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
+    command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
 
-    try:
-        command = protocol_engine.add_command(command_create)
-
-    except pe_errors.SetupCommandNotAllowedError as e:
-        raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
-    except pe_errors.RunStoppedError as e:
-        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+    # TODO (spp): re-add `RunStoppedError` exception catching if/when maintenance runs
+    #  have actions.
+    command = protocol_engine.add_command(command_create)
 
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0
@@ -215,17 +190,17 @@ async def create_run_command(
 
 
 @commands_router.get(
-    path="/runs/{runId}/commands",
-    summary="Get a list of all protocol commands in the run",
+    path="/maintenance_runs/{runId}/commands",
+    summary="Get a list of all commands in the run",
     description=(
         "Get a list of all commands in the run and their statuses. "
         "This endpoint returns command summaries. Use "
-        "`GET /runs/{runId}/commands/{commandId}` to get all "
+        "`GET /maintenance_runs/{runId}/commands/{commandId}` to get all "
         "information available for a given command."
     ),
     responses={
         status.HTTP_200_OK: {
-            "model": MultiBody[RunCommandSummary, CommandCollectionLinks]
+            "model": MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
@@ -244,8 +219,10 @@ async def get_run_commands(
         _DEFAULT_COMMAND_LIST_LENGTH,
         description="The maximum number of commands in the list to return.",
     ),
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
+) -> PydanticResponse[MultiBody[MaintenanceRunCommandSummary, CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -260,13 +237,13 @@ async def get_run_commands(
             cursor=cursor,
             length=pageLength,
         )
-    except RunNotFoundError as e:
+    except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     current_command = run_data_manager.get_current_command(run_id=runId)
 
     data = [
-        RunCommandSummary.construct(
+        MaintenanceRunCommandSummary.construct(
             id=c.id,
             key=c.key,
             commandType=c.commandType,
@@ -307,7 +284,7 @@ async def get_run_commands(
 
 
 @commands_router.get(
-    path="/runs/{runId}/commands/{commandId}",
+    path="/maintenance_runs/{runId}/commands/{commandId}",
     summary="Get full details about a specific command in the run",
     description=(
         "Get a command along with any associated payload, result, and "
@@ -323,7 +300,9 @@ async def get_run_commands(
 async def get_run_command(
     runId: str,
     commandId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+    run_data_manager: MaintenanceRunDataManager = Depends(
+        get_maintenance_run_data_manager
+    ),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Get a specific command from a run.
 
@@ -334,9 +313,9 @@ async def get_run_command(
     """
     try:
         command = run_data_manager.get_command(run_id=runId, command_id=commandId)
-    except RunNotFoundError as e:
+    except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
-    except CommandNotFoundError as e:
+    except CommandDoesNotExistError as e:
         raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(

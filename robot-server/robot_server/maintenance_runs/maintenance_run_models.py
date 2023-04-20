@@ -1,4 +1,4 @@
-"""Request and response models for run resources."""
+"""Request and response models for maintenance run resources."""
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -17,16 +17,16 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     Liquid,
 )
+from robot_server.maintenance_runs.maintenance_action_models import MaintenanceRunAction
 from robot_server.service.json_api import ResourceModel
-from .action_models import RunAction
 
 
-# TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
+# TODO(mc, 2022-02-01): since the `/maintenance_runs/:run_id/commands` response is now paginated,
 # this summary model is a lot less useful. Remove and replace with full `Command`
 # models once problematically large objects like full labware and module definitions
 # are no longer part of the public command.result API
-class RunCommandSummary(ResourceModel):
-    """A stripped down model of a full Command for usage in a Run response."""
+class MaintenanceRunCommandSummary(ResourceModel):
+    """A stripped down model of a full Command for usage in a Maintenance run response."""
 
     id: str = Field(..., description="Unique command identifier.")
     key: str = Field(
@@ -57,8 +57,8 @@ class RunCommandSummary(ResourceModel):
     )
 
 
-class Run(ResourceModel):
-    """Run resource model."""
+class MaintenanceRun(ResourceModel):
+    """Maintenance run resource model."""
 
     id: str = Field(..., description="Unique run identifier.")
     createdAt: datetime = Field(..., description="When the run was created")
@@ -70,7 +70,7 @@ class Run(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
-    actions: List[RunAction] = Field(
+    actions: List[MaintenanceRunAction] = Field(
         ...,
         description="Client-initiated run control actions.",
     )
@@ -98,13 +98,6 @@ class Run(ResourceModel):
         ...,
         description="Labware offsets to apply as labware are loaded.",
     )
-    protocolId: Optional[str] = Field(
-        None,
-        description=(
-            "Protocol resource being run, if any. If not present, the run may"
-            " still be used to execute protocol commands over HTTP."
-        ),
-    )
     completedAt: Optional[datetime] = Field(
         None,
         description="Run completed at timestamp.",
@@ -115,21 +108,17 @@ class Run(ResourceModel):
     )
 
 
-class RunCreate(BaseModel):
-    """Create request data for a new run."""
+class MaintenanceRunCreate(BaseModel):
+    """Create request data for a new maintenance run."""
 
-    protocolId: Optional[str] = Field(
-        None,
-        description="Protocol resource ID that this run will be using, if applicable.",
-    )
     labwareOffsets: List[LabwareOffsetCreate] = Field(
         default_factory=list,
         description="Labware offsets to apply as labware are loaded.",
     )
 
 
-class RunUpdate(BaseModel):
-    """Update request data for an existing run."""
+class MaintenanceRunUpdate(BaseModel):
+    """Update request data for an existing maintenance run."""
 
     current: Optional[bool] = Field(
         None,
@@ -149,7 +138,7 @@ class LabwareDefinitionSummary(BaseModel):
     )
 
 
-class RunNotFoundError(ValueError):
+class MaintenanceRunNotFoundError(ValueError):
     """Error raised when a given Run ID is not found in the store."""
 
     def __init__(self, run_id: str) -> None:
