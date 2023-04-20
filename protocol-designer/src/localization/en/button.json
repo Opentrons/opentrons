@@ -21,5 +21,7 @@
   "yes": "yes",
   "upload_custom_labware": "Upload custom labware",
   "upload_custom_tip_rack": "Upload custom tip rack",
+  "add_another_custom_tiprack": "Add another custom tiprack",
+  "remove_custom_tiprack": "Remove",
   "got_it": "Got It!"
 }

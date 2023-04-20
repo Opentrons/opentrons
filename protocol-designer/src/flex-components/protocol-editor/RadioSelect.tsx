@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import { RadioGroup } from '@opentrons/components'
+import { pipetteNameBlocklist } from '../constant'
 
 export interface PipetteSelectProps {
     /** currently selected value, optional in case selecting triggers immediate action */
@@ -53,9 +54,8 @@ export interface SelectOption {
 }
 
 export const RadioSelect = ({ propsData, pipetteName, pipetteType }: any) => {
-    const nameBlocklist = ['p10_single', 'p10_multi', 'p50_single', 'p50_multi', 'p300_single', 'p300_multi', 'p1000_single']
     const allowlist = ({ value }: SelectOption): boolean => {
-        return !nameBlocklist.some(n => n === value)
+        return !pipetteNameBlocklist.some(n => n === value)
     }
     const gen3Options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
     const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)

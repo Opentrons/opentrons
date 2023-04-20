@@ -117,6 +117,7 @@
 
 .custom_tiprack_upload_file {
   margin: 5px 0;
+  width: auto;
 }
 
 .custom_tiprack_upload_file input {
@@ -130,6 +131,28 @@
   user-select: none;
 }
 
+/* Custom Tip Rack Selection */
+.filterData {
+  display: flex;
+  flex-direction: column;
+  margin-left: 17%;
+  margin-top: -3%;
+}
+
+.custom_tiprack {
+  background: #D9E9FE;
+  width: fit-content;
+  padding: 5px;
+  margin: 2px 0;
+}
+
+.remove_button {
+  display: flex;
+  align-items: center;
+  color: #5181FF;
+  padding-left: 10px;
+  cursor: pointer;
+}
 .module_section {
   display: flex;
   flex-direction: row;

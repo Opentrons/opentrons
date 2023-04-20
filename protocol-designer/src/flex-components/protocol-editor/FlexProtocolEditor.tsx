@@ -14,7 +14,7 @@ import { FlexModules } from './FlexModules'
 import { FlexProtocolName } from './FlexProtocolName'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
-import { mountSide, navPillTabListLength } from '../constant'
+import { mountSide, navPillTabListLength, pipetteSlot } from '../constant'
 import { RoundTabs } from './RoundTab'
 import { SelectPipetteOption } from './SelectPipette'
 
@@ -85,17 +85,21 @@ const newDummyFormPropsForTesting = {
   supportedModuleSlot: '1',
 }
 
-const selectComponent = (selectedTab: Number, props: any): any => {
+const selectComponent = (selectedTab: number, props: any): any => {
+  function comp(selectedTab: number) {
+    const { firstPipette, secondPipette } = pipetteSlot
+    return selectedTab == 1
+      ? <SelectPipetteOption formProps={props} pipetteName={firstPipette} />
+      : <SelectPipetteOption formProps={props} pipetteName={secondPipette} />
+  }
+
   switch (selectedTab) {
     case 0:
       return <FlexProtocolName formProps={props} />
     case 1:
-      return (
-        <SelectPipetteOption formProps={props} pipetteName={'firstPipette'} />
-      )
     case 2:
       return (
-        <SelectPipetteOption formProps={props} pipetteName={'secondPipette'} />
+        comp(selectedTab)
       )
     case 3:
       return <FlexModules formProps={newDummyFormPropsForTesting} />
@@ -106,14 +110,16 @@ const selectComponent = (selectedTab: Number, props: any): any => {
 
 function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
+
   // Next button click
   const handleNext = ({ selectedTab }: Props) => {
     const setTabNumber =
-      selectedTab >= 0 && selectedTab < navPillTabListLength - 1
+      selectedTab >= 0 && selectedTab < navPillTabListLength
         ? selectedTab + 1
         : selectedTab
     setTab(setTabNumber)
   }
+
   // Previous button click
   const handlePrevious = ({ selectedTab }: Props) => {
     const setTabNumber =
@@ -124,7 +130,7 @@ function FlexProtocolEditor(): JSX.Element {
   }
 
   const nextButton =
-    selectedTab === navPillTabListLength - 1
+    selectedTab === navPillTabListLength
       ? i18n.t('flex.round_tabs.go_to_liquids_page')
       : i18n.t('flex.round_tabs.next')
 
