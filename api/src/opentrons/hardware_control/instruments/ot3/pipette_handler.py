@@ -225,7 +225,6 @@ class PipetteHandlerProvider:
             instr_dict = instr.as_dict()
             # TODO (spp, 2021-08-27): Revisit this logic. Why do we need to build
             #  this dict newly every time? Any why only a few items are being updated?
-
             for key in configs:
                 result[key] = instr_dict[key]
             result["channels"] = instr._max_channels.as_int
