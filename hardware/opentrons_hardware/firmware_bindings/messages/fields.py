@@ -19,6 +19,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     MoveStopCondition,
     GearMotorId,
+    MotorUsageValueType,
 )
 
 from opentrons_hardware.firmware_bindings.binary_constants import (
@@ -485,4 +486,4 @@ class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
 
     def __repr__(self) -> str:
         """Repr."""
-        return f"{self.__class__.__name__}(key={self.key}, length={self.length}, usage_data={self.usage_value})"
+        return f"{self.__class__.__name__}(key={MotorUsageValueType(self.key).name}, length={self.length}, usage_data={self.usage_value})"
