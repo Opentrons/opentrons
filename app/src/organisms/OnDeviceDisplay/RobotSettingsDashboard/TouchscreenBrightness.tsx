@@ -39,7 +39,7 @@ const BUTTON_STYLE = css`
   }
 `
 
-interface RectProps {
+interface BrightnessTileProps {
   isActive: boolean
 }
 
@@ -47,7 +47,7 @@ const BrightnessTile = styled(Box)`
   width: 100%;
   height: 8.75rem;
   border-radius: ${BORDERS.size_two};
-  background: ${(props: RectProps) =>
+  background: ${(props: BrightnessTileProps) =>
     props.isActive ? COLORS.blueEnabled : COLORS.foundationalBlue};
 `
 
