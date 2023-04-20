@@ -984,10 +984,6 @@ class OT3Controller:
         if error != ErrorCode.ok:
             log.warning(f"Halt stop request failed: {error}")
 
-    async def hard_halt(self) -> None:
-        """Halt the motors."""
-        return None
-
     async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
