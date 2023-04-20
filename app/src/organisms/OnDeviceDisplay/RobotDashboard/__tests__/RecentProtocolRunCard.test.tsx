@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
-import { RecentProtocolRunCard } from '../'
+import { RecentRunProtocolCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -63,14 +63,14 @@ const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.Mocked
   typeof useMissingProtocolHardware
 >
 
-const render = (props: React.ComponentProps<typeof RecentProtocolRunCard>) => {
-  return renderWithProviders(<RecentProtocolRunCard {...props} />, {
+const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
+  return renderWithProviders(<RecentRunProtocolCard {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('RecentProtocolRunCard', () => {
-  let props: React.ComponentProps<typeof RecentProtocolRunCard>
+describe('RecentRunProtocolCard', () => {
+  let props: React.ComponentProps<typeof RecentRunProtocolCard>
 
   beforeEach(() => {
     props = {

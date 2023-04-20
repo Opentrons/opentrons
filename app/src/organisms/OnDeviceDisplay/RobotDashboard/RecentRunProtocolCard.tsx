@@ -17,7 +17,7 @@ import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 
-interface RecentProtocolRunCardProps {
+interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
   protocolName: string
   /** protocol id that was run recently  */
@@ -26,11 +26,11 @@ interface RecentProtocolRunCardProps {
   lastRun?: string
 }
 
-export function RecentProtocolRunCard({
+export function RecentRunProtocolCard({
   protocolName,
   protocolId,
   lastRun,
-}: RecentProtocolRunCardProps): JSX.Element {
+}: RecentRunProtocolCardProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
@@ -48,12 +48,11 @@ export function RecentProtocolRunCard({
   `
 
   const PROTOCOL_TEXT_STYLE = css`
-    overflow-wrap: break-word;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
-    width: 100%;
+    overflow-wrap: break-word;
     height: max-content;
   `
 

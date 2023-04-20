@@ -1,3 +1,3 @@
 export * from './EmptyRecentRun'
-export * from './RecentProtocolRunCard'
+export * from './RecentRunProtocolCard'
 export * from './RecentRunProtocolCarousel'

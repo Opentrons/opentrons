@@ -8,7 +8,7 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { RecentProtocolRunCard } from './RecentProtocolRunCard'
+import { RecentRunProtocolCard } from './RecentRunProtocolCard'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -77,7 +77,7 @@ export function RecentRunProtocolCarousel({
             protocol.metadata.protocolName ?? protocol.files[0].name
           return (
             <React.Fragment key={protocolId}>
-              <RecentProtocolRunCard
+              <RecentRunProtocolCard
                 lastRun={lastRun}
                 protocolId={protocolId}
                 protocolName={protocolName}
