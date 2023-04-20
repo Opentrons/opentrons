@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 import {
   HandleKeypress,
   TYPOGRAPHY,
@@ -14,14 +15,14 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
+
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 
-import { StyledText } from '../../atoms/text'
-import styled, { css } from 'styled-components'
-
 import type { StepSize } from './types'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
+const JUMP_SIZE_SUBTITLE = "- / +"
 const JUMP_SIZE_ICON_STYLE = css`
   flex-shrink: 0;
 `
@@ -134,7 +135,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.labelRegular}
           >
-            - / +
+            {JUMP_SIZE_SUBTITLE}
           </StyledText>
           <Box css={BUTTON_WRAPPER_STYLE}>
             {stepSizes.map((stepSize: StepSize, index) => {

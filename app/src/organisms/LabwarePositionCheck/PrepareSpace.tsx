@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   LabwareRender,
   Module,
@@ -26,12 +27,12 @@ import {
 import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
-import { StyledText } from '../../atoms/text'
-import { CheckLabwareStep } from './types'
-import { NeedHelpLink } from '../CalibrationPanels'
 import { getIsOnDevice } from '../../redux/config'
-import { useSelector } from 'react-redux'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { NeedHelpLink } from '../CalibrationPanels'
+
+import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

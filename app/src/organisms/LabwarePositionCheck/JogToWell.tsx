@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
   Flex,
@@ -27,6 +28,9 @@ import {
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
+import { getIsOnDevice } from '../../redux/config'
+import { Portal } from '../../App/portal'
+import { ModalShell } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { NeedHelpLink } from '../CalibrationPanels'
@@ -37,10 +41,6 @@ import type { Jog } from '../../molecules/JogControls'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellStroke } from '@opentrons/components'
 import type { VectorOffset } from '@opentrons/api-client'
-import { getIsOnDevice } from '../../redux/config'
-import { useSelector } from 'react-redux'
-import { Portal } from '../../App/portal'
-import { ModalShell } from '../../molecules/Modal'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =
@@ -209,7 +209,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   jog={(axis, direction, step, _onSuccess) =>
                     handleJog(axis, direction, step, setJoggedPosition)
                   }
-                  touchScreenMode={true}
+                  isOnDevice={true}
                 />
               </ModalShell>
             ) : null}

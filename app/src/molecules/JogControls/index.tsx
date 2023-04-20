@@ -31,7 +31,7 @@ export interface JogControlsProps extends StyleProps {
   auxiliaryControl?: React.ReactNode | null
   directionControlButtonColor?: string
   initialPlane?: Plane
-  touchScreenMode?: boolean
+  isOnDevice?: boolean
 }
 
 export {
@@ -50,14 +50,14 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     auxiliaryControl = null,
     initialPlane = HORIZONTAL_PLANE,
-    touchScreenMode = false,
+    isOnDevice = false,
     ...styleProps
   } = props
   const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
     stepSizes[0]
   )
 
-  const controls = touchScreenMode ? (
+  const controls = isOnDevice ? (
     <>
       <TouchStepSizeControl
         {...{ currentStepSize, setCurrentStepSize, stepSizes }}
