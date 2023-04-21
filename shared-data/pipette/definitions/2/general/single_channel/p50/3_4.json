@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "P50 One Channel GEN3",
+  "displayName": "Flex 1-Channel 50 μL",
   "model": "p50",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {

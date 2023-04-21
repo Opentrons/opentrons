@@ -147,7 +147,7 @@ export function RunningProtocolCommandList({
             {(command, index) => {
               const backgroundColor =
                 index === currentRunCommandIndex
-                  ? COLORS.foundationalBlue
+                  ? COLORS.mediumBlueEnabled
                   : COLORS.light_one
               return (
                 <Flex
