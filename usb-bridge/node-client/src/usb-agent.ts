@@ -9,10 +9,6 @@ import type { PortInfo } from '@serialport/bindings-cpp'
 import type { Logger, LogLevel } from './types'
 
 export type { PortInfo }
-// TODO: move these types to ./types
-// export interface AgentOptions {
-//   serialPort: string
-// }
 
 export interface SerialPortListMonitorConfig {
   /** Call the health endpoints for a given IP once every `interval` ms */
@@ -36,23 +32,15 @@ interface SerialPortListMonitorOptions {
   logger?: Logger
 }
 
-export function buildUSBAgent(opts: AgentOptions): http.Agent {
+export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
   console.log(`path is ${opts.serialPort}`)
   const port = new SerialPort({ path: opts.serialPort, baudRate: 115200 })
   const usbAgent = agent(
     (req: http.ClientRequest, opts: http.RequestOptions): Duplex => {
-      console.log('usbAgent req', req)
       if (!port.isOpen) port.open()
       return port
     }
   )
-  // const usbAgent = agent(
-  //   (
-  //     req: http.ClientRequest,
-  //     opts: http.RequestOptions,
-  //     fn: agent.AgentCallbackCallback
-  //   ): void => {}
-  // )
 
   usbAgent.maxFreeSockets = 1
   usbAgent.maxSockets = 1
@@ -125,6 +113,30 @@ class SerialPortSocket extends SerialPort {
   unref(): void {}
   setTimeout(): void {}
   ref(): void {}
+
+  // log on
+  on(...args: any): any {
+    console.log('serialport on', ...args)
+    return super.on(...args)
+  }
+
+  // log emit
+  emit(type: string, ...args: any): boolean {
+    console.log('serialport emitted', type)
+    return super.emit(type, ...args)
+  }
+
+  // log cork
+  cork(...args: any): any {
+    console.log('serialport cork', args)
+    return super.cork()
+  }
+
+  // log uncork
+  uncork(...args: any): any {
+    console.log('serialport uncork', args)
+    return super.uncork()
+  }
 }
 
 interface SerialPortHttpAgentOptions extends AgentOptions {
@@ -179,17 +191,53 @@ class SerialPortHttpAgent extends http.Agent {
     const originalRead = socket.read.bind(socket)
     const originalWrite = socket.write.bind(socket)
     const originalClose = socket.close.bind(socket)
+    const originalPause = socket.pause.bind(socket)
+    const originalEnd = socket.end.bind(socket)
+    const originalDestroy = socket.destroy.bind(socket)
+    const originalPush = socket.push.bind(socket)
+    const originalUnshift = socket.unshift.bind(socket)
     socket.on('data', chunk => {
       console.log(`received chunk:  ${chunk}`)
       console.log('end chunk')
     })
     socket.on('free', () => {
-      console.log('closing socket')
+      console.log('socket free writableEnded', socket.writableEnded)
       // socket.close();
     })
+    socket.on('prefinish', () => {
+      console.log(
+        'socket prefinishing isOpen writableFinished writableEnded',
+        socket.isOpen,
+        socket.writableFinished,
+        socket.writableEnded
+      )
+    })
+    socket.on('finish', () => {
+      console.log(
+        'socket finishing isOpen writableFinished writableEnded',
+        socket.isOpen,
+        socket.writableFinished,
+        socket.writableEnded
+      )
+      // close socket on finish: allows agent to create another socket and requests to continue
+      socket.close()
+    })
+    socket.on('end', () => {
+      console.log(
+        'socket ending isOpen writableFinished writableEnded',
+        socket.isOpen,
+        socket.writableFinished,
+        socket.writableEnded
+      )
+    })
     socket.read = (...args) => {
+      console.log(`calling read with: ${args}`)
       const result = originalRead(...args)
-      console.log(`read result: ${result}`)
+      console.log(
+        `read result: ${result}`,
+        'socket._readableState',
+        socket._readableState
+      )
       return result
     }
     socket.write = (...args) => {
@@ -199,9 +247,40 @@ class SerialPortHttpAgent extends http.Agent {
       return result
     }
     socket.close = (...args) => {
-      console.log('')
+      console.log(`calling close with: ${args}`)
       const result = originalClose(...args)
       console.log(`close result: ${result}`)
+      return result
+    }
+    socket.pause = (...args) => {
+      console.log(`calling pause with: ${args}`)
+      const result = originalPause(...args)
+      return result
+    }
+    socket.end = (...args: any) => {
+      // .caller doesn't work but throws a useful stack trace
+      // console.log(`${socket.end.caller} called end with: ${args}`)
+      console.log(`calling end with: ${args}`)
+      const result = originalEnd(...args)
+      return result
+
+      // original end emits prefinish/finish, signaling no more data to be written. We want to keep the writable stream open.
+      // https://nodejs.org/api/stream.html#writableendchunk-encoding-callback
+      // return socket
+    }
+    socket.destroy = (...args) => {
+      console.log(`calling destroy with: ${args}`)
+      const result = originalDestroy(...args)
+      return result
+    }
+    socket.push = (...args) => {
+      console.log(`calling push with: ${args}`)
+      const result = originalPush(...args)
+      return result
+    }
+    socket.unshift = (...args) => {
+      console.log(`calling unshift with: ${args}`)
+      const result = originalUnshift(...args)
       return result
     }
     if (socket) oncreate(null, socket)
@@ -222,6 +301,7 @@ function once(callback) {
 function installListeners(agent, s, options) {
   function onFree() {
     // debug('CLIENT socket onFree');
+    // need to emit free to attach listeners to serialport
     agent.emit('free', s, options)
   }
   s.on('free', onFree)

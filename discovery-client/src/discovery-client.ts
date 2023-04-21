@@ -1,13 +1,8 @@
-import // buildUSBAgent,
-// createSerialPortListMonitor,
-'@opentrons/usb-bridge/node-client'
-
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
 import * as Store from './store'
 
-// import type { Agent } from 'http'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type {
   DiscoveryClient,
@@ -27,12 +22,8 @@ export function createDiscoveryClient(
   const getSerialPorts = (): PortInfo[] => Store.getSerialPorts(getState())
   let unsubscribe: (() => void) | null = null
 
-  // const createHttpAgent = (serialPort: string): Agent =>
-  //   buildUSBAgent({ serialPort })
-
   const healthPoller = createHealthPoller({
     onPollResult: result => dispatch(Store.healthPolled(result)),
-    // onSerialPortFetch: result => dispatch(Store.serialPortsPolled(result)),
     logger,
   })
 
@@ -54,23 +45,19 @@ export function createDiscoveryClient(
 
     let prevAddrs = getAddresses()
     let prevRobots = getRobots()
-    // let prevSerialPorts = getSerialPorts()
 
     healthPoller.start({
       list: prevAddrs,
       interval: healthPollInterval,
     })
     mdnsBrowser.start()
-    // serialPortListMonitor.start({ interval: serialPortPollInterval })
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!unsubscribe) {
       unsubscribe = subscribe(() => {
         const addrs = getAddresses()
         const robots = getRobots()
-        // const serialPorts = getSerialPorts()
 
-        // if (addrs !== prevAddrs || serialPorts !== prevSerialPorts) {
         if (addrs !== prevAddrs) {
           healthPoller.start({ list: addrs })
         }
@@ -78,7 +65,6 @@ export function createDiscoveryClient(
 
         prevAddrs = addrs
         prevRobots = robots
-        // prevSerialPorts = serialPorts
       })
     }
   }
@@ -94,7 +80,6 @@ export function createDiscoveryClient(
   }
 
   return {
-    // createHttpAgent,
     getRobots,
     getSerialPorts,
     removeRobot,

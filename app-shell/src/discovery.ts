@@ -286,6 +286,7 @@ export function registerDiscovery(
         break
       case USB_DEVICE_REMOVED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
+          // TODO: should probably close serialport here
           // destroyHttpAgent?.()
           ipcMain.removeHandler('usb:request')
           client.start({
