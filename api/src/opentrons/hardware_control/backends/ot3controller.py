@@ -542,7 +542,7 @@ class OT3Controller:
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
+            self._configuration.motion_settings.max_speed_discontinuity.high_throughput
         )
 
         distances_pipette = {
@@ -646,7 +646,7 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )
@@ -816,8 +816,6 @@ class OT3Controller:
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
         motor_nodes = self._motor_nodes()
-        print("motor_nodes")
-        print(motor_nodes)
         assert motor_nodes, "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
