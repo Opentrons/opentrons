@@ -6,8 +6,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
@@ -47,6 +48,13 @@ class CommandIntent(str, Enum):
     SETUP = "setup"
 
 
+# Workaround for no Self type in Python 3.7.
+# https://peps.python.org/pep-0673/
+BaseCommandCreateSelfT = TypeVar(
+    "BaseCommandCreateSelfT", bound="BaseCommandCreate[Any]"
+)
+
+
 class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
@@ -84,6 +92,11 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             " If a value is not provided, one will be generated."
         ),
     )
+
+    def canonicalize(
+        self: BaseCommandCreateSelfT, robot_type: RobotType
+    ) -> BaseCommandCreateSelfT:
+        return self
 
 
 class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):

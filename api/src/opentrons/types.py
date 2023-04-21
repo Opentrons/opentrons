@@ -3,6 +3,8 @@ import enum
 from math import sqrt, isclose
 from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
@@ -223,6 +225,19 @@ class DeckSlotName(enum.Enum):
     SLOT_11 = "11"
     FIXED_TRASH = "12"
 
+    SLOT_A1 = "A1"
+    SLOT_A2 = "A2"
+    SLOT_A3 = "A3"
+    SLOT_B1 = "B1"
+    SLOT_B2 = "B2"
+    SLOT_B3 = "B3"
+    SLOT_C1 = "C1"
+    SLOT_C2 = "C2"
+    SLOT_C3 = "C3"
+    SLOT_D1 = "D1"
+    SLOT_D2 = "D2"
+    SLOT_D3 = "D3"
+
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         str_val = str(value).upper()
@@ -231,7 +246,19 @@ class DeckSlotName(enum.Enum):
         return cls(str_val)
 
     def as_int(self) -> int:
-        return int(self.value)
+        return int(self.to_ot2_equivalent().value)
+
+    def to_ot3_equivalent(self) -> DeckSlotName:
+        return _ot2_to_ot3.get(self, self)
+
+    def to_ot2_equivalent(self) -> DeckSlotName:
+        return _ot3_to_ot2.get(self, self)
+
+    def to_equivalent_by_robot_type(self, robot_type: RobotType) -> DeckSlotName:
+        if robot_type == "OT-2 Standard":
+            return self.to_ot2_equivalent()
+        elif robot_type == "OT-3 Standard":
+            return self.to_ot3_equivalent()
 
     def as_coordinate(self) -> str:
         return DECK_SLOT_NAME_TO_COORDINATE[self.value]
@@ -252,6 +279,27 @@ class DeckSlotName(enum.Enum):
         For explicitness, prefer using `.id` instead.
         """
         return self.id
+
+
+# fmt: off
+_slot_equivalencies = [
+    (DeckSlotName.SLOT_1,      DeckSlotName.SLOT_D1),
+    (DeckSlotName.SLOT_2,      DeckSlotName.SLOT_D2),
+    (DeckSlotName.SLOT_3,      DeckSlotName.SLOT_D3),
+    (DeckSlotName.SLOT_4,      DeckSlotName.SLOT_C1),
+    (DeckSlotName.SLOT_5,      DeckSlotName.SLOT_C2),
+    (DeckSlotName.SLOT_6,      DeckSlotName.SLOT_C3),
+    (DeckSlotName.SLOT_7,      DeckSlotName.SLOT_B1),
+    (DeckSlotName.SLOT_8,      DeckSlotName.SLOT_B2),
+    (DeckSlotName.SLOT_9,      DeckSlotName.SLOT_B3),
+    (DeckSlotName.SLOT_10,     DeckSlotName.SLOT_A1),
+    (DeckSlotName.SLOT_11,     DeckSlotName.SLOT_A2),
+    (DeckSlotName.FIXED_TRASH, DeckSlotName.SLOT_A3),
+]
+# fmt: on
+
+_ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
+_ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
 
 
 class TransferTipPolicy(enum.Enum):
