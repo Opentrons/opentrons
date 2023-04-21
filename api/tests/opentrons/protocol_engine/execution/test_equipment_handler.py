@@ -16,7 +16,6 @@ from opentrons.hardware_control.modules import (
     MagDeck,
     HeaterShaker,
     AbstractModule,
-
 )
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.models import LabwareDefinition
@@ -121,16 +120,6 @@ async def temp_module_v1(decoy: Decoy) -> TempDeck:
 async def temp_module_v2(decoy: Decoy) -> TempDeck:
     """Get a mocked out module fixture."""
     temp_mod = decoy.mock(cls=TempDeck)
-    decoy.when(temp_mod.device_info).then_return({"serial": "serial-2"})
-    decoy.when(temp_mod.model()).then_return("temperatureModuleV2")
-
-    return temp_mod
-
-
-@pytest.fixture
-async def mag_block_module_v2(decoy: Decoy) -> TempDeck:
-    """Get a mocked out module fixture."""
-    temp_mod = decoy.mock(cls=Mag)
     decoy.when(temp_mod.device_info).then_return({"serial": "serial-2"})
     decoy.when(temp_mod.model()).then_return("temperatureModuleV2")
 
@@ -897,17 +886,6 @@ async def test_load_magnetic_block(
         module_data_provider.get_definition(ModuleModel.MAGNETIC_BLOCK_V1)
     ).then_return(mag_block_v1_def)
 
-    # decoy.when(
-    #     state_store.modules.select_hardware_module_to_load(
-    #         model=ModuleModel.TEMPERATURE_MODULE_V1,
-    #         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-    #         attached_modules=[
-    #             HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def),
-    #             HardwareModule(serial_number="serial-2", definition=tempdeck_v2_def),
-    #         ],
-    #     )
-    # ).then_return(HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def))
-
     result = await subject.load_magnetic_block(
         model=ModuleModel.MAGNETIC_BLOCK_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -916,6 +894,6 @@ async def test_load_magnetic_block(
 
     assert result == LoadedModuleData(
         module_id="module-id",
-        serial_number="",
+        serial_number=None,
         definition=mag_block_v1_def,
     )
