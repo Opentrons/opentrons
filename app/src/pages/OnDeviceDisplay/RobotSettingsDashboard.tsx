@@ -181,7 +181,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingName={t('app_settings:update_channel')}
             currentOption="UpdateChannel"
             setCurrentOption={setCurrentOption}
-            iconName="wifi"
+            iconName="update-channel"
           />
           {/* Enable Developer Tools */}
           <RobotSettingButton
@@ -260,7 +260,7 @@ const RobotSettingButton = ({
             <StyledText
               fontSize="1.5rem"
               lineHeight="1.875rem"
-              fontWeight="700"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {settingName}
             </StyledText>

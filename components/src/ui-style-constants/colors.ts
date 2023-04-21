@@ -31,7 +31,6 @@ export const opacity90HexCode = 'e6' // 90% opacity
 export const blueEnabled = '#006cfa'
 export const blueHover = '#0061e0'
 export const bluePressed = '#0050b8'
-export const medBluePressed = '#9cb9e0'
 
 // colors black
 export const darkBlackEnabled = '#16212d'
@@ -124,7 +123,8 @@ export const highlightPurple_two = '#e7c3e9'
 export const highlightPurple_two_pressed = '#c8abcd'
 
 // touchscreen foundational color
-export const foundationalBlue = '#b4d4ff'
+export const mediumBlueEnabled = '#b4d4ff'
+export const mediumBluePressed = '#9cb9e0'
 
 // touchscreen communication colors
 export const green_one = '#027e23'
