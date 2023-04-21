@@ -882,7 +882,7 @@ class ModuleView(HasState[ModuleState]):
             HeaterShakerMovementRestrictors(
                 plate_shaking=substate.is_plate_shaking,
                 latch_closed=substate.is_labware_latch_closed,
-                deck_slot=int(self.get_location(substate.module_id).slotName),
+                deck_slot=self.get_location(substate.module_id).slotName.as_int(),
             )
             for substate in hs_substates
         ]
