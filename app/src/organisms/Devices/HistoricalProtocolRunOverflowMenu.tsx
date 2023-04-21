@@ -129,6 +129,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     e.preventDefault()
     e.stopPropagation()
 
+    console.log('rerun')
+    console.log('runid', runId)
+    console.log('createRunResponse', onResetSuccess)
+
     reset()
     trackEvent({
       name: 'proceedToRun',

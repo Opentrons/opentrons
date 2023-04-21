@@ -14,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -121,7 +122,7 @@ function SetupInstructionsButton(
       alignItems="center"
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
       borderRadius={BORDERS.size_five}
-      display="flex"
+      display={DISPLAY_FLEX}
       gridGap="0.5rem"
       padding="1rem 2rem"
       whiteSpace="nowrap"

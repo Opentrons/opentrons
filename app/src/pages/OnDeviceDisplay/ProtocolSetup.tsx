@@ -32,10 +32,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import {
-  useAttachedModules,
-  useRunCreatedAtTimestamp,
-} from '../../organisms/Devices/hooks'
+import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
@@ -49,10 +46,7 @@ import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
-import {
-  useRunControls,
-  useRunStatus,
-} from '../../organisms/RunTimeControl/hooks'
+import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
@@ -86,8 +80,8 @@ function ProtocolSetupStep({
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
         borderRadius={BORDERS.size_four}
-        gridGap="1.5rem"
-        padding="1.5rem 1rem"
+        gridGap={SPACING.spacing5}
+        padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
       >
         {status !== 'general' ? (
           <Icon
@@ -120,16 +114,16 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      border={`2px solid ${COLORS.errorEnabled}`}
-      borderRadius="4.25rem"
+      backgroundColor={COLORS.errorEnabled}
+      borderRadius="6.25rem"
       display={DISPLAY_FLEX}
-      height="4.25rem"
+      height="6.25rem"
       justifyContent={JUSTIFY_CENTER}
-      width="4.25rem"
+      width="6.25rem"
       onClick={onClose}
       aria-label="close"
     >
-      <Icon color={COLORS.errorEnabled} name="ot-close" size="2rem" />
+      <Icon color={COLORS.white} name="close" size="2.5rem" />
     </Btn>
   )
 }
@@ -144,16 +138,21 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={disabled ? COLORS.successDisabled : COLORS.blueEnabled}
-      borderRadius="4.25rem"
+      borderRadius="6.25rem"
       display={DISPLAY_FLEX}
-      height="4.25rem"
+      height="6.25rem"
       justifyContent={JUSTIFY_CENTER}
-      width="4.25rem"
+      width="6.25rem"
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
     >
-      <Icon color={COLORS.white} marginLeft="0.25rem" name="play" size="2rem" />
+      <Icon
+        color={COLORS.white}
+        marginLeft="0.25rem"
+        name="play"
+        size="2.5rem"
+      />
     </Btn>
   )
 }
@@ -183,9 +182,6 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-
-  const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const runStatus: string = useRunStatus(runId) ?? ''
 
   const { play } = useRunControls(runId)
 
@@ -305,8 +301,19 @@ function PrepareToRun({
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-            <StyledText fontSize="2rem">{t('prepare_to_run')}</StyledText>
-            <StyledText fontSize="2rem" color={COLORS.darkGreyEnabled}>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize28}
+              lineHeight={TYPOGRAPHY.lineHeight36}
+              fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+            >
+              {t('prepare_to_run')}
+            </StyledText>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize28}
+              lineHeight={TYPOGRAPHY.lineHeight36}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.darkBlack_seventy}
+            >
               {protocolName}
             </StyledText>
           </Flex>
@@ -315,7 +322,7 @@ function PrepareToRun({
             <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>
         </Flex>
-        <Flex gridGap={SPACING.spacing4}>
+        {/* <Flex gridGap={SPACING.spacing4}>
           <Flex
             backgroundColor={COLORS.fundamentalsBackgroundShade}
             padding="0.25rem 0.5rem"
@@ -329,7 +336,7 @@ function PrepareToRun({
           >
             {`${t('status')}: ${runStatus}`}
           </Flex>
-        </Flex>
+        </Flex> */}
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}

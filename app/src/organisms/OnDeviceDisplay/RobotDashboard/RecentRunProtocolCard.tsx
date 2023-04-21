@@ -12,11 +12,18 @@ import {
   DIRECTION_COLUMN,
   BORDERS,
 } from '@opentrons/components'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { useRunControls } from '../../RunTimeControl/hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useTrackEvent } from '../../../redux/analytics'
+import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
+
+import type { Run, RunData } from '@opentrons/api-client'
 
 interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
@@ -36,6 +43,15 @@ export function RecentRunProtocolCard({
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
+
+  const currentRunId = useCurrentRunId()
+  const { data: allRuns } = useAllRunsQuery()
+  const runId =
+    allRuns?.data.find(run => run.protocolId === protocolId)?.id ?? null
+  const trackEvent = useTrackEvent()
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(currentRunId)
+  const onResetSuccess = (): void => history.push(`protocols/${runId}/setup`)
+  const { reset } = useRunControls(runId, onResetSuccess)
 
   const PROTOCOL_CARD_STYLE = css`
     &:active {
@@ -100,7 +116,12 @@ export function RecentRunProtocolCard({
     chipText = t('missing_both')
   }
   const handleCardClick = (): void => {
-    history.push(`protocols/${protocolId}`)
+    reset()
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RecentRunProtocolCard' },
+    })
+    trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   console.log(protocolName)
