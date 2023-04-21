@@ -49,8 +49,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
         early_sense_tolerance_mm=0.5,
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=1,
-            max_overrun_distance_mm=1,
-            speed_mm_per_s=0.5,
+            max_overrun_distance_mm=1.0, # 1.0
+            speed_mm_per_s=1.0, # 0.5
             sensor_threshold_pf=3.0,
         ),
         search_initial_tolerance_mm=8.0,

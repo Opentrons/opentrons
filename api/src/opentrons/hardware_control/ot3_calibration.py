@@ -226,6 +226,16 @@ async def find_edge_binary(
     found_edge = checking_pos - critical_edge_offset(search_axis, direction_if_hit)
     return found_edge
 
+async def _arc_move(
+    hcapi: OT3API, mount: OT3Mount, deck_height: float, position: Point, offset: float = 5
+) -> None:
+    # Move up
+    current_pos = await hcapi.gantry_position(mount)
+    z_offset = current_pos._replace(z=deck_height + offset)
+    await hcapi.move_to(mount, z_offset, speed=20)
+    # Move to position
+    end_position = position._replace(z=deck_height + offset)
+    await hcapi.move_to(mount, end_position, speed=20)
 
 async def find_slot_center_binary(
     hcapi: OT3API,
@@ -236,7 +246,9 @@ async def find_slot_center_binary(
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
     """
+    estimated_center = estimated_center._replace(y=estimated_center.y - 3)
     # Find all four edges of the calibration slot
+    print("Finding +X edge...")
     plus_x_edge = await find_edge_binary(
         hcapi,
         mount,
@@ -248,18 +260,34 @@ async def find_slot_center_binary(
     LOG.info(f"Found +x edge at {plus_x_edge.x}mm")
     estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
 
+    # Move over Z-axis gauge plunger
+    await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center + EDGES["left"])
+
+    print("Finding -X edge...")
     minus_x_edge = await find_edge_binary(
         hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, 1, raise_verify_error
     )
     LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
     estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
 
+    x_center = (plus_x_edge.x + minus_x_edge.x) / 2
+    x_center_off = x_center - 3
+    estimated_center = estimated_center._replace(x=x_center_off)
+
+    # Move over Z-axis gauge plunger
+    await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center)
+
+    print("Finding +Y edge...")
     plus_y_edge = await find_edge_binary(
         hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, -1, raise_verify_error
     )
     LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
 
+    # Move over Z-axis gauge plunger
+    await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center + EDGES["bottom"])
+
+    print("Finding -Y edge...")
     minus_y_edge = await find_edge_binary(
         hcapi,
         mount,
@@ -270,6 +298,8 @@ async def find_slot_center_binary(
     )
     LOG.info(f"Found -y edge at {minus_y_edge.y}mm")
     estimated_center = estimated_center._replace(y=(plus_y_edge.y + minus_y_edge.y) / 2)
+
+    estimated_center = estimated_center._replace(x=x_center)
 
     # Found XY center and the average of the edges' Zs
     return estimated_center._replace(
@@ -725,7 +755,7 @@ async def calibrate_pipette(
         await hcapi.reset_instrument_offset(mount)
         await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
         offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
-        await hcapi.save_instrument_offset(mount, offset)
+        # await hcapi.save_instrument_offset(mount, offset)
         return offset
     finally:
         await hcapi.remove_tip(mount)
