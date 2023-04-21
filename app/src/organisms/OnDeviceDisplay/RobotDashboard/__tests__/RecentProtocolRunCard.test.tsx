@@ -115,7 +115,7 @@ describe('RecentRunProtocolCard', () => {
 
   it('when tapping a card, a mock function is called', () => {
     const [{ getByLabelText }] = render(props)
-    const button = getByLabelText('RecentRunCard')
+    const button = getByLabelText('RecentRunProtocolCard')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith(`protocols/${props.protocolId}`)
   })

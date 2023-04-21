@@ -15,6 +15,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 
 interface RecentRunProtocolCardProps {
@@ -36,14 +37,14 @@ export function RecentRunProtocolCard({
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
 
-  const CARD_STYLE = css`
+  const PROTOCOL_CARD_STYLE = css`
     &:active {
       background-color: ${isReadyToBeReRun
         ? COLORS.green_three_pressed
         : COLORS.yellow_three_pressed};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
     }
   `
 
@@ -105,8 +106,8 @@ export function RecentRunProtocolCard({
   console.log(protocolName)
   return (
     <Flex
-      aria-label="RecentRunCard"
-      css={CARD_STYLE}
+      aria-label="RecentRunProtocolCard"
+      css={PROTOCOL_CARD_STYLE}
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing5}
       gridGap={SPACING.spacing5}
