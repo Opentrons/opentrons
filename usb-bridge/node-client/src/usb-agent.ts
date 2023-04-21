@@ -108,35 +108,17 @@ export function createSerialPortListMonitor(
 }
 
 class SerialPortSocket extends SerialPort {
+  // log write method
+  write(args: any): any {
+    console.log(`serialport writing ${args}`)
+    return super.write(args)
+  }
+
   // added these to squash keepAlive errors
   setKeepAlive(): void {}
   unref(): void {}
   setTimeout(): void {}
   ref(): void {}
-
-  // log on
-  on(...args: any): any {
-    console.log('serialport on', ...args)
-    return super.on(...args)
-  }
-
-  // log emit
-  emit(type: string, ...args: any): boolean {
-    console.log('serialport emitted', type)
-    return super.emit(type, ...args)
-  }
-
-  // log cork
-  cork(...args: any): any {
-    console.log('serialport cork', args)
-    return super.cork()
-  }
-
-  // log uncork
-  uncork(...args: any): any {
-    console.log('serialport uncork', args)
-    return super.uncork()
-  }
 }
 
 interface SerialPortHttpAgentOptions extends AgentOptions {
@@ -150,9 +132,14 @@ class SerialPortHttpAgent extends http.Agent {
   }
 
   options: { path: string } = { path: '' }
+  // totalSocketCount!: number
 
   // copied from _http_agent.js, replacing this.createConnection
-  createSocket(req, options, cb) {
+  createSocket(
+    req: http.ClientRequest,
+    options: { [k: string]: unknown },
+    cb: Function
+  ): void {
     console.log('called createSocket with options', options)
     options = { __proto__: null, ...options, ...this.options }
     if (options.socketPath) options.path = options.socketPath
@@ -172,7 +159,6 @@ class SerialPortHttpAgent extends http.Agent {
       // debug("sockets", name, this.sockets[name].length, this.totalSocketCount);
       installListeners(this, s, options)
       cb(null, s)
-      console.log('oncreate totalSocketCount', this.totalSocketCount)
     })
     // TODO(BTH: what does this do without createConnection?)
     // When keepAlive is true, pass the related options to createConnection
@@ -180,7 +166,6 @@ class SerialPortHttpAgent extends http.Agent {
     //   options.keepAlive = this.keepAlive;
     //   options.keepAliveInitialDelay = this.keepAliveMsecs;
     // }
-    console.log('creating socket this.options', this.options)
     const socket = new SerialPortSocket({
       path: this.options.path,
       baudRate: 115200,
@@ -188,136 +173,51 @@ class SerialPortHttpAgent extends http.Agent {
     if (!socket.isOpen && !socket.opening) {
       socket.open()
     }
-    const originalRead = socket.read.bind(socket)
-    const originalWrite = socket.write.bind(socket)
-    const originalClose = socket.close.bind(socket)
-    const originalPause = socket.pause.bind(socket)
-    const originalEnd = socket.end.bind(socket)
-    const originalDestroy = socket.destroy.bind(socket)
-    const originalPush = socket.push.bind(socket)
-    const originalUnshift = socket.unshift.bind(socket)
-    socket.on('data', chunk => {
-      console.log(`received chunk:  ${chunk}`)
-      console.log('end chunk')
-    })
-    socket.on('free', () => {
-      console.log('socket free writableEnded', socket.writableEnded)
-      // socket.close();
-    })
-    socket.on('prefinish', () => {
-      console.log(
-        'socket prefinishing isOpen writableFinished writableEnded',
-        socket.isOpen,
-        socket.writableFinished,
-        socket.writableEnded
-      )
-    })
-    socket.on('finish', () => {
-      console.log(
-        'socket finishing isOpen writableFinished writableEnded',
-        socket.isOpen,
-        socket.writableFinished,
-        socket.writableEnded
-      )
-      // close socket on finish: allows agent to create another socket and requests to continue
-      socket.close()
-    })
-    socket.on('end', () => {
-      console.log(
-        'socket ending isOpen writableFinished writableEnded',
-        socket.isOpen,
-        socket.writableFinished,
-        socket.writableEnded
-      )
-    })
-    socket.read = (...args) => {
-      console.log(`calling read with: ${args}`)
-      const result = originalRead(...args)
-      console.log(
-        `read result: ${result}`,
-        'socket._readableState',
-        socket._readableState
-      )
-      return result
-    }
-    socket.write = (...args) => {
-      console.log(`calling write with: ${args}`)
-      const result = originalWrite(...args)
-      console.log(`write result: ${result}`)
-      return result
-    }
-    socket.close = (...args) => {
-      console.log(`calling close with: ${args}`)
-      const result = originalClose(...args)
-      console.log(`close result: ${result}`)
-      return result
-    }
-    socket.pause = (...args) => {
-      console.log(`calling pause with: ${args}`)
-      const result = originalPause(...args)
-      return result
-    }
-    socket.end = (...args: any) => {
-      // .caller doesn't work but throws a useful stack trace
-      // console.log(`${socket.end.caller} called end with: ${args}`)
-      console.log(`calling end with: ${args}`)
-      const result = originalEnd(...args)
-      return result
-
-      // original end emits prefinish/finish, signaling no more data to be written. We want to keep the writable stream open.
-      // https://nodejs.org/api/stream.html#writableendchunk-encoding-callback
-      // return socket
-    }
-    socket.destroy = (...args) => {
-      console.log(`calling destroy with: ${args}`)
-      const result = originalDestroy(...args)
-      return result
-    }
-    socket.push = (...args) => {
-      console.log(`calling push with: ${args}`)
-      const result = originalPush(...args)
-      return result
-    }
-    socket.unshift = (...args) => {
-      console.log(`calling unshift with: ${args}`)
-      const result = originalUnshift(...args)
-      return result
-    }
     if (socket) oncreate(null, socket)
   }
 }
 
 // copied from internal/util.js
-function once(callback) {
+function once<T extends (this: unknown, ...args: unknown[]) => T>(
+  callback: T
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+): (this: unknown, args: any) => T | void {
   let called = false
   return function (...args) {
     if (called) return
     called = true
-    return Reflect.apply(callback, this, args)
+    return Reflect.apply<ThisParameterType<unknown>, unknown[], T>(
+      callback,
+      this,
+      args
+    )
   }
 }
 
-// copied from _http_agent.js
-function installListeners(agent, s, options) {
-  function onFree() {
+// most copied from _http_agent.js; onData and onFinish listeners added to log and close serial port
+function installListeners(
+  agent: SerialPortHttpAgent,
+  s: SerialPortSocket,
+  options: { [k: string]: unknown }
+): void {
+  function onFree(): void {
     // debug('CLIENT socket onFree');
     // need to emit free to attach listeners to serialport
     agent.emit('free', s, options)
   }
   s.on('free', onFree)
 
-  function onClose(err) {
+  function onClose(err): void {
     // debug('CLIENT socket onClose');
     // This is the only place where sockets get removed from the Agent.
     // If you want to remove a socket from the pool, just close it.
     // All socket errors end in a close event anyway.
     agent.totalSocketCount--
     agent.removeSocket(s, options)
-    console.log('onClose totalSocketCount', agent.totalSocketCount)
   }
   s.on('close', onClose)
 
-  function onTimeout() {
+  function onTimeout(): void {
     // debug('CLIENT socket onTimeout');
 
     // Destroy if in free list.
@@ -333,7 +233,19 @@ function installListeners(agent, s, options) {
   }
   s.on('timeout', onTimeout)
 
-  function onRemove() {
+  function onData(chunk: unknown): void {
+    console.log(`received chunk:  ${chunk}`)
+    console.log('end chunk')
+  }
+  s.on('data', onData)
+
+  function onFinish(): void {
+    console.log('socket finishing: closing serialport')
+    s.close()
+  }
+  s.on('finish', onFinish)
+
+  function onRemove(): void {
     // We need this function for cases like HTTP 'upgrade'
     // (defined by WebSockets) where we need to remove a socket from the
     // pool because it'll be locked up indefinitely
@@ -343,8 +255,9 @@ function installListeners(agent, s, options) {
     s.removeListener('close', onClose)
     s.removeListener('free', onFree)
     s.removeListener('timeout', onTimeout)
+    s.removeListener('data', onData)
+    s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
-    console.log('onRemove totalSocketCount', agent.totalSocketCount)
   }
   s.on('agentRemove', onRemove)
 
