@@ -132,7 +132,7 @@
 }
 
 /* Custom Tip Rack Selection */
-.filterData {
+.filter_data {
   display: flex;
   flex-direction: column;
   margin-left: 17%;
@@ -140,7 +140,7 @@
 }
 
 .custom_tiprack {
-  background: #D9E9FE;
+  background: #d9e9fe;
   width: fit-content;
   padding: 5px;
   margin: 2px 0;
@@ -149,10 +149,11 @@
 .remove_button {
   display: flex;
   align-items: center;
-  color: #5181FF;
+  color: #5181ff;
   padding-left: 10px;
   cursor: pointer;
 }
+
 .module_section {
   display: flex;
   flex-direction: row;
