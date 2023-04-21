@@ -31,7 +31,7 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from ..run_store import RunNotFoundError
+from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineConflictError

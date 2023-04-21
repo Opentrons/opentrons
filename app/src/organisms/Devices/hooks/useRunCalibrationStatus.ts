@@ -15,7 +15,7 @@ export function useRunCalibrationStatus(
   runId: string
 ): ProtocolCalibrationStatus {
   const deckCalStatus = useDeckCalibrationStatus(robotName)
-  const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
+  const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
   const runPipetteInfoValues = Object.values(runPipetteInfoByMount)
   const isOT3 = useIsOT3(robotName)
 
@@ -51,8 +51,8 @@ export function useRunCalibrationStatus(
     const pipetteIsMatch =
       pipette?.requestedPipetteMatch === MATCH ||
       pipette?.requestedPipetteMatch === INEXACT_MATCH
-
-    if (pipette !== null && !pipetteIsMatch) {
+    // TODO(bh, 8/18/2022): remove isOT3 condition after OT-3 pipette calibration is implemented
+    if (pipette !== null && !pipetteIsMatch && !isOT3) {
       calibrationStatus = {
         complete: false,
         reason: 'attach_pipette_failure_reason',

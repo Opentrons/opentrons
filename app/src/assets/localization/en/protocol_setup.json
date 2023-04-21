@@ -104,7 +104,7 @@
   "lpc_disabled_no_tipracks_loaded": "Labware Position Check requires that the protocol loads a tip rack",
   "lpc_disabled_no_tipracks_used": "Labware Position Check requires that the protocol has at least one pipette that picks up a tip",
   "get_labware_offset_data": "Get Labware Offset Data",
-  "additional_labware": "{{count}} additonal labware",
+  "additional_labware": "{{count}} additional labware",
   "instruments": "Instruments",
   "instruments_connected": "{{count}} instrument connected",
   "instruments_connected_plural": "{{count}} instruments connected",
@@ -166,5 +166,14 @@
   "liquids_not_in_setup": "Liquids not in setup",
   "initial_liquids_num": "{{num}} initial liquids",
   "opening": "Opening...",
-  "closing": "Closing..."
+  "closing": "Closing...",
+  "calibration": "Calibration",
+  "mount": "{{mount}} mount",
+  "no_data": "no data",
+  "attach": "attach",
+  "calibration_status": "calibration status",
+  "total_vol": "total volume",
+  "calibrated": "calibrated",
+  "calibrate": "calibrate",
+  "96_mount": "left + right mount"
 }

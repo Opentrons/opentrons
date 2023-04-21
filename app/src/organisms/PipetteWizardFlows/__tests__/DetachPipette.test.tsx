@@ -47,7 +47,7 @@ describe('DetachPipette', () => {
       chainRunCommands: jest.fn(),
       runId: RUN_ID_1,
       attachedPipettes: { left: mockPipette, right: null },
-      flowType: FLOWS.CALIBRATE,
+      flowType: FLOWS.DETACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
@@ -59,12 +59,12 @@ describe('DetachPipette', () => {
     mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
-    const { getByText, getByAltText, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByLabelText } = render(props)
     getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByAltText('Detach pipette')
+    getByTestId('Pipette_Detach_1_L.webm')
     getByText('mock check pipette button')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
@@ -124,12 +124,12 @@ describe('DetachPipette', () => {
       flowType: FLOWS.ATTACH,
       selectedPipette: NINETY_SIX_CHANNEL,
     }
-    const { getByText, getByAltText, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByLabelText } = render(props)
     getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByAltText('Detach pipette')
+    getByTestId('Pipette_Detach_1_L.webm')
     getByText('mock check pipette button')
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
