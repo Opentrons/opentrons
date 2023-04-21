@@ -32,7 +32,6 @@ describe('DetachProbe', () => {
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
-      handleCleanUp: jest.fn(),
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
@@ -49,7 +48,7 @@ describe('DetachProbe', () => {
     getByTestId('Pipette_Detach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
-    expect(props.handleCleanUp).toHaveBeenCalled()
+    expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

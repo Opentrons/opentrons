@@ -8,14 +8,14 @@ import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachProbeProps extends PipetteWizardStepProps {
-  handleCleanUp: () => void
+  proceed: () => void
 }
 
 export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   const {
     isRobotMoving,
     goBack,
-    handleCleanUp,
+    proceed,
     mount,
     flowType,
     attachedPipettes,
@@ -38,7 +38,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
         </StyledText>
       }
       proceedButtonText={t('complete_cal')}
-      proceed={handleCleanUp}
+      proceed={proceed}
       back={goBack}
     />
   )

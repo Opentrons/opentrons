@@ -123,9 +123,7 @@ export const PipetteWizardFlows = (
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      handleClose()
-    },
+    onSuccess: () => handleClose(),
   })
 
   const handleCleanUpAndClose = (): void => {
@@ -133,17 +131,7 @@ export const PipetteWizardFlows = (
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      chainRunCommands(
-        [
-          {
-            commandType: 'home' as const,
-            params: {},
-          },
-        ],
-        false
-      ).then(() => {
-        deleteMaintenanceRun(maintenanceRunId)
-      })
+      deleteMaintenanceRun(maintenanceRunId)
     }
   }
   const {
@@ -224,20 +212,9 @@ export const PipetteWizardFlows = (
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachProbe
-        {...currentStep}
-        {...calibrateBaseProps}
-        handleCleanUp={handleCleanUpAndClose}
-      />
+      <DetachProbe {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
-    const handleProceed = (): void => {
-      if (currentStepIndex < totalStepCount) {
-        proceed()
-      } else {
-        closeFlow()
-      }
-    }
     onExit = confirmExit
     modalContent = showConfirmExit ? (
       exitModal
@@ -245,7 +222,6 @@ export const PipetteWizardFlows = (
       <Results
         {...currentStep}
         {...calibrateBaseProps}
-        proceed={handleProceed}
         handleCleanUpAndClose={handleCleanUpAndClose}
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
