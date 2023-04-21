@@ -590,8 +590,10 @@ class AionotifyEvent:
 class GripperJawState(enum.Enum):
     UNHOMED = enum.auto()
     #: the gripper must be homed before it can do anything
-    HOMED_READY = enum.auto()
-    #: the gripper has been homed and is at its fully-open homed position
+    HOME = enum.auto()
+    #: the gripper is in the fully open position
+    IDLE = enum.auto()
+    #: the gripper is in the idle (closed) position for movement
     GRIPPING = enum.auto()
     #: the gripper is actively force-control gripping something
     HOLDING_CLOSED = enum.auto()

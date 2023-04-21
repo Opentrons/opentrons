@@ -700,13 +700,11 @@ class OT3API(
         Home the jaw of the gripper.
         """
         try:
-            gripper = self._gripper_handler.get_gripper()
             self._log.info("Homing gripper jaw.")
-            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-                gripper.default_home_force
+            await self._ungrip(
+                duty_cycle=self._gripper_handler.default_home_duty_cycle()
             )
-            await self._ungrip(duty_cycle=dc)
-            gripper.state = GripperJawState.HOMED_READY
+            self._gripper_handler.set_jaw_state(GripperJawState.HOME)
         except GripperNotAttachedError:
             pass
 
@@ -925,8 +923,7 @@ class OT3API(
         else:
             checked_max = None
 
-        await self._cache_and_maybe_retract_mount(realmount)
-        await self._move_gripper_to_idle_position(realmount)
+        await self.prepare_for_mount_move(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1036,8 +1033,8 @@ class OT3API(
             }
         else:
             checked_max = None
-        await self._cache_and_maybe_retract_mount(realmount)
-        await self._move_gripper_to_idle_position(realmount)
+
+        await self.prepare_for_mount_move(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1046,8 +1043,12 @@ class OT3API(
             expect_stalls=_expect_stalls,
         )
 
-    async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
-        """Retract the 'other' mount if necessary
+    async def prepare_for_mount_move(self, mount: OT3Mount) -> None:
+        await self._cache_and_retract_other_mount(mount)
+        await self._idle_gripper()
+
+    async def _cache_and_retract_other_mount(self, mount: OT3Mount) -> None:
+        """Retract the 'other' mount(s) if necessary
 
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
@@ -1058,26 +1059,12 @@ class OT3API(
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
-    async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
-        """Move gripper to its idle, gripped position.
-
-        If the gripper is not currently in use, puts its jaws in a low-current,
-        gripped position. Experimental behavior in order to prevent gripper jaws
-        from colliding into thermocycler lid & lid latch clips.
-        """
-        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
-        if (
-            self._gripper_handler.gripper
-            and mount_in_use != OT3Mount.GRIPPER
-            and self._gripper_handler.gripper.state != GripperJawState.GRIPPING
-        ):
-            if self._gripper_handler.gripper.state == GripperJawState.UNHOMED:
-                self._log.warning(
-                    "Gripper jaw is not homed. Can't be moved to idle position"
-                )
-            else:
-                # allows for safer gantry movement at minimum force
-                await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+    async def _idle_gripper(self) -> None:
+        """Close gripper jaw when gripper is not actively gripper."""
+        if self._gripper_handler.has_gripper() and \
+                self._gripper_handler.check_jaw_state(GripperJawState.HOME):
+            await self._grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+            self._gripper_handler.set_jaw_state(GripperJawState.IDLE)
 
     def _build_moves(
         self,
@@ -1235,7 +1222,7 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
-        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None
+        self, axes: Optional[Union[List[Axis], List[OT3Axis]]] = None,
     ) -> None:
         """
         Worker function to home the robot by axis or list of
@@ -1247,7 +1234,11 @@ class OT3API(
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
-            checked_axes = [ax for ax in OT3Axis if ax != OT3Axis.Q]
+            checked_axes = [ax for ax in OT3Axis if ax not in OT3Axis.of_kind(OT3AxisKind.OTHER)]
+            # gripper jaw is already in the idle position, we can skip
+            if self._gripper_handler.has_gripper() and not \
+                    self._gripper_handler.check_jaw_state(GripperJawState.IDLE):
+                checked_axes.append(OT3Axis.G)
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
@@ -1403,11 +1394,10 @@ class OT3API(
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
         # get default grip force for release if not provided
         self._gripper_handler.check_ready_for_jaw_move()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            force_newtons or self._gripper_handler.get_gripper().default_home_force
-        )
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons) \
+            if force_newtons else self._gripper_handler.default_home_duty_cycle()
         await self._ungrip(duty_cycle=dc)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
+        self._gripper_handler.set_jaw_state(GripperJawState.HOME)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()

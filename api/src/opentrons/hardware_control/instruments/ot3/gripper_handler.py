@@ -139,6 +139,10 @@ class GripperHandler:
 
     def set_jaw_state(self, state: GripperJawState) -> None:
         self.get_gripper().state = state
+    
+    def default_home_duty_cycle(self):
+        gripper = self.get_gripper()
+        return gripper.duty_cycle_by_force(gripper.default_home_force)
 
     def get_duty_cycle_by_grip_force(self, newton: float) -> float:
         gripper = self.get_gripper()
@@ -151,3 +155,6 @@ class GripperHandler:
     def is_valid_jaw_width(self, mm: float) -> bool:
         conf = self.get_gripper().geometry
         return conf.jaw_width["min"] <= mm <= conf.jaw_width["max"]
+
+    def check_jaw_state(self, state: GripperJawState) -> bool:
+        return self.get_gripper().state == state
