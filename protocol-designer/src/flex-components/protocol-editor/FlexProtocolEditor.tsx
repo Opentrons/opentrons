@@ -15,10 +15,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
   ModuleModel,
-  getPipetteNameSpecs,
-  PipetteName,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
@@ -115,27 +112,10 @@ interface Props {
   selectedTab: number
 }
 
-const newDummyFormPropsForTesting = {
-  moduleType: 'heaterShakerModuleType',
-  moduleOnDeck: {
-    id: 'eded7d07-e12f-4742-be64-16a0a4dbb878:heaterShakerModuleType',
-    model: 'heaterShakerModuleV1',
-    type: 'heaterShakerModuleType',
-    slot: '1',
-    moduleState: {
-      type: 'heaterShakerModuleType',
-      targetTemp: null,
-      targetSpeed: null,
-      latchOpen: null,
-    },
-  },
-  supportedModuleSlot: '1',
-}
-
 const selectComponent = (selectedTab: number, props: any): any => {
-  function comp(selectedTab: number) {
+  const comp = (selectedTab: number): any => {
     const { firstPipette, secondPipette } = pipetteSlot
-    return selectedTab == 1 ? (
+    return selectedTab === 1 ? (
       <SelectPipetteOption formProps={props} pipetteName={firstPipette} />
     ) : (
       <SelectPipetteOption formProps={props} pipetteName={secondPipette} />
@@ -159,7 +139,7 @@ function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
 
   // Next button click
-  const handleNext = ({ selectedTab }: Props) => {
+  const handleNext = ({ selectedTab }: Props): void => {
     const setTabNumber =
       selectedTab >= 0 && selectedTab < navPillTabListLength
         ? selectedTab + 1
@@ -168,7 +148,7 @@ function FlexProtocolEditor(): JSX.Element {
   }
 
   // Previous button click
-  const handlePrevious = ({ selectedTab }: Props) => {
+  const handlePrevious = ({ selectedTab }: Props): void => {
     const setTabNumber =
       selectedTab > 0 && selectedTab <= navPillTabListLength
         ? selectedTab - 1
