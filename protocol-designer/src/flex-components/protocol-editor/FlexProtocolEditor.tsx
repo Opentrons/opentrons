@@ -8,6 +8,19 @@ import {
   SPACING,
   NewPrimaryBtn,
 } from '@opentrons/components'
+import {
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+  HEATERSHAKER_MODULE_TYPE,
+  ModuleType,
+  ModuleModel,
+  getPipetteNameSpecs,
+  PipetteName,
+  SPAN7_8_10_11_SLOT,
+} from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import { i18n } from '../../localization'
 import { FlexModules } from './FlexModules'
@@ -17,7 +30,13 @@ import styles from './FlexComponents.css'
 import { mountSide, navPillTabListLength, pipetteSlot } from '../constant'
 import { RoundTabs } from './RoundTab'
 import { SelectPipetteOption } from './SelectPipette'
+import { DeckSlot } from '../../types'
 
+export interface FormModule {
+  onDeck: boolean
+  model: ModuleModel | null
+  slot: DeckSlot
+}
 interface InitialValues {
   fields: {
     pndName: string
@@ -38,6 +57,12 @@ interface InitialValues {
       tipRackList: any[]
       isSelected: boolean
     }
+  }
+  modulesByType: {
+    magneticModuleType: FormModule
+    temperatureModuleType: FormModule
+    thermocyclerModuleType: FormModule
+    heaterShakerModuleType: FormModule
   }
 }
 
@@ -60,6 +85,28 @@ const getInitialValues: InitialValues = {
       mount: 'right',
       tipRackList: [],
       isSelected: false,
+    },
+  },
+  modulesByType: {
+    [HEATERSHAKER_MODULE_TYPE]: {
+      onDeck: false,
+      model: HEATERSHAKER_MODULE_V1,
+      slot: '1',
+    },
+    [MAGNETIC_MODULE_TYPE]: {
+      onDeck: false,
+      model: null,
+      slot: '1',
+    },
+    [TEMPERATURE_MODULE_TYPE]: {
+      onDeck: false,
+      model: null,
+      slot: '3',
+    },
+    [THERMOCYCLER_MODULE_TYPE]: {
+      onDeck: false,
+      model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
+      slot: SPAN7_8_10_11_SLOT,
     },
   },
 }
@@ -88,9 +135,11 @@ const newDummyFormPropsForTesting = {
 const selectComponent = (selectedTab: number, props: any): any => {
   function comp(selectedTab: number) {
     const { firstPipette, secondPipette } = pipetteSlot
-    return selectedTab == 1
-      ? <SelectPipetteOption formProps={props} pipetteName={firstPipette} />
-      : <SelectPipetteOption formProps={props} pipetteName={secondPipette} />
+    return selectedTab == 1 ? (
+      <SelectPipetteOption formProps={props} pipetteName={firstPipette} />
+    ) : (
+      <SelectPipetteOption formProps={props} pipetteName={secondPipette} />
+    )
   }
 
   switch (selectedTab) {
@@ -98,11 +147,9 @@ const selectComponent = (selectedTab: number, props: any): any => {
       return <FlexProtocolName formProps={props} />
     case 1:
     case 2:
-      return (
-        comp(selectedTab)
-      )
+      return comp(selectedTab)
     case 3:
-      return <FlexModules formProps={newDummyFormPropsForTesting} />
+      return <FlexModules formProps={props} />
     default:
       return null
   }
