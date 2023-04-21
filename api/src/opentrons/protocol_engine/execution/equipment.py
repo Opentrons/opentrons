@@ -252,13 +252,13 @@ class EquipmentHandler:
             A LoadedModuleData object.
 
         Raises:
-            ModuleNotAttachedError: A not-yet-assigned module matching the requested
-                parameters could not be found in the attached modules list.
             ModuleAlreadyPresentError: A module of a different type is already
                 assigned to the requested location.
         """
         definition = self._module_data_provider.get_definition(model)
-
+        self._state_store.modules.ensure_module_not_present(
+            model=model, location=location
+        )
         return LoadedModuleData(
             module_id=self._model_utils.ensure_id(module_id),
             serial_number=None,

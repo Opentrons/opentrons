@@ -72,7 +72,7 @@ class LoadModuleResult(BaseModel):
         ),
     )
 
-    serialNumber: str = Field(
+    serialNumber: Optional[str] = Field(
         ...,
         description="Hardware serial number of the connected module.",
     )
@@ -86,11 +86,18 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        loaded_module = await self._equipment.load_module(
-            model=params.model,
-            location=params.location,
-            module_id=params.moduleId,
-        )
+        if params.model == ModuleModel.MAGNETIC_BLOCK_V1:
+            loaded_module = await self._equipment.load_magnetic_block(
+                model=params.model,
+                location=params.location,
+                module_id=params.moduleId,
+            )
+        else:
+            loaded_module = await self._equipment.load_module(
+                model=params.model,
+                location=params.location,
+                module_id=params.moduleId,
+            )
 
         return LoadModuleResult(
             moduleId=loaded_module.module_id,

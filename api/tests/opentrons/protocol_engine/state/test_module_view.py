@@ -881,6 +881,30 @@ def test_select_hardware_module_to_load_rejects_location_reassignment(
         )
 
 
+def test_ensure_module_not_present_rejects_location_reassignment(
+    magdeck_v1_def: ModuleDefinition,
+    tempdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise if a non-matching module is already present in the slot."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                definition=magdeck_v1_def,
+            )
+        },
+    )
+
+    with pytest.raises(errors.ModuleAlreadyPresentError):
+        subject.ensure_module_not_present(
+            model=ModuleModel.MAGNETIC_BLOCK_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+
+
 class _CalculateMagnetHardwareHeightTestParams(NamedTuple):
     definition: ModuleDefinition
     mm_from_base: float
