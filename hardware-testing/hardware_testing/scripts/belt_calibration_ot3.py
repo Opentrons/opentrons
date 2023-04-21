@@ -18,17 +18,37 @@ async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
     if not api.is_simulator:
         ui.get_user_ready("calibrating pipette to slot #5")
     await calibrate_pipette(api, mount, slot=5)
-    await api.home([types.OT3Axis.by_mount(mount)])
+    await api.move_rel(mount, types.Point(z=100))
 
 
 async def _check_belt_accuracy(api: OT3API, mount: types.OT3Mount) -> None:
-    ui.print_header("CHECK PIPETTE ACCURACY")
+    ui.print_header("CHECK BELT ACCURACY")
     for slot in [1, 3, 10, 12]:
         if not api.is_simulator:
             ui.get_user_ready(f"about to find offset of slot #{slot}")
+        await api.add_tip(mount, api.config.calibration.probe_length)
         slot_offset = await _calibrate_mount(api, mount, slot=slot)
+        await api.remove_tip(mount)
         print(f"Slot #{slot}: {slot_offset}")
-        await api.home([types.OT3Axis.by_mount(mount)])
+        await api.move_rel(mount, types.Point(z=100))
+
+
+async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
+    ui.print_header("PROBE the DECK")
+    if not api.is_simulator:
+        ui.get_user_ready("about to probe deck slots #3, #10, and #12")
+    # NOTE: looking at "calibrate_belts()" it looks like the attitude matrix is not
+    #       saved, but only returned
+    await api.reset_instrument_offset(mount)
+    attitude = await calibrate_belts(api, mount)
+    await api.move_rel(mount, types.Point(z=100))
+    if api.is_simulator:
+        attitude = DEFAULT_DECK_TRANSFORM
+    print("attitude:")
+    print(attitude)
+    new_calibration = build_temporary_identity_calibration()
+    new_calibration.deck_calibration.attitude = attitude
+    api.set_robot_calibration(new_calibration)
 
 
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
@@ -47,21 +67,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     await _calibrate_pipette(api, mount)
     await _check_belt_accuracy(api, mount)
 
-    ui.print_header("PROBE the DECK")
-    if not api.is_simulator:
-        ui.get_user_ready("about to probe deck slots #3, #10, and #12")
-    # NOTE: looking at "calibrate_belts()" it looks like the attitude matrix is not
-    #       saved, but only returned
-    await api.reset_instrument_offset(mount)
-    attitude = await calibrate_belts(api, mount)
-    await api.home([types.OT3Axis.by_mount(mount)])
-    if api.is_simulator:
-        attitude = DEFAULT_DECK_TRANSFORM
-    print("attitude:")
-    print(attitude)
-    new_calibration = build_temporary_identity_calibration()
-    new_calibration.deck_calibration.attitude = attitude
-    api.set_robot_calibration(new_calibration)
+    await _calibrate_belts(api, mount)
 
     await _calibrate_pipette(api, mount)
     await _check_belt_accuracy(api, mount)
