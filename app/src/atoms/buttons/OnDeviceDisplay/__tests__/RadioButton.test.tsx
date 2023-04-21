@@ -11,7 +11,7 @@ describe('RadioButton', () => {
   let props: React.ComponentProps<typeof RadioButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onChange: jest.fn(),
       buttonLabel: 'radio button',
       buttonValue: 1,
     }
@@ -23,7 +23,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${COLORS.foundationalBlue}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing5}`)
   })
   it('renders the large selected button', () => {
@@ -44,7 +44,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${COLORS.foundationalBlue}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacingM}`)
   })
   it('renders the small selected button', () => {
