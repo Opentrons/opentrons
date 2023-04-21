@@ -19,7 +19,7 @@ describe('RadioButton', () => {
   it('renders the large button', () => {
     props = {
       ...props,
-      size: 'large',
+      radioButtonType: 'large',
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
@@ -30,7 +30,7 @@ describe('RadioButton', () => {
     props = {
       ...props,
       isSelected: true,
-      size: 'large',
+      radioButtonType: 'large',
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
@@ -40,7 +40,7 @@ describe('RadioButton', () => {
   it('renders the small button', () => {
     props = {
       ...props,
-      size: 'small',
+      radioButtonType: 'small',
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
@@ -51,7 +51,7 @@ describe('RadioButton', () => {
     props = {
       ...props,
       isSelected: true,
-      size: 'small',
+      radioButtonType: 'small',
     }
     const { getByRole } = render(props)
     const label = getByRole('label')

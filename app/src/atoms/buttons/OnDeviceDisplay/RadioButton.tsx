@@ -8,6 +8,7 @@ import {
   Flex,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -17,7 +18,7 @@ interface RadioButtonProps extends StyleProps {
   onChange: React.ChangeEventHandler<HTMLInputElement>
   disabled?: boolean
   isSelected?: boolean
-  size?: 'large' | 'small'
+  radioButtonType?: 'large' | 'small'
 }
 
 export function RadioButton(props: RadioButtonProps): JSX.Element {
@@ -27,33 +28,33 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     disabled = false,
     isSelected = false,
     onChange,
-    size,
+    radioButtonType = 'large',
   } = props
 
-  const isLarge = size === 'large'
+  const isLarge = radioButtonType === 'large'
 
   const SettingButton = styled.input`
     display: none;
   `
 
-  const availableButtonStyles = css`
+  const AVAILABLE_BUTTON_STYLE = css`
     background: ${COLORS.mediumBlueEnabled};
 
     &:active {
-      background-color: #94afd4;
+      background-color: ${COLORS.mediumBluePressed};
     }
   `
 
-  const selectedButtonStyles = css`
+  const SELECTED_BUTTON_STYLE = css`
     background: ${COLORS.blueEnabled};
     color: ${COLORS.white};
 
     &:active {
-      background-color: #045dd0;
+      background-color: ${COLORS.bluePressed};
     }
   `
 
-  const disabledButtonStyles = css`
+  const DISABLED_BUTTON_STYLE = css`
     background-color: ${COLORS.darkBlack_twenty};
     color: ${COLORS.darkBlack_sixty};
     cursor: not-allowed;
@@ -67,11 +68,11 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     padding: ${isLarge ? SPACING.spacing5 : SPACING.spacingM};
     width: 100%;
 
-    ${isSelected ? selectedButtonStyles : availableButtonStyles}
-    ${disabled && disabledButtonStyles}
+    ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
+    ${disabled && DISABLED_BUTTON_STYLE}
 
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
     }
   `
 

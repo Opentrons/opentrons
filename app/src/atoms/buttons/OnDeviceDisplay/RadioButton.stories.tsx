@@ -5,7 +5,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/Buttons/RadioButton',
   argTypes: {
-    size: {
+    radioButtonType: {
       control: {
         type: 'select',
         options: ['large', 'small'],
