@@ -167,8 +167,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 
 const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
   'mousedown',
-  'click',
-  'scroll',
+  // 'click',
+  // 'scroll',
 ]
 
 const TURN_OFF_BACKLIGHT = 7
@@ -203,9 +203,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%">
-        {/* {Boolean(isIdle) ? (
-          <SleepScreen />
-        ) : ( */}
         <ToasterOven>
           <Switch>
             {onDeviceDisplayRoutes.map(
@@ -229,7 +226,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             <Redirect exact from="/" to="/dashboard" />
           </Switch>
         </ToasterOven>
-        {/* )} */}
       </Box>
     </ApiHostProvider>
   )
