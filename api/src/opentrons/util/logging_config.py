@@ -56,6 +56,11 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
+            "opentrons_hardware.drivers.can_bus.can_messenger": {
+                "handlers": ["serial"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
             "__main__": {"handlers": ["api"], "level": level_value},
         },
     }
@@ -98,6 +103,11 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             "opentrons_hardware": {
                 "handlers": ["api"],
                 "level": level_value,
+            },
+            "opentrons_hardware.drivers.can_bus.can_messenger": {
+                "handlers": ["serial"],
+                "level": logging.DEBUG,
+                "propagate": False,
             },
             "__main__": {"handlers": ["api"], "level": level_value},
         },
