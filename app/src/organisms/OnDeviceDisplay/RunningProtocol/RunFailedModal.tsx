@@ -140,6 +140,7 @@ export function RunFailedModal({
         </StyledText>
         <Flex marginTop="1.75rem">
           <SmallButton
+            width="100%"
             buttonType="alert"
             buttonText={i18n.format(t('shared:close'), 'titleCase')}
             onClick={handleClose}
