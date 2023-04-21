@@ -225,6 +225,7 @@ class ErrorCode(int, Enum):
     labware_dropped = 0x09
     estop_released = 0x0A
     motor_busy = 0x0B
+    stop_requested = 0x0C
 
 
 @unique
