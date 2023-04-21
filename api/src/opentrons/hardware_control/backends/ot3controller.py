@@ -88,7 +88,12 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteType,
     USBTarget,
     FirmwareTarget,
+    ErrorCode,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    StopRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
@@ -973,11 +978,11 @@ class OT3Controller:
 
     async def halt(self) -> None:
         """Halt the motors."""
-        return None
-
-    async def hard_halt(self) -> None:
-        """Halt the motors."""
-        return None
+        error = await self._messenger.ensure_send(
+            NodeId.broadcast, StopRequest(payload=EmptyPayload())
+        )
+        if error != ErrorCode.ok:
+            log.warning(f"Halt stop request failed: {error}")
 
     async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
