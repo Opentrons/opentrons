@@ -452,7 +452,7 @@ class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
     @classmethod
     def _parse(cls, data: bytes) -> Tuple[int, int, int]:
         key = cls._usage_field_from_bytes(data, 0, 2)
-        length = cls._usage_field_from_bytes(data, 1, 3)
+        length = cls._usage_field_from_bytes(data, 2, 3)
         usage_value = cls._usage_field_from_bytes(data, 3, 11)
         if length < 8:
             usage_value = usage_value >> (8 - length) * 8
