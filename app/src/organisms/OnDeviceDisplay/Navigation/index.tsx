@@ -73,7 +73,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         <Flex flexDirection={DIRECTION_ROW}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
             <NavigationLink key={name} to={navLinkTo as string}>
-              <StyledText as="h3" marginRight={TYPOGRAPHY.fontSize32}>
+              <StyledText as="h3" marginRight={SPACING.spacing6}>
                 {name}
               </StyledText>
             </NavigationLink>
