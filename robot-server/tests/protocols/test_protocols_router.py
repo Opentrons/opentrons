@@ -251,7 +251,7 @@ async def test_get_protocol_by_id(
         key="dummy-key-111",
     )
 
-    assert result.content.links == ProtocolLinks.construct(referencingRunIds=[])
+    assert result.content.links == ProtocolLinks.construct(referencingRuns=[])
     assert result.status_code == 200
 
 
