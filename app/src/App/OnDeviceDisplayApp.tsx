@@ -167,8 +167,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
 
 const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
   'mousedown',
-  // 'click',
-  // 'scroll',
+  'click',
+  'scroll',
 ]
 
 const TURN_OFF_BACKLIGHT = 7
