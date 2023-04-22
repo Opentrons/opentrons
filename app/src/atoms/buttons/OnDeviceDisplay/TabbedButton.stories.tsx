@@ -12,7 +12,8 @@ const TabbedButtonTemplate: Story<
 > = args => <TabbedButton {...args} />
 export const Tabbed = TabbedButtonTemplate.bind({})
 Tabbed.args = {
-  foreground: true,
+  isSelected: true,
   children: 'Button text',
+  disabled: false,
   title: 'tabbed button',
 }

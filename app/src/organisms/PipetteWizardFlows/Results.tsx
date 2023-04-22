@@ -9,7 +9,6 @@ import {
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { useAttachedPipetteCalibrations } from '../Devices/hooks'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
@@ -21,6 +20,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   totalStepCount: number
   isFetching: boolean
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
+  hasCalData: boolean
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -36,6 +36,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     isOnDevice,
     isFetching,
     setFetching,
+    hasCalData,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
@@ -43,12 +44,10 @@ export const Results = (props: ResultsProps): JSX.Element => {
     attachedPipettes[mount] != null
       ? attachedPipettes[mount]?.modelSpecs.displayName
       : ''
-  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
-  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
-  let buttonText: string = t('shared:exit')
+  let buttonText: string = i18n.format(t('shared:exit'), 'capitalize')
   let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {

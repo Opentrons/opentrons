@@ -59,6 +59,8 @@ const FOOTER_STYLE = {
 } as const
 
 export interface ModalShellProps extends StyleProps {
+  /** Modal content */
+  children: React.ReactNode
   /** Optional close on outside click **/
   onOutsideClick?: React.MouseEventHandler
   /** Optional sticky header */
@@ -67,8 +69,8 @@ export interface ModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
-  /** Modal content */
-  children: React.ReactNode
+  /** For on device display */
+  isOnDeviceDisplay?: boolean
 }
 
 /**
@@ -89,6 +91,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     footer,
     fullPage = false,
     children,
+    isOnDeviceDisplay = false,
     ...styleProps
   } = props
 
@@ -99,8 +102,11 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       right="0"
       top="0"
       bottom="0"
+      aria-label="BackgroundOverlay_ModalShell"
       zIndex="1"
-      backgroundColor={COLORS.backgroundOverlay}
+      backgroundColor={
+        isOnDeviceDisplay ? COLORS.darkBlack_sixty : COLORS.backgroundOverlay
+      }
       cursor="default"
       onClick={e => {
         e.stopPropagation()

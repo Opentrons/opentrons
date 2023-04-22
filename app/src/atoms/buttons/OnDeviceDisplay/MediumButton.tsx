@@ -6,13 +6,13 @@ import {
   Btn,
   COLORS,
   DIRECTION_ROW,
-  Flex,
   Icon,
   SPACING,
-  styleProps,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
+
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type MediumButtonTypes =
@@ -21,14 +21,13 @@ type MediumButtonTypes =
   | 'alert'
   | 'alertSecondary'
   | 'tertiaryHigh'
-  | 'tertiaryHighLight'
+  | 'tertiaryLowLight'
 interface MediumButtonProps extends StyleProps {
   buttonText: React.ReactNode
   buttonType?: MediumButtonTypes
   disabled?: boolean
   iconName?: IconName
-  onClick: () => void
-  width?: string
+  onClick: React.MouseEventHandler
 }
 
 export function MediumButton(props: MediumButtonProps): JSX.Element {
@@ -37,13 +36,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     buttonType = 'primary',
     disabled = false,
     iconName,
-    onClick,
-    width,
+    ...buttonProps
   } = props
-  const buttonProps = {
-    disabled,
-    onClick,
-  }
 
   const MEDIUM_BUTTON_PROPS_BY_TYPE: Record<
     MediumButtonTypes,
@@ -51,6 +45,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: string
       defaultBackgroundColor: string
       defaultColor: string
+      disabledBackgroundColor: string
       iconColor: string
     }
   > = {
@@ -59,6 +54,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#b91f20',
       defaultBackgroundColor: COLORS.red_two,
       defaultColor: COLORS.white,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.white,
     },
     alertSecondary: {
@@ -66,6 +62,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#ccabac',
       defaultBackgroundColor: COLORS.red_three,
       defaultColor: COLORS.red_one,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.red_one,
     },
     primary: {
@@ -73,25 +70,29 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#045dd0',
       defaultBackgroundColor: COLORS.blueEnabled,
       defaultColor: COLORS.white,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.white,
     },
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-      defaultBackgroundColor: COLORS.foundationalBlue,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
       defaultColor: COLORS.darkBlackEnabled,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.blueEnabled,
     },
     tertiaryHigh: {
       activeBackgroundColor: COLORS.darkBlack_twenty,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.darkBlack_hundred,
+      disabledBackgroundColor: COLORS.transparent,
       iconColor: COLORS.darkBlack_hundred,
     },
-    tertiaryHighLight: {
+    tertiaryLowLight: {
       activeBackgroundColor: COLORS.darkBlack_twenty,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.darkBlack_seventy,
+      disabledBackgroundColor: COLORS.transparent,
       iconColor: COLORS.darkBlack_seventy,
     },
   }
@@ -103,10 +104,6 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     cursor: default;
-    text-align: ${TYPOGRAPHY.textAlignLeft};
-    text-transform: ${TYPOGRAPHY.textTransformNone};
-
-    ${styleProps}
 
     &:focus {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
@@ -121,7 +118,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
     }
 
     &:active {
@@ -130,49 +127,46 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack_twenty};
+      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
       color: ${COLORS.darkBlack_sixty};
     }
   `
   return (
     <Btn
-      {...buttonProps}
+      disabled={disabled}
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
+      display="flex"
+      alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacingSM}
       padding={
         iconName !== undefined
           ? `${SPACING.spacingM} ${SPACING.spacing5}`
           : `${SPACING.spacingM} ${SPACING.spacingXXL}`
       }
-      width={width}
+      {...buttonProps}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacingSM}
+      {iconName !== undefined && (
+        <Icon
+          name={iconName ?? 'play'}
+          aria-label={`MediumButton_${iconName ?? 'play'}`}
+          color={
+            disabled
+              ? COLORS.darkBlack_sixty
+              : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+          }
+          size={SPACING.spacingXXL}
+        />
+      )}
+      <StyledText
+        fontSize={TYPOGRAPHY.fontSize28}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        lineHeight={TYPOGRAPHY.lineHeight36}
       >
-        {iconName !== undefined && (
-          <Icon
-            name={iconName ?? 'play'}
-            aria-label={`MediumButton_${iconName ?? 'play'}`}
-            color={
-              disabled
-                ? COLORS.darkBlack_sixty
-                : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
-            }
-            width={SPACING.spacingXL}
-            height={SPACING.spacingXL}
-          />
-        )}
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize28}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight36}
-        >
-          {buttonText}
-        </StyledText>
-      </Flex>
+        {buttonText}
+      </StyledText>
     </Btn>
   )
 }

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,8 +13,8 @@ import {
   BORDERS,
   Btn,
   SIZE_1,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import type { StyleProps } from '@opentrons/components'
 
 export type BannerType =
@@ -104,7 +103,7 @@ export function Banner(props: BannerProps): JSX.Element {
     font-weight: ${TYPOGRAPHY.fontWeightRegular};
     border-radius: ${SPACING.spacing2};
 
-    @media ${ODD_MEDIA_QUERY_SPECS} {
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       border: none;

@@ -5,7 +5,7 @@ marks:
       - run_server
 
 stages:
-  - name: Create Empty Run
+  - name: Create empty run
     request:
       url: '{host:s}:{port:d}/runs'
       json:

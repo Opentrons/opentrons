@@ -11,6 +11,7 @@ import {
   useCreateRunMutation,
   useStopRunMutation,
   useDeleteRunMutation,
+  useDismissCurrentRunMutation,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
@@ -19,9 +20,13 @@ import {
   mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
 import { getIsOnDevice } from '../../../redux/config'
-import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
+import { useAttachedPipetteCalibrations } from '../../Devices/hooks/useAttachedPipetteCalibrations'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
@@ -29,7 +34,10 @@ import { FLOWS, SECTIONS } from '../constants'
 import { UnskippableModal } from '../UnskippableModal'
 import { PipetteWizardFlows } from '..'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type {
+  AttachedPipette,
+  PipetteCalibrationsByMount,
+} from '../../../redux/pipettes/types'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')
@@ -41,7 +49,11 @@ jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../UnskippableModal')
 jest.mock('../../../redux/config')
+jest.mock('../../Devices/hooks/useAttachedPipetteCalibrations')
 
+const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
+  typeof useAttachedPipetteCalibrations
+>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
@@ -63,8 +75,8 @@ const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
 const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
   typeof useStopRunMutation
 >
-const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
-  typeof useCloseCurrentRun
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -88,11 +100,19 @@ const mockPipette: AttachedPipette = {
     maxVolume: 50,
   },
 }
+const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
+  left: {
+    offset: mockPipetteOffsetCalibration1,
+  },
+  right: {
+    offset: mockPipetteOffsetCalibration2,
+  },
+} as any
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   let mockCreateRun: jest.Mock
   let mockStopRun: jest.Mock
-  let mockCloseCurrentRun: jest.Mock
+  let mockDismissCurrentRun: jest.Mock
   let mockDeleteRun: jest.Mock
   let refetchPromise: Promise<void>
   let mockRefetch: jest.Mock
@@ -105,9 +125,13 @@ describe('PipetteWizardFlows', () => {
       closeFlow: jest.fn(),
       setSelectedPipette: jest.fn(),
     }
+    mockUseAttachedPipetteCalibrations.mockReturnValue({
+      left: {},
+      right: {},
+    } as any)
     mockCreateRun = jest.fn()
     mockStopRun = jest.fn()
-    mockCloseCurrentRun = jest.fn()
+    mockDismissCurrentRun = jest.fn()
     mockDeleteRun = jest.fn()
     refetchPromise = Promise.resolve()
     mockRefetch = jest.fn(() => refetchPromise)
@@ -128,8 +152,8 @@ describe('PipetteWizardFlows', () => {
       chainRunCommands: mockChainRunCommands,
       isCommandMutationLoading: false,
     })
-    mockUseCloseCurrentRun.mockReturnValue({
-      closeCurrenRun: mockCloseCurrentRun,
+    mockUseDismissCurrentRunMutation.mockReturnValue({
+      dismissCurrenRun: mockDismissCurrentRun,
     } as any)
     mockUseRunStatus.mockReturnValue('idle')
     mockGetPipetteWizardSteps.mockReturnValue([
@@ -159,6 +183,9 @@ describe('PipetteWizardFlows', () => {
     mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     const { getByText, getByRole } = render(props)
     //  first page
     getByText('Recalibrate Left Pipette')
@@ -241,6 +268,9 @@ describe('PipetteWizardFlows', () => {
     // })
   })
   it('renders the correct first page for calibrating single mount when rendering from on device display', () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     mockGetIsOnDevice.mockReturnValue(true)
     const { getByText } = render(props)
     getByText('Recalibrate Left Pipette')
