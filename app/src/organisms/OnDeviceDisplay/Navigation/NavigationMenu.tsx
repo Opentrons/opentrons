@@ -26,17 +26,17 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   return (
     <MenuList onClick={onClick} isOnDevice={true}>
       <MenuItem
-        key="home-gantry"
+        key="home-robot-arm"
         onClick={() => dispatch(home(robotName, ROBOT))}
       >
         <Flex>
           <Icon
-            name="home-gantry"
-            aria-label="home-gantry_icon"
+            name="home-robot-arm"
+            aria-label="home-robot-arm_icon"
             size={SIZE_2}
           />
           <StyledText marginLeft={SPACING.spacing5}>
-            {t('home_gantry')}
+            {t('home_robot_arm')}
           </StyledText>
         </Flex>
       </MenuItem>

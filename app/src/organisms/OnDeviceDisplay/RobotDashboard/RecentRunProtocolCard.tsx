@@ -23,8 +23,6 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 
-import type { Run, RunData } from '@opentrons/api-client'
-
 interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
   protocolName: string
