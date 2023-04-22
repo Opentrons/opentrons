@@ -15,22 +15,22 @@ from .models import v1
 log = logging.getLogger(__name__)
 
 
-# Delete Deck Calibration
+# Delete Belt Calibration
 
 
 @no_type_check
-def delete_robot_deck_attitude() -> None:
+def delete_robot_belt_attitude() -> None:
     """
-    Delete the robot deck attitude calibration.
+    Delete the robot belt attitude calibration.
     """
     gantry_path = (
-        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
+        config.get_opentrons_path("robot_calibration_dir") / "belt_calibration.json"
     )
 
     io.delete_file(gantry_path)
 
 
-# Save Deck Calibration
+# Save Belt Calibration
 
 
 @no_type_check
@@ -62,7 +62,7 @@ def save_robot_belt_attitude(
     io.save_to_file(robot_dir, "belt_calibration", gantry_calibration)
 
 
-# Get Deck Calibration
+# Get Belt Calibration
 
 
 @no_type_check

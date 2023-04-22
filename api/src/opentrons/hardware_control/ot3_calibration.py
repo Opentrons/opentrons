@@ -9,7 +9,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
-from opentrons.util.linal import SolvePoints, solve_attitude
+from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -844,9 +844,7 @@ def save_belt_attitude_matrix(
 
 
 def load_attitude_matrix() -> DeckCalibration:
-    calibration_data = (
-        get_robot_belt_attitude()
-    )
+    calibration_data = get_robot_belt_attitude()
 
     if calibration_data:
         return DeckCalibration(

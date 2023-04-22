@@ -85,6 +85,7 @@ def test_get_deck_calibration(
         from opentrons.calibration_storage import get_robot_belt_attitude
 
         robot_belt = get_robot_belt_attitude()
+        assert robot_belt
         assert robot_belt == OT3BeltCalModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             lastModified=robot_belt.lastModified,
@@ -98,6 +99,7 @@ def test_get_deck_calibration(
         from opentrons.calibration_storage import get_robot_deck_attitude
 
         robot_deck = get_robot_deck_attitude()
+        assert robot_deck
         assert robot_deck == OT2DeckCalModel(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
             last_modified=robot_deck.last_modified,
@@ -107,16 +109,31 @@ def test_get_deck_calibration(
         )
 
 
-def test_delete_deck_calibration(starting_calibration_data: Any) -> None:
+def test_delete_deck_calibration(
+    starting_calibration_data: Any, robot_model: "RobotModel"
+) -> None:
     """
     Test delete deck calibration.
     """
-    from opentrons.calibration_storage import (
-        get_robot_deck_attitude,
-        delete_robot_deck_attitude,
-    )
+    if robot_model == "OT-3 Standard":
+        from opentrons.calibration_storage import (
+            get_robot_belt_attitude,
+            delete_robot_belt_attitude,
+        )
 
-    assert get_robot_deck_attitude() != {}
-    assert get_robot_deck_attitude().attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    delete_robot_deck_attitude()
-    assert get_robot_deck_attitude() is None
+        robot_belt = get_robot_belt_attitude()
+        assert robot_belt
+        assert robot_belt.attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        delete_robot_belt_attitude()
+        assert get_robot_belt_attitude() is None
+    else:
+        from opentrons.calibration_storage import (
+            get_robot_deck_attitude,
+            delete_robot_deck_attitude,
+        )
+
+        robot_deck = get_robot_deck_attitude()
+        assert robot_deck
+        assert robot_deck.attitude == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        delete_robot_deck_attitude()
+        assert get_robot_deck_attitude() is None
