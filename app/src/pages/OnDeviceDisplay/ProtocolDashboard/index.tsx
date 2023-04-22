@@ -33,7 +33,7 @@ import { LongPressModal } from './LongPressModal'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 
-import imgSrc from '../../../assets/images/odd/abstract@x2.png'
+import imgSrc from '../../../assets/images/on-device-display/abstract@x2.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
@@ -305,7 +305,7 @@ export function ProtocolCard(props: {
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
         {longpress.isLongPressed && (
-          <LongPressModal longpress={longpress} protocol={protocol} />
+          <LongPressModal longpress={longpress} protocolId={protocol.id} />
         )}
       </Flex>
     </Flex>

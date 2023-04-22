@@ -1,113 +1,64 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   Flex,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   SPACING,
-  COLORS,
   TYPOGRAPHY,
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
+import {
+  useAllProtocolsQuery,
+  useAllRunsQuery,
+} from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
-import { MiniCardButton } from '../../molecules/MiniCardButton'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import {
+  EmptyRecentRun,
+  RecentRunProtocolCarousel,
+} from '../../organisms/OnDeviceDisplay/RobotDashboard'
+import { sortProtocols } from './ProtocolDashboard/utils'
 
-import abstractImage from '../../assets/images/odd/abstract@x2.png'
-
-import type { MiniCardButtonProps } from '../../molecules/MiniCardButton'
-
-// TODO: kj 12/0/7/2022 this part will be update when hi-fi is ready
-const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
-  {
-    iconName: 'wifi',
-    cardName: 'Run a protocol',
-    destinationPath: '/protocols',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Instrument + Module Hub',
-    destinationPath: '/instruments',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Settings',
-    destinationPath: '/robot-settings',
-  },
-]
+export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
+const SORT_KEY = 'recentRun'
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
+  const protocols = useAllProtocolsQuery()
+  const runs = useAllRunsQuery()
+  const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  const runData = runs.data?.data != null ? runs.data?.data : []
 
-  // ToDo kj 12/07/2022 get protocol runs and add conditional rendering
-  // if there is no run data, shows the following
+  /** Currently the max number of displaying recent run protocol is 8 */
+  const sortedProtocols = sortProtocols(SORT_KEY, protocolsData, runData).slice(
+    0,
+    MAXIMUM_RECENT_RUN_PROTOCOLS
+  )
   return (
-    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+      flexDirection={DIRECTION_COLUMN}
+    >
       <Navigation routes={onDeviceDisplayRoutes} />
-      <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
-        {t('run_again')}
-      </StyledText>
-      <Flex
-        width="100%"
-        height="14.375rem"
-        backgroundColor={COLORS.fundamentalsBackground}
-        flexDirection={DIRECTION_COLUMN}
-        padding={`${String(SPACING.spacing4)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacing6)}`}
-        alignItems={ALIGN_CENTER}
-      >
-        <img
-          src={abstractImage}
-          alt="Robot Dashboard no protocol run data"
-          width="864px"
-          height="108px"
-        />
-        <StyledText
-          fontSize="1.5rem"
-          lineHeight="2.25rem"
-          fontWeight="700"
-          color={COLORS.black}
-        >
-          {t('have_not_run')}
-        </StyledText>
-        <StyledText
-          fontSize="1.375rem"
-          lineHeight="1.875rem"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.black}
-        >
-          {t('have_not_run_description')}
-        </StyledText>
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
-        marginTop="1.3125rem"
-      >
-        {DASHBOARD_ITEMS.map((card, index) => (
-          <MiniCardButton key={`miniCardButton_${index}`} {...card} />
-        ))}
-      </Flex>
-      {/* temp button to robot dashboard until we can detect setup status */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        {sortedProtocols.length === 0 ? (
+          <>
+            <EmptyRecentRun />
+          </>
+        ) : (
+          <>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize20}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('run_again')}
+            </StyledText>
+            <RecentRunProtocolCarousel sortedProtocols={sortedProtocols} />
+          </>
+        )}
       </Flex>
     </Flex>
   )

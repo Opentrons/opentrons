@@ -6,7 +6,6 @@ import {
   SPACING,
   BORDERS,
   Btn,
-  styleProps,
   DIRECTION_ROW,
   Icon,
 } from '@opentrons/components'
@@ -24,11 +23,13 @@ interface LargeButtonProps extends StyleProps {
 }
 
 export function LargeButton(props: LargeButtonProps): JSX.Element {
-  const { onClick, buttonType, buttonText, iconName, disabled } = props
-  const buttonProps = {
-    onClick,
-    disabled,
-  }
+  const {
+    buttonType,
+    buttonText,
+    iconName,
+    disabled = false,
+    ...buttonProps
+  } = props
 
   const LARGE_BUTTON_PROPS_BY_TYPE: Record<
     LargeButtonTypes,
@@ -41,8 +42,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   > = {
     secondary: {
       defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.foundationalBlue,
-      activeBackgroundColor: COLORS.medBluePressed,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
       iconColor: COLORS.blueEnabled,
     },
     alert: {
@@ -70,10 +71,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     padding: ${SPACING.spacing5};
     line-height: ${TYPOGRAPHY.lineHeight20};
     max-height: 14.375rem;
-    text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
-    ${styleProps}
     &:focus {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
@@ -103,10 +102,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   `
   return (
     <Btn
-      {...buttonProps}
       css={LARGE_BUTTON_STYLE}
       aria-label={`LargeButton_${buttonType}`}
       flexDirection={DIRECTION_ROW}
+      disabled={disabled}
+      {...buttonProps}
     >
       <StyledText
         fontSize="2rem"

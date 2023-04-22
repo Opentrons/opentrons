@@ -1,7 +1,7 @@
 import * as React from 'react'
+import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
-import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import {
@@ -23,6 +23,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
@@ -149,6 +150,11 @@ export const ResultsSummary = (
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        css={css`
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            margin-top: 0;
+          }
+        `}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
         <PrimaryButton onClick={() => handleApplyOffsets(offsetsToApply)}>

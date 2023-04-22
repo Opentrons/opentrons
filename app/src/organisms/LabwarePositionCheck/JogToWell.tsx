@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   RobotWorkSpace,
@@ -14,6 +15,7 @@ import {
   ALIGN_FLEX_START,
   PrimaryButton,
   SecondaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -147,6 +149,11 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        css={css`
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            margin-top: 0;
+          }
+        `}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
         <Flex gridGap={SPACING.spacing3}>

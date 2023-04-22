@@ -4,7 +4,7 @@
 #  from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from . import message_definitions
-from typing import Iterator
+from typing import Iterator, List
 
 from .fields import (
     FirmwareShortSHADataField,
@@ -27,6 +27,7 @@ from .fields import (
     MoveStopConditionField,
     GearMotorIdField,
     OptionalRevisionField,
+    MotorUsageTypeField,
 )
 from .. import utils
 
@@ -568,3 +569,40 @@ class SerialNumberPayload(EmptyPayload):
     """A payload with a serial number."""
 
     serial: SerialField
+
+
+@dataclass(eq=False)
+class _GetMotorUsageResponsePayloadBase(EmptyPayload):
+    num_elements: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
+    """A payload with motor lifetime usage."""
+
+    @classmethod
+    def build(cls, data: bytes) -> "GetMotorUsageResponsePayload":
+        """Build a response payload from incoming bytes.
+
+        This override is required to handle responses with multiple values.
+        """
+        consumed = _GetMotorUsageResponsePayloadBase.get_size()
+        superdict = asdict(_GetMotorUsageResponsePayloadBase.build(data))
+        num_elements = superdict["num_elements"]
+        message_index = superdict.pop("message_index")
+
+        usage_values: List[MotorUsageTypeField] = []
+
+        for i in range(num_elements.value):
+            usage_values.append(
+                MotorUsageTypeField.build(
+                    data[consumed : consumed + MotorUsageTypeField.NUM_BYTES]
+                )
+            )
+            consumed = consumed + MotorUsageTypeField.NUM_BYTES
+
+        inst = cls(**superdict, usage_elements=usage_values)
+        inst.message_index = message_index
+        return inst
+
+    usage_elements: List[MotorUsageTypeField]

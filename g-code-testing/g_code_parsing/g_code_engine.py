@@ -15,7 +15,7 @@ from opentrons.protocol_reader.protocol_source import (
     ProtocolSource,
     PythonProtocolConfig,
 )
-from opentrons.protocol_runner.protocol_runner import ProtocolRunner
+from opentrons.protocol_runner.protocol_runner import create_protocol_runner
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from contextlib import asynccontextmanager, contextmanager
@@ -156,7 +156,8 @@ class GCodeEngine:
                     content_hash=path,
                 )
 
-                protocol_runner: ProtocolRunner = ProtocolRunner(
+                protocol_runner = create_protocol_runner(
+                    protocol_config=config,
                     protocol_engine=await create_protocol_engine(
                         hardware_api=hardware,  # type: ignore
                         config=Config(robot_type=robot_type),

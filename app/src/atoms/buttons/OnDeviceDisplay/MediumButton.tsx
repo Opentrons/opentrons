@@ -11,6 +11,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
+
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type MediumButtonTypes =
@@ -19,7 +21,7 @@ type MediumButtonTypes =
   | 'alert'
   | 'alertSecondary'
   | 'tertiaryHigh'
-  | 'tertiaryHighLight'
+  | 'tertiaryLowLight'
 interface MediumButtonProps extends StyleProps {
   buttonText: React.ReactNode
   buttonType?: MediumButtonTypes
@@ -43,6 +45,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: string
       defaultBackgroundColor: string
       defaultColor: string
+      disabledBackgroundColor: string
       iconColor: string
     }
   > = {
@@ -51,6 +54,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#b91f20',
       defaultBackgroundColor: COLORS.red_two,
       defaultColor: COLORS.white,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.white,
     },
     alertSecondary: {
@@ -58,6 +62,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#ccabac',
       defaultBackgroundColor: COLORS.red_three,
       defaultColor: COLORS.red_one,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.red_one,
     },
     primary: {
@@ -65,25 +70,29 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#045dd0',
       defaultBackgroundColor: COLORS.blueEnabled,
       defaultColor: COLORS.white,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.white,
     },
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-      defaultBackgroundColor: COLORS.foundationalBlue,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
       defaultColor: COLORS.darkBlackEnabled,
+      disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.blueEnabled,
     },
     tertiaryHigh: {
       activeBackgroundColor: COLORS.darkBlack_twenty,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.darkBlack_hundred,
+      disabledBackgroundColor: COLORS.transparent,
       iconColor: COLORS.darkBlack_hundred,
     },
-    tertiaryHighLight: {
+    tertiaryLowLight: {
       activeBackgroundColor: COLORS.darkBlack_twenty,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.darkBlack_seventy,
+      disabledBackgroundColor: COLORS.transparent,
       iconColor: COLORS.darkBlack_seventy,
     },
   }
@@ -109,7 +118,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
     }
 
     &:active {
@@ -118,7 +127,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack_twenty};
+      background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
+        .disabledBackgroundColor};
       color: ${COLORS.darkBlack_sixty};
     }
   `
@@ -147,8 +157,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
               ? COLORS.darkBlack_sixty
               : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
-          width={SPACING.spacingXL}
-          height={SPACING.spacingXL}
+          size={SPACING.spacingXXL}
         />
       )}
       <StyledText

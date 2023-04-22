@@ -24,6 +24,17 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
 }
 
+# The height of the bottom of the pipette nozzle at home position without any tips.
+# We rely on this being the same for every OT-3 pipette.
+#
+# We found this number by peeking at the height that OT3Simulator returns for these pipettes:
+#   * Single- and 8-Channel P50 GEN3
+#   * Single-, 8-, and 96-channel P1000 GEN3
+#
+# That OT3Simulator return value is what Protocol Engine uses for simulation when Protocol Engine
+# is configured to not virtualize pipettes, so this number should match it.
+VIRTUAL_MAX_OT3_HEIGHT = 248.0
+
 
 class GantryMover(TypingProtocol):
     """Abstract class for gantry movement handler."""
@@ -211,9 +222,12 @@ class VirtualGantryMover(GantryMover):
         Args:
             pipette_id: Pipette ID to get instrument height and tip length for.
         """
-        instrument_height = self._state_view.pipettes.get_instrument_max_height_ot2(
-            pipette_id
-        )
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            instrument_height = self._state_view.pipettes.get_instrument_max_height_ot2(
+                pipette_id
+            )
+        else:
+            instrument_height = VIRTUAL_MAX_OT3_HEIGHT
         tip_length = self._state_view.tips.get_tip_length(pipette_id)
         return instrument_height - tip_length
 
@@ -248,7 +262,7 @@ class VirtualGantryMover(GantryMover):
 def create_gantry_mover(
     state_view: StateView, hardware_api: HardwareControlAPI
 ) -> GantryMover:
-    """Create a tip handler."""
+    """Create a gantry mover."""
     return (
         HardwareGantryMover(hardware_api=hardware_api, state_view=state_view)
         if state_view.config.use_virtual_pipettes is False
