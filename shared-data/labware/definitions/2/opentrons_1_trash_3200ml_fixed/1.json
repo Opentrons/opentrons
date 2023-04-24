@@ -12,7 +12,7 @@
   "dimensions": {
     "xDimension": 246.5,
     "yDimension": 91.5,
-    "zDimension": 174.5
+    "zDimension": 40
   },
   "parameters": {
     "format": "trash",
@@ -27,10 +27,10 @@
       "yDimension": 78,
       "xDimension": 225,
       "totalLiquidVolume": 3200000,
-      "depth": 172.5,
+      "depth": 40,
       "x": 106.25,
       "y": 43,
-      "z": -132.5
+      "z": 0
     }
   },
   "brand": {
@@ -45,6 +45,6 @@
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
-    "z": -132.5
+    "z": 0
   }
 }
