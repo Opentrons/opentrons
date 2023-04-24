@@ -9,7 +9,7 @@ const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
 
 jest.mock('@opentrons/react-api-client')
 
-const mockUsePipettesQuery = useInstrumentsQuery as jest.MockedFunction<
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
 
@@ -24,7 +24,7 @@ describe('CheckPipetteButton', () => {
       isOnDevice: false,
       isFetching: false,
     }
-    mockUsePipettesQuery.mockReturnValue({
+    mockUseInstrumentsQuery.mockReturnValue({
       refetch,
     } as any)
   })
