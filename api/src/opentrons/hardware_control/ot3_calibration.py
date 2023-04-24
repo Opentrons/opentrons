@@ -294,7 +294,7 @@ async def find_calibration_structure_height(
     z_prep_point = nominal_center + PREP_OFFSET_DEPTH
     structure_z = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
     z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
-    if isclose(z_limit, structure_z, abs_tol=0.001):
+    if (structure_z < z_limit) or isclose(z_limit, structure_z, abs_tol=0.001):
         raise CalibrationStructureNotFoundError(structure_z, z_limit)
     LOG.info(f"autocalibration: found structure at {structure_z}")
     return structure_z
