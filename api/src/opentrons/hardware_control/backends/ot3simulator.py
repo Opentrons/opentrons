@@ -563,11 +563,6 @@ class OT3Simulator:
         return None
 
     @ensure_yield
-    async def hard_halt(self) -> None:
-        """Halt the motors."""
-        return None
-
-    @ensure_yield
     async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
