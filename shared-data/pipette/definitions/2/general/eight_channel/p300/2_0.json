@@ -31,5 +31,6 @@
   },
   "channels": 8,
   "shaftDiameter": 3.5,
-  "shaftULperMM": 9.621
+  "shaftULperMM": 9.621,
+  "backCompatNames": ["p300_multi"]
 }

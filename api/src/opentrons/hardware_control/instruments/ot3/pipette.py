@@ -511,6 +511,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "fw_update_required": self._fw_update_info.update_required,
                 "fw_current_version": self._fw_update_info.current_version,
                 "fw_next_version": self._fw_update_info.next_version,
+                "back_compat_names": self._config.pipette_backcompat_names,
             }
         )
         return self._config_as_dict
