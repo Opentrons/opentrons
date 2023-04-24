@@ -2,13 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
-import {
-  Flex,
-  useConditionalConfirm,
-  DIRECTION_COLUMN,
-  POSITION_ABSOLUTE,
-  COLORS,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -371,16 +365,11 @@ export const PipetteWizardFlows = (
 
   return (
     <Portal level="top">
-      {Boolean(isOnDevice) ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="100%"
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
+      {isOnDevice ? (
+        <ModalShell>
           {wizardHeader}
           {modalContent}
-        </Flex>
+        </ModalShell>
       ) : (
         <ModalShell
           width="47rem"

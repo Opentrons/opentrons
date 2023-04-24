@@ -5,7 +5,7 @@ import { hot } from 'react-hot-loader/root'
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
-import { getIsOnDevice } from '../redux/config'
+import { getConfig, getIsOnDevice } from '../redux/config'
 import { DesktopApp } from './DesktopApp'
 import { OnDeviceDisplayApp } from './OnDeviceDisplayApp'
 import { TopPortalRoot } from './portal'
@@ -13,10 +13,11 @@ import { TopPortalRoot } from './portal'
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element | null => {
+  const hasConfigLoaded = useSelector(getConfig) != null
   const isOnDevice = useSelector(getIsOnDevice)
 
   // render null until getIsOnDevice returns the isOnDevice value from config
-  return isOnDevice != null ? (
+  return hasConfigLoaded ? (
     <>
       <GlobalStyle isOnDevice={isOnDevice} />
       <Flex
