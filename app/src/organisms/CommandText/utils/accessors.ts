@@ -25,11 +25,11 @@ export function getLoadedPipette(
     : analysis.pipettes[mount]
 }
 export function getLoadedModule(
-  runData: CompletedProtocolAnalysis | RunData,
+  protocolData: CompletedProtocolAnalysis | RunData,
   moduleId: string
 ): LoadedModule | undefined {
   // NOTE: old analysis contains a object dictionary of module entities by id, this case is supported for backwards compatibility purposes
-  return Array.isArray(runData.modules)
-    ? runData.modules.find(l => l.id === moduleId)
-    : runData.modules[moduleId]
+  return Array.isArray(protocolData.modules)
+    ? protocolData.modules.find(l => l.id === moduleId)
+    : protocolData.modules[moduleId]
 }
