@@ -35,7 +35,7 @@
   "update_robot_software": "Update robot software",
   "disconnect_from_network": "Disconnect from network",
   "connect_to_network": "Connect to network",
-  "home_robot_arm": "Home robot arm",
+  "home_gantry": "Home gantry",
   "this_robot_has_connected_and_power_on_module": "This robot has a connected and powered on {{moduleName}}",
   "forget_unavailable_robot": "Forget unavailable robot",
   "looking_for_robots": "Looking for robots",
