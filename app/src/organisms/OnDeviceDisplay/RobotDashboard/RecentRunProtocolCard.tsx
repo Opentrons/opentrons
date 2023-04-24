@@ -18,7 +18,7 @@ import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
 import { useRunControls } from '../../RunTimeControl/hooks'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+// import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
@@ -42,13 +42,20 @@ export function RecentRunProtocolCard({
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
 
-  const currentRunId = useCurrentRunId()
+  // const currentRunId = useCurrentRunId()
   const { data: allRuns } = useAllRunsQuery()
   const runId =
     allRuns?.data.find(run => run.protocolId === protocolId)?.id ?? null
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(currentRunId)
-  const onResetSuccess = (): void => history.push(`protocols/${runId}/setup`)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  console.log('')
+  const onResetSuccess = (): void => {
+    if (runId != null) {
+      history.push(`protocols/${runId}/setup`)
+    } else {
+      history.push(`protocols/${protocolId}`)
+    }
+  }
   const { reset } = useRunControls(runId, onResetSuccess)
 
   const PROTOCOL_CARD_STYLE = css`
@@ -122,7 +129,6 @@ export function RecentRunProtocolCard({
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 
-  console.log(protocolName)
   return (
     <Flex
       aria-label="RecentRunProtocolCard"
