@@ -55,6 +55,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        paddingTop={SPACING.spacingXXL}
         marginBottom={SPACING.spacing5}
       >
         <Flex
