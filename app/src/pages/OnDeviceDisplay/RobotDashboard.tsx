@@ -39,6 +39,7 @@ export function RobotDashboard(): JSX.Element {
           MAXIMUM_RECENT_RUN_PROTOCOLS
         )
       : []
+
   return (
     <Flex
       padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
