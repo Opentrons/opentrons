@@ -23,7 +23,7 @@ export interface PauseContentProps {
 
 export function PauseInterventionContent({
   startedAt,
-  message
+  message,
 }: PauseContentProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem">

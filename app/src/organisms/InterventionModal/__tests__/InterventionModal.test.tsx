@@ -10,6 +10,8 @@ import {
 
 const ROBOT_NAME = 'Otie'
 
+const mockOnResumeHandler = jest.fn()
+
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />, {
     i18nInstance: i18n,
@@ -19,7 +21,11 @@ const render = (props: React.ComponentProps<typeof InterventionModal>) => {
 describe('InterventionModal', () => {
   let props: React.ComponentProps<typeof InterventionModal>
   beforeEach(() => {
-    props = { robotName: ROBOT_NAME, command: mockPauseCommandWithStartTime }
+    props = {
+      robotName: ROBOT_NAME,
+      command: mockPauseCommandWithStartTime,
+      onResume: mockOnResumeHandler,
+    }
   })
 
   it('renders an InterventionModal with the robot name in the header, learn more link, and confirm button', () => {

@@ -83,6 +83,7 @@ describe('RunProgressMeter', () => {
       runId: NON_DETERMINISTIC_RUN_ID,
       robotName: ROBOT_NAME,
       makeHandleJumpToStep: jest.fn(),
+      resumeRunHandler: jest.fn(),
     }
   })
 
