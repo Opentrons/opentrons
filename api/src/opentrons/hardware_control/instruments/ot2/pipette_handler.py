@@ -217,6 +217,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "default_dispense_flow_rates",
                 "back_compat_names",
             ]
+
             instr_dict = instr.as_dict()
             # TODO (spp, 2021-08-27): Revisit this logic. Why do we need to build
             #  this dict newly every time? Any why only a few items are being updated?
@@ -609,26 +610,25 @@ class PipetteHandlerProvider(Generic[MountType]):
 
     @overload
     def plan_check_blow_out(
-        self, mount: top_types.Mount, microliters: Optional[float]
+        self, mount: top_types.Mount, microliters: Optional[float] = None
     ) -> LiquidActionSpec[Axis]:
         ...
 
     @overload
     def plan_check_blow_out(
-        self, mount: OT3Mount, microliters: Optional[float]
+        self, mount: OT3Mount, microliters: Optional[float] = None
     ) -> LiquidActionSpec[OT3Axis]:
         ...
 
-    def plan_check_blow_out(self, mount, microliters: Optional[float]):  # type: ignore[no-untyped-def]
+    def plan_check_blow_out(self, mount, microliters: Optional[float] = None):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
-
         if microliters:
-            distance_mm = microliters / instrument.ul_per_mm(microliters, "dispense")
+            distance_mm = instrument.ul_per_mm(microliters, "dispense")
         else:
             distance_mm = instrument.config.blow_out
 

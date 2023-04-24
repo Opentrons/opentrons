@@ -133,8 +133,8 @@ class PipetteNameSpec(TypedDict):
     defaultAspirateFlowRate: PipetteConfigElementWithPerApiLevelValue
     defaultDispenseFlowRate: PipetteConfigElementWithPerApiLevelValue
     defaultBlowOutFlowRate: PipetteConfigElementWithPerApiLevelValue
-    defaultBlowOutVolume: float
-    shaftUlPerMm: float
+    # defaultBlowOutVolume: float
+    # shaftUlPerMm: float
     smoothieConfigs: SmoothieConfigs
     defaultTipracks: List[LabwareUri]
 
