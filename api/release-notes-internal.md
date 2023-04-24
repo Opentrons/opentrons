@@ -39,11 +39,17 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - In general, it's pretty doable to run protocols and pre-protocol from the ODD; give it a try by sending a protocol to the flex with the "send to OT3" button in the desktop app
 
 ### Robot Control
+- Even more acceleration changes from hardware testing
 - Improved trash bin positioning should mean dropped tips don't go quite as "everywhere"
 - DVT multis return tips a little better now
 - Fixed a bunch of behavior stuff around the 96 with plunger stalls, breaking instruments endpoints, etc. Should be usable now.
 - You should be able to cancel a protocol now without breaking the robot
 - Calibration should raise an error if it got a really bizarre output now
+- Logging overhaul:
+  - CANbus messages (and USB rear panel messages) are logged now; you can see them by downloading serial logs or running `journalctl -t opentrons-api-serial`
+  - We limited what goes in the api logs, removing HTTP access logs and SQL logs and move command spam; they should be more useful now. You can see them by downloading API logs or running `journalctl -t opentrons-api`.
+  - All the above is now in the robot-server unit logs, which can be accessed via `journalctl -u opentrons-robot-server`
+- Protocol analysis should be a _lot_ faster
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control

@@ -10,7 +10,11 @@ This is 0.5.0, an internal release for the app supporting the Opentrons Flex.
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
 ## New Stuff In This Release
-- No real big changes in the desktop app this week
+- Protocol analysis of Flex protocols is faster
+- Overhaul of pipette data generally should mean that 
+  - Flex instrument calibration shows up now
+  - 96-channels should show up in the instruments page and work in protocols
+  - We don't cause a lot of instrument polling anymore on the robot
 
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
