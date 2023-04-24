@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import { css } from 'styled-components'
+import { useLocation, useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -66,6 +67,9 @@ export function NameRobot(): JSX.Element {
   ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const dispatch = useDispatch<Dispatch>()
+  const { state } = useLocation()
+  const history = useHistory()
+  const isFromRobotSettings = state === 'robotSettings'
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>
@@ -134,7 +138,6 @@ export function NameRobot(): JSX.Element {
       properties: {
         previousRobotName: previousName,
         newRobotName: formik.values.newRobotName,
-        appType: 'OnDeviceDisplay',
       },
     })
     formik.handleSubmit()

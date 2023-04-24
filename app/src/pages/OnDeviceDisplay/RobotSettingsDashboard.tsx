@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -115,13 +115,20 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
 
           {/* Robot Name */}
-          <RobotSettingButton
-            settingName={t('robot_name')}
-            settingInfo={robotName}
-            currentOption="RobotName"
-            setCurrentOption={setCurrentOption}
-            iconName="flex-robot"
-          />
+          <Link
+            to={{
+              pathname: '/robot-settings/rename-robot',
+              state: 'robotSettings',
+            }}
+          >
+            <RobotSettingButton
+              settingName={t('robot_name')}
+              settingInfo={robotName}
+              currentOption="RobotName"
+              setCurrentOption={setCurrentOption}
+              iconName="flex-robot"
+            />
+          </Link>
 
           {/* Robot System Version */}
           <RobotSettingButton
@@ -232,10 +239,13 @@ const RobotSettingButton = ({
 }: RobotSettingButtonProps): JSX.Element => {
   const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  // const history = useHistory()
 
   const handleClick = (): void => {
     if (currentOption != null && setCurrentOption != null) {
-      setCurrentOption(currentOption)
+      if (currentOption !== 'RobotName') {
+        setCurrentOption(currentOption)
+      }
     } else {
       dispatch(toggleDevtools())
     }
@@ -269,7 +279,7 @@ const RobotSettingButton = ({
                 color={COLORS.darkGreyEnabled}
                 fontSize="1.375rem"
                 lineHeight="1.875rem"
-                fontWeight="400"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {settingInfo}
               </StyledText>
