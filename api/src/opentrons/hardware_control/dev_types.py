@@ -97,7 +97,7 @@ class PipetteDict(InstrumentDict):
     default_blow_out_speeds: Dict[str, float]
     ready_to_aspirate: bool
     has_tip: bool
-    # default_blow_out_volume: float
+    default_blow_out_volume: float
 
 
 class GripperDict(InstrumentDict):
