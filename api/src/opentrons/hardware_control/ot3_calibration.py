@@ -149,7 +149,7 @@ async def find_edge_binary(
     slot_edge_nominal: Point,
     search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
     direction_if_hit: Literal[1, -1],
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Find the true position of one edge of the calibration slot in the deck.
@@ -231,7 +231,7 @@ async def find_slot_center_binary(
     hcapi: OT3API,
     mount: OT3Mount,
     estimated_center: Point,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
@@ -487,7 +487,7 @@ async def find_calibration_structure_center(
     mount: OT3Mount,
     nominal_center: Point,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
 
     # Perform xy offset search
@@ -508,7 +508,7 @@ async def _calibrate_mount(
     mount: OT3Mount,
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Run automatic calibration for the tool attached to the specified mount.
@@ -562,7 +562,7 @@ async def find_calibration_structure_position(
     mount: OT3Mount,
     nominal_center: Point,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """Find the calibration square offset given an arbitry postition on the deck."""
     # Find the estimated structure plate height. This will be used to baseline the edge detection points.
@@ -667,7 +667,7 @@ async def calibrate_gripper_jaw(
     probe: GripperProbe,
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Run automatic calibration for gripper jaw.
@@ -711,7 +711,7 @@ async def calibrate_pipette(
     mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Run automatic calibration for pipette.
