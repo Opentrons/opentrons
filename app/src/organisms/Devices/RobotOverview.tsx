@@ -151,7 +151,9 @@ export function RobotOverview({
           </Box>
         </Flex>
       </Flex>
-      {!isRobotBusy ? <CalibrationStatusBanner robotName={robotName} /> : null}
+      {robotModel === 'OT-2' && !isRobotBusy ? (
+        <CalibrationStatusBanner robotName={robotName} />
+      ) : null}
       <Flex
         borderBottom={BORDERS.lineBorder}
         marginBottom={SPACING.spacing4}
