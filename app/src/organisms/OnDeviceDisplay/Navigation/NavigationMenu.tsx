@@ -26,12 +26,12 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   return (
     <MenuList onClick={onClick} isOnDevice={true}>
       <MenuItem
-        key="home-robot-arm"
+        key="home-gantry"
         onClick={() => dispatch(home(robotName, ROBOT))}
       >
         <Flex>
           <Icon
-            name="robot-gantry"
+            name="home-gantry"
             aria-label="home-gantry_icon"
             size={SIZE_2}
           />
