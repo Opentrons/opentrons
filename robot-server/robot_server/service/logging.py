@@ -18,10 +18,10 @@ def initialize_logging() -> None:
 
 
 class _LogBelow:
-    def __init__(self, level: int) -> "_LogBelow":
+    def __init__(self, level: int) -> None:
         self._log_below_level = level
 
-    def __call__(self, record: LogRecord) -> bool:
+    def __call__(self, record: logging.LogRecord) -> bool:
         return record.levelno < self._log_below_level
 
 
