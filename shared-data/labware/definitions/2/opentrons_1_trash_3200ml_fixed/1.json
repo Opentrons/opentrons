@@ -28,8 +28,8 @@
       "xDimension": 225,
       "totalLiquidVolume": 3200000,
       "depth": 40,
-      "x": 106.25,
-      "y": 43,
+      "x": 123.25,
+      "y": 45.75,
       "z": 0
     }
   },
@@ -43,8 +43,8 @@
     }
   ],
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": -17,
+    "y": -2.75,
     "z": 0
   }
 }
