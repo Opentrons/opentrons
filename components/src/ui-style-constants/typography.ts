@@ -31,9 +31,9 @@ export const lineHeight36 = '2.25rem' // 36px
 export const lineHeight28 = '1.75rem' // 28px
 export const lineHeight24 = '1.5rem' // 24px
 export const lineHeight20 = '1.25rem' // 20px
+export const lineHeight18 = '1.125rem' // 18px
 export const lineHeight16 = '1rem' // 16px
 export const lineHeight12 = '.75rem' // 12px
-export const lineHeight18 = '1.125rem' // 18px
 
 // font styles
 export const fontStyleNormal = 'normal'

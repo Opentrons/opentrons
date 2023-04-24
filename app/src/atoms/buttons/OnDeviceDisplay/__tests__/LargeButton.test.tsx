@@ -42,7 +42,7 @@ describe('LargeButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.foundationalBlue}`
+      `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
   it('renders the button as disabled', () => {

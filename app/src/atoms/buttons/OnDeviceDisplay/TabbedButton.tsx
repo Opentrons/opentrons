@@ -8,7 +8,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-const FOREGROUND_STYLES = css`
+const SELECTED_STYLE = css`
   background-color: ${COLORS.highlightPurple_one};
   color: ${COLORS.white};
 
@@ -23,7 +23,7 @@ const FOREGROUND_STYLES = css`
   }
 `
 
-const BACKGROUND_STYLES = css`
+const UNSELECTED_STYLE = css`
   background-color: ${COLORS.highlightPurple_two};
   color: ${COLORS.darkBlack_hundred};
 
@@ -39,7 +39,7 @@ const BACKGROUND_STYLES = css`
 `
 
 interface TabbedButtonProps extends React.ComponentProps<typeof Btn> {
-  foreground?: boolean
+  isSelected?: boolean
 }
 
 export const TabbedButton = styled(Btn)<TabbedButtonProps>`
@@ -53,7 +53,7 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
       padding: ${SPACING.spacing4} ${SPACING.spacing5};
       text-transform: ${TYPOGRAPHY.textTransformNone};
 
-      ${props.foreground === true ? FOREGROUND_STYLES : BACKGROUND_STYLES}
+      ${props.isSelected === true ? SELECTED_STYLE : UNSELECTED_STYLE}
 
       ${styleProps}
 

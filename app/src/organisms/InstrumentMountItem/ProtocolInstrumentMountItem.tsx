@@ -60,13 +60,8 @@ interface ProtocolInstrumentMountItemProps {
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  const {
-    mount,
-    attachedInstrument,
-    speccedName,
-    attachedCalibrationData,
-  } = props
+  const { t, i18n } = useTranslation('protocol_setup')
+  const { mount, attachedInstrument, speccedName } = props
 
   const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
     false
@@ -90,8 +85,10 @@ export function ProtocolInstrumentMountItem(
       attachedInstrument
     )
   }
-  const isAttachedWithCal =
-    attachedInstrument != null && attachedCalibrationData != null
+  const is96ChannelPipette = speccedName === 'p1000_96'
+  // TODO: check for presence of calibration data once instruments endpoint
+  // returns calibration data for pipettes
+  const isAttachedWithCal = attachedInstrument != null
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
@@ -101,7 +98,12 @@ export function ProtocolInstrumentMountItem(
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing2}
           >
-            <MountLabel>{t('mount', { mount })}</MountLabel>
+            <MountLabel>
+              {i18n.format(
+                is96ChannelPipette ? t('96_mount') : t('mount', { mount }),
+                'capitalize'
+              )}
+            </MountLabel>
             <SpeccedInstrumentName>
               {mount === 'extension'
                 ? getGripperDisplayName(speccedName as GripperModel)
@@ -127,7 +129,10 @@ export function ProtocolInstrumentMountItem(
             <CalibrationStatus
               color={isAttachedWithCal ? COLORS.green_one : COLORS.yellow_one}
             >
-              {isAttachedWithCal ? t('calibrated') : t('no_data')}
+              {i18n.format(
+                t(isAttachedWithCal ? 'calibrated' : 'no_data'),
+                'capitalize'
+              )}
             </CalibrationStatus>
           </Flex>
           <Flex flex="1">
@@ -135,12 +140,12 @@ export function ProtocolInstrumentMountItem(
               onClick={
                 attachedInstrument != null ? handleCalibrate : handleAttach
               }
-              buttonText={
-                attachedInstrument != null ? t('calibrate') : t('attach')
-              }
+              buttonText={i18n.format(
+                t(attachedInstrument != null ? 'calibrate' : 'attach'),
+                'capitalize'
+              )}
               buttonType="default"
               buttonCategory="rounded"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
             />
           </Flex>
         </Flex>
@@ -165,7 +170,6 @@ export function ProtocolInstrumentMountItem(
 const MountLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
 `
@@ -173,7 +177,6 @@ const MountLabel = styled.p`
 const SpeccedInstrumentName = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
 `
@@ -181,7 +184,6 @@ const SpeccedInstrumentName = styled.p`
 const CalibrationStatus = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   color: ${({ color }) => color};

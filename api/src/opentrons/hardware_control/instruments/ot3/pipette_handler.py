@@ -142,6 +142,17 @@ class PipetteHandlerProvider:
         else:
             _reset(mount)
 
+    def get_instrument_offset(
+        self, mount: OT3Mount
+    ) -> Optional[PipetteOffsetByPipetteMount]:
+        """Get the specified pipette's offset."""
+        assert mount != OT3Mount.GRIPPER, "Wrong mount type to fetch pipette offset"
+        try:
+            pipette = self.get_pipette(mount)
+        except top_types.PipetteNotAttachedError:
+            return None
+        return pipette.pipette_offset
+
     def reset_instrument_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """
         Temporarily reset the pipette offset to default values.

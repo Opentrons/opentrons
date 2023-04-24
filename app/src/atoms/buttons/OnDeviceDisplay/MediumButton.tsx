@@ -11,6 +11,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
+
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type MediumButtonTypes =
@@ -74,7 +76,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-      defaultBackgroundColor: COLORS.foundationalBlue,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
       defaultColor: COLORS.darkBlackEnabled,
       disabledBackgroundColor: COLORS.darkBlack_twenty,
       iconColor: COLORS.blueEnabled,
@@ -116,7 +118,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacingS} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
     }
 
     &:active {

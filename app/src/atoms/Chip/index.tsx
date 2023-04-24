@@ -13,11 +13,11 @@ import {
 
 import { StyledText } from '../text'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 
 export type ChipType = 'basic' | 'success' | 'warning' | 'neutral'
 
-interface ChipProps {
+interface ChipProps extends StyleProps {
   /** Display background color? */
   background?: boolean
   /** Chip icon */
@@ -70,6 +70,7 @@ export function Chip({
   iconName,
   type,
   text,
+  ...styleProps
 }: ChipProps): JSX.Element {
   const backgroundColor =
     background === false && type !== 'basic'
@@ -85,6 +86,7 @@ export function Chip({
       padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
       gridGap={SPACING.spacing3}
       data-testid={`Chip_${type}`}
+      {...styleProps}
     >
       {type !== 'basic' && (
         <Icon

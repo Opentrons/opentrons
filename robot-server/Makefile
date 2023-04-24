@@ -4,6 +4,7 @@ include ../scripts/push.mk
 include ../scripts/python.mk
 
 SHX := npx shx
+REDOC := npx @redocly/cli
 
 # Path of source package
 SRC_PATH = robot_server
@@ -192,8 +193,10 @@ change-left:
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
 
-.PHONY: docs
-docs: settings_schema.json
 
-settings_schema.json: robot_server/settings.py
-	$(python) -m scripts.settings_schema $@
+.PHONY: docs
+docs:
+	$(SHX) mkdir -p docs/build/
+	$(python) ./scripts/spec_generator.py docs/build/openapi.json
+	$(SHX) mkdir -p docs/dist/http
+	$(REDOC) build-docs docs/build/openapi.json -o docs/dist/http/api_reference.html

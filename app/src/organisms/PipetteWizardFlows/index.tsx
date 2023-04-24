@@ -20,6 +20,7 @@ import {
   useHost,
   useCreateRunMutation,
   useStopRunMutation,
+  useDismissCurrentRunMutation,
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -107,8 +108,10 @@ export const PipetteWizardFlows = (
     },
     host
   )
+  const { dismissCurrentRun } = useDismissCurrentRunMutation()
   const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
     onSuccess: () => {
+      dismissCurrentRun(runId)
       if (currentStep.section === SECTIONS.DETACH_PROBE) {
         proceed()
       } else {
@@ -373,7 +376,7 @@ export const PipetteWizardFlows = (
           flexDirection={DIRECTION_COLUMN}
           width="100%"
           position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.white}
         >
           {wizardHeader}
           {modalContent}

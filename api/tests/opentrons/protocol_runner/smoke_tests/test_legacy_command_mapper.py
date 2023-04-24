@@ -32,7 +32,10 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
         files=[protocol_file],
         directory=None,
     )
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=protocol_source.config,
+    )
     result = await subject.run(protocol_source)
     assert result.state_summary.errors == []
     assert result.state_summary.status == EngineStatus.SUCCEEDED
