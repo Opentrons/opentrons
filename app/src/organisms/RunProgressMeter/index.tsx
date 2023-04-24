@@ -30,7 +30,10 @@ import {
   useCommandQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { OT2_STANDARD_MODEL, getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
+import {
+  OT2_STANDARD_MODEL,
+  getRobotTypeFromLoadedLabware,
+} from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Portal } from '../../App/portal'
@@ -46,7 +49,11 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
-import { isInterventionCommand, getLabwareDisplayLocationFromRunData, getLabwareNameFromRunData } from '../InterventionModal/utils'
+import {
+  isInterventionCommand,
+  getLabwareDisplayLocationFromRunData,
+  getLabwareNameFromRunData,
+} from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { LabwareLocation } from '@opentrons/shared-data'
@@ -193,7 +200,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       null
   }
   const robotType =
-    runData != null ? getRobotTypeFromLoadedLabware(runData.labware) : OT2_STANDARD_MODEL
+    runData != null
+      ? getRobotTypeFromLoadedLabware(runData.labware)
+      : OT2_STANDARD_MODEL
 
   return (
     <>

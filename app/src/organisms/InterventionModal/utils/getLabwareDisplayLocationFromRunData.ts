@@ -23,7 +23,10 @@ export function getLabwareDisplayLocationFromRunData(
   } else if ('slotName' in location) {
     return t('slot', { slot_name: location.slotName })
   } else if ('moduleId' in location) {
-    const moduleModel = getModuleModelFromRunData(protocolData, location.moduleId)
+    const moduleModel = getModuleModelFromRunData(
+      protocolData,
+      location.moduleId
+    )
     if (moduleModel == null) {
       console.warn('labware is located on an unknown module model')
       return ''
@@ -34,7 +37,10 @@ export function getLabwareDisplayLocationFromRunData(
           robotType
         ),
         module: getModuleDisplayName(moduleModel),
-        slot_name: getModuleDisplayLocationFromRunData(protocolData, location.moduleId),
+        slot_name: getModuleDisplayLocationFromRunData(
+          protocolData,
+          location.moduleId
+        ),
       })
     }
   } else {

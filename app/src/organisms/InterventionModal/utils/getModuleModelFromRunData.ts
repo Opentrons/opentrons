@@ -1,9 +1,7 @@
 import { getLoadedModule } from '../../CommandText/utils/accessors'
 
 import type { RunData } from '@opentrons/api-client'
-import type {
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleModelFromRunData(
   protocolData: RunData,
