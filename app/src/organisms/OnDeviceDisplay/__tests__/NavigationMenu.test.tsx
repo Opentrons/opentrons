@@ -36,12 +36,12 @@ describe('NavigationMenu', () => {
       toggleLights: mockToggleLights,
     })
   })
-  it('should render the home menu item and clicking home robot arm, dispatches home', () => {
+  it('should render the home menu item and clicking home gantry, dispatches home', () => {
     const { getByText, getByLabelText } = render(props)
     fireEvent.click(getByLabelText('BackgroundOverlay_ModalShell'))
     expect(props.onClick).toHaveBeenCalled()
-    const home = getByText('Home robot arm')
-    getByLabelText('home-robot-arm_icon')
+    const home = getByText('Home gantry')
+    getByLabelText('home-gantry')
     fireEvent.click(home)
     expect(mockHome).toHaveBeenCalled()
   })

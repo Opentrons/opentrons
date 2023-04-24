@@ -31,12 +31,12 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
       >
         <Flex>
           <Icon
-            name="home-robot-arm"
-            aria-label="home-robot-arm_icon"
+            name="robot-gantry"
+            aria-label="home-gantry_icon"
             size={SIZE_2}
           />
           <StyledText marginLeft={SPACING.spacing5}>
-            {t('home_robot_arm')}
+            {t('home_gantry')}
           </StyledText>
         </Flex>
       </MenuItem>
