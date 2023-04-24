@@ -1,15 +1,14 @@
 import { getLoadedModule } from './accessors'
 
-import type { RunData } from '@opentrons/api-client'
 import type {
   ModuleModel,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 export function getModuleModel(
-  protocolData: CompletedProtocolAnalysis | RunData,
+  analysis: CompletedProtocolAnalysis,
   moduleId: string
 ): ModuleModel | null {
-  const loadedModule = getLoadedModule(protocolData, moduleId)
+  const loadedModule = getLoadedModule(analysis, moduleId)
   return loadedModule != null ? loadedModule.model : null
 }

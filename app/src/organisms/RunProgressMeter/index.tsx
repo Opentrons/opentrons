@@ -30,7 +30,7 @@ import {
   useCommandQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
+import { OT2_STANDARD_MODEL, getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Portal } from '../../App/portal'
@@ -46,12 +46,11 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
-import { isInterventionCommand } from '../InterventionModal/utils'
+import { isInterventionCommand, getLabwareDisplayLocationFromRunData, getLabwareNameFromRunData } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { LabwareLocation } from '@opentrons/shared-data'
 import { getLoadedLabware } from '../CommandText/utils/accessors'
-import { getLabwareDisplayLocation, getLabwareName } from '../CommandText/utils'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -80,7 +79,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   })
   const { data: runRecord } = useRunQuery(runId)
   const runData = runRecord?.data ?? null
-  console.log({ runData })
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
     cursor: null,
@@ -190,13 +188,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   let oldLabwareLocation: LabwareLocation | null = null
   if (lastRunCommand?.commandType === 'moveLabware' && runData != null) {
-    console.log(analysis)
     oldLabwareLocation =
       getLoadedLabware(runData, lastRunCommand.params.labwareId)?.location ??
       null
   }
   const robotType =
-    runData != null ? getRobotTypeFromLoadedLabware(runData.labware) : undefined
+    runData != null ? getRobotTypeFromLoadedLabware(runData.labware) : OT2_STANDARD_MODEL
 
   return (
     <>
@@ -213,14 +210,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             command={lastRunCommand}
             moduleRenderInfo={moduleRenderInfoById}
             labwareRenderInfo={labwareRenderInfoById}
-            labwareName={getLabwareName(
+            labwareName={getLabwareNameFromRunData(
               runData,
               lastRunCommand.params.labwareId,
               analysis.commands
             )}
             oldDisplayLocation={
               oldLabwareLocation != null
-                ? getLabwareDisplayLocation(
+                ? getLabwareDisplayLocationFromRunData(
                     runData,
                     oldLabwareLocation,
                     commandTextTranslator,
@@ -228,7 +225,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
                   )
                 : ''
             }
-            newDisplayLocation={getLabwareDisplayLocation(
+            newDisplayLocation={getLabwareDisplayLocationFromRunData(
               runData,
               lastRunCommand.params.newLocation,
               commandTextTranslator,
