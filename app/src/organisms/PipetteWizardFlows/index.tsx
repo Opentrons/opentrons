@@ -31,7 +31,10 @@ import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { getIsOnDevice } from '../../redux/config'
-import { useAttachedPipettes } from '../Devices/hooks'
+import {
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+} from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -86,7 +89,8 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-
+  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
+  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
@@ -257,6 +261,7 @@ export const PipetteWizardFlows = (
         totalStepCount={totalStepCount}
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
+        hasCalData={hasCalData}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -305,7 +310,11 @@ export const PipetteWizardFlows = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(t('recalibrate_pipette', { mount: mount }))
+        wizardTitle = startCase(
+          t(hasCalData ? 'recalibrate_pipette' : 'calibrate_pipette', {
+            mount: mount,
+          })
+        )
       } else {
         wizardTitle = t('calibrate_96_channel')
       }

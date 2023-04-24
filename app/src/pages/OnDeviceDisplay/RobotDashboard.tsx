@@ -5,42 +5,21 @@ import { Link } from 'react-router-dom'
 import {
   Flex,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   SPACING,
   COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
-import { MiniCardButton } from '../../molecules/MiniCardButton'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 
 import abstractImage from '../../assets/images/odd/abstract@x2.png'
-
-import type { MiniCardButtonProps } from '../../molecules/MiniCardButton'
-
-// TODO: kj 12/0/7/2022 this part will be update when hi-fi is ready
-const DASHBOARD_ITEMS: MiniCardButtonProps[] = [
-  {
-    iconName: 'wifi',
-    cardName: 'Run a protocol',
-    destinationPath: '/protocols',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Instrument + Module Hub',
-    destinationPath: '/instruments',
-  },
-  {
-    iconName: 'wifi',
-    cardName: 'Settings',
-    destinationPath: '/robot-settings',
-  },
-]
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -50,21 +29,13 @@ export function RobotDashboard(): JSX.Element {
   return (
     <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
-        {t('run_again')}
-      </StyledText>
       <Flex
         width="100%"
-        height="14.375rem"
+        height="27.25rem"
         backgroundColor={COLORS.fundamentalsBackground}
+        borderRadius={BORDERS.radiusRoundEdge}
         flexDirection={DIRECTION_COLUMN}
-        padding={`${String(SPACING.spacing4)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacing6)}`}
+        justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
         <img
@@ -90,15 +61,7 @@ export function RobotDashboard(): JSX.Element {
           {t('have_not_run_description')}
         </StyledText>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
-        marginTop="1.3125rem"
-      >
-        {DASHBOARD_ITEMS.map((card, index) => (
-          <MiniCardButton key={`miniCardButton_${index}`} {...card} />
-        ))}
-      </Flex>
+
       {/* temp button to robot dashboard until we can detect setup status */}
       <Flex
         alignSelf={ALIGN_FLEX_END}

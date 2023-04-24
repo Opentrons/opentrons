@@ -5,7 +5,6 @@ import styled from 'styled-components'
 
 import {
   Flex,
-  Icon,
   COLORS,
   SPACING,
   DIRECTION_ROW,
@@ -14,72 +13,96 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   ALIGN_END,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { getLocalRobot } from '../../../redux/discovery'
+import { NavigationMenu } from './NavigationMenu'
 
 import type { RouteProps } from '../../../App/types'
 
-const NavigationLink = styled(NavLink)`
-  color: ${COLORS.black};
-  display: flex;
-  grid-gap: 0.5rem;
-
-  &.active {
-    color: ${COLORS.blueEnabled};
-  }
-`
-
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
+  const [showNavMenu, setNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
+  const NavigationLink = styled(NavLink)`
+    color: ${COLORS.black};
+    display: flex;
+    grid-gap: ${SPACING.spacing3};
+    border-bottom: 0.3125rem solid transparent;
+    height: 3.5rem;
 
+    &.active {
+      border-bottom: 0.3125rem solid transparent;
+      border-image: linear-gradient(
+        to right,
+        white 33.3%,
+        ${COLORS.highlightPurple_one} 33.3%,
+        ${COLORS.highlightPurple_one} 66.6%,
+        white 66.6%
+      );
+      border-image-slice: 1;
+    }
+  `
   return (
-    <Flex
-      flexDirection={DIRECTION_ROW}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom={SPACING.spacing5}
-    >
+    <>
       <Flex
         flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_FLEX_START}
-        justifyContent={JUSTIFY_CENTER}
-        gridGap="0.5rem"
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginBottom={SPACING.spacing5}
       >
-        <NavigationLink to="/dashboard">
-          <StyledText
-            fontSize="1.625rem"
-            fontWeight="700"
-            lineHeight="1.9375rem"
-          >
-            {robotName}
-          </StyledText>
-        </NavigationLink>
-        <Icon name="wifi" size="2rem" />
-      </Flex>
-      <Flex flexDirection={DIRECTION_ROW}>
-        {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-          <NavigationLink key={name} to={navLinkTo as string}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_FLEX_START}
+          justifyContent={JUSTIFY_CENTER}
+          gridGap={SPACING.spacing3}
+        >
+          <NavigationLink to="/dashboard">
             <StyledText
-              fontSize="1.625rem"
-              fontWeight="600"
-              lineHeight="1.9375rem"
-              marginRight="2.75rem"
+              fontSize={TYPOGRAPHY.fontSize32}
+              fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+              lineHeight={TYPOGRAPHY.lineHeight42}
+              color={COLORS.darkBlackEnabled}
             >
-              {name}
+              {robotName}
             </StyledText>
           </NavigationLink>
-        ))}
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW}>
+          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
+            <NavigationLink key={name} to={navLinkTo as string}>
+              <StyledText
+                fontSize={TYPOGRAPHY.fontSize32}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                lineHeight={TYPOGRAPHY.lineHeight42}
+                color={COLORS.darkBlack_seventy}
+                marginRight={TYPOGRAPHY.fontSize32}
+              >
+                {name}
+              </StyledText>
+            </NavigationLink>
+          ))}
+        </Flex>
+        <Flex alignItems={ALIGN_END}>
+          <OverflowBtn
+            isOnDevice={true}
+            onClick={() => setNavMenu(true)}
+            aria-label="Navigation_OverflowBtn"
+          />
+        </Flex>
       </Flex>
-      <Flex alignItems={ALIGN_END}>
-        {/* This icon is temporary since the current design is mid-fi and the icon will be varied in hi-fi */}
-        <Icon name="radiobox-blank" size="3rem" />
-      </Flex>
-    </Flex>
+      {showNavMenu && (
+        <NavigationMenu
+          onClick={() => setNavMenu(false)}
+          robotName={robotName}
+        />
+      )}
+    </>
   )
 }

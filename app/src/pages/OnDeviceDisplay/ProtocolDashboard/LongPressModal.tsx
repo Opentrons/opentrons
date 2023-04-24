@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useQueryClient } from 'react-query'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -11,34 +13,34 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
-import {
-  useCreateRunMutation,
-  // TODO useDeleteProtocolMutation,
-} from '@opentrons/react-api-client'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
 import { ModalShell } from '../../../molecules/Modal'
-import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
 
 export function LongPressModal(props: {
   longpress: UseLongPressResult
-  protocol: ProtocolResource
+  protocolId: string
 }): JSX.Element {
-  const { longpress, protocol } = props
+  const { longpress, protocolId } = props
   const history = useHistory()
+  const host = useHost()
+  const queryClient = useQueryClient()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const { makeSnackbar } = useToaster()
 
-  const pinned = pinnedProtocolIds.includes(protocol.id)
+  const pinned = pinnedProtocolIds.includes(protocolId)
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
 
@@ -63,13 +65,37 @@ export function LongPressModal(props: {
     longpress.setIsLongPressed(false)
   }
 
-  // TODO const { deleteProtocol } = useDeleteProtocolMutation(protocol.id)
-
   const handleDeleteClick = (): void => {
-    longpress.setIsLongPressed(false)
-    // TODO: deleteProtocol()
-    console.log(`deleted protocol with id ${protocol.id}`)
-    history.go(0)
+    if (host != null) {
+      getProtocol(host, protocolId)
+        .then(
+          response =>
+            response.data.links?.referencingRunIds.map(({ id }) => id) ?? []
+        )
+        .then(referencingRunIds => {
+          return Promise.all(
+            referencingRunIds?.map(runId => deleteRun(host, runId))
+          )
+        })
+        .then(() => deleteProtocol(host, protocolId))
+        .then(() =>
+          queryClient
+            .invalidateQueries([host, 'protocols'])
+            .catch((e: Error) =>
+              console.error(`error invalidating runs query: ${e.message}`)
+            )
+        )
+        .then(() => longpress.setIsLongPressed(false))
+        .catch((e: Error) => {
+          console.error(`error deleting resources: ${e.message}`)
+          longpress.setIsLongPressed(false)
+        })
+    } else {
+      console.error(
+        'could not delete resources because the robot host is unknown'
+      )
+      longpress.setIsLongPressed(false)
+    }
   }
 
   const handlePinClick = (): void => {
@@ -77,18 +103,20 @@ export function LongPressModal(props: {
       if (pinnedProtocolIds.length === MAXIMUM_PINNED_PROTOCOLS) {
         setShowMaxPinsAlert(true)
       } else {
-        pinnedProtocolIds.push(protocol.id)
+        pinnedProtocolIds.push(protocolId)
         handlePinnedProtocolIds(pinnedProtocolIds)
+        makeSnackbar(t('pinned_protocol'))
       }
     } else {
-      pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocol.id)
+      pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
       handlePinnedProtocolIds(pinnedProtocolIds)
+      makeSnackbar(t('unpinned_protocol'))
     }
   }
 
   const handleRunClick = (): void => {
     longpress.setIsLongPressed(false)
-    createRun({ protocolId: protocol.id })
+    createRun({ protocolId: protocolId })
   }
 
   const handlePinnedProtocolIds = (pinnedProtocolIds: string[]): void => {
@@ -102,7 +130,10 @@ export function LongPressModal(props: {
   return (
     <>
       {showMaxPinsAlert ? (
-        <TooManyPinsModal
+        <SmallModalChildren
+          header={t('too_many_pins_header')}
+          subText={t('too_many_pins_body')}
+          buttonText={t('shared:close')}
           handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
         />
       ) : (
@@ -121,6 +152,7 @@ export function LongPressModal(props: {
               height="4.875rem"
               padding={SPACING.spacing5}
               onClick={handleRunClick}
+              as="button"
             >
               <Icon name="play-circle" size="1.75rem" color={COLORS.black} />
               <StyledText
@@ -138,8 +170,9 @@ export function LongPressModal(props: {
               height="4.875rem"
               padding={SPACING.spacing5}
               onClick={handlePinClick}
+              as="button"
             >
-              <Icon name="push-pin" size="1.875rem" color={COLORS.black} />
+              <Icon name="pin" size="1.875rem" color={COLORS.black} />
               <StyledText
                 fontSize="1.375rem"
                 lineHeight="1.5rem"
@@ -156,6 +189,7 @@ export function LongPressModal(props: {
               height="4.875rem"
               padding={SPACING.spacing5}
               onClick={handleDeleteClick}
+              as="button"
             >
               <Icon name="trash" size="1.875rem" color={COLORS.white} />
               <StyledText
