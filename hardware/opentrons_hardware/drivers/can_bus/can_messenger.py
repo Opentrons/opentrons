@@ -27,7 +27,6 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     Acknowledgement,
     ErrorMessage,
-    StopRequest,
 )
 
 from opentrons_hardware.firmware_bindings.messages.messages import (
