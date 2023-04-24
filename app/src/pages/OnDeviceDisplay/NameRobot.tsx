@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   POSITION_FIXED,
   JUSTIFY_CENTER,
@@ -18,6 +19,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   Icon,
+  Btn,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -32,9 +34,9 @@ import { useTrackEvent } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { StepMeter } from '../../atoms/StepMeter'
-import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
+import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
@@ -54,6 +56,8 @@ interface FormikErrors {
   newRobotName?: string
 }
 
+const NAME_MAX_LENGTH = 17
+
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const trackEvent = useTrackEvent()
@@ -69,6 +73,7 @@ export function NameRobot(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const { state } = useLocation()
   const history = useHistory()
+  console.log('state', state)
   const isFromRobotSettings = state === 'robotSettings'
 
   // check for robot name
@@ -120,7 +125,11 @@ export function NameRobot(): JSX.Element {
     onSuccess: (data: UpdatedRobotName) => {
       if (data.name != null) {
         setNewName(data.name)
-        setIsShowConfirmRobotName(true)
+        if (isFromRobotSettings) {
+          history.push('/robot-settings')
+        } else {
+          setIsShowConfirmRobotName(true)
+        }
         if (previousName != null) {
           dispatch(removeRobot(previousName))
         }
@@ -149,9 +158,17 @@ export function NameRobot(): JSX.Element {
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>
-          <StepMeter totalSteps={5} currentStep={4} OnDevice />
-          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
-            <Flex
+          {!isFromRobotSettings ? (
+            <StepMeter totalSteps={5} currentStep={4} OnDevice />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing6}
+            marginX={SPACING.spacingXXL}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacingXXL}
+          >
+            {/* <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_CENTER}
@@ -167,43 +184,113 @@ export function NameRobot(): JSX.Element {
                   {t('name_your_robot')}
                 </StyledText>
               </Flex>
-
               <Flex position={POSITION_ABSOLUTE} right="0">
-                <TertiaryButton
-                  width="11.8125rem"
-                  height="3.75rem"
-                  fontSize="1.5rem"
-                  fontWeight="500"
-                  lineHeight="2.0425rem"
-                  onClick={handleConfirm}
+                {Boolean(isNaming) ? (
+                  <Icon
+                    name="ot-spinner"
+                    size="1.25rem"
+                    spin
+                    marginRight={SPACING.spacing3}
+                  />
+                ) : (
+                  <SmallButton
+                    buttonType="primary"
+                    buttonText={t('shared:confirm')}
+                    buttonCategory="rounded"
+                    onClick={handleConfirm}
+                    disabled={
+                      newName.length === 0 || newName.length > NAME_MAX_LENGTH
+                    }
+                  />
+                )}
+              </Flex>
+            </Flex> */}
+
+            {/* header */}
+
+            <Flex
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing4}
+              marginBottom={SPACING.spacing3}
+            >
+              <Btn
+                paddingLeft="0rem"
+                paddingRight="1.25rem"
+                onClick={() => {
+                  if (!isFromRobotSettings) {
+                    history.push('/robot-settings/update-robot')
+                  } else {
+                    history.push('/robot-settings')
+                  }
+                }}
+                width="3rem"
+              >
+                <Icon
+                  name="back"
+                  width="1.25rem"
+                  color={COLORS.darkBlack_hundred}
+                />
+              </Btn>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing3}
+                maxWidth="42.625rem"
+              >
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize38}
+                  fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                  lineHeight={TYPOGRAPHY.lineHeight48}
                 >
-                  {Boolean(isNaming) ? (
-                    <Icon
-                      name="ot-spinner"
-                      size="1.25rem"
-                      spin
-                      marginRight={SPACING.spacing3}
-                    />
-                  ) : null}
-                  {t('shared:confirm')}
-                </TertiaryButton>
+                  {!isFromRobotSettings
+                    ? t('name_your_robot')
+                    : t('rename_robot')}
+                </StyledText>
               </Flex>
             </Flex>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              marginLeft={SPACING.spacingXXL}
+              maxHeight="3.75rem"
+              minWidth="15.6875rem"
+            >
+              {Boolean(isNaming) ? (
+                <Icon
+                  name="ot-spinner"
+                  size="1.25rem"
+                  spin
+                  marginRight={SPACING.spacing3}
+                />
+              ) : (
+                <SmallButton
+                  buttonType="primary"
+                  buttonText={t('shared:confirm')}
+                  buttonCategory="rounded"
+                  onClick={handleConfirm}
+                  // disabled={
+                  //   newName.length === 0 || newName.length > NAME_MAX_LENGTH
+                  // }
+                />
+              )}
+            </Flex>
+
+            {/* header */}
 
             <Flex
               width="100%"
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                color={COLORS.black}
-                fontSize="1.375rem"
-                lineHeight="1.875rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                marginBottom="0.75rem"
-              >
-                {t('name_your_robot_description')}
-              </StyledText>
+              {!isFromRobotSettings ? (
+                <StyledText
+                  color={COLORS.black}
+                  fontSize="1.375rem"
+                  lineHeight="1.875rem"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  marginBottom="0.75rem"
+                >
+                  {t('name_your_robot_description')}
+                </StyledText>
+              ) : null}
               <Flex
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
