@@ -298,11 +298,7 @@ export function ProtocolDetails(): JSX.Element | null {
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds => {
-          if (referencingRunIds != null) {
-            return Promise.all(
-              referencingRunIds.map(runId => deleteRun(host, runId))
-            )
-          }
+          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         })
         .then(() => deleteProtocol(host, protocolId))
         .then(() => history.goBack())
