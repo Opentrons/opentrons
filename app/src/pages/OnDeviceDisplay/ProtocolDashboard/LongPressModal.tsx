@@ -65,7 +65,7 @@ export function LongPressModal(props: {
         )
         .then(referencingRunIds => {
           return Promise.all(
-            referencingRunIds.map(runId => deleteRun(host, runId))
+            referencingRunIds?.map(runId => deleteRun(host, runId))
           )
         })
         .then(() => deleteProtocol(host, protocolId))
