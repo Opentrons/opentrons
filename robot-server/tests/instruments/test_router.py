@@ -241,3 +241,42 @@ async def test_get_ot2_instruments(
             ),
         )
     ]
+
+
+async def test_get_96_channel_instruments(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+) -> None:
+    """It should correctly be able to construct a 96 channel pipette."""
+    # Return attached pipettes
+    decoy.when(hardware_api.attached_instruments).then_return(
+        {
+            Mount.LEFT: {  # type: ignore [typeddict-item]
+                "name": "p1000_96",
+                "model": PipetteModel("xyz"),
+                "pipette_id": "pipette-id",
+                "back_compat_names": [],
+                "min_volume": 1,
+                "max_volume": 1000,
+                "channels": 96,
+            },
+            Mount.RIGHT: cast(PipetteDict, {}),
+        }
+    )
+    result2 = await get_attached_instruments(hardware=hardware_api)
+    decoy.verify(await hardware_api.cache_instruments(), times=0)
+    assert result2.status_code == 200
+    assert result2.content.data == [
+        Pipette.construct(
+            mount="left",
+            instrumentType="pipette",
+            instrumentName="p1000_96",
+            instrumentModel=PipetteModel("xyz"),
+            serialNumber="pipette-id",
+            data=PipetteData(
+                channels=96,
+                min_volume=1,
+                max_volume=1000,
+            ),
+        )
+    ]
