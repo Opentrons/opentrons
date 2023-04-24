@@ -1,7 +1,10 @@
 """Implementation, request models, and response models for the load module command."""
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
+
+from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -53,6 +56,17 @@ class LoadModuleParams(BaseModel):
             " If None, an ID will be generated."
         ),
     )
+
+    def canonicalize(self, robot_type: RobotType) -> LoadModuleParams:
+        return self.copy(
+            update={
+                "deckSlot": DeckSlotLocation.construct(
+                    slotName=self.location.slotName.to_equivalent_by_robot_type(
+                        robot_type
+                    )
+                )
+            }
+        )
 
 
 class LoadModuleResult(BaseModel):
@@ -130,3 +144,6 @@ class LoadModuleCreate(BaseCommandCreate[LoadModuleParams]):
     params: LoadModuleParams
 
     _CommandCls: Type[LoadModule] = LoadModule
+
+    def canonicalize(self, robot_type: RobotType) -> LoadModuleCreate:
+        return self.copy(update={"params": self.params.canonicalize(robot_type)})
