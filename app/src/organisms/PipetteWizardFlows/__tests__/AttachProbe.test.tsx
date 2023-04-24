@@ -95,7 +95,7 @@ describe('AttachProbe', () => {
       'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
     )
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
     )
     getByTestId('Pipette_Probing_1.webm')
   })

@@ -334,7 +334,12 @@ export const mockRightPipetteCalibration: any = {
 }
 
 export const mockPipetteData1Channel: PipetteData = {
-  data: { channels: 1, min_volume: 1, max_volume: 50 },
+  data: {
+    channels: 1,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: { offset: [0, 2, 1], source: 'default' },
+  },
   instrumentModel: 'p1000_single_v3.0',
   instrumentName: 'p1000_single_gen3',
   instrumentType: 'pipette',
@@ -347,7 +352,12 @@ export const mockAttachedPipetteInformation: PipetteInformation = {
 }
 
 export const mockPipetteData8Channel: PipetteData = {
-  data: { channels: 8, min_volume: 1, max_volume: 50 },
+  data: {
+    channels: 8,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: { offset: [0, 2, 1], source: 'default' },
+  },
   instrumentModel: 'p1000_multi_v3.0',
   instrumentName: 'p1000_multi_gen3',
   instrumentType: 'pipette',
@@ -360,7 +370,12 @@ export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
 }
 
 export const mockPipetteData96Channel: PipetteData = {
-  data: { channels: 96, min_volume: 1, max_volume: 50 },
+  data: {
+    channels: 96,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: { offset: [0, 2, 1], source: 'default' },
+  },
   instrumentModel: 'p1000_96_v1',
   instrumentName: 'p1000_96',
   instrumentType: 'pipette',
