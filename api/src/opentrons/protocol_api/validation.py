@@ -70,7 +70,7 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
-        return DeckSlotName(str(deck_slot))
+        return DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
 
