@@ -42,7 +42,12 @@ const INFO_BY_FLOW_TYPE: {
   },
 }
 interface BeforeBeginningProps extends GripperWizardStepProps {
-  createMaintenanceRun: UseMutateFunction<MaintenanceRun, AxiosError<any>, void, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    void,
+    unknown
+  >
   isCreateLoading: boolean
 }
 

@@ -37,7 +37,9 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
   CreateMaintenanceCommandMutateParams
 >
 
-export function useCreateMaintenanceCommandMutation(maintenanceRunId: string): UseCreateMaintenanceCommandMutationResult {
+export function useCreateMaintenanceCommandMutation(
+  maintenanceRunId: string
+): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 

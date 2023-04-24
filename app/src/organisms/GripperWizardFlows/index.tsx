@@ -17,9 +17,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
-import {
-  useChainMaintenanceCommands,
-} from '../../resources/runs/hooks'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -52,8 +50,11 @@ export function GripperWizardFlows(
     createMaintenanceCommand,
     isLoading: isCommandLoading,
   } = useCreateMaintenanceCommandMutation(maintenanceRunId)
-  
-  const { createMaintenanceRun, isLoading: isCreateLoading } = useCreateMaintenanceRunMutation({
+
+  const {
+    createMaintenanceRun,
+    isLoading: isCreateLoading,
+  } = useCreateMaintenanceRunMutation({
     onSuccess: response => {
       setMaintenanceRunId(response.data.id)
     },
@@ -77,9 +78,7 @@ export function GripperWizardFlows(
       createMaintenanceRun={createMaintenanceRun}
       isCreateLoading={isCreateLoading}
       isRobotMoving={
-        isChainCommandMutationLoading ||
-        isCommandLoading ||
-        isExiting
+        isChainCommandMutationLoading || isCommandLoading || isExiting
       }
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
@@ -92,11 +91,18 @@ interface GripperWizardProps {
   flowType: GripperWizardFlowType
   maintenanceRunId: string
   attachedGripper: InstrumentData | null
-  createMaintenanceRun: UseMutateFunction<MaintenanceRun, AxiosError<any>, void, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    void,
+    unknown
+  >
   isCreateLoading: boolean
   isRobotMoving: boolean
   handleCleanUpAndClose: () => void
-  chainRunCommands: ReturnType<typeof useChainMaintenanceCommands>['chainRunCommands']
+  chainRunCommands: ReturnType<
+    typeof useChainMaintenanceCommands
+  >['chainRunCommands']
   createRunCommand: ReturnType<
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
