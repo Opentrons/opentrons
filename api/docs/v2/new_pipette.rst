@@ -23,19 +23,19 @@ Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a P50 multi on the left slot
-        left = protocol.load_instrument(instrument_name = 'p50_multi', mount = 'left')
+        left=protocol.load_instrument(instrument_name='p50_multi', mount='left')
         # Load a P1000 Single on the right slot, with two racks of tips
-        tiprack1 = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_1000ul', location = 1)
-        tiprack2 = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_1000ul', location = 2)
-        right = protocol.load_instrument(
-            instrument_name = 'p1000_single',
-            mount = 'right',
+        tiprack1=protocol.load_labware(
+            load_name='opentrons_96_tiprack_1000ul', location=1)
+        tiprack2=protocol.load_labware(
+            load_name='opentrons_96_tiprack_1000ul', location=2)
+        right=protocol.load_instrument(
+            instrument_name='p1000_single',
+            mount='right',
             tip_racks=[tiprack1, tiprack2])
 
 .. versionadded:: 2.0
@@ -71,21 +71,21 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
-        tiprack1 = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 1)
+        tiprack1=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=1)
         # Load a wellplate
-        plate = protocol.load_labware(
-            load_name = 'corning_96_wellplate_360ul_flat', location = 4)
+        plate=protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location=4)
 
         # Load a P300 Multi GEN2 on the right mount
-        right = protocol.load_instrument(
-            instrument_name = 'p300_multi_gen2',
-            mount = 'right',
-            tip_racks = [tiprack1])
+        right=protocol.load_instrument(
+            instrument_name='p300_multi_gen2',
+            mount='right',
+            tip_racks=[tiprack1])
 
         # Specify well A1 for pick_up_tip. The backmost channel of the
         # pipette moves to A1, which means the rest of the wells are above the
@@ -95,11 +95,11 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
         # Similarly, specifying well A2 for aspirate means the pipette will
         # position its backmost channel over well A2, and the rest of the
         # pipette channels are over the rest of the wells of column 1
-        right.aspirate(volume = 300, location = plate['A2'])
+        right.aspirate(volume=300, location=plate['A2'])
 
         # Dispense into column 3 of the plate with all 8 channels of the
         # pipette at the top of their respective wells
-        right.dispense(volume = 300, location = plate['A3'].top())
+        right.dispense(volume=300, location=plate['A3'].top())
 
 In general, you should specify wells in the first row of a labware when you are
 using multi-channel pipettes. One common exception to this rule is when using
@@ -115,29 +115,29 @@ F, H, J, L, N, and P).
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
-        tiprack1 = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 1)
+        tiprack1=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=1)
         # Load a wellplate
-        plate = protocol.load_labware(
-            load_name = 'corning_384_wellplate_112ul_flat', location = 4)
+        plate=protocol.load_labware(
+            load_name='corning_384_wellplate_112ul_flat', location=4)
 
         # Load a P300 Multi GEN2 on the right mount
-        right = protocol.load_instrument(
-            instrument_name = 'p300_multi_gen2',
-            mount = 'right',
+        right=protocol.load_instrument(
+            instrument_name='p300_multi_gen2',
+            mount='right',
             tip_racks=[tiprack1])
 
         # pick up a tip in preparation for aspiration
         right.pick_up_tip()
 
         # Aspirate from wells A1, C1, E1, G1, I1, K1, M1, and O1
-        right.aspirate(volume = 300, location = plate['A1'])
+        right.aspirate(volume=300, location=plate['A1'])
         # Dispense in wells B1, D1, F1, H1, J1, L1, N1, and P1
-        right.dispense(volume = 300, location = plate['B1'])
+        right.dispense(volume=300, location=plate['B1'])
 
 
 This pattern of access applies to both building block commands and advanced
@@ -218,18 +218,18 @@ For instance, in this protocol you can see the effects of specifying tipracks:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack_left = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = '1')
-        tiprack_right = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = '2')
-        left_pipette = protocol.load_instrument(
-            instrument_name = 'p300_single', mount = 'left')
-        right_pipette = protocol.load_instrument(
-            instrument_name = 'p300_multi',
-            mount = 'right',
+        tiprack_left=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location='1')
+        tiprack_right=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location='2')
+        left_pipette=protocol.load_instrument(
+            instrument_name='p300_single', mount='left')
+        right_pipette=protocol.load_instrument(
+            instrument_name='p300_multi',
+            mount='right',
             tip_racks=[tiprack_right])
 
         # You must specify the tip location for the left pipette, which was
@@ -284,41 +284,41 @@ Each of these attributes can be altered without affecting the others.
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = '1')
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single',
-            mount = 'right',
+        tiprack=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location='1')
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single',
+            mount='right',
             tip_racks=[tiprack])
-        plate = protocol.load_labware(
-            load_name = 'corning_384_wellplate_112ul_flat', location = 3)
+        plate=protocol.load_labware(
+            load_name='corning_384_wellplate_112ul_flat', location=3)
         pipette.pick_up_tip()
 
         # Aspirate at the default flowrate of 150 ul/s
-        pipette.aspirate(volume = 50, location = plate['A1'])
+        pipette.aspirate(volume=50, location=plate['A1'])
         # Dispense at the default flowrate of 300 ul/s
-        pipette.dispense(volume = 50, location = plate['A1'])
+        pipette.dispense(volume=50, location=plate['A1'])
 
         # Change default aspirate speed to 50ul/s, 1/3 of the default
-        pipette.flow_rate.aspirate = 50
+        pipette.flow_rate.aspirate=50
         # this aspirate will be at 50ul/s
-        pipette.aspirate(volume = 50, location = plate['A1'])
+        pipette.aspirate(volume=50, location=plate['A1'])
         # this dispense will be the default 300 ul/s
-        pipette.dispense(volume = 50, location = plate['A1'])
+        pipette.dispense(volume=50, location=plate['A1'])
 
         # Slow down dispense too
-        pipette.flow_rate.dispense = 50
+        pipette.flow_rate.dispense=50
         # This is still at 50 ul/s
-        pipette.aspirate(volume = 50, location = plate['A1'])
+        pipette.aspirate(volume=50, location=plate['A1'])
         # This is now at 50 ul/s as well
-        pipette.dispense(volume = 50, location = plate['A1'])
+        pipette.dispense(volume=50, location=plate['A1'])
 
         # Also slow down the blow out flowrate from its default
-        pipette.flow_rate.blow_out = 100
-        pipette.aspirate(volume = 50, location = plate['A1'])
+        pipette.flow_rate.blow_out=100
+        pipette.aspirate(volume=50, location=plate['A1'])
         # This will be much slower
         pipette.blow_out()
 

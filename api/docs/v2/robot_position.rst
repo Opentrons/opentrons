@@ -32,8 +32,8 @@ This is a good position to use for :ref:`new-blow-out` or any other operation wh
 
 .. code-block:: python
 
-   plate['A1'].top(z = 1)  # 1 mm above the top center of the well
-   plate['A1'].top(z = -1) # 1 mm below the top center of the well
+   plate['A1'].top(z=1)  # 1 mm above the top center of the well
+   plate['A1'].top(z=-1) # 1 mm below the top center of the well
 
 .. versionadded:: 2.0
 
@@ -47,8 +47,8 @@ This is a good position to start for aspiration or any other operation where you
 
 .. code-block:: python
 
-   plate['A1'].bottom(z = 1)  # 1 mm above the bottom center of the well
-   plate['A1'].bottom(z = -1) # 1 mm below the bottom center of the well
+   plate['A1'].bottom(z=1)  # 1 mm above the bottom center of the well
+   plate['A1'].bottom(z=-1) # 1 mm below the bottom center of the well
                               # this may be dangerous!
 
 
@@ -82,35 +82,35 @@ Changing these attributes will affect all subsequent aspirate and dispense actio
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = '1')
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single', mount = 'right', tip_racks = [tiprack])
-        plate = protocol.load_labware(
-            load_name = 'corning_384_wellplate_112ul_flat', location = 3)
+        tiprack=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location='1')
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single', mount='right', tip_racks=[tiprack])
+        plate=protocol.load_labware(
+            load_name='corning_384_wellplate_112ul_flat', location=3)
 
         pipette.pick_up_tip()
 
         # aspirate 1 mm above the bottom of the well (default)
-        pipette.aspirate(volume = 50, plate['A1'])
+        pipette.aspirate(volume=50, plate['A1'])
         # dispense 1 mm above the bottom of the well (default)
-        pipette.dispense(volume = 50, plate['A1'])
+        pipette.dispense(volume=50, plate['A1'])
 
         # change clearance for aspiration to 2 mm
-        pipette.well_bottom_clearance.aspirate = 2
+        pipette.well_bottom_clearance.aspirate=2
         # aspirate 2 mm above the bottom of the well
-        pipette.aspirate(volume = 50, plate['A1'])
+        pipette.aspirate(volume=50, plate['A1'])
         # still dispensing 1 mm above the bottom
-        pipette.dispense(volume = 50, plate['A1'])
+        pipette.dispense(volume=50, plate['A1'])
 
-        pipette.aspirate(volume = 50, plate['A1'])
+        pipette.aspirate(volume=50, plate['A1'])
         # change clearance for dispensing to 10 mm      
-        pipette.well_bottom_clearance.dispense = 10
+        pipette.well_bottom_clearance.dispense=10
         # dispense high above the well
-        pipette.dispense(volume = 50, plate['A1'])
+        pipette.dispense(volume=50, plate['A1'])
 
 .. versionadded:: 2.0
 
@@ -133,17 +133,17 @@ To prepare code written for Jupyter notebook so it can be run in the app, you ne
 
 .. code-block:: python
 
-    metadata = {'apiLevel': '2.12'}
+    metadata={'apiLevel': '2.12'}
 
     def run(protocol):
-        tiprack = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 1)
-        reservoir = protocol.load_labware(
-            load_name = 'nest_12_reservoir_15ml', location = 2)
-        plate = protocol.load_labware(
-            load_name = 'nest_96_wellplate_200ul_flat', location = 3)
-        p300 = protocol.load_instrument(
-            instrument_name = 'p300_single_gen2', mount = 'left', tip_racks=[tiprack])
+        tiprack=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=1)
+        reservoir=protocol.load_labware(
+            load_name='nest_12_reservoir_15ml', location=2)
+        plate=protocol.load_labware(
+            load_name='nest_96_wellplate_200ul_flat', location=3)
+        p300=protocol.load_instrument(
+            instrument_name='p300_single_gen2', mount='left', tip_racks=[tiprack])
         p300.pick_up_tip()
         p300.return_tip()
 		
@@ -151,24 +151,24 @@ After importing this protocol to the Opentrons App, run Labware Position Check t
 
 .. code-block:: python
 	
-    labware_1 = protocol.load_labware(
-        load_name = "opentrons_96_tiprack_300ul", location = "1")
+    labware_1=protocol.load_labware(
+        load_name="opentrons_96_tiprack_300ul", location="1")
     labware_1.set_offset(x=0.00, y=0.00, z=0.00)
 
-    labware_2 = protocol.load_labware(
-        load_name = "nest_12_reservoir_15ml", location = "2")
+    labware_2=protocol.load_labware(
+        load_name="nest_12_reservoir_15ml", location="2")
     labware_2.set_offset(x=0.10, y=0.20, z=0.30)
 
-    labware_3 = protocol.load_labware(
-        load_name = "nest_96_wellplate_200ul_flat", location = "3")
+    labware_3=protocol.load_labware(
+        load_name="nest_96_wellplate_200ul_flat", location="3")
     labware_3.set_offset(x=0.10, y=0.20, z=0.30)
     
 You'll notice that this code uses generic names for the loaded labware. If you want to match the labware names already in your protocol, add your own ``.set_offset()`` calls using the arguments provided by Labware Position Check:
 
 .. code-block:: python
 
-    reservoir = protocol.load_labware(
-        load_name = 'nest_12_reservoir_15ml', location = 2)
+    reservoir=protocol.load_labware(
+        load_name='nest_12_reservoir_15ml', location=2)
     reservoir.set_offset(x=0.10, y=0.20, z=0.30)
     
 .. versionadded:: 2.12
@@ -256,32 +256,32 @@ This distinction is important for the :py:meth:`.Location.move` method, which op
 
     from opentrons import types
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware(
-            load_name = 'corning_24_wellplate_3.4ml_flat', location = '1')
-        tiprack = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = '2')
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single',
-            mount = 'right',
-            tip_racks = [tiprack])
+        plate=protocol.load_labware(
+            load_name='corning_24_wellplate_3.4ml_flat', location='1')
+        tiprack=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location='2')
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single',
+            mount='right',
+            tip_racks=[tiprack])
         pipette.pick_up_tip()
 
         # get the location at the center of well A1
-        center_location = plate['A1'].center()
+        center_location=plate['A1'].center()
 
         # get a location 1 mm right, 1 mm back,
         # and 1 mm up from the center of well A1
-        adjusted_location = center_location.move(types.Point(x=1, y=1, z=1))
+        adjusted_location=center_location.move(types.Point(x=1, y=1, z=1))
 
         # aspirate 1 mm right, 1 mm back,
         # and 1 mm up from the center of well A1
-        pipette.aspirate(volume = 50, adjusted_location)
+        pipette.aspirate(volume=50, adjusted_location)
         # dispense at the same location
         pipette.dispense(
-            volume = 50, center_location.move(types.Point(x=1, y=1, z=1)))
+            volume=50, center_location.move(types.Point(x=1, y=1, z=1)))
 
 .. note::
 
@@ -318,7 +318,7 @@ The OT-2's gantry usually moves as fast as it can given its construction: 400 mm
 	# move to the first well at default speed
 	pipette.move_to(plate['A1'].top())
 	# slow down the pipette
-	pipette.default_speed = 100
+	pipette.default_speed=100
 	# move to the last well much more slowly
 	pipette.move_to(plate['D6'].top())
         
@@ -340,10 +340,10 @@ In addition to controlling the overall gantry speed, you can set speed limits fo
 .. code-block:: python
     :substitutions:
 
-	protocol.max_speeds['x'] = 50       # limit x-axis to 50 mm/s
+	protocol.max_speeds['x']=50       # limit x-axis to 50 mm/s
 	del protocol.max_speeds['x']        # reset x-axis limit
-	protocol.max_speeds['a'] = 10       # limit a-axis to 10 mm/s
-	protocol.max_speeds['a'] = None     # reset a-axis limit
+	protocol.max_speeds['a']=10       # limit a-axis to 10 mm/s
+	protocol.max_speeds['a']=None     # reset a-axis limit
 
 
 Note that ``max_speeds`` can't set limits for the pipette plunger axes (``b`` and ``c``); instead, set the flow rates or plunger speeds as described in :ref:`new-plunger-flow-rates`.

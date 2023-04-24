@@ -16,15 +16,15 @@ The examples in this section would be added to the following:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware(
-            load_name = 'corning_96_wellplate_360ul_flat', location = 2)
-        plate = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 3)
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single_gen2', mount ='left')
+        tiprack=protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location=2)
+        plate=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=3)
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single_gen2', mount='left')
         # the example code below would go here, inside the run function
 
 
@@ -44,7 +44,7 @@ Before any liquid handling can be done, your pipette must have a tip on it. The 
 
 .. code-block:: python
 
-   pipette.pick_up_tip(location = tiprack['A1'])
+   pipette.pick_up_tip(location=tiprack['A1'])
 
 If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` or :ref:`protocol_api-protocols-and-instruments` sections, then you can simply call
 
@@ -65,7 +65,7 @@ If no location is specified, the OT-2 will drop the tip in the fixed trash in sl
 .. code-block:: python
 
     pipette.pick_up_tip()
-    pipette.drop_tip(location = tiprack['A1'])  # drop back in A1 of the tiprack
+    pipette.drop_tip(location=tiprack['A1'])  # drop back in A1 of the tiprack
     pipette.pick_up_tip()
     pipette.drop_tip()  # drop in the fixed trash on the deck
 
@@ -81,7 +81,7 @@ To return the tip to the original location, you can call :py:meth:`.InstrumentCo
 
 .. code-block:: python
 
-    pipette.pick_up_tip(location = tiprack['A3'])
+    pipette.pick_up_tip(location=tiprack['A3'])
     pipette.return_tip()
 
 .. note:
@@ -94,12 +94,12 @@ In API version 2.2 or above:
 
 .. code-block:: python
 
-    tip_rack = protocol.load_labware(
-        load_name = 'opentrons_96_tiprack_300ul', location = 1)
-    pipette = protocol.load_instrument(
-        instrument_name = 'p300_single_gen2',
-        mount = 'left',
-        tip_racks = [tip_rack])
+    tip_rack=protocol.load_labware(
+        load_name='opentrons_96_tiprack_300ul', location=1)
+    pipette=protocol.load_instrument(
+        instrument_name='p300_single_gen2',
+        mount='left',
+        tip_racks=[tip_rack])
 
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
@@ -109,12 +109,12 @@ In API version 2.0 and 2.1:
 
 .. code-block:: python
 
-    tip_rack = protocol.load_labware(
-        load_name = 'opentrons_96_tiprack_300ul', location = 1)
-    pipette = protocol.load_instrument(
-        instrument_name = 'p300_single_gen2',
-        mount = 'left', 
-        tip_racks = [tip_rack])
+    tip_rack=protocol.load_labware(
+        load_name='opentrons_96_tiprack_300ul', location=1)
+    pipette=protocol.load_instrument(
+        instrument_name='p300_single_gen2',
+        mount='left', 
+        tip_racks=[tip_rack])
 
     pipette.pick_up_tip() # picks up tip_rack:A1
     pipette.return_tip()
@@ -130,19 +130,19 @@ For this section, instead of using the protocol defined above, consider this set
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware(
-            load_name = 'corning_96_wellplate_360ul_flat', location = 2)
-        tip_rack_1 = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 3)
-        tip_rack_2 = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 4)
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single_gen2',
-            mount = 'left',
-            tip_racks = [tip_rack_1, tip_rack_2])
+        plate=protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location=2)
+        tip_rack_1=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=3)
+        tip_rack_2=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=4)
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single_gen2',
+            mount='left',
+            tip_racks=[tip_rack_1, tip_rack_2])
 
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and two `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slots 3 and 4 respectively, and uses a P300 Single GEN2 pipette.
 
@@ -156,7 +156,7 @@ When a list of tip racks is associated with a pipette in its ``tip_racks`` argum
     pipette.drop_tip()     # automatically drops in trash
 
     # use loop to pick up tips tip_rack_1:A3 through tip_rack_2:H12
-    tips_left = 94 + 96 # add up the number of tips leftover in both tipracks
+    tips_left=94 + 96 # add up the number of tips leftover in both tipracks
     for _ in range(tips_left):
         pipette.pick_up_tip()
         pipette.return_tip()
@@ -172,7 +172,7 @@ To change the location of the first tip used by the pipette, you can use :py:obj
 
 .. code-block:: python
 
-    pipette.starting_tip = tip_rack_1.well('C3')
+    pipette.starting_tip=tip_rack_1.well('C3')
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
     pipette.return_tip()
 
@@ -221,17 +221,17 @@ The examples in this section should be inserted in the following:
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate = protocol.load_labware(
-            load_name = 'corning_96_wellplate_360ul_flat', location = 2)
-        tiprack = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 3)
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single_gen2',
-            mount = 'left',
-            tip_racks = [tiprack])
+        plate=protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location=2)
+        tiprack=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=3)
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single_gen2',
+            mount='left',
+            tip_racks=[tiprack])
         pipette.pick_up_tip()
         # example code goes here
 
@@ -248,7 +248,7 @@ To aspirate is to pull liquid up into the pipette's tip. When calling :py:meth:`
 .. code-block:: python
 
     pipette.aspirate(
-        volume = 50, plate['A1'], rate = 2.0) # aspirate 50uL from plate:A1
+        volume=50, plate['A1'], rate=2.0) # aspirate 50uL from plate:A1
 
 Now the pipette's tip is holding 50 µL.
 
@@ -261,7 +261,7 @@ You can also simply specify the volume to aspirate, and not mention a location. 
 .. code-block:: python
 
     # aspirate 50uL from current position
-    pipette.aspirate(volume = 50)
+    pipette.aspirate(volume=50)
 
 Now our pipette's tip is holding 100 µL.
 
@@ -289,10 +289,10 @@ To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:
 .. code-block:: python
 
     # dispense 50uL to plate:B1 at twice the normal rate
-    pipette.dispense(volume = 50, location = plate['B1'], rate = 2.0)
+    pipette.dispense(volume=50, location=plate['B1'], rate=2.0)
     
     # dispense 50uL to current position at the normal rate
-    pipette.dispense(volume = 50)
+    pipette.dispense(volume=50)
 
 The ``location`` parameter is either a well (like ``plate['A1']``) or a position within a well, like the return value of ``plate['A1'].bottom``.
 
@@ -329,7 +329,7 @@ When calling :py:meth:`.InstrumentContext.blow_out`, you can specify a location 
     pipette.blow_out()
     
     # blow out in current plate:B3            
-    pipette.blow_out(location = plate['B3'])
+    pipette.blow_out(location=plate['B3'])
 
 .. versionadded:: 2.0
 
@@ -350,16 +350,16 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
     pipette.touch_tip()
    
     # touch tip 2mm below the top of the current location
-    pipette.touch_tip(v_offset = -2)
+    pipette.touch_tip(v_offset=-2)
     
     # touch tip within plate:B1
-    pipette.touch_tip(location = plate['B1'])
+    pipette.touch_tip(location=plate['B1'])
     
     # touch tip within plate:B1 at 100 mm/s
-    pipette.touch_tip(location = plate['B1'], speed = 100)
+    pipette.touch_tip(location=plate['B1'], speed=100)
     
     # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
-    pipette.touch_tip(location = plate['B1'],radius = 0.75, v_offset = -2)
+    pipette.touch_tip(location=plate['B1'],radius=0.75, v_offset=-2)
 
 
 .. versionadded:: 2.0
@@ -385,13 +385,13 @@ The ``mix`` command takes up to three arguments: ``mix(repetitions, volume, loca
 .. code-block:: python
 
     # mix 4 times, 100uL, in plate:A2
-    pipette.mix(repetitions = 4, volume = 100, location = plate['A2'])
+    pipette.mix(repetitions=4, volume=100, location=plate['A2'])
     
     # mix 3 times, 50uL, in current location
-    pipette.mix(repetitions = 3, volume = 50)
+    pipette.mix(repetitions=3, volume=50)
     
     # mix 2 times, pipette's max volume, in current location
-    pipette.mix(location = 2)
+    pipette.mix(location=2)
 
 .. note::
 
@@ -408,8 +408,8 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 
 .. code-block:: python
 
-    pipette.aspirate(volume = 100, location = plate['B4'])
-    pipette.air_gap(volume = 20)
+    pipette.aspirate(volume=100, location=plate['B4'])
+    pipette.air_gap(volume=20)
     pipette.drop_tip()
 
 .. versionadded:: 2.0
@@ -431,9 +431,9 @@ The values passed into ``delay()`` specify the number of minutes and seconds tha
 
 .. code-block:: python
 
-    protocol.delay(seconds = 2) # delay for 2 seconds
-    protocol.delay(minutes = 5) # delay for 5 minutes
-    protocol.delay(minutes = 5, seconds = 2) # delay for 5 minutes and 2 seconds
+    protocol.delay(seconds=2) # delay for 2 seconds
+    protocol.delay(minutes=5) # delay for 5 minutes
+    protocol.delay(minutes=5, seconds=2) # delay for 5 minutes and 2 seconds
 
 
 Pause Until Resumed
@@ -448,7 +448,7 @@ will be displayed in the Opentrons App when protocol execution pauses.
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
@@ -480,11 +480,11 @@ None of these functions take any arguments:
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single', location = 'right')
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single', location='right')
         protocol.home() # Homes the gantry, z axes, and plungers
         pipette.home()  # Homes the right z axis and plunger
         pipette.home_plunger() # Homes the right plunger
@@ -503,7 +503,7 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
@@ -522,14 +522,14 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # turn on robot rail lights
-        protocol.set_rail_lights(on = True)
+        protocol.set_rail_lights(on=True)
 
         # turn off robot rail lights
-        protocol.set_rail_lights(on = False)
+        protocol.set_rail_lights(on=False)
 
 .. versionadded:: 2.5
 

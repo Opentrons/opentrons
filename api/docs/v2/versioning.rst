@@ -26,7 +26,7 @@ You must specify the API version you are targeting in the ``metadata`` block at 
 
    from opentrons import protocol_api
 
-   metadata = {
+   metadata={
        'apiLevel': '|apiLevel|',
        'author': 'A. Biologist'}
 

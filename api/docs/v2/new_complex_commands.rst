@@ -20,21 +20,21 @@ The examples in this section will use the following set up:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata={'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware(
-            load_name = 'corning_96_wellplate_360ul_flat', location = 1)
-        tiprack = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 2)
-        tiprack_multi = protocol.load_labware(
-            load_name = 'opentrons_96_tiprack_300ul', location = 3)
-        pipette = protocol.load_instrument(
-            instrument_name = 'p300_single',mount = 'left', tip_racks=[tiprack])
-        pipette_multi = protocol.load_instrument(
-            instrument_name = 'p300_multi',
-            mount = 'right',
-            tip_racks = [tiprack_multi])
+        plate=protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat', location=1)
+        tiprack=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=2)
+        tiprack_multi=protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul', location=3)
+        pipette=protocol.load_instrument(
+            instrument_name='p300_single',mount='left', tip_racks=[tiprack])
+        pipette_multi=protocol.load_instrument(
+            instrument_name='p300_multi',
+            mount='right',
+            tip_racks=[tiprack_multi])
 
         # The code used in the rest of the examples goes here
 
@@ -153,18 +153,18 @@ This example below transfers 100 µL from well ``'A1'`` to well ``'B1'`` using t
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate.wells_by_name()['A1'],
-        dest = plate.wells_by_name()['B1'])
+        volume=100,
+        source=plate.wells_by_name()['A1'],
+        dest=plate.wells_by_name()['B1'])
 
 When you are using a multi-channel pipette, you can transfer the entire column (8 wells) in the plate to another using:
 
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate.wells_by_name()['A1'],
-        dest = plate.wells_by_name()['A2'])
+        volume=100,
+        source=plate.wells_by_name()['A1'],
+        dest=plate.wells_by_name()['A2'])
 
 .. note::
         
@@ -185,9 +185,9 @@ Volumes larger than the pipette's ``max_volume`` (see :ref:`defaults`) will auto
 .. code-block:: python
 
     pipette.transfer(
-        volume = 700,
-        source = plate.wells_by_name()['A2'],
-        dest = plate.wells_by_name()['B2'])
+        volume=700,
+        source=plate.wells_by_name()['A2'],
+        dest=plate.wells_by_name()['B2'])
 
 will have the steps...
 
@@ -212,9 +212,9 @@ from where well ``A1``'s contents are transferred to well ``A2``, well ``B1``'s 
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate.columns_by_name()['1'],
-        dest = plate.columns_by_name()['2'])
+        volume=100,
+        source=plate.columns_by_name()['1'],
+        dest=plate.columns_by_name()['2'])
 
 will have the steps...
 
@@ -250,9 +250,9 @@ You can transfer from a single source to multiple destinations, and the other wa
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate.wells_by_name()['A1'], 
-        dest = plate.columns_by_name()['2'])
+        volume=100,
+        source=plate.wells_by_name()['A1'], 
+        dest=plate.columns_by_name()['2'])
 
 
 will have the steps...
@@ -289,9 +289,9 @@ Instead of applying a single volume amount to all source/destination wells, you 
 .. code-block:: python
 
     pipette.transfer(
-        volume = [20, 40, 60],
-        source = plate['A1'],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
+        volume=[20, 40, 60],
+        source=plate['A1'],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
 
 
 will have the steps...
@@ -316,9 +316,9 @@ can use a list of volumes to skip over certain wells by setting the volume to ze
 .. code-block:: python
 
     pipette.transfer(
-        volume = [20, 0, 60],
-        source = plate['A1'],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
+        volume=[20, 0, 60],
+        source=plate['A1'],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
 
 will have the steps...
 
@@ -350,9 +350,9 @@ Volumes going to the same destination well are combined within the same tip, so 
 .. code-block:: python
 
     pipette.consolidate(
-        volume = 30, 
-        source = plate.columns_by_name()['2'],
-        dest = plate.wells_by_name()['A1'])
+        volume=30, 
+        source=plate.columns_by_name()['2'],
+        dest=plate.wells_by_name()['A1'])
 
 will have the steps...
 
@@ -377,9 +377,9 @@ If there are multiple destination wells, the pipette will not combine the transf
 .. code-block:: python
 
     pipette.consolidate(
-        volume = 30,
-        source = plate.columns_by_name()['1'],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']])
+        volume=30,
+        source=plate.columns_by_name()['1'],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']])
 
 
 will have the steps...
@@ -412,9 +412,9 @@ Volumes from the same source well are combined within the same tip, so that one 
 .. code-block:: python
 
     pipette.distribute(
-        volume = 55, 
-        source = plate.wells_by_name()['A1'],
-        dest = plate.rows_by_name()['A'])
+        volume=55, 
+        source=plate.wells_by_name()['A1'],
+        dest=plate.rows_by_name()['A'])
 
 
 will have the steps...
@@ -451,9 +451,9 @@ If there are multiple source wells, the pipette will never combine their volumes
 .. code-block:: python
 
     pipette.distribute(
-        volume = 30,
-        source = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
-        dest = plate.rows_by_name()['A'])
+        volume=30,
+        source=[plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
+        dest=plate.rows_by_name()['A'])
 
 will have the steps...
 
@@ -496,9 +496,9 @@ For example, this distribute command
 .. code-block:: python
 
     pipette.distribute(
-        volume = [20, 40, 60],
-        source = plate['A1'],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
+        volume=[20, 40, 60],
+        source=plate['A1'],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']])
 
 
 will have the steps...
@@ -519,9 +519,9 @@ and this consolidate command
 .. code-block:: python
 
     pipette.consolidate(
-        volume = [20, 40, 60],
-        source = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
-        dest = plate['A1'])
+        volume=[20, 40, 60],
+        source=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
+        dest=plate['A1'])
 
 will have the steps...
 
@@ -545,9 +545,9 @@ can use a list of volumes to skip over certain wells by setting the volume to ze
 .. code-block:: python
 
     pipette.distribute(
-        volume = [20, 40, 60, 0, 0, 0, 50, 100],
-        source = plate['A1'],
-        dest = plate.columns_by_name()['2'])
+        volume=[20, 40, 60, 0, 0, 0, 50, 100],
+        source=plate['A1'],
+        dest=plate.columns_by_name()['2'])
 
 will have the steps...
 
@@ -619,10 +619,10 @@ The pipette can optionally get a new tip at the beginning of each aspirate, to h
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
-        new_tip = 'always') # always pick up a new tip
+        volume=100,
+        source=[plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
+        new_tip='always') # always pick up a new tip
 
 
 will have the steps...
@@ -654,10 +654,10 @@ For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()``
     pipette.pick_up_tip()
     ...
     pipette.transfer(
-        volume = 100,
-        source = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
-        new_tip = 'never') # never pick up or drop a tip
+        volume=100,
+        source=[plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
+        new_tip='never') # never pick up or drop a tip
     ...
     pipette.drop_tip()
 
@@ -687,10 +687,10 @@ The default behavior of complex commands is to use one tip:
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
-        dest = [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
-        new_tip = 'once') # use one tip (default behavior)
+        volume=100,
+        source=[plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
+        dest=[plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
+        new_tip='once') # use one tip (default behavior)
 
 will have the steps...
 
@@ -714,10 +714,10 @@ By default, compelx commands will drop the pipette's tips in the trash container
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['B1'],
-        trash = False) # do not trash tip
+        volume=100,
+        source=plate['A1'],
+        dest=plate['B1'],
+        trash=False) # do not trash tip
 
 
 will have the steps...
@@ -741,10 +741,10 @@ A :ref:`touch-tip` can be performed after every aspirate and dispense by setting
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        touch_tip = True) # touch tip to each well's edge
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        touch_tip=True) # touch tip to each well's edge
 
 
 will have the steps...
@@ -769,10 +769,10 @@ A :ref:`blow-out` into the trash can be performed after every dispense that leav
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        blow_out = True) # blow out droplets when tip is empty
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        blow_out=True) # blow out droplets when tip is empty
 
 
 will have the steps...
@@ -794,13 +794,13 @@ the source well of your transfer function.
 .. code-block:: python
 
     pipette.pick_up_tip()
-    pipette.aspirate(volume = 10, location = plate['A1'])
+    pipette.aspirate(volume=10, location=plate['A1'])
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        blow_out = True, # blow out droplets into the source well (A1 of "plate")
-        new_tip = 'never')
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        blow_out=True, # blow out droplets into the source well (A1 of "plate")
+        new_tip='never')
 
 .. versionadded:: 2.8
 
@@ -817,11 +817,11 @@ every transfer into the trash.
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        blow_out = True,
-        blowout_location = 'trash') # blow out droplets into the trash
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        blow_out=True,
+        blowout_location='trash') # blow out droplets into the trash
 
 .. versionadded:: 2.8
 
@@ -830,14 +830,14 @@ The same is true even if you have extra liquid left in your tip shown below.
 .. code-block:: python
 
     pipette.pick_up_tip()
-    pipette.aspirate(volume = 10, location = plate['A1'])
+    pipette.aspirate(volume=10, location=plate['A1'])
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        blow_out = True,
-        blowout_location = 'trash', # blow out droplets into the trash
-        new_tip = 'never')
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        blow_out=True,
+        blowout_location='trash', # blow out droplets into the trash
+        new_tip='never')
 
 .. versionadded:: 2.8
 
@@ -847,13 +847,13 @@ For example, to blow out in the destination well you can do the following:
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate.wells(),
-        blow_out = True,
+        volume=100,
+        source=plate['A1'],
+        dest=plate.wells(),
+        blow_out=True,
         # Blow out droplets into each destination well.
         # This will blow out in wells `A1`, `B1`, `C1`, ... etc.
-        blowout_location = 'destination well')
+        blowout_location='destination well')
 
 .. versionadded:: 2.8
 
@@ -872,11 +872,11 @@ A :ref:`mix` can be performed before every aspirate by setting ``mix_before=``, 
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        mix_before = (2, 50), # mix 2 times with 50uL before aspirating
-        mix_after = (3, 75)) # mix 3 times with 75uL after dispensing
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        mix_before=(2, 50), # mix 2 times with 50uL before aspirating
+        mix_after=(3, 75)) # mix 3 times with 75uL after dispensing
 
 
 will have the steps...
@@ -911,10 +911,10 @@ An :ref:`air-gap` can be performed after every aspirate by setting ``air_gap=vol
 .. code-block:: python
 
     pipette.transfer(
-        volume = 100,
-        source = plate['A1'],
-        dest = plate['A2'],
-        air_gap = 20) # add 20uL of air after each aspirate
+        volume=100,
+        source=plate['A1'],
+        dest=plate['A2'],
+        air_gap=20) # add 20uL of air after each aspirate
 
 
 will have the steps...
@@ -941,11 +941,11 @@ The default disposal volume is the pipette's minimum volume (see :ref:`Defaults`
 .. code-block:: python
 
     pipette.distribute(
-        volume = 30,
-        source = [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
-        dest = plate.columns_by_name()['2'],
+        volume=30,
+        source=[plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
+        dest=plate.columns_by_name()['2'],
         # include extra liquid to make dispenses more accurate, 20% of total volume
-        disposal_volume = 60)
+        disposal_volume=60)
 
 
 will have the steps...
