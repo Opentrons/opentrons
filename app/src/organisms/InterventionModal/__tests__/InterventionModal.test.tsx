@@ -31,7 +31,7 @@ describe('InterventionModal', () => {
   it('renders an InterventionModal with the robot name in the header, learn more link, and confirm button', () => {
     const { getByText, getByRole } = render(props)
     expect(getByText('Perform manual step on Otie')).toBeTruthy()
-    expect(getByText('Learn more about user interventions')).toBeTruthy()
+    expect(getByText('Learn more about manual steps')).toBeTruthy()
     expect(getByRole('button', { name: 'Confirm and resume' })).toBeTruthy()
   })
 
@@ -45,5 +45,11 @@ describe('InterventionModal', () => {
     props = { ...props, command: mockPauseCommandWithoutStartTime }
     const { getByText } = render(props)
     expect(getByText('Paused for --:--:--')).toBeTruthy()
+  })
+
+  it('clicking "Confirm and resume" triggers the resume handler', () => {
+    const { getByText } = render(props)
+    getByText('Confirm and resume').click()
+    expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 })

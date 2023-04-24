@@ -12,32 +12,32 @@ export const MOCK_MODULE_ID = 'f806ff9f-3b17-4692-aa63-f77c57fe18d1'
 
 export const mockPauseCommandWithStartTime = {
   commandType: 'waitForResume',
-  startedAt: new Date(),
   params: {
+    startedAt: new Date(),
     message: longCommandMessage,
   },
 } as any
 
 export const mockPauseCommandWithoutStartTime = {
   commandType: 'waitForResume',
-  startedAt: null,
   params: {
+    startedAt: null,
     message: longCommandMessage,
   },
 } as any
 
 export const mockPauseCommandWithShortMessage = {
   commandType: 'waitForResume',
-  startedAt: null,
   params: {
+    startedAt: null,
     message: shortCommandMessage,
   },
 } as any
 
 export const mockPauseCommandWithNoMessage = {
   commandType: 'waitForResume',
-  startedAt: null,
   params: {
+    startedAt: null,
     message: null,
   },
 } as any
@@ -51,53 +51,4 @@ export const mockMoveLabwareCommand = {
     },
     strategy: 'manualMoveWithPause',
   },
-} as any
-
-export const mockRobotSideAnalysis = {
-  labware: [
-    {
-      id: MOCK_LABWARE_ID,
-      loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
-      definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
-      location: {
-        moduleId: MOCK_MODULE_ID,
-      },
-    },
-  ],
-  modules: [
-    {
-      id: MOCK_MODULE_ID,
-      model: 'heaterShakerModuleV1',
-      location: {
-        slotName: '3',
-      },
-      serialNumber: 'fake-serial-number-a9106dff-30d9-46cc-b6e5-9083a86a3b81',
-    },
-  ],
-  commands: [
-    {
-      commandType: 'loadLabware',
-      params: {
-        location: {
-          moduleId: MOCK_MODULE_ID,
-        },
-        loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
-        namespace: 'opentrons',
-        version: 1,
-      },
-      result: {
-        labwareId: MOCK_LABWARE_ID,
-        definition: {
-          version: 1,
-          namespace: 'opentrons',
-          parameters: {
-            loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
-          },
-          metadata: {
-            displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
-          },
-        },
-      },
-    },
-  ],
 } as any

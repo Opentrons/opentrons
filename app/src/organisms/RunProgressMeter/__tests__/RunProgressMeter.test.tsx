@@ -4,6 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   useAllCommandsQuery,
   useCommandQuery,
+  useRunQuery,
 } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -31,6 +32,7 @@ jest.mock('../../../atoms/ProgressBar')
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -78,6 +80,7 @@ describe('RunProgressMeter', () => {
     when(mockUseLastRunCommandKey)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .mockReturnValue(NON_DETERMINISTIC_COMMAND_KEY)
+    mockUseRunQuery.mockReturnValue({ data: null } as any)
 
     props = {
       runId: NON_DETERMINISTIC_RUN_ID,
