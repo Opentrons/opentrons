@@ -32,7 +32,7 @@ describe('MovePin', () => {
     render = (props = {}) => {
       return renderWithProviders(
         <MovePin
-          runId={mockRunId}
+          maintenanceRunId={mockRunId}
           section={SECTIONS.MOVE_PIN}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}

@@ -6,22 +6,17 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { COLORS, renderWithProviders } from '@opentrons/components'
-import { usePipettesQuery } from '@opentrons/react-api-client'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { Results } from '../Results'
 import { FLOWS } from '../constants'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-
 jest.mock('@opentrons/react-api-client')
 
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 
 const render = (props: React.ComponentProps<typeof Results>) => {
@@ -29,14 +24,11 @@ const render = (props: React.ComponentProps<typeof Results>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('Results', () => {
   let props: React.ComponentProps<typeof Results>
   let pipettePromise: Promise<void>
-  let mockRefetchPipette: jest.Mock
+  let mockRefetchInstruments: jest.Mock
   beforeEach(() => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
@@ -45,8 +37,8 @@ describe('Results', () => {
       proceed: jest.fn(),
       chainRunCommands: jest.fn(),
       isRobotMoving: false,
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       flowType: FLOWS.CALIBRATE,
@@ -59,8 +51,10 @@ describe('Results', () => {
       hasCalData: false,
     }
     pipettePromise = Promise.resolve()
-    mockRefetchPipette = jest.fn(() => pipettePromise)
-    mockUsePipettesQuery.mockReturnValue({ refetch: mockRefetchPipette } as any)
+    mockRefetchInstruments = jest.fn(() => pipettePromise)
+    mockUseInstrumentsQuery.mockReturnValue({
+      refetch: mockRefetchInstruments,
+    } as any)
   })
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     props = {
@@ -106,7 +100,7 @@ describe('Results', () => {
     )
     getByRole('button', { name: 'Try again' }).click()
     await act(() => pipettePromise)
-    expect(mockRefetchPipette).toHaveBeenCalled()
+    expect(mockRefetchInstruments).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a success for detach flow', () => {
     props = {
@@ -254,6 +248,6 @@ describe('Results', () => {
     )
     getByRole('button', { name: 'SmallButton_default' }).click()
     await act(() => pipettePromise)
-    expect(mockRefetchPipette).toHaveBeenCalled()
+    expect(mockRefetchInstruments).toHaveBeenCalled()
   })
 })
