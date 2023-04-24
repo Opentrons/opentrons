@@ -23,6 +23,8 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 
+import type { Run } from '@opentrons/api-client'
+
 interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
   protocolName: string
@@ -48,14 +50,10 @@ export function RecentRunProtocolCard({
     allRuns?.data.find(run => run.protocolId === protocolId)?.id ?? null
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  console.log('')
-  const onResetSuccess = (): void => {
-    if (runId != null) {
-      history.push(`protocols/${runId}/setup`)
-    } else {
-      history.push(`protocols/${protocolId}`)
-    }
-  }
+  const onResetSuccess = (createRunResponse: Run): void =>
+    runId != null
+      ? history.push(`protocols/${runId}/setup`)
+      : history.push(`protocols/${createRunResponse.data.id}`)
   const { reset } = useRunControls(runId, onResetSuccess)
 
   const PROTOCOL_CARD_STYLE = css`
