@@ -21,6 +21,7 @@ import {
   JUSTIFY_FLEX_END,
   ALIGN_FLEX_END,
   POSITION_RELATIVE,
+  PrimaryButton,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
@@ -28,7 +29,6 @@ import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import { StepMeter } from '../../atoms/StepMeter'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { State, Dispatch } from '../../redux/types'
 
@@ -181,7 +181,7 @@ const DisplayConnectionStatus = ({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
-          backgroundColor={COLORS.greyDisabled}
+          backgroundColor={COLORS.light_two}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
@@ -237,10 +237,7 @@ const DisplayEthernetInfo = ({
   const { t } = useTranslation(['device_settings', 'shared'])
 
   return (
-    <Flex
-      backgroundColor={COLORS.greyDisabled}
-      flexDirection={DIRECTION_COLUMN}
-    >
+    <Flex backgroundColor={COLORS.light_two} flexDirection={DIRECTION_COLUMN}>
       <Flex
         padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing6)}}`}
         flexDirection={DIRECTION_ROW}

@@ -7,10 +7,12 @@ import { registerRobotLogs } from './robot-logs'
 import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import systemd from './systemd'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
 
+systemd.sendStatus('starting app')
 const config = getConfig()
 const log = createLogger('main')
 
@@ -20,10 +22,7 @@ log.debug('App config', {
   overrides: getOverrides(),
 })
 
-if (config.devtools) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('electron-debug')({ isEnabled: true, showDevTools: true })
-}
+systemd.setRemoteDevToolsEnabled(config.devtools)
 
 // hold on to references so they don't get garbage collected
 let mainWindow: BrowserWindow | null | undefined
@@ -32,8 +31,6 @@ let rendererLogger: Logger
 // prepended listener is important here to work around Electron issue
 // https://github.com/electron/electron/issues/19468#issuecomment-623529556
 app.prependOnceListener('ready', startUp)
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
@@ -42,6 +39,7 @@ app.once('window-all-closed', () => {
 
 function startUp(): void {
   log.info('Starting App')
+  systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
@@ -80,6 +78,11 @@ function startUp(): void {
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
+
+  ipcMain.once('dispatch', () => {
+    systemd.sendStatus('started')
+    systemd.ready()
+  })
 }
 
 function createRendererLogger(): Logger {
@@ -89,23 +92,4 @@ function createRendererLogger(): Logger {
   ipcMain.on('log', (_, info) => logger.log(info))
 
   return logger
-}
-
-function installDevtools(): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const devtools = require('electron-devtools-installer')
-  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
-  const install = devtools.default
-  const forceReinstall = config.reinstallDevtools
-
-  log.debug('Installing devtools')
-
-  return install(extensions, forceReinstall)
-    .then(() => log.debug('Devtools extensions installed'))
-    .catch((error: unknown) => {
-      log.warn('Failed to install devtools extensions', {
-        forceReinstall,
-        error,
-      })
-    })
 }

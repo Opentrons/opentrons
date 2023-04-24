@@ -24,6 +24,9 @@ export type AttachedPipettesByMount = {
 
 export type Pipettes = FetchPipettesResponseBody
 
+export interface GetPipettesParams {
+  refresh?: boolean
+}
 // API response types
 
 export type FetchPipettesResponsePipette =

@@ -19,7 +19,6 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwarePa
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -216,8 +215,8 @@ class Well:
         """
         Load a liquid into a well.
 
-        :param liquid: The type of liquid to load into the well.
-        :param volume: The volume of liquid to load, in µL.
+        :param Liquid liquid: The liquid to load into the well.
+        :param float volume: The volume of liquid to load, in µL.
         """
         self._core.load_liquid(
             liquid=liquid,
@@ -314,6 +313,9 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError("Labware.separate_calibration has been removed")
+
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
             " It no longer has meaning, but will always return `False`"
@@ -433,8 +435,16 @@ class Labware:
 
     def set_calibration(self, delta: Point) -> None:
         """
-        Called by save calibration in order to update the offset on the object.
+        An internal, deprecated method used for updating the offset on the object.
+
+        .. deprecated:: 2.14
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.set_calibration() is not supported when apiLevel is 2.14 or higher."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
         self._core.set_calibration(delta)
 
     @requires_version(2, 12)
@@ -748,7 +758,6 @@ class Labware:
 
         return self._wells_by_name[well_name] if well_name is not None else None
 
-    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def use_tips(self, start_well: Well, num_channels: int = 1) -> None:
         """
         Removes tips from the tip tracker.
@@ -768,12 +777,23 @@ class Labware:
         :type start_well: :py:class:`.Well`
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
-        """
-        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
 
+        .. deprecated:: 2.14
+            Modification of tip tracking state outside :py:meth:`.reset` has been deprecated.
+        """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.use_tips has been deprecated."
+                " To modify tip state, use Labware.reset"
+            )
+
+        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
         fail_if_full = self._api_version < APIVersion(2, 2)
 
-        self._core.get_tip_tracker().use_tips(
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        cast(LegacyLabwareCore, self._core).get_tip_tracker().use_tips(
             start_well=start_well._core,
             num_channels=num_channels,
             fail_if_full=fail_if_full,
@@ -790,7 +810,6 @@ class Labware:
     def __hash__(self) -> int:
         return hash((self._core, self._api_version))
 
-    # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
         Find the best well to drop a tip in.
@@ -802,10 +821,25 @@ class Labware:
                          column
         :type num_tips: int
         :return: The :py:class:`.Well` meeting the target criteria, or ``None``
+
+        .. versionchanged:: 2.14
+            This method has been removed.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.previous_tip is unsupported in this API version."
+            )
+
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        well_core = (
+            cast(LegacyLabwareCore, self._core)
+            .get_tip_tracker()
+            .previous_tip(num_tips=num_tips)
+        )
         return self._wells_by_name[well_core.get_name()] if well_core else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
@@ -829,16 +863,34 @@ class Labware:
         :type start_well: :py:class:`.Well`
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
+
+        .. versionchanged:: 2.14
+            This method has been removed. Use :py:meth:`.reset` instead.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.return_tips() is unsupported in this API version."
+                " Use Labware.reset() instead."
+            )
+
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
-        self._core.get_tip_tracker().return_tips(
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyLabwareCore)
+        cast(LegacyLabwareCore, self._core).get_tip_tracker().return_tips(
             start_well=start_well._core, num_channels=num_channels
         )
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tiprack."""
+        """Reset all tips in a tip rack.
+
+        .. versionchanged:: 2.14
+            This method will raise an exception if you call it on a labware that isn't
+            a tip rack. Formerly, it would do nothing.
+        """
         self._core.reset_tips()
 
 
@@ -922,7 +974,7 @@ def load_from_definition(
     :param api_level: the API version to set for the loaded labware
                       instance. The :py:class:`.Labware` will
                       conform to this level. If not specified,
-                      defaults to ``MAX_SUPPORTED_VERSION``.
+                      defaults to ``APIVersion(2, 13)``.
     """
     return Labware(
         core=LegacyLabwareCore(
@@ -930,7 +982,7 @@ def load_from_definition(
             parent=parent,
             label=label,
         ),
-        api_version=api_level or MAX_SUPPORTED_VERSION,
+        api_version=api_level or APIVersion(2, 13),
         protocol_core=None,  # type: ignore[arg-type]
         core_map=None,  # type: ignore[arg-type]
     )
@@ -973,7 +1025,7 @@ def load(
     :param api_level: the API version to set for the loaded labware
                       instance. The :py:class:`.Labware` will
                       conform to this level. If not specified,
-                      defaults to ``MAX_SUPPORTED_VERSION``.
+                      defaults to ``APIVersion(2, 13)``.
     """
     definition = get_labware_definition(
         load_name,

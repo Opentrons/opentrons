@@ -1,3 +1,5 @@
+:og:description: A comprehensive reference of classes and methods that make up the Opentrons Python Protocol API.
+
 .. _protocol-api-reference:
 
 API Version 2 Reference
@@ -11,7 +13,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, _hw_manager, cleanup, clear_commands, commands
+   :exclude-members: location_cache, cleanup, clear_commands, commands, move_labware
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
@@ -23,9 +25,13 @@ Protocols and Instruments
 
 Labware and Wells
 -----------------
-.. automodule:: opentrons.protocol_api.labware
+.. autoclass:: opentrons.protocol_api.Labware
    :members:
-   :exclude-members: _depth, _width, _length
+   :exclude-members: next_tip, use_tips, previous_tip, return_tips
+
+.. autoclass:: opentrons.protocol_api.Well
+   :members:
+   :exclude-members: geometry
 
 .. _protocol-api-modules:
 

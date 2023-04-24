@@ -2,8 +2,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useInterval } from '@opentrons/components'
-
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
 import { Portal } from '../../../App/portal'
@@ -23,8 +21,6 @@ interface TempSelectNetworkProps {
   robotName: string
   isRobotBusy: boolean
 }
-
-const LIST_REFRESH_MS = 10000
 
 export const SelectNetwork = ({
   robotName,
@@ -56,12 +52,6 @@ export const SelectNetwork = ({
       setChangeState({ ...changeState, ssid: options.ssid })
     }
   }
-
-  useInterval(
-    () => dispatch(Networking.fetchWifiList(robotName)),
-    LIST_REFRESH_MS,
-    true
-  )
 
   React.useEffect(() => {
     // if we're connecting to a network, ensure we get the info needed to

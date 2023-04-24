@@ -317,7 +317,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
-                self._state.queued_command_ids.clear()
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -395,17 +394,25 @@ class CommandView(HasState[CommandState]):
     ) -> CommandSlice:
         """Get a subset of commands around a given cursor.
 
-        If the cursor is omitted, return the tail of `length` of the collection.
+        If the cursor is omitted, a cursor will be selected automatically
+        based on the currently running or most recently executed command."
         """
         # TODO(mc, 2022-01-31): this is not the most performant way to implement
         # this; if this becomes a problem, change or the underlying data structure
         # to something that isn't just an OrderedDict
         all_command_ids = self._state.all_command_ids
         commands_by_id = self._state.commands_by_id
+        running_command_id = self._state.running_command_id
+        queued_command_ids = self._state.queued_command_ids
         total_length = len(all_command_ids)
 
         if cursor is None:
-            cursor = total_length - length
+            if running_command_id is not None:
+                cursor = commands_by_id[running_command_id].index
+            elif len(queued_command_ids) > 0:
+                cursor = commands_by_id[queued_command_ids.head()].index - 1
+            else:
+                cursor = total_length - length
 
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
@@ -441,7 +448,7 @@ class CommandView(HasState[CommandState]):
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
         for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
-            if self.get_is_complete(cid):
+            if self.get_command_is_final(cid):
                 entry = self._state.commands_by_id[cid]
                 return CurrentCommand(
                     command_id=entry.command.id,
@@ -452,27 +459,27 @@ class CommandView(HasState[CommandState]):
 
         return None
 
-    def get_next_queued(self) -> Optional[str]:
+    def get_next_to_execute(self) -> Optional[str]:
         """Return the next command in line to be executed.
 
         Returns:
             The ID of the earliest queued command, if any.
 
         Raises:
-            RunStoppedError: The engine is currently stopped, so
-                there are not queued commands.
+            RunStoppedError: The engine is currently stopped or stopping,
+                so it will never run any more commands.
         """
         if self._state.run_result:
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = next(iter(self._state.queued_setup_command_ids), None)
+        next_setup_cmd = self._state.queued_setup_command_ids.head(None)
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-            return next(iter(self._state.queued_command_ids), None)
+            return self._state.queued_command_ids.head(None)
 
         # otherwise we've got nothing to do
         return None
@@ -502,31 +509,43 @@ class CommandView(HasState[CommandState]):
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
-    def get_is_complete(self, command_id: str) -> bool:
-        """Get whether a given command is completed.
+    def get_command_is_final(self, command_id: str) -> bool:
+        """Get whether a given command has reached its final `status`.
 
-        A command is "completed" if one of the following is true:
+        This happens when one of the following is true:
 
-        - Its status is CommandStatus.SUCCEEDED
-        - Its status is CommandStatus.FAILED
+        - Its status is `CommandStatus.SUCCEEDED`.
+        - Its status is `CommandStatus.FAILED`.
+        - Its status is `CommandStatus.QUEUED` but the run has been requested to stop,
+          so the run will never reach it.
 
         Arguments:
             command_id: Command to check.
         """
         status = self.get(command_id).status
 
-        return status == CommandStatus.SUCCEEDED or status == CommandStatus.FAILED
+        return (
+            status == CommandStatus.SUCCEEDED
+            or status == CommandStatus.FAILED
+            or (status == CommandStatus.QUEUED and self._state.run_result is not None)
+        )
 
-    def get_all_complete(self) -> bool:
-        """Get whether all added commands have completed.
+    def get_all_commands_final(self) -> bool:
+        """Get whether all commands added so far have reached their final `status`.
+
+        See `get_command_is_final()`.
 
         Raises:
-            CommandExecutionFailedError: if any added command failed.
+            CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
+            `setup`.
         """
         no_command_running = self._state.running_command_id is None
-        no_command_queued = len(self._state.queued_command_ids) == 0
+        no_command_to_execute = (
+            self._state.run_result is not None
+            or len(self._state.queued_command_ids) == 0
+        )
 
-        if no_command_running and no_command_queued:
+        if no_command_running and no_command_to_execute:
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
@@ -534,13 +553,6 @@ class CommandView(HasState[CommandState]):
             return True
         else:
             return False
-
-    def get_stop_requested(self) -> bool:
-        """Get whether an engine stop has been requested.
-
-        A command may still be executing while the engine is stopping.
-        """
-        return self._state.run_result is not None
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
@@ -566,7 +578,7 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
-        if self.get_stop_requested():
+        if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):

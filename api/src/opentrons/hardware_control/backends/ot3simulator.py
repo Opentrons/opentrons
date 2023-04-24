@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import (
-    Callable,
     Dict,
     List,
     Optional,
@@ -16,6 +15,7 @@ from typing import (
     Set,
     Union,
     Mapping,
+    Iterator,
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
@@ -31,9 +31,14 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_tip_action_group,
     PipetteAction,
+    NODEID_SUBSYSTEM,
 )
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    FirmwareTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
@@ -43,6 +48,7 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
+    InstrumentFWInfo,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
@@ -50,8 +56,11 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     MotorStatus,
     PipetteSubType,
+    UpdateStatus,
+    OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
@@ -119,6 +128,8 @@ class OT3Simulator:
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
         self._update_required = False
+        self._initialized = False
+        self._lights = {"button": False, "rails": False}
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -162,6 +173,15 @@ class OT3Simulator:
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     @property
+    def initialized(self) -> bool:
+        """True when the hardware controller has initialized and is ready."""
+        return self._initialized
+
+    @initialized.setter
+    def initialized(self, value: bool) -> None:
+        self._initialized = value
+
+    @property
     def board_revision(self) -> BoardRevision:
         """Get the board revision"""
         return BoardRevision.UNKNOWN
@@ -194,10 +214,15 @@ class OT3Simulator:
     @ensure_yield
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
-        # Simulate condition at boot, status would not be ok
-        self._motor_status.update(
-            (node, MotorStatus(False, False)) for node in self._present_nodes
-        )
+        if not self._motor_status:
+            # Simulate condition at boot, status would not be ok
+            self._motor_status.update(
+                (node, MotorStatus(False, False)) for node in self._present_nodes
+            )
+        else:
+            self._motor_status.update(
+                (node, MotorStatus(True, True)) for node in self._present_nodes
+            )
 
     @ensure_yield
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
@@ -205,24 +230,51 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def check_ready_for_movement(self, axes: Sequence[OT3Axis]) -> bool:
-        get_stat: Callable[
-            [Sequence[OT3Axis]], List[Optional[MotorStatus]]
-        ] = lambda ax: [self._motor_status.get(axis_to_node(a)) for a in ax]
+    def _get_motor_status(
+        self, ax: Sequence[OT3Axis]
+    ) -> Iterator[Optional[MotorStatus]]:
+        return (self._motor_status.get(axis_to_node(a)) for a in ax)
+
+    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
-            for status in get_stat(axes)
+            for status in self._get_motor_status(axes)
         )
 
-    @ensure_yield
+    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
+        """If any of the encoder statuses is ok, parking can proceed."""
+        return all(
+            isinstance(status, MotorStatus) and status.encoder_ok
+            for status in self._get_motor_status(axes)
+        )
+
     async def update_position(self) -> OT3AxisMap[float]:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
-    @ensure_yield
     async def update_encoder_position(self) -> OT3AxisMap[float]:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
+
+    @ensure_yield
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        max_z_distance: float,
+        mount_speed: float,
+        plunger_speed: float,
+        threshold_pascals: float,
+        log_pressure: bool = True,
+        auto_zero_sensor: bool = True,
+        num_baseline_reads: int = 10,
+        sensor_id: SensorId = SensorId.S0,
+    ) -> None:
+
+        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        pos = self._position
+        pos[head_node] = max_z_distance - 2
+        self._position.update(pos)
+        self._encoder_position.update(pos)
 
     @ensure_yield
     async def move(
@@ -261,24 +313,7 @@ class OT3Simulator:
         else:
             homed = list(self._position.keys())
         for h in homed:
-            self._motor_status[h] = MotorStatus(True, True)
-        return axis_convert(self._position, 0.0)
-
-    @ensure_yield
-    async def fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        """Fast home axes.
-
-        Args:
-            axes: List of axes to home.
-            margin: Margin
-
-        Returns:
-            New position.
-        """
-        homed = [axis_to_node(a) for a in axes] if axes else self._position.keys()
-        for h in homed:
+            self._position[h] = self._get_home_position()[h]
             self._motor_status[h] = MotorStatus(True, True)
         return axis_convert(self._position, 0.0)
 
@@ -303,6 +338,7 @@ class OT3Simulator:
         encoder_position_um: int,
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
+        self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     @ensure_yield
     async def tip_action(
@@ -353,7 +389,7 @@ class OT3Simulator:
             raise RuntimeError(
                 f"mount {mount.name} requested a {expected_instr} which is not supported on the OT3"
             )
-        if found_model and expected_instr and (expected_instr != found_model):
+        if found_model and expected_instr and (expected_instr not in found_model):
             if self._strict_attached:
                 raise RuntimeError(
                     "mount {}: expected instrument {} but got {}".format(
@@ -451,16 +487,14 @@ class OT3Simulator:
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
-            OT3Axis.G: phony_bounds,
         }
 
-    def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
-        return {ax: bound[boundary] for ax, bound in self.axis_bounds.items()}
-
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> Dict[OT3SubSystem, int]:
         """Get the firmware version."""
-        return None
+        return {
+            NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
+        }
 
     @property
     def update_required(self) -> bool:
@@ -472,13 +506,22 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
+    def get_instrument_update(
+        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
+    ) -> InstrumentFWInfo:
+        return InstrumentFWInfo(mount, False, 0, 0)
+
+    def get_update_progress(self) -> Set[UpdateStatus]:
+        return set()
+
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[NodeId]] = None,
-    ) -> None:
+        nodes: Optional[Set[FirmwareTarget]] = None,
+        force: bool = False,
+    ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        return None
+        yield set()
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
@@ -494,13 +537,17 @@ class OT3Simulator:
         """Engage axes."""
         return None
 
-    def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
+    @ensure_yield
+    async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
-        return None
+        # Simulate how the real driver does this - there's no button so it's always false
+        if rails is not None:
+            self._lights["rails"] = rails
 
-    def get_lights(self) -> Dict[str, bool]:
+    @ensure_yield
+    async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
-        return {}
+        return self._lights
 
     def pause(self) -> None:
         """Pause the controller activity."""
@@ -512,11 +559,6 @@ class OT3Simulator:
 
     @ensure_yield
     async def halt(self) -> None:
-        """Halt the motors."""
-        return None
-
-    @ensure_yield
-    async def hard_halt(self) -> None:
         """Halt the motors."""
         return None
 
@@ -592,3 +634,11 @@ class OT3Simulator:
     ) -> List[float]:
         self._position[axis_to_node(moving)] += distance_mm
         return []
+
+    @ensure_yield
+    async def connect_usb_to_rear_panel(self) -> None:
+        """Connect to rear panel over usb."""
+        return None
+
+    def status_bar_interface(self) -> status_bar.StatusBar:
+        return status_bar.StatusBar(None)

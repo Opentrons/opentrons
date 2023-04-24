@@ -1,15 +1,14 @@
 import {
-  FIXED_TRASH_ID,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
-  SetupRunTimeCommand,
-  SetupCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+  CreateCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { SetupRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
@@ -17,12 +16,10 @@ import type {
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 type LPCPrepCommand =
   | HomeCreateCommand
   | SetupRunTimeCommand
-  | DropTipCreateCommand
   | TCOpenLidCreateCommand
   | HeaterShakerDeactivateShakerCreateCommand
   | HeaterShakerCloseLatchCreateCommand
@@ -30,14 +27,16 @@ type LPCPrepCommand =
 export function getPrepCommands(
   protocolData: CompletedProtocolAnalysis
 ): LPCPrepCommand[] {
-  let dropTipCommands: DropTipCreateCommand[] = []
   // load commands come from the protocol resource
   const loadCommands: LPCPrepCommand[] =
     protocolData.commands
       .filter(isLoadCommand)
       .reduce<LPCPrepCommand[]>((acc, command) => {
-        if (command.commandType === 'loadPipette') {
-          const pipetteId = command.result?.pipetteId
+        if (
+          command.commandType === 'loadPipette' &&
+          command.result?.pipetteId != null
+        ) {
+          const { pipetteId } = command.result
           const loadWithPipetteId = {
             ...command,
             params: {
@@ -45,17 +44,11 @@ export function getPrepCommands(
               pipetteId,
             },
           }
-          const dropTipToBeSafe = {
-            commandType: 'dropTip' as const,
-            params: {
-              pipetteId: pipetteId,
-              labwareId: FIXED_TRASH_ID,
-              wellName: 'A1',
-            },
-          }
-          dropTipCommands = [...dropTipCommands, dropTipToBeSafe]
           return [...acc, loadWithPipetteId]
-        } else if (command.commandType === 'loadLabware') {
+        } else if (
+          command.commandType === 'loadLabware' &&
+          command.result?.labwareId != null
+        ) {
           // load all labware off-deck so that LPC can move them on individually later
           return [
             ...acc,
@@ -70,7 +63,10 @@ export function getPrepCommands(
               },
             },
           ]
-        } else if (command.commandType === 'loadModule') {
+        } else if (
+          command.commandType === 'loadModule' &&
+          command.result?.moduleId != null
+        ) {
           return [
             ...acc,
             {
@@ -122,24 +118,16 @@ export function getPrepCommands(
     params: {},
   }
   // prepCommands will be run when a user starts LPC
-  return [
-    ...loadCommands,
-    ...TCCommands,
-    ...HSCommands,
-    homeCommand,
-    ...dropTipCommands,
-  ]
+  return [...loadCommands, ...TCCommands, ...HSCommands, homeCommand]
 }
 
 function isLoadCommand(
   command: RunTimeCommand
 ): command is SetupRunTimeCommand {
-  const loadCommands: Array<SetupCreateCommand['commandType']> = [
+  const loadCommands: Array<CreateCommand['commandType']> = [
     'loadLabware',
-    'loadLiquid',
     'loadModule',
     'loadPipette',
   ]
-  // @ts-expect-error SetupCommand is more specific than Command, but the whole point of this util :)
   return loadCommands.includes(command.commandType)
 }

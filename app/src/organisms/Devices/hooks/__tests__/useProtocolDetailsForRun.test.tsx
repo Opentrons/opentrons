@@ -2,8 +2,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
-import { schemaV6Adapter } from '@opentrons/shared-data'
 import {
   useProtocolAnalysesQuery,
   useProtocolQuery,
@@ -15,19 +13,7 @@ import { useProtocolDetailsForRun } from '..'
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
-import type { LegacySchemaAdapterOutput } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
-  return {
-    ...actualSharedData,
-    schemaV6Adapter: jest.fn(),
-  }
-})
-
-const mockSchemaV6Adapter = schemaV6Adapter as jest.MockedFunction<
-  typeof schemaV6Adapter
->
 jest.mock('@opentrons/react-api-client')
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
@@ -48,8 +34,6 @@ const PROTOCOL_RESPONSE = {
     key: 'fakeProtocolKey',
   },
 } as Protocol
-
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as LegacySchemaAdapterOutput
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
@@ -102,14 +86,11 @@ describe('useProtocolDetailsForRun hook', () => {
         data: { data: [PROTOCOL_ANALYSIS as any] },
       } as UseQueryResult<ProtocolAnalyses>)
 
-    when(mockSchemaV6Adapter)
-      .calledWith(PROTOCOL_ANALYSIS)
-      .mockReturnValue(simpleV6Protocol)
-
     const { result } = renderHook(() => useProtocolDetailsForRun(RUN_ID_2))
+
     expect(result.current).toStrictEqual({
       displayName: 'fake protocol',
-      protocolData: simpleV6Protocol,
+      protocolData: { id: 'fake analysis', status: 'completed', labware: [] },
       protocolKey: 'fakeProtocolKey',
       isProtocolAnalyzing: false,
       robotType: 'OT-2 Standard',

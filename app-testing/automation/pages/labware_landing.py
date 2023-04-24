@@ -1,4 +1,6 @@
 """Model for the Labware Landing page that displays labware info for the app."""
+from typing import Optional
+
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -109,24 +111,24 @@ class LabwareLanding:
         )
         return self.base.clickable_wrapper(header, 2)
 
-    def get_success_toast_message(self) -> WebElement:
+    def get_success_toast_message(self, filename: str = "sample_labware.json") -> Optional[WebElement]:
         """Get the success toast message after an invalid labware definition is uploaded."""
         header: Element = Element(
-            (By.XPATH, "//p[contains(text(),'sample_labware.json imported.')]"),
+            (By.XPATH, f"//p[contains(text(),'{filename} imported.')]"),
             "the success toast message after an invalid labware definition is uploaded",
         )
-        return self.base.clickable_wrapper(header, 2)
+        return self.base.clickable_wrapper_safe(header, 2)
 
-    def get_duplicate_error_toast_message(self) -> WebElement:
+    def get_duplicate_error_toast_message(self, filename: str = "sample_labware.json") -> Optional[WebElement]:
         """Get the duplicate error toast message after an invalid labware definition is uploaded."""
         header: Element = Element(
             (
                 By.XPATH,
-                "//p[contains(text(),'sample_labware.json. Duplicate labware definition')]",
+                f"//p[contains(text(),'{filename}. Duplicate labware definition')]",
             ),
             "the duplicate error toast message after an invalid labware definition is uploaded",
         )
-        return self.base.clickable_wrapper(header, 2)
+        return self.base.clickable_wrapper_safe(header, 2)
 
     open_labware_creator: Element = Element(
         (By.LINK_TEXT, "Open Labware Creator"),

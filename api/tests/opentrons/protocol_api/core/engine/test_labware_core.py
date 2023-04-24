@@ -7,6 +7,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
     LabwareParameters as LabwareParamsDict,
+    LabwareUri,
 )
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -195,7 +196,7 @@ def test_get_uri(
     """It should get a labware's URI from the core."""
     decoy.when(
         mock_engine_client.state.labware.get_definition_uri("cool-labware")
-    ).then_return("great/uri/42")
+    ).then_return(LabwareUri("great/uri/42"))
 
     result = subject.get_uri()
 
@@ -222,12 +223,41 @@ def test_get_next_tip(
     assert result == "A2"
 
 
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    ],
+)
 def test_reset_tips(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
     """It should reset the tip state of a labware."""
     subject.reset_tips()
     decoy.verify(mock_engine_client.reset_tips(labware_id="cool-labware"), times=1)
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(isTiprack=False),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+                displayName="Cool Display Name"
+            ),
+        )
+    ],
+)
+def test_reset_tips_raises_if_not_tip_rack(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should raise an exception if the labware isn't a tip rack."""
+    with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
+        subject.reset_tips()
 
 
 def test_get_tip_length(

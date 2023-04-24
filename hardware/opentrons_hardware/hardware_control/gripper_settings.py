@@ -12,6 +12,7 @@ from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     SetBrushedMotorVrefRequest,
     SetBrushedMotorPwmRequest,
+    SetGripperErrorTolerance,
     GripperGripRequest,
     GripperHomeRequest,
     AddBrushedLinearMoveRequest,
@@ -69,6 +70,26 @@ async def set_pwm_param(
     )
     if error != ErrorCode.ok:
         log.error(f"recieved error trying to set gripper pwm {str(error)}")
+
+
+async def set_error_tolerance(
+    can_messenger: CanMessenger, max_pos_error: float, max_unwanted_movement: float
+) -> None:
+    """Set the error tolerance for gripper jaw."""
+    error = await can_messenger.ensure_send(
+        node_id=NodeId.gripper_g,
+        message=SetGripperErrorTolerance(
+            payload=payloads.GripperErrorTolerancePayload(
+                max_pos_error_mm=UInt32Field(int(max_pos_error * (2**16))),
+                max_unwanted_movement_mm=UInt32Field(
+                    int(max_unwanted_movement * (2**16))
+                ),
+            )
+        ),
+        expected_nodes=[NodeId.gripper_g],
+    )
+    if error != ErrorCode.ok:
+        log.error(f"recieved error trying to set gripper error tolerance {str(error)}")
 
 
 async def get_gripper_jaw_motor_param(

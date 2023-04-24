@@ -7,12 +7,12 @@ import {
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_FLEX_END,
+  AlertPrimaryButton,
   Link,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: React.MouseEventHandler<HTMLAnchorElement> | undefined

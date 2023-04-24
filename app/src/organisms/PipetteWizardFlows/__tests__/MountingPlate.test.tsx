@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -30,11 +31,12 @@ describe('MountingPlate', () => {
   let props: React.ComponentProps<typeof MountingPlate>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve()),
       runId: RUN_ID_1,
       attachedPipettes: { left: mockPipette, right: null },
       flowType: FLOWS.ATTACH,
@@ -42,6 +44,7 @@ describe('MountingPlate', () => {
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', () => {
@@ -59,7 +62,7 @@ describe('MountingPlate', () => {
     expect(props.goBack).toHaveBeenCalled()
   })
 
-  it('returns the correct information, buttons work as expected for detach flow', () => {
+  it('returns the correct information, buttons work as expected for detach flow', async () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -72,7 +75,20 @@ describe('MountingPlate', () => {
     getByAltText('Detach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: {
+            mount: RIGHT,
+          },
+        },
+      ],
+      false
+    )
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

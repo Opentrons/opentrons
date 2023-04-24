@@ -5,6 +5,7 @@ from dataclasses import replace
 import logging
 from collections import OrderedDict
 from typing import (
+    AsyncIterator,
     cast,
     Callable,
     Dict,
@@ -15,6 +16,10 @@ from typing import (
     Set,
     Any,
     TypeVar,
+    Tuple,
+)
+from opentrons.hardware_control.modules.module_calibration import (
+    ModuleCalibrationOffset,
 )
 
 
@@ -30,24 +35,24 @@ from opentrons.config.types import (
     OT3Config,
     GantryLoad,
     CapacitivePassSettings,
+    LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
+    Move,
     MoveManager,
     MoveTarget,
     ZeroLengthMoveError,
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
-from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
 from .instruments.ot3.pipette import (
-    Pipette,
     load_from_config_and_check_skip,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
 from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -56,6 +61,10 @@ from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
+    axis_convert,
+    mount_from_subsystem,
+    sub_system_to_node_id,
+    subsystem_from_mount,
 )
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
@@ -69,15 +78,23 @@ from .types import (
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
+    InstrumentUpdateStatus,
     MotionChecks,
+    OT3SubSystem,
     PipetteSubType,
     PauseType,
     OT3Axis,
+    OT3AxisKind,
     OT3Mount,
     OT3AxisMap,
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
+    EarlyLiquidSenseTrigger,
+    LiquidNotFound,
+    UpdateState,
+    UpdateStatus,
+    StatusBarState,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -123,6 +140,10 @@ from .dev_types import (
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
+
+from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
+
+from .status_bar_state import StatusBarStateController
 
 mod_log = logging.getLogger(__name__)
 
@@ -173,7 +194,7 @@ class OT3API(
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: OT3AxisMap[float] = {}
-        self._encoder_current_position: OT3AxisMap[float] = {}
+        self._encoder_position: OT3AxisMap[float] = {}
 
         self._last_moved_mount: Optional[OT3Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -185,11 +206,14 @@ class OT3API(
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager()
         self._transforms = build_ot3_transforms(self._config)
-        self._gantry_load = GantryLoad.NONE
+        self._gantry_load = GantryLoad.LOW_THROUGHPUT
         self._move_manager = MoveManager(
             constraints=get_system_constraints(
                 self._config.motion_settings, self._gantry_load
             )
+        )
+        self._status_bar_controller = StatusBarStateController(
+            self._backend.status_bar_interface()
         )
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
@@ -242,6 +266,15 @@ class OT3API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
+    def _deck_from_machine(
+        self, machine_pos: Dict[OT3Axis, float]
+    ) -> Dict[OT3Axis, float]:
+        return deck_from_machine(
+            machine_pos,
+            self._transforms.deck_calibration.attitude,
+            self._transforms.carriage_offset,
+        )
+
     @classmethod
     async def build_hardware_controller(
         cls,
@@ -252,6 +285,8 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        use_usb_bus: bool = False,
+        update_firmware: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -259,14 +294,34 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
-        backend = await OT3Controller.build(checked_config)
+        backend = await OT3Controller.build(
+            checked_config, use_usb_bus, check_updates=update_firmware
+        )
+
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
-        await api_instance.cache_instruments()
+        await api_instance._cache_instruments()
+
+        await api_instance.set_status_bar_state(StatusBarState.IDLE)
+
+        # check for and start firmware updates if required
+        if update_firmware:
+            mod_log.info("Checking for firmware updates")
+            async for progress in api_instance.update_firmware():
+                for update in progress:
+                    if update.state == UpdateState.updating:
+                        mod_log.info(update)
+            mod_log.info("Done with firmware updates")
+
+        await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
+        door_state = await backend.door_state()
+        api_instance._update_door_state(door_state)
+        backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
+        backend.initialized = True
         return api_instance
 
     @classmethod
@@ -339,10 +394,11 @@ class OT3API(
         Return the firmware version of the connected hardware.
         """
         from_backend = self._backend.fw_version
-        if from_backend is None:
+        uniques = set(version for version in from_backend.values())
+        if not from_backend:
             return "unknown"
         else:
-            return from_backend
+            return ", ".join(str(version) for version in uniques)
 
     @property
     def fw_version(self) -> str:
@@ -352,17 +408,92 @@ class OT3API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    def _get_pipette_subtypes(self) -> Dict[OT3Mount, PipetteSubType]:
+        """Get attached pipette subtypes.
+
+        The PipetteSubType is a direct map of PipetteChannelType (single, multi, 96).
+        This is needed because unlike the rest of the subsystems, the pipettes have different firmware that gets
+        installed based on the PipetteChannelType.
+        """
+        # Get the attached instruments so we can get determine the PipetteSubType attached.
+        pipette_subtypes: Dict[OT3Mount, PipetteSubType] = dict()
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        for mount, _ in attached_instruments.items():
+            # we can exclude the gripper here since we can use the OT3SubSystem to map to NodeId directly.
+            if self._pipette_handler.has_pipette(mount):
+                pipette = self._pipette_handler.get_pipette(mount)
+                pipette_subtypes[mount] = PipetteSubType.from_channels(pipette.channels)
+        return pipette_subtypes
+
+    def get_firmware_update_progress(self) -> Dict[OT3Mount, InstrumentUpdateStatus]:
+        """Get the update progress for instruments currently updating."""
+        progress_updates: Dict[OT3Mount, InstrumentUpdateStatus] = {}
+        instruments = {
+            OT3SubSystem.pipette_left,
+            OT3SubSystem.pipette_right,
+            OT3SubSystem.gripper,
+        }
+        for update_status in self._backend.get_update_progress():
+            # we only want instruments, this will drop core substystems
+            if update_status.subsystem in instruments:
+                mount = mount_from_subsystem(update_status.subsystem)
+                state = update_status.state
+                progress = update_status.progress
+                if not progress_updates.get(mount):
+                    progress_updates[mount] = InstrumentUpdateStatus(
+                        mount, state, progress
+                    )
+                progress_updates[mount].update(state, progress)
+        return progress_updates
+
+    async def update_instrument_firmware(
+        self, mount: Optional[OT3Mount] = None
+    ) -> None:
+        """Update the firmware on one or all instruments."""
+        # check that mount is actually attached
+        # TODO (ba, 2023-03-03) get_attached_instruments should probably return gripper as well, for now just add it
+        attached_instruments = self._pipette_handler.get_attached_instruments()
+        attached_instruments[OT3Mount.GRIPPER] = self.attached_gripper  # type: ignore
+        if mount and not attached_instruments.get(mount):
+            mod_log.debug(f"Can't update instrument, mount {mount} is not attached.")
+            return
+        mounts = {mount} if mount else set(attached_instruments)
+        subsystems = {subsystem_from_mount(mount) for mount in mounts}
+        async for update_status in self.update_firmware(subsystems):
+            mod_log.debug(update_status)
+
+    async def update_firmware(
+        self, subsystems: Optional[Set[OT3SubSystem]] = None, force: bool = False
+    ) -> AsyncIterator[Set[UpdateStatus]]:
+        """Start the firmware update for one or more subsystems and return update progress iterator."""
+        subsystems = subsystems or set()
+        targets: Set[FirmwareTarget] = set()
+        for subsystem in subsystems:
+            if subsystem is OT3SubSystem.rear_panel:
+                targets.add(USBTarget.rear_panel)
+            else:
+                targets.add(sub_system_to_node_id(subsystem))
+        # get the attached pipette subtypes so we can determine which binary to install for pipettes
+        pipettes = self._get_pipette_subtypes()
+        # start the updates and yield the progress
+        async for update_status in self._backend.update_firmware(
+            pipettes, targets, force
+        ):
+            yield update_status
+        # refresh Instrument cache
+        await self._cache_instruments()
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(
         self, button: Optional[bool] = None, rails: Optional[bool] = None
     ) -> None:
         """Control the robot lights."""
-        self._backend.set_lights(button, rails)
+        await self._backend.set_lights(button, rails)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights."""
-        return self._backend.get_lights()
+        return await self._backend.get_lights()
 
     async def identify(self, duration_s: int = 5) -> None:
         """Blink the button light to identify the robot."""
@@ -375,6 +506,9 @@ class OT3API(
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
+
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
+        await self._status_bar_controller.set_status_bar_state(state)
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -405,50 +539,14 @@ class OT3API(
             sim_model=model.value,
         )
 
-    @staticmethod
-    def _pipette_subtype_from_pipette(pipette: Pipette) -> PipetteSubType:
-        pipettes = {
-            PipetteChannelType.SINGLE_CHANNEL: PipetteSubType.pipette_single,
-            PipetteChannelType.EIGHT_CHANNEL: PipetteSubType.pipette_multi,
-            PipetteChannelType.NINETY_SIX_CHANNEL: PipetteSubType.pipette_96,
-        }
-        return pipettes[pipette.channels]
-
-    async def do_firmware_updates(self) -> None:
-        """Update all the firmware."""
-        # get the attached instruments so we can get the type of pipettes attached
-        pipettes: Dict[OT3Mount, PipetteSubType] = dict()
-        attached_instruments = self._pipette_handler.get_attached_instruments()
-        for mount, _ in attached_instruments.items():
-            if self._pipette_handler.has_pipette(mount):
-                pipette = self._pipette_handler.get_pipette(mount)
-                pipettes[mount] = self._pipette_subtype_from_pipette(pipette)
-        await self._backend.update_firmware(pipettes)
-
     def _gantry_load_from_instruments(self) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
-        right = self._pipette_handler.has_pipette(OT3Mount.RIGHT)
-        gripper = self._gripper_handler.has_gripper()
-        if left and right:
-            # Only low-throughputs can have the two-instrument case
-            return GantryLoad.TWO_LOW_THROUGHPUT
-        if right:
-            # only a low-throughput pipette can be on the right mount
-            return GantryLoad.LOW_THROUGHPUT
         if left:
-            # as good a measure as any to define low vs high throughput, though
-            # we'll want to touch this up as we get pipette definitions for HT
-            # pipettes
-            left_hw_pipette = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if left_hw_pipette.config.channels.as_int <= 8:
-                return GantryLoad.LOW_THROUGHPUT
-            else:
+            pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+            if pip.config.channels.as_int > 8:
                 return GantryLoad.HIGH_THROUGHPUT
-        if gripper:
-            # only a gripper is attached
-            return GantryLoad.GRIPPER
-        return GantryLoad.NONE
+        return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
         self,
@@ -460,12 +558,18 @@ class OT3API(
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
+
+        pipete_subtype = (
+            PipetteSubType.from_channels(config.channels) if config else None
+        )
+        fw_update_info = self._backend.get_instrument_update(mount, pipete_subtype)
         p, _ = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
             pip_offset_cal,
+            fw_update_info,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
@@ -473,11 +577,13 @@ class OT3API(
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
+        fw_update_info = self._backend.get_instrument_update(OT3Mount.GRIPPER)
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
         g = compare_gripper_config_and_check_skip(
             instrument_data,
             self._gripper_handler._gripper,
             grip_cal,
+            fw_update_info,
         )
         self._gripper_handler.gripper = g
 
@@ -496,6 +602,13 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
+        await self._cache_instruments(require)
+        await self._configure_instruments()
+
+    async def _cache_instruments(
+        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+    ) -> None:
+        """Actually cache instruments and scan network."""
         self._log.info("Updating instrument model cache")
         checked_require = {
             OT3Mount.from_mount(m): v for m, v in (require or {}).items()
@@ -529,6 +642,10 @@ class OT3API(
                 self._pipette_handler.hardware_instruments[pipette_mount] = None
 
         await self._backend.probe_network()
+        await self.refresh_positions()
+
+    async def _configure_instruments(self) -> None:
+        """Configure instruments"""
         await self._backend.update_motor_status()
         await self.set_gantry_load(self._gantry_load_from_instruments())
 
@@ -587,7 +704,7 @@ class OT3API(
 
     async def halt(self) -> None:
         """Immediately stop motion."""
-        await self._backend.hard_halt()
+        await self._backend.halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
     async def stop(self, home_after: bool = True) -> None:
@@ -632,12 +749,16 @@ class OT3API(
         """
         Home the jaw of the gripper.
         """
-        gripper = self._gripper_handler.get_gripper()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            gripper.default_home_force
-        )
-        await self._ungrip(duty_cycle=dc)
-        gripper.state = GripperJawState.HOMED_READY
+        try:
+            gripper = self._gripper_handler.get_gripper()
+            self._log.info("Homing gripper jaw.")
+            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+                gripper.default_home_force
+            )
+            await self._ungrip(duty_cycle=dc)
+            gripper.state = GripperJawState.HOMED_READY
+        except GripperNotAttachedError:
+            pass
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
@@ -668,68 +789,74 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         realmount = OT3Mount.from_mount(mount)
-        ot3_pos = await self.current_position_ot3(
-            realmount, critical_point, refresh, fail_on_not_homed
-        )
+        ot3_pos = await self.current_position_ot3(realmount, critical_point, refresh)
         return self._axis_map_from_ot3axis_map(ot3_pos)
 
     async def current_position_ot3(
         self,
         mount: OT3Mount,
         critical_point: Optional[CriticalPoint] = None,
-        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
-        # position reporting when motors are not homed
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[OT3Axis, float]:
         """Return the postion (in deck coords) of the critical point of the
         specified mount.
         """
-        z_ax = OT3Axis.by_mount(mount)
-        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
-        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
-
-        if fail_on_not_homed and (
-            not self._backend.check_ready_for_movement(position_axes)
-            or not self._current_position
-        ):
-            raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
+        if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
+            raise GripperNotAttachedError(
+                f"Cannot return position for {mount} if no gripper is attached"
             )
 
-        elif not self._current_position and not refresh:
-            raise MustHomeError("Current position is unknown; please home motors.")
-
         if refresh:
-            await self.refresh_current_position_ot3()
+            await self.refresh_positions()
+
+        position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        valid_motor = self._current_position and self._backend.check_motor_status(
+            position_axes
+        )
+        if not valid_motor:
+            raise MustHomeError(
+                f"Current position of {str(mount)} is invalid; please home motors."
+            )
+
         return self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
-    async def refresh_current_position_ot3(self) -> Dict[OT3Axis, float]:
-        """Requests the current position and updates _current_position."""
+    async def refresh_positions(self) -> None:
+        """Request and update both the motor and encoder positions from backend."""
         async with self._motion_lock:
             await self._backend.update_motor_status()
-            self._current_position = deck_from_machine(
-                await self._backend.update_position(),
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+            await self._cache_current_position()
+            await self._cache_encoder_position()
+
+    async def _cache_current_position(self) -> Dict[OT3Axis, float]:
+        """Cache current position from backend and return in absolute deck coords."""
+        self._current_position = self._deck_from_machine(
+            await self._backend.update_position()
+        )
         return self._current_position
+
+    async def _cache_encoder_position(self) -> Dict[OT3Axis, float]:
+        """Cache encoder position from backend and return in absolute deck coords."""
+        self._encoder_position = self._deck_from_machine(
+            await self._backend.update_encoder_position()
+        )
+        if self.has_gripper():
+            self._gripper_handler.set_jaw_displacement(
+                self._encoder_position[OT3Axis.G]
+            )
+        return self._encoder_position
 
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        ot3pos = await self.encoder_current_position_ot3(
-            mount, critical_point, refresh, fail_on_not_homed
-        )
+        ot3pos = await self.encoder_current_position_ot3(mount, critical_point, refresh)
         return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
     async def encoder_current_position_ot3(
@@ -737,36 +864,33 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        fail_on_not_homed: bool = False,
     ) -> Dict[OT3Axis, float]:
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        z_ax = OT3Axis.by_mount(mount)
-        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
-        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
+        if refresh:
+            await self.refresh_positions()
 
-        if fail_on_not_homed and (
-            not self._backend.check_ready_for_movement(position_axes)
-            or not self._encoder_current_position
-        ):
+        if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
+            raise GripperNotAttachedError(
+                f"Cannot return encoder position for {mount} if no gripper is attached"
+            )
+
+        position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        valid_motor = self._encoder_position and self._backend.check_encoder_status(
+            position_axes
+        )
+        if not valid_motor:
             raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
+                f"Encoder position of {str(mount)} is invalid; please home motors."
             )
-        elif not self._encoder_current_position and not refresh:
-            raise MustHomeError("Encoder position is unknown; please home motors.")
-        async with self._motion_lock:
-            self._encoder_current_position = deck_from_machine(
-                await self._backend.update_encoder_position(),
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            ot3pos = self._effector_pos_from_carriage_pos(
-                OT3Mount.from_mount(mount),
-                self._encoder_current_position,
-                critical_point,
-            )
-            return ot3pos
+
+        ot3pos = self._effector_pos_from_carriage_pos(
+            OT3Mount.from_mount(mount),
+            self._encoder_position,
+            critical_point,
+        )
+        return ot3pos
 
     def _effector_pos_from_carriage_pos(
         self,
@@ -796,8 +920,6 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
-        # position reporting when motors are not homed
         fail_on_not_homed: bool = False,
     ) -> top_types.Point:
         """Return the position of the critical point as pertains to the gantry."""
@@ -806,7 +928,6 @@ class OT3API(
             realmount,
             critical_point,
             refresh,
-            fail_on_not_homed,
         )
         return top_types.Point(
             x=cur_pos[OT3Axis.X],
@@ -826,13 +947,19 @@ class OT3API(
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
-
-        # Refresh current position
-        await self.refresh_current_position_ot3()
-
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_ready_for_movement(axes_moving):
-            await self.home(axes_moving)
+
+        # Cache current position from backend
+        await self._cache_current_position()
+        await self._cache_encoder_position()
+
+        if not self._backend.check_encoder_status(axes_moving):
+            # a moving axis has not been homed before, homing robot now
+            await self.home()
+        elif not self._backend.check_motor_status(axes_moving):
+            raise MustHomeError(
+                f"Inaccurate motor position for {str(realmount)}, please home motors."
+            )
 
         target_position = target_position_from_absolute(
             realmount,
@@ -870,28 +997,24 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
-
-        # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
-        # Having the optional arg makes the bug stick around in existing code and we
-        # really want to fix it when we're not gearing up for a release.
-        mhe = MustHomeError(
-            "Cannot make a relative move because absolute position is unknown"
-        )
-
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        if not self._backend.check_ready_for_movement([axis for axis in axes_moving]):
-            if fail_on_not_homed:
-                raise mhe
-            else:
-                await self.home(axes_moving)
-        # Refresh current position
-        position = await self.refresh_current_position_ot3()
-        target_position = target_position_from_relative(realmount, delta, position)
-        if fail_on_not_homed and not self._backend.check_ready_for_movement(
-            [axis for axis in axes_moving if axis is not None]
-        ):
-            raise mhe
+
+        if not self._backend.check_encoder_status(axes_moving):
+            await self.home()
+
+        # Cache current position from backend
+        await self._cache_current_position()
+        await self._cache_encoder_position()
+
+        if not self._backend.check_motor_status([axis for axis in axes_moving]):
+            raise MustHomeError(
+                f"Inaccurate motor position for {str(realmount)}, please home motors."
+            )
+
+        target_position = target_position_from_relative(
+            realmount, delta, self._current_position
+        )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
                 OT3Axis.from_axis(k): v for k, v in max_speeds.items()
@@ -941,6 +1064,21 @@ class OT3API(
                 # allows for safer gantry movement at minimum force
                 await self.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
+    def _build_moves(
+        self,
+        origin: Dict[OT3Axis, float],
+        target: Dict[OT3Axis, float],
+        speed: Optional[float] = None,
+    ) -> List[List[Move[OT3Axis]]]:
+        """Build move with Move Manager with machine positions."""
+        # TODO: (2022-02-10) Use actual max speed for MoveTarget
+        checked_speed = speed or 400
+        move_target = MoveTarget.build(position=target, max_speed=checked_speed)
+        _, moves = self._move_manager.plan_motion(
+            origin=origin, target_list=[move_target]
+        )
+        return moves
+
     @ExecutionManagerProvider.wait_for_running
     async def _move(
         self,
@@ -966,17 +1104,9 @@ class OT3API(
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
-        # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 400
-        self._move_manager.update_constraints(
-            get_system_constraints(self._config.motion_settings, self._gantry_load)
-        )
-        move_target = MoveTarget.build(position=machine_pos, max_speed=checked_speed)
         origin = await self._backend.update_position()
         try:
-            blended, moves = self._move_manager.plan_motion(
-                origin=origin, target_list=[move_target]
-            )
+            moves = self._build_moves(origin, machine_pos, speed)
         except ZeroLengthMoveError as zero_length_error:
             self._log.info(f"{str(zero_length_error)}, ignoring")
             return
@@ -993,19 +1123,105 @@ class OT3API(
                     moves[0],
                     MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
                 )
-                encoder_machine_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
-                self._current_position.update(target_position)
-                encoder_position = deck_from_machine(
-                    encoder_machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
+                await self._cache_current_position()
+                await self._cache_encoder_position()
+
+    async def _home_axis(self, axis: OT3Axis) -> None:
+        """
+        Perform home; base on axis motor/encoder statuses, shorten homing time
+        if possible.
+
+        1. If stepper position status is valid, move directly to the home position.
+        2. If encoder position status is valid, update position estimation.
+           If axis encoder is accurate (Zs & Ps ONLY), move directly to home position.
+           Or, if axis encoder is not accurate, move to 20mm away from home position,
+           then home.
+        3. If both stepper and encoder statuses are invalid, home full axis.
+
+        Note that when an axis is move directly to the home position, the axis limit
+        switch will not be triggered.
+        """
+
+        async def _retrieve_home_position() -> Tuple[
+            OT3AxisMap[float], OT3AxisMap[float]
+        ]:
+            origin = await self._backend.update_position()
+            target_pos = {ax: pos for ax, pos in origin.items()}
+            target_pos.update({axis: self._backend.home_position()[axis]})
+            return origin, target_pos
+
+        # G, Q should be handled in the backend through `self._home()`
+        assert axis not in [OT3Axis.G, OT3Axis.Q]
+
+        # FIXME: See https://github.com/Opentrons/opentrons/pull/11978
+        # Because of the workaround introduced above, we cannot fully trust the motor
+        # flag until the already_homed check is removed. Until then, we should only
+        # evaluate the encoder status and update motor pos as a safeguard.
+        # if self._backend.check_motor_status(
+        #     [axis]
+        # ) and self._backend.check_encoder_status([axis]):
+        #     # retrieve home position
+        #     origin, target_pos = await _retrieve_home_position()
+        #     # move directly the home position if the stepper position is valid
+        #     moves = self._build_moves(origin, target_pos)
+        #     await self._backend.move(
+        #         origin,
+        #         moves[0],
+        #         MoveStopCondition.none,
+        #     )
+        if self._backend.check_encoder_status([axis]):
+            # ensure stepper position can be updated after boot
+            await self.engage_axes([axis])
+            # update stepper position using the valid encoder position
+            await self._update_position_estimation([axis])
+            origin, target_pos = await _retrieve_home_position()
+            if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
+                axis_home_dist = self._config.safe_home_distance
+            else:
+                # FIXME: (AA 2/15/23) This is a temporary workaround because of
+                # XY encoder inaccuracy. Otherwise, we should be able to use
+                # 5.0 mm for all axes.
+                # Move to 20 mm away from the home position and then home
+                axis_home_dist = 20.0
+            if origin[axis] - target_pos[axis] > axis_home_dist:
+                target_pos[axis] += axis_home_dist
+                moves = self._build_moves(origin, target_pos)
+                await self._backend.move(
+                    origin,
+                    moves[0],
+                    MoveStopCondition.none,
                 )
-                self._encoder_current_position.update(encoder_position)
+            await self._backend.home([axis])
+        else:
+            # both stepper and encoder positions are invalid, must home
+            await self._backend.home([axis])
+
+    async def _home(self, axes: Sequence[OT3Axis]) -> None:
+        """Home one axis at a time."""
+        async with self._motion_lock:
+            for axis in axes:
+                try:
+                    if axis == OT3Axis.G:
+                        await self.home_gripper_jaw()
+                    elif axis == OT3Axis.Q:
+                        await self._backend.home([axis])
+                    else:
+                        await self._home_axis(axis)
+                except ZeroLengthMoveError:
+                    self._log.info(f"{axis} already at home position, skip homing")
+                    continue
+                except (MoveConditionNotMet, Exception):
+                    self._log.exception("Homing failed")
+                    self._current_position.clear()
+                    raise
+                else:
+                    await self._cache_current_position()
+                    await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1015,8 +1231,9 @@ class OT3API(
         Worker function to home the robot by axis or list of
         desired axes.
         """
+        # make sure current position is up-to-date
+        await self.refresh_positions()
 
-        self._reset_last_mount()
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
@@ -1024,35 +1241,9 @@ class OT3API(
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
-        async with self._motion_lock:
-            try:
-                await self._backend.home(checked_axes)
-            except MoveConditionNotMet:
-                self._log.exception("Homing failed")
-                self._current_position.clear()
-                raise
-            else:
-                machine_pos = await self._backend.update_position()
-                encoder_machine_pos = await self._backend.update_encoder_position()
-                position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._current_position.update(position)
-                encoder_position = deck_from_machine(
-                    encoder_machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
-                self._encoder_current_position.update(encoder_position)
-                if OT3Axis.G in checked_axes:
-                    try:
-                        gripper = self._gripper_handler.get_gripper()
-                        gripper.state = GripperJawState.HOMED_READY
-                        gripper.current_jaw_displacement = encoder_position[OT3Axis.G]
-                    except GripperNotAttachedError:
-                        pass
+
+        home_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
+        await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
@@ -1074,11 +1265,6 @@ class OT3API(
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
 
-    async def _fast_home(
-        self, axes: Sequence[OT3Axis], margin: float
-    ) -> OT3AxisMap[float]:
-        return await self._backend.fast_home(axes, margin)
-
     @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10
@@ -1088,14 +1274,7 @@ class OT3API(
         Works regardless of critical point or home status.
         """
         machine_ax = OT3Axis.by_mount(mount)
-
-        async with self._motion_lock:
-            machine_pos = await self._fast_home((machine_ax,), margin)
-            self._current_position = deck_from_machine(
-                machine_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
+        await self._home((machine_ax,))
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -1141,18 +1320,10 @@ class OT3API(
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_current_position[OT3Axis.G]
-            )
+            await self._cache_encoder_position()
         except Exception:
             self._log.exception(
-                f"Gripper grip failed, encoder pos: {self._encoder_current_position[OT3Axis.G]}"
+                f"Gripper grip failed, encoder pos: {self._encoder_position[OT3Axis.G]}"
             )
             raise
 
@@ -1161,15 +1332,7 @@ class OT3API(
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_current_position[OT3Axis.G]
-            )
+            await self._cache_encoder_position()
         except Exception:
             self._log.exception("Gripper home failed")
             raise
@@ -1180,27 +1343,11 @@ class OT3API(
         try:
             if not self._gripper_handler.is_valid_jaw_width(jaw_width_mm):
                 raise ValueError("Setting gripper jaw width out of bounds")
-            await self._backend.gripper_hold_jaw(
-                int(
-                    1000
-                    * (
-                        self._gripper_handler.get_gripper().config.geometry.jaw_width[
-                            "max"
-                        ]
-                        - jaw_width_mm
-                    )
-                    / 2
-                )
-            )
-            encoder_pos = await self._backend.update_encoder_position()
-            self._encoder_current_position = deck_from_machine(
-                encoder_pos,
-                self._transforms.deck_calibration.attitude,
-                self._transforms.carriage_offset,
-            )
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_current_position[OT3Axis.G]
-            )
+            gripper = self._gripper_handler.get_gripper()
+            width_max = gripper.config.geometry.jaw_width["max"]
+            jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
+            await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
+            await self._cache_encoder_position()
         except Exception:
             self._log.exception("Gripper set width failed")
             raise
@@ -1421,14 +1568,15 @@ class OT3API(
         else:
             await self._force_pick_up_tip(realmount, spec)
 
+        # we expect a stall has happened during pick up, so we want to
+        # update the motor estimation
+        await self._update_position_estimation([OT3Axis.by_mount(realmount)])
+
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
-        # Here we add in the debounce distance for the switch as
-        # a safety precaution
-        await self.retract(realmount, spec.retract_target)
 
         _add_tip_to_instrs()
 
@@ -1446,7 +1594,7 @@ class OT3API(
         instrument.current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(
-        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: int
+        self, mount: Union[top_types.Mount, OT3Mount], tip_volume: float
     ) -> None:
         instrument = self._pipette_handler.get_pipette(OT3Mount.from_mount(mount))
         self._log.info(
@@ -1456,7 +1604,7 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = True
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
@@ -1493,16 +1641,8 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-            if move.home_after:
-                machine_pos = await self._backend.fast_home(
-                    [OT3Axis.from_axis(ax) for ax in move.home_axes],
-                    move.home_after_safety_margin,
-                )
-                self._current_position = deck_from_machine(
-                    machine_pos,
-                    self._transforms.deck_calibration.attitude,
-                    self._transforms.carriage_offset,
-                )
+        if move.home_after:
+            await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
@@ -1542,6 +1682,12 @@ class OT3API(
         }
 
     @property
+    def hardware_gripper(self) -> Optional[Gripper]:
+        if not self.has_gripper():
+            return None
+        return self._gripper_handler.get_gripper()
+
+    @property
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
@@ -1571,6 +1717,22 @@ class OT3API(
         else:
             self._pipette_handler.reset_instrument(checked_mount)
 
+    def get_instrument_offset(
+        self, mount: OT3Mount
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount, None]:
+        """Get instrument calibration data."""
+        # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
+        #  PipetteDict because the dict is shared with OT2 pipettes which have
+        #  different offset type. Once we figure out if we want the calibration data
+        #  to be a part of the dict, this getter can be updated to fetch pipette offset
+        #  from the dict, or just remove this getter entirely.
+
+        if mount == OT3Mount.GRIPPER:
+            gripper_dict = self._gripper_handler.get_gripper_dict()
+            return gripper_dict["calibration_offset"] if gripper_dict else None
+        else:
+            return self._pipette_handler.get_instrument_offset(mount=mount)
+
     async def reset_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
     ) -> None:
@@ -1591,6 +1753,28 @@ class OT3API(
             return self._gripper_handler.save_instrument_offset(delta)
         else:
             return self._pipette_handler.save_instrument_offset(checked_mount, delta)
+
+    async def save_module_offset(
+        self, module_id: str, mount: OT3Mount, slot: int, offset: top_types.Point
+    ) -> Optional[ModuleCalibrationOffset]:
+        """Save a new offset for a given module."""
+        module = self._backend.module_controls.get_module_by_module_id(module_id)
+        if not module:
+            self._log.warning(f"Could not save calibration: unknown module {module_id}")
+            return None
+        # TODO (ba, 2023-03-22): gripper_id and pipette_id should probably be combined to instrument_id
+        instrument_id = None
+        if self._gripper_handler.has_gripper():
+            instrument_id = self._gripper_handler.get_gripper().gripper_id
+        elif self._pipette_handler.has_pipette(mount):
+            instrument_id = self._pipette_handler.get_pipette(mount).pipette_id
+        module_type = module.MODULE_TYPE
+        self._log.info(
+            f"Saving module offset: {offset} for module {module_type.name} {module_id}."
+        )
+        return self._backend.module_controls.save_module_offset(
+            module_type, module_id, mount, slot, offset, instrument_id
+        )
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
@@ -1662,11 +1846,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
-        carriage_pos = deck_from_machine(
-            self._backend.home_position(),
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-        )
+        carriage_pos = self._deck_from_machine(self._backend.home_position())
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )
@@ -1686,6 +1866,86 @@ class OT3API(
 
     def remove_gripper_probe(self) -> None:
         self._gripper_handler.remove_probe()
+
+    async def liquid_probe(
+        self,
+        mount: OT3Mount,
+        probe_settings: Optional[LiquidProbeSettings] = None,
+    ) -> float:
+        """Search for and return liquid level height.
+
+        This function begins by moving the mount the distance specified by starting_mount_height in the
+        LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+        reading from the pressure sensor.
+
+        If the move is completed without the specified threshold being triggered, a
+        LiquidNotFound error will be thrown.
+        If the threshold is triggered before the minimum z distance has been traveled,
+        a EarlyLiquidSenseTrigger error will be thrown.
+
+        Otherwise, the function will stop moving once the threshold is triggered,
+        and return the position of the
+        z axis in deck coordinates, as well as the encoder position, where
+        the liquid was found.
+        """
+
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        self._pipette_handler.ready_for_tip_action(
+            instrument, HardwareAction.LIQUID_PROBE
+        )
+
+        if not probe_settings:
+            probe_settings = self.config.liquid_sense
+        mount_axis = OT3Axis.by_mount(mount)
+
+        gantry_position = await self.gantry_position(mount, refresh=True)
+
+        await self.move_to(
+            mount,
+            top_types.Point(
+                x=gantry_position.x,
+                y=gantry_position.y,
+                z=probe_settings.starting_mount_height,
+            ),
+        )
+
+        if probe_settings.aspirate_while_sensing:
+            await self.home_plunger(mount)
+
+        plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
+
+        machine_pos_node_id = await self._backend.liquid_probe(
+            mount,
+            probe_settings.max_z_distance,
+            probe_settings.mount_speed,
+            (probe_settings.plunger_speed * plunger_direction),
+            probe_settings.sensor_threshold_pascals,
+            probe_settings.log_pressure,
+            probe_settings.auto_zero_sensor,
+            probe_settings.num_baseline_reads,
+        )
+        machine_pos = axis_convert(machine_pos_node_id, 0.0)
+        position = self._deck_from_machine(machine_pos)
+        z_distance_traveled = (
+            position[mount_axis] - probe_settings.starting_mount_height
+        )
+        if z_distance_traveled < probe_settings.min_z_distance:
+            min_z_travel_pos = position
+            min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
+            raise EarlyLiquidSenseTrigger(
+                triggered_at=position,
+                min_z_pos=min_z_travel_pos,
+            )
+        elif z_distance_traveled > probe_settings.max_z_distance:
+            max_z_travel_pos = position
+            max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
+            raise LiquidNotFound(
+                position=position,
+                max_z_pos=max_z_travel_pos,
+            )
+
+        return position[mount_axis]
 
     async def capacitive_probe(
         self,

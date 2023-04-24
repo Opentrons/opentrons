@@ -12,10 +12,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
+  SecondaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SecondaryButton } from '../../../atoms/buttons'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
@@ -74,11 +74,6 @@ export function RobotSettingsNetworking({
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
   useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
-
-  React.useEffect(() => {
-    dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
-  }, [robotName, dispatch])
 
   React.useEffect(() => {
     updateRobotStatus(isRobotBusy)

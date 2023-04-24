@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, List, NamedTuple, Optional, Type, Union, Mapping
+from typing import (
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Type,
+    Union,
+    Mapping,
+    cast,
+)
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -19,7 +29,6 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.common import ModuleCore, ProtocolCore
-from .core.engine import ENGINE_CORE_API_VERSION
 from .core.core_map import LoadedCoreMap
 from .core.module import (
     AbstractTemperatureModuleCore,
@@ -27,7 +36,9 @@ from .core.module import (
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
 )
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
@@ -191,7 +202,19 @@ class ProtocolContext(CommandPublisher):
                                                # 10 mm/s
                 protocol.max_speeds['X'] = None  # reset to default
 
+        .. caution::
+            This property is not yet supported on
+            :ref:`API version <v2-versioning>` 2.14 or higher.
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
+            # See https://opentrons.atlassian.net/browse/RCORE-373
+            raise APIVersionError(
+                "ProtocolContext.max_speeds is not supported at apiLevel 2.14 or higher."
+                " Use a lower apiLevel or set speeds using InstrumentContext.default_speed"
+                " or the per-method 'speed' argument."
+            )
+
         return self._core.get_max_speeds()
 
     @requires_version(2, 0)
@@ -275,18 +298,32 @@ class ProtocolContext(CommandPublisher):
         This function returns the created and initialized labware for use
         later in the protocol.
 
-        :param load_name: A string to use for looking up a labware definition
-        :param location: The slot into which to load the labware such as
-                         1 or '1'
+        :param str load_name: A string to use for looking up a labware definition.
+            You can find the ``load_name`` for any standard labware on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+
+        :param location: The slot into which to load the labware,
+            such as ``1`` or ``"1"``.
+
         :type location: int or str
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        :param str namespace: The namespace the labware definition belongs to.
-            If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition. If
-            unspecified, will use version 1.
+
+        :param str label: An optional special name to give the labware. If specified, this
+            is the name the labware will appear as in the run log and the calibration
+            view in the Opentrons app.
+
+        :param str namespace: The namespace that the labware definition belongs to.
+            If unspecified, will search both:
+
+              * ``"opentrons"``, to load standard Opentrons labware definitions.
+              * ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons standard
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
@@ -382,11 +419,13 @@ class ProtocolContext(CommandPublisher):
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+
         Other experimental params:
+
         :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its pick up location.
+                                                associated with its pick up location.
         :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
-                            associated with its drop off location.
+                                             associated with its drop off location.
         :param pick_up_offset: Offset to use when picking up labware.
         :param drop_offset: Offset to use when dropping off labware.
 
@@ -655,7 +694,16 @@ class ProtocolContext(CommandPublisher):
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
-        self._core.resume()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "A Python Protocol cannot safely resume itself after a pause."
+                " To wait automatically for a period of time, use ProtocolContext.delay()."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyProtocolCore)
+        cast(LegacyProtocolCore, self._core).resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
@@ -761,6 +809,8 @@ class ProtocolContext(CommandPublisher):
         :param str name: A human-readable name for the liquid.
         :param str description: An optional description of the liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+
+        :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
         """
         return self._core.define_liquid(
             name=name,

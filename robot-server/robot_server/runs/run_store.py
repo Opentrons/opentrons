@@ -16,7 +16,7 @@ from robot_server.persistence import run_table, action_table
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
-
+from .run_models import RunNotFoundError
 
 _CACHE_ENTRIES = 32
 
@@ -33,14 +33,6 @@ class RunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
-
-
-class RunNotFoundError(ValueError):
-    """Error raised when a given Run ID is not found in the store."""
-
-    def __init__(self, run_id: str) -> None:
-        """Initialize the error message from the missing ID."""
-        super().__init__(f"Run {run_id} was not found.")
 
 
 class CommandNotFoundError(ValueError):

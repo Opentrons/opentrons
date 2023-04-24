@@ -24,7 +24,7 @@ import {
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { useTrackEvent } from '../../../../redux/analytics'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -47,7 +47,8 @@ const HIDE_SCROLLBAR = css`
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
   const { runId } = props
-  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const protocolData = useMostRecentCompletedAnalysis(runId)
+
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     protocolData?.liquids ?? [],
     protocolData?.commands ?? []
@@ -91,7 +92,8 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
     string | null
   >(null)
-  const commands = useProtocolDetailsForRun(runId).protocolData?.commands
+  const commands = useMostRecentCompletedAnalysis(runId)?.commands
+
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands ?? [])
   const trackEvent = useTrackEvent()
 

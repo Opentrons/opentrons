@@ -47,19 +47,25 @@ import {
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 
-interface ProtocolCardProps extends StoredProtocolData {
-  handleRunProtocol: () => void
+interface ProtocolCardProps {
+  handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  storedProtocolData: StoredProtocolData
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
     handleRunProtocol,
+    handleSendProtocolToOT3,
+    storedProtocolData,
+  } = props
+  const {
     protocolKey,
     srcFileNames,
     mostRecentAnalysis,
     modified,
-  } = props
+  } = storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -93,9 +99,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         right={SPACING.spacing2}
       >
         <ProtocolOverflowMenu
-          protocolDisplayName={protocolDisplayName}
-          protocolKey={protocolKey}
           handleRunProtocol={handleRunProtocol}
+          handleSendProtocolToOT3={handleSendProtocolToOT3}
+          storedProtocolData={storedProtocolData}
         />
       </Box>
     </Box>

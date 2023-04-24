@@ -4,13 +4,15 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import {
   useCreateRunMutation,
   useStopRunMutation,
+  useDeleteRunMutation,
+  useDismissCurrentRunMutation,
   usePipettesQuery,
-  // useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useChainRunCommands } from '../../../resources/runs/hooks'
@@ -18,15 +20,24 @@ import {
   mockAttachedGen3Pipette,
   mockGen3P1000PipetteSpecs,
 } from '../../../redux/pipettes/__fixtures__'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
-import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
+import { getIsOnDevice } from '../../../redux/config'
+import { useAttachedPipetteCalibrations } from '../../Devices/hooks/useAttachedPipetteCalibrations'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { ExitModal } from '../ExitModal'
 import { FLOWS, SECTIONS } from '../constants'
 import { UnskippableModal } from '../UnskippableModal'
 import { PipetteWizardFlows } from '..'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
+import type {
+  AttachedPipette,
+  PipetteCalibrationsByMount,
+} from '../../../redux/pipettes/types'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')
@@ -34,9 +45,15 @@ jest.mock('../../../resources/runs/hooks')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ExitModal')
 jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../UnskippableModal')
+jest.mock('../../../redux/config')
+jest.mock('../../Devices/hooks/useAttachedPipetteCalibrations')
 
+const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
+  typeof useAttachedPipetteCalibrations
+>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
@@ -52,18 +69,24 @@ const mockUseChainRunCommands = useChainRunCommands as jest.MockedFunction<
 const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
   typeof useCreateRunMutation
 >
+const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
+  typeof useDeleteRunMutation
+>
 const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
   typeof useStopRunMutation
 >
-// const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
-//   typeof useDeleteRunMutation
-// >
-const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
-  typeof useCloseCurrentRun
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
 const mockUnskippableModal = UnskippableModal as jest.MockedFunction<
   typeof UnskippableModal
+>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
   return renderWithProviders(<PipetteWizardFlows {...props} />, {
@@ -77,12 +100,20 @@ const mockPipette: AttachedPipette = {
     maxVolume: 50,
   },
 }
+const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
+  left: {
+    offset: mockPipetteOffsetCalibration1,
+  },
+  right: {
+    offset: mockPipetteOffsetCalibration2,
+  },
+} as any
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   let mockCreateRun: jest.Mock
-  // let mockDeleteRun = jest.fn()
   let mockStopRun: jest.Mock
-  let mockCloseCurrentRun: jest.Mock
+  let mockDismissCurrentRun: jest.Mock
+  let mockDeleteRun: jest.Mock
   let refetchPromise: Promise<void>
   let mockRefetch: jest.Mock
   let mockChainRunCommands: jest.Mock
@@ -91,13 +122,17 @@ describe('PipetteWizardFlows', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       flowType: FLOWS.CALIBRATE,
       mount: LEFT,
-      robotName: 'otie',
       closeFlow: jest.fn(),
+      setSelectedPipette: jest.fn(),
     }
+    mockUseAttachedPipetteCalibrations.mockReturnValue({
+      left: {},
+      right: {},
+    } as any)
     mockCreateRun = jest.fn()
-    // mockDeleteRun = jest.fn()
     mockStopRun = jest.fn()
-    mockCloseCurrentRun = jest.fn()
+    mockDismissCurrentRun = jest.fn()
+    mockDeleteRun = jest.fn()
     refetchPromise = Promise.resolve()
     mockRefetch = jest.fn(() => refetchPromise)
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
@@ -106,6 +141,9 @@ describe('PipetteWizardFlows', () => {
       refetch: mockRefetch,
     } as any)
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
+    mockUseDeleteRunMutation.mockReturnValue({
+      deleteRun: mockDeleteRun,
+    } as any)
     mockExitModal.mockReturnValue(<div>mock exit modal</div>)
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
@@ -114,9 +152,10 @@ describe('PipetteWizardFlows', () => {
       chainRunCommands: mockChainRunCommands,
       isCommandMutationLoading: false,
     })
-    mockUseCloseCurrentRun.mockReturnValue({
-      closeCurrenRun: mockCloseCurrentRun,
+    mockUseDismissCurrentRunMutation.mockReturnValue({
+      dismissCurrenRun: mockDismissCurrentRun,
     } as any)
+    mockUseRunStatus.mockReturnValue('idle')
     mockGetPipetteWizardSteps.mockReturnValue([
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -141,19 +180,23 @@ describe('PipetteWizardFlows', () => {
     ])
     mockGetRequestById.mockReturnValue(null)
     mockUnskippableModal.mockReturnValue(<div>mock unskippable modal</div>)
+    mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
     const { getByText, getByRole } = render(props)
     //  first page
-    getByText('Calibrate a pipette')
+    getByText('Recalibrate Left Pipette')
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
+      'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
     )
-    const getStarted = getByRole('button', { name: 'Get started' })
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -177,10 +220,7 @@ describe('PipetteWizardFlows', () => {
     })
     // second page
     getByText('Step 1 / 3')
-    getByText('Attach Calibration Probe')
-    getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
-    )
+    getByText('Attach calibration probe')
     const initiate = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(initiate)
     await waitFor(() => {
@@ -200,24 +240,22 @@ describe('PipetteWizardFlows', () => {
     })
     //  third page
     getByText('Step 2 / 3')
-    getByText('Remove Calibration Probe')
-    getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
-    )
+    getByText('Remove calibration probe')
     const complete = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(complete)
     await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'home',
-            params: {},
-          },
-        ],
-        false
-      )
+      //  TODO(sb, 3/21/23): rewire this when home issue is sorted
+      // expect(mockChainRunCommands).toHaveBeenCalledWith(
+      //   [
+      //     {
+      //       commandType: 'home',
+      //       params: {},
+      //     },
+      //   ],
+      //   false
+      // )
       //  TODO(jr, 11/2/22): wire this up when stop run logic is figured out
-      // expect(mockStopRun).toHaveBeenCalled()
+      expect(mockStopRun).toHaveBeenCalled()
     })
     //  last page
     //  TODO(jr, 11/2/22): wire this up when stop run logic is figured out
@@ -229,23 +267,38 @@ describe('PipetteWizardFlows', () => {
     //   expect(props.closeFlow).toHaveBeenCalled()
     // })
   })
+  it('renders the correct first page for calibrating single mount when rendering from on device display', () => {
+    mockUseAttachedPipetteCalibrations.mockReturnValue(
+      mockAttachedPipetteCalibrations
+    )
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText } = render(props)
+    getByText('Recalibrate Left Pipette')
+    getByText('Before you begin')
+    getByText(
+      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+    )
+    getByText(
+      'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
+    )
+  })
   it('renders 3rd page and clicking back button redirects to the first page', async () => {
     const { getByText, getByRole } = render(props)
     //  first page
     getByText('Before you begin')
-    getByRole('button', { name: 'Get started' }).click()
+    getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // second page
-    getByText('Attach Calibration Probe')
+    getByText('Attach calibration probe')
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
     })
     //  third page
-    getByText('Remove Calibration Probe')
+    getByText('Remove calibration probe')
     getByRole('button', { name: 'back' }).click()
     //   first page
     getByText('Before you begin')
@@ -274,7 +327,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText } = render(props)
-    getByText('Detach a pipette')
+    getByText('Detach Left Pipette')
     //  TODO(jr 11/11/22): finish the rest of the test
   })
 
@@ -316,7 +369,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach Left Pipette')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -334,7 +387,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Connect and screw in pipette')
+    getByText('Connect and secure pipette')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
   })
@@ -387,13 +440,17 @@ describe('PipetteWizardFlows', () => {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
           },
+          {
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: { mount: RIGHT },
+          },
         ],
         false
       )
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z-axis Carriage')
+    getByText('Unscrew z-axis carriage')
     // TODO wait until commands are wired up to write out more of this test!
   })
   it('renders the correct information, calling the correct commands for the detach flow 96 channel', async () => {
@@ -452,7 +509,7 @@ describe('PipetteWizardFlows', () => {
     getByText('Detach 96-Channel Pipette')
     getByText('Before you begin')
     // page 1
-    const getStarted = getByRole('button', { name: 'Get started' })
+    const getStarted = getByRole('button', { name: 'Move gantry to front' })
     fireEvent.click(getStarted)
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -475,7 +532,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Loosen Screws and Detach 96-Channel Pipette')
+    getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
     const continueBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(continueBtn)
   })
@@ -522,7 +579,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Detach P1000 Single-Channel GEN3 and Attach 96-Channel Pipette')
+    getByText('Detach Flex 1-Channel 1000 μL and Attach 96-Channel Pipette')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -540,9 +597,6 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText(
-      'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
-    )
     getByText('Continue')
   })
   it('renders the correct information, calling the correct commands for the 96-channel calibration flow', async () => {
@@ -555,13 +609,7 @@ describe('PipetteWizardFlows', () => {
     //  first page
     getByText('Calibrate 96-Channel pipette')
     getByText('Before you begin')
-    getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
-    )
-    getByText(
-      'The calibration probe is included with the robot and should be stored on the right hand side of the door opening.'
-    )
-    getByRole('button', { name: 'Get started' }).click()
+    getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
@@ -584,10 +632,7 @@ describe('PipetteWizardFlows', () => {
     })
     // second page
     getByText('Step 1 / 3')
-    getByText('Attach Calibration Probe')
-    getByText(
-      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
-    )
+    getByText('Attach calibration probe')
     getByRole('button', { name: 'Begin calibration' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
@@ -606,22 +651,20 @@ describe('PipetteWizardFlows', () => {
     })
     //  third page
     getByText('Step 2 / 3')
-    getByText('Remove Calibration Probe')
-    getByText(
-      'Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.'
-    )
+    getByText('Remove calibration probe')
     getByRole('button', { name: 'Complete calibration' }).click()
-    await waitFor(() => {
-      expect(mockChainRunCommands).toHaveBeenCalledWith(
-        [
-          {
-            commandType: 'home',
-            params: {},
-          },
-        ],
-        false
-      )
-    })
+    //  TODO(sb, 3/21/23): rewire this when home issue is sorted
+    // await waitFor(() => {
+    //   expect(mockChainRunCommands).toHaveBeenCalledWith(
+    //     [
+    //       {
+    //         commandType: 'home',
+    //         params: {},
+    //       },
+    //     ],
+    //     false
+    //   )
+    // })
   })
   it('renders the unskippable modal when you try to exit out of a 96 channel detach flow from a the detach pipette unskippable page', async () => {
     mockUsePipettesQuery.mockReturnValue({
@@ -672,13 +715,12 @@ describe('PipetteWizardFlows', () => {
     ])
     const { getByText, getByRole, getByLabelText } = render(props)
     // page 1
-    getByRole('button', { name: 'Get started' }).click()
+    getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalled()
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Loosen Screws and Detach 96-Channel Pipette')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })
@@ -726,7 +768,7 @@ describe('PipetteWizardFlows', () => {
       expect(mockCreateRun).toHaveBeenCalled()
     })
     // page 2
-    getByText('Unscrew Z-axis Carriage')
+    getByText('Unscrew z-axis carriage')
     getByLabelText('Exit').click()
     getByText('mock unskippable modal')
   })

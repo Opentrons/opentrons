@@ -25,26 +25,19 @@ export interface BaseStep {
 }
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface DetachProbeStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PROBE
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface AttachProbeStep extends BaseStep {
   section: typeof SECTIONS.ATTACH_PROBE
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface ResultsStep extends BaseStep {
   section: typeof SECTIONS.RESULTS
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
+  recalibrate?: boolean
 }
 export interface MountPipetteStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_PIPETTE
@@ -69,12 +62,6 @@ export type CreateRunCommand = (
 
 export type SelectablePipettes = '96-Channel' | 'Single-Channel_and_8-Channel'
 
-export type ZAxisScrewStatus =
-  | 'detached'
-  | 'attached'
-  | 'stillAttached'
-  | 'unknown'
-
 export interface PipetteWizardStepProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
@@ -89,6 +76,6 @@ export interface PipetteWizardStepProps {
   attachedPipettes: AttachedPipettesByMount
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
-  robotName: string
   selectedPipette: SelectablePipettes
+  isOnDevice: boolean | null
 }

@@ -1,6 +1,6 @@
-"""Smoke tests for the ProtocolRunner and ProtocolEngine classes.
+"""Smoke tests for the AbstractRunner and ProtocolEngine classes.
 
-These tests construct a ProtocolRunner with a real ProtocolEngine
+These tests construct a AbstractRunner with a real ProtocolEngine
 hooked to a simulating HardwareAPI.
 
 Minimal, but valid and complete, protocol files are then loaded from
@@ -8,14 +8,11 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to check that
 everything was loaded and run as expected.
 """
-import pytest
-
 from datetime import datetime
 from decoy import matchers
 from pathlib import Path
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -25,26 +22,27 @@ from opentrons.protocol_engine import (
     ModuleDefinition,
     ModuleModel,
     commands,
+    DeckPoint,
 )
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 
-# TODO (tz, 6-17-22): API version 3.x in-development.
-# Currently parsing protocol versions less then MAX_SUPPORTED_VERSION
-@pytest.mark.xfail(strict=True)
 async def test_runner_with_python(
     python_protocol_file: Path,
     tempdeck_v1_def: ModuleDefinition,
 ) -> None:
-    """It should run a Python protocol on the ProtocolRunner."""
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[python_protocol_file],
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=protocol_source.config,
+    )
     result = await subject.run(protocol_source)
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
@@ -94,22 +92,30 @@ async def test_runner_with_python(
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(tipVolume=300.0),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0,
+            tipLength=51.83,
+            tipDiameter=5.23,
+            position=DeckPoint(x=14.38, y=74.24, z=64.69),
+        ),
     )
 
     assert expected_command in commands_result
 
 
 async def test_runner_with_json(json_protocol_file: Path) -> None:
-    """It should run a JSON protocol on the ProtocolRunner."""
+    """It should run a JSON protocol on the JsonRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[json_protocol_file],
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
+    )
     result = await subject.run(protocol_source)
+
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
@@ -147,21 +153,29 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             labwareId="labware-id",
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(tipVolume=300.0),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0,
+            tipLength=51.83,
+            tipDiameter=5.23,
+            position=DeckPoint(x=14.38, y=74.24, z=64.69),
+        ),
     )
 
     assert expected_command in commands_result
 
 
 async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> None:
-    """It should run a Python protocol on the ProtocolRunner."""
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[legacy_python_protocol_file],
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=protocol_source.config,
+    )
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
@@ -202,21 +216,25 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(tipVolume=300.0),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
+        ),
     )
 
     assert expected_command in commands_result
 
 
 async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
-    """It should run a Python protocol on the ProtocolRunner."""
+    """It should run a Python protocol on the PythonAndLegacyRunner."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
         files=[legacy_json_protocol_file],
         directory=None,
     )
 
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard", protocol_config=protocol_source.config
+    )
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
@@ -258,7 +276,9 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
-        result=commands.PickUpTipResult(tipVolume=300.0),
+        result=commands.PickUpTipResult(
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
+        ),
     )
 
     assert expected_command in commands_result

@@ -6,7 +6,11 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 
-from robot_server.app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
@@ -49,6 +53,17 @@ async def get_engine_store(
         _engine_store_accessor.set_on(app_state, engine_store)
 
     return engine_store
+
+
+async def get_protocol_run_has_been_played(
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> bool:
+    """Whether the current protocol run, if any, has been played."""
+    try:
+        protocol_run_state = engine_store.engine.state_view
+    except AssertionError:
+        return False
+    return protocol_run_state.commands.has_been_played()
 
 
 async def get_run_data_manager(

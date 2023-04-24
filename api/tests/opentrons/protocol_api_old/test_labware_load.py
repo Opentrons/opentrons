@@ -21,9 +21,9 @@ def test_load_to_slot(
     ][0]
     labware = ctx.load_labware(labware_name, "1")
 
-    assert labware._core.get_geometry().offset == types.Point(*slot_1["position"])
+    assert labware._core.get_geometry().offset == types.Point(*slot_1["position"])  # type: ignore[attr-defined]
     other = ctx.load_labware(labware_name, 2)
-    assert other._core.get_geometry().offset == types.Point(*slot_2["position"])
+    assert other._core.get_geometry().offset == types.Point(*slot_2["position"])  # type: ignore[attr-defined]
 
 
 def test_loaded(ctx: papi.ProtocolContext) -> None:

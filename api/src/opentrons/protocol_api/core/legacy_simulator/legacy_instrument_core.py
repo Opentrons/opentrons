@@ -77,6 +77,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -116,8 +117,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         volume: float,
         rate: float,
         flow_rate: float,
+        in_place: bool,
     ) -> None:
-        self.move_to(location=location, well_core=well_core)
+        if not in_place:
+            self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
         self._update_volume(self.get_current_volume() - volume)
 
@@ -125,9 +128,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self,
         location: types.Location,
         well_core: Optional[LegacyWellCore],
-        move_to_well: bool,
+        in_place: bool,
     ) -> None:
-        if move_to_well:
+        if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
         self._update_volume(0)
@@ -289,6 +292,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def get_max_volume(self) -> float:
         return self._pipette_dict["max_volume"]
+
+    def get_working_volume(self) -> float:
+        return self._pipette_dict["working_volume"]
 
     def get_current_volume(self) -> float:
         return self._pipette_dict["current_volume"]

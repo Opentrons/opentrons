@@ -22,6 +22,17 @@ log = logging.getLogger(__name__)
 # Get Tip Length Calibration
 
 
+def _conver_tip_length_model_to_dict(
+    to_dict: typing.Dict[str, v1.TipLengthModel]
+) -> typing.Dict[str, typing.Any]:
+    # This is a workaround since pydantic doesn't have a nice way to
+    # add encoders when converting to a dict.
+    dict_of_tip_lengths = {}
+    for key, item in to_dict.items():
+        dict_of_tip_lengths[key] = json.loads(item.json())
+    return dict_of_tip_lengths
+
+
 def tip_lengths_for_pipette(
     pipette_id: str,
 ) -> typing.Dict[str, v1.TipLengthModel]:
@@ -57,12 +68,12 @@ def load_tip_length_calibration(
     load_name = definition["parameters"]["loadName"]
     try:
         return tip_lengths_for_pipette(pip_id)[labware_hash]
-    except KeyError:
+    except KeyError as e:
         raise local_types.TipLengthCalNotFound(
             f"Tip length of {load_name} has not been "
             f"calibrated for this pipette: {pip_id} and cannot"
             "be loaded"
-        )
+        ) from e
 
 
 def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
@@ -127,12 +138,14 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
     :param pipette: pipette serial number
     """
     tip_lengths = tip_lengths_for_pipette(pipette_id)
+
     if tiprack in tip_lengths:
         # maybe make modify and delete same file?
         del tip_lengths[tiprack]
         tip_length_dir = config.get_tip_length_cal_path()
         if tip_lengths:
-            io.save_to_file(tip_length_dir, pipette_id, tip_lengths)
+            dict_of_tip_lengths = _conver_tip_length_model_to_dict(tip_lengths)
+            io.save_to_file(tip_length_dir, pipette_id, dict_of_tip_lengths)
         else:
             io.delete_file(tip_length_dir / f"{pipette_id}.json")
     else:
@@ -222,9 +235,5 @@ def save_tip_length_calibration(
 
     all_tip_lengths.update(tip_length_cal)
 
-    # This is a workaround since pydantic doesn't have a nice way to
-    # add encoders when converting to a dict.
-    dict_of_tip_lengths = {}
-    for key, item in all_tip_lengths.items():
-        dict_of_tip_lengths[key] = json.loads(item.json())
+    dict_of_tip_lengths = _conver_tip_length_model_to_dict(all_tip_lengths)
     io.save_to_file(tip_length_dir_path, pip_id, dict_of_tip_lengths)

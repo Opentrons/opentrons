@@ -11,7 +11,7 @@ from decoy import Decoy
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine import ProtocolEngine, commands
+from opentrons.protocol_engine import ProtocolEngine, commands, DeckPoint
 from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolEngineError
 from opentrons.protocol_engine.clients.transports import ChildThreadTransport
 
@@ -41,7 +41,7 @@ async def test_execute_command(
         labwareId="labware-id",
         wellName="A1",
     )
-    cmd_result = commands.MoveToWellResult()
+    cmd_result = commands.MoveToWellResult(position=DeckPoint(x=1, y=2, z=3))
     cmd_request = commands.MoveToWellCreate(params=cmd_data)
 
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(

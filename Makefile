@@ -16,11 +16,12 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+SERVER_UTILS_DIR := server-utils
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -141,6 +142,8 @@ push:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push
 	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
+	sleep 1
+	$(MAKE) -C $(SERVER_UTILS_DIR) push
 
 
 .PHONY: push-ot3
@@ -151,6 +154,7 @@ push-ot3:
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart-ot3
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
+	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
 	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 
@@ -184,6 +188,7 @@ test-py-windows:
 test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
+	$(MAKE) -C $(SERVER_UTILS_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
 	$(MAKE) -C $(USB_BRIDGE_DIR) test
@@ -254,8 +259,4 @@ circular-dependencies-js:
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
-
-.PHONY: bump
-bump:
-	@echo "Bumping versions"
-	yarn lerna version $(or $(version),prerelease)
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts

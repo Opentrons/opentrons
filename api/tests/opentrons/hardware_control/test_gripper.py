@@ -4,7 +4,7 @@ import pytest
 from opentrons.types import Point
 from opentrons.calibration_storage import types as cal_types
 from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calibration
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, InstrumentFWInfo, OT3Mount
 from opentrons.config import gripper_config
 from opentrons_shared_data.gripper import GripperModel
 
@@ -22,8 +22,14 @@ def fake_offset():
 
 
 @pytest.mark.ot3_only
-def test_id_get_added_to_dict(fake_offset):
-    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+@pytest.fixture
+def fake_fw_info():
+    return InstrumentFWInfo(OT3Mount.GRIPPER, False, 0, 0)
+
+
+@pytest.mark.ot3_only
+def test_id_get_added_to_dict(fake_offset, fake_fw_info):
+    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123", fake_fw_info)
     assert gripr.as_dict()["gripper_id"] == "fakeid123"
 
 
@@ -48,14 +54,15 @@ def test_critical_point(
     override: Optional[CriticalPoint],
     result_accessor: Callable[[gripper.Gripper], Point],
     fake_offset,
+    fake_fw_info,
 ):
-    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123", fake_fw_info)
     assert gripr.critical_point(override) == result_accessor(gripr)
 
 
 @pytest.mark.ot3_only
-def test_load_gripper_cal_offset(fake_offset):
-    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+def test_load_gripper_cal_offset(fake_offset, fake_fw_info):
+    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123", fake_fw_info)
     # if offset data do not exist, loaded values should match DEFAULT
     assert gripr._calibration_offset.offset == Point(
         *gripper_config.DEFAULT_GRIPPER_CALIBRATION_OFFSET
@@ -63,15 +70,19 @@ def test_load_gripper_cal_offset(fake_offset):
 
 
 @pytest.mark.ot3_only
-def test_reload_instrument_cal_ot3(fake_offset) -> None:
-    old_gripper = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+def test_reload_instrument_cal_ot3(fake_offset, fake_fw_info) -> None:
+    old_gripper = gripper.Gripper(
+        fake_gripper_conf, fake_offset, "fakeid123", fake_fw_info
+    )
     # if only calibration is changed
     new_cal = instrument_calibration.GripperCalibrationOffset(
         offset=Point(3, 4, 5),
         source=cal_types.SourceType.user,
         status=cal_types.CalibrationStatus(),
     )
-    new_gripper = gripper._reload_gripper(old_gripper.config, old_gripper, new_cal)
+    new_gripper = gripper._reload_gripper(
+        old_gripper.config, old_gripper, new_cal, fake_fw_info
+    )
 
     # it's the same pipette
     assert new_gripper == old_gripper

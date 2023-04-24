@@ -155,7 +155,7 @@
               },
               "boundingBox": { "$ref": "#/definitions/boundingBox" },
               "displayName": {
-                "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
+                "description": "A human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
                 "type": "string"
               },
               "compatibleModuleTypes": {

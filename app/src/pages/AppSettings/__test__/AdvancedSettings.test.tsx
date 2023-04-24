@@ -245,9 +245,9 @@ describe('AdvancedSettings', () => {
 
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Show Link to Get Labware Offset Data')
+    getByText('Show Labware Offset data code snippets')
     getByText(
-      'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
+      'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
     )
     getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
   })

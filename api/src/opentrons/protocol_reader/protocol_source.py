@@ -104,6 +104,8 @@ class ProtocolSource:
         directory: The directory containing the protocol files
             (and only the protocol files), or ``None`` if this is unknown.
         main_file: The location of the protocol's main file on disk.
+        content_hash: A md5 hex digest of the protocol source combined with
+            custom labware that was provided at the time of protocol creation
         files: Descriptions of all files that make up the protocol.
         metadata: Arbitrary metadata specified by the protocols.
         config: Protocol execution configuration.
@@ -115,6 +117,7 @@ class ProtocolSource:
 
     directory: Optional[Path]
     main_file: Path
+    content_hash: str
     files: List[ProtocolSourceFile]
     metadata: Metadata
     robot_type: RobotType

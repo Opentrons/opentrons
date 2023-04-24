@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
-import { COLORS } from '@opentrons/components'
+import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
 import {
-  CreateCommand,
+  LEFT,
   NINETY_SIX_CHANNEL,
+  RIGHT,
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
@@ -21,9 +22,11 @@ import {
   HEX_SCREWDRIVER,
   NINETY_SIX_CHANNEL_PIPETTE,
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
+  BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
 import type { AxiosError } from 'axios'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { Run, CreateRunData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 
@@ -31,7 +34,6 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
   isCreateLoading: boolean
 }
-
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
@@ -47,13 +49,13 @@ export const BeforeBeginning = (
     errorMessage,
     setShowErrorMessage,
     selectedPipette,
+    isOnDevice,
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   React.useEffect(() => {
     createRun({})
   }, [])
   const pipetteId = attachedPipettes[mount]?.id
-
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -67,7 +69,7 @@ export const BeforeBeginning = (
     return null
 
   let equipmentList = [CALIBRATION_PROBE]
-  let proceedButtonText: string = t('get_started')
+  const proceedButtonText = t('move_gantry_to_front')
   let bodyTranslationKey: string = ''
 
   switch (flowType) {
@@ -77,7 +79,6 @@ export const BeforeBeginning = (
     }
     case FLOWS.ATTACH: {
       bodyTranslationKey = 'remove_labware'
-      proceedButtonText = t('move_gantry_to_front')
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
         equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
       } else {
@@ -129,17 +130,38 @@ export const BeforeBeginning = (
       })
   }
 
+  const SingleMountAttachCommand: CreateCommand[] = [
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: mount,
+      },
+    },
+  ]
+
+  const NinetySixChannelAttachCommand: CreateCommand[] = [
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: LEFT,
+      },
+    },
+    {
+      // @ts-expect-error calibration type not yet supported
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: RIGHT,
+      },
+    },
+  ]
+
   const handleOnClickAttach = (): void => {
     chainRunCommands(
-      [
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: mount,
-          },
-        },
-      ],
+      selectedPipette === SINGLE_MOUNT_PIPETTES
+        ? SingleMountAttachCommand
+        : NinetySixChannelAttachCommand,
       false
     )
       .then(() => {
@@ -167,17 +189,23 @@ export const BeforeBeginning = (
       rightHandBody={rightHandBody}
       bodyText={
         <>
-          <Trans
-            t={t}
-            i18nKey={bodyTranslationKey}
-            components={{ block: <StyledText as="p" /> }}
-          />
           {selectedPipette === NINETY_SIX_CHANNEL &&
           (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner type="warning">
+            <Banner
+              type="warning"
+              size={isOnDevice ? '1.5rem' : SIZE_1}
+              marginY={SPACING.spacing2}
+            >
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>
           ) : null}
+          <Trans
+            t={t}
+            i18nKey={bodyTranslationKey}
+            components={{
+              block: <StyledText css={BODY_STYLE} />,
+            }}
+          />
         </>
       }
       proceedButtonText={proceedButtonText}

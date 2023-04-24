@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Optional, Union
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.types import Mount, DeckSlotName
 
@@ -53,6 +54,7 @@ class InstrumentLoadInfo:
 
     instrument_load_name: str
     mount: Mount
+    pipette_dict: PipetteDict
 
 
 @dataclass(frozen=True)

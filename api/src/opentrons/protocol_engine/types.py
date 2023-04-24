@@ -76,11 +76,34 @@ class ExperimentalOffsetData(BaseModel):
 
 
 class WellOrigin(str, Enum):
-    """Origin of WellLocation offset."""
+    """Origin of WellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+    """
 
     TOP = "top"
     BOTTOM = "bottom"
     CENTER = "center"
+
+
+class DropTipWellOrigin(str, Enum):
+    """The origin of a DropTipWellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+        DEFAULT: the default drop-tip location of the well,
+            based on pipette configuration and length of the tip.
+    """
+
+    TOP = "top"
+    BOTTOM = "bottom"
+    CENTER = "center"
+    DEFAULT = "default"
 
 
 # This is deliberately a separate type from Vec3f to let components default to 0.
@@ -96,6 +119,17 @@ class WellLocation(BaseModel):
     """A relative location in reference to a well's location."""
 
     origin: WellOrigin = WellOrigin.TOP
+    offset: WellOffset = Field(default_factory=WellOffset)
+
+
+class DropTipWellLocation(BaseModel):
+    """Like WellLocation, but for dropping tips.
+
+    Unlike a typical WellLocation, the location for a drop tip
+    defaults to location based on the tip length rather than the well's top.
+    """
+
+    origin: DropTipWellOrigin = DropTipWellOrigin.DEFAULT
     offset: WellOffset = Field(default_factory=WellOffset)
 
 
@@ -142,6 +176,30 @@ class FlowRates:
     default_blow_out: Dict[str, float]
     default_aspirate: Dict[str, float]
     default_dispense: Dict[str, float]
+
+
+@dataclass(frozen=True)
+class CurrentWell:
+    """The latest well that the robot has accessed."""
+
+    pipette_id: str
+    labware_id: str
+    well_name: str
+
+
+@dataclass(frozen=True)
+class TipGeometry:
+    """Tip geometry data.
+
+    Props:
+        length: The effective length (total length minus overlap) of a tip in mm.
+        diameter: Tip diameter in mm.
+        volume: Maximum volume in µL.
+    """
+
+    length: float
+    diameter: float
+    volume: float
 
 
 class MovementAxis(str, Enum):
@@ -272,30 +330,69 @@ class InstrumentOffsetVector(BaseModel):
     z: float
 
 
-class ModuleDefinition(BaseModel):
-    """Module definition class."""
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
+class ModuleOffsetVector(BaseModel):
+    """Offset, in deck coordinates, from nominal to actual position of labware on a module."""
 
+    x: float
+    y: float
+    z: float
+
+
+# TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
+# schema that it's sourced from. We already do that for labware definitions and JSON protocols.
+class ModuleDefinition(BaseModel):
+    """A module definition conforming to module definition schema v3."""
+
+    # Note: This field is misleading.
+    #
+    # This class only models v3 definitions ("module/schemas/3"), not v2 ("module/schemas/2").
+    # labwareOffset is required to have a z-component, for example.
+    #
+    # When parsing from a schema v3 JSON definition into this model,
+    # the definition's `"$otSharedSchema": "module/schemas/3"` field will be thrown away
+    # because it has a dollar sign, which doesn't match this field.
+    # Then, this field will default to "module/schemas/2", because no value was provided.
+    #
+    # We should fix this field once Jira RSS-221 is resolved. RSS-221 makes it difficult to fix
+    # because robot-server has been storing and loading these bad fields in its database.
     otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
+
     moduleType: ModuleType = Field(
         ...,
         description="Module type (Temperature/Magnetic/Thermocycler)",
     )
+
     model: ModuleModel = Field(..., description="Model name of the module")
+
     labwareOffset: LabwareOffsetVector = Field(
         ...,
         description="Labware offset in x, y, z.",
     )
+
     dimensions: ModuleDimensions = Field(..., description="Module dimension")
+
     calibrationPoint: ModuleCalibrationPoint = Field(
         ...,
         description="Calibration point of module.",
     )
+
     displayName: str = Field(..., description="Display name.")
+
     quirks: List[str] = Field(..., description="Module quirks")
+
+    # In releases prior to https://github.com/Opentrons/opentrons/pull/11873 (v6.3.0),
+    # the matrices in slotTransforms were 3x3.
+    # After, they are 4x4, even though there was no schema version bump.
+    #
+    # Because old objects of this class, with the 3x3 matrices, were stored in robot-server's
+    # database, this field needs to stay typed loosely enough to support both sizes.
+    # We can fix this once Jira RSS-221 is resolved.
     slotTransforms: Dict[str, Any] = Field(
         ...,
         description="Dictionary of transforms for each slot.",
     )
+
     compatibleWith: List[ModuleModel] = Field(
         ...,
         description="List of module models this model is compatible with.",

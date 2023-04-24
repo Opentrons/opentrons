@@ -24,6 +24,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../../hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -57,7 +58,8 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     runId
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const { protocolData, robotType } = useProtocolDetailsForRun(runId)
+  const { robotType } = useProtocolDetailsForRun(runId)
+  const protocolData = useMostRecentCompletedAnalysis(runId)
   const liquids = parseLiquidsInLoadOrder(
     protocolData?.liquids != null ? protocolData?.liquids : [],
     protocolData?.commands ?? []

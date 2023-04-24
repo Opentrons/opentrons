@@ -6,7 +6,7 @@ from typing import List, Optional
 from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
 
-from .pipettes import CurrentWell
+from ..types import CurrentWell
 
 
 @dataclass

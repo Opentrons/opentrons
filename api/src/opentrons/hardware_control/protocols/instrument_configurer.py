@@ -154,7 +154,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    def set_working_volume(self, mount: Mount, tip_volume: int) -> None:
+    def set_working_volume(self, mount: Mount, tip_volume: float) -> None:
         """Inform the hardware how much volume a pipette can aspirate.
 
         This will set the limit of aspiration for the pipette, and is

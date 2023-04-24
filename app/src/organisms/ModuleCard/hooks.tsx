@@ -1,8 +1,5 @@
 import * as React from 'react'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
@@ -14,11 +11,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -37,12 +33,15 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
-  const { protocolData } = useProtocolDetailsForRun(currentRunId)
-  if (protocolData == null) return false
-  const robotType = getRobotTypeFromLoadedLabware(protocolData.labware)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(currentRunId)
+  if (robotProtocolAnalysis == null) return false
+  const robotType = getRobotTypeFromLoadedLabware(robotProtocolAnalysis.labware)
 
   const deckDef = getDeckDefFromRobotType(robotType)
-  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
+  const protocolModulesInfo = getProtocolModulesInfo(
+    robotProtocolAnalysis,
+    deckDef
+  )
   return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
@@ -104,23 +103,17 @@ type deactivateCommandTypes =
 
 export function useModuleOverflowMenu(
   module: AttachedModule,
-  runId: string | null = null,
   handleAboutClick: () => void,
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
   handleSlideoutClick: (isSecondary: boolean) => void,
-  isLoadedInRun: boolean,
   isDisabled: boolean,
   isIncompatibleWithOT3: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const { isRunTerminal, isRunIdle } = useRunStatuses()
-  const currentRunId = useCurrentRunId()
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -208,27 +201,16 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId: isRunIdle ? moduleIdFromRun : module.id,
+        moduleId: module.id,
       },
     }
-    if (isRunIdle && currentRunId != null && isLoadedInRun) {
-      createCommand({
-        runId: currentRunId,
-        command: deactivateCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
-        )
-      })
-    } else if (isRunTerminal || currentRunId == null) {
-      createLiveCommand({
-        command: deactivateCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
-        )
-      })
-    }
+    createLiveCommand({
+      command: deactivateCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
+      )
+    })
   }
 
   const lidCommand: TCOpenLidCreateCommand | TCCloseLidCreateCommand = {

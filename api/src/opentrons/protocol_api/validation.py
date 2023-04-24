@@ -1,9 +1,22 @@
-from typing import Any, Dict, List, Optional, Sequence, Union, Tuple, Mapping
+from __future__ import annotations
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Union,
+    Tuple,
+    Mapping,
+    NamedTuple,
+    TYPE_CHECKING,
+)
+
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -12,6 +25,9 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
+
+if TYPE_CHECKING:
+    from .labware import Well
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -180,3 +196,69 @@ def ensure_valid_labware_offset_vector(
     if not all(isinstance(v, (float, int)) for v in offsets):
         raise TypeError("Offset values should be a number (int or float).")
     return offsets
+
+
+class WellTarget(NamedTuple):
+    """A movement target that is a well."""
+
+    well: Well
+    location: Optional[Location]
+    in_place: bool
+
+
+class PointTarget(NamedTuple):
+    """A movement to coordinates"""
+
+    location: Location
+    in_place: bool
+
+
+class NoLocationError(ValueError):
+    """Error representing that no location was supplied."""
+
+
+class LocationTypeError(TypeError):
+    """Error representing that the location supplied is of different expected type."""
+
+
+def validate_location(
+    location: Union[Location, Well, None], last_location: Optional[Location]
+) -> Union[WellTarget, PointTarget]:
+    """Validate a given location for a liquid handling command.
+
+    Args:
+        location: The input location.
+        last_location: The last location accessed by the pipette.
+
+    Returns:
+        A `WellTarget` if the input location represents a well.
+        A `PointTarget` if the input location is an x, y, z coordinate.
+
+    Raises:
+        NoLocationError: The is no input location and no cached loaction.
+        LocationTypeError: The location supplied is of unexpected type.
+    """
+    from .labware import Well
+
+    target_location = location or last_location
+
+    if target_location is None:
+        raise NoLocationError()
+
+    if not isinstance(target_location, (Location, Well)):
+        raise LocationTypeError(
+            f"location should be a Well or Location, but it is {location}"
+        )
+
+    in_place = target_location == last_location
+
+    if isinstance(target_location, Well):
+        return WellTarget(well=target_location, location=None, in_place=in_place)
+
+    _, well = target_location.labware.get_parent_labware_and_well()
+
+    return (
+        WellTarget(well=well, location=target_location, in_place=in_place)
+        if well is not None
+        else PointTarget(location=target_location, in_place=in_place)
+    )

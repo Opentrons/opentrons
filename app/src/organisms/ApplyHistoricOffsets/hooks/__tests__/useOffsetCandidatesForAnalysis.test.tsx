@@ -35,8 +35,8 @@ const mockFirstCandidate: OffsetCandidate = {
   location: { slotName: '1' },
   vector: { x: 1, y: 2, z: 3 },
   definitionUri: 'firstFakeDefURI',
-  createdAt: '2022-07-11T13:34:51.012179+00:00',
-  runCreatedAt: '2022-07-11T13:33:51.012179+00:00',
+  createdAt: '2022-05-11T13:34:51.012179+00:00',
+  runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
 }
 const mockSecondCandidate: OffsetCandidate = {
   id: 'second_offset_id',
@@ -53,13 +53,15 @@ const mockThirdCandidate: OffsetCandidate = {
   location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
   vector: { x: 7, y: 8, z: 9 },
   definitionUri: 'thirdFakeDefURI',
-  createdAt: '2022-05-11T13:34:51.012179+00:00',
-  runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
+  createdAt: '2022-07-11T13:34:51.012179+00:00',
+  runCreatedAt: '2022-07-11T13:33:51.012179+00:00',
 }
 
 const mockFirstDupCandidate = {
   ...mockFirstCandidate,
   id: 'laterDuplicateOfFirstOffset',
+  createdAt: '2022-08-11T13:34:51.012179+00:00',
+  runCreatedAt: '2022-08-11T13:33:51.012179+00:00',
 }
 
 const mockRobotIp = 'fakeRobotIp'
@@ -69,10 +71,10 @@ describe('useOffsetCandidatesForAnalysis', () => {
     when(mockUseAllHistoricOffsets)
       .calledWith({ hostname: mockRobotIp })
       .mockReturnValue([
-        mockFirstCandidate,
         mockFirstDupCandidate,
-        mockSecondCandidate,
         mockThirdCandidate,
+        mockSecondCandidate,
+        mockFirstCandidate,
       ])
     when(mockUseAllHistoricOffsets).calledWith(null).mockReturnValue([])
     when(mockGetLabwareLocationCombos)
@@ -135,7 +137,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
     await waitFor(() => result.current != null)
     expect(result.current).toEqual([])
   })
-  it('returns candidates for each first match', async () => {
+  it('returns candidates for each first match with newest first', async () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <div>{children}</div>
     )
@@ -150,7 +152,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
     await waitFor(() => result.current != null)
     expect(result.current).toEqual([
       {
-        ...mockFirstCandidate,
+        ...mockFirstDupCandidate,
         labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
       },
       {

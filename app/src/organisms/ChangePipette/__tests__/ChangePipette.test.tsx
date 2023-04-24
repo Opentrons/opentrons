@@ -3,7 +3,6 @@ import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { getAttachedPipettes } from '../../../redux/pipettes'
 import { i18n } from '../../../i18n'
 import { getHasCalibrationBlock } from '../../../redux/config'
 import { getMovementStatus } from '../../../redux/robot-controls'
@@ -14,6 +13,7 @@ import {
   SUCCESS,
   useDispatchApiRequests,
 } from '../../../redux/robot-api'
+import { useAttachedPipettes } from '../../Devices/hooks'
 import { PipetteSelection } from '../PipetteSelection'
 import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
@@ -41,7 +41,6 @@ jest.mock('@opentrons/shared-data', () => {
   }
 })
 jest.mock('../../../redux/config')
-jest.mock('../../../redux/pipettes')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/calibration')
 jest.mock('../../../redux/robot-api')
@@ -49,12 +48,13 @@ jest.mock('../PipetteSelection')
 jest.mock('../ExitModal')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 jest.mock('../ConfirmPipette')
+jest.mock('../../Devices/hooks')
 
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
   typeof getPipetteNameSpecs
 >
-const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
-  typeof getAttachedPipettes
+const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
+  typeof useAttachedPipettes
 >
 const mockGetMovementStatus = getMovementStatus as jest.MockedFunction<
   typeof getMovementStatus
@@ -117,7 +117,7 @@ describe('ChangePipette', () => {
       closeModal: jest.fn(),
     }
     dispatchApiRequest = jest.fn()
-    mockGetAttachedPipettes.mockReturnValue({ left: null, right: null })
+    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     mockGetRequestById.mockReturnValue(null)
     mockGetCalibrationForPipette.mockReturnValue(null)
     mockGetHasCalibrationBlock.mockReturnValue(false)
@@ -207,7 +207,7 @@ describe('ChangePipette', () => {
         status: 200,
       },
     })
-    mockGetAttachedPipettes.mockReturnValue({
+    mockUseAttachedPipettes.mockReturnValue({
       left: mockAttachedPipettes as AttachedPipette,
       right: null,
     })
@@ -252,7 +252,7 @@ describe('ChangePipette', () => {
 
   it('renders the wizard pages for detaching a single channel pipette and goes through the whole flow', () => {
     mockConfirmPipette.mockReturnValue(<div>mock confirm pipette</div>)
-    mockGetAttachedPipettes.mockReturnValue({
+    mockUseAttachedPipettes.mockReturnValue({
       left: mockAttachedPipettes as AttachedPipette,
       right: null,
     })

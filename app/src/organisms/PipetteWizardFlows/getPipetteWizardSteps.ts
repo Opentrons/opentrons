@@ -6,7 +6,7 @@ import type {
   SelectablePipettes,
 } from './types'
 import type { PipetteMount } from '@opentrons/shared-data'
-import { AttachedPipettesByMount } from '@opentrons/api-client'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
@@ -25,7 +25,11 @@ export const getPipetteWizardSteps = (
         },
         { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
         { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
-        { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
+        {
+          section: SECTIONS.RESULTS,
+          mount: mount,
+          flowType: flowType,
+        },
       ]
     }
     case FLOWS.ATTACH: {

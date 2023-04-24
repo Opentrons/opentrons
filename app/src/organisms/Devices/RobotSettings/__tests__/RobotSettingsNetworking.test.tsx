@@ -13,7 +13,7 @@ import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../redux/networking/selectors')
+jest.mock('../../../../redux/networking')
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../hooks')
 jest.mock('../ConnectNetwork/DisconnectModal')
@@ -23,7 +23,9 @@ const mockUpdateRobotStatus = jest.fn()
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
-
+const mockFetchWifiList = Networking.fetchWifiList as jest.MockedFunction<
+  typeof Networking.fetchWifiList
+>
 const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
   typeof Networking.getWifiList
 >
@@ -76,6 +78,8 @@ const mockWifiList = [
 ]
 
 describe('RobotSettingsNetworking', () => {
+  jest.useFakeTimers()
+
   beforeEach(() => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
@@ -274,5 +278,15 @@ describe('RobotSettingsNetworking', () => {
     const [{ queryByRole }] = render()
 
     expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+  })
+
+  it('dispatches fetchWifiList on mount and on an interval', () => {
+    render()
+    expect(mockFetchWifiList).toHaveBeenNthCalledWith(1, ROBOT_NAME)
+    expect(mockFetchWifiList).toHaveBeenCalledTimes(1)
+    jest.advanceTimersByTime(20000)
+    expect(mockFetchWifiList).toHaveBeenNthCalledWith(2, ROBOT_NAME)
+    expect(mockFetchWifiList).toHaveBeenNthCalledWith(3, ROBOT_NAME)
+    expect(mockFetchWifiList).toHaveBeenCalledTimes(3)
   })
 })

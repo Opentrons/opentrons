@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 
@@ -17,25 +16,45 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  BORDERS,
+  SPACING,
 } from '@opentrons/components'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  useProtocolQuery,
+  useRunQuery,
+  useAllPipetteOffsetCalibrationsQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
+import {
+  getDeckDefFromRobotType,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
-import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { Skeleton } from '../../atoms/Skeleton'
 import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
-  useUnmatchedModulesForProtocol,
 } from '../../organisms/Devices/hooks'
-import { getLabwareSetupItemGroups } from '../../organisms/Devices/ProtocolRun/SetupLabware/utils'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
+import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
+import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
+import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
+import {
+  getAreInstrumentsReady,
+  getProtocolUsesGripper,
+} from '../../organisms/ProtocolSetupInstruments/utils'
 import {
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -59,14 +78,14 @@ function ProtocolSetupStep({
   const backgroundColorByStepStatus = {
     ready: `${COLORS.successEnabled}${COLORS.opacity20HexCode}`,
     'not ready': COLORS.warningBackgroundMed,
-    general: COLORS.greyDisabled,
+    general: COLORS.light_two,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius="1rem"
+        borderRadius={BORDERS.size_four}
         gridGap="1.5rem"
         padding="1.5rem 1rem"
       >
@@ -140,12 +159,15 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
 }
 
 interface PrepareToRunProps {
+  runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
 
-function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
+function PrepareToRun({
+  runId,
+  setSetupScreen,
+}: PrepareToRunProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { runId } = useParams<OnDeviceRouteParams>()
   const history = useHistory()
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
@@ -153,13 +175,14 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  const {
+    data: allPipettesCalibrationData,
+  } = useAllPipetteOffsetCalibrationsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const protocolData = useMostRecentCompletedAnalysis(runId)
-
-  // TODO(bh, 2023-01-25): remove the hardcode when data exists for all start run blockers
-  const isReadyToRun = true
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const runStatus: string = useRunStatus(runId) ?? ''
@@ -182,38 +205,55 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  const robotName = useSelector(getLocalRobot)?.name ?? ''
-
-  // Instruments information
-  // TODO(bh, 2023-01-25): implement when instruments endpoints available
-  const instrumentsDetail = t('instruments_connected', {
-    count: 4,
-  })
-  const instrumentsStatus = 'ready'
-
-  // Modules infomation
   const protocolHasModules =
-    protocolData?.modules != null && protocolData?.modules.length > 0
-  // get missing/unmatched modules and derive status
+    mostRecentAnalysis?.modules != null &&
+    mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
-  /**
-   * TODO(bh, 2023-01-24): for convenience, reusing hooks written for desktop app
-   * useUnmatchedModulesForProtocol is indirect for the local robot case and calls other hooks that aren't relevant here
-   * consider refactoring, extracting relevant internals of those hooks
-   * */
+
+  if (
+    mostRecentAnalysis == null ||
+    attachedInstruments == null ||
+    (protocolHasModules && attachedModules == null) ||
+    allPipettesCalibrationData == null
+  ) {
+    return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
+  }
+
+  const areInstrumentsReady = getAreInstrumentsReady(
+    mostRecentAnalysis,
+    attachedInstruments,
+    allPipettesCalibrationData
+  )
+  const speccedInstrumentCount =
+    mostRecentAnalysis.pipettes.length +
+    (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+  const instrumentsDetail = t('instruments_connected', {
+    count: speccedInstrumentCount,
+  })
+  const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
+
+  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+
+  const protocolModulesInfo =
+    mostRecentAnalysis != null
+      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+      : []
+
   const {
     missingModuleIds,
     remainingAttachedModules,
-  } = useUnmatchedModulesForProtocol(robotName, runId)
+  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
 
   const isMissingModules = missingModuleIds.length > 0
   const isUnmatchedModules =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
+  const isReadyToRun = areInstrumentsReady && !isMissingModules
+
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
-  const firstMissingModuleModel = protocolData?.modules.find(
+  const firstMissingModuleModel = mostRecentAnalysis?.modules.find(
     module => module.id === firstMissingModuleId
   )?.model
   const firstMissingModuleDisplayName: string =
@@ -238,7 +278,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
-    protocolData?.commands ?? []
+    mostRecentAnalysis?.commands ?? []
   )
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
@@ -252,13 +292,16 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
 
+  // Liquids information
+  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
+
   return (
     <>
       {/* Protocol Setup Header */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap="1.5rem"
-        marginBottom="2.5rem"
+        gridGap={SPACING.spacing5}
+        marginBottom={SPACING.spacingXXL}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
@@ -267,12 +310,12 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
               {protocolName}
             </StyledText>
           </Flex>
-          <Flex gridGap="1.5rem">
+          <Flex gridGap={SPACING.spacing5}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
             <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>
         </Flex>
-        <Flex gridGap="1rem">
+        <Flex gridGap={SPACING.spacing4}>
           <Flex
             backgroundColor={COLORS.fundamentalsBackgroundShade}
             padding="0.25rem 0.5rem"
@@ -291,7 +334,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap="0.5rem"
+        gridGap={SPACING.spacing3}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
@@ -299,15 +342,13 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
           detail={instrumentsDetail}
           status={instrumentsStatus}
         />
-        {protocolHasModules ? (
-          <ProtocolSetupStep
-            onClickSetupStep={() => setSetupScreen('modules')}
-            title={t('modules')}
-            detail={modulesDetail}
-            subDetail={modulesSubDetail}
-            status={modulesStatus}
-          />
-        ) : null}
+        <ProtocolSetupStep
+          onClickSetupStep={() => setSetupScreen('modules')}
+          title={t('modules')}
+          detail={modulesDetail}
+          subDetail={modulesSubDetail}
+          status={modulesStatus}
+        />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('labware')}
           title={t('labware')}
@@ -325,6 +366,13 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
           onClickSetupStep={() => setSetupScreen('liquids')}
           title={t('liquids')}
           status="general"
+          detail={
+            liquidsInProtocol.length < 0
+              ? t('initial_liquids_num', {
+                  num: liquidsInProtocol.length,
+                })
+              : t('liquids_not_in_setup')
+          }
         />
       </Flex>
       {showConfirmCancelModal ? (
@@ -334,7 +382,7 @@ function PrepareToRun({ setSetupScreen }: PrepareToRunProps): JSX.Element {
   )
 }
 
-type SetupScreens =
+export type SetupScreens =
   | 'prepare to run'
   | 'instruments'
   | 'modules'
@@ -343,49 +391,65 @@ type SetupScreens =
   | 'liquids'
 
 export function ProtocolSetup(): JSX.Element {
+  const { runId } = useParams<OnDeviceRouteParams>()
+
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
     'prepare to run'
   )
-
   const setupComponentByScreen = {
-    'prepare to run': <PrepareToRun setSetupScreen={setSetupScreen} />,
-    // TODO: insert setup screen components below:
+    'prepare to run': (
+      <PrepareToRun runId={runId} setSetupScreen={setSetupScreen} />
+    ),
     instruments: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Instrument Configuration
-      </>
+      <ProtocolSetupInstruments runId={runId} setSetupScreen={setSetupScreen} />
     ),
     modules: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Modules
-      </>
+      <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
     ),
     labware: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Labware
-      </>
+      <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
     lpc: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Labware Position Check
-      </>
+      <ProtocolSetupLabwarePositionCheck
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+      />
     ),
     liquids: (
-      <>
-        <BackButton onClick={() => setSetupScreen('prepare to run')} />
-        Liquids
-      </>
+      <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding="2rem 2.5rem">
       {setupComponentByScreen[setupScreen]}
+    </Flex>
+  )
+}
+
+interface ProtocolSetupSkeletonProps {
+  cancelAndClose: () => void
+}
+function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
+          <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
+          <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
+        </Flex>
+        <Flex gridGap={SPACING.spacing5}>
+          <CloseButton onClose={() => props.cancelAndClose()} />
+          <PlayButton disabled onPlay={() => {}} />
+        </Flex>
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
+      </Flex>
     </Flex>
   )
 }

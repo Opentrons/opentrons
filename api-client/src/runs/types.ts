@@ -38,7 +38,7 @@ export interface RunData {
   current: boolean
   status: RunStatus
   actions: RunAction[]
-  errors: Error[]
+  errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   protocolId?: string
@@ -104,7 +104,7 @@ export interface CommandData {
   data: RunCommandSummary
 }
 
-export interface Error {
+export interface RunError {
   id: string
   errorType: string
   createdAt: string

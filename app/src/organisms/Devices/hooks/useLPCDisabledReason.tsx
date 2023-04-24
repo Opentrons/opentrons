@@ -1,8 +1,9 @@
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
@@ -23,9 +24,7 @@ export function useLPCDisabledReason(
     robotName,
     runId
   )
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const { missingModuleIds } = unmatchedModuleResults
@@ -35,9 +34,13 @@ export function useLPCDisabledReason(
     missingModuleIds.length > 0 && isCalibrationComplete
   const moduleAndCalibrationIncomplete =
     missingModuleIds.length > 0 && !isCalibrationComplete
+  const labwareDefinitions =
+    protocolData?.commands != null
+      ? getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      : {}
 
   const tipRackLoadedInProtocol: boolean = some(
-    protocolData?.labwareDefinitions,
+    labwareDefinitions,
     def => def.parameters?.isTiprack
   )
   const tipsArePickedUp: boolean = some(

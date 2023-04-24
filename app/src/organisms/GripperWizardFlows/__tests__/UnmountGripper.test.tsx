@@ -12,22 +12,20 @@ describe('UnmountGripper', () => {
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
-  const mockChainRunCommands = jest.fn()
-  const mockSetIsBetweenCommands = jest.fn()
+  const mockChainRunCommands = jest.fn(() => Promise.resolve())
   const mockRunId = 'fakeRunId'
 
   beforeEach(() => {
-    render = (props = {}) => {
+    render = props => {
       return renderWithProviders(
         <UnmountGripper
           runId={mockRunId}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
-          attachedGripper={{}}
+          attachedGripper={props?.attachedGripper ?? null}
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
-          setIsBetweenCommands={mockSetIsBetweenCommands}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -39,9 +37,13 @@ describe('UnmountGripper', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm proceed calls proceed', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'continue' }).click()
+  it('clicking confirm proceed calls home and proceed if gripper attached', async () => {
+    const { getByRole } = render({ attachedGripper: null })[0]
+    await getByRole('button', { name: 'continue' }).click()
+    expect(mockChainRunCommands).toHaveBeenCalledWith(
+      [{ commandType: 'home', params: {} }],
+      true
+    )
     expect(mockProceed).toHaveBeenCalled()
   })
 
@@ -52,8 +54,8 @@ describe('UnmountGripper', () => {
   })
 
   it('renders correct text', () => {
-    const { getByRole, getByText } = render()[0]
-    getByRole('heading', { name: 'Loosen Screws and Detach' })
+    const { getByText } = render()[0]
+    getByText('Loosen Screws and Detach')
     getByText(
       'Hold the gripper in place and loosen the screws. (The screws are captive and will not come apart from the gripper) Then carefully remove the gripper'
     )

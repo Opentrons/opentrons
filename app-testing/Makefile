@@ -28,6 +28,7 @@ lint:
 format:
 	$(MAKE) black
 	$(MAKE) ruff
+	$(MAKE) format-readme
 
 .PHONY: test-ci
 test-ci:
@@ -43,4 +44,8 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	yarn prettier --write README.md
+	yarn prettier --ignore-path .eslintignore --write app-testing/**/*.md
+
+.PHONY: print-protocols
+print-protocols:
+	pipenv run python print_protocols.py

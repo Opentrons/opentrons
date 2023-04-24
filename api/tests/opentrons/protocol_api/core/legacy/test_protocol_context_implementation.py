@@ -132,6 +132,8 @@ def test_load_instrument(
     pipette_dict = cast(
         PipetteDict,
         {
+            "model": "cool-model",
+            "pipette_id": "cool-serial-number",
             "default_aspirate_flow_rates": {"1.1": 22},
             "default_dispense_flow_rates": {"3.3": 44},
             "default_blow_out_flow_rates": {"5.5": 66},
@@ -152,7 +154,11 @@ def test_load_instrument(
     decoy.verify(
         mock_sync_hardware_api.cache_instruments({Mount.RIGHT: "p300_single"}),
         mock_equipment_broker.publish(
-            InstrumentLoadInfo(instrument_load_name="p300_single", mount=Mount.RIGHT)
+            InstrumentLoadInfo(
+                instrument_load_name="p300_single",
+                mount=Mount.RIGHT,
+                pipette_dict=pipette_dict,
+            )
         ),
     )
 

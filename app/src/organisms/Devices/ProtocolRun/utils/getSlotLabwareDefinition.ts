@@ -8,8 +8,8 @@ export function getSlotLabwareDefinition(
     command => command.commandType === 'loadLabware'
   )
   const loadLabwareCommand = loadLabwareCommands?.find(
-    command => command.result.labwareId === labwareId
+    command => command.result?.labwareId === labwareId
   )
 
-  return loadLabwareCommand?.result.definition
+  return loadLabwareCommand?.result?.definition
 }
