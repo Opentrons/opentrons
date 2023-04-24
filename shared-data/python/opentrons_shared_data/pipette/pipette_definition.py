@@ -213,6 +213,11 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The display or full product name of the pipette.",
         alias="displayName",
     )
+    pipette_backcompat_names: List[str] = Field(
+        ...,
+        description="A list of pipette names that are compatible with this pipette.",
+        alias="backCompatNames",
+    )
     pipette_type: PipetteModelType = Field(
         ...,
         description="The pipette model type (related to number of channels).",

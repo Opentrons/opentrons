@@ -27,11 +27,16 @@ import {
 import { getIsGantryEmpty } from './utils'
 import type { AxiosError } from 'axios'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { Run, CreateRunData } from '@opentrons/api-client'
+import type { MaintenanceRun } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
-  createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    void,
+    unknown
+  >
   isCreateLoading: boolean
 }
 export const BeforeBeginning = (
@@ -40,7 +45,7 @@ export const BeforeBeginning = (
   const {
     proceed,
     flowType,
-    createRun,
+    createMaintenanceRun,
     attachedPipettes,
     chainRunCommands,
     isCreateLoading,
@@ -53,9 +58,9 @@ export const BeforeBeginning = (
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   React.useEffect(() => {
-    createRun({})
+    createMaintenanceRun()
   }, [])
-  const pipetteId = attachedPipettes[mount]?.id
+  const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -107,7 +112,7 @@ export const BeforeBeginning = (
         commandType: 'loadPipette' as const,
         params: {
           // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.name,
+          pipetteName: attachedPipettes[mount]?.instrumentName,
           pipetteId: pipetteId,
           mount: mount,
         },

@@ -9,6 +9,8 @@ import {
   Flex,
   Icon,
   DIRECTION_ROW,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -143,7 +145,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        alignItems={TYPOGRAPHY.textAlignCenter}
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
