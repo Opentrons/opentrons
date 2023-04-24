@@ -311,8 +311,6 @@ class CanMessenger:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
         error_payload: ErrorMessagePayload = err_msg.payload
         err_msg.log_error(log)
-        if error_payload.severity.value == ErrorSeverity.unrecoverable:
-            await self.send(NodeId.broadcast, StopRequest())
 
         if error_payload.message_index == 0:
             log.error(
