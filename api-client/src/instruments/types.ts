@@ -18,6 +18,10 @@ export interface PipetteData {
     channels: number
     min_volume: number
     max_volume: number
+    calibratedOffset: {
+      offset: [number, number, number]
+      source: string
+    }
   }
   instrumentName: string
   instrumentModel: string

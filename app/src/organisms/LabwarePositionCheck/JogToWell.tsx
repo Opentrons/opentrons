@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
   Flex,
@@ -15,7 +16,7 @@ import {
   ALIGN_FLEX_START,
   PrimaryButton,
   SecondaryButton,
-  RESPONSIVENESS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -27,7 +28,11 @@ import {
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
+import { getIsOnDevice } from '../../redux/config'
+import { Portal } from '../../App/portal'
+import { ModalShell } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
@@ -69,6 +74,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
     initialPosition
   )
+  const isOnDevice = useSelector(getIsOnDevice)
+  const [showFullJogControls, setShowFullJogControls] = React.useState(false)
   React.useEffect(() => {
     //  NOTE: this will perform a "null" jog when the jog controls mount so
     //  if a user reaches the "confirm exit" modal (unmounting this component)
@@ -99,7 +106,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing6}
-      minHeight="25rem"
+      minHeight="29.5rem"
     >
       <Flex gridGap={SPACING.spacingL}>
         <Flex
@@ -115,7 +122,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacingM}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
-              <React.Fragment>
+              <>
                 <LabwareRender
                   definition={labwareDef}
                   wellStroke={wellStroke}
@@ -128,7 +135,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   labwareDef={labwareDef}
                   pipetteName={pipetteName}
                 />
-              </React.Fragment>
+              </>
             )}
           </RobotWorkSpace>
           <img
@@ -139,32 +146,100 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           />
         </Flex>
       </Flex>
-      <JogControls
-        jog={(axis, direction, step, _onSuccess) =>
-          handleJog(axis, direction, step, setJoggedPosition)
-        }
-      />
-      <Flex
-        width="100%"
-        marginTop={SPACING.spacing6}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        css={css`
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            margin-top: 0;
-          }
-        `}
-      >
-        <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <Flex gridGap={SPACING.spacing3}>
-          <SecondaryButton onClick={handleGoBack}>
-            {t('shared:go_back')}
-          </SecondaryButton>
-          <PrimaryButton onClick={handleConfirmPosition}>
-            {t('shared:confirm_position')}
-          </PrimaryButton>
+      {isOnDevice ? (
+        <Flex
+          width="100%"
+          marginTop={SPACING.spacing6}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+        >
+          <SmallButton
+            buttonType="tertiaryLowLight"
+            buttonText={t('shared:go_back')}
+            onClick={handleGoBack}
+          />
+          <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+            <SmallButton
+              buttonType="alt"
+              buttonText={t('move_pipette')}
+              onClick={() => {
+                setShowFullJogControls(true)
+              }}
+            />
+            <SmallButton
+              buttonType="default"
+              buttonText={t('shared:confirm_position')}
+              onClick={handleConfirmPosition}
+            />
+          </Flex>
+          <Portal level="top">
+            {showFullJogControls ? (
+              <ModalShell
+                width="60rem"
+                height="33.5rem"
+                padding={SPACING.spacing6}
+                display="flex"
+                flexDirection={DIRECTION_COLUMN}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                header={
+                  <StyledText
+                    as="h4"
+                    css={css`
+                      font-weight: ${TYPOGRAPHY.fontWeightBold};
+                      font-size: ${TYPOGRAPHY.fontSize28};
+                      line-height: ${TYPOGRAPHY.lineHeight36};
+                    `}
+                  >
+                    {t('move_to_a1_position')}
+                  </StyledText>
+                }
+                footer={
+                  <SmallButton
+                    width="100%"
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                    buttonType="default"
+                    buttonText={t('shared:close')}
+                    onClick={() => {
+                      setShowFullJogControls(false)
+                    }}
+                  />
+                }
+              >
+                <JogControls
+                  jog={(axis, direction, step, _onSuccess) =>
+                    handleJog(axis, direction, step, setJoggedPosition)
+                  }
+                  isOnDevice={true}
+                />
+              </ModalShell>
+            ) : null}
+          </Portal>
         </Flex>
-      </Flex>
+      ) : (
+        <>
+          <JogControls
+            jog={(axis, direction, step, _onSuccess) =>
+              handleJog(axis, direction, step, setJoggedPosition)
+            }
+          />
+          <Flex
+            width="100%"
+            marginTop={SPACING.spacing6}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+          >
+            <NeedHelpLink href={LPC_HELP_LINK_URL} />
+            <Flex gridGap={SPACING.spacing3}>
+              <SecondaryButton onClick={handleGoBack}>
+                {t('shared:go_back')}
+              </SecondaryButton>
+              <PrimaryButton onClick={handleConfirmPosition}>
+                {t('shared:confirm_position')}
+              </PrimaryButton>
+            </Flex>
+          </Flex>
+        </>
+      )}
     </Flex>
   )
 }
