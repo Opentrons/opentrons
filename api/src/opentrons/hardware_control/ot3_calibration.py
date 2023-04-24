@@ -822,7 +822,7 @@ async def calibrate_belts(
         await hcapi.remove_tip(mount)
 
 
-# test this!
+# test this! Verified
 def apply_machine_transform(
     belt_attitude: types.AttitudeMatrix,
 ) -> types.AttitudeMatrix:
