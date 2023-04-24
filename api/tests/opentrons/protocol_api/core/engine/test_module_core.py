@@ -42,7 +42,6 @@ def subject(
         module_id="1234",
         engine_client=mock_engine_client,
         api_version=api_version,
-        sync_module_hardware=mock_sync_module_hardware,
     )
 
 

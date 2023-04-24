@@ -244,7 +244,7 @@ class ModuleModel(str, Enum):
             return ModuleType.THERMOCYCLER
         elif ModuleModel.is_heater_shaker_module_model(self):
             return ModuleType.HEATER_SHAKER
-        elif ModuleModel.is_magnetic_module_model(self):
+        elif ModuleModel.is_magnetic_block(self):
             return ModuleType.MAGNETIC_BLOCK
 
         assert False, f"Invalid ModuleModel {self}"
@@ -276,6 +276,13 @@ class ModuleModel(str, Enum):
     ) -> TypeGuard[HeaterShakerModuleModel]:
         """Whether a given model is a Heater-Shaker Module."""
         return model == cls.HEATER_SHAKER_MODULE_V1
+
+    @classmethod
+    def is_magnetic_block(
+        cls, model: ModuleModel
+    ) -> TypeGuard[HeaterShakerModuleModel]:
+        """Whether a given model is a Magnetic block."""
+        return model == cls.MAGNETIC_BLOCK_V1
 
 
 TemperatureModuleModel = Literal[

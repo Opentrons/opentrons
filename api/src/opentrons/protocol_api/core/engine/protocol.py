@@ -32,13 +32,7 @@ from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import (
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerModuleCore,
-    HeaterShakerModuleCore,
-)
+from .module_core import ModuleCore, create_module_core
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
@@ -255,20 +249,13 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
-        selected_hardware = self._resolve_module_hardware(result.serialNumber, model)
+        if module_type != ModuleType.MAGNETIC_BLOCK:
+            selected_hardware = self._resolve_module_hardware(
+                result.serialNumber, model
+            )
 
-        # TODO(mc, 2022-10-25): move to module core factory function
-        module_core_cls: Type[ModuleCore] = ModuleCore
-        if module_type == ModuleType.TEMPERATURE:
-            module_core_cls = TemperatureModuleCore
-        elif module_type == ModuleType.MAGNETIC:
-            module_core_cls = MagneticModuleCore
-        elif module_type == ModuleType.THERMOCYCLER:
-            module_core_cls = ThermocyclerModuleCore
-        elif module_type == ModuleType.HEATER_SHAKER:
-            module_core_cls = HeaterShakerModuleCore
-
-        module_core = module_core_cls(
+        module_core = create_module_core(
+            module_type=module_type,
             module_id=result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,

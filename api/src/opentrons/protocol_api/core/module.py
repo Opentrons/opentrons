@@ -320,3 +320,9 @@ class AbstractHeaterShakerCore(AbstractModuleCore):
     @abstractmethod
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
+
+
+class AbstractMagneticBlockCore(AbstractModuleCore):
+    """Core control interface for an attached Magnetic Block."""
+
+    MODULE_TYPE: ClassVar = ModuleType.MAGNETIC_BLOCK

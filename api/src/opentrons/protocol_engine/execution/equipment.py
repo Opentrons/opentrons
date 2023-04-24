@@ -67,7 +67,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
 
     module_id: str
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 

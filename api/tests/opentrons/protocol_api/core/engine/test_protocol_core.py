@@ -377,7 +377,6 @@ def test_load_labware_on_module(
         module_id="module-id",
         engine_client=mock_engine_client,
         api_version=api_version,
-        sync_module_hardware=mock_sync_module_hardware,
     )
 
     result = subject.load_labware(

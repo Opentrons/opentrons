@@ -1,7 +1,7 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
@@ -11,6 +11,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerStep,
     SpeedStatus,
     module_model_from_string,
+    ModuleType,
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -31,6 +32,7 @@ from ..module import (
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
 from .exceptions import InvalidMagnetEngageHeightError
 
@@ -47,12 +49,10 @@ class ModuleCore(AbstractModuleCore):
         module_id: str,
         engine_client: ProtocolEngineClient,
         api_version: APIVersion,
-        sync_module_hardware: SynchronousAdapter[hw_modules.AbstractModule],
     ) -> None:
         self._module_id = module_id
         self._engine_client = engine_client
         self._api_version = api_version
-        self._sync_module_hardware = sync_module_hardware
 
     @property
     def api_version(self) -> APIVersion:
@@ -89,6 +89,18 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
     """Temperature Module core logic implementation for Python protocols."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
+
+    def __init__(
+        self,
+        sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck],
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ):
+        super().__init__(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )
+        self._sync_module_hardware = sync_module_hardware
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
@@ -127,6 +139,18 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
     """Magnetic Module control interface via a ProtocolEngine."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
+
+    def __init__(
+        self,
+        sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck],
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ):
+        super().__init__(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )
+        self._sync_module_hardware = sync_module_hardware
 
     def engage(
         self,
@@ -206,6 +230,18 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
     _repetitions: Optional[int] = None
     _step_count: Optional[int] = None
+
+    def __init__(
+        self,
+        sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler],
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ):
+        super().__init__(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )
+        self._sync_module_hardware = sync_module_hardware
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
@@ -348,6 +384,18 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
 
+    def __init__(
+        self,
+        sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker],
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ):
+        super().__init__(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )
+        self._sync_module_hardware = sync_module_hardware
+
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
         self._engine_client.heater_shaker_set_target_temperature(
@@ -407,3 +455,56 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
+
+
+class MagneticBlockCore(ModuleCore, AbstractMagneticBlockCore):
+    """Magnetic Block control interface via a ProtocolEngine."""
+
+
+def create_module_core(
+    module_type: ModuleType,
+    module_id: str,
+    engine_client: ProtocolEngineClient,
+    api_version: APIVersion,
+    sync_module_hardware: Optional[SynchronousAdapter[hw_modules.AbstractModule]],
+) -> ModuleCore:
+    if sync_module_hardware:
+        # assert (
+        #     sync_module_hardware is not None
+        # ), "Expected module hardware, got None instead."
+        if module_type == ModuleType.TEMPERATURE:
+            return TemperatureModuleCore(
+                module_id=module_id,
+                engine_client=engine_client,
+                api_version=api_version,
+                sync_module_hardware=sync_module_hardware,
+            )
+        elif module_type == ModuleType.MAGNETIC:
+            return MagneticModuleCore(
+                module_id=module_id,
+                engine_client=engine_client,
+                api_version=api_version,
+                sync_module_hardware=sync_module_hardware,
+            )
+        elif module_type == ModuleType.THERMOCYCLER:
+            return ThermocyclerModuleCore(
+                module_id=module_id,
+                engine_client=engine_client,
+                api_version=api_version,
+                sync_module_hardware=sync_module_hardware,
+            )
+        elif module_type == ModuleType.HEATER_SHAKER:
+            return HeaterShakerModuleCore(
+                module_id=module_id,
+                engine_client=engine_client,
+                api_version=api_version,
+                sync_module_hardware=sync_module_hardware,
+            )
+    elif module_type == ModuleType.MAGNETIC_BLOCK:
+        return MagneticBlockCore(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )
+
+    return ModuleCore(
+        module_id=module_id, engine_client=engine_client, api_version=api_version
+    )
