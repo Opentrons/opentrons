@@ -3,29 +3,18 @@ import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
-import type {
-  AttachedPipette,
-  AttachedPipettesByMount,
-} from '../../../redux/pipettes/types'
 import type { PipetteWizardStep } from '../types'
+import type { AttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
 
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
-
-const mockAttachedPipettesEmpty: AttachedPipettesByMount = {
+const mockAttachedPipettesEmpty: AttachedPipettesFromInstrumentsQuery = {
   left: null,
   right: null,
 }
-const mockAttachedPipettesNotEmpty: AttachedPipettesByMount = {
-  left: mockPipette,
+const mockAttachedPipettesNotEmpty: AttachedPipettesFromInstrumentsQuery = {
+  left: mockAttachedPipetteInformation,
   right: null,
 }
 

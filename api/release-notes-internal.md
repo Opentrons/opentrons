@@ -4,9 +4,9 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.3.0
+# Internal Release 0.4.0
 
-This is internal release 0.3.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+This is internal release 0.4.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
 
 Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
 
@@ -15,13 +15,12 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - This release will work best on a DVT robot frame with a programmed rear-panel board. If that doesn't apply, edit `/data/feature_flags.json` and turn `rearPanelIntegration` to `false` or the robot server won't start.
 - This release is compatible with EVT pipettes and gripper only if they have received the tool ID rework.
 - This release is compatible with DVT pipettes and gripper.
-- This release is _not_ compatible with DVT module caddies.
+- This release should be used with DVT module caddies. This might introduce a slight LPC offset change if the previous offsets for labware on modules were measured while using EVT caddies.
 - This release should be used with pipette bootloaders of at least v7.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
 ### ODD
-- Deleting protocols stored on the robot via the ODD
 - Changing the text size on the ODD through the settings
 
 ### Robot Control
@@ -32,13 +31,15 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## Reasonably Sized New Things
 ### ODD
-- Liquid setup has come to protocol setup page
-- Gripper and pipette attach and calibration flows!
-- Running protocol page
+- No more unsightly menu bar at the top
+- You can delete runs  and protocols from the ODD
+- The ODD now displays the firmware version of attached devices. If devices are on different firmwares, it will display them in a list. If this is happening, it means something wasn't updated, and you should restart the robot with that thing connected.
+- More in-depth liquid setup screens
+
 ### Robot Control
-- Motion configuration fixes from harware testing
-- Module calibration exists in the protocol engine; you can use a script to run it with any pipette for any module. The data will be saved for inspection, but will not be loaded during protocols.
-- Cancelling a run should work now. It should no longer stay in "stop requested" forever and require a restart.
+- Updates to accelerations and speeds from hardware testing
+- Module calibration offsets will now be loaded in protocols once you run it with the script
+- When running the repl, you can disable automatic firmware update by setting the `OT3_DISABLE_FW_UPDATES` environment variable. Please do this rarely, since often you will see weird failures if you have out-of-date firmware.
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
@@ -48,6 +49,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Pipette and gripper automated offset calibration
 - Network connectivity and discoverability
 - Firmware update for all devices attached when the robot turns on
+- Cancelling a protocol run. We're pretty sure we fixed this so definitely tell us if it's not.
 
 ### ODD
 - Protocol execution
@@ -63,3 +65,4 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Smaller fun features
 - Turn on display idle in the display settings for a fun surprise
 - The lights work (don't do anything yet though)
+- Lots of visual updates and improvements in the ODD
