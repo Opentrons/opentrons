@@ -307,6 +307,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
+        selected_hardware: Union[HeaterShaker, MagDeck, TempDeck, Thermocycler, None] = None
         if module_type != ModuleType.MAGNETIC_BLOCK:
             assert (
                 result.serialNumber is not None

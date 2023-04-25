@@ -10,7 +10,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     ThermocyclerStep,
     SpeedStatus,
-    module_model_from_string
+    module_model_from_string,
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,

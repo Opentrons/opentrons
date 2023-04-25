@@ -15,13 +15,20 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules import (
+    AbstractModule,
+    TempDeck,
+    MagDeck,
+    Thermocycler,
+    HeaterShaker,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     TemperatureModuleModel,
     MagneticModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
 )
 from opentrons.protocol_engine import (
     ModuleModel as EngineModuleModel,
@@ -57,6 +64,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     MagneticModuleCore,
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
+    MagneticBlockCore,
 )
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
@@ -426,42 +434,54 @@ def test_add_labware_definition(
 
 # TODO(mc, 2022-10-25): move to module core factory function
 @pytest.mark.parametrize(
-    ("requested_model", "engine_model", "expected_core_cls"),
+    (
+        "requested_model",
+        "engine_model",
+        "expected_core_cls",
+        "expected_hardware_module",
+    ),
     [
         (
             TemperatureModuleModel.TEMPERATURE_V1,
             EngineModuleModel.TEMPERATURE_MODULE_V1,
             TemperatureModuleCore,
+            TempDeck,
         ),
         (
             TemperatureModuleModel.TEMPERATURE_V2,
             EngineModuleModel.TEMPERATURE_MODULE_V2,
             TemperatureModuleCore,
+            TempDeck,
         ),
         (
             MagneticModuleModel.MAGNETIC_V1,
             EngineModuleModel.MAGNETIC_MODULE_V1,
             MagneticModuleCore,
+            MagDeck,
         ),
         (
             MagneticModuleModel.MAGNETIC_V2,
             EngineModuleModel.MAGNETIC_MODULE_V2,
             MagneticModuleCore,
+            MagDeck,
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleCore,
+            Thermocycler,
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V2,
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
             ThermocyclerModuleCore,
+            Thermocycler,
         ),
         (
             HeaterShakerModuleModel.HEATER_SHAKER_V1,
             EngineModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleCore,
+            HeaterShaker,
         ),
     ],
 )
@@ -472,19 +492,16 @@ def test_load_module(
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
+    expected_hardware_module: Type[AbstractModule],
     subject: ProtocolCore,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
 
-    mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
-    mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
+    mock_hw_mod = decoy.mock(cls=expected_hardware_module)
 
-    decoy.when(mock_hw_mod_1.device_info).then_return({"serial": "abc123"})
-    decoy.when(mock_hw_mod_2.device_info).then_return({"serial": "xyz789"})
-    decoy.when(mock_sync_hardware_api.attached_modules).then_return(
-        [mock_hw_mod_1, mock_hw_mod_2]
-    )
+    decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
 
     decoy.when(
         mock_engine_client.load_module(
@@ -500,6 +517,8 @@ def test_load_module(
         )
     )
 
+    decoy.when(mock_engine_client.state.config.ignore_pause).then_return(False)
+
     result = subject.load_module(
         model=requested_model,
         deck_slot=DeckSlotName.SLOT_1,
@@ -507,6 +526,65 @@ def test_load_module(
     )
 
     assert isinstance(result, expected_core_cls)
+    assert result.module_id == "abc123"
+    assert subject.get_module_cores() == [result]
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_module_id="abc123",
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_1,
+            allowed_labware_ids={"fixed-trash-123"},
+            allowed_module_ids={"abc123"},
+        )
+    ).then_return(
+        LoadedModule.construct(id="abc123")  # type: ignore[call-arg]
+    )
+    decoy.when(mock_engine_client.state.labware.get_id_by_module("abc123")).then_raise(
+        LabwareNotLoadedOnModuleError("oh no")
+    )
+
+    assert subject.get_slot_item(DeckSlotName.SLOT_1) is result
+    assert subject.get_labware_on_module(result) is None
+
+
+def test_load_mag_block(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a load module engine command."""
+    definition = ModuleDefinition.construct()  # type: ignore[call-arg]
+
+    decoy.when(
+        mock_engine_client.load_module(
+            model=EngineModuleModel.MAGNETIC_BLOCK_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+    ).then_return(
+        commands.LoadModuleResult(
+            moduleId="abc123",
+            definition=definition,
+            model=EngineModuleModel.MAGNETIC_BLOCK_V1,
+            serialNumber=None,
+        )
+    )
+
+    result = subject.load_module(
+        model=MagneticBlockModel.MAGNETIC_BLOCK_V1,
+        deck_slot=DeckSlotName.SLOT_1,
+        configuration=None,
+    )
+
+    assert isinstance(result, MagneticBlockCore)
     assert result.module_id == "abc123"
     assert subject.get_module_cores() == [result]
 
@@ -560,7 +638,7 @@ def test_load_module_thermocycler_with_no_location(
     """It should issue a load module engine command with location at 7."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
 
-    mock_hw_mod = decoy.mock(cls=AbstractModule)
+    mock_hw_mod = decoy.mock(cls=Thermocycler)
     decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
 
@@ -577,6 +655,8 @@ def test_load_module_thermocycler_with_no_location(
             serialNumber="xyz789",
         )
     )
+
+    decoy.when(mock_engine_client.state.config.ignore_pause).then_return(False)
 
     result = subject.load_module(
         model=requested_model,

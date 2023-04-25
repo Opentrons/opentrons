@@ -76,7 +76,7 @@ async def test_load_module_implementation_mag_block(
     ).then_return(
         LoadedModuleData(
             module_id="module-id",
-            serial_number="",
+            serial_number=None,
             definition=mag_block_v1_def,
         )
     )
@@ -84,7 +84,7 @@ async def test_load_module_implementation_mag_block(
     result = await subject.execute(data)
     assert result == LoadModuleResult(
         moduleId="module-id",
-        serialNumber="",
+        serialNumber=None,
         model=ModuleModel.TEMPERATURE_MODULE_V2,
         definition=mag_block_v1_def,
     )
