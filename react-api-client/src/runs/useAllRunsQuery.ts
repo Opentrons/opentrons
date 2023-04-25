@@ -9,7 +9,8 @@ export function useAllRunsQuery(
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs> {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host as HostConfig, 'runs', 'details'],
     () => getRuns(host as HostConfig).then(response => response.data),
