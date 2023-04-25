@@ -16,15 +16,15 @@ import {
   SecondaryButton,
   BORDERS,
 } from '@opentrons/components'
-import { useCreateMaintenanceRunMutation, useDeleteMaintenanceRunMutation, useRunQuery } from '@opentrons/react-api-client'
+import { useRunQuery } from '@opentrons/react-api-client'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
-import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { HowLPCWorksModal } from './HowLPCWorksModal'
 import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
 import { CurrentOffsetsModal } from './CurrentOffsetsModal'
+import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 
 interface LaunchLabwarePositionCheckProps {
   robotName: string
@@ -44,9 +44,6 @@ export function LaunchLabwarePositionCheck(
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [showHelpModal, setShowHelpModal] = React.useState(false)
-  const { createMaintenanceRun } = useCreateMaintenanceRunMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
-  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(null)
   const [showCurrentOffsetsModal, setShowCurrentOffsetsModal] = React.useState(
     false
   )
@@ -59,13 +56,7 @@ export function LaunchLabwarePositionCheck(
   const handleClickViewCurrentOffsets: React.MouseEventHandler<HTMLAnchorElement> = () => {
     setShowCurrentOffsetsModal(true)
   }
-  const handleCloseLPC = (): void => {
-    if (maintenanceRunId != null) {
-      deleteMaintenanceRun(maintenanceRunId, {
-        onSuccess: () => { setMaintenanceRunId(null) }
-      })
-    }
-  }
+  const {launchLPC, LPCWizard} = useLaunchLPC(runId)
 
   return (
     <Flex
@@ -128,7 +119,7 @@ export function LaunchLabwarePositionCheck(
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
           onClick={() => {
-            createMaintenanceRun({}, { onSuccess: (maintenanceRun) => setMaintenanceRunId(maintenanceRun.data.id) })
+            launchLPC()
             setIsShowingLPCSuccessToast(false)
           }}
           id="LabwareSetup_checkLabwarePositionsButton"
@@ -144,15 +135,7 @@ export function LaunchLabwarePositionCheck(
       {showHelpModal && (
         <HowLPCWorksModal onCloseClick={() => setShowHelpModal(false)} />
       )}
-      {maintenanceRunId != null ? (
-        <LabwarePositionCheck
-          onCloseClick={handleCloseLPC}
-          runId={runId}
-          mostRecentAnalysis={robotProtocolAnalysis}
-          existingOffsets={currentOffsets}
-          maintenanceRunId={maintenanceRunId}
-        />
-      ) : null}
+      {LPCWizard}
       {showCurrentOffsetsModal && (
         <CurrentOffsetsModal
           currentOffsets={currentOffsets}
