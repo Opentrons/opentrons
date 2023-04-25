@@ -54,6 +54,9 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     MoveScheduler,
     _CompletionPacket,
 )
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
@@ -475,11 +478,13 @@ class MockSendMoveCompleter:
         move_groups: MoveGroups,
         listener: MessageListenerCallback,
         start_at_index: int = 0,
+        ack_id: int = 1,
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
         self._start_at_index = start_at_index
+        self._ack_id = ack_id
 
     @property
     def groups(self) -> MoveGroups:
@@ -516,7 +521,7 @@ class MockSendMoveCompleter:
                                 int(move.distance_mm * 4000)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                         )
                         arbitration_id = ArbitrationId(
                             parts=ArbitrationIdParts(originating_node_id=node)
@@ -535,7 +540,7 @@ class MockSendMoveCompleter:
                                 int(move.velocity_mm_sec * 0)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                             action=PipetteTipActionTypeField(move.action.value),
                             success=UInt8Field(1),
                             gear_motor_id=GearMotorIdField(1),
@@ -557,7 +562,7 @@ class MockSendMoveCompleter:
                                 int(move.velocity_mm_sec * 0)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                             action=PipetteTipActionTypeField(move.action.value),
                             success=UInt8Field(1),
                             gear_motor_id=GearMotorIdField(0),
@@ -597,7 +602,7 @@ class MockSendMoveCompleter:
                                 int(move.velocity_mm_sec * 0)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                             action=PipetteTipActionTypeField(move.action.value),
                             success=UInt8Field(1),
                             gear_motor_id=GearMotorIdField(1),
@@ -725,6 +730,18 @@ async def test_single_move(
     )
     assert len(position) == 1
     assert position[0][1].payload.current_position_um.value == 246000
+
+
+async def test_home_timeout(
+    mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups
+) -> None:
+    """It should send a start group command."""
+    subject = MoveScheduler(move_groups=move_group_home_single)
+    mock_sender = MockSendMoveCompleter(move_group_home_single, subject, ack_id=3)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(MoveConditionNotMet):
+        await subject.run(can_messenger=mock_can_messenger)
 
 
 async def test_tip_action_move_runner_receives_two_responses(

@@ -12,6 +12,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     MotorPositionFlags,
     ErrorSeverity,
     GearMotorId,
+    MoveAckId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -58,6 +59,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
     MoveStopConditionField,
+    MoveAckIdField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -411,15 +413,14 @@ class MoveScheduler:
 
     def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
-        ack_id = message.payload.ack_id.value
+        ack_id = MoveAckIdField(message.payload.ack_id.value)
+        stop_cond = self._stop_condition[group_id]
         try:
-            if self._stop_condition[
-                group_id
-            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-                if ack_id == UInt8Field(1):
-                    condition = "Homing timed out."
-                    log.warning(f"Homing failed. Condition: {condition}")
-                    raise MoveConditionNotMet()
+            # FIXME: revise this
+            if stop_cond == MoveStopCondition.limit_switch and ack_id != MoveAckId.stopped_by_condition:
+                condition = "Homing timed out."
+                log.warning(f"Homing failed. Condition: {condition}")
+                raise MoveConditionNotMet()
         except IndexError:
             # If we have two move group runners running at once, they each
             # pick up groups they don't care about, and need to not fail.

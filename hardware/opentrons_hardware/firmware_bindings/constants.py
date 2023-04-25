@@ -352,3 +352,12 @@ class MotorUsageValueType(int, Enum):
     right_gear_motor_distance = 0x2
     force_application_time = 0x3
     total_error_count = 0x4
+
+
+class MoveAckId(int, Enum):
+    """Move Ack IDs. """
+
+    complete_without_condition = 0x1
+    stopped_by_condition = 0x2
+    timeout = 0x3
+    position_error = 0x4

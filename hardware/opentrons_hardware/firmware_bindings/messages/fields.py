@@ -20,6 +20,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     MoveStopCondition,
     GearMotorId,
     MotorUsageValueType,
+    MoveAckId,
 )
 
 from opentrons_hardware.firmware_bindings.binary_constants import (
@@ -486,3 +487,15 @@ class MotorUsageTypeField(utils.BinaryFieldBase[bytes]):
     def __repr__(self) -> str:
         """Repr."""
         return f"{self.__class__.__name__}(key={MotorUsageValueType(self.key).name}, length={self.length}, usage_data={self.usage_value})"
+
+
+class MoveAckIdField(utils.UInt8Field):
+    """Move Ack id."""
+
+    def __repr__(self) -> str:
+        """Print ack id."""
+        try:
+            ack_id = MoveAckId(self.value).name
+        except ValueError:
+            ack_id = str(self.value)
+        return f"{self.__class__.__name__}(value={ack_id})"
