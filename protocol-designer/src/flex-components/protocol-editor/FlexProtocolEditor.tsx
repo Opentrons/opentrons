@@ -17,6 +17,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleModel,
   SPAN7_8_10_11_SLOT,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import { i18n } from '../../localization'
@@ -28,6 +30,7 @@ import { mountSide, navPillTabListLength, pipetteSlot } from '../constant'
 import { RoundTabs } from './RoundTab'
 import { SelectPipetteOption } from './SelectPipette'
 import { DeckSlot } from '../../types'
+import { useDispatch } from 'react-redux'
 
 export interface FormModule {
   onDeck: boolean
@@ -35,11 +38,7 @@ export interface FormModule {
   slot: DeckSlot
 }
 interface InitialValues {
-  fields: {
-    pndName: string
-    pndOrgAuthor: string
-    pndDescription: string
-  }
+  fields: { name: string; author: string; description: string }
   mountSide: string
   pipetteSelectionData: {
     firstPipette: {
@@ -65,9 +64,9 @@ interface InitialValues {
 
 const getInitialValues: InitialValues = {
   fields: {
-    pndName: '',
-    pndOrgAuthor: '',
-    pndDescription: '',
+    name: '',
+    author: '',
+    description: '',
   },
   mountSide,
   pipetteSelectionData: {
@@ -92,12 +91,12 @@ const getInitialValues: InitialValues = {
     },
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
-      slot: '1',
+      model: MAGNETIC_MODULE_V1,
+      slot: '4',
     },
     [TEMPERATURE_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
+      model: TEMPERATURE_MODULE_V2,
       slot: '3',
     },
     [THERMOCYCLER_MODULE_TYPE]: {
@@ -137,7 +136,7 @@ const selectComponent = (selectedTab: number, props: any): any => {
 
 function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
-
+  
   // Next button click
   const handleNext = ({ selectedTab }: Props): void => {
     const setTabNumber =
