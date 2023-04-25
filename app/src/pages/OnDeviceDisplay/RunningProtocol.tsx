@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -127,6 +126,7 @@ export function RunningProtocol(): JSX.Element {
           <ConfirmCancelRunModal
             runId={runId}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+            isActiveRun={true}
           />
         ) : null}
         <Flex

@@ -3,7 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
@@ -58,6 +58,7 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
+      isActiveRun: false,
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
     }
@@ -90,6 +91,14 @@ describe('ConfirmCancelRunModal', () => {
     expect(getAllByRole('button').length).toBe(2)
     getByText('Go back')
     getByText('Cancel run')
+  })
+
+  it('should render the modal with red frame', () => {
+    props.isActiveRun = true
+    const [{ getByLabelText }] = render(props)
+    expect(getByLabelText('modal_medium')).toHaveStyle(
+      `backgroundColor: ${COLORS.red_two}`
+    )
   })
 
   it('when tapping go back, the mock function is called', () => {

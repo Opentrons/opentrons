@@ -22,11 +22,13 @@ import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisp
 interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
+  isActiveRun: boolean
 }
 
 export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
+  isActiveRun,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
@@ -57,7 +59,7 @@ export function ConfirmCancelRunModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      isError
+      isError={isActiveRun}
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
