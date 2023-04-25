@@ -85,6 +85,6 @@ async def test_load_module_implementation_mag_block(
     assert result == LoadModuleResult(
         moduleId="module-id",
         serialNumber=None,
-        model=ModuleModel.TEMPERATURE_MODULE_V2,
+        model=ModuleModel.MAGNETIC_BLOCK_V1,
         definition=mag_block_v1_def,
     )
