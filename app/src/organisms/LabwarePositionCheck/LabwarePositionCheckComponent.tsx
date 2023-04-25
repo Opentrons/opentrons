@@ -44,7 +44,7 @@ interface LabwarePositionCheckModalProps {
   caughtError?: Error
 }
 
-export const LabwarePositionCheckInner = (
+export const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const { mostRecentAnalysis, onCloseClick, existingOffsets, runId, maintenanceRunId } = props
@@ -298,12 +298,3 @@ export const LabwarePositionCheckInner = (
     </Portal>
   )
 }
-
-// NOTE: we are memoizing on the run id here, because this flow cannot be launched
-// until the robot analysis loads (which requires a stable run), other components that
-// rendered nearby will cause the run to be periodically polled for updates
-// and we don't need those polls causing unnecessary rerenders to the LPC flow
-export const LabwarePositionCheckComponent = React.memo(
-  LabwarePositionCheckInner,
-  ({ maintenanceRunId: prevMaintenanceRunId }, { maintenanceRunId: nextMaintenanceRunId }) => prevMaintenanceRunId === nextMaintenanceRunId
-)
