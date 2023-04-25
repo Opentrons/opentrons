@@ -1,6 +1,6 @@
-import { COLORS } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { COLORS } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
 export interface InterventionCommandMessageProps {
