@@ -192,7 +192,7 @@ async def find_edge_binary(
             # In this block, we've hit the deck
             LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
             # store the final found Z height found
-            # because the height
+            # because the height is most accurate next to the edge
             final_z_height_found = interaction_pos
             if copysign(stride, direction_if_hit) == stride:
                 # If we're in direction_if_hit direction, the last probe was on the deck,
