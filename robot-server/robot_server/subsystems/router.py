@@ -141,12 +141,41 @@ async def get_subsystem_update(hardware: HardwareControlAPI = Depends(get_hardwa
     pass
 
 @subsystems_router.get(
-    "/subsystems/updates",
-    summary="Get a list of ongoing updates.",
-    description="Get a list of currently-running subsystem firmware updates.",
+    "/subsystems/updates/current",
+    summary="Get a list of currently-ongoing updates by subsystem.",
+    description="Get a list of currently-running subsystem firmware updates. This is a good snapshot of what, if anything, is currently being updated and may block other robot work. To guarantee data about an update you were previously interested in, get its id using /subsystems/updates/all.",
     response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}}
 )
 async def get_subsystem_updates(hardware: HardwareControlAPI = Depends(get_hardware)) -> PydanticResponse[SimpleMultiBody[UpdateProgressData]]:
+    pass
+
+@subsystems_router.get(
+    "/subsystems/updates/current/{subsystem}",
+    summary="Get any currently-ongoing update for a specific subsystem.",
+    description="As /subsystems/updates/current but filtered by the route parameter."
+)
+async def get_subsystem_update(
+        subsystem: str,
+        hardware: HardwareControlAPI = Depends(get_hardware),
+) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
+    pass
+
+@subsystems_router.get(
+    "/subsystems/updates/all",
+    summary="Get a list of all updates by id.",
+    description="Get a list of all updates, including both current and concluded ones, by their update id. This is a list of all previous updates since the machine booted, including their final status and whether they succeeded or failed. While an update might complete while you're not polling and therefore disappear from /subsystems/updates/running, you can always pull a previous update by id from here.",
+    response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}}
+)
+async def get_update_processes(hardware: HardwareControlAPI = Depends(get_hardware)) -> PydanticResponse[SimpleMultiBody[UpdateProgressData]]:
+    pass
+
+@subsystems_router.get(
+    "/subsystems/updates/all/{id}",
+    summary="Get the details of a specific update id.",
+    description="As /subsystems/updates/all but filtered by the route parameter.",
+    response={status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]}}
+)
+async def get_update_process(id: str, hardware: HardwareControlAPI = Depends(get_hardware)) -> PydanticResponse[SimpleBody[UpdateProgress]]:
     pass
 
 @subsystems_router.post(

@@ -1,6 +1,6 @@
 """Class to monitor firmware update status."""
 from datetime import datetime
-from typing import Dict, Union, TYPE_CHECKING, Iterable, Iterator, Optional, Any
+from typing import Dict, Union, TYPE_CHECKING, Iterable, Iterator, Optional, Any, Callable, Awaitable
 from typing_extensions import Literal
 
 # TODO: Remove when on py 3.11 when this isn't a different class anymore
@@ -16,6 +16,8 @@ from opentrons.hardware_control.types import (
     SubSystem,
 )
 from robot_server.service.task_runner import TaskRunner
+
+from .errors import SubSystemNotFound
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +35,15 @@ class UpdateFailed(RuntimeError):
 
 class UpdateInProgress(RuntimeError):
     """Error raised when an update is already ongoing on the same device."""
+    def __init__(self, subsystem: Subsystem) -> None:
+        super().__init__()
+        self.subsystem = subsystem
+
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__}: {self.subsystem}>'
+
+    def __str__(self) -> str:
+        return f'Update for {self.subsystem} already in progress'
 
 
 class _UpdatePacketType(Enum):
@@ -67,13 +78,14 @@ class _UpdateProcess:
 
     _status_queue: "Queue[_UpdatePacket]"
     _hw_handle: "OT3API"
-    _mount: OT3Mount
+    _subsystem: SubSystem
     _status_cache: Optional[_UpdatePacket]
     _created_at: datetime
     _update_id: str
+    _complete_callback: Callable[[], Awaitable[None]]
 
     def __init__(
-        self, hw_handle: "OT3API", subsystem: SubSystem, created_at: datetime
+            self, hw_handle: "OT3API", subsystem: SubSystem, created_at: datetime, complete_callback: Callable[[], Awaitable[None]]
     ) -> None:
         self._status_queue = Queue()
         self._hw_handle = hw_handle
@@ -81,25 +93,15 @@ class _UpdateProcess:
         self._status_cache = None
         self._status_cache_lock = Lock()
         self._created_at = created_at
+        self._complete_callback = complete_callback
+
+        if subsystem not in self._hw_handle.attached_subsystems:
+            raise SubsystemNotFound(subsystem)
+
         in_progress = self._hw_handle.get_firmware_update_progress()
+        if subsystem in in_progress:
+            raise _UpdateInProgress(subsystem)
 
-        def _mounts_in_subsystem_list(
-            subsystem: Iterable[SubSystem],
-        ) -> Iterator[OT3Mount]:
-            for subsys in subsystem:
-                try:
-                    mount = subsystem_to_mount(subsys)
-                except KeyError:
-                    continue
-                else:
-                    yield mount
-
-        in_progress_instruments = list(_mounts_in_subsystem_list(in_progress.keys()))
-        if in_progress_instruments:
-            raise UpdateInProgress()
-
-        if not self._hw_handle.get_all_attached_instr()[self._mount]:
-            raise InstrumentNotFound()
 
     @property
     def status_cache(self) -> _UpdatePacket:
@@ -123,7 +125,7 @@ class _UpdateProcess:
 
     async def _update_task(self) -> None:
         try:
-            async for update in self._hw_handle.update_instrument_firmware(self.mount):
+            async for update in self._hw_handle.update_firmware({self.subsystem}):
                 await self._status_queue.put(
                     _UpdateProgressPacket(update.progress, update.status)
                 )
@@ -131,6 +133,7 @@ class _UpdateProcess:
         except Exception as e:
             log.exception("Failed to update firmware")
             await self._status_queue.put(_UpdateErrorPacket(e))
+        await self._complete_callback()
 
     def get_handle(self) -> "UpdateProcessHandle":
         return UpdateProcessHandle(self)
@@ -166,7 +169,7 @@ class ProcessDetails:
     """The static details of an update process that are set when it starts."""
 
     created_at: datetime
-    mount: OT3Mount
+    subsystem: SubSystem
     update_id: str
 
 
@@ -234,8 +237,10 @@ class UpdateProcessHandle:
 class FirmwareUpdateManager:
     """State storage and progress monitoring for instrument firmware updates."""
 
-    _running_updates: Dict[str, _UpdateProcess]
-    #: A store for any updates that are currently running
+    _all_updates_by_id: Dict[str, _UpdateProcess]
+    #: A store for any updates that are currently running, by their process id
+    _running_updates_by_subsystem: Dict[SubSystem, _UpdateProcess]
+    #: A store for any updates that are currently running, by subsystem
     _management_lock: Lock
     #: A lock for accessing the store, mostly to avoid spurious toctou problems with it
 
@@ -243,44 +248,79 @@ class FirmwareUpdateManager:
     _hardware_handle: "OT3API"
 
     def __init__(self, task_runner: TaskRunner, hw_handle: "OT3API") -> None:
-        self._running_updates = {}
+        self._all_updates_by_id = {}
+        self._running_updates_by_subsystem = {}
         self._task_runner = task_runner
         self._management_lock = Lock()
         self._hardware_handle = hw_handle
 
-    async def _get(self, update_id: str) -> _UpdateProcess:
+    async def _get_by_id(self, update_id: str) -> _UpdateProcess:
         async with self._management_lock:
             try:
-                return self._running_updates[update_id]
+                return self._all_updates_by_id[update_id]
             except KeyError as e:
                 raise UpdateIdNotFound() from e
 
-    async def _emplace(
-        self, update_id: str, mount: OT3Mount, creation_time: datetime
-    ) -> _UpdateProcess:
-        if update_id in self._running_updates:
-            raise UpdateIdExists()
-        self._running_updates[update_id] = _UpdateProcess(
-            self._hardware_handle, mount, creation_time, update_id
-        )
-        self._task_runner.run(self._running_updates[update_id]._update_task)
-        return self._running_updates[update_id]
+    async def _get_by_subsystem(self, subsystem: SubSystem) -> _UpdateProcess:
+        async with self._management_lock:
+            try:
+                return self._running_updates_by_subsystem[subsystem]
+            except KeyError as e:
+                raise UpdateNotFound() from e
 
-    def get_update_process_handle(self, update_id: str) -> UpdateProcessHandle:
+    async def _emplace(
+        self, update_id: str, subsystem: SubSystem, creation_time: datetime
+    ) -> _UpdateProcess:
+        if update_id in self._all_updates_by_id:
+            raise UpdateIdExists()
+        if subsystem in self._running_updates_by_subsystem:
+            raise UpdateInProgress(subsystem)
+
+        async def complete(self) -> None:
+            with self._management_lock:
+                try:
+                    self._running_updates_by_subsystem.pop(subsystem)
+                except KeyError:
+                    log.exception(f'Double pop for update on {subsystem}')
+
+        self._all_updates_by_id[update_id] = _UpdateProcess(
+            self._hardware_handle, mount, creation_time, update_id, complete
+
+        )
+        self._running_updates_by_subsystem[subsystem] = self._all_updates_by_id[update_id]
+        self._task_runner.run(self._all_updates_by_id[update_id]._update_task)
+        return self._all_updates_by_id[update_id]
+
+
+    def get_update_process_handle_by_id(self, update_id: str) -> UpdateProcessHandle:
         """Get a handle for a process by its update id.
+
+        Note that process are kept around basically forever (program lifetime) by id, to allow for
+        clients that weren't around at the moment of completion to still retrieve the completion outcome.
 
         This is the way to get access to a running process - the process object itself should
         not be touched outside this object or the task runner.
         """
         try:
-            return self._running_updates[update_id].get_handle()
+            return self._all_updates_by_id[update_id].get_handle()
         except KeyError as ke:
             raise UpdateIdNotFound() from ke
+
+    def get_update_process_handle_by_subsystem(self, subsystem: SubSystem) -> UpdateProcessHandle:
+        """Get a handle for a process by its subsystem.
+
+        This is the way to get access to a running process - the process object itself should
+        not be touched outside this object or the task runner.
+        """
+        try:
+            return self._running_updates_by_subsystem[subsystem].get_handle()
+        except KeyError as ke:
+            raise UpdateNotFound() from ke
 
     async def start_update_process(
         self,
         update_id: str,
-        mount: OT3Mount,
+        subsystem: SubSystem,
         created_at: datetime,
         start_timeout_s: float,
     ) -> UpdateProcessHandle:
@@ -293,7 +333,7 @@ class FirmwareUpdateManager:
         """
         try:
             return await wait_for(
-                self._start_and_get_process(update_id, mount, created_at),
+                self._start_and_get_process(update_id, subsystem, created_at),
                 start_timeout_s,
             )
         except FuturesTimeoutError as fte:
@@ -302,21 +342,9 @@ class FirmwareUpdateManager:
             raise TimeoutError from fte
 
     async def _start_and_get_process(
-        self, update_id: str, mount: OT3Mount, creation_time: datetime
+        self, update_id: str, subsystem: SubSystem, creation_time: datetime
     ) -> UpdateProcessHandle:
         async with self._management_lock:
-            process = await self._emplace(update_id, mount, creation_time)
+            process = await self._emplace(update_id, subsystem, creation_time)
             await process.provide_latest_progress()
         return process.get_handle()
-
-    async def complete_update_process(self, update_id: str) -> None:
-        """Mark an update process as complete.
-
-        This should probably only be called when a process is marked done, but all it really does is
-        eject the process from the internal store so that future status calls will indicate the process
-        is gone.
-        """
-        try:
-            self._running_updates.pop(update_id)
-        except KeyError as ke:
-            raise UpdateIdNotFound() from ke
