@@ -43,6 +43,7 @@ import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { getLoadedLabware } from '../CommandText/utils/accessors'
 import {
   useDownloadRunLog,
   useLabwareRenderInfoForRunById,
@@ -57,7 +58,6 @@ import {
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { LabwareLocation } from '@opentrons/shared-data'
-import { getLoadedLabware } from '../CommandText/utils/accessors'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,

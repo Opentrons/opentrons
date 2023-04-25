@@ -29,9 +29,9 @@ import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 
 import type { RobotType } from '@opentrons/shared-data'
+import type { RunCommandSummary } from '@opentrons/api-client'
 import type { LabwareRenderInfoById } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import type { ModuleRenderInfoById } from '../Devices/hooks'
-import { RunCommandSummary } from '@opentrons/api-client'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
