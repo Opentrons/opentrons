@@ -15,15 +15,11 @@ export function getLabwareNameFromRunData(
   commands: RunTimeCommand[]
 ): string {
   const loadedLabware = getLoadedLabware(protocolData, labwareId)
-  console.log({ loadedLabware })
   if (loadedLabware == null) {
-    console.log('loaded labware was null')
     return ''
   } else if (loadedLabware.definitionUri === FIXED_TRASH_DEF_URI) {
-    console.log('loaded labware was trash')
     return 'Fixed Trash'
   } else if (loadedLabware.displayName != null) {
-    console.log('loaded labware has display name')
     return loadedLabware.displayName
   } else {
     const labwareDef = getLabwareDefinitionsFromCommands(commands).find(

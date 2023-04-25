@@ -234,12 +234,16 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
                   )
                 : ''
             }
-            newDisplayLocation={getLabwareDisplayLocationFromRunData(
-              runData,
-              lastRunCommand.params.newLocation,
-              commandTextTranslator,
-              robotType
-            )}
+            newDisplayLocation={
+              lastRunCommand?.commandType === 'moveLabware'
+                ? getLabwareDisplayLocationFromRunData(
+                    runData,
+                    lastRunCommand.params.newLocation,
+                    commandTextTranslator,
+                    robotType
+                  )
+                : ''
+            }
             robotType={robotType}
             onResume={() => {
               setShowInterventionModal(false)

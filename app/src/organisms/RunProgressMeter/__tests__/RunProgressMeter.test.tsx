@@ -9,6 +9,7 @@ import {
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
+import { InterventionModal } from '../../InterventionModal'
 import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -20,6 +21,7 @@ import {
   NON_DETERMINISTIC_COMMAND_ID,
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
+import { mockPauseCommandWithStartTime } from '../../InterventionModal/__fixtures__'
 import { RunProgressMeter } from '..'
 
 jest.mock('@opentrons/react-api-client')
@@ -28,6 +30,7 @@ jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../../Devices/hooks/useLastRunCommandKey')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../atoms/ProgressBar')
+jest.mock('../../InterventionModal')
 
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -49,6 +52,9 @@ const mockUseLastRunCommandKey = useLastRunCommandKey as jest.MockedFunction<
   typeof useLastRunCommandKey
 >
 const mockProgressBar = ProgressBar as jest.MockedFunction<typeof ProgressBar>
+const mockInterventionModal = InterventionModal as jest.MockedFunction<
+  typeof InterventionModal
+>
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -63,6 +69,7 @@ describe('RunProgressMeter', () => {
   let props: React.ComponentProps<typeof RunProgressMeter>
   beforeEach(() => {
     mockProgressBar.mockReturnValue(<div>MOCK PROGRESS BAR</div>)
+    mockInterventionModal.mockReturnValue(<div>MOCK INTERVENTION MODAL</div>)
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
@@ -106,5 +113,15 @@ describe('RunProgressMeter', () => {
     getByText('Current Step:')
     getByText('Not started yet')
     getByText('Download run log')
+  })
+  it('should render an intervention modal when lastRunCommand is an intervention type', () => {
+    mockUseAllCommandsQuery.mockReturnValue({
+      data: { data: [mockPauseCommandWithStartTime], meta: { totalLength: 1 } },
+    } as any)
+    mockUseRunQuery.mockReturnValue({ data: { data: { labware: [] } } } as any)
+    mockUseCommandQuery.mockReturnValue({ data: null } as any)
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
+    const { getByText } = render(props)
+    expect(getByText('MOCK INTERVENTION MODAL')).toBeTruthy()
   })
 })
