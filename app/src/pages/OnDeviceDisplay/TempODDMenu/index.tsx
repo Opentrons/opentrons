@@ -39,15 +39,6 @@ export function TempODDMenu(): JSX.Element {
           {`Download latest OT-3 system version ${latestRobotSystemVersion}`}
         </PrimaryButton>
       )}
-      <Flex marginY="1rem">
-        <PrimaryButton
-          onClick={() =>
-            dispatch(updateConfigValue('onDeviceDisplaySettings.brightness', 7))
-          }
-        >
-          {'Change Display Brightness '}
-        </PrimaryButton>
-      </Flex>
       {/* TODO(bh, 2022-12-7): TEMP links to all routes to allow development throughout the app */}
       {onDeviceDisplayRoutes.map((route: RouteProps) => (
         <Flex key={route.path} margin="0.5rem">
