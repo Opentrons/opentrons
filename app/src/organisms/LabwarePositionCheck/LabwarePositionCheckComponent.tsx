@@ -15,8 +15,8 @@ import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 import {
-  useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
+  useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -30,7 +30,7 @@ import type { RegisterPositionAction, WorkingOffset } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 
@@ -38,6 +38,7 @@ const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
+  maintenanceRunId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
   caughtError?: Error
@@ -46,7 +47,7 @@ interface LabwarePositionCheckModalProps {
 export const LabwarePositionCheckInner = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
+  const { mostRecentAnalysis, onCloseClick, existingOffsets, runId, maintenanceRunId } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
@@ -123,11 +124,11 @@ export const LabwarePositionCheckInner = (
     { workingOffsets: [], tipPickUpOffset: null }
   )
   const [isExiting, setIsExiting] = React.useState(false)
-  const { createCommand: createSilentCommand } = useCreateCommandMutation()
+  const { createMaintenanceCommand: createSilentCommand } = useCreateMaintenanceCommandMutation(maintenanceRunId)
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
-  } = useChainRunCommands(runId)
+  } = useChainMaintenanceCommands(maintenanceRunId)
 
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -182,7 +183,6 @@ export const LabwarePositionCheckInner = (
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
       createSilentCommand({
-        runId,
         command: {
           commandType: 'moveRelative',
           params: { pipetteId: pipetteId, distance: step * dir, axis },
@@ -214,7 +214,7 @@ export const LabwarePositionCheckInner = (
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
     Promise.all(
-      offsets.map(data => createLabwareOffset({ runId: runId, data }))
+      offsets.map(data => createLabwareOffset({ runId, data }))
     )
       .then(() => {
         onCloseClick()
@@ -305,5 +305,5 @@ export const LabwarePositionCheckInner = (
 // and we don't need those polls causing unnecessary rerenders to the LPC flow
 export const LabwarePositionCheckComponent = React.memo(
   LabwarePositionCheckInner,
-  ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
+  ({ maintenanceRunId: prevMaintenanceRunId }, { maintenanceRunId: nextMaintenanceRunId }) => prevMaintenanceRunId === nextMaintenanceRunId
 )

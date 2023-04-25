@@ -16,7 +16,7 @@ import {
   SecondaryButton,
   BORDERS,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
+import { useCreateMaintenanceRunMutation, useDeleteMaintenanceRunMutation, useRunQuery } from '@opentrons/react-api-client'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { StyledText } from '../../../../atoms/text'
@@ -44,10 +44,9 @@ export function LaunchLabwarePositionCheck(
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [showHelpModal, setShowHelpModal] = React.useState(false)
-  const [
-    showLabwarePositionCheckModal,
-    setShowLabwarePositionCheckModal,
-  ] = React.useState(false)
+  const { createMaintenanceRun } = useCreateMaintenanceRunMutation()
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(null)
   const [showCurrentOffsetsModal, setShowCurrentOffsetsModal] = React.useState(
     false
   )
@@ -59,6 +58,13 @@ export function LaunchLabwarePositionCheck(
 
   const handleClickViewCurrentOffsets: React.MouseEventHandler<HTMLAnchorElement> = () => {
     setShowCurrentOffsetsModal(true)
+  }
+  const handleCloseLPC = (): void => {
+    if (maintenanceRunId != null) {
+      deleteMaintenanceRun(maintenanceRunId, {
+        onSuccess: () => { setMaintenanceRunId(null) }
+      })
+    }
   }
 
   return (
@@ -122,7 +128,7 @@ export function LaunchLabwarePositionCheck(
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
           onClick={() => {
-            setShowLabwarePositionCheckModal(true)
+            createMaintenanceRun({}, { onSuccess: (maintenanceRun) => setMaintenanceRunId(maintenanceRun.data.id) })
             setIsShowingLPCSuccessToast(false)
           }}
           id="LabwareSetup_checkLabwarePositionsButton"
@@ -138,12 +144,15 @@ export function LaunchLabwarePositionCheck(
       {showHelpModal && (
         <HowLPCWorksModal onCloseClick={() => setShowHelpModal(false)} />
       )}
-      {showLabwarePositionCheckModal && (
+      {maintenanceRunId != null ? (
         <LabwarePositionCheck
-          onCloseClick={() => setShowLabwarePositionCheckModal(false)}
+          onCloseClick={handleCloseLPC}
           runId={runId}
+          mostRecentAnalysis={robotProtocolAnalysis}
+          existingOffsets={currentOffsets}
+          maintenanceRunId={maintenanceRunId}
         />
-      )}
+      ) : null}
       {showCurrentOffsetsModal && (
         <CurrentOffsetsModal
           currentOffsets={currentOffsets}

@@ -9,10 +9,10 @@
       "channels": 1
     },
     "left": {
-      "model": "p10_single_v1",
+      "model": "p300_single_v2.1",
       "id": "123",
-      "max_volume": 10,
-      "name": "p10_single",
+      "max_volume": 300,
+      "name": "p300_single",
       "tip_length": 0,
       "channels": 1
     }
