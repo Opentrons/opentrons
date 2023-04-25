@@ -73,8 +73,8 @@ function curl(argv: CurlArgv): void {
     .then(res => res.text())
     .then(text => console.log(text))
     .finally(() => {
-        log.info('done, closing connection')
-        agent.destroy()
+      log.info('done, closing connection')
+      agent.destroy()
     })
 }
 
