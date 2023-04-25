@@ -1,6 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing_extensions import Literal
-from typing import Dict, Optional, Type, Union, List, Tuple
+from typing import Dict, Optional, cast, Union, List, Tuple, overload
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -9,8 +9,21 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.modules import (
+    TempDeck,
+    MagDeck,
+    Thermocycler,
+    HeaterShaker,
+)
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    ModuleType,
+    module_model_from_string,
+    HeaterShakerModuleModel,
+    ThermocyclerModuleModel,
+    TemperatureModuleModel,
+    MagneticModuleModel,
+)
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
@@ -213,18 +226,63 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             drop_offset=_drop_offset,
         )
 
+    @overload
     def _resolve_module_hardware(
-        self, serial_number: str, model: ModuleModel
-    ) -> AbstractModule:
+        self,
+        serial_number: str,
+        model: Literal["temperatureModuleV1", "temperatureModuleV2"],
+    ) -> TempDeck:
         """Resolve a module serial number to module hardware API."""
+        ...
+
+    @overload
+    def _resolve_module_hardware(
+        self,
+        serial_number: str,
+        model: Literal["magneticModuleV1", "magneticModuleV2"],
+    ) -> MagDeck:
+        """Resolve a module serial number to module hardware API."""
+        ...
+
+    @overload
+    def _resolve_module_hardware(
+        self,
+        serial_number: str,
+        model: Literal["thermocyclerModuleV1", "thermocyclerModuleV2"],
+    ) -> Thermocycler:
+        """Resolve a module serial number to module hardware API."""
+        ...
+
+    def _resolve_module_hardware(
+        self,
+        serial_number: str,
+        model: Literal[
+            "heaterShakerModuleV1",
+            "thermocyclerModuleV1",
+            "thermocyclerModuleV2",
+            "magneticModuleV1",
+            "magneticModuleV2",
+            "temperatureModuleV1",
+            "temperatureModuleV2",
+        ],
+    ) -> Union[HeaterShaker, MagDeck, TempDeck, Thermocycler]:
+        """Resolve a module serial number to module hardware API."""
+        module_model = module_model_from_string(model)
         if self.is_simulating():
-            return self._sync_hardware.create_simulating_module(model)  # type: ignore[no-any-return]
+            return self._sync_hardware.create_simulating_module(module_model)  # type: ignore[no-any-return]
 
         for module_hardware in self._sync_hardware.attached_modules:
             if serial_number == module_hardware.device_info["serial"]:
-                return module_hardware  # type: ignore[no-any-return]
+                if isinstance(module_model, HeaterShakerModuleModel):
+                    return cast(HeaterShaker, module_hardware)
+                elif isinstance(module_model, ThermocyclerModuleModel):
+                    return cast(Thermocycler, module_hardware)
+                elif isinstance(module_model, TemperatureModuleModel):
+                    return cast(TempDeck, module_hardware)
+                elif isinstance(module_model, MagneticModuleModel):
+                    return cast(MagDeck, module_hardware)
 
-        raise RuntimeError(f"Could not find specified module: {model.value}")
+        raise RuntimeError(f"Could not find specified module: {model}")
 
     def load_module(
         self,
@@ -250,8 +308,11 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         module_type = result.model.as_type()
 
         if module_type != ModuleType.MAGNETIC_BLOCK:
+            assert (
+                result.serialNumber is not None
+            ), "Expected a connected module but did not get a serial number."
             selected_hardware = self._resolve_module_hardware(
-                result.serialNumber, model
+                result.serialNumber, model.value
             )
 
         module_core = create_module_core(
