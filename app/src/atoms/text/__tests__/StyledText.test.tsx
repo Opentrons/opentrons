@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { TYPOGRAPHY, renderWithProviders } from '@opentrons/components'
 import { StyledText } from '../'
+import { fontSizeLabel } from '@opentrons/components/src/ui-style-constants/typography'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {
   return renderWithProviders(<StyledText {...props} />)[0]
@@ -188,28 +189,14 @@ describe('StyledText', () => {
 
   it('should render label semibold style', () => {
     props = {
-      as: 'labelSemiBold',
+      as: 'label',
       fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'labelSemiBold',
     }
     const { getByText } = render(props)
-    // passed
-    expect(getByText('labelSemiBold')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeLabel)}
-      fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}
-      lineHeight: ${String(TYPOGRAPHY.lineHeight12)}
-      `
-    )
-
-    // not passed
-    // expect(getByText('labelSemiBold')).toHaveStyle(
-    //   `fontSize: ${String(TYPOGRAPHY.fontSizeLabel)}`
-    // )
-    // expect(getByText('labelSemiBold')).toHaveStyle(
-    //   `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
-    // )
-    // expect(getByText('labelSemiBold')).toHaveStyle(
-    //   `lineHeight: ${String(TYPOGRAPHY.lineHeight12)}`
-    // )
+    const label = getByText('labelSemiBold')
+    expect(label).toHaveStyle(`fontSize: ${TYPOGRAPHY.fontSizeLabel}`)
+    expect(label).toHaveStyle(`fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(label).toHaveStyle(`lineHeight: ${TYPOGRAPHY.lineHeight12}`)
   })
 })
