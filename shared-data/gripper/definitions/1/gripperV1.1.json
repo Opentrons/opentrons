@@ -7,7 +7,7 @@
     "polynomial": [
       [0, 3.47784],
       [1, 1.37276],
-      [2, 0.02030]
+      [2, 0.0203]
     ],
     "defaultGripForce": 15.0,
     "defaultHomeForce": 12.0,
