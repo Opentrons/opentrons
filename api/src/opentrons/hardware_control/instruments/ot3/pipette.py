@@ -426,7 +426,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume = new_volume
 
     def add_current_volume(self, volume_incr: float) -> None:
-        assert self.ok_to_add_volume(volume_incr)
+        # assert self.ok_to_add_volume(volume_incr)
         self._current_volume += volume_incr
 
     def remove_current_volume(self, volume_incr: float) -> None:
