@@ -1,14 +1,17 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '..'
 import {
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
+  mockMoveLabwareCommand,
   truncatedCommandMessage,
 } from '../__fixtures__'
 
 const ROBOT_NAME = 'Otie'
+const LABWARE_NAME = 'Mock 96 Well Plate'
 
 const mockOnResumeHandler = jest.fn()
 
@@ -51,5 +54,24 @@ describe('InterventionModal', () => {
     const { getByText } = render(props)
     getByText('Confirm and resume').click()
     expect(mockOnResumeHandler).toHaveBeenCalled()
+  })
+
+  it('renders a move labware intervention modal given a move labware command', () => {
+    props = {
+      ...props,
+      command: mockMoveLabwareCommand,
+      robotType: OT2_STANDARD_MODEL,
+      moduleRenderInfo: {},
+      labwareRenderInfo: {},
+      labwareName: LABWARE_NAME,
+      oldDisplayLocation: 'Slot 1',
+      newDisplayLocation: 'Slot 2',
+    }
+    const { getByText } = render(props)
+    getByText('Move Labware')
+    getByText('Labware Name')
+    getByText('Mock 96 Well Plate')
+    getByText('Labware Location')
+    getByText('Slot 1 → Slot 2')
   })
 })
