@@ -13,7 +13,6 @@ import {
   startBuildrootUpdate,
 } from '../../../redux/buildroot'
 import { getLocalRobot } from '../../../redux/discovery'
-import { updateConfigValue } from '../../../redux/config'
 
 import type { RouteProps } from '../../../App/types'
 
