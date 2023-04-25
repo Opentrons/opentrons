@@ -15,7 +15,6 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import { BackButton } from '../../atoms/buttons'
-import { ContinueButton } from '../ProtocolSetupModules'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
@@ -55,13 +54,10 @@ export function ProtocolSetupInstruments({
       width="100%"
       gridGap={SPACING.spacing3}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+      <Flex alignItems={ALIGN_CENTER}>
         <BackButton onClick={() => setSetupScreen('prepare to run')}>
           {t('instruments')}
         </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          <ContinueButton onClick={() => setSetupScreen('modules')} />
-        </Flex>
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
