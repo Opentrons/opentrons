@@ -25,6 +25,8 @@ from typing_extensions import TypedDict
 import pytest
 from decoy import Decoy
 
+from tests.opentrons.threaded_protocol_engine import protocol_engine_in_thread
+
 try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
@@ -40,7 +42,9 @@ from opentrons_shared_data.deck import (
 )
 
 from opentrons import config
+from opentrons import protocol_engine
 from opentrons import hardware_control as hc
+
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
@@ -255,9 +259,31 @@ async def hardware(
         yield hw
 
 
-@pytest.fixture()
-def ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+def _make_ot2_papi213_ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
     return create_protocol_context(api_version=APIVersion(2, 13), hardware_api=hardware)
+
+
+@contextlib.contextmanager
+def _make_ot3_papi214_ctx(
+    hardware: ThreadManagedHardware
+) -> Generator[ProtocolContext, None, None]:
+    with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
+        yield create_protocol_context(
+            api_version=APIVersion(2, 14),
+            hardware_api=hardware,
+            protocol_engine=engine,
+            # TODO will this deadlock?
+            protocol_engine_loop=loop,
+        )
+
+
+@pytest.fixture()
+def ctx(robot_model: RobotModel, hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
+    if robot_model == "OT-2 Standard":
+        yield _make_ot2_papi213_ctx(hardware=hardware)
+    elif robot_model == "OT-3 Standard":
+        with _make_ot3_papi214_ctx(hardware=hardware) as ctx:
+            yield ctx
 
 
 @pytest.fixture()
