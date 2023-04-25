@@ -7,7 +7,7 @@
       "defaultBlowOutFlowRate": 80,
       "defaultTipLength": 57.9,
       "defaultTipOverlap": 10.5,
-      "defaultReturnTipHeight": 0.83,
+      "defaultReturnTipHeight": 0.5,
       "aspirate": {
         "default": [
           [0.4148, -1705.1015, 20.5455],

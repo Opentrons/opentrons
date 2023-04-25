@@ -20,7 +20,7 @@ describe('MountGripper', () => {
     render = (props = {}) => {
       return renderWithProviders(
         <MountGripper
-          runId={mockRunId}
+          maintenanceRunId={mockRunId}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
           attachedGripper={props?.attachedGripper ?? null}

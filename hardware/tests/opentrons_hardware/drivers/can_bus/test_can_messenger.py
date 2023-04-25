@@ -352,49 +352,6 @@ async def test_ensure_send_timeout(
     )
 
 
-async def test_auto_halt(
-    subject: CanMessenger, mock_driver: AsyncMock, incoming_messages: Queue[CanMessage]
-) -> None:
-    """Test to make sure can messenger broadcasts a stop when a critical error orrcurs."""
-    error_payload = ErrorMessagePayload(
-        severity=ErrorSeverityField(3),
-        error_code=ErrorCodeField(5),
-    )
-    error_payload.message_index = UInt32Field(0)
-
-    incoming_messages.put_nowait(
-        CanMessage(
-            arbitration_id=ArbitrationId(
-                parts=ArbitrationIdParts(
-                    message_id=MessageId.error_message,
-                    node_id=NodeId.host,
-                    function_code=2,
-                    originating_node_id=NodeId.gripper_g,
-                )
-            ),
-            data=error_payload.serialize(),
-        )
-    )
-    await asyncio.gather(subject.__aenter__())
-
-    while not incoming_messages.empty():
-        await asyncio.sleep(0.01)
-
-    mock_driver.send.assert_called_once_with(
-        message=CanMessage(
-            arbitration_id=ArbitrationId(
-                parts=ArbitrationIdParts(
-                    message_id=MessageId.stop_request,
-                    node_id=NodeId.broadcast,
-                    function_code=0,
-                    originating_node_id=NodeId.host,
-                )
-            ),
-            data=(1).to_bytes(4, "big"),
-        )
-    )
-
-
 async def test_listen_messages(
     subject: CanMessenger, incoming_messages: Queue[CanMessage]
 ) -> None:

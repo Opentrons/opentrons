@@ -1173,7 +1173,6 @@ class OT3Controller:
             speed_mm_per_s,
             sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
-            log_sensor_values=True,
         )
 
         self._position[axis_to_node(moving)] = pos

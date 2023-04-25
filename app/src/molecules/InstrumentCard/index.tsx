@@ -32,6 +32,7 @@ interface InstrumentCardProps extends StyleProps {
   instrumentDiagramProps?: InstrumentDiagramProps
   // special casing the gripper at least for now
   isGripperAttached?: boolean
+  banner?: React.ReactNode
 }
 
 /**
@@ -46,6 +47,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     isGripperAttached = false,
     label,
     menuOverlayItems,
+    banner,
     ...styleProps
   } = props
 
@@ -91,6 +93,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         gridGap={SPACING.spacing1}
         paddingRight={SPACING.spacing5}
       >
+        {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}

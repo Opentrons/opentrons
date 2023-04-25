@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { StyleProps, Svg } from '../../primitives'
 import { DeckFromData } from './DeckFromData'
 import styles from './RobotWorkSpace.css'
 
@@ -13,7 +14,7 @@ export interface RobotWorkSpaceRenderProps {
   ) => { x: number; y: number }
 }
 
-export interface RobotWorkSpaceProps {
+export interface RobotWorkSpaceProps extends StyleProps {
   deckDef?: DeckDefinition
   viewBox?: string | null
   className?: string
@@ -25,7 +26,14 @@ export interface RobotWorkSpaceProps {
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
-  const { children, deckDef, deckLayerBlocklist = [], viewBox, id } = props
+  const {
+    children,
+    deckDef,
+    deckLayerBlocklist = [],
+    viewBox,
+    id,
+    ...styleProps
+  } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
@@ -58,18 +66,18 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     )
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
-
   return (
-    <svg
+    <Svg
       className={cx(styles.robot_work_space, props.className)}
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
       id={id}
+      {...styleProps}
     >
       {deckDef != null && (
         <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
       )}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
-    </svg>
+    </Svg>
   )
 }

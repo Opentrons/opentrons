@@ -304,7 +304,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} minHeight="25rem">
+    <Flex flexDirection={DIRECTION_COLUMN} minHeight="29.5rem">
       {initialPosition != null ? (
         <JogToWell
           header={t('check_item_in_location', {

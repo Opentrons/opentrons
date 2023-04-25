@@ -71,6 +71,6 @@ export interface GripperWizardStepProps {
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  runId: string
+  maintenanceRunId: string
   attachedGripper: {} | null
 }
