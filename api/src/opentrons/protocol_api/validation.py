@@ -70,6 +70,7 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
+        # TODO(jbl 2023-04-25) this should raise an error when below version 2.15 and using deck coordinates
         return DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e

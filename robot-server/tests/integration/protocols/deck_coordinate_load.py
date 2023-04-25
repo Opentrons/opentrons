@@ -11,4 +11,6 @@ def run(context):
     module = context.load_module("temperatureModuleV2", "A1")
 
     pipette.move_to(labware.wells()[0].top())
-    module.set_temperature(42)
+    module_labware = module.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt")
+
+    pipette.move_to(module_labware.wells()[0].top())
