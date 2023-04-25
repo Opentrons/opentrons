@@ -30,7 +30,7 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config, feature_flags as ff
+from opentrons.config import robot_configs, ot3_pipette_config
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,

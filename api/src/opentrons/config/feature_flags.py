@@ -37,5 +37,5 @@ def rear_panel_integration() -> bool:
     return advs.get_setting_with_env_overload("rearPanelIntegration")
 
 
-def disable_stall_detection() -> bool:
-    return advs.get_setting_with_env_overload("disableStallDetection")
+def stall_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableStallDetection")

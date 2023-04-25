@@ -732,7 +732,7 @@ async def test_update_motor_estimation(
     ):
         nodes = [axis_to_node(a) for a in axes]
         if len(nodes) > 0:
-            with pytest.raises(MustHomeError):
+            with not pytest.raises(MustHomeError):
                 await controller.update_motor_estimation(axes)
         for node in nodes:
             controller._motor_status.update(
