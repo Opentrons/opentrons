@@ -71,10 +71,10 @@ export function NameRobot(): JSX.Element {
   ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const dispatch = useDispatch<Dispatch>()
-  const { state } = useLocation()
+  const { state: fromPath } = useLocation()
   const history = useHistory()
-  console.log('state', state)
-  const isFromRobotSettings = state === 'robotSettings'
+  const isFromRobotSettings = fromPath === 'robotSettings'
+  console.log('isFromRobotSettings', isFromRobotSettings)
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>
@@ -154,7 +154,7 @@ export function NameRobot(): JSX.Element {
 
   return (
     <>
-      {isShowConfirmRobotName ? (
+      {isShowConfirmRobotName && !isFromRobotSettings ? (
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>
@@ -165,23 +165,42 @@ export function NameRobot(): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing6}
             marginX={SPACING.spacingXXL}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            gridGap={SPACING.spacingXXL}
           >
-            {/* <Flex
+            <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
+              justifyContent={
+                isFromRobotSettings ? JUSTIFY_SPACE_BETWEEN : JUSTIFY_CENTER
+              }
               position={POSITION_RELATIVE}
               marginBottom="3.041875rem"
             >
-              <Flex>
-                <StyledText
-                  fontSize="2rem"
-                  fontWeight="700"
-                  lineHeight="2.72375rem"
+              <Flex position={POSITION_ABSOLUTE} left="0">
+                <Btn
+                  onClick={() => {
+                    if (!isFromRobotSettings) {
+                      history.push('/robot-settings/update-robot')
+                    } else {
+                      history.push('/robot-settings')
+                    }
+                  }}
                 >
-                  {t('name_your_robot')}
+                  <Icon
+                    name="back"
+                    size="3rem"
+                    color={COLORS.darkBlack_hundred}
+                  />
+                </Btn>
+              </Flex>
+              <Flex marginLeft={isFromRobotSettings ? '4rem' : '0'}>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize38}
+                  fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                  lineHeight={TYPOGRAPHY.lineHeight48}
+                >
+                  {!isFromRobotSettings
+                    ? t('name_your_robot')
+                    : t('rename_robot')}
                 </StyledText>
               </Flex>
               <Flex position={POSITION_ABSOLUTE} right="0">
@@ -199,82 +218,12 @@ export function NameRobot(): JSX.Element {
                     buttonCategory="rounded"
                     onClick={handleConfirm}
                     disabled={
-                      newName.length === 0 || newName.length > NAME_MAX_LENGTH
+                      name.length === 0 || name.length > NAME_MAX_LENGTH
                     }
                   />
                 )}
               </Flex>
-            </Flex> */}
-
-            {/* header */}
-
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing4}
-              marginBottom={SPACING.spacing3}
-            >
-              <Btn
-                paddingLeft="0rem"
-                paddingRight="1.25rem"
-                onClick={() => {
-                  if (!isFromRobotSettings) {
-                    history.push('/robot-settings/update-robot')
-                  } else {
-                    history.push('/robot-settings')
-                  }
-                }}
-                width="3rem"
-              >
-                <Icon
-                  name="back"
-                  width="1.25rem"
-                  color={COLORS.darkBlack_hundred}
-                />
-              </Btn>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing3}
-                maxWidth="42.625rem"
-              >
-                <StyledText
-                  fontSize={TYPOGRAPHY.fontSize38}
-                  fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-                  lineHeight={TYPOGRAPHY.lineHeight48}
-                >
-                  {!isFromRobotSettings
-                    ? t('name_your_robot')
-                    : t('rename_robot')}
-                </StyledText>
-              </Flex>
             </Flex>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              marginLeft={SPACING.spacingXXL}
-              maxHeight="3.75rem"
-              minWidth="15.6875rem"
-            >
-              {Boolean(isNaming) ? (
-                <Icon
-                  name="ot-spinner"
-                  size="1.25rem"
-                  spin
-                  marginRight={SPACING.spacing3}
-                />
-              ) : (
-                <SmallButton
-                  buttonType="primary"
-                  buttonText={t('shared:confirm')}
-                  buttonCategory="rounded"
-                  onClick={handleConfirm}
-                  // disabled={
-                  //   newName.length === 0 || newName.length > NAME_MAX_LENGTH
-                  // }
-                />
-              )}
-            </Flex>
-
-            {/* header */}
-
             <Flex
               width="100%"
               flexDirection={DIRECTION_COLUMN}
@@ -286,7 +235,8 @@ export function NameRobot(): JSX.Element {
                   fontSize="1.375rem"
                   lineHeight="1.875rem"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  marginBottom="0.75rem"
+                  // marginBottom="0.75rem"
+                  marginBottom={SPACING.spacingXXL}
                 >
                   {t('name_your_robot_description')}
                 </StyledText>
@@ -294,7 +244,7 @@ export function NameRobot(): JSX.Element {
               <Flex
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
-                marginBottom="0.625rem"
+                marginBottom={SPACING.spacing3}
                 justifyContent={JUSTIFY_CENTER}
                 width="100%"
               >
@@ -314,7 +264,6 @@ export function NameRobot(): JSX.Element {
                 fontSize="1.5rem"
                 lineHeight="2.0625rem"
                 fontWeight="500"
-                marginBottom="0.75rem"
               >
                 {t('name_rule_description')}
               </StyledText>
