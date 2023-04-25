@@ -72,14 +72,13 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
 }
 
 export const StyledText = styled(Text)<Props>`
-  ${props =>
-    styleMap[
-      `${String(props.as)}${
-        props.fontWeight === TYPOGRAPHY.fontWeightSemiBold
-          ? 'SemiBold'
-          : props.fontWeight === TYPOGRAPHY.fontWeightRegular
-          ? 'Regular'
-          : 'Bold'
-      }`
-    ]}
+  ${props => {
+    let fontWeight = 'Regular'
+    if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {
+      fontWeight = 'SemiBold'
+    } else if (props.fontWeight === TYPOGRAPHY.fontWeightLevel2_bold) {
+      fontWeight = 'Bold'
+    }
+    return styleMap[`${props.as}${fontWeight}`]
+  }}
 `

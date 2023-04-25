@@ -117,6 +117,7 @@ describe('StyledText', () => {
   it('should render h2 semibold style', () => {
     props = {
       as: 'h2SemiBold',
+      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'h2SemiBold',
     }
     const { getByText } = render(props)
@@ -134,6 +135,7 @@ describe('StyledText', () => {
   it('should render h3 semibold style', () => {
     props = {
       as: 'h3SemiBold',
+      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'h3SemiBold',
     }
     const { getByText } = render(props)
@@ -151,6 +153,7 @@ describe('StyledText', () => {
   it('should render h6 semibold style', () => {
     props = {
       as: 'h6SemiBold',
+      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'h6SemiBold',
     }
     const { getByText } = render(props)
@@ -168,6 +171,7 @@ describe('StyledText', () => {
   it('should render p semibold style', () => {
     props = {
       as: 'pSemiBold',
+      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'pSemiBold',
     }
     const { getByText } = render(props)
@@ -185,6 +189,7 @@ describe('StyledText', () => {
   it('should render label semibold style', () => {
     props = {
       as: 'labelSemiBold',
+      fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'labelSemiBold',
     }
     const { getByText } = render(props)
