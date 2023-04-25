@@ -183,7 +183,7 @@ settings = [
     ),
     SettingDefinition(
         _id="disableStallDetection",
-        title="Disable stall detection on the OT-3.",
+        title="Disable stall detection on the Flex.",
         description="This is an Opentrons-internal setting for hardware-testing.",
     ),
 ]
