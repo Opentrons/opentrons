@@ -1175,27 +1175,30 @@ class OT3API(
         #         MoveStopCondition.none,
         #     )
         if self._backend.check_encoder_status([axis]):
-            self._log.info(f'homing {axis}')
+            print(f'homing {axis}')
             # ensure stepper position can be updated after boot
             await self.engage_axes([axis])
             # update stepper position using the valid encoder position
             await self._update_position_estimation([axis])
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
-                self._log.info('config safe home')
+                print('config safe home')
                 axis_home_dist = self._config.safe_home_distance
             else:
                 # FIXME: (AA 2/15/23) This is a temporary workaround because of
                 # XY encoder inaccuracy. Otherwise, we should be able to use
                 # 5.0 mm for all axes.
                 # Move to 20 mm away from the home position and then home
-                self._log.info('20mm default safe home')
+                print('20mm default safe home')
                 axis_home_dist = 20.0
             if origin[axis] - target_pos[axis] > axis_home_dist:
+                print(f"origin = {origin[axis]}")
+                print(f"target_pos = {target_pos[axis]}")
                 target_pos[axis] += axis_home_dist
-                self._log.info(f'room for a safety move of {axis_home_dist} to {target_pos[axis]}')
+                print(f'room for a safety move of {axis_home_dist} to {target_pos[axis]}')
                 moves = self._build_moves(origin, target_pos)
-                self._log.info(f'built moves {moves}')
+                print(f'built moves {moves}')
+                await asyncio.sleep(3)
                 await self._backend.move(
                     origin,
                     moves[0],

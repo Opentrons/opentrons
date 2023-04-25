@@ -14,12 +14,8 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
 
 PLUNGER_MAX_SKIP_MM = 0.1
-SPEEDS_TO_TEST = [5, 10, 15, 20, 25, 30]
+SPEEDS_TO_TEST = [5, 8, 12, 16, 20]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
-    0.5: SPEEDS_TO_TEST,
-    0.75: SPEEDS_TO_TEST,
-    1.0: SPEEDS_TO_TEST,
-    1.5: SPEEDS_TO_TEST,
     2.2: SPEEDS_TO_TEST,
 }
 
