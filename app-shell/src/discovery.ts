@@ -204,6 +204,7 @@ export function registerDiscovery(
           keepAlive: true,
           keepAliveMsecs: 10000,
           path: ot3UsbSerialPort?.path ?? '',
+          logger: log,
         })
 
         usbHttpAgent = httpAgent as Agent

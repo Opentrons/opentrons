@@ -5,6 +5,7 @@ import type { Duplex } from 'stream'
 import { SerialPort } from 'serialport'
 
 import type { AgentOptions } from 'http'
+import type { Socket } from 'net'
 import type { PortInfo } from '@serialport/bindings-cpp'
 import type { Logger, LogLevel } from './types'
 
@@ -108,6 +109,8 @@ export function createSerialPortListMonitor(
 }
 
 class SerialPortSocket extends SerialPort {
+  // TODO: pass log function
+
   // log write method
   write(args: any): any {
     console.log(`serialport writing ${args}`)
@@ -123,49 +126,78 @@ class SerialPortSocket extends SerialPort {
 
 interface SerialPortHttpAgentOptions extends AgentOptions {
   path: string
+  logger: Logger
 }
 
+const kOnKeylog = Symbol.for('onkeylog')
+
 class SerialPortHttpAgent extends http.Agent {
+  declare totalSocketCount: number
+  declare sockets: NodeJS.Dict<Socket[]>
+  declare emit: (
+    event: string,
+    socket: SerialPortSocket,
+    options: NodeJS.Dict<unknown>
+  ) => void
+
+  declare getName: (options: NodeJS.Dict<unknown>) => string
+  declare removeSocket: (
+    socket: SerialPortSocket,
+    options: NodeJS.Dict<unknown>
+  ) => void;
+
+  // node can assign a keylogger to the agent for debugging, this allows adding the keylog listener to the event
+  declare [kOnKeylog]: (...args: unknown[]) => void
+
   constructor(options: SerialPortHttpAgentOptions) {
     super(options)
     this.options = options
   }
 
-  options: { path: string } = { path: '' }
-  // totalSocketCount!: number
+  // TODO: add method to close port (or destroy agent)
+
+  options: {
+    path: string
+    logger?: Logger
+  } = { path: '' }
+
+  log = (
+    level: LogLevel,
+    msg: string,
+    meta: Record<string, unknown> = {}
+  ): void => {
+    typeof this.options.logger?.[level] === 'function' &&
+      this.options.logger[level](msg, meta)
+  }
 
   // copied from _http_agent.js, replacing this.createConnection
   createSocket(
     req: http.ClientRequest,
-    options: { [k: string]: unknown },
+    options: NodeJS.Dict<unknown>,
     cb: Function
   ): void {
-    console.log('called createSocket with options', options)
+    this.log('info', `creating usb socket at ${this.options.path}`)
     options = { __proto__: null, ...options, ...this.options }
-    if (options.socketPath) options.path = options.socketPath
-    if (!options.servername && options.servername !== '')
-      options.servername = calculateServerName(options, req)
     const name = this.getName(options)
     options._agentKey = name
-    // debug("createConnection", name, options);
     options.encoding = null
     const oncreate = once((err, s) => {
-      if (err) return cb(err)
-      if (!this.sockets[name]) {
+      if (err != null) return cb(err)
+      if (this.sockets[name] == null) {
         this.sockets[name] = []
       }
-      Array.prototype.push(this.sockets[name], s)
+      this.sockets[name]?.push(s as Socket)
       this.totalSocketCount++
-      // debug("sockets", name, this.sockets[name].length, this.totalSocketCount);
-      installListeners(this, s, options)
+      this.log(
+        'debug',
+        `sockets ${name} ${this.sockets[name]?.length ?? ''} ${
+          this.totalSocketCount
+        }`
+      )
+      installListeners(this, s as SerialPortSocket, options)
       cb(null, s)
     })
-    // TODO(BTH: what does this do without createConnection?)
-    // When keepAlive is true, pass the related options to createConnection
-    // if (this.keepAlive) {
-    //   options.keepAlive = this.keepAlive;
-    //   options.keepAliveInitialDelay = this.keepAliveMsecs;
-    // }
+
     const socket = new SerialPortSocket({
       path: this.options.path,
       baudRate: 115200,
@@ -173,24 +205,20 @@ class SerialPortHttpAgent extends http.Agent {
     if (!socket.isOpen && !socket.opening) {
       socket.open()
     }
-    if (socket) oncreate(null, socket)
+    if (socket != null) oncreate(null, socket)
   }
 }
 
-// copied from internal/util.js
-function once<T extends (this: unknown, ...args: unknown[]) => T>(
+// js function from internal/util.js
+function once<T extends (this: unknown, ...args: unknown[]) => T, U>(
   callback: T
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-): (this: unknown, args: any) => T | void {
+): (this: unknown, ...args: U[]) => T | void {
   let called = false
   return function (...args) {
     if (called) return
     called = true
-    return Reflect.apply<ThisParameterType<unknown>, unknown[], T>(
-      callback,
-      this,
-      args
-    )
+    return Reflect.apply(callback, this, args)
   }
 }
 
@@ -201,14 +229,14 @@ function installListeners(
   options: { [k: string]: unknown }
 ): void {
   function onFree(): void {
-    // debug('CLIENT socket onFree');
+    agent.log('debug', 'CLIENT socket onFree')
     // need to emit free to attach listeners to serialport
     agent.emit('free', s, options)
   }
   s.on('free', onFree)
 
-  function onClose(err): void {
-    // debug('CLIENT socket onClose');
+  function onClose(): void {
+    agent.log('debug', 'CLIENT socket onClose')
     // This is the only place where sockets get removed from the Agent.
     // If you want to remove a socket from the pool, just close it.
     // All socket errors end in a close event anyway.
@@ -218,14 +246,14 @@ function installListeners(
   s.on('close', onClose)
 
   function onTimeout(): void {
-    // debug('CLIENT socket onTimeout');
+    agent.log('debug', 'CLIENT socket onTimeout')
 
     // Destroy if in free list.
     // TODO(ronag): Always destroy, even if not in free list.
     const sockets = agent.freeSockets
     if (
-      Array.prototype.some(Object.keys(sockets), name =>
-        Array.prototype.includes(sockets[name], s)
+      Object.keys(sockets).some(name =>
+        sockets[name]?.includes((s as unknown) as Socket)
       )
     ) {
       return s.destroy()
@@ -234,16 +262,20 @@ function installListeners(
   s.on('timeout', onTimeout)
 
   function onData(chunk: unknown): void {
-    console.log(`received chunk:  ${chunk}`)
-    console.log('end chunk')
+    agent.log('info', `received chunk:  ${chunk}`)
+    agent.log('info', 'end chunk')
   }
   s.on('data', onData)
 
   function onFinish(): void {
-    console.log('socket finishing: closing serialport')
+    agent.log('info', 'socket finishing: closing serialport')
     s.close()
   }
   s.on('finish', onFinish)
+
+  if (agent[kOnKeylog] != null) {
+    s.on('keylog', agent[kOnKeylog])
+  }
 
   function onRemove(): void {
     // We need this function for cases like HTTP 'upgrade'
@@ -258,14 +290,11 @@ function installListeners(
     s.removeListener('data', onData)
     s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
+    if (agent[kOnKeylog] != null) {
+      s.removeListener('keylog', agent[kOnKeylog])
+    }
   }
   s.on('agentRemove', onRemove)
-
-  if (agent[kOnKeylog]) {
-    s.on('keylog', agent[kOnKeylog])
-  }
 }
-
-const kOnKeylog = Symbol('onkeylog')
 
 export { SerialPortHttpAgent }
