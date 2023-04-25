@@ -19,6 +19,7 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName } from '../../redux/discovery'
+import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
 import { RobotBusyStatusAction } from '.'
@@ -64,7 +65,10 @@ export function AvailableRobotOption(
         }
       },
     },
-    { hostname: ip }
+    {
+      hostname: ip,
+      requestor: ip === 'opentrons-usb' ? appShellRequestor : undefined,
+    }
   )
   const robotHasCurrentRun = runsData?.links?.current != null
 
