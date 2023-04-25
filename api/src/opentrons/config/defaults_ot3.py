@@ -61,10 +61,15 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
 
 ROBOT_CONFIG_VERSION: Final = 1
 DEFAULT_LOG_LEVEL: Final = "INFO"
-DEFAULT_DECK_TRANSFORM: Final[OT3Transform] = [
+DEFAULT_MACHINE_TRANSFORM: Final[OT3Transform] = [
     [-1.0, 0.0, 0.0],
     [0.0, -1.0, 0.0],
     [0.0, 0.0, -1.0],
+]
+DEFAULT_BELT_ATTITUDE: Final[OT3Transform] = [
+    [1.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0],
+    [0.0, 0.0, 1.0],
 ]
 DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (477.20, 493.8, 253.475)
 DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
@@ -383,7 +388,7 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
             "safe_home_distance", DEFAULT_SAFE_HOME_DISTANCE
         ),
         deck_transform=_build_default_transform(
-            robot_settings.get("deck_transform", []), DEFAULT_DECK_TRANSFORM
+            robot_settings.get("deck_transform", []), DEFAULT_MACHINE_TRANSFORM
         ),
         carriage_offset=_build_default_offset(
             robot_settings.get("carriage_offset", []), DEFAULT_CARRIAGE_OFFSET
