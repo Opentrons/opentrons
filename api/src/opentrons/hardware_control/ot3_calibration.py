@@ -190,8 +190,6 @@ async def find_edge_binary(
         if hit_deck:
             LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
             # In this block, we've hit the deck
-            # update the fonud deck value
-            checking_pos = checking_pos._replace(z=interaction_pos)
             if copysign(stride, direction_if_hit) == stride:
                 # If we're in direction_if_hit direction, the last probe was on the deck,
                 # so we want to continue
