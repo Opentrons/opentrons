@@ -10,8 +10,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticStatus,
     ThermocyclerStep,
     SpeedStatus,
-    module_model_from_string,
-    ModuleType,
+    module_model_from_string
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
@@ -462,49 +461,47 @@ class MagneticBlockCore(ModuleCore, AbstractMagneticBlockCore):
 
 
 def create_module_core(
-    module_type: ModuleType,
     module_id: str,
     engine_client: ProtocolEngineClient,
     api_version: APIVersion,
-    sync_module_hardware: Optional[SynchronousAdapter[hw_modules.AbstractModule]],
+    sync_module_hardware: Union[
+        hw_modules.HeaterShaker,
+        hw_modules.MagDeck,
+        hw_modules.TempDeck,
+        hw_modules.Thermocycler,
+        None,
+    ],
 ) -> ModuleCore:
     if sync_module_hardware:
-        # assert (
-        #     sync_module_hardware is not None
-        # ), "Expected module hardware, got None instead."
-        if module_type == ModuleType.TEMPERATURE:
+        if isinstance(sync_module_hardware, hw_modules.TempDeck):
             return TemperatureModuleCore(
                 module_id=module_id,
                 engine_client=engine_client,
                 api_version=api_version,
-                sync_module_hardware=sync_module_hardware,
+                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
             )
-        elif module_type == ModuleType.MAGNETIC:
+        elif isinstance(sync_module_hardware, hw_modules.MagDeck):
             return MagneticModuleCore(
                 module_id=module_id,
                 engine_client=engine_client,
                 api_version=api_version,
-                sync_module_hardware=sync_module_hardware,
+                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
             )
-        elif module_type == ModuleType.THERMOCYCLER:
+        elif isinstance(sync_module_hardware, hw_modules.Thermocycler):
             return ThermocyclerModuleCore(
                 module_id=module_id,
                 engine_client=engine_client,
                 api_version=api_version,
-                sync_module_hardware=sync_module_hardware,
+                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
             )
-        elif module_type == ModuleType.HEATER_SHAKER:
+        elif isinstance(sync_module_hardware, hw_modules.HeaterShaker):
             return HeaterShakerModuleCore(
                 module_id=module_id,
                 engine_client=engine_client,
                 api_version=api_version,
-                sync_module_hardware=sync_module_hardware,
+                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
             )
-    elif module_type == ModuleType.MAGNETIC_BLOCK:
-        return MagneticBlockCore(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
-
-    return ModuleCore(
+    # is it ok to think that if the hardware layer is none it's a mag block?
+    return MagneticBlockCore(
         module_id=module_id, engine_client=engine_client, api_version=api_version
     )
