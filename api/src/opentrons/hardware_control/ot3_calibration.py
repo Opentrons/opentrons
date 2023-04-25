@@ -227,7 +227,7 @@ async def find_edge_binary(
     # remove probe offset so we actually get position of the edge
     found_edge = checking_pos - critical_edge_offset(search_axis, direction_if_hit)
     # use the last-found Z height as the edge's most true Z position
-    found_edge.z = final_z_height_found
+    found_edge = found_edge._replace(z=final_z_height_found)
     return found_edge
 
 
