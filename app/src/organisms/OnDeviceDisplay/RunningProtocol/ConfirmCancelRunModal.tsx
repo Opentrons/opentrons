@@ -63,7 +63,11 @@ export function ConfirmCancelRunModal({
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          padding={SPACING.spacing6}
+          gridGap="0.75rem"
+        >
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
