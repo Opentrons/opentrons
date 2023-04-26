@@ -143,7 +143,6 @@ export function registerDiscovery(
   client.start({
     initialRobots,
     healthPollInterval: SLOW_POLL_INTERVAL_MS,
-    serialPortPollInterval: FAST_POLL_INTERVAL_MS,
     manualAddresses: makeManualAddresses(config.candidates),
   })
 
@@ -213,7 +212,6 @@ export function registerDiscovery(
         ipcMain.handle('usb:request', usbListener)
         client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
-          serialPortPollInterval: FAST_POLL_INTERVAL_MS,
           manualAddresses: [
             {
               ip: 'opentrons-usb',
@@ -235,13 +233,11 @@ export function registerDiscovery(
         handleRobots()
         return client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
-          serialPortPollInterval: FAST_POLL_INTERVAL_MS,
         })
 
       case DISCOVERY_FINISH:
         return client.start({
           healthPollInterval: SLOW_POLL_INTERVAL_MS,
-          serialPortPollInterval: FAST_POLL_INTERVAL_MS,
         })
 
       case DISCOVERY_REMOVE:
@@ -268,7 +264,6 @@ export function registerDiscovery(
           ipcMain.removeHandler('usb:request')
           client.start({
             healthPollInterval: FAST_POLL_INTERVAL_MS,
-            serialPortPollInterval: FAST_POLL_INTERVAL_MS,
             manualAddresses: [],
           })
         }

@@ -50,8 +50,6 @@ describe('app-shell/discovery', () => {
     stop: jest.fn(),
     getRobots: jest.fn(),
     removeRobot: jest.fn(),
-    createHttpAgent: jest.fn(),
-    getSerialPorts: jest.fn(),
   }
 
   const emitListChange = (): void => {

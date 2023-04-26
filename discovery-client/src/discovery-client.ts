@@ -36,8 +36,7 @@ export function createDiscoveryClient(
   }
 
   const start = (config?: DiscoveryClientConfig): void => {
-    const { healthPollInterval, serialPortPollInterval, ...intialState } =
-      config ?? {}
+    const { healthPollInterval, ...intialState } = config ?? {}
 
     dispatch(Store.initializeState(intialState))
 
