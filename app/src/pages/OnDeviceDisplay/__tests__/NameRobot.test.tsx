@@ -75,7 +75,7 @@ describe('NameRobot', () => {
     const button = getByLabelText('SmallButton_primary')
     fireEvent.click(button)
     const error = await findByText(
-      'Oops! Robot name must be between 1 and 17 characters.'
+      'Oops! Robot name must follow the character count and limitations'
     )
     await waitFor(() => {
       expect(error).toBeInTheDocument()

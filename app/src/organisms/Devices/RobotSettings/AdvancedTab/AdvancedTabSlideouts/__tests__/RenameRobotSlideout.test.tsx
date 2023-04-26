@@ -164,7 +164,9 @@ describe('RobotSettings RenameRobotSlideout', () => {
     })
     expect(input).toHaveValue('connectableOtie')
     const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText('Robot name already exists')
+    const error = await findByText(
+      'Oops! Name is already in use. Choose a different name.'
+    )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
       expect(error).toBeInTheDocument()
@@ -178,7 +180,9 @@ describe('RobotSettings RenameRobotSlideout', () => {
     })
     expect(input).toHaveValue('reachableOtie')
     const renameButton = getByRole('button', { name: 'Rename robot' })
-    const error = await findByText('Robot name already exists')
+    const error = await findByText(
+      'Oops! Name is already in use. Choose a different name.'
+    )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
       expect(error).toBeInTheDocument()
