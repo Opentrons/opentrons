@@ -13,8 +13,9 @@ jest.mock('node-fetch', () => ({ __esModule: true, default: jest.fn() }))
 const fetch = nodeFetch as jest.MockedFunction<typeof nodeFetch>
 
 const EXPECTED_FETCH_OPTS = {
+  agent: undefined,
   timeout: 10000,
-  headers: { 'Opentrons-Version': '2' },
+  headers: { Connection: 'keep-alive', 'Opentrons-Version': '2' },
 }
 
 const stubFetchOnce = (
