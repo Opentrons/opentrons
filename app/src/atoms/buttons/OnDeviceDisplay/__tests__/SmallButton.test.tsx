@@ -54,9 +54,7 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryHighLight',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
-    )
+    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
   })
   it('renders the tertiary low light', () => {
     props = {
@@ -64,7 +62,9 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryLowLight',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    expect(getByRole('button')).toHaveStyle(
+      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
+    )
   })
   it('renders the button as disabled', () => {
     props = {
