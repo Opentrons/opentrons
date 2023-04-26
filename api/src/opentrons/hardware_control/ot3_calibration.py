@@ -246,7 +246,9 @@ async def find_slot_center_binary(
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
     """
-    estimated_center = estimated_center._replace(y=estimated_center.y - 3)
+    y_center_estimated = estimated_center.y
+    y_center_off = y_center_estimated - 3
+    estimated_center = estimated_center._replace(y=y_center_off)
     # Find all four edges of the calibration slot
     print("Finding +X edge...")
     plus_x_edge = await find_edge_binary(
@@ -273,6 +275,7 @@ async def find_slot_center_binary(
     x_center = (plus_x_edge.x + minus_x_edge.x) / 2
     x_center_off = x_center - 3
     estimated_center = estimated_center._replace(x=x_center_off)
+    estimated_center = estimated_center._replace(y=y_center_estimated)
 
     # Move over Z-axis gauge plunger
     await _arc_move(hcapi, mount, estimated_center.z, position=estimated_center)
