@@ -9,6 +9,7 @@ import {
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import { RadioGroup } from '@opentrons/components'
 import { pipetteNameBlocklist } from '../constant'
+import { useFormikContext } from 'formik'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
@@ -53,11 +54,8 @@ export interface SelectOption {
   isDisabled?: boolean
 }
 
-export const RadioSelect = ({
-  propsData,
-  pipetteName,
-  pipetteType,
-}: any): any => {
+export const RadioSelect = ({ pipetteName, pipetteType }: any): any => {
+  const { handleChange } = useFormikContext<any>()
   const allowlist = ({ value }: SelectOption): boolean => {
     return !pipetteNameBlocklist.some(n => n === value)
   }
@@ -73,7 +71,7 @@ export const RadioSelect = ({
       name={pipetteName}
       value={pipetteType}
       options={groupedOptions}
-      onChange={propsData.handleChange}
+      onChange={handleChange}
     />
   )
 }
