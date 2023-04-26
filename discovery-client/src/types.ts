@@ -1,7 +1,5 @@
 import type { Agent } from 'http'
 
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
-
 import type {
   RobotState,
   HostState,
@@ -114,8 +112,6 @@ export interface HealthPollerConfig {
 export interface HealthPollerOptions {
   /** Function to call whenever the requests for an IP settle */
   onPollResult: (pollResult: HealthPollerResult) => unknown
-  /** Function to call whenever the requests for serial ports settle */
-  onSerialPortFetch?: (list: PortInfo[]) => void
   /** Optional logger */
   logger?: Logger
 }
@@ -182,8 +178,6 @@ export interface DiscoveryClient {
   removeRobot: (robotName: string) => void
   start: (config: DiscoveryClientConfig) => void
   stop: () => void
-  createHttpAgent?: (serialPort: string) => Agent
-  getSerialPorts?: () => PortInfo[]
 }
 
 /**
