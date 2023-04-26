@@ -181,6 +181,7 @@ async def find_edge_binary(
         search_axis, direction_if_hit
     )
     stride = edge_settings.search_initial_tolerance_mm * direction_if_hit
+    final_z_height_found = slot_edge_nominal.z
     for _ in range(edge_settings.search_iteration_limit):
         LOG.info(f"Checking position {checking_pos}")
         interaction_pos = await _probe_deck_at(
@@ -188,10 +189,11 @@ async def find_edge_binary(
         )
         hit_deck = _deck_hit(interaction_pos, checking_pos.z, edge_settings)
         if hit_deck:
-            LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
             # In this block, we've hit the deck
-            # update the fonud deck value
-            checking_pos = checking_pos._replace(z=interaction_pos)
+            LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
+            # store the final found Z height found
+            # because the height is most accurate next to the edge
+            final_z_height_found = interaction_pos
             if copysign(stride, direction_if_hit) == stride:
                 # If we're in direction_if_hit direction, the last probe was on the deck,
                 # so we want to continue
@@ -224,6 +226,8 @@ async def find_edge_binary(
             LOG.warning(e)
     # remove probe offset so we actually get position of the edge
     found_edge = checking_pos - critical_edge_offset(search_axis, direction_if_hit)
+    # use the last-found Z height as the edge's most true Z position
+    found_edge = found_edge._replace(z=final_z_height_found)
     return found_edge
 
 
