@@ -7,6 +7,7 @@ import {
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
   BORDERS,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -31,8 +32,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
-import { BackButton } from '../../atoms/buttons'
-import { DeckMapButton } from '../ProtocolSetupModules' // Probably should move this to atoms/buttons as well
+import { MapViewButton } from '../../organisms/MapViewButton' // Probably should move this to atoms/buttons as well
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
@@ -241,7 +241,7 @@ export function ProtocolSetupLabware({
                 </StyledText>
                 <StyledText
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  fontSize="1.5rem"
+                  fontSize={TYPOGRAPHY.fontSize22}
                 >
                   {getLabwareDisplayName(selectedLabware)}
                 </StyledText>
@@ -250,21 +250,42 @@ export function ProtocolSetupLabware({
           </Modal>
         ) : null}
       </Portal>
-      <Flex>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('labware')}
-        </BackButton>
+      <Flex
+        gridGap={SPACING.spacing4}
+        fontSize={TYPOGRAPHY.fontSize38}
+        fontWeight={TYPOGRAPHY.fontWeightBold}
+        lineHeight={TYPOGRAPHY.lineHeight48}
+      >
+        <Btn
+          paddingLeft="0rem"
+          paddingRight={SPACING.spacing5}
+          onClick={() => setSetupScreen('prepare to run')}
+          width="3rem"
+        >
+          <Icon
+            name="back"
+            width={SPACING.spacing5}
+            color={COLORS.darkBlack_hundred}
+          />
+        </Btn>
+        {t('labware')}
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}
         marginTop={SPACING.spacing6}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex paddingLeft={SPACING.spacing5} width="16%">
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          color={COLORS.darkBlack_seventy}
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+        >
+          <Flex paddingLeft={SPACING.spacing5} width="17.9%">
             <StyledText>{'Location'}</StyledText>
           </Flex>
-          <Flex width="84%">
+          <Flex width="82.1%">
             <StyledText>{'Labware Name'}</StyledText>
           </Flex>
         </Flex>
@@ -280,7 +301,7 @@ export function ProtocolSetupLabware({
           ) : null
         })}
       </Flex>
-      <DeckMapButton onClick={() => setShowDeckMapModal(true)} />
+      <MapViewButton onClick={() => setShowDeckMapModal(true)} />
     </>
   )
 }
@@ -322,26 +343,24 @@ function LabwareLatch({
 
   return (
     <Flex
-      minWidth="11.4375rem"
-      height="7rem"
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_FLEX_START}
-      padding={SPACING.spacing4}
-      gridGap="0.75rem"
       backgroundColor={COLORS.mediumBlueEnabled}
+      borderRadius={BORDERS.size_three}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack_hundred}${COLORS.opacity60HexCode}`
           : COLORS.darkBlackEnabled
       }
-      borderRadius={BORDERS.size_three}
+      flexDirection={DIRECTION_COLUMN}
+      fontSize={TYPOGRAPHY.fontSize22}
+      gridGap={SPACING.spacing3}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      lineHeight={TYPOGRAPHY.lineHeight28}
+      minWidth="11.0625rem"
       onClick={toggleLatch}
+      padding="0.75rem"
     >
-      <StyledText
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        fontSize="1.375rem"
-      >
+      <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('labware_latch')}
       </StyledText>
       <Flex
@@ -351,15 +370,12 @@ function LabwareLatch({
       >
         {statusText != null && icon != null ? (
           <>
-            <StyledText
-              fontSize="1.375rem"
-              fontWeight={TYPOGRAPHY.fontWeightRegular}
-            >
+            <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
               {t(statusText)}
             </StyledText>
             <Icon
               name={icon}
-              size="2.5rem"
+              size={SPACING.spacingXXL}
               color={latchStatus === 'idle_open' ? COLORS.blueEnabled : ''}
             />
           </>
@@ -395,7 +411,12 @@ function RowLabware({
         )
       : null
   const moduleInstructions = (
-    <StyledText color={COLORS.darkBlack_seventy}>
+    <StyledText
+      color={COLORS.darkBlack_seventy}
+      fontSize={TYPOGRAPHY.fontSize20}
+      fontWeight={TYPOGRAPHY.fontWeightRegular}
+      lineHeight={TYPOGRAPHY.lineHeight24}
+    >
       {setupTextTranslator('labware_latch_instructions')}
     </StyledText>
   )
@@ -405,8 +426,7 @@ function RowLabware({
     | HeaterShakerOpenLatchCreateCommand
   let latchStatus: LatchStatus = 'unknown'
   if (
-    matchedModule != null &&
-    matchedModule.attachedModuleMatch != null &&
+    matchedModule?.attachedModuleMatch != null &&
     matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
   ) {
     latchStatus = matchedModule.attachedModuleMatch.data.labwareLatchStatus
@@ -441,12 +461,12 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light_one}
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.size_three}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-      gridGap={SPACING.spacing6}
+      gridGap={SPACING.spacing5}
     >
-      <Flex minWidth="10%">
+      <Flex width="7.6875rem">
         <StyledText>
           {getLabwareDisplayLocation(
             robotSideAnalysis,
@@ -456,15 +476,27 @@ function RowLabware({
         </StyledText>
       </Flex>
       <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="86%"
-        gridGap={SPACING.spacing2}
         alignSelf={ALIGN_FLEX_START}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing2}
+        width="86%"
       >
-        <StyledText fontSize="1.5rem" fontWeight="500">
+        <StyledText
+          color={COLORS.darkBlackEnabled}
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+        >
           {getLabwareDisplayName(definition)}
         </StyledText>
-        <StyledText color={COLORS.darkBlack_seventy}>{nickName}</StyledText>
+        <StyledText
+          color={COLORS.darkBlack_seventy}
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+        >
+          {nickName}
+        </StyledText>
         {isOnHeaterShaker ? moduleInstructions : null}
       </Flex>
       {isOnHeaterShaker ? (
