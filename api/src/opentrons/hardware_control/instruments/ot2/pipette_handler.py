@@ -620,15 +620,16 @@ class PipetteHandlerProvider(Generic[MountType]):
     ) -> LiquidActionSpec[OT3Axis]:
         ...
 
-    def plan_check_blow_out(self, mount, microliters: Optional[float] = None):  # type: ignore[no-untyped-def]
+    def plan_check_blow_out(self, mount, volume: Optional[float] = None):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
-        if microliters:
-            distance_mm = instrument.ul_per_mm(microliters, "dispense")
+        # TODO(cm, 04/23): change this to use schema v2 configs
+        if volume is not None:
+            distance_mm = instrument.ul_per_mm(volume, "dispense")
         else:
             distance_mm = instrument.config.blow_out
 

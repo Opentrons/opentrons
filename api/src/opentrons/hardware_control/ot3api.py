@@ -1577,6 +1577,7 @@ class OT3API(
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
+        # breakpoint()
 
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)

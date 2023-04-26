@@ -589,7 +589,7 @@ class PipetteHandlerProvider:
         )
 
     def plan_check_blow_out(
-        self, mount: OT3Mount, microliters: Optional[float] = None
+        self, mount: OT3Mount, volume: Optional[float] = None
     ) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
@@ -599,11 +599,11 @@ class PipetteHandlerProvider:
             instrument.blow_out_flow_rate,
             "blowout",
         )
+        if volume is None:
+            ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
+        else:
+            ul = volume
 
-        ul = (
-            microliters
-            or self.get_attached_instrument(mount)["default_blow_out_volume"]
-        )
         distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
 
         return LiquidActionSpec(

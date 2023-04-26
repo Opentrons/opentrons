@@ -226,6 +226,17 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
     ) as mock_refresh:
         yield mock_refresh
 
+# @pytest.fixture
+# async def mock_pick_up_tip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+#     with patch.object(
+#         ot3_hardware.managed_obj,
+#         "pick_up_tip",
+#         AsyncMock(
+#             spec=ot3_hardware.managed_obj.pick_up_tip,
+#         )
+#     ) as mock_pick_up:
+#         yield mock_pick_up
+
 
 @pytest.fixture
 async def mock_instrument_handlers(
@@ -382,6 +393,37 @@ def mock_backend_capacitive_pass(
 
         mock_pass.side_effect = _update_position
         yield mock_pass
+
+
+@pytest.mark.parametrize(
+    "load_configs",
+    [
+        {OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"}},
+        {OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"}},
+        {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)}},
+    ]
+)
+async def test_blow_out(
+        ot3_hardware: ThreadManager[OT3API],
+        load_configs: Dict[str, Union[int, str, Tuple[int, int]]],
+) -> None:
+    for mount, configs in load_configs.items():
+        print(f"mount = {mount}, configs = {configs}")
+        pipette_config = ot3_pipette_config.load_ot3_pipette(
+            ot3_pipette_config.PipetteModelVersionType(
+                PipetteModelType(configs["model"]),
+                PipetteChannelType(configs["channels"]),
+                PipetteVersionType(*configs["version"]),
+            )
+        )
+        instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(mount, instr_data, None)
+        # attach tip
+        await ot3_hardware.pick_up_tip(mount, 100)
+
+        with pytest.raises(ValueError):
+            await ot3_hardware.blow_out(mount, 100)
+
 
 
 @pytest.mark.parametrize(
