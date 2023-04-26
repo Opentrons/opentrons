@@ -23,7 +23,7 @@
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "dependencies": {
     "serialport": "10.5.0",
-    "yargs": "^15.4.0",
+    "yargs": "15.4.0",
     "node-fetch": "^2.6.0",
     "agent-base": "^6.0.0"
   }
