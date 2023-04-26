@@ -407,7 +407,7 @@ export function TouchDirectionControl(
             return (
               <SmallButton
                 key={plane}
-                buttonType={currentPlane === plane ? 'default' : 'alt'}
+                buttonType={currentPlane === plane ? 'primary' : 'secondary'}
                 onClick={() => {
                   setCurrentPlane(plane)
                 }}

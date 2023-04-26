@@ -55,7 +55,7 @@ describe('NameRobot', () => {
     getByText('Don’t worry, you can always change this in your settings.')
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByRole('textbox')
-    getByRole('button', { name: 'Confirm' })
+    getByText('Confirm')
     // keyboard
     getByRole('button', { name: 'a' })
     expect(queryByRole('button', { name: 'enter' })).not.toBeInTheDocument()
@@ -71,11 +71,11 @@ describe('NameRobot', () => {
   })
 
   it('should show an error message when tapping confirm without typing anything', async () => {
-    const [{ getByRole, findByText }] = render()
-    const button = getByRole('button', { name: 'Confirm' })
+    const [{ findByText, getByLabelText }] = render()
+    const button = getByLabelText('SmallButton_primary')
     fireEvent.click(button)
     const error = await findByText(
-      'Oops! Too short. Robot name must be at least 1 character.'
+      'Oops! Robot name must be between 1 and 17 characters.'
     )
     await waitFor(() => {
       expect(error).toBeInTheDocument()
@@ -83,12 +83,12 @@ describe('NameRobot', () => {
   })
 
   it('should show an error message when typing an existing name - connectable robot', async () => {
-    const [{ getByRole, findByText }] = render()
+    const [{ getByRole, findByText, getByLabelText }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
-    const nameButton = getByRole('button', { name: 'Confirm' })
+    const nameButton = getByLabelText('SmallButton_primary')
     fireEvent.click(nameButton)
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
@@ -99,12 +99,12 @@ describe('NameRobot', () => {
   })
 
   it('should show an error message when typing an existing name - reachable robot', async () => {
-    const [{ getByRole, findByText }] = render()
+    const [{ getByRole, findByText, getByLabelText }] = render()
     const input = getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
-    const nameButton = getByRole('button', { name: 'Confirm' })
+    const nameButton = getByLabelText('SmallButton_primary')
     fireEvent.click(nameButton)
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
@@ -115,12 +115,23 @@ describe('NameRobot', () => {
   })
 
   it('should call a mock function when tapping the confirm button', () => {
-    const [{ getByRole }] = render()
+    const [{ getByRole, getByLabelText }] = render()
     fireEvent.click(getByRole('button', { name: 'a' }))
     fireEvent.click(getByRole('button', { name: 'b' }))
     fireEvent.click(getByRole('button', { name: 'c' }))
-    const button = getByRole('button', { name: 'Confirm' })
+    const button = getByLabelText('SmallButton_primary')
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalled()
   })
+
+  it.todo('should render text and button when coming from robot settings')
+  // it('should render text and button when coming from robot settings', () => {
+  //   const [{ getByText, queryByText }] = render()
+  //   getByText('Name your robot')
+  //   expect(
+  //     queryByText('Don’t worry, you can always change this in your settings.')
+  //   ).not.toBeInTheDocument()
+  //   getByText('Enter up to 17 characters (letters and numbers only)')
+  //   getByText('Confirm')
+  // })
 })

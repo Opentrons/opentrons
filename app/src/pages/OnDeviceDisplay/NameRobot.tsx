@@ -56,8 +56,6 @@ interface FormikErrors {
   newRobotName?: string
 }
 
-const NAME_MAX_LENGTH = 17
-
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const trackEvent = useTrackEvent()
@@ -74,7 +72,6 @@ export function NameRobot(): JSX.Element {
   const { state: fromPath } = useLocation()
   const history = useHistory()
   const isFromRobotSettings = fromPath === 'robotSettings'
-  console.log('isFromRobotSettings', isFromRobotSettings)
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>
@@ -108,7 +105,7 @@ export function NameRobot(): JSX.Element {
       // In ODD users cannot input letters and numbers from software keyboard
       // so the app only checks the length of input string
       if (newName.length < 1) {
-        errors.newRobotName = t('name_rule_error_too_short')
+        errors.newRobotName = t('name_rule_error_name_length')
       }
       if (
         [...connectableRobots, ...reachableRobots].some(
@@ -217,9 +214,6 @@ export function NameRobot(): JSX.Element {
                     buttonText={t('shared:confirm')}
                     buttonCategory="rounded"
                     onClick={handleConfirm}
-                    disabled={
-                      name.length === 0 || name.length > NAME_MAX_LENGTH
-                    }
                   />
                 )}
               </Flex>
