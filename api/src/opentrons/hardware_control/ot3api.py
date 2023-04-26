@@ -218,23 +218,6 @@ class OT3API(
         RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
-    def set_deck_calibration(self, robot_calibration: RobotCalibration) -> None:
-        # use RobotCalibrationProvider.set_robot_calibration
-        self._robot_calibration.deck_calibration = robot_calibration.deck_calibration
-
-    def reset_robot_calibration(
-        self,
-    ) -> None:  # remove, add inheritance like OT2. Follow OT2
-        RobotCalibrationProvider.reset_robot_calibration(self)
-
-    @property
-    def robot_calibration(self) -> OT3Transforms:
-        return self._robot_calibration
-
-    def validate_calibration(self) -> DeckTransformState:
-        # use RobotCalibrationProvider.validate_calibration
-        return DeckTransformState.OK
-
     @property
     def door_state(self) -> DoorState:
         return self._door_state
