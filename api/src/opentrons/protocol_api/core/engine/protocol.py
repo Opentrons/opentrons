@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import (
     TempDeck,
     MagDeck,
@@ -307,7 +307,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
-        selected_hardware: Union[HeaterShaker, MagDeck, TempDeck, Thermocycler, None] = None
+        selected_hardware: Union[
+            HeaterShaker, MagDeck, TempDeck, Thermocycler, None
+        ] = None
         if module_type != ModuleType.MAGNETIC_BLOCK:
             assert (
                 result.serialNumber is not None

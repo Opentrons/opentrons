@@ -20,6 +20,7 @@ from .core.common import (
     MagneticModuleCore,
     ThermocyclerCore,
     HeaterShakerCore,
+    MagneticBlockCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -854,3 +855,15 @@ class HeaterShakerContext(ModuleContext):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
+
+
+class MagneticBlockContext(ModuleContext):
+    """An object representing a Magnetic Block.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.15
+    """
+
+    _core: MagneticBlockCore

@@ -35,6 +35,7 @@ from .core.module import (
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
@@ -50,6 +51,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
     ModuleContext,
 )
 
@@ -62,6 +64,7 @@ ModuleTypes = Union[
     MagneticModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 ]
 
 
@@ -847,6 +850,8 @@ def _create_module_context(
         module_cls = ThermocyclerContext
     elif isinstance(module_core, AbstractHeaterShakerCore):
         module_cls = HeaterShakerContext
+    elif isinstance(module_core, AbstractMagneticBlockCore):
+        module_cls = MagneticBlockContext
     else:
         assert False, "Unsupported module type"
 
