@@ -69,7 +69,7 @@ class ModuleCore(AbstractModuleCore):
             self._engine_client.state.modules.get_connected_model(self.module_id)
         )
 
-    def get_serial_number(self) -> str:
+    def get_serial_number(self) -> Optional[str]:
         """Get the module's unique hardware serial number."""
         return self._engine_client.state.modules.get_serial_number(self.module_id)
 

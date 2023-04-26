@@ -95,6 +95,7 @@ class HeaterShakerMovementFlagger:
                 Protocol Engine and when this function is called?
         """
         hs_serial = self._state_store.modules.get_serial_number(module_id=module_id)
+        assert hs_serial is not None, "Expected a module serial number and got None."
         heater_shaker = await self._find_heater_shaker_by_serial(
             serial_number=hs_serial
         )

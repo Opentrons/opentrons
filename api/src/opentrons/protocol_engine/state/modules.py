@@ -650,6 +650,9 @@ class ModuleView(HasState[ModuleState]):
 
         # add the calibrated module offset if there is one
         module_serial = self.get_serial_number(module_id)
+        assert (
+            module_serial is not None
+        ), "Expected a module serial number and got None."
         offset = self._state.module_offset_by_serial.get(module_serial)
         if offset is not None:
             module_offset = array((offset.x, offset.y, offset.z, 1))

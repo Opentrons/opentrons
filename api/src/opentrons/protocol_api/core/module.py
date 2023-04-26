@@ -29,7 +29,7 @@ class AbstractModuleCore(ABC):
         """Get the module's model identifier."""
 
     @abstractmethod
-    def get_serial_number(self) -> str:
+    def get_serial_number(self) -> Optional[str]:
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
