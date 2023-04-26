@@ -99,7 +99,7 @@ from .types import (
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
 from .robot_calibration import RobotCalibration
-from .ot3_calibration import OT3Transforms, RobotCalibrationProvider
+from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
 from .protocols import HardwareControlAPI
 
@@ -153,7 +153,7 @@ class OT3API(
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
     HardwareControlAPI,
-    RobotCalibrationProvider,
+    OT3RobotCalibrationProvider,
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -215,7 +215,7 @@ class OT3API(
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
-        RobotCalibrationProvider.__init__(self, self._config)
+        OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
     @property
@@ -1296,10 +1296,6 @@ class OT3API(
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
-
-    async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
-        # populate this
-        pass
 
     @ExecutionManagerProvider.wait_for_running
     async def _grip(self, duty_cycle: float) -> None:
