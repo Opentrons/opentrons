@@ -22,11 +22,13 @@ import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisp
 interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
+  isActiveRun: boolean
 }
 
 export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
+  isActiveRun,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
@@ -57,10 +59,15 @@ export function ConfirmCancelRunModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
+      isError={isActiveRun}
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          padding={SPACING.spacing6}
+          gridGap="0.75rem"
+        >
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
@@ -77,17 +84,18 @@ export function ConfirmCancelRunModal({
           </StyledText>
         </Flex>
         <Flex
-          marginTop={SPACING.spacing6}
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing3}
           width="100%"
         >
           <SmallButton
+            flex="1"
             buttonType="default"
             buttonText={t('shared:go_back')}
             onClick={() => setShowConfirmCancelRunModal(false)}
           />
           <SmallButton
+            flex="1"
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
