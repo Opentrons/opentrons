@@ -18,9 +18,10 @@ class Plot:
         self.PLOT_PATH = "plot_pipette_calibration/"
         self.PLOT_FORMAT = ".png"
         # self.axes = ["X", "Y", "Z"]
-        self.axes = ["X", "Y"]
-        # self.axes = ["Z"]
+        # self.axes = ["X", "Y"]
+        self.axes = ["Z"]
         self.jog_offset = 0 # mm
+        self.gauge_time =  0.33 # min
         self.plot_param = {
             "figure":None,
             "filename":None,
@@ -36,6 +37,10 @@ class Plot:
         }
         self.create_folder()
         self.df_data = self.import_file(self.data)
+        cycle_time = self.get_cycle_time(self.df_data)
+        calibration_time = self.get_calibration_time(cycle_time)
+        print(f"Average Cycle Time = {cycle_time}")
+        print(f"Average Calibration Time = {calibration_time}")
 
     def import_file(self, file):
         df = pd.read_csv(file)
@@ -70,6 +75,20 @@ class Plot:
             self.gauge_plot(axis, idx)
             self.gauge_plot(axis, idx, zero=True)
         print("Plots Saved!")
+
+    def get_cycle_time(self, df):
+        cycles = len(df)
+        total_time = []
+        for i in range(cycles-1):
+            stop_time = df["Time"].iloc[-(i+1)]
+            start_time = df["Time"].iloc[-(i+2)]
+            total_time.append(round(stop_time - start_time, 3))
+        avg_time = sum(total_time) / len(total_time)
+        avg_time = round(avg_time, 3)
+        return avg_time
+
+    def get_calibration_time(self, avg_time):
+        return round(avg_time - self.gauge_time, 3)
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
