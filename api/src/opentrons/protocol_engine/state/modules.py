@@ -98,7 +98,7 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 class HardwareModule:
     """Data describing an actually connected module."""
 
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
@@ -225,7 +225,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _add_module_substate(
         self,
         module_id: str,
-        serial_number: str,
+        serial_number: Optional[str],
         definition: ModuleDefinition,
         slot_name: Optional[DeckSlotName],
         requested_model: Optional[ModuleModel],
@@ -277,6 +277,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
+            assert module_serial is not None, "Expected a serial number and got None."
             self._state.module_offset_by_serial[module_serial] = module_offset
 
     def _handle_heater_shaker_commands(
@@ -600,11 +601,12 @@ class ModuleView(HasState[ModuleState]):
         """
         return self.get(module_id).model
 
-    def get_serial_number(self, module_id: str) -> str:
+    def get_serial_number(self, module_id: str) -> Optional[str]:
         """Get the hardware serial number of the given module.
 
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
+        If the hardware is not connected by a serial it will return None.
         """
         return self.get(module_id).serialNumber
 

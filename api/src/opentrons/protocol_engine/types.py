@@ -415,7 +415,7 @@ class LoadedModule(BaseModel):
     id: str
     model: ModuleModel
     location: Optional[DeckSlotLocation]
-    serialNumber: str
+    serialNumber: Optional[str]
 
 
 class LabwareOffsetLocation(BaseModel):

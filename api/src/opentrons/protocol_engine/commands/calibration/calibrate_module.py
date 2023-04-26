@@ -76,6 +76,9 @@ class CalibrateModuleImplementation(
             labware_id=params.labwareId, well_name="B1"
         )
         # start the calibration
+        assert (
+            module_serial is not None
+        ), "Expected a module serial number and got None."
         module_offset = await calibration.calibrate_module(
             ot3_api, ot3_mount, slot, module_serial, nominal_position
         )
