@@ -11,6 +11,9 @@ from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
 )
+from opentrons.hardware_control.motion_utilities import (
+    target_position_from_relative,
+)
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Lifetime Test')
@@ -29,9 +32,9 @@ class Gripper_Lifetime_Test:
         self.home = None
         self.gripper_id = None
         self.GRIP_FORCE = 20 # N
-        self.START_HEIGHT = 3 # mm
+        self.GRIP_HEIGHT = Point(0, 0, -100) # mm
+        self.HOLD_TIME = 10 # s
         self.axes = [OT3Axis.G, OT3Axis.Z_G]
-        self.engage_position = Point(0, 0, -50)
         self.test_data ={
             "Time":"None",
             "Cycle":"None",
@@ -89,10 +92,27 @@ class Gripper_Lifetime_Test:
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
-    async def _engage_gripper(
+    async def _pick(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        await api.move_rel(mount, self.engage_position)
+        target_position = target_position_from_relative(mount, self.GRIP_HEIGHT, api._current_position)
+        await api._move(target_position)
+        time.sleep(1.0)
+        await api.grip(self.GRIP_FORCE)
+
+    async def _hold(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        await api.home_z(mount)
+        time.sleep(self.HOLD_TIME)
+
+    async def _drop(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        target_position = target_position_from_relative(mount, self.GRIP_HEIGHT, api._current_position)
+        await api._move(target_position)
+        time.sleep(1.0)
+        await api.ungrip()
 
     async def _home_gripper(
         self, api: OT3API, mount: OT3Mount
@@ -100,7 +120,7 @@ class Gripper_Lifetime_Test:
         await api.home(self.axes)
 
     async def exit(self):
-        print("Exiting...")
+        print("\nExiting...")
         if self.api and self.mount:
             await self._home_gripper(self.api, self.mount)
 
@@ -112,8 +132,9 @@ class Gripper_Lifetime_Test:
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home_gripper(self.api, self.mount)
-                    await self._engage_gripper(self.api, self.mount)
-                    print(f"\n-> Completed Test Cycle {cycle}/{self.cycles}")
+                    await self._pick(self.api, self.mount)
+                    await self._hold(self.api, self.mount)
+                    await self._drop(self.api, self.mount)
         except Exception as e:
             await self.exit()
             raise e
@@ -121,7 +142,7 @@ class Gripper_Lifetime_Test:
             await self.exit()
             print("Test Cancelled!")
         finally:
-            # await self.exit()
+            await self.exit()
             print("Test Completed!")
 
 if __name__ == '__main__':
