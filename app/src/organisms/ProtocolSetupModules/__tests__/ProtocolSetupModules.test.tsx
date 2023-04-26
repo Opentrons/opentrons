@@ -91,9 +91,7 @@ describe('ProtocolSetupModules', () => {
     getByText('Module Name')
     getByText('Location')
     getByText('Status')
-    getByRole('button', { name: 'Modules' })
-    getByRole('button', { name: 'Setup Instructions' })
-    getByRole('button', { name: 'continue' })
+    getByText('Setup Instructions')
     getByRole('button', { name: 'Map View' })
   })
 
@@ -104,9 +102,9 @@ describe('ProtocolSetupModules', () => {
   })
 
   it('should launch setup instructions modal on button click', () => {
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
-    getByRole('button', { name: 'Setup Instructions' }).click()
+    getByText('Setup Instructions').click()
     getByText('TODO: setup instructions modal')
   })
 })

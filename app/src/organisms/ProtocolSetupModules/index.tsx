@@ -2,18 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Btn,
   Flex,
   Icon,
   Module,
   RobotWorkSpace,
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -26,10 +25,11 @@ import {
 
 import { Portal } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
-import { BackButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay/SmallButton'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { MapViewButton } from '../../organisms/MapViewButton'
+import { ODDBackButton } from '../../organisms/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -110,52 +110,6 @@ function RowModule({
         ) : null}
       </Flex>
     </Flex>
-  )
-}
-
-function SetupInstructionsButton(
-  props: React.HTMLProps<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  return (
-    <Btn
-      alignItems="center"
-      backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
-      borderRadius={BORDERS.size_five}
-      display="flex"
-      gridGap="0.5rem"
-      padding="1rem 2rem"
-      whiteSpace="nowrap"
-      onClick={props.onClick}
-    >
-      <Icon name="information" size="1.5rem" />
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('setup_instructions')}
-      </StyledText>
-    </Btn>
-  )
-}
-
-export function ContinueButton(
-  props: React.HTMLProps<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation('shared')
-  return (
-    <Btn
-      backgroundColor={COLORS.blueEnabled}
-      borderRadius={BORDERS.size_five}
-      color={COLORS.white}
-      padding="1rem 2rem"
-      onClick={props.onClick}
-    >
-      <StyledText
-        as="h1"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        textTransform={TYPOGRAPHY.textTransformCapitalize}
-      >
-        {t('continue')}
-      </StyledText>
-    </Btn>
   )
 }
 
@@ -262,11 +216,21 @@ export function ProtocolSetupModules({
           </Modal>
         ) : null}
       </Portal>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('modules')}
-        </BackButton>
-        <SetupInstructionsButton
+      <Flex
+        alignItems={ALIGN_CENTER}
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <ODDBackButton
+          label={t('modules')}
+          onClick={() => setSetupScreen('prepare to run')}
+        />
+        <SmallButton
+          alignSelf={ALIGN_FLEX_END}
+          buttonText={t('setup_instructions')}
+          buttonType="tertiaryLowLight"
+          iconName="information"
+          iconPlacement="startIcon"
           onClick={() => setShowSetupInstructionsModal(true)}
         />
       </Flex>

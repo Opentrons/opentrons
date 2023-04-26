@@ -7,7 +7,6 @@ import {
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
   BORDERS,
-  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -32,7 +31,8 @@ import {
 } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
-import { MapViewButton } from '../../organisms/MapViewButton' // Probably should move this to atoms/buttons as well
+import { MapViewButton } from '../../organisms/MapViewButton'
+import { ODDBackButton } from '../../organisms/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
@@ -250,26 +250,10 @@ export function ProtocolSetupLabware({
           </Modal>
         ) : null}
       </Portal>
-      <Flex
-        gridGap={SPACING.spacing4}
-        fontSize={TYPOGRAPHY.fontSize38}
-        fontWeight={TYPOGRAPHY.fontWeightBold}
-        lineHeight={TYPOGRAPHY.lineHeight48}
-      >
-        <Btn
-          paddingLeft="0rem"
-          paddingRight={SPACING.spacing5}
-          onClick={() => setSetupScreen('prepare to run')}
-          width="3rem"
-        >
-          <Icon
-            name="back"
-            width={SPACING.spacing5}
-            color={COLORS.darkBlack_hundred}
-          />
-        </Btn>
-        {t('labware')}
-      </Flex>
+      <ODDBackButton
+        label={t('labware')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}
