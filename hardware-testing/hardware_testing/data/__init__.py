@@ -50,10 +50,10 @@ def create_run_id_and_start_time() -> Tuple[str, float]:
 
 
 def create_file_name(
-    test_name: str, run_id: str, tag: str, extension: str = "csv"
+    test_name: str, run_id: str, tag: str,pipid: str, extension: str = "csv"
 ) -> str:
     """Create a file name, given a test name."""
-    return f"{test_name}_{run_id}_{tag}.{extension}"
+    return f"{test_name}_{run_id}_{tag}_{pipid}.{extension}"
 
 
 def _save_data(test_name: str, file_name: str, data: str, perm: str = "w+") -> Path:

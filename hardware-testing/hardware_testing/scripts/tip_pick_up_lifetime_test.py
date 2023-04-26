@@ -165,6 +165,7 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
         outfile.write(json_object)
     return calibrated_slot_loc
 
+
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
@@ -182,21 +183,29 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     else:
         AXIS = OT3Axis.Z_R
 
+    
+
     # TIP_RACKS = args.tip_rack_num # default: 12
     PICKUPS_PER_TIP = args.pick_up_num # default: 20
     COLUMNS = 12
     ROWS = 8
     CYCLES = 3
+    
+    test_pip = api.get_attached_instrument(mount)
+    
+    print("mount.id:{}".format(test_pip["pipette_id"]))
 
     test_name = "tip-pick-up-lifetime-test"
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
+    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
 
     header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
                 'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-    test_pip = api.get_attached_instrument(mount)
+    
+
+    print("test_pip",test_pip)
     if(len(test_pip) == 0):
         print(f"No pipette recognized on {mount.name} mount\n")
         sys.exit()
@@ -327,7 +336,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                             tip_presence_eject_flag = 'Tip Presence Not Checked'
 
                         ### save test data and continue loop/exit based on tip eject success
-                        cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_pip['name'], rack, pick_up+1,
+                        
+                        cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_pip["pipette_id"], rack, pick_up+1,
                             total_pick_ups, tip_presence_pick_up_flag, tip_presence_eject_flag, total_failures]
                         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
                         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
