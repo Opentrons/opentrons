@@ -29,6 +29,7 @@ import { Banner } from '../../atoms/Banner'
 import { BackButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
+import { MapViewButton } from '../../organisms/MapViewButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -153,28 +154,6 @@ export function ContinueButton(
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {t('continue')}
-      </StyledText>
-    </Btn>
-  )
-}
-
-export function DeckMapButton(
-  props: React.HTMLProps<HTMLButtonElement>
-): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  return (
-    <Btn
-      position="fixed"
-      bottom="1.5rem"
-      right="1.5rem"
-      backgroundColor={COLORS.blueEnabled}
-      borderRadius={BORDERS.size_five}
-      color={COLORS.white}
-      padding="1rem 2rem"
-      onClick={props.onClick}
-    >
-      <StyledText as="h1" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('deck_map')}
       </StyledText>
     </Btn>
   )
@@ -338,7 +317,7 @@ export function ProtocolSetupModules({
           )
         })}
       </Flex>
-      <DeckMapButton onClick={() => setShowDeckMapModal(true)} />
+      <MapViewButton onClick={() => setShowDeckMapModal(true)} />
     </>
   )
 }
