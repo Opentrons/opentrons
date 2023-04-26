@@ -1,5 +1,3 @@
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
-
 import type { HealthPollerResult } from '../types'
 import type { MdnsBrowserService } from '../mdns-browser'
 
@@ -40,13 +38,6 @@ export const healthPolled = (
   payload: HealthPollerResult
 ): Types.HealthPolledAction => ({
   type: HEALTH_POLLED,
-  payload,
-})
-
-export const serialPortsPolled = (
-  payload: PortInfo[]
-): Types.SerialPortsPolledAction => ({
-  type: SERIAL_PORTS_POLLED,
   payload,
 })
 

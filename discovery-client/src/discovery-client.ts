@@ -3,7 +3,6 @@ import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
 import * as Store from './store'
 
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type {
   DiscoveryClient,
   DiscoveryClientConfig,
@@ -19,7 +18,6 @@ export function createDiscoveryClient(
   const { getState, dispatch, subscribe } = Store.createStore()
   const getAddresses = (): Address[] => Store.getAddresses(getState())
   const getRobots = (): DiscoveryClientRobot[] => Store.getRobots(getState())
-  const getSerialPorts = (): PortInfo[] => Store.getSerialPorts(getState())
   let unsubscribe: (() => void) | null = null
 
   const healthPoller = createHealthPoller({
@@ -81,7 +79,6 @@ export function createDiscoveryClient(
 
   return {
     getRobots,
-    getSerialPorts,
     removeRobot,
     start,
     stop,

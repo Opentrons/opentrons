@@ -12,7 +12,6 @@ import {
 import * as Actions from './actions'
 
 import type { Reducer } from 'redux'
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 
 import type {
   HealthResponse,
@@ -35,7 +34,6 @@ const INITIAL_STATE: State = {
   robotsByName: {},
   hostsByIp: {},
   manualAddresses: [],
-  serialPorts: [],
 }
 
 const makeHostState = (
@@ -257,26 +255,8 @@ export const manualAddressesReducer = (
   return state
 }
 
-export const serialPortsReducer = (
-  // eslint-disable-next-line @typescript-eslint/default-param-last
-  state: PortInfo[] = INITIAL_STATE.serialPorts,
-  action: Action
-): PortInfo[] => {
-  switch (action.type) {
-    case Actions.INITIALIZE_STATE: {
-      return action.payload.serialPorts ?? state
-    }
-    case Actions.SERIAL_PORTS_POLLED: {
-      return action.payload ?? state
-    }
-  }
-
-  return state
-}
-
 export const reducer: Reducer<State, Action> = combineReducers({
   robotsByName: robotsByNameReducer,
   hostsByIp: hostsByIpReducer,
   manualAddresses: manualAddressesReducer,
-  serialPorts: serialPortsReducer,
 })
