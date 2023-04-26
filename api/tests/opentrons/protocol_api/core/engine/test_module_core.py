@@ -1,15 +1,16 @@
 """Tests for opentrons.protocol_api.core.engine.ModuleCore."""
 import pytest
 from decoy import Decoy
+from typing import Type, Optional
 
 from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules import AbstractModule, HeaterShaker, MagDeck, TempDeck, Thermocycler
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel, ModuleDefinition
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.engine.module_core import ModuleCore
+from opentrons.protocol_api.core.engine.module_core import ModuleCore, create_module_core, ThermocyclerModuleCore, MagneticBlockCore, MagneticModuleCore, TemperatureModuleCore, HeaterShakerModuleCore
 from opentrons.types import DeckSlotName
 
 
@@ -29,6 +30,26 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule]:
     """Get a mock synchronous module hardware."""
     return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
+
+
+@pytest.fixture
+def mock_hw_thermocycler(decoy: Decoy) -> Thermocycler:
+    return decoy.mock(cls=Thermocycler)
+
+
+@pytest.fixture
+def mock_hw_mag_deck(decoy: Decoy) -> MagDeck:
+    return decoy.mock(cls=MagDeck)
+
+
+@pytest.fixture
+def mock_hw_temp_deck(decoy: Decoy) -> TempDeck:
+    return decoy.mock(cls=TempDeck)
+
+
+@pytest.fixture
+def mock_hw_heater_shaker(decoy: Decoy) -> HeaterShaker:
+    return decoy.mock(cls=HeaterShaker)
 
 
 @pytest.fixture
@@ -98,3 +119,14 @@ def test_get_display_name(
     )
 
     assert subject.get_display_name() == "abra kadabra"
+
+
+@pytest.mark.parametrize("hw_module, expected_module_core", [(pytest.lazy_fixture("mock_hw_thermocycler"), ThermocyclerModuleCore),
+                                                             (pytest.lazy_fixture("mock_hw_mag_deck"), MagneticModuleCore),
+                                                             (pytest.lazy_fixture("mock_hw_temp_deck"), TemperatureModuleCore),
+                                                             (pytest.lazy_fixture("mock_hw_heater_shaker"), HeaterShakerModuleCore),
+                                                             (None, MagneticBlockCore)])
+def test_create_module_core(api_version: APIVersion, mock_engine_client: EngineClient, hw_module: Optional[AbstractModule], expected_module_core: Type[ModuleCore]) -> None:
+    """It should get the proper module_core."""
+    result = create_module_core(module_id="123", engine_client=mock_engine_client, api_version=api_version, sync_module_hardware=hw_module)
+    assert isinstance(result, expected_module_core)
