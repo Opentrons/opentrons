@@ -6,7 +6,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
 
-async def _main(is_simulating: bool) -> None:
+async def _main(is_simulating: bool, force: int) -> None:
     mount = types.OT3Mount.GRIPPER
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
@@ -15,7 +15,7 @@ async def _main(is_simulating: bool) -> None:
         while True:
             inp = input("\"g\" to grip, \"u\" to ungrip, \"j\" to jog: ").strip()
             if inp == "g":
-                await api.grip(15)
+                await api.grip(force)
             elif inp == "u":
                 await api.ungrip()
             elif inp == "j":
@@ -28,5 +28,6 @@ async def _main(is_simulating: bool) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--force", type=int, default=15)
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate))
+    asyncio.run(_main(args.simulate, args.force))
