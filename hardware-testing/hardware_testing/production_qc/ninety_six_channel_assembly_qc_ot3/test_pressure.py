@@ -21,4 +21,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    # for each channel:
+    #  - open-pa
+    #  - sealed-pa
+    #  - aspirate-pa
+    #  - dispense-pa
     return
