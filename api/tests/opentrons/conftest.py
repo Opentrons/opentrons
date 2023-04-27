@@ -265,7 +265,7 @@ def _make_ot2_papi213_ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
 
 @contextlib.contextmanager
 def _make_ot3_papi214_ctx(
-    hardware: ThreadManagedHardware
+    hardware: ThreadManagedHardware,
 ) -> Generator[ProtocolContext, None, None]:
     with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
         yield create_protocol_context(
@@ -278,7 +278,9 @@ def _make_ot3_papi214_ctx(
 
 
 @pytest.fixture()
-def ctx(robot_model: RobotModel, hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
+def ctx(
+    robot_model: RobotModel, hardware: ThreadManagedHardware
+) -> Generator[ProtocolContext, None, None]:
     if robot_model == "OT-2 Standard":
         yield _make_ot2_papi213_ctx(hardware=hardware)
     elif robot_model == "OT-3 Standard":
