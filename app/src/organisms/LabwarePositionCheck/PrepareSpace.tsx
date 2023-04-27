@@ -164,7 +164,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         >
           <SmallButton
             onClick={props.confirmPlacement}
-            buttonType="default"
+            buttonType="primary"
             buttonText={t('shared:confirm_placement')}
           />
         </Flex>
