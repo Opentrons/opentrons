@@ -1,26 +1,149 @@
 """Test Pressure."""
+from asyncio import sleep
 from typing import List, Union
 
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.sensors import sensor_driver, sensor_types
+
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
+from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
+from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.data import ui
+from hardware_testing.opentrons_api import helpers_ot3
+from hardware_testing.opentrons_api.types import OT3Mount
 from hardware_testing.data.csv_report import (
     CSVReport,
+    CSVResult,
     CSVLine,
     CSVLineRepeating,
 )
 
+TIP_VOLUME = 50
+ASPIRATE_VOLUME = 300
+PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
+
+
+def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
+    assert reading in PRESSURE_READINGS, f"{reading} not in PRESSURE_READINGS"
+    return f"{probe.name.lower()}-{reading}"
+
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    # for each channel:
-    #  - open-pa
-    #  - sealed-pa
-    #  - aspirate-pa
-    #  - dispense-pa
-    return []
+    lines: List[Union[CSVLine, CSVLineRepeating]] = list()
+    for p in InstrumentProbeType:
+        for r in PRESSURE_READINGS:
+            tag = _get_test_tag(p, r)
+            lines.append(CSVLine(tag, [float, CSVResult]))
+    return lines
+
+
+async def read_once(
+    api: OT3API,
+    driver: sensor_driver.SensorDriver,
+    sensor: sensor_types.PressureSensor,
+    timeout: int = 1,
+) -> float:
+    if not api.is_simulator and isinstance(api._backend, OT3Controller):
+        data = await driver.read(
+            api._backend._messenger, sensor, offset=False, timeout=timeout
+        )
+        if isinstance(data, sensor_types.SensorDataType):
+            return data.to_float()
+        raise helpers_ot3.SensorResponseBad("no response from sensor")
+    return 0.0
+
+
+async def _read_from_sensor(
+    api: OT3API,
+    driver: sensor_driver.SensorDriver,
+    sensor: sensor_types.PressureSensor,
+    num_readings: int = 10,
+) -> float:
+    readings: List[float] = []
+    sequential_failures = 0
+    while len(readings) != num_readings:
+        try:
+            r = await read_once(api, driver, sensor)
+            sequential_failures = 0
+            readings.append(r)
+            if not api.is_simulator:
+                await sleep(0.2)
+        except helpers_ot3.SensorResponseBad as e:
+            sequential_failures += 1
+            if sequential_failures == 3:
+                raise e
+            else:
+                continue
+    return sum(readings) / num_readings
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    ui.print_error("skipping")
+
+    s_driver = sensor_driver.SensorDriver()
+
+    for probe in InstrumentProbeType:
+        sensor_id = sensor_id_for_instrument(probe)
+        ui.print_header(f"Sensor: {probe}")
+        pressure_sensor = sensor_types.PressureSensor.build(sensor_id, NodeId.pipette_left)
+
+        # OPEN-Pa
+        open_pa = 0.0
+        if not api.is_simulator:
+            try:
+                open_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+            except helpers_ot3.SensorResponseBad:
+                ui.print_error(f"{probe} pressure sensor not working, skipping")
+                continue
+        print(f"open-pa: {open_pa}")
+        # FIXME: create stricter pass/fail criteria
+        report(section, _get_test_tag(probe, "open-pa"), [open_pa, CSVResult.PASS])
+
+        # SEALED-Pa
+        sealed_pa = 0.0
+        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+        await api.prepare_for_aspirate(OT3Mount.LEFT)
+        if not api.is_simulator:
+            ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
+            ui.get_user_ready("SEAL tip using your FINGER")
+            try:
+                sealed_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+            except helpers_ot3.SensorResponseBad:
+                ui.print_error(f"{probe} pressure sensor not working, skipping")
+                break
+        print(f"sealed-pa: {sealed_pa}")
+        # FIXME: create stricter pass/fail criteria
+        report(section, _get_test_tag(probe, "open-pa"), [sealed_pa, CSVResult.PASS])
+
+        # ASPIRATE-Pa
+        aspirate_pa = 0.0
+        await api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
+        if not api.is_simulator:
+            try:
+                aspirate_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+            except helpers_ot3.SensorResponseBad:
+                ui.print_error(f"{probe} pressure sensor not working, skipping")
+                break
+        print(f"aspirate-pa: {aspirate_pa}")
+        # FIXME: create stricter pass/fail criteria
+        report(section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, CSVResult.PASS])
+
+        # DISPENSE-Pa
+        dispense_pa = 0.0
+        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
+        if not api.is_simulator:
+            try:
+                dispense_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+            except helpers_ot3.SensorResponseBad:
+                ui.print_error(f"{probe} pressure sensor not working, skipping")
+                break
+        print(f"dispense-pa: {dispense_pa}")
+        # FIXME: create stricter pass/fail criteria
+        report(section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, CSVResult.PASS])
+
+        if not api.is_simulator:
+            ui.get_user_ready(f"REMOVE tip")
+        await api.remove_tip(OT3Mount.LEFT)

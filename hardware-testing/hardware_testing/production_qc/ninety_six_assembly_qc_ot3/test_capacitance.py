@@ -21,7 +21,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, GripperProbe
+from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 TEST_SLOT = 5
@@ -70,14 +70,20 @@ async def _read_from_sensor(
     num_readings: int = 10,
 ) -> float:
     readings: List[float] = []
+    sequential_failures = 0
     while len(readings) != num_readings:
         try:
             r = await read_once(api, driver, sensor)
+            sequential_failures = 0
             readings.append(r)
             if not api.is_simulator:
                 await sleep(0.2)
-        except helpers_ot3.SensorResponseBad:
-            continue
+        except helpers_ot3.SensorResponseBad as e:
+            sequential_failures += 1
+            if sequential_failures == 3:
+                raise e
+            else:
+                continue
     return sum(readings) / num_readings
 
 
@@ -116,7 +122,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # AIR-pF
         air_pf = 0.0
         if not api.is_simulator:
-            air_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+            try:
+                air_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+            except helpers_ot3.SensorResponseBad:
+                ui.print_error(f"{probe} cap sensor not working, skipping")
+                continue
         print(f"air-pf: {air_pf}")
         # FIXME: create stricter pass/fail criteria
         report(section, _get_test_tag(probe, "air-pf"), [air_pf, CSVResult.PASS])
@@ -127,7 +137,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
         attached_pf = 0.0
         if not api.is_simulator:
-            attached_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+            try:
+                attached_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+            except helpers_ot3.SensorResponseBad:
+                ui.print_error(f"{probe} cap sensor not working, skipping")
+                continue
         print(f"attached-pf: {attached_pf}")
         # FIXME: create stricter pass/fail criteria
         report(
@@ -186,7 +200,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 ui.get_user_ready("about to PRESS into the DECK")
             await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=deck_mm))
             if not api.is_simulator:
-                deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+                try:
+                    deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+                except helpers_ot3.SensorResponseBad:
+                    ui.print_error(f"{probe} cap sensor not working, skipping")
+                    continue
             print(f"deck-pf: {deck_pf}")
         else:
             print("skipping deck-pf")
