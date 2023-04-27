@@ -80,7 +80,9 @@ if __name__ == "__main__":
         ), 'use "--only" for just one test, not multiple tests'
     else:
         _t_sections = {
-            s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower().replace('-', '_')}")
+            s: f
+            for s, f in TESTS
+            if not getattr(args, f"skip_{s.value.lower().replace('-', '_')}")
         }
     _config = TestConfig(simulate=args.simulate, tests=_t_sections)
     asyncio.run(_main(_config))

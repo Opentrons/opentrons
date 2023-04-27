@@ -82,26 +82,28 @@ def build_report(test_name: str) -> CSVReport:
             CSVSection(
                 title=TestSection.PLUNGER.value, lines=test_plunger.build_csv_lines()
             ),
+            CSVSection(title=TestSection.JAWS.value, lines=test_jaws.build_csv_lines()),
             CSVSection(
-                title=TestSection.JAWS.value, lines=test_jaws.build_csv_lines()
-            ),
-            CSVSection(
-                title=TestSection.CAPACITANCE.value, lines=test_capacitance.build_csv_lines()
+                title=TestSection.CAPACITANCE.value,
+                lines=test_capacitance.build_csv_lines(),
             ),
             CSVSection(
                 title=TestSection.PRESSURE.value, lines=test_pressure.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.ENVIRONMENT_SENSOR.value, lines=test_environmental_sensor.build_csv_lines()
+                title=TestSection.ENVIRONMENT_SENSOR.value,
+                lines=test_environmental_sensor.build_csv_lines(),
             ),
             CSVSection(
-                title=TestSection.TIP_SENSOR.value, lines=test_tip_sensor.build_csv_lines()
+                title=TestSection.TIP_SENSOR.value,
+                lines=test_tip_sensor.build_csv_lines(),
             ),
             CSVSection(
                 title=TestSection.DROPLETS.value, lines=test_droplets.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.PARTIAL_PICKUP.value, lines=test_partial_pickup.build_csv_lines()
+                title=TestSection.PARTIAL_PICKUP.value,
+                lines=test_partial_pickup.build_csv_lines(),
             ),
         ],
     )

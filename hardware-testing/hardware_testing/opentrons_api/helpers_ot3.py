@@ -430,7 +430,7 @@ async def move_tip_motor_relative_ot3(
     _move_coro = api._backend.tip_action(
         axes=[OT3Axis.Q],
         distance=distance,
-        speed=speed,
+        speed=speed if speed else 5,
         tip_action=action,
     )
     if motor_current is None:

@@ -17,15 +17,13 @@ RETRACT_MM = 0.25
 MAX_TRAVEL = 29.8 - RETRACT_MM  # FIXME: what is the max travel?
 ENDSTOP_OVERRUN_MM = 0.25
 ENDSTOP_OVERRUN_SPEED = 5
-SPEEDS_TO_TEST = [5, 10, 15, 20, 30, 50]
+SPEEDS_TO_TEST: List[float] = [5, 10, 15, 20, 30, 50]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
     1.5: SPEEDS_TO_TEST,
 }
 
 
-def _get_test_tag(
-    current: float, speed: float
-) -> str:
+def _get_test_tag(current: float, speed: float) -> str:
     return f"current-{current}-speed-{speed}"
 
 
@@ -50,7 +48,9 @@ async def _check_if_jaw_is_aligned_with_endstop(api: OT3API) -> Tuple[bool, bool
         ui.print_error("endstop hit too early")
         return pass_no_hit, False
     # now purposefully hit the endstop
-    await helpers_ot3.move_tip_motor_relative_ot3(api, -RETRACT_MM - ENDSTOP_OVERRUN_MM, speed=ENDSTOP_OVERRUN_SPEED)
+    await helpers_ot3.move_tip_motor_relative_ot3(
+        api, -RETRACT_MM - ENDSTOP_OVERRUN_MM, speed=ENDSTOP_OVERRUN_SPEED
+    )
     if not api.is_simulator:
         pass_hit = ui.get_user_answer("are both endstop Lights ON")
     else:
@@ -94,8 +94,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             )
             # MOVE DOWN then UP
             print(f"moving down/up {MAX_TRAVEL} mm at {speed} mm/sec")
-            await helpers_ot3.move_tip_motor_relative_ot3(api, MAX_TRAVEL, speed=speed, motor_current=current)
-            await helpers_ot3.move_tip_motor_relative_ot3(api, -MAX_TRAVEL, speed=speed, motor_current=current)
+            await helpers_ot3.move_tip_motor_relative_ot3(
+                api, MAX_TRAVEL, speed=speed, motor_current=current
+            )
+            await helpers_ot3.move_tip_motor_relative_ot3(
+                api, -MAX_TRAVEL, speed=speed, motor_current=current
+            )
             # RESET CURRENTS, CHECK, then HOME
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, ax, default_max_speed=default_speed
