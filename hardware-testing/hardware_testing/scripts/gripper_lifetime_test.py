@@ -29,7 +29,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "/var/log/gripper-lifetime.log",
+            "filename": "/data/logs/gripper-lifetime.log",
             "maxBytes": 5000000,
             "level": logging.DEBUG,
             "backupCount": 3,
