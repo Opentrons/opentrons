@@ -199,6 +199,7 @@ describe('InstrumentsAndModules', () => {
     render()
     expect(mockUseAllPipetteOffsetCalibrationsQuery).toHaveBeenCalledWith({
       refetchInterval: 30000,
+      enabled: true,
     })
     expect(mockUsePipettesQuery).toHaveBeenCalledWith(
       {},

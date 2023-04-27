@@ -33,7 +33,7 @@ import { LongPressModal } from './LongPressModal'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 
-import imgSrc from '../../../assets/images/odd/abstract@x2.png'
+import imgSrc from '../../../assets/images/on-device-display/abstract@x2.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
@@ -118,7 +118,7 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
-      padding={SPACING.spacing6}
+      padding={`0 ${SPACING.spacingXXL}`}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
@@ -151,7 +151,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('protocol_name_title')}
                 buttonType={
                   sortBy === 'alphabetical' || sortBy === 'reverse'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -170,7 +170,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('last_run')}
                 buttonType={
                   sortBy === 'recentRun' || sortBy === 'oldRun'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -189,7 +189,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('date_added')}
                 buttonType={
                   sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -305,7 +305,7 @@ export function ProtocolCard(props: {
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
         {longpress.isLongPressed && (
-          <LongPressModal longpress={longpress} protocol={protocol} />
+          <LongPressModal longpress={longpress} protocolId={protocol.id} />
         )}
       </Flex>
     </Flex>

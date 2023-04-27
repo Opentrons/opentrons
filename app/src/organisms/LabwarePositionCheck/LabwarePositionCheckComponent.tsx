@@ -1,13 +1,7 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import {
-  useConditionalConfirm,
-  Flex,
-  DIRECTION_COLUMN,
-  COLORS,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import { useSelector } from 'react-redux'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
@@ -291,16 +285,11 @@ export const LabwarePositionCheckInner = (
   )
   return (
     <Portal level="top">
-      {Boolean(isOnDevice) ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="100%"
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
+      {isOnDevice ? (
+        <ModalShell fullPage>
           {wizardHeader}
           {modalContent}
-        </Flex>
+        </ModalShell>
       ) : (
         <ModalShell width="47rem" header={wizardHeader}>
           {modalContent}

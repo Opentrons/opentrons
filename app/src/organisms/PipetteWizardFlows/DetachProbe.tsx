@@ -8,21 +8,21 @@ import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachProbeProps extends PipetteWizardStepProps {
-  handleCleanUp: () => void
+  proceed: () => void
 }
 
 export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   const {
     isRobotMoving,
     goBack,
-    handleCleanUp,
+    proceed,
     mount,
     flowType,
     attachedPipettes,
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.DETACH_PROBE }
-  const channel = attachedPipettes[mount]?.modelSpecs.channels
+  const channel = attachedPipettes[mount]?.data.channels
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   return (
@@ -38,7 +38,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
         </StyledText>
       }
       proceedButtonText={t('complete_cal')}
-      proceed={handleCleanUp}
+      proceed={proceed}
       back={goBack}
     />
   )

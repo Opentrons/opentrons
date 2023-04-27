@@ -626,9 +626,9 @@ async def get_capacitance_ot3(
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
-    if not channel or channel == "primary":
+    if not channel or channel == "rear":
         capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
-    elif channel == "secondary":
+    elif channel == "front":
         capacitive = sensor_types.CapacitiveSensor.build(SensorId.S1, node_id)
     else:
         raise ValueError(f"unexpected channel for capacitance sensor: {channel}")
@@ -701,10 +701,9 @@ async def get_pressure_ot3(
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
-    # FIXME: allow SensorId to specify which sensor on the device to read from
-    if not channel or channel == "primary":
+    if not channel or channel == "rear":
         pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
-    elif channel == "secondary":
+    elif channel == "front":
         pressure = sensor_types.PressureSensor.build(SensorId.S1, node_id)
     else:
         raise ValueError(f"unexpected channel for pressure sensor: {channel}")

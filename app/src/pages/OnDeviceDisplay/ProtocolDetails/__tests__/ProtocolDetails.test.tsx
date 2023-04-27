@@ -1,12 +1,19 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 import { format } from 'date-fns'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  deleteProtocol,
+  deleteRun,
+  getProtocol,
+  HostConfig,
+} from '@opentrons/api-client'
+import {
   useCreateRunMutation,
-  useDeleteProtocolMutation,
+  useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
@@ -15,22 +22,26 @@ import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 
+jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../Deck')
 jest.mock('../Hardware')
 jest.mock('../Labware')
 
+const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = jest.fn((id: string) => {})
-const mockDeleteProtocol = jest.fn((id: string) => {})
 const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
 const mockLabware = Labware as jest.MockedFunction<typeof Labware>
 const mockDeck = Deck as jest.MockedFunction<typeof Deck>
 const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
   typeof useCreateRunMutation
 >
-const mockUseDeleteProtocolMutation = useDeleteProtocolMutation as jest.MockedFunction<
-  typeof useDeleteProtocolMutation
+const mockuseHost = useHost as jest.MockedFunction<typeof useHost>
+const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
+const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
+  typeof deleteProtocol
 >
+const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
@@ -53,9 +64,7 @@ describe('ODDProtocolDetails', () => {
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-    mockUseDeleteProtocolMutation.mockReturnValue({
-      deleteProtocol: mockDeleteProtocol,
-    } as any)
+
     mockUseProtocolQuery.mockReturnValue({
       data: {
         data: {
@@ -76,6 +85,10 @@ describe('ODDProtocolDetails', () => {
         },
       },
     } as any)
+    when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
   })
 
   it('renders protocol truncated name that expands when clicked', () => {
@@ -113,9 +126,23 @@ describe('ODDProtocolDetails', () => {
     const [{ getByText }] = render()
     getByText('Pin protocol')
   })
-  it('renders the delete protocol button', () => {
+  it('renders the delete protocol button', async () => {
+    when(mockGetProtocol)
+      .calledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
+      .mockResolvedValue({
+        data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
+      } as any)
     const [{ getByText }] = render()
-    getByText('Delete protocol')
+    const deleteButton = getByText('Delete protocol').closest('button')
+    deleteButton?.click()
+    // flush promises and then make assertions
+    await new Promise(setImmediate)
+    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+    expect(mockDeleteProtocol).toHaveBeenCalledWith(
+      MOCK_HOST_CONFIG,
+      'fakeProtocolId'
+    )
   })
   it('renders the navigation buttons', () => {
     mockHardware.mockReturnValue(<div>Mock Hardware</div>)

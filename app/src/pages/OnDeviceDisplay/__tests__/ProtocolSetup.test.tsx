@@ -25,7 +25,7 @@ import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
-import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   useRunControls,
   useRunStatus,
@@ -41,7 +41,7 @@ jest.mock(
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../organisms/ProtocolSetupModules')
 jest.mock('../../../organisms/ProtocolSetupModules/utils')
-jest.mock('../../../organisms/RunDetails/ConfirmCancelModal')
+jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../organisms/ProtocolSetupLiquids')
 jest.mock('@opentrons/react-api-client')
@@ -64,8 +64,8 @@ const mockProtocolSetupModules = ProtocolSetupModules as jest.MockedFunction<
 const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof getUnmatchedModulesForProtocol
 >
-const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
-  typeof ConfirmCancelModal
+const mockConfirmCancelRunModal = ConfirmCancelRunModal as jest.MockedFunction<
+  typeof ConfirmCancelRunModal
 >
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
@@ -142,7 +142,9 @@ describe('ProtocolSetup', () => {
     mockProtocolSetupLiquids.mockReturnValue(
       <div>Mock ProtocolSetupLiquids</div>
     )
-    mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
+    mockConfirmCancelRunModal.mockReturnValue(
+      <div>Mock ConfirmCancelRunModal</div>
+    )
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -219,9 +221,9 @@ describe('ProtocolSetup', () => {
     const [{ getByRole, getByText, queryByText }] = render(
       `/protocols/${RUN_ID}/setup/`
     )
-    expect(queryByText('Mock ConfirmCancelModal')).toBeNull()
+    expect(queryByText('Mock ConfirmCancelRunModal')).toBeNull()
     getByRole('button', { name: 'close' }).click()
-    getByText('Mock ConfirmCancelModal')
+    getByText('Mock ConfirmCancelRunModal')
   })
 
   it('should launch protocol setup modules screen when click modules', () => {

@@ -42,7 +42,6 @@ export function InstrumentsAndModules({
   robotName,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-
   const attachedPipettes = usePipettesQuery(
     {},
     {
@@ -82,6 +81,7 @@ export function InstrumentsAndModules({
   const pipetteOffsetCalibrations =
     useAllPipetteOffsetCalibrationsQuery({
       refetchInterval: FETCH_PIPETTE_CAL_POLL,
+      enabled: !isOT3,
     })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,
@@ -140,13 +140,25 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
-                pipetteOffsetCalibration={leftMountOffsetCalibration}
+                isPipetteCalibrated={
+                  isOT3
+                    ? attachedInstruments?.data?.find(i => i.mount === 'left')
+                        ?.data?.calibratedOffset != null
+                    : leftMountOffsetCalibration != null
+                }
                 mount={LEFT}
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
               {isOT3 ? (
-                <GripperCard attachedGripper={extensionInstrument} />
+                <GripperCard
+                  attachedGripper={extensionInstrument}
+                  isCalibrated={
+                    attachedInstruments?.data?.find(
+                      i => i.mount === 'extension'
+                    )?.data?.calibratedOffset != null
+                  }
+                />
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
@@ -173,7 +185,13 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
-                  pipetteOffsetCalibration={rightMountOffsetCalibration}
+                  isPipetteCalibrated={
+                    isOT3
+                      ? attachedInstruments?.data?.find(
+                          i => i.mount === 'right'
+                        )?.data?.calibratedOffset != null
+                      : rightMountOffsetCalibration != null
+                  }
                   mount={RIGHT}
                   robotName={robotName}
                   is96ChannelAttached={false}

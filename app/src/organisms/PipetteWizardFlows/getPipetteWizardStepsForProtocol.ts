@@ -1,13 +1,15 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import * as PipetteConstants from '../../redux/pipettes/constants'
 import { FLOWS, SECTIONS } from './constants'
-import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { Mount } from '../../redux/pipettes/types'
-import type { PipetteInfo } from '../Devices/hooks'
+import type {
+  AttachedPipettesFromInstrumentsQuery,
+  PipetteInfo,
+} from '../Devices/hooks'
 import type { PipetteWizardStep } from './types'
 
 export const getPipetteWizardStepsForProtocol = (
-  attachedPipettesByMount: AttachedPipettesByMount,
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfoByMount: { [mount in Mount]: PipetteInfo | null },
   mount: Mount
 ): PipetteWizardStep[] => {
@@ -17,7 +19,7 @@ export const getPipetteWizardStepsForProtocol = (
       ? pipetteInfoByMount[mount]?.pipetteSpecs.name
       : null
   const nintySixChannelAttached =
-    attachedPipettesByMount[LEFT]?.name === 'p1000_96'
+    attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
 
   //    return calibration flow only if correct pipette is attached and pipette cal null
   if (
@@ -56,7 +58,7 @@ export const getPipetteWizardStepsForProtocol = (
     //  if required pipette is not the 96-channel and a pipette attached to gantry
   } else if (
     requiredPipetteName !== 'p1000_96' &&
-    attachedPipettesByMount[mount] != null
+    attachedPipettes[mount] != null
   ) {
     //    96-channel pipette attached and need to attach single mount pipette
     if (nintySixChannelAttached) {
@@ -154,8 +156,8 @@ export const getPipetteWizardStepsForProtocol = (
     //  Single mount pipette attached to both mounts and need to attach 96-channel pipette
   } else if (
     requiredPipetteName === 'p1000_96' &&
-    attachedPipettesByMount[LEFT] != null &&
-    attachedPipettesByMount[RIGHT] != null
+    attachedPipettes[LEFT] != null &&
+    attachedPipettes[RIGHT] != null
   ) {
     return [
       {
@@ -220,8 +222,8 @@ export const getPipetteWizardStepsForProtocol = (
     //  Single mount pipette attached to left mount and need to attach 96-channel pipette
   } else if (
     requiredPipetteName === 'p1000_96' &&
-    attachedPipettesByMount[LEFT] != null &&
-    attachedPipettesByMount[RIGHT] == null
+    attachedPipettes[LEFT] != null &&
+    attachedPipettes[RIGHT] == null
   ) {
     return [
       {
@@ -275,8 +277,8 @@ export const getPipetteWizardStepsForProtocol = (
     //  Single mount pipette attached to right mount and need to attach 96-channel pipette
   } else if (
     requiredPipetteName === 'p1000_96' &&
-    attachedPipettesByMount[LEFT] == null &&
-    attachedPipettesByMount[RIGHT] != null
+    attachedPipettes[LEFT] == null &&
+    attachedPipettes[RIGHT] != null
   ) {
     return [
       {

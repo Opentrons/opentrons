@@ -74,6 +74,7 @@ class SerialUsbDriver:
             log.error("Unable to send message to unconnected device")
             return 0
         try:
+            log.debug(f"binary write: {message}")
             return int(
                 await self._loop.run_in_executor(
                     self._executor, self._port.write, message.serialize()
@@ -111,7 +112,9 @@ class SerialUsbDriver:
                     ),
                 )
                 data = b"".join([header_data, message_data])
-                return message_def.build(data)  # type: ignore[return-value]
+                msg = message_def.build(data)
+                log.debug(f"binary read: {msg}")
+                return msg  # type: ignore[return-value]
             else:
                 return None
         except serial.SerialException as e:

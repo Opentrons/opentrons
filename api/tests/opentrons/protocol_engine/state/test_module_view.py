@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     LabwareOffsetVector,
     DeckType,
+    ModuleOffsetVector,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -41,6 +42,7 @@ def make_module_view(
     requested_model_by_module_id: Optional[Dict[str, Optional[ModuleModel]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
+    module_offset_by_serial: Optional[Dict[str, ModuleOffsetVector]] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -48,6 +50,7 @@ def make_module_view(
         requested_model_by_id=requested_model_by_module_id or {},
         hardware_by_module_id=hardware_by_module_id or {},
         substate_by_module_id=substate_by_module_id or {},
+        module_offset_by_serial=module_offset_by_serial or {},
     )
 
     return ModuleView(state=state)
@@ -315,27 +318,27 @@ def test_get_module_offset_for_ot2_standard(
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=2.17, y=0, z=9),
+            LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=-2.17, y=0, z=9),
+            LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7,
-            LabwareOffsetVector(x=-19.88, y=67.76, z=-0.04),
+            LabwareOffsetVector(x=-20.005, y=67.96, z=0.26),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1,
-            LabwareOffsetVector(x=3, y=1, z=19),
+            LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3,
-            LabwareOffsetVector(x=-3, y=-1, z=19),
+            LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
     ],
 )

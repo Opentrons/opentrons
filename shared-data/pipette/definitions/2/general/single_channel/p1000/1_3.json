@@ -31,5 +31,6 @@
   },
   "channels": 1,
   "shaftDiameter": 9.0,
-  "shaftULperMM": 63.617
+  "shaftULperMM": 63.617,
+  "backCompatNames": []
 }

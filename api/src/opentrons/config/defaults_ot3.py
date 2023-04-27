@@ -76,16 +76,16 @@ DEFAULT_SAFE_HOME_DISTANCE: Final = 5
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
         OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.Y: 375,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 50,
         OT3AxisKind.Q: 5.5,
     },
     low_throughput={
-        OT3AxisKind.X: 500,
+        OT3AxisKind.X: 600,
         OT3AxisKind.Y: 500,
-        OT3AxisKind.Z: 65,
+        OT3AxisKind.Z: 100,
         OT3AxisKind.P: 45,
         OT3AxisKind.Z_G: 50,
     },
@@ -95,15 +95,15 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
     high_throughput={
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.Z: 120,
         OT3AxisKind.P: 10,
         OT3AxisKind.Z_G: 150,
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 1000,
+        OT3AxisKind.X: 1600,
         OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 100,
+        OT3AxisKind.Z: 300,
         OT3AxisKind.P: 100,
         OT3AxisKind.Z_G: 150,
     },
@@ -115,7 +115,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     high_throughput={
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 10,
+        OT3AxisKind.Z: 5,
         OT3AxisKind.P: 10,
         OT3AxisKind.Z_G: 10,
         OT3AxisKind.Q: 10,
@@ -123,7 +123,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     low_throughput={
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 10,
+        OT3AxisKind.Z: 5,
         OT3AxisKind.P: 10,
         OT3AxisKind.Z_G: 10,
     },
@@ -135,7 +135,7 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     high_throughput={
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 5,
-        OT3AxisKind.Z: 5,
+        OT3AxisKind.Z: 1,
         OT3AxisKind.P: 5,
         OT3AxisKind.Q: 5,
         OT3AxisKind.Z_G: 5,
@@ -143,7 +143,7 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
     low_throughput={
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 5,
-        OT3AxisKind.Z: 5,
+        OT3AxisKind.Z: 1,
         OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 5,
     },
