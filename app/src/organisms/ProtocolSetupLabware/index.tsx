@@ -30,8 +30,8 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
+import { FloatingActionButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../atoms/text'
-import { MapViewButton } from '../../organisms/MapViewButton'
 import { ODDBackButton } from '../../organisms/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
@@ -285,7 +285,7 @@ export function ProtocolSetupLabware({
           ) : null
         })}
       </Flex>
-      <MapViewButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
     </>
   )
 }

@@ -25,10 +25,12 @@ import {
 
 import { Portal } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay/SmallButton'
+import {
+  FloatingActionButton,
+  SmallButton,
+} from '../../atoms/buttons/OnDeviceDisplay'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { MapViewButton } from '../../organisms/MapViewButton'
 import { ODDBackButton } from '../../organisms/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
@@ -278,7 +280,7 @@ export function ProtocolSetupModules({
           )
         })}
       </Flex>
-      <MapViewButton onClick={() => setShowDeckMapModal(true)} />
+      <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
     </>
   )
 }
