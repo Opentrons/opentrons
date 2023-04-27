@@ -4,6 +4,9 @@ import argparse
 import string
 import time
 
+import logging
+from logging.config import dictConfig
+
 from opentrons_shared_data.deck import load
 from opentrons.hardware_control.ot3api import OT3API
 from hardware_testing import data
@@ -14,6 +17,32 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 from opentrons.hardware_control.motion_utilities import (
     target_position_from_relative,
 )
+
+
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
+    },
+    "handlers": {
+        "file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "basic",
+            "filename": "/var/log/gripper-lifetime.log",
+            "maxBytes": 5000000,
+            "level": logging.DEBUG,
+            "backupCount": 3,
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["file_handler"],
+            "level": logging.DEBUG,
+        },
+    },
+}
+
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Lifetime Test')
@@ -147,6 +176,7 @@ class Gripper_Lifetime_Test:
 
 if __name__ == '__main__':
     print("\nOT-3 Gripper Lifetime Test\n")
+    dictConfig(LOG_CONFIG)
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
     test = Gripper_Lifetime_Test(args.simulate, args.cycles)
