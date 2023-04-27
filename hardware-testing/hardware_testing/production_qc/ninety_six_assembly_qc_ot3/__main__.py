@@ -6,7 +6,7 @@ from pathlib import Path
 from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -18,11 +18,13 @@ async def _main(cfg: TestConfig) -> None:
         pipette_left="p1000_96_v3.4",
     )
     mount = OT3Mount.LEFT
-    await api.home()
-    home_pos = await api.gantry_position(OT3Mount.LEFT)
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    attach_pos = attach_pos._replace(z=home_pos.z)
+    attach_pos += Point(z=200)
     if not api.hardware_pipettes[mount.to_mount()]:
+        # FIXME: Do not home the plunger using the normal home method.
+        #        See section below where we use OT3Controller to home it.
+        await api.home()
+        home_pos = await api.gantry_position(OT3Mount.LEFT)
         await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
         while not api.hardware_pipettes[mount.to_mount()]:
             ui.get_user_ready("attach a 96ch pipette")
@@ -31,6 +33,10 @@ async def _main(cfg: TestConfig) -> None:
     pipette = api.hardware_pipettes[mount.to_mount()]
     assert pipette
     pipette_id = str(pipette.pipette_id)
+
+    # FIXME: remove this once the "'L' format requires 0 <= number <= 4294967295" bug is gone
+    await api._backend.home([OT3Axis.P_L])
+    await api.refresh_positions()
 
     # BUILD REPORT
     test_name = Path(__file__).parent.name

@@ -18,6 +18,7 @@ from hardware_testing.opentrons_api.types import OT3Mount, Point
 TIP_VOLUME = 1000
 NUM_SECONDS_TO_WAIT = 30
 HOVER_HEIGHT_MM = 50
+DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -20
 
 TIP_RACK_LABWARE = f"opentrons_ot3_96_tiprack_{TIP_VOLUME}ul"
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
@@ -61,17 +62,21 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         print("picking up tips")
         await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
         await api.home_z(OT3Mount.LEFT)
+        if not api.is_simulator:
+            ui.get_user_ready("check tips are OK")
     else:
         await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+        await api.prepare_for_aspirate(OT3Mount.LEFT)
 
-    ui.print_header("JOG to LIQUID")
-    print("jog tips to -5 mm below surface of liquid")
+    ui.print_header("JOG to TOP of RESERVOIR")
+    print("jog tips to the TOP of the RESERVOIR")
     await helpers_ot3.move_to_arched_ot3(
         api, OT3Mount.LEFT, reservoir_a1_nominal + Point(z=10)
     )
     await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
 
     ui.print_header("ASPIRATE and WAIT")
+    await api.move_rel(OT3Mount.LEFT, Point(z=DEPTH_INTO_RESERVOIR_FOR_ASPIRATE))
     await api.aspirate(OT3Mount.LEFT)
     await api.move_rel(OT3Mount.LEFT, Point(z=HOVER_HEIGHT_MM))
     start_time = time()
@@ -90,6 +95,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.blow_out(OT3Mount.LEFT)
 
     ui.print_header("DROP in TRASH")
+    await api.home_z(OT3Mount.LEFT)
     await helpers_ot3.move_to_arched_ot3(
         api, OT3Mount.LEFT, trash_nominal + Point(z=20)
     )
