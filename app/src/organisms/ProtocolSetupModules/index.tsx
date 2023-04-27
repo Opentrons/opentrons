@@ -3,16 +3,17 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  Icon,
   Module,
   RobotWorkSpace,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -24,11 +25,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
-import { Banner } from '../../atoms/Banner'
 import {
   FloatingActionButton,
   SmallButton,
 } from '../../atoms/buttons/OnDeviceDisplay'
+import { Chip } from '../../atoms/Chip'
+import { InlineNotification } from '../../atoms/InlineNotification'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../organisms/ODDBackButton'
@@ -66,27 +68,32 @@ function RowModule({
   setShowMultipleModulesModal,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const attachedModuleMatch = !!module.attachedModuleMatch
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        module.attachedModuleMatch != null
+        attachedModuleMatch
           ? `${COLORS.successEnabled}${COLORS.opacity20HexCode}`
           : COLORS.warningBackgroundMed
       }
-      borderRadius="1rem"
+      borderRadius={BORDERS.size_three}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing4}
-      paddingLeft={SPACING.spacing5}
+      gridGap={SPACING.spacing5}
+      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
       onClick={() =>
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }
     >
-      <Flex width="50%">
+      <Flex
+        width="22.25rem"
+        fontSize={TYPOGRAPHY.fontSize22}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        lineHeight={TYPOGRAPHY.lineHeight28}
+      >
         <StyledText>{getModuleDisplayName(module.moduleDef.model)}</StyledText>
       </Flex>
-      <Flex width="20%">
+      <Flex width="11.625rem">
         <StyledText>
           {/* TODO(bh, 2023-02-07): adjust slot location when hi-fi designs finalized */}
           {t('slot_location', {
@@ -97,20 +104,14 @@ function RowModule({
           })}
         </StyledText>
       </Flex>
-      <Flex
-        width="30%"
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <StyledText>
-          {module.attachedModuleMatch != null
-            ? t('module_connected')
-            : t('module_disconnected')}
-        </StyledText>
-        {isDuplicateModuleModel ? (
-          <Icon name="information" size="1.5rem" />
-        ) : null}
-      </Flex>
+      <Chip
+        text={
+          attachedModuleMatch ? t('module_connected') : t('module_disconnected')
+        }
+        type={attachedModuleMatch ? 'success' : 'warning'}
+        background={false}
+        iconName="connection-status"
+      />
     </Flex>
   )
 }
@@ -128,6 +129,10 @@ export function ProtocolSetupModules({
   setSetupScreen,
 }: ProtocolSetupModulesProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const [
+    showModuleMismatchModal,
+    setShowModuleMismatchModal,
+  ] = React.useState<boolean>(false)
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -169,6 +174,14 @@ export function ProtocolSetupModules({
   return (
     <>
       <Portal level="top">
+        {showModuleMismatchModal ? (
+          <Modal
+            title={t('module_mismatch_error')}
+            onClose={() => setShowModuleMismatchModal(false)}
+          >
+            TODO: module mismatch modal
+          </Modal>
+        ) : null}
         {showMultipleModulesModal ? (
           <MultipleModulesModal
             onCloseClick={() => setShowMultipleModulesModal(false)}
@@ -238,47 +251,59 @@ export function ProtocolSetupModules({
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing5}
         marginTop={SPACING.spacing6}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
-          <Banner
-            type="warning"
-            onCloseClick={() => setClearModuleMismatchBanner(true)}
-          >
-            {`${t('module_mismatch_error')}. ${t('module_mismatch_body')}`}
-          </Banner>
+          <InlineNotification
+            type="alert"
+            onClick={() => setShowModuleMismatchModal(true)}
+            onCloseClick={e => {
+              e.stopPropagation()
+              setClearModuleMismatchBanner(true)
+            }}
+            heading={t('module_mismatch_error')}
+            message={t('module_mismatch_body')}
+          />
         ) : null}
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex paddingLeft={SPACING.spacing5} width="50%">
-            <StyledText>{'Module Name'}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          <Flex
+            color={COLORS.darkBlack_seventy}
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            gridGap={SPACING.spacing5}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+          >
+            <Flex paddingLeft={SPACING.spacing5} width="22.75rem">
+              <StyledText>{'Module Name'}</StyledText>
+            </Flex>
+            <Flex width="13.8125rem" paddingLeft="0.9375rem">
+              <StyledText>{'Location'}</StyledText>
+            </Flex>
+            <Flex width="17.9375rem">
+              <StyledText>{'Status'}</StyledText>
+            </Flex>
           </Flex>
-          <Flex width="20%">
-            <StyledText>{'Location'}</StyledText>
-          </Flex>
-          <Flex width="30%">
-            <StyledText>{'Status'}</StyledText>
-          </Flex>
-        </Flex>
-        {attachedProtocolModuleMatches.map(module => {
-          // check for duplicate module model in list of modules for protocol
-          const isDuplicateModuleModel = protocolModulesInfo
-            // filter out current module
-            .filter(otherModule => otherModule.moduleId !== module.moduleId)
-            // check for existence of another module of same model
-            .some(
-              otherModule =>
-                otherModule.moduleDef.model === module.moduleDef.model
+          {attachedProtocolModuleMatches.map(module => {
+            // check for duplicate module model in list of modules for protocol
+            const isDuplicateModuleModel = protocolModulesInfo
+              // filter out current module
+              .filter(otherModule => otherModule.moduleId !== module.moduleId)
+              // check for existence of another module of same model
+              .some(
+                otherModule =>
+                  otherModule.moduleDef.model === module.moduleDef.model
+              )
+            return (
+              <RowModule
+                key={module.moduleId}
+                module={module}
+                isDuplicateModuleModel={isDuplicateModuleModel}
+                setShowMultipleModulesModal={setShowMultipleModulesModal}
+              />
             )
-          return (
-            <RowModule
-              key={module.moduleId}
-              module={module}
-              isDuplicateModuleModel={isDuplicateModuleModel}
-              setShowMultipleModulesModal={setShowMultipleModulesModal}
-            />
-          )
-        })}
+          })}
+        </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />
     </>
