@@ -261,6 +261,13 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
             calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
         print("Calibration data successfully loaded!\n")
 
+    # add cfg start slot
+    start_slot = int(str(args.start_slot_row_col).split(':')[0])
+    start_row = int(str(args.start_slot_row_col).split(':')[1])
+    start_col = int(str(args.start_slot_row_col).split(':')[2])
+    for i in range(start_slot-1):
+        del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
+
     start_time = time.perf_counter()
     rack = 0
     total_pick_ups = 0
@@ -278,9 +285,13 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
             await api.move_to(mount, Point(calibrated_slot_loc[key][0],
                         calibrated_slot_loc[key][1], calibrated_slot_loc[key][2]+5))
             for col in range(COLUMNS):
+                if col < start_col - 1:
+                    continue
                 await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
                             calibrated_slot_loc[key][1], calibrated_slot_loc[key][2]+5))
                 for row in range(ROWS):
+                    if col == start_col -1 and row < start_row -1:
+                        continue
                     print("=================================\n")
                     print(f"Tip rack in slot {key}, Column: {col+1}, Row: {row+1}\n")
                     await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
@@ -376,6 +387,7 @@ if __name__ == "__main__":
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
     parser.add_argument("--test_robot", action="store_true")
+    parser.add_argument("--start_slot_row_col", type=str, default="1:1:1")
     # parser.add_argument("--check_tip", action="store_true")
     args = parser.parse_args()
     mount = mount_options[args.mount]
