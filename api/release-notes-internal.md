@@ -50,6 +50,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
   - We limited what goes in the api logs, removing HTTP access logs and SQL logs and move command spam; they should be more useful now. You can see them by downloading API logs or running `journalctl -t opentrons-api`.
   - All the above is now in the robot-server unit logs, which can be accessed via `journalctl -u opentrons-robot-server`
 - Protocol analysis should be a _lot_ faster
+- Fixed an issue where pinging `GET /instruments` during automated calibration would cause calibration to fail
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
