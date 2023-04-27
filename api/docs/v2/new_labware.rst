@@ -15,10 +15,12 @@ In the example given in the :ref:`overview-section-v2` section, we loaded labwar
 
 .. code-block:: python
 
-    plate=protocol.load_labware(
-        load_name='corning_96_wellplate_360ul_flat', location='2')
-    tiprack=protocol.load_labware(
-        load_name='opentrons_96_tiprack_300ul', location='1')
+    plate = protocol.load_labware(
+        load_name="corning_96_wellplate_360ul_flat", location="2"
+    )
+    tiprack = protocol.load_labware(
+        load_name="opentrons_96_tiprack_300ul", location="1"
+    )
 
 
 which informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
@@ -27,10 +29,11 @@ A third optional argument can be used to give the labware a nickname to be displ
 
 .. code-block:: python
 
-    plate=protocol.load_labware(
+    plate = protocol.load_labware(
         load_name="corning_96_wellplate_360ul_flat",
         location="2",
-        label="any-name-you-want")
+        label="any-name-you-want",
+    )
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
 :py:class:`opentrons.protocol_api.labware.Labware` object.
@@ -82,12 +85,12 @@ The ending well will be in the bottom right, see the diagram below for further e
     :substitutions:
 
     '''Examples in this section expect the following'''
-    metadata={'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-
-        plate=protocol.load_labware(
-            load_name='corning_24_wellplate_3.4ml_flat', location='1')
+    plate = protocol.load_labware(
+        load_name="corning_24_wellplate_3.4ml_flat", location="1"
+    )
 
 
 .. versionadded:: 2.0
@@ -127,8 +130,8 @@ you will receive a ``KeyError``. This is equivalent to using the return value of
 
 .. code-block:: python
 
-    a1=plate['A1']
-    d6=plate.wells_by_name()['D6']
+    a1 = plate['A1']
+    d6 = plate.wells_by_name()['D6']
 
 .. versionadded:: 2.0
 
@@ -165,10 +168,10 @@ on a labware. These methods both return a dictionary with the row or column name
 
 .. code-block:: python
 
-    row_dict=plate.rows_by_name()['A']
-    row_list=plate.rows()[0] # equivalent to the line above
-    column_dict=plate.columns_by_name()['1']
-    column_list=plate.columns()[0] # equivalent to the line above
+    row_dict = plate.rows_by_name()['A']
+    row_list = plate.rows()[0] # equivalent to the line above
+    column_dict = plate.columns_by_name()['1']
+    column_list = plate.columns()[0] # equivalent to the line above
 
     print('Column "1" has', len(column_dict), 'wells')
     print('Row "A" has', len(row_dict), 'wells')
@@ -217,14 +220,16 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
 
 .. code-block:: python
 
-        greenWater=protocol.define_liquid(
-            name="Green water",
-            description="Green colored water for demo",
-            display_color="#00FF00")
-        blueWater=protocol.define_liquid(
-            name="Blue water",
-            description="Blue colored water for demo",
-            display_color="#0000FF")
+    greenWater = protocol.define_liquid(
+        name="Green water",
+        description="Green colored water for demo",
+        display_color="#00FF00",
+    )
+    blueWater = protocol.define_liquid(
+        name="Blue water",
+        description="Blue colored water for demo",
+        display_color="#0000FF",
+    )
 
 .. versionadded:: 2.14
         
@@ -274,12 +279,13 @@ Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the
 .. code-block:: python
     :substitutions:
 
-    metadata={'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate=protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat', location='1')
-        depth=plate['A1'].depth # 10.67
+        plate = protocol.load_labware(
+            load_name="corning_96_wellplate_360ul_flat", location="1"
+        )
+        depth = plate["A1"].depth  # 10.67
 
 Diameter
 ^^^^^^^^
@@ -288,12 +294,13 @@ Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since d
 .. code-block:: python
     :substitutions:
 
-    metadata={'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate=protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat', location='1')
-        diameter=plate['A1'].diameter	# 6.86
+        plate = protocol.load_labware(
+        load_name="corning_96_wellplate_360ul_flat", location="1"
+        )
+        diameter = plate["A1"].diameter  # 6.86
 
 
 Length
@@ -303,12 +310,11 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
 .. code-block:: python
     :substitutions:
 
-    metadata={'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate=protocol.load_labware(
-            load_name='nest_12_reservoir_15ml', location='1')
-        length=plate['A1'].length # 8.2
+        plate = protocol.load_labware(load_name='nest_12_reservoir_15ml', location='1')
+        length = plate['A1'].length # 8.2
 
 
 Width
@@ -319,12 +325,11 @@ Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defi
 .. code-block:: python
     :substitutions:
 
-    metadata={'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol):
-        plate=protocol.load_labware(
-            load_name='nest_12_reservoir_15ml', location='1')
-        width=plate['A1'].width # 71.2
+        plate = protocol.load_labware(load_name="nest_12_reservoir_15ml", location="1")
+        width = plate["A1"].width  # 71.2
 
 
 
