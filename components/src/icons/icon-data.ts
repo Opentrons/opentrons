@@ -39,6 +39,10 @@ export const ICON_DATA_BY_NAME = {
     path:
       'M18 7.209L16.791 6 12 10.791 7.209 6 6 7.209 10.791 12 6 16.791 7.209 18 12 13.209 16.791 18 18 16.791 13.209 12z',
   },
+  'connection-status': {
+    viewBox: '0 0 24 24',
+    path: 'M 6, 12 a 6,6 0 1,1 12,0 a 6,6 0 1,1 -12,0',
+  },
   'deck-map': {
     viewBox: '0 0 60 48',
     path:
