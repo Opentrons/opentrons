@@ -9,6 +9,9 @@ from logging.config import dictConfig
 
 from opentrons_shared_data.deck import load
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons_hardware.hardware_control.gripper_settings import (
+    set_error_tolerance,
+)
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
@@ -76,6 +79,7 @@ class Gripper_Lifetime_Test:
     async def test_setup(self):
         self.file_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
+        set_error_tolerance(self.api._backend._messenger, 15, 15)
         self.mount = OT3Mount.GRIPPER
         if self.simulate:
             self.gripper_id = "SIMULATION"
