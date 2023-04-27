@@ -79,7 +79,7 @@ class Gripper_Lifetime_Test:
     async def test_setup(self):
         self.file_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
-        set_error_tolerance(self.api._backend._messenger, 15, 15)
+        await set_error_tolerance(self.api._backend._messenger, 15, 15)
         self.mount = OT3Mount.GRIPPER
         if self.simulate:
             self.gripper_id = "SIMULATION"
