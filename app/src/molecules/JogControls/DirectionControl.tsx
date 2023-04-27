@@ -1,7 +1,7 @@
 // jog controls component
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   Box,
@@ -23,7 +23,9 @@ import {
   TEXT_ALIGN_LEFT,
   JUSTIFY_FLEX_START,
   ALIGN_STRETCH,
+  RESPONSIVENESS,
 } from '@opentrons/components'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
@@ -289,6 +291,15 @@ const ARROW_GRID_STYLES = css`
   @media (max-width: 750px) {
     max-width: 12.5rem;
   }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    max-width: 415px;
+    grid-gap: ${SPACING.spacingM};
+    grid-template-areas:
+      '.         .         ArrowUp   ArrowUp   .          .         '
+      'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
+      'ArrowLeft ArrowLeft ArrowDown ArrowDown ArrowRight ArrowRight'
+      '.         .         ArrowDown ArrowDown .          .         ';
+  }
 `
 const ARROW_BUTTON_STYLES = css`
   color: ${COLORS.darkGreyEnabled};
@@ -326,6 +337,10 @@ const ARROW_BUTTON_STYLES = css`
   @media (max-width: 750px) {
     width: 4rem;
     height: 4rem;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 125px;
+    height: 125px;
   }
 `
 
@@ -366,3 +381,51 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
     </Box>
   )
 }
+
+export function TouchDirectionControl(
+  props: DirectionControlProps
+): JSX.Element {
+  const { planes, jog, stepSize, initialPlane } = props
+  const [currentPlane, setCurrentPlane] = React.useState<Plane>(
+    initialPlane ?? planes[0]
+  )
+  const { t } = useTranslation(['robot_calibration'])
+
+  return (
+    <Flex
+      flex="1"
+      flexDirection={DIRECTION_COLUMN}
+      border={`1px solid ${COLORS.darkBlack_forty}`}
+      borderRadius={BORDERS.radiusSoftCorners}
+      padding={SPACING.spacing4}
+      gridGap={SPACING.spacing3}
+    >
+      <TouchControlLabel>{t('jog_controls')}</TouchControlLabel>
+      <Flex css={DIRECTION_CONTROL_LAYOUT}>
+        <Flex css={PLANE_BUTTONS_STYLE}>
+          {planes.map((plane: Plane) => {
+            return (
+              <SmallButton
+                key={plane}
+                buttonType={currentPlane === plane ? 'primary' : 'secondary'}
+                onClick={() => {
+                  setCurrentPlane(plane)
+                }}
+                buttonText={CONTROLS_CONTENTS_BY_PLANE[plane].title}
+              />
+            )
+          })}
+        </Flex>
+        <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+          <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
+        </Flex>
+      </Flex>
+    </Flex>
+  )
+}
+
+const TouchControlLabel = styled.p`
+  font-size: ${TYPOGRAPHY.fontSize20};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight24};
+`

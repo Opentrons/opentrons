@@ -9,15 +9,17 @@ import {
   Flex,
   Icon,
   DIRECTION_ROW,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type SmallButtonTypes =
-  | 'alt'
   | 'alert'
-  | 'default'
+  | 'primary'
+  | 'secondary'
   | 'tertiaryLowLight'
   | 'tertiaryHighLight'
 
@@ -55,7 +57,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       defaultColor: string
     }
   > = {
-    alt: {
+    secondary: {
       defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.mediumBlueEnabled,
       activeBackgroundColor: COLORS.mediumBluePressed,
@@ -69,7 +71,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },
-    default: {
+    primary: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
       activeBackgroundColor: COLORS.bluePressed,
@@ -143,7 +145,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        alignItems={TYPOGRAPHY.textAlignCenter}
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionStart`}>

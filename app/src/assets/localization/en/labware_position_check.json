@@ -92,5 +92,7 @@
   "jupyter_notebook": "Jupyter Notebook",
   "cli_ssh": "Command Line Interface (SSH)",
   "learn_more": "Learn more",
-  "no_offset_data_available": "No labware offset data available"
+  "no_offset_data_available": "No labware offset data available",
+  "move_to_a1_position": "Move the pipette to line up in the A1 position",
+  "move_pipette": "Move pipette"
 }

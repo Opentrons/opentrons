@@ -7,22 +7,18 @@ import {
 import { fireEvent } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedGen3Pipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
-import { useAttachedPipettes } from '../../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 jest.mock('../utils')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../redux/config')
 
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
+const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
+  typeof useAttachedPipettesFromInstrumentsQuery
 >
 const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
   typeof getIsGantryEmpty
@@ -35,19 +31,16 @@ const render = (props: React.ComponentProps<typeof ChoosePipette>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedGen3Pipette,
-  modelSpecs: {
-    ...mockGen3P1000PipetteSpecs,
-    displayName: 'mock pipette display name',
-  },
-}
+
 describe('ChoosePipette', () => {
   let props: React.ComponentProps<typeof ChoosePipette>
   beforeEach(() => {
     mockGetIsOnDevice.mockReturnValue(false)
     mockGetIsGantryEmpty.mockReturnValue(true)
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: null,
+      right: null,
+    })
     props = {
       proceed: jest.fn(),
       exit: jest.fn(),
@@ -114,7 +107,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(singleMountPipettes)
     expect(props.setSelectedPipette).toHaveBeenCalled()
 
-    const proceedBtn = getByLabelText('SmallButton_default')
+    const proceedBtn = getByLabelText('SmallButton_primary')
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })
@@ -156,16 +149,22 @@ describe('ChoosePipette', () => {
   })
   it('renders the correct text for the 96 channel button when there is a left pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)
-    mockUseAttachedPipettes.mockReturnValue({ left: mockPipette, right: null })
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: mockAttachedPipetteInformation,
+      right: null,
+    })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     const { getByText } = render(props)
-    getByText('Detach mock pipette display name and attach 96-Channel pipette')
+    getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
   })
   it('renders the correct text for the 96 channel button when there is a right pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: mockPipette })
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: null,
+      right: mockAttachedPipetteInformation,
+    })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     const { getByText } = render(props)
-    getByText('Detach mock pipette display name and attach 96-Channel pipette')
+    getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
   })
 })

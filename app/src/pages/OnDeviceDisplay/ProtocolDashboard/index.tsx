@@ -118,7 +118,7 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
-      padding={SPACING.spacing6}
+      padding={`0 ${SPACING.spacingXXL}`}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
@@ -151,7 +151,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('protocol_name_title')}
                 buttonType={
                   sortBy === 'alphabetical' || sortBy === 'reverse'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -170,7 +170,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('last_run')}
                 buttonType={
                   sortBy === 'recentRun' || sortBy === 'oldRun'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -189,7 +189,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('date_added')}
                 buttonType={
                   sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
