@@ -17,6 +17,7 @@ SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
+SYSTEM_SERVER_DIR := system-server
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
 
@@ -153,6 +154,7 @@ push-ot3:
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
+	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
 	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 
