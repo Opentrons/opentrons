@@ -93,7 +93,7 @@ class Gripper_Lifetime_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"force_"
+        self.test_tag = f"force_20"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
