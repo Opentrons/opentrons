@@ -179,6 +179,7 @@
   "ip_address": "IP Address",
   "subnet_mask": "Subnet Mask",
   "mac_address": "MAC Address",
+  "security_type": "Security Type",
   "connecting": "Connecting...",
   "lets_connect_to_a_network": "Let’s connect to a network",
   "choose_your_connection_type": "Choose your connection type from the options below.",
@@ -242,5 +243,8 @@
   "alpha_description": "Warning: alpha releases are feature-complete but may contain significant bugs.",
   "dev_tools_description": "Enable additional logging and allow access to feature flags.",
   "attach_a_pipette_before_calibrating": "Attach a pipette in order to perform calibration",
-  "ethernet_connection_description": "Connect an Ethernet cable to the back of the robot and a network switch or hub."
+  "ethernet_connection_description": "Connect an Ethernet cable to the back of the robot and a network switch or hub.",
+  "connected_network": "Connected Network",
+  "other_networks": "Other Networks",
+  "view_details": "View details"
 }
