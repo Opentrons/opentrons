@@ -7,7 +7,7 @@ import { i18n } from '../../../../../i18n'
 import { getLocalRobot } from '../../../../../redux/discovery'
 import * as Networking from '../../../../../redux/networking'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
-import { WifiSettings } from '../WiFiSettings'
+import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
 import type { State } from '../../../../../redux/types'
 
@@ -34,14 +34,14 @@ const initialMockWifi = {
   type: Networking.INTERFACE_WIFI,
 }
 
-const render = (props: React.ComponentProps<typeof WifiSettings>) => {
-  return renderWithProviders(<WifiSettings {...props} />, {
+const render = (props: React.ComponentProps<typeof WifiConnectionDetails>) => {
+  return renderWithProviders(<WifiConnectionDetails {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('WifiSettings', () => {
-  let props: React.ComponentProps<typeof WifiSettings>
+describe('WifiConnectionDetails', () => {
+  let props: React.ComponentProps<typeof WifiConnectionDetails>
   beforeEach(() => {
     props = {
       ssid: 'mock wifi ssid',

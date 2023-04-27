@@ -27,14 +27,14 @@ import {
 
 import type { Dispatch, State } from '../../../../redux/types'
 
-interface WifiSettingsProps {
+interface WifiConnectionDetailsProps {
   ssid?: string
   authType?: string
 }
-export function WifiSettings({
+export function WifiConnectionDetails({
   ssid,
   authType,
-}: WifiSettingsProps): JSX.Element {
+}: WifiConnectionDetailsProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const [
     showNetworkDetailModal,

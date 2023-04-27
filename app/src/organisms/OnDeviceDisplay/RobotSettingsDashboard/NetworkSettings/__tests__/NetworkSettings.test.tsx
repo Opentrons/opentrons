@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { getLocalRobot } from '../../../../../redux/discovery'
 import { getWifiList } from '../../../../../redux/networking'
-import { WifiSettings } from '../WiFiSettings'
+import { WifiConnectionDetails } from '../WifiConnectionDetails'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 import { NetworkSettings } from '..'
 
@@ -14,15 +14,15 @@ import type { WifiNetwork } from '../../../../../redux/networking/types'
 
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/networking')
-jest.mock('../WiFiSettings')
+jest.mock('../WifiConnectionDetails')
 jest.mock('../EthernetConnectionDetails')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
-const mockWifiSettings = WifiSettings as jest.MockedFunction<
-  typeof WifiSettings
+const mockWifiSettings = WifiConnectionDetails as jest.MockedFunction<
+  typeof WifiConnectionDetails
 >
 const mockEthernetConnectionDetails = EthernetConnectionDetails as jest.MockedFunction<
   typeof EthernetConnectionDetails
@@ -59,7 +59,7 @@ describe('NetworkSettings', () => {
         securityType: 'wpa-psk',
       } as WifiNetwork,
     ])
-    mockWifiSettings.mockReturnValue(<div>mock WifiSettings</div>)
+    mockWifiSettings.mockReturnValue(<div>mock WifiConnectionDetails</div>)
     mockEthernetConnectionDetails.mockReturnValue(
       <div>mock EthernetConnectionDetails</div>
     )
@@ -79,7 +79,7 @@ describe('NetworkSettings', () => {
   it('selecting the Wi-Fi option displays the wifi details', () => {
     const [{ getByText }] = render(props)
     getByText('Wi-Fi').click()
-    expect(getByText('mock WifiSettings')).toBeTruthy()
+    expect(getByText('mock WifiConnectionDetails')).toBeTruthy()
   })
 
   it('clicking back on the wifi details screen shows the network settings page again', () => {

@@ -21,7 +21,7 @@ import { Chip } from '../../../../atoms/Chip'
 import { getWifiList } from '../../../../redux/networking'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { EthernetConnectionDetails } from './EthernetConnectionDetails'
-import { WifiSettings } from './WiFiSettings'
+import { WifiConnectionDetails } from './WifiConnectionDetails'
 
 import type { IconName } from '@opentrons/components'
 import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
@@ -89,7 +89,10 @@ export function NetworkSettings({
     switch (showDetailsTab) {
       case 'wifi':
         return (
-          <WifiSettings ssid={activeSsid} authType={connectedWifiAuthType} />
+          <WifiConnectionDetails
+            ssid={activeSsid}
+            authType={connectedWifiAuthType}
+          />
         )
       case 'ethernet':
         return <EthernetConnectionDetails />
