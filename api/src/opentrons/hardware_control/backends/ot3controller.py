@@ -43,6 +43,8 @@ from .ot3utils import (
     create_tip_action_group,
     PipetteAction,
     sub_system_to_node_id,
+    NODEID_SUBSYSTEM,
+    USBTARGET_SUBSYSTEM,
 )
 
 try:
@@ -86,7 +88,13 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteType,
     USBTarget,
     FirmwareTarget,
+    ErrorCode,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    StopRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
+from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
@@ -111,6 +119,7 @@ from opentrons.hardware_control.types import (
     UpdateStatus,
     mount_to_subsystem,
     DoorState,
+    OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
     MustHomeError,
@@ -176,7 +185,9 @@ class OT3Controller:
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
-    async def build(cls, config: OT3Config, use_usb_bus: bool = False) -> OT3Controller:
+    async def build(
+        cls, config: OT3Config, use_usb_bus: bool = False, check_updates: bool = True
+    ) -> OT3Controller:
         """Create the OT3Controller instance.
 
         Args:
@@ -195,13 +206,16 @@ class OT3Controller:
                     "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
                 )
                 raise e
-        return cls(config, driver=driver, usb_driver=usb_driver)
+        return cls(
+            config, driver=driver, usb_driver=usb_driver, check_updates=check_updates
+        )
 
     def __init__(
         self,
         config: OT3Config,
         driver: AbstractCanDriver,
         usb_driver: Optional[SerialUsbDriver] = None,
+        check_updates: bool = True,
     ) -> None:
         """Construct.
 
@@ -219,9 +233,11 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._check_updates = check_updates
         self._update_required = False
         self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
+        self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -242,13 +258,22 @@ class OT3Controller:
         self._initialized = value
 
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> Dict[OT3SubSystem, int]:
         """Get the firmware version."""
-        return None
+        subsystem_map: Dict[Union[NodeId, USBTarget], OT3SubSystem] = deepcopy(
+            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], USBTARGET_SUBSYSTEM)
+        )
+        subsystem_map.update(
+            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], NODEID_SUBSYSTEM)
+        )
+        return {
+            subsystem_map[node.application_for()]: device.version
+            for node, device in self._network_info.device_info.items()
+        }
 
     @property
     def update_required(self) -> bool:
-        return self._update_required
+        return self._update_required and self._check_updates
 
     @update_required.setter
     def update_required(self, value: bool) -> None:
@@ -468,8 +493,7 @@ class OT3Controller:
         )
 
     def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
-        """If any of the encoder statuses is ok, parking can proceed."""
-        return any(
+        return all(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
         )
@@ -612,6 +636,9 @@ class OT3Controller:
             A dictionary containing the new positions of each axis
         """
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
+        assert (
+            OT3Axis.G not in checked_axes
+        ), "Please home G axis using gripper_home_jaw()"
         if not checked_axes:
             return {}
 
@@ -625,8 +652,6 @@ class OT3Controller:
             if runner
         ]
         positions = await asyncio.gather(*coros)
-        if OT3Axis.G in checked_axes:
-            await self.gripper_home_jaw(self._configuration.grip_jaw_home_duty_cycle)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -953,11 +978,11 @@ class OT3Controller:
 
     async def halt(self) -> None:
         """Halt the motors."""
-        return None
-
-    async def hard_halt(self) -> None:
-        """Halt the motors."""
-        return None
+        error = await self._messenger.ensure_send(
+            NodeId.broadcast, StopRequest(payload=EmptyPayload())
+        )
+        if error != ErrorCode.ok:
+            log.warning(f"Halt stop request failed: {error}")
 
     async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
@@ -1148,7 +1173,6 @@ class OT3Controller:
             speed_mm_per_s,
             sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
-            log_sensor_values=True,
         )
 
         self._position[axis_to_node(moving)] = pos
@@ -1228,3 +1252,6 @@ class OT3Controller:
                     message_id == BinaryMessageId.door_switch_state_info
                 ),
             )
+
+    def status_bar_interface(self) -> status_bar.StatusBar:
+        return self._status_bar

@@ -67,7 +67,7 @@ class ModuleCore(AbstractModuleCore):
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
         return module_model_from_string(
-            self._engine_client.state.modules.get_model(self.module_id)
+            self._engine_client.state.modules.get_connected_model(self.module_id)
         )
 
     def get_serial_number(self) -> str:

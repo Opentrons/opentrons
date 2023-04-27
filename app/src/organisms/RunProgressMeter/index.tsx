@@ -13,6 +13,8 @@ import {
   SIZE_1,
   Link,
   ALIGN_CENTER,
+  useHoverTooltip,
+  TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -21,6 +23,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_RUNNING,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
   useAllCommandsQuery,
@@ -28,11 +31,11 @@ import {
 } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog } from '../Devices/hooks'
-import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { InterventionTicks } from './InterventionTicks'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -53,21 +56,27 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const runStatus = useRunStatus(runId)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_LEFT,
+  })
   const analysis = useMostRecentCompletedAnalysis(runId)
-  const { data: allCommandsQueryData } = useAllCommandsQuery(runId)
+  const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
+    cursor: null,
+    pageLength: 1,
+  })
   const analysisCommands = analysis?.commands ?? []
-  const runCommands = allCommandsQueryData?.data ?? []
+  const lastRunCommand = allCommandsQueryData?.data[0] ?? null
   const runCommandsLength = allCommandsQueryData?.meta.totalLength
 
-  // todo (jb 2-16-23) This should be switched out soon for something more performant, see https://opentrons.atlassian.net/browse/RLAB-298
-  const { downloadRunLog } = useDownloadRunLog(
-    robotName,
-    runId,
-    analysisCommands.length
-  )
+  const downloadIsDisabled =
+    runStatus === RUN_STATUS_RUNNING ||
+    runStatus === RUN_STATUS_IDLE ||
+    runStatus === RUN_STATUS_FINISHING
+
+  const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
   /**
-   * find the analysis command within the analysis
+   * find the index of the analysis command within the analysis
    * that has the same commandKey as the most recent
    * command from the run record.
    * Or in the case of a non-deterministic protocol
@@ -75,24 +84,23 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
    * NOTE: the most recent
    * command may not always be "current", for instance if
    * the run has completed/failed */
-  const lastRunCommandKey = useLastRunCommandKey(runId)
-  const lastRunCommandIndex =
-    analysisCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
-  const lastRunCommandIndexFromRunCommands =
-    runCommands.findIndex(c => c.key === lastRunCommandKey) ?? 0
+  const lastRunAnalysisCommandIndex =
+    analysisCommands.findIndex(c => c.key === lastRunCommand?.key) ?? 0
   const { data: runCommandDetails } = useCommandQuery(
     runId,
-    runCommands[lastRunCommandIndexFromRunCommands]?.id
+    lastRunCommand?.id ?? null
   )
   let countOfTotalText = ''
   if (
-    lastRunCommandIndex >= 0 &&
-    lastRunCommandIndex <= analysisCommands.length - 1
+    lastRunAnalysisCommandIndex >= 0 &&
+    lastRunAnalysisCommandIndex <= analysisCommands.length - 1
   ) {
-    countOfTotalText = ` ${lastRunCommandIndex + 1}/${analysisCommands.length}`
+    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${
+      analysisCommands.length
+    }`
   } else if (
-    lastRunCommandIndex === -1 &&
-    lastRunCommandKey != null &&
+    lastRunAnalysisCommandIndex === -1 &&
+    lastRunCommand?.key != null &&
     runCommandsLength != null
   ) {
     countOfTotalText = `${runCommandsLength}/?`
@@ -100,17 +108,29 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     countOfTotalText = ''
   }
 
+  const runHasNotBeenStarted =
+    (lastRunAnalysisCommandIndex === 0 &&
+      runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR) ||
+    runStatus === RUN_STATUS_IDLE
+
   let currentStepContents: React.ReactNode = null
-  if (analysis != null && analysisCommands[lastRunCommandIndex] != null) {
+  if (runHasNotBeenStarted) {
+    currentStepContents = (
+      <StyledText as="h2">{t('not_started_yet')}</StyledText>
+    )
+  } else if (
+    analysis != null &&
+    analysisCommands[lastRunAnalysisCommandIndex] != null
+  ) {
     currentStepContents = (
       <CommandText
         robotSideAnalysis={analysis}
-        command={analysisCommands[lastRunCommandIndex]}
+        command={analysisCommands[lastRunAnalysisCommandIndex]}
       />
     )
   } else if (
     analysis != null &&
-    lastRunCommandIndex === -1 &&
+    lastRunAnalysisCommandIndex === -1 &&
     runCommandDetails != null
   ) {
     currentStepContents = (
@@ -118,13 +138,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         robotSideAnalysis={analysis}
         command={runCommandDetails.data}
       />
-    )
-  } else if (
-    runStatus === RUN_STATUS_IDLE &&
-    analysisCommands[lastRunCommandIndex] == null
-  ) {
-    currentStepContents = (
-      <StyledText as="h2">{t('not_started_yet')}</StyledText>
     )
   } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
     currentStepContents = (
@@ -138,21 +151,22 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     e.stopPropagation()
     downloadRunLog()
   }
-
-  const downloadIsDisabled = runStatus === RUN_STATUS_RUNNING
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex gridGap={SPACING.spacing3}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
-          )} ${countOfTotalText}${
-            currentStepContents != null ? ': ' : ''
+          )}${
+            runStatus === RUN_STATUS_IDLE
+              ? ':'
+              : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''}`
           }`}</StyledText>
+
           {currentStepContents}
         </Flex>
         <Link
+          {...targetProps}
           role="button"
           css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
@@ -174,13 +188,19 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             {t('download_run_log')}
           </Flex>
         </Link>
+        {downloadIsDisabled ? (
+          <Tooltip tooltipProps={tooltipProps}>
+            {t('complete_protocol_to_download')}
+          </Tooltip>
+        ) : null}
       </Flex>
-      {analysis != null && lastRunCommandIndex >= 0 ? (
+      {analysis != null && lastRunAnalysisCommandIndex >= 0 ? (
         <ProgressBar
           percentComplete={
-            lastRunCommandIndex > 0
-              ? ((lastRunCommandIndex + 1) / analysisCommands.length) * 100
-              : 0
+            runHasNotBeenStarted
+              ? 0
+              : ((lastRunAnalysisCommandIndex + 1) / analysisCommands.length) *
+                100
           }
           outerStyles={css`
             height: 0.375rem;

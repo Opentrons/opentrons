@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
 
@@ -24,6 +24,9 @@ describe('SmallButton', () => {
     expect(getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.blueEnabled}`
     )
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.size_four}`
+    )
   })
   it('renders the alert button', () => {
     props = {
@@ -32,7 +35,7 @@ describe('SmallButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.errorEnabled}`
+      `background-color: ${COLORS.red_two}`
     )
   })
   it('renders the alt button', () => {
@@ -42,33 +45,23 @@ describe('SmallButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.foundationalBlue}`
+      `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
-  it('renders the ghost low button', () => {
+  it('renders the tertiary high light button', () => {
     props = {
       ...props,
-      buttonType: 'ghostLow',
+      buttonType: 'tertiaryHighLight',
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
       `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
     )
   })
-  it('renders the ghost high blue', () => {
+  it('renders the tertiary low light', () => {
     props = {
       ...props,
-      buttonType: 'ghostHigh',
-      textColor: COLORS.blueEnabled,
-    }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.blueEnabled}`)
-  })
-  it('renders the ghost high black', () => {
-    props = {
-      ...props,
-      buttonType: 'ghostHigh',
-      textColor: COLORS.darkBlackEnabled,
+      buttonType: 'tertiaryLowLight',
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
@@ -80,5 +73,33 @@ describe('SmallButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toBeDisabled()
+  })
+  it('renders the rounded button category', () => {
+    props = {
+      ...props,
+      buttonCategory: 'rounded',
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.size_five}`
+    )
+  })
+  it('renders an icon with start placement', () => {
+    props = {
+      ...props,
+      iconName: 'alert',
+      iconPlacement: 'startIcon',
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_alert_positionStart')
+  })
+  it('renders an icon with end placement', () => {
+    props = {
+      ...props,
+      iconName: 'alert',
+      iconPlacement: 'endIcon',
+    }
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_alert_positionEnd')
   })
 })

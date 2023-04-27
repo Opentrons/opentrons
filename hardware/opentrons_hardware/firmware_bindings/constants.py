@@ -31,6 +31,27 @@ class NodeId(int, Enum):
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
 
+    def is_bootloader(self) -> bool:
+        """Whether this node ID is a bootloader."""
+        return bool(self.value & 0xF == 0xF)
+
+    def bootloader_for(self) -> "NodeId":
+        """The associated bootloader node ID for the node.
+
+        This is safe to call on any node id, including ones that are already bootloaders.
+        """
+        return NodeId(self.value | 0xF)
+
+    def application_for(self) -> "NodeId":
+        """The associated core node ID for the node (i.e. head, not head_l).
+
+        This is safe to call on any node ID, including non-core application node IDs like
+        head_l. It will always give the code node ID.
+        """
+        # in c this would be & ~0xf but in python that gives 0x10 for some reason
+        # so let's write out the whole byte
+        return NodeId(self.value & 0xF0)
+
 
 # make these negative numbers so there is no chance they overlap with NodeId
 @unique
@@ -38,6 +59,14 @@ class USBTarget(int, Enum):
     """List of firmware targets connected over usb."""
 
     rear_panel = -1
+
+    def is_bootloader(self) -> bool:
+        """Whether this is a bootloader id (always false)."""
+        return False
+
+    def application_for(self) -> "USBTarget":
+        """The corresponding application id."""
+        return self
 
 
 FirmwareTarget = Union[NodeId, USBTarget]
@@ -72,6 +101,8 @@ class MessageId(int, Enum):
     pipette_info_response = 0x307
     gripper_info_response = 0x308
     set_serial_number = 0x30A
+    get_motor_usage_request = 0x30B
+    get_motor_usage_response = 0x30C
 
     stop_request = 0x00
 
@@ -130,6 +161,7 @@ class MessageId(int, Enum):
     attached_tools_request = 0x700
     tools_detected_notification = 0x701
     tip_presence_notification = 0x702
+    get_tip_status_request = 0x703
 
     fw_update_initiate = 0x60
     fw_update_data = 0x61
@@ -193,6 +225,7 @@ class ErrorCode(int, Enum):
     labware_dropped = 0x09
     estop_released = 0x0A
     motor_busy = 0x0B
+    stop_requested = 0x0C
 
 
 @unique
@@ -307,3 +340,12 @@ class MoveStopCondition(int, Enum):
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10
+
+
+@unique
+class MotorUsageValueType(int, Enum):
+    """Type of motor Usage value types."""
+
+    linear_motor_distance = 0x0
+    left_gear_motor_distance = 0x1
+    right_gear_motor_distance = 0x2

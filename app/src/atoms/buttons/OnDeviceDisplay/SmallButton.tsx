@@ -5,28 +5,47 @@ import {
   COLORS,
   SPACING,
   BORDERS,
-  NewPrimaryBtn,
-  styleProps,
+  Btn,
+  Flex,
+  Icon,
+  DIRECTION_ROW,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
-import type { StyleProps } from '@opentrons/components'
+import { ODD_FOCUS_VISIBLE } from './constants'
+import type { IconName, StyleProps } from '@opentrons/components'
 
-type SmallButtonTypes = 'alt' | 'alert' | 'default' | 'ghostHigh' | 'ghostLow'
+type SmallButtonTypes =
+  | 'alt'
+  | 'alert'
+  | 'default'
+  | 'tertiaryLowLight'
+  | 'tertiaryHighLight'
+
+type SmallButtonCategory = 'default' | 'rounded'
+
+type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
-  onClick: () => void
+  onClick: React.MouseEventHandler
   buttonType: SmallButtonTypes
   buttonText: React.ReactNode
+  iconPlacement?: IconPlacement
+  iconName?: IconName
+  buttonCategory?: SmallButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
-  //  optional text color for the 2 ghostHigh options
-  textColor?: string
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
-  const { onClick, buttonType, buttonText, textColor, disabled } = props
-  const buttonProps = {
-    onClick,
+  const {
+    buttonType,
+    buttonText,
+    buttonCategory = 'default',
     disabled,
-  }
+    iconPlacement,
+    iconName,
+    ...buttonProps
+  } = props
 
   const SMALL_BUTTON_PROPS_BY_TYPE: Record<
     SmallButtonTypes,
@@ -40,39 +59,38 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   > = {
     alt: {
       defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.foundationalBlue,
-      //  TODO(jr, 3/14/23): replaces these hex codes with the color constants
-      activeBackgroundColor: '#99b1d2',
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
-      disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
+      disabledColor: `${COLORS.darkBlack_sixty}`,
     },
     alert: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.errorEnabled,
-      activeBackgroundColor: '#ab302a',
+      defaultBackgroundColor: COLORS.red_two,
+      activeBackgroundColor: COLORS.red_two_pressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
-      disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
+      disabledColor: `${COLORS.darkBlack_sixty}`,
     },
     default: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: '#2160ca',
+      activeBackgroundColor: COLORS.bluePressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
-      disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
+      disabledColor: `${COLORS.darkBlack_sixty}`,
     },
-    ghostLow: {
+    tertiaryHighLight: {
       defaultColor: `${COLORS.darkBlack_seventy}`,
       defaultBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
+      disabledColor: `${COLORS.darkBlack_sixty}`,
     },
-    ghostHigh: {
-      defaultColor: textColor ?? COLORS.blueEnabled,
+    tertiaryLowLight: {
+      defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: ` ${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      disabledColor: `${COLORS.darkBlackEnabled}${COLORS.opacity55HexCode}`,
+      disabledColor: `${COLORS.darkBlack_sixty}`,
     },
   }
 
@@ -81,15 +99,13 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     cursor: default;
-    border-radius: ${BORDERS.size_three};
+    border-radius: ${buttonCategory === 'rounded'
+      ? BORDERS.size_five
+      : BORDERS.size_four};
     box-shadow: none;
-    padding-left: ${SPACING.spacing4};
-    padding-right: ${SPACING.spacing4};
-    line-height: ${TYPOGRAPHY.lineHeight20};
-    text-transform: ${TYPOGRAPHY.textTransformNone};
+    padding: ${SPACING.spacing4} ${SPACING.spacing5};
     ${TYPOGRAPHY.pSemiBold}
 
-    ${styleProps}
     &:focus {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
@@ -103,7 +119,9 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+      background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .defaultBackgroundColor};
     }
 
     &:active {
@@ -119,18 +137,44 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   `
 
   return (
-    <NewPrimaryBtn
-      {...buttonProps}
+    <Btn
       css={SMALL_BUTTON_STYLE}
       aria-label={`SmallButton_${buttonType}`}
+      disabled={disabled}
+      {...buttonProps}
     >
-      <StyledText
-        fontSize="1.375rem"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        padding={SPACING.spacing4}
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
       >
-        {buttonText}
-      </StyledText>
-    </NewPrimaryBtn>
+        {iconPlacement === 'startIcon' && iconName != null ? (
+          <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
+            <Icon
+              size="1.75rem"
+              marginRight={SPACING.spacing3}
+              name={iconName}
+            />
+          </Flex>
+        ) : null}
+
+        <StyledText
+          fontSize="1.375rem"
+          lineHeight={TYPOGRAPHY.lineHeight28}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
+          {buttonText}
+        </StyledText>
+        {iconPlacement === 'endIcon' && iconName != null ? (
+          <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
+            <Icon
+              size="1.75rem"
+              marginLeft={SPACING.spacing3}
+              name={iconName}
+            />
+          </Flex>
+        ) : null}
+      </Flex>
+    </Btn>
   )
 }

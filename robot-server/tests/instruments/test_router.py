@@ -10,8 +10,9 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
 )
-from opentrons.hardware_control.types import GripperJawState
+from opentrons.hardware_control.types import GripperJawState, OT3Mount
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Point, Mount
 from opentrons_shared_data.gripper.gripper_definition import (
@@ -25,7 +26,7 @@ from robot_server.instruments.instrument_models import (
     GripperData,
     Pipette,
     PipetteData,
-    GripperCalibrationData,
+    InstrumentCalibrationData,
 )
 from robot_server.instruments.router import get_attached_instruments
 
@@ -69,9 +70,6 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
         return None  # type: ignore[return-value]
 
 
-# TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
-#  OT2 vs OT3 tests correclty
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_instruments_empty(
     decoy: Decoy,
@@ -87,7 +85,6 @@ async def test_get_instruments_empty(
 
 # TODO (spp, 2022-01-17): remove xfail once robot server test flow is set up to handle
 #  OT2 vs OT3 tests correclty
-@pytest.mark.xfail
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy,
@@ -133,6 +130,24 @@ async def test_get_all_attached_instruments(
     decoy.when(await ot3_hardware_api.cache_instruments()).then_do(
         rehearse_instrument_retrievals
     )
+    decoy.when(ot3_hardware_api.get_instrument_offset(mount=OT3Mount.LEFT)).then_return(
+        PipetteOffsetByPipetteMount(
+            offset=Point(1, 2, 3),
+            source=SourceType.default,
+            status=CalibrationStatus(),
+            last_modified=None,
+        )
+    )
+    decoy.when(
+        ot3_hardware_api.get_instrument_offset(mount=OT3Mount.RIGHT)
+    ).then_return(
+        PipetteOffsetByPipetteMount(
+            offset=Point(4, 5, 6),
+            source=SourceType.default,
+            status=CalibrationStatus(),
+            last_modified=None,
+        )
+    )
     result = await get_attached_instruments(hardware=ot3_hardware_api)
 
     assert result.content.data == [
@@ -146,6 +161,11 @@ async def test_get_all_attached_instruments(
                 channels=1,
                 min_volume=1,
                 max_volume=1,
+                calibratedOffset=InstrumentCalibrationData(
+                    offset=Vec3f(x=1, y=2, z=3),
+                    source=SourceType.default,
+                    last_modified=None,
+                ),
             ),
         ),
         Pipette.construct(
@@ -158,6 +178,11 @@ async def test_get_all_attached_instruments(
                 channels=1,
                 min_volume=1,
                 max_volume=1,
+                calibratedOffset=InstrumentCalibrationData(
+                    offset=Vec3f(x=4, y=5, z=6),
+                    source=SourceType.default,
+                    last_modified=None,
+                ),
             ),
         ),
         Gripper.construct(
@@ -167,7 +192,7 @@ async def test_get_all_attached_instruments(
             serialNumber="GripperID321",
             data=GripperData(
                 jawState="unhomed",
-                calibratedOffset=GripperCalibrationData(
+                calibratedOffset=InstrumentCalibrationData(
                     offset=Vec3f(x=1, y=2, z=3),
                     source=SourceType.default,
                     last_modified=None,
@@ -213,6 +238,45 @@ async def test_get_ot2_instruments(
                 channels=1,
                 min_volume=1,
                 max_volume=1,
+            ),
+        )
+    ]
+
+
+async def test_get_96_channel_instruments(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+) -> None:
+    """It should correctly be able to construct a 96 channel pipette."""
+    # Return attached pipettes
+    decoy.when(hardware_api.attached_instruments).then_return(
+        {
+            Mount.LEFT: {  # type: ignore [typeddict-item]
+                "name": "p1000_96",
+                "model": PipetteModel("xyz"),
+                "pipette_id": "pipette-id",
+                "back_compat_names": [],
+                "min_volume": 1,
+                "max_volume": 1000,
+                "channels": 96,
+            },
+            Mount.RIGHT: cast(PipetteDict, {}),
+        }
+    )
+    result2 = await get_attached_instruments(hardware=hardware_api)
+    decoy.verify(await hardware_api.cache_instruments(), times=0)
+    assert result2.status_code == 200
+    assert result2.content.data == [
+        Pipette.construct(
+            mount="left",
+            instrumentType="pipette",
+            instrumentName="p1000_96",
+            instrumentModel=PipetteModel("xyz"),
+            serialNumber="pipette-id",
+            data=PipetteData(
+                channels=96,
+                min_volume=1,
+                max_volume=1000,
             ),
         )
     ]

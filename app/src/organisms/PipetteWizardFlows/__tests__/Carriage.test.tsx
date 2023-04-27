@@ -7,25 +7,17 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { Carriage } from '../Carriage'
-
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof Carriage>) => {
   return renderWithProviders(<Carriage {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('Carriage', () => {
   let props: React.ComponentProps<typeof Carriage>
   beforeEach(() => {
@@ -36,8 +28,8 @@ describe('Carriage', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -48,10 +40,7 @@ describe('Carriage', () => {
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Unscrew Z-axis Carriage')
-    getByText(
-      'Loosen the captive screw on the top right of the gantry carriage. This will release the right pipette mount, which should then freely move up and down.'
-    )
+    getByText('Unscrew z-axis carriage')
     getByAltText('Unscrew gantry')
     getByRole('button', { name: 'Continue' })
     getByLabelText('back').click()
@@ -71,7 +60,7 @@ describe('Carriage', () => {
       flowType: FLOWS.DETACH,
     }
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Reattach Z-axis Carriage')
+    getByText('Reattach z-axis carriage')
     getByText(
       'Push the right pipette mount up to the top of the z-axis. Then tighten the captive screw at the top right of the gantry carriage.'
     )
