@@ -29,11 +29,11 @@ PROBE_PREP_HEIGHT_MM = 5
 PROBE_MAX_OVERRUN = 5
 PROBE_POS_OFFSET = Point(13, 13, 0)
 
-PROBE_READINGS = ["air-pf", "attached-pf", "deck-pf", "deck-z"]
+PROBE_READINGS = ["air-pf", "attached-pf", "deck-pf", "deck-mm"]
 
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
-    assert reading in PROBE_READINGS
+    assert reading in PROBE_READINGS, f"{reading} not in PROBE_READINGS"
     return f"{probe.name.lower()}-{reading}"
 
 
