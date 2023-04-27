@@ -29,8 +29,10 @@ def hash_command_params(
         The command hash, if the command is a protocol command.
         `None` if the command is a setup command.
     """
-
-    last_contribution = b"" if last_hash is None else last_hash.encode("ascii")
-    this_contribution = md5(create.commandType.encode("ascii")).digest()
-    to_hash = last_contribution + this_contribution
-    return md5(to_hash).hexdigest()
+    if create.intent == CommandIntent.SETUP:
+        return None
+    else:
+        last_contribution = b"" if last_hash is None else last_hash.encode("ascii")
+        this_contribution = md5(create.commandType.encode("ascii")).digest()
+        to_hash = last_contribution + this_contribution
+        return md5(to_hash).hexdigest()
