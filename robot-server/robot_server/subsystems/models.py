@@ -9,7 +9,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.hardware_control.types import SubSystem
 
-class SubSystemState(BaseModel):
+class PresentSubsystem(BaseModel):
     """Model for the status of a subsystem."""
     name: str = Field(..., description='The name of a connected subsystem.')
     ok: bool = Field(..., description='Whether the subsystem is running, up to date, and in a normal state.')
@@ -24,12 +24,21 @@ class UpdateProgressData(BaseModel):
 
     id: str = Field(..., description="Unique ID for the update process.")
     createdAt: datetime = Field(..., description="When the update was posted.")
-    mount: MountTypesStr = Field(..., description="The mount that is being updated.")
+    subsystem: str = Field(..., description="The subsystem that is being updated.")
     updateStatus: UpdateState = Field(
         ..., description="Whether an update is queued, in progress or completed. "
     )
     updateProgress: int = Field(
         ..., description="Progress of the update depicted as an integer from 0 to 100."
+    )
+
+class UpdateProgressSummary(BaseModel):
+    """Model for a quick summary of an update's progress."""
+    id: str = Field(..., description="Unique ID for the update process.")
+    createdAt: str = Field(..., description="When the update was posted.")
+    subsystem: str = Field(..., descripiton="The subsystem that is being updated.")
+    updateStatus: UpdateState = Field(
+        ..., description="Whether an update is queued, in progress or completed"
     )
 
 class UpdateCreate(BaseModel):
