@@ -143,6 +143,8 @@ push:
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
 	sleep 1
 	$(MAKE) -C $(SERVER_UTILS_DIR) push
+	sleep 1
+	$(MAKE) -C $(SYSTEM_SERVER_DIR) push
 
 
 .PHONY: push-ot3
