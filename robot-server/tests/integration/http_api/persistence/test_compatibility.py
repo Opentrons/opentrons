@@ -76,6 +76,8 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
             server.start()
             assert await robot_client.wait_until_alive(
                 # Leave time for the server to perform database migrations.
+                # On my 2021 dev laptop, the v6.2.0Large snapshot takes ~10 seconds
+                # to migrate from schema 1 to schema 2.
                 timeout_sec=40
             ), "Dev Robot never became available."
             all_protocols = (await robot_client.get_protocols()).json()["data"]
