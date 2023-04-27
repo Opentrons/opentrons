@@ -6,6 +6,16 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## OT-2 Software Changes in 7.0.0
+
+### Update notes
+
+This update changes the internal format in which the robot stores runs and protocols.
+The first time the robot starts up with this update, it may take several extra minutes to initialize while it performs this migration.
+Within 10 minutes, the robot should be usable as normal, with all the runs and protocols that were there before.
+
+---
+
 ## OT-2 Software Changes in 6.3.0
 
 Welcome to the v6.3.0 release of the OT-2 software!
@@ -27,6 +37,7 @@ Welcome to the v6.3.0 release of the OT-2 software!
     - Python protocols specifying an `apiLevel` of 2.14
 
 ---
+
 ## OT-2 Software Changes in 6.2.1
 
 Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresses a few problems.

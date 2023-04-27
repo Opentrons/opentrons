@@ -4,6 +4,16 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
+# Internal Release 0.6.0
+
+## Update notes
+
+This update changes the internal format in which the robot stores runs and protocols.
+The first time the robot starts up with this update, it may take several extra minutes to initialize while it performs this migration.
+While this is ongoing, the on-device display will mistakenly show that the robot has no runs or protocols.
+Within 10 minutes, your old runs and protocols should show up and the robot should be usable as normal.
+
+
 # Internal Release 0.4.0
 
 This is internal release 0.4.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
