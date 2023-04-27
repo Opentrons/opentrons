@@ -277,7 +277,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
-            assert module_serial is not None, "Expected a serial number and got None."
+            assert (
+                module_serial is not None
+            ), "Expected a module SN and got None instead."
             self._state.module_offset_by_serial[module_serial] = module_offset
 
     def _handle_heater_shaker_commands(
@@ -601,14 +603,18 @@ class ModuleView(HasState[ModuleState]):
         """
         return self.get(module_id).model
 
-    def get_serial_number(self, module_id: str) -> Optional[str]:
+    def get_serial_number(self, module_id: str) -> str:
         """Get the hardware serial number of the given module.
 
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
-        If the hardware is not connected by a serial it will return None.
         """
-        return self.get(module_id).serialNumber
+        module = self.get(module_id)
+        if module.serialNumber:
+            return module.serialNumber
+        raise errors.ModuleNotConnectedBySerial(
+            f"{module.model} is not connected by a serial port."
+        )
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
@@ -650,9 +656,6 @@ class ModuleView(HasState[ModuleState]):
 
         # add the calibrated module offset if there is one
         module_serial = self.get_serial_number(module_id)
-        assert (
-            module_serial is not None
-        ), "Expected a module serial number and got None."
         offset = self._state.module_offset_by_serial.get(module_serial)
         if offset is not None:
             module_offset = array((offset.x, offset.y, offset.z, 1))
