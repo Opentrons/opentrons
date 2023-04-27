@@ -28,7 +28,8 @@ TRASH_SLOT = 12
 
 TRASH_HEIGHT = 40  # FIXME: get real value
 
-OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * -7 * 0.5)
+# X moves negative (to left), Y moves positive (to rear)
+OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -52,13 +53,16 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     trash_nominal += OFFSET_FOR_1_WELL_LABWARE
 
     ui.print_header("JOG to TIP-RACK")
-    await helpers_ot3.move_to_arched_ot3(
-        api, OT3Mount.LEFT, tip_rack_a1_nominal + Point(z=30)
-    )
-    await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
-    print("picking up tips")
-    await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
-    await api.home_z(OT3Mount.LEFT)
+    if api.is_simulator or ui.get_user_answer("PICK-UP new tips"):
+        await helpers_ot3.move_to_arched_ot3(
+            api, OT3Mount.LEFT, tip_rack_a1_nominal + Point(z=30)
+        )
+        await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
+        print("picking up tips")
+        await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+        await api.home_z(OT3Mount.LEFT)
+    else:
+        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
 
     ui.print_header("JOG to LIQUID")
     print("jog tips to -5 mm below surface of liquid")

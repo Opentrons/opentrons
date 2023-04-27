@@ -152,6 +152,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator:
             ui.get_user_ready("about to probe the DECK")
         # move to 5 mm above the deck
+        await api.home_z(OT3Mount.LEFT)
+        current_pos = await api.gantry_position(OT3Mount.LEFT)
+        await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=current_pos.z))
         await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
         z_ax = OT3Axis.by_mount(OT3Mount.LEFT)
         # NOTE: currently there's an issue where the 1st time an instrument
@@ -167,8 +170,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.refresh_positions()
         found_pos = await api.gantry_position(OT3Mount.LEFT)
         deck_mm = found_pos.z
-        deck_mm_is_valid = deck_mm >= (PROBE_MAX_OVERRUN - 0.1) * -0.1
-        print(f"deck-mm: {deck_mm}")
+        pass_threshold = (PROBE_MAX_OVERRUN - 0.001) * -1.0
+        deck_mm_is_valid = (deck_mm >= pass_threshold)
+        print(f"deck-mm: {deck_mm} ({deck_mm_is_valid})")
         report(
             section,
             _get_test_tag(probe, "deck-mm"),

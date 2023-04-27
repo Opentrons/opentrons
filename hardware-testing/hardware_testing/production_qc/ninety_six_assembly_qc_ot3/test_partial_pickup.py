@@ -1,17 +1,14 @@
-"""Test Pressure."""
-from typing import List, Union, Tuple, Dict
+"""Test Partial Pickup."""
+from typing import List, Union
 
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
-    CSVResult,
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
@@ -21,9 +18,5 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    # for each channel:
-    #  - open-pa
-    #  - sealed-pa
-    #  - aspirate-pa
-    #  - dispense-pa
+    ui.print_error("skipping")
     return
