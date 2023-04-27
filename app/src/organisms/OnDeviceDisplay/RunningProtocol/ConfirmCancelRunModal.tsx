@@ -90,7 +90,7 @@ export function ConfirmCancelRunModal({
         >
           <SmallButton
             flex="1"
-            buttonType="default"
+            buttonType="primary"
             buttonText={t('shared:go_back')}
             onClick={() => setShowConfirmCancelRunModal(false)}
           />
