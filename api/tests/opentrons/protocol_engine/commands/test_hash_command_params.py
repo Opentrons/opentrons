@@ -1,9 +1,12 @@
+"""Tests for hash_command_params."""
+
 from opentrons.protocol_engine import CommandIntent
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.commands.hash_command_params import hash_command_params
 
 
 def test_equivalent_commands() -> None:
+    """Equivalent commands should have the same hash."""
     a = commands.BlowOutInPlaceCreate(
         params=commands.BlowOutInPlaceParams(
             pipetteId="abc123",
@@ -24,6 +27,7 @@ def test_equivalent_commands() -> None:
 
 
 def test_nonequivalent_commands() -> None:
+    """Nonequivalent commands should have different hashes."""
     a = commands.BlowOutInPlaceCreate(
         params=commands.BlowOutInPlaceParams(
             pipetteId="abc123",
@@ -38,6 +42,7 @@ def test_nonequivalent_commands() -> None:
 
 
 def test_repeated_commands() -> None:
+    """Repeated commands should hash differently, even though they're equivalent in isolation."""
     a = commands.WaitForDurationCreate(
         params=commands.WaitForDurationParams(seconds=123)
     )
@@ -56,4 +61,4 @@ def test_setup_command() -> None:
         params=commands.WaitForDurationParams(seconds=123),
         intent=CommandIntent.SETUP,
     )
-    assert hash_command_params(setup_command, None) == None
+    assert hash_command_params(setup_command, None) is None
