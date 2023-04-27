@@ -8,7 +8,6 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 from opentrons.broker import Broker
-from opentrons.types import DeckSlotName
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, ProtocolCore
@@ -166,10 +165,7 @@ def test_load_labware_from_definition(
 
 def test_parent(decoy: Decoy, mock_core: ModuleCore, subject: ModuleContext) -> None:
     """Should get the parent slot name."""
-    decoy.when(mock_core.get_deck_slot()).then_return(DeckSlotName.SLOT_1)
-
-    # TODO (tz, 1-17-23): make sure that the subject is not returning an Enum that subclasses str
-    assert type(subject.parent) == str
+    decoy.when(mock_core.get_deck_slot_display_name()).then_return("1")
     assert subject.parent == "1"
 
 

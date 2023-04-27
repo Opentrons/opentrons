@@ -74,6 +74,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         return self._api_version
 
     @property
+    def robot_type(self) -> RobotType:
+        return self._engine_client.state.config.robot_type
+
+    @property
     def fixed_trash(self) -> LabwareCore:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
@@ -436,13 +440,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[DeckSlotName, ModuleCore, None]:
+    ) -> Union[str, ModuleCore, None]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
         )
         if isinstance(labware_location, DeckSlotLocation):
-            return labware_location.slotName
+            if self._engine_client.state.config.robot_type == "OT-2 Standard":
+                return str(labware_location.slotName)
+            else:
+                return labware_location.slotName.as_coordinate()
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id.get(labware_location.moduleId)
         return None

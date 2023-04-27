@@ -78,6 +78,13 @@ class ModuleCore(AbstractModuleCore):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
+    def get_deck_slot_display_name(self) -> str:
+        slot_name = self.get_deck_slot()
+        if self._engine_client.state.config.robot_type == "OT-2 Standard":
+            return str(slot_name)
+        else:
+            return slot_name.as_coordinate()
+
     def get_display_name(self) -> str:
         """Get the module's display name."""
         return self._engine_client.state.modules.get_definition(

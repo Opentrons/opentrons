@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 
 from opentrons_shared_data.deck.dev_types import SlotDefV3
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.types import DeckLocation, DeckSlotName, Location, Point
 
@@ -29,6 +30,16 @@ class CalibrationPosition:
     id: str
     position: Tuple[float, float, float]
     displayName: str
+
+
+def _get_robot_canonical_slot_name(
+    slot_key: DeckLocation, robot_type: RobotType
+) -> str:
+    deck_slot_name = _get_slot_name(slot_key)
+    if robot_type == "OT-2 Standard":
+        return str(deck_slot_name)
+    else:
+        return deck_slot_name.as_coordinate()
 
 
 def _get_slot_name(slot_key: DeckLocation) -> DeckSlotName:
@@ -105,8 +116,8 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
-        slot_name = _get_slot_name(slot)
-        return self._slot_definitions_by_name[slot_name.value]
+        slot_name = _get_robot_canonical_slot_name(slot, self._protocol_core.robot_type)
+        return self._slot_definitions_by_name[slot_name]
 
     def get_slot_center(self, slot: DeckLocation) -> Point:
         """Get the absolute coordinates of a slot's center."""
