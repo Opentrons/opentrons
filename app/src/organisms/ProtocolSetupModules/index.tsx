@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
+  Icon,
   Module,
   RobotWorkSpace,
   ALIGN_CENTER,
@@ -93,7 +94,7 @@ function RowModule({
       >
         <StyledText>{getModuleDisplayName(module.moduleDef.model)}</StyledText>
       </Flex>
-      <Flex width="11.625rem">
+      <Flex alignItems={ALIGN_CENTER} width="11.625rem">
         <StyledText>
           {/* TODO(bh, 2023-02-07): adjust slot location when hi-fi designs finalized */}
           {t('slot_location', {
@@ -103,6 +104,13 @@ function RowModule({
                 : module.slotName,
           })}
         </StyledText>
+        {isDuplicateModuleModel ? (
+          <Icon
+            name="information"
+            paddingLeft={SPACING.spacing3}
+            size="1.5rem"
+          />
+        ) : null}
       </Flex>
       <Chip
         text={
