@@ -72,8 +72,8 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     # add each test-section as a skippable argument (eg: --skip-gantry)
     for s in TestSection:
-        parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
-        parser.add_argument(f"--only-{s.value.lower()}", action="store_true")
+        parser.add_argument(f"--skip-{s.value.lower()}".replace("_", "-"), action="store_true")
+        parser.add_argument(f"--only-{s.value.lower()}".replace("_", "-"), action="store_true")
     args = parser.parse_args()
     _t_sections = {
         s: f
