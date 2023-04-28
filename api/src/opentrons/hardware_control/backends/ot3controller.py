@@ -516,9 +516,14 @@ class OT3Controller:
                 if axis in self._motor_status.keys()
                 else False
             )
-            self._motor_status.update(
-                {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
-            )
+            if axis == NodeId.gripper_z:
+                self._motor_status.update(
+                    {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3] or already_homed)}
+                )
+            else:
+                self._motor_status.update(
+                    {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
+                )
 
     @requires_update
     async def move(
