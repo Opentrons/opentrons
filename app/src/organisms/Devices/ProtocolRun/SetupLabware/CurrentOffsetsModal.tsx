@@ -19,11 +19,12 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import { StyledText } from '../../../../atoms/text'
+import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from './utils'
+import { getLatestCurrentOffsets } from '../SetupLabwarePositionCheck/utils'
+
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   RunTimeCommand,
@@ -41,7 +42,6 @@ const OffsetTable = styled('table')`
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
   padding: ${SPACING.spacing2};
 `
 const OffsetTableRow = styled('tr')`
@@ -55,16 +55,17 @@ const OffsetTableDatum = styled('td')`
   text-overflow: wrap;
 `
 
-interface CurrentOffsetsTableProps {
+interface CurrentOffsetsModalProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
+  onCloseClick: () => void
 }
-export function CurrentOffsetsTable(
-  props: CurrentOffsetsTableProps
+export function CurrentOffsetsModal(
+  props: CurrentOffsetsModalProps
 ): JSX.Element {
-  const { currentOffsets, commands, labware, modules } = props
+  const { currentOffsets, commands, labware, modules, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
@@ -129,21 +130,27 @@ export function CurrentOffsetsTable(
     />
   )
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing4}
+    <ModalShell
+      maxWidth="40rem"
+      header={
+        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
+      }
     >
-      <StyledText as="h6">{t('applied_offset_data')}</StyledText>
-      {isLabwareOffsetCodeSnippetsOn ? (
-        <LabwareOffsetTabs
-          TableComponent={TableComponent}
-          JupyterComponent={JupyterSnippet}
-          CommandLineComponent={CommandLineSnippet}
-        />
-      ) : (
-        TableComponent
-      )}
-    </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        padding={SPACING.spacing6}
+      >
+        {isLabwareOffsetCodeSnippetsOn ? (
+          <LabwareOffsetTabs
+            TableComponent={TableComponent}
+            JupyterComponent={JupyterSnippet}
+            CommandLineComponent={CommandLineSnippet}
+          />
+        ) : (
+          TableComponent
+        )}
+      </Flex>
+    </ModalShell>
   )
 }

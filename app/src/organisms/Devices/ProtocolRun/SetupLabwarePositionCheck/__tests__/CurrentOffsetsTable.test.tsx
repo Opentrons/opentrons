@@ -6,8 +6,8 @@ import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
-import { CurrentOffsetsModal } from '../CurrentOffsetsTable'
-import { getLatestCurrentOffsets } from '../../SetupLabware/utils'
+import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
+import { getLatestCurrentOffsets } from '../utils'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
@@ -38,8 +38,8 @@ const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
   typeof useLPCDisabledReason
 >
 
-const render = (props: React.ComponentProps<typeof CurrentOffsetsModal>) => {
-  return renderWithProviders(<CurrentOffsetsModal {...props} />, {
+const render = (props: React.ComponentProps<typeof CurrentOffsetsTable>) => {
+  return renderWithProviders(<CurrentOffsetsTable {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -77,8 +77,8 @@ const mockCurrentOffsets: LabwareOffset[] = [
   },
 ]
 
-describe('CurrentOffsetsModal', () => {
-  let props: React.ComponentProps<typeof CurrentOffsetsModal>
+describe('CurrentOffsetsTable', () => {
+  let props: React.ComponentProps<typeof CurrentOffsetsTable>
   beforeEach(() => {
     props = {
       currentOffsets: mockCurrentOffsets,
@@ -96,7 +96,6 @@ describe('CurrentOffsetsModal', () => {
         location: { slotName: '1' },
         serialNumber: 'fakeserial',
       })),
-      onCloseClick: jest.fn(),
     }
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockGetLoadedLabwareDefinitionsByUri.mockReturnValue(

@@ -10,7 +10,6 @@ import {
   Link,
   TOOLTIP_LEFT,
   useHoverTooltip,
-  JUSTIFY_FLEX_END,
   SecondaryButton,
   PrimaryButton,
 } from '@opentrons/components'
@@ -106,11 +105,11 @@ export function SetupLabwarePositionCheck(
       <Flex justifyContent={JUSTIFY_CENTER}>
         <PrimaryButton
           onClick={expandLabwareStep}
-          id="ModuleSetup_proceedToLabwarePositionCheck"
+          id="ModuleSetup_proceedToLabwareSetup"
           padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_position_check')}
+          {t('proceed_to_labware_setup_step')}
         </PrimaryButton>
       </Flex>
       {LPCWizard}

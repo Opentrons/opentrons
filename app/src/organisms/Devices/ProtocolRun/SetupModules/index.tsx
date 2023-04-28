@@ -51,7 +51,7 @@ export const SetupModules = ({
           padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_setup_step')}
+          {t('proceed_to_labware_position_check')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 || runHasStarted ? (
