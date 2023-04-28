@@ -202,6 +202,7 @@ class ToolDetector:
     async def resolve(
         self, with_tools: ToolDetectionResult, timeout_sec: float = 1.0
     ) -> ToolSummary:
+        """Based on a detection result, return details of attached tools."""
         with WaitableCallback(self._messenger) as wc:
             return await _resolve_tool_types(
                 self._messenger, wc, with_tools, timeout_sec

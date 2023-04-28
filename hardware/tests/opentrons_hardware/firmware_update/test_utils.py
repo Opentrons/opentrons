@@ -394,7 +394,7 @@ def test_check_firmware_updates_available_nodes_specified(
         mock.Mock(return_value=known_firmware_updates),
     ):
         firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}, targets={NodeId.gripper}
+            device_info_cache, targets={NodeId.gripper}
         )
         # only the gripper needs an update
         assert len(firmware_updates) == 1
@@ -409,9 +409,7 @@ def test_check_firmware_updates_available_forced(mock_manifest: Dict[str, Any]) 
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=known_firmware_updates),
     ):
-        firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}, force=True
-        )
+        firmware_updates = check_firmware_updates(device_info_cache, force=True)
         assert firmware_updates
         assert len(firmware_updates) == len(device_info_cache)
         for node_id in firmware_updates:
@@ -426,7 +424,7 @@ def test_load_firmware_manifest_is_empty(mock_manifest: Dict[str, Any]) -> None:
         mock.Mock(return_value={}),
     ):
         firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}
+            device_info_cache,
         )
         assert firmware_updates == {}
 
@@ -435,7 +433,13 @@ def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
     """Don't do updates if the FirmwareUpdateType is unknown."""
     device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
         NodeId.head: DeviceInfoCache(
-            NodeId.head, 2, "12345678", None, PCBARevision(None), subidentifier=0
+            NodeId.head,
+            2,
+            "12345678",
+            None,
+            PCBARevision(None),
+            subidentifier=0,
+            ok=False,
         )
     }
     known_firmware_updates = generate_update_info(mock_manifest)
@@ -444,5 +448,5 @@ def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value={}),
     ):
-        firmware_updates = check_firmware_updates(device_info, attached_pipettes={})
+        firmware_updates = check_firmware_updates(device_info)
         assert firmware_updates == {}

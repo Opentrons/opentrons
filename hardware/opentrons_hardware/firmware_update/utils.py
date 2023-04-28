@@ -8,7 +8,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Union, Tuple, Iterable, Iterator, cast
+from typing import Any, Dict, Optional, Set, Union, Tuple, Iterable, Iterator
 from opentrons_hardware.firmware_bindings.constants import (
     FirmwareTarget,
     NodeId,
