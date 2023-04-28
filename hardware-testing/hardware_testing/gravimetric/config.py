@@ -23,6 +23,8 @@ class GravimetricConfig:
     mix: bool
     inspect: bool
     user_volumes: bool
+    gantry_speed: int
+    scale_delay: int
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]

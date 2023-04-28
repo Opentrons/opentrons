@@ -7,7 +7,7 @@ requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
 
 SLOT_VIAL = 4
 SLOTS_TIPRACK = {
-    50: [3],
+    50: [5, 6, 8, 9],
 }
 
 

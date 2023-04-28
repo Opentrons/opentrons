@@ -5,23 +5,23 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentCon
 
 # Rows by Channel:
 #  - Rear Racks
-#     - 8
 #     - 7
-#     - empty
 #     - 6
-#     - empty
 #     - empty
 #     - 5
 #     - empty
-#  - Front Racks
 #     - empty
 #     - 4
 #     - empty
+#  - Front Racks
 #     - empty
 #     - 3
 #     - empty
+#     - empty
 #     - 2
+#     - empty
 #     - 1
+#     - 0
 #
 # Increment
 #  - 72x total transfers

@@ -30,6 +30,7 @@ from .measurement import (
     record_measurement_data,
     calculate_change_in_volume,
     create_measurement_tag,
+    DELAY_FOR_MEASUREMENT,
 )
 from .measurement.environment import get_min_reading, get_max_reading
 from .measurement.record import (
@@ -158,7 +159,15 @@ def _load_pipette(
     pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
-    pipette.default_speed = config.GANTRY_MAX_SPEED
+    assert pipette.channels == cfg.pipette_channels, (
+        f"expected {cfg.pipette_channels} channels, "
+        f"but got pipette with {pipette.channels} channels"
+    )
+    assert pipette.max_volume == cfg.pipette_volume, (
+        f"expected {cfg.pipette_volume} uL pipette, "
+        f"but got a {pipette.max_volume} uL pipette"
+    )
+    pipette.default_speed = cfg.gantry_speed
     if cfg.increment:
         print("clearing pipette ul-per-mm table to be linear")
         clear_pipette_ul_per_mm(
@@ -292,6 +301,7 @@ def _run_trial(
     inspect: bool,
     mix: bool = False,
     stable: bool = True,
+    scale_delay: int = DELAY_FOR_MEASUREMENT,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     pipetting_callbacks = _generate_callbacks_for_trial(
         recorder, volume, channel, trial, blank
@@ -308,7 +318,13 @@ def _run_trial(
             elif m_type == MeasurementType.DISPENSE:
                 recorder.add_simulation_mass(volume * 0.001)
         m_data = record_measurement_data(
-            ctx, m_tag, recorder, pipette.mount, stable, shorten=inspect
+            ctx,
+            m_tag,
+            recorder,
+            pipette.mount,
+            stable,
+            shorten=inspect,
+            delay_seconds=scale_delay,
         )
         report.store_measurement(test_report, m_tag, m_data)
         _MEASUREMENTS.append(
@@ -425,8 +441,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
     print(f'found pipette "{pipette_tag}"')
-    setup_tip = get_tips(ctx, pipette, channel=pipette.channels - 1)[-1]
-    setup_channel_offset = _get_channel_offset(cfg, pipette.channels - 1)
+    setup_tip = get_tips(ctx, pipette, channel=0)[0]
+    setup_channel_offset = _get_channel_offset(cfg, channel=0)
     setup_tip_location = setup_tip.top().move(setup_channel_offset)
 
     if cfg.increment:
@@ -531,6 +547,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     inspect=cfg.inspect,
                     mix=cfg.mix,
                     stable=True,
+                    scale_delay=cfg.scale_delay,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -554,14 +571,14 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_aspirate_evaporation_ul,
                 average_dispense_evaporation_ul,
             )
+        if not ctx.is_simulating():
+            ui.get_user_ready("REPLACE first Tip with NEW Tip")
         test_count = 0
         test_total = len(test_volumes) * cfg.trials * cfg.pipette_channels
         tips_per_channel = {
             channel: get_tips(ctx, pipette, channel)
             for channel in range(pipette.channels)
         }
-        # remove the tip we used for liquid-height calibration
-        tips_per_channel[pipette.channels - 1].pop(-1)
         for volume in test_volumes:
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -610,6 +627,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         inspect=cfg.inspect,
                         mix=cfg.mix,
                         stable=True,
+                        scale_delay=cfg.scale_delay,
                     )
                     print(
                         "measured volumes:\n"

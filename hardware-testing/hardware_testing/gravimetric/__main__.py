@@ -15,7 +15,8 @@ from hardware_testing.protocols import (
 )
 
 from . import execute, helpers, workarounds
-from .config import GravimetricConfig
+from .config import GravimetricConfig, GANTRY_MAX_SPEED
+from .measurement import DELAY_FOR_MEASUREMENT
 
 LABWARE_OFFSETS: List[dict] = []
 
@@ -52,6 +53,8 @@ def run(
     mix: bool,
     inspect: bool,
     user_volumes: bool,
+    gantry_speed: int,
+    scale_delay: int,
 ) -> None:
     """Run."""
     protocol_cfg = PROTOCOL_CFG[pipette_volume][pipette_channels][tip_volume]
@@ -73,6 +76,8 @@ def run(
             mix=mix,
             inspect=inspect,
             user_volumes=user_volumes,
+            gantry_speed=gantry_speed,
+            scale_delay=scale_delay,
         ),
     )
 
@@ -91,6 +96,8 @@ if __name__ == "__main__":
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
+    parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
+    parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -121,4 +128,6 @@ if __name__ == "__main__":
         args.mix,
         args.inspect,
         args.user_volumes,
+        args.gantry_speed,
+        args.scale_delay,
     )
