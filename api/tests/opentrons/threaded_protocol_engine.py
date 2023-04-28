@@ -1,7 +1,5 @@
 import asyncio
-import concurrent.futures
 import contextlib
-import threading
 import typing
 from opentrons.hardware_control import ThreadManagedHardware
 

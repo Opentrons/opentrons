@@ -1,7 +1,4 @@
 import asyncio
-import abc
-import contextlib
-import typing
 
 import pytest
 
@@ -56,7 +53,8 @@ def test_returns_matching_loop() -> None:
 
 
 def test_loop_lifetime() -> None:
-    """
+    """Test the lifetime of the returned event loop.
+
     While the context manager is open, the event loop should be running and usable.
     After the context manager closes, the event loop should be closed and unusable.
     """

@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import queue
-import threading
 import typing
 
 from concurrent.futures import ThreadPoolExecutor

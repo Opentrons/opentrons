@@ -25,8 +25,6 @@ from typing_extensions import TypedDict
 import pytest
 from decoy import Decoy
 
-from tests.opentrons.threaded_protocol_engine import protocol_engine_in_thread
-
 try:
     import aionotify  # type: ignore[import]
 except (OSError, ModuleNotFoundError):
@@ -42,7 +40,6 @@ from opentrons_shared_data.deck import (
 )
 
 from opentrons import config
-from opentrons import protocol_engine
 from opentrons import hardware_control as hc
 
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -56,6 +53,8 @@ from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_con
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
+
+from .threaded_protocol_engine import protocol_engine_in_thread
 
 
 if TYPE_CHECKING:
