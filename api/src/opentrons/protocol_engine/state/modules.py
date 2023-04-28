@@ -622,7 +622,7 @@ class ModuleView(HasState[ModuleState]):
     ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
-        slot = self.get_location(module_id).slotName.value
+        slot = self.get_location(module_id).slotName.id
 
         pre_transform = array(
             (
