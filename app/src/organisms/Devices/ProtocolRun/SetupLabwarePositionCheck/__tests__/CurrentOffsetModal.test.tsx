@@ -7,7 +7,7 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
 import { CurrentOffsetsModal } from '../CurrentOffsetsModal'
-import { getLatestCurrentOffsets } from '../utils'
+import { getLatestCurrentOffsets } from '../../SetupLabware/utils'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 

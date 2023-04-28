@@ -280,10 +280,10 @@ export const LabwarePositionCheckComponent = (
       title={t('labware_position_check_title')}
       currentStep={currentStepIndex}
       totalSteps={totalStepCount}
-      onExit={() => {
+      onExit={showConfirmation || isExiting ? undefined : () => {
         if (fatalError != null) {
           handleCleanUpAndClose()
-        } else if (!showConfirmation && !isExiting) {
+        } else {
           confirmExitLPC()
         }
       }}

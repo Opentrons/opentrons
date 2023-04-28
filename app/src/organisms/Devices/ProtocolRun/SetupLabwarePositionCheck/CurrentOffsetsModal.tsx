@@ -23,7 +23,7 @@ import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from './utils'
+import { getLatestCurrentOffsets } from '../SetupLabware/utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
@@ -130,27 +130,20 @@ export function CurrentOffsetsModal(
     />
   )
   return (
-    <ModalShell
-      maxWidth="40rem"
-      header={
-        <ModalHeader title={t('applied_offset_data')} onClose={onCloseClick} />
-      }
+
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={SPACING.spacing6}
-      >
-        {isLabwareOffsetCodeSnippetsOn ? (
-          <LabwareOffsetTabs
-            TableComponent={TableComponent}
-            JupyterComponent={JupyterSnippet}
-            CommandLineComponent={CommandLineSnippet}
-          />
-        ) : (
-          TableComponent
-        )}
-      </Flex>
-    </ModalShell>
+      {isLabwareOffsetCodeSnippetsOn ? (
+        <LabwareOffsetTabs
+          TableComponent={TableComponent}
+          JupyterComponent={JupyterSnippet}
+          CommandLineComponent={CommandLineSnippet}
+        />
+      ) : (
+        TableComponent
+      )}
+    </Flex>
   )
 }
