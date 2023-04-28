@@ -71,9 +71,7 @@ SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
 
 NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
 
-SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {
-    SubSystem.rear_panel: USBTarget.rear_panel
-}
+SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rear_panel}
 
 USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
 

@@ -299,14 +299,17 @@ class SubSystem(enum.Enum):
         return self.name
 
     @classmethod
-    def of_mount(cls: SubSystem, mount: Union[top_types.Mount, OT3Mount]) -> Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]:
-        return {
-            Mount.LEFT: cls.pipette_left,
-            Mount.RIGHT: cls.pipette_right,
-            OT3Mount.LEFT: cls.pipette_left,
-            OT3Mount.RIGHT: cls.pipette_right,
-            OT3Mount.GRIPPER: cls.gripper
-        }[mount]
+    def of_mount(
+        cls: Type[SubSystem], mount: Union[top_types.Mount, OT3Mount]
+    ) -> Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]:
+        return cast(Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper],
+                    {
+                        top_types.Mount.LEFT: cls.pipette_left,
+                        top_types.Mount.RIGHT: cls.pipette_right,
+                        OT3Mount.LEFT: cls.pipette_left,
+                        OT3Mount.RIGHT: cls.pipette_right,
+                        OT3Mount.GRIPPER: cls.gripper,
+                    }[mount])
 
 
 class PipetteSubType(enum.Enum):

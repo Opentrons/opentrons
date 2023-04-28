@@ -107,14 +107,14 @@ class SubsystemManager:
                 ok=info.ok,
                 current_fw_version=info.version,
                 next_fw_version=self._updates_required[
-                    subsystem_to_target(subsystem)
+                    target
                 ].target_version,
                 fw_update_needed=self._updates_required[
-                    subsystem_to_target(subsystem)
-                ].update_required,
+                    target
+                ].update_needed,
                 current_fw_sha=info.shortsha,
                 pcba_revision=str(info.revision),
-                update_state=self._updates_ongoing.get(subsystem),
+                update_state=self._updates_ongoing.get(target_to_subsystem(target)),
             )
             for target, info in self.device_info.items()
         }
@@ -161,7 +161,7 @@ class SubsystemManager:
         subsystems_to_update = subsystems_to_check - subsystems_updating
         if not subsystems_to_update:
             if subsystems:
-                raise SubsystemUpdating(f'Ongoing update for {subsystems}')
+                raise SubsystemUpdating(f"Ongoing update for {subsystems}")
             else:
                 log.info("No viable subsystem to update.")
                 return
