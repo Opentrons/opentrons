@@ -190,7 +190,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     PICKUPS_PER_TIP = args.pick_up_num # default: 20
     COLUMNS = 12
     ROWS = 8
-    CYCLES = 3
+    CYCLES = 1
     
     test_pip = api.get_attached_instrument(mount)
     
