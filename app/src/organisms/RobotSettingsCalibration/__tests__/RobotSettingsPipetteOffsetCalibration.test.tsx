@@ -9,11 +9,9 @@ import {
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useIsOT3,
   usePipetteOffsetCalibrations,
-  useRobot,
 } from '../../../organisms/Devices/hooks'
 
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
@@ -28,7 +26,6 @@ const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
 >
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
   typeof PipetteOffsetCalibrationItems
 >
@@ -64,7 +61,6 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
       mockPipetteOffsetCalibration2,
       mockPipetteOffsetCalibration3,
     ])
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockPipetteOffsetCalibrationItems.mockReturnValue(
       <div>PipetteOffsetCalibrationItems</div>
     )

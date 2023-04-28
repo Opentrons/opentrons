@@ -87,7 +87,7 @@ describe('CalibrationDataDownload', () => {
       })
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     when(mockUsePipetteOffsetCalibrations)
-      .calledWith(mockConnectableRobot.name)
+      .calledWith()
       .mockReturnValue([
         mockPipetteOffsetCalibration1,
         mockPipetteOffsetCalibration2,
@@ -95,7 +95,7 @@ describe('CalibrationDataDownload', () => {
       ])
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
     when(mockUseTipLengthCalibrations)
-      .calledWith(mockConnectableRobot.name)
+      .calledWith()
       .mockReturnValue([
         mockTipLengthCalibration1,
         mockTipLengthCalibration2,
@@ -175,9 +175,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders disabled button when pipettes are not calibrated', () => {
-    when(mockUsePipetteOffsetCalibrations)
-      .calledWith(mockConnectableRobot.name)
-      .mockReturnValue([])
+    when(mockUsePipetteOffsetCalibrations).calledWith().mockReturnValue([])
     const [{ getByRole, getByText }] = render()
     getByText('No calibration data available.')
 
@@ -189,9 +187,7 @@ describe('CalibrationDataDownload', () => {
 
   it('renders disabled button for OT-3 when pipettes are not calibrated', () => {
     when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
-    when(mockUsePipetteOffsetCalibrations)
-      .calledWith(mockConnectableRobot.name)
-      .mockReturnValue([])
+    when(mockUsePipetteOffsetCalibrations).calledWith().mockReturnValue([])
     const [{ getByRole, queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
@@ -207,9 +203,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders disabled button when tip lengths are not calibrated', () => {
-    when(mockUseTipLengthCalibrations)
-      .calledWith(mockConnectableRobot.name)
-      .mockReturnValue([])
+    when(mockUseTipLengthCalibrations).calledWith().mockReturnValue([])
     const [{ getByRole, getByText }] = render()
     getByText('No calibration data available.')
 

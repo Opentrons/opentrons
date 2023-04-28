@@ -1,6 +1,7 @@
 # Uncomment to enable logging during tests
 from __future__ import annotations
 import asyncio
+import contextlib
 import inspect
 import io
 import json
@@ -155,6 +156,7 @@ async def machine_variant_ffs(
     )
 
 
+@contextlib.asynccontextmanager
 async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
@@ -172,10 +174,11 @@ async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
 async def ot2_hardware(
     virtual_smoothie_env: None,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
-    async for hw in _build_ot2_hw():
+    async with _build_ot2_hw() as hw:
         yield hw
 
 
+@contextlib.asynccontextmanager
 async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     from opentrons.hardware_control.ot3api import OT3API
 
@@ -199,7 +202,7 @@ async def ot3_hardware(
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
-    async for hw in _build_ot3_hw():
+    async with _build_ot3_hw() as hw:
         yield hw
 
 
@@ -244,7 +247,7 @@ async def hardware(
         robot_model
     ]
 
-    async for hw in hw_builder():
+    async with hw_builder() as hw:
         decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
             robot_model == "OT-3 Standard"
         )

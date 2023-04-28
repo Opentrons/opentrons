@@ -390,6 +390,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         """Get the max volume."""
         return self.get_hardware_state()["max_volume"]
 
+    def get_working_volume(self) -> float:
+        """Get the working volume."""
+        return self.get_hardware_state()["working_volume"]
+
     def get_current_volume(self) -> float:
         """Get the current volume."""
         return self.get_hardware_state()["current_volume"]

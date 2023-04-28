@@ -2,7 +2,7 @@ import { SECTIONS, FLOWS } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { PipetteMount } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { AttachedPipettesByMount } from '../../redux/pipettes/types'
+import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
@@ -25,26 +25,19 @@ export interface BaseStep {
 }
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface DetachProbeStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PROBE
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface AttachProbeStep extends BaseStep {
   section: typeof SECTIONS.ATTACH_PROBE
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
 }
 
 export interface ResultsStep extends BaseStep {
   section: typeof SECTIONS.RESULTS
-  mount: PipetteMount
-  flowType: PipetteWizardFlow
+  recalibrate?: boolean
 }
 export interface MountPipetteStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_PIPETTE
@@ -79,8 +72,8 @@ export interface PipetteWizardStepProps {
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  runId: string
-  attachedPipettes: AttachedPipettesByMount
+  maintenanceRunId: string
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null
   selectedPipette: SelectablePipettes

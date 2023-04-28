@@ -31,6 +31,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_tip_action_group,
     PipetteAction,
+    NODEID_SUBSYSTEM,
 )
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -56,8 +57,10 @@ from opentrons.hardware_control.types import (
     MotorStatus,
     PipetteSubType,
     UpdateStatus,
+    OT3SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
@@ -211,10 +214,15 @@ class OT3Simulator:
     @ensure_yield
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
-        # Simulate condition at boot, status would not be ok
-        self._motor_status.update(
-            (node, MotorStatus(False, False)) for node in self._present_nodes
-        )
+        if not self._motor_status:
+            # Simulate condition at boot, status would not be ok
+            self._motor_status.update(
+                (node, MotorStatus(False, False)) for node in self._present_nodes
+            )
+        else:
+            self._motor_status.update(
+                (node, MotorStatus(True, True)) for node in self._present_nodes
+            )
 
     @ensure_yield
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
@@ -235,7 +243,7 @@ class OT3Simulator:
 
     def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
         """If any of the encoder statuses is ok, parking can proceed."""
-        return any(
+        return all(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
         )
@@ -330,6 +338,7 @@ class OT3Simulator:
         encoder_position_um: int,
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
+        self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     @ensure_yield
     async def tip_action(
@@ -481,9 +490,11 @@ class OT3Simulator:
         }
 
     @property
-    def fw_version(self) -> Optional[str]:
+    def fw_version(self) -> Dict[OT3SubSystem, int]:
         """Get the firmware version."""
-        return None
+        return {
+            NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
+        }
 
     @property
     def update_required(self) -> bool:
@@ -548,11 +559,6 @@ class OT3Simulator:
 
     @ensure_yield
     async def halt(self) -> None:
-        """Halt the motors."""
-        return None
-
-    @ensure_yield
-    async def hard_halt(self) -> None:
         """Halt the motors."""
         return None
 
@@ -633,3 +639,6 @@ class OT3Simulator:
     async def connect_usb_to_rear_panel(self) -> None:
         """Connect to rear panel over usb."""
         return None
+
+    def status_bar_interface(self) -> status_bar.StatusBar:
+        return status_bar.StatusBar(None)

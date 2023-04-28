@@ -69,7 +69,7 @@ def test_engage_from_base(
 ) -> None:
     """Should verify a call to sync client engage method."""
     decoy.when(
-        mock_engine_client.state.modules.get_model(module_id="1234")
+        mock_engine_client.state.modules.get_connected_model(module_id="1234")
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
@@ -90,7 +90,7 @@ def test_engage_to_labware(
 ) -> None:
     """Should verify a call to sync client engage method."""
     decoy.when(
-        mock_engine_client.state.modules.get_model(module_id="1234")
+        mock_engine_client.state.modules.get_connected_model(module_id="1234")
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(

@@ -1,19 +1,31 @@
-export interface InstrumentData {
+export type InstrumentData = PipetteData | GripperData
+
+export interface GripperData {
   data: {
     jawState: string
     calibratedOffset: {
-      last_modified: string
       offset: [number, number, number]
       source: string
-      status: {
-        markedBad: boolean
-        source: string | null
-        markedAt: string | null
-      }
     }
   }
   instrumentModel: string
-  instrumentType: string
+  instrumentType: 'gripper'
+  mount: string
+  serialNumber: string
+}
+export interface PipetteData {
+  data: {
+    channels: number
+    min_volume: number
+    max_volume: number
+    calibratedOffset: {
+      offset: [number, number, number]
+      source: string
+    }
+  }
+  instrumentName: string
+  instrumentModel: string
+  instrumentType: 'pipette'
   mount: string
   serialNumber: string
 }

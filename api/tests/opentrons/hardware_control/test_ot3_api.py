@@ -4,16 +4,26 @@ from typing import Iterator, Union, Dict, Tuple, List
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, call
+from mock import AsyncMock, patch, Mock, call, PropertyMock
+
+from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
     GantryLoad,
     CapacitivePassSettings,
     LiquidProbeSettings,
 )
-from opentrons.hardware_control.dev_types import AttachedGripper, OT3AttachedPipette
+from opentrons.hardware_control.dev_types import (
+    AttachedGripper,
+    OT3AttachedPipette,
+    GripperDict,
+)
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
     GripperHandler,
+)
+from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    PipetteOffsetByPipetteMount,
 )
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
@@ -30,6 +40,8 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     LiquidNotFound,
     EarlyLiquidSenseTrigger,
+    OT3SubSystem,
+    GripperJawState,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -400,7 +412,7 @@ async def test_move_to_without_homing_first(
         mount,
         Point(0.001, 0.001, 0.001),
     )
-    mock_home.assert_called_once_with(homed_axis)
+    mock_home.assert_called_once()
     assert ot3_hardware._backend.check_motor_status(homed_axis)
 
 
@@ -420,10 +432,11 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
+    mock_ungrip: AsyncMock,
     mock_home_plunger: AsyncMock,
 ) -> None:
+    mock_ungrip.return_value = None
     backend = ot3_hardware.managed_obj._backend
-
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -490,9 +503,10 @@ async def test_liquid_sensing_errors(
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
     mock_home_plunger: AsyncMock,
+    mock_ungrip: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
-
+    mock_ungrip.return_value = None
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -787,6 +801,8 @@ async def test_gripper_action(
     mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
     await ot3_hardware.home([OT3Axis.G])
+    mock_ungrip.assert_called_once()
+    mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
         gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
@@ -928,6 +944,63 @@ async def test_reset_instrument_offset(
 
 
 @pytest.mark.parametrize(
+    argnames=["mount", "expected_offset"],
+    argvalues=[
+        [
+            OT3Mount.GRIPPER,
+            GripperCalibrationOffset(
+                offset=Point(1, 2, 3),
+                source=SourceType.default,
+                status=CalibrationStatus(),
+                last_modified=None,
+            ),
+        ],
+        [
+            OT3Mount.RIGHT,
+            PipetteOffsetByPipetteMount(
+                offset=Point(10, 20, 30),
+                source=SourceType.default,
+                status=CalibrationStatus(),
+                last_modified=None,
+            ),
+        ],
+        [
+            OT3Mount.LEFT,
+            PipetteOffsetByPipetteMount(
+                offset=Point(100, 200, 300),
+                source=SourceType.default,
+                status=CalibrationStatus(),
+                last_modified=None,
+            ),
+        ],
+    ],
+)
+def test_get_instrument_offset(
+    ot3_hardware: ThreadManager[OT3API],
+    mount: OT3Mount,
+    expected_offset: Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount],
+    mock_instrument_handlers: Tuple[Mock],
+) -> None:
+    gripper_handler, pipette_handler = mock_instrument_handlers
+    if mount == OT3Mount.GRIPPER:
+        gripper_handler.get_gripper_dict.return_value = GripperDict(
+            model=GripperModel.v1,
+            gripper_id="abc",
+            state=GripperJawState.UNHOMED,
+            display_name="abc",
+            fw_update_required=False,
+            fw_current_version=100,
+            fw_next_version=None,
+            calibration_offset=expected_offset,
+        )
+    else:
+        pipette_handler.get_instrument_offset.return_value = expected_offset
+
+    found_offset = ot3_hardware.get_instrument_offset(mount=mount)
+    assert found_offset == expected_offset
+
+
+@pytest.mark.parametrize(
     "mount",
     (
         OT3Mount.RIGHT,
@@ -956,7 +1029,9 @@ async def test_save_instrument_offset(
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
+    mock_ungrip: AsyncMock,
 ) -> None:
+    mock_ungrip.return_value = None
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
@@ -1162,7 +1237,10 @@ async def test_home_axis(
             if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
                 # move is called
                 mock_backend_move.assert_awaited_once()
-                mock_backend_home.assert_not_awaited()
+                move = mock_backend_move.call_args_list[0][0][1][0]
+                assert move.distance == 95.0
+                # then home is called
+                mock_backend_home.assert_awaited_once()
             else:
                 # we move to 20 mm away from home
                 mock_backend_move.assert_awaited_once()
@@ -1201,3 +1279,32 @@ async def test_light_settings(
     check = await ot3_hardware.get_lights()
     assert check["rails"] != setting
     assert not check["button"]
+
+
+@pytest.mark.parametrize(
+    "versions,version_str",
+    [
+        ({}, "unknown"),
+        ({OT3SubSystem.pipette_right: 2}, "2"),
+        (
+            {
+                OT3SubSystem.pipette_left: 2,
+                OT3SubSystem.gantry_x: 2,
+                OT3SubSystem.gantry_y: 2,
+            },
+            "2",
+        ),
+        ({OT3SubSystem.gripper: 3, OT3SubSystem.head: 1}, "1, 3"),
+    ],
+)
+def test_fw_version(
+    ot3_hardware: ThreadManager[OT3API],
+    versions: Dict[OT3SubSystem, int],
+    version_str: str,
+) -> None:
+    with patch(
+        "opentrons.hardware_control.ot3api.OT3Simulator.fw_version",
+        new_callable=PropertyMock,
+    ) as mock_fw_version:
+        mock_fw_version.return_value = versions
+        assert ot3_hardware.get_fw_version() == version_str

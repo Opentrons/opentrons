@@ -50,12 +50,10 @@ const render = () => {
 
 describe('SetupPipetteCalibration', () => {
   beforeEach(() => {
-    when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        left: PIPETTE_INFO,
-        right: null,
-      })
+    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+      left: PIPETTE_INFO,
+      right: null,
+    })
     when(mockSetupPipetteCalibrationItem).mockReturnValue(
       <div>Mock SetupPipetteCalibrationItem</div>
     )
@@ -73,12 +71,10 @@ describe('SetupPipetteCalibration', () => {
     expect(getAllByText('Mock SetupPipetteCalibrationItem')).toHaveLength(1)
   })
   it('renders two SetupPipetteCalibrationItems when protocol run requires two pipettes', () => {
-    when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        left: PIPETTE_INFO,
-        right: PIPETTE_INFO,
-      })
+    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+      left: PIPETTE_INFO,
+      right: PIPETTE_INFO,
+    })
     const { getAllByText } = render()
     expect(getAllByText('Mock SetupPipetteCalibrationItem')).toHaveLength(2)
   })

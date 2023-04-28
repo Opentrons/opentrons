@@ -1,1 +1,2 @@
-export { TooManyPinsModal } from './TooManyPinsModal'
+export * from './Modal'
+export * from './SmallModalChildren'

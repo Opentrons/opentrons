@@ -91,6 +91,9 @@ MessageDefinition = Union[
     defs.BrushedMotorConfResponse,
     defs.SetGripperErrorTolerance,
     defs.PushTipPresenceNotification,
+    defs.TipStatusQueryRequest,
+    defs.GetMotorUsageRequest,
+    defs.GetMotorUsageResponse,
 ]
 
 
