@@ -1,6 +1,7 @@
 import typing
 from dataclasses import dataclass
 from datetime import datetime
+
 from opentrons.config import feature_flags as ff
 from opentrons.config.robot_configs import (
     default_pipette_offset,
@@ -35,8 +36,8 @@ class GripperCalibrationOffset:
     """
     Class to store gripper offset calibration with gripper info
 
-        TODO(lc 09/15/2022) this can probably be combined with
-        pipette offset mount.
+    TODO(lc 09/15/2022) this can probably be combined with
+    pipette offset mount.
     """
 
     offset: Point

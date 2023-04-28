@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import Any, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Sequence, Union, cast
 from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
@@ -24,6 +24,7 @@ from opentrons.protocols.api_support.util import (
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
 from . import labware, validation
 
@@ -1178,7 +1179,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
-            max_volume = self.hw_pipette["working_volume"]
+            max_volume = self._core.get_working_volume()
 
         touch_tip = None
         if kwargs.get("touch_tip"):
@@ -1243,7 +1244,7 @@ class InstrumentContext(publisher.CommandPublisher):
             # would get a TypeError if they tried to call it like delay(minutes=10).
             # Without changing the ultimate behavior that such a call fails the
             # protocol, we can provide a more descriptive message as a courtesy.
-            raise NotImplementedError(
+            raise APIVersionError(
                 "InstrumentContext.delay() is not supported in Python Protocol API v2."
                 " Use ProtocolContext.delay() instead."
             )
@@ -1330,8 +1331,21 @@ class InstrumentContext(publisher.CommandPublisher):
 
             instrument.speed.aspirate = 50
 
+        .. versionchanged:: 2.14
+            This property has been removed because it's fundamentally misaligned
+            with the step-wise nature of a pipette's plunger speed configuration.
+            Use :py:attr:`.flow_rate` instead.
         """
-        return self._core.get_speed()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "InstrumentContext.speed has been removed."
+                " Use InstrumentContext.flow_rate, instead."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyInstrumentCore)
+        return cast(LegacyInstrumentCore, self._core).get_speed()
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1478,7 +1492,12 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """The height to return a tip to its tiprack."""
+        """The height to return a tip to its tiprack.
+
+        :returns: A scaling factor to apply to the tip length.
+                  During a drop tip, this factor will be multiplied by the tip length
+                  to get the distance from the top of the well where the tip is dropped.
+        """
         return self._core.get_return_height()
 
     @property  # type: ignore

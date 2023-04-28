@@ -20,6 +20,12 @@ export type ProtocolsOnDeviceSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
+export interface OnDeviceDisplaySettings {
+  sleepMs: number
+  brightness: number
+  textSize: number
+}
+
 export interface ConfigV0 {
   version: 0
   devtools: boolean
@@ -177,4 +183,20 @@ export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
   }
 }
 
-export type Config = ConfigV13
+export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
+  version: 14
+  protocols: ConfigV13['protocols'] & {
+    pinnedProtocolIds: string[]
+  }
+}
+
+export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
+  version: 15
+  onDeviceDisplaySettings: {
+    sleepMs: number
+    brightness: number
+    textSize: number
+  }
+}
+
+export type Config = ConfigV15

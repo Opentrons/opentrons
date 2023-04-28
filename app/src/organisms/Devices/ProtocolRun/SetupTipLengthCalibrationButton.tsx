@@ -14,14 +14,16 @@ import {
   COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useDeleteCalibrationMutation } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useDeleteCalibrationMutation,
+} from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '../../../atoms/buttons'
 import {
   useAttachedPipettes,
   useDeckCalibrationData,
-  usePipetteOffsetCalibrations,
   useRunHasStarted,
 } from '../hooks'
 import { useDashboardCalibrateTipLength } from '../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
@@ -57,8 +59,8 @@ export function SetupTipLengthCalibrationButton({
   ] = useDashboardCalibrateTipLength(robotName)
   const { deleteCalibration } = useDeleteCalibrationMutation()
   const attachedPipettes = useAttachedPipettes()
-  const offsetCalibrations = usePipetteOffsetCalibrations(robotName)
-
+  const offsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery()?.data?.data ?? []
   const offsetCalsToDelete = offsetCalibrations?.filter(
     cal =>
       cal.pipette === attachedPipettes[mount]?.id &&

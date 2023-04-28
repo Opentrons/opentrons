@@ -20,11 +20,11 @@ def test_gripper_definition_type() -> None:
     assert GripperDefinition.parse_obj(GRIPPER_DEF)
 
     # missing key
-    del GRIPPER_DEF["geometry"]
+    del GRIPPER_DEF["gripForceProfile"]
     with pytest.raises(ValidationError):
         assert GripperDefinition.parse_obj(GRIPPER_DEF)
 
     # no missing key but with incorrect value
-    GRIPPER_DEF["ZMotorConfigurations"] = {"idle": 2.0, "run": "1.0"}
+    GRIPPER_DEF["geometry"]["gripForceProfile"] = {"min": 1.0, "max": "0.0"}
     with pytest.raises(ValidationError):
         assert GripperDefinition.parse_obj(GRIPPER_DEF)

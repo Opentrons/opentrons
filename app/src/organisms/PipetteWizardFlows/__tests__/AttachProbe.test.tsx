@@ -1,54 +1,50 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
-  mockAttachedPipette,
-  mockP300PipetteSpecs,
+  mock8ChannelAttachedPipetteInformation,
+  mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockP300PipetteSpecs,
-}
+
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected', async () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
-    getByText('Attach Calibration Probe')
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
+    getByText('Attach calibration probe')
     getByText(
       'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
     )
-    getByAltText('Attach probe')
+    getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
@@ -73,17 +69,35 @@ describe('AttachProbe', () => {
     expect(props.goBack).toHaveBeenCalled()
   })
 
+  it('returns the correct info when the pipette is a 8 channel', () => {
+    props = {
+      ...props,
+      attachedPipettes: {
+        left: mock8ChannelAttachedPipetteInformation,
+        right: null,
+      },
+    }
+    const { getByText } = render(props)
+    getByText(
+      nestedTextMatcher(
+        'backmost pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+      )
+    )
+  })
+
   it('returns the correct information when robot is in motion', () => {
     props = {
       ...props,
       isRobotMoving: true,
     }
-    const { getByText, getByAltText } = render(props)
-    getByText('Stand Back, Pipette is Calibrating')
+    const { getByText, getByTestId } = render(props)
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
+      'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
     )
-    getByAltText('Pipette is calibrating')
+    getByText(
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+    )
+    getByTestId('Pipette_Probing_1.webm')
   })
 
   it('renders the error modal screen when errorMessage is true', () => {
@@ -94,5 +108,37 @@ describe('AttachProbe', () => {
     const { getByText } = render(props)
     getByText('Error encountered')
     getByText('error shmerror')
+  })
+
+  it('renders the correct text when is on device', async () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
+    getByText('Attach calibration probe')
+    getByText(
+      'Take the calibration probe from its storage location. Make sure its latch is in the unlocked (straight) position. Press the probe firmly onto the pipette nozzle and then lock the latch. Then test that the probe is securely attached by gently pulling it back and forth.'
+    )
+    getByTestId('Pipette_Attach_Probe_1.webm')
+    getByRole('button', { name: 'Begin calibration' }).click()
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/calibratePipette',
+          params: { mount: 'left' },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition',
+          params: { mount: 'left' },
+        },
+      ],
+      false
+    )
+    await waitFor(() => {
+      expect(props.proceed).toHaveBeenCalled()
+    })
+    getByLabelText('back').click()
+    expect(props.goBack).toHaveBeenCalled()
   })
 })

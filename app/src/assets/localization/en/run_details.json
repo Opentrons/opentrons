@@ -38,8 +38,8 @@
   "step_failed": "Step failed",
   "failed_step": "Failed step",
   "cancel_run_modal_heading": "Are you sure you want to cancel this run?",
-  "cancel_run_modal_confirm": "yes, cancel run",
-  "cancel_run_modal_back": "no, go back",
+  "cancel_run_modal_confirm": "Yes, cancel run",
+  "cancel_run_modal_back": "No, go back",
   "cancel_run_alert_info": "Doing so will terminate this run, drop any attached tips in the trash container and home your robot.",
   "cancel_run_module_info": "Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.",
   "protocol_setup": "Protocol Setup",
@@ -85,7 +85,7 @@
   "clear_protocol_to_make_available": "Clear protocol from robot to make it available.",
   "download_run_log": "Download run log",
   "downloading_run_log": "Downloading run log",
-  "jump_to_current_step": "Jump to current step",
+  "view_current_step": "View current step",
   "run_has_diverged_from_predicted": "Run has diverged from predicted state. Cannot anticipate new steps.",
   "unable_to_determine_steps": "Unable to determine steps",
   "robot_has_previous_offsets": "This robot has stored Labware Offset data from previous protocol runs. Do you want to apply that data to this protocol run? You can still adjust any offsets with Labware Position Check.",
@@ -116,5 +116,10 @@
   "not_started_yet": "Not started yet",
   "preview_of_protocol_steps": "This is a preview of your protocol's steps",
   "steps_total": "{{count}} steps total",
-  "protocol_completed": "Protocol completed"
+  "protocol_completed": "Protocol completed",
+  "complete_protocol_to_download": "Complete the protocol to download the run log",
+  "run_failed_modal_title": "Run failed",
+  "run_failed_modal_header": "{{errorName}}: {{errorCode}} at protocol step {{count}}",
+  "run_failed_modal_body": "Error occurred when protocol was {{command}}",
+  "run_failed_modal_description": "Please contact support@opentrons.com with relevant information for assistance with troubleshooting."
 }

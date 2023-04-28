@@ -12,9 +12,9 @@ from opentrons import motion_planning
 
 from . import move_types
 from .. import errors
-from ..types import WellLocation
+from ..types import WellLocation, CurrentWell
 from .labware import LabwareView
-from .pipettes import PipetteView, CurrentWell
+from .pipettes import PipetteView
 from .geometry import GeometryView
 from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId
@@ -42,7 +42,7 @@ class MotionView:
         self._labware = labware_view
         self._pipettes = pipette_view
         self._geometry = geometry_view
-        self._module = module_view
+        self._modules = module_view
 
     def get_pipette_location(
         self,
@@ -175,7 +175,7 @@ class MotionView:
             pipette_deck_slot = int(
                 self._geometry.get_ancestor_slot_name(current_well.labware_id)
             )
-            hs_deck_slot = int(self._module.get_location(hs_module_id).slotName)
+            hs_deck_slot = int(self._modules.get_location(hs_module_id).slotName)
             conflicting_slots = get_east_west_slots(hs_deck_slot) + [hs_deck_slot]
             pipette_blocking = pipette_deck_slot in conflicting_slots
         return pipette_blocking
@@ -190,7 +190,42 @@ class MotionView:
             pipette_deck_slot = int(
                 self._geometry.get_ancestor_slot_name(current_well.labware_id)
             )
-            hs_deck_slot = int(self._module.get_location(hs_module_id).slotName)
+            hs_deck_slot = int(self._modules.get_location(hs_module_id).slotName)
             conflicting_slots = get_adjacent_slots(hs_deck_slot) + [hs_deck_slot]
             pipette_blocking = pipette_deck_slot in conflicting_slots
         return pipette_blocking
+
+    def get_touch_tip_waypoints(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        center_point: Point,
+        radius: float = 1.0,
+    ) -> List[motion_planning.Waypoint]:
+        """Get a list of touch points for a touch tip operation."""
+        mount = self._pipettes.get_mount(pipette_id)
+        labware_slot = self._geometry.get_ancestor_slot_name(labware_id)
+        next_to_module = self._modules.is_edge_move_unsafe(mount, labware_slot)
+        edge_path_type = self._labware.get_edge_path_type(
+            labware_id, well_name, mount, labware_slot, next_to_module
+        )
+
+        x_offset, y_offset = self._labware.get_well_radial_offsets(
+            labware_id, well_name, radius
+        )
+
+        positions = move_types.get_edge_point_list(
+            center_point, x_offset, y_offset, edge_path_type
+        )
+
+        critical_point = (
+            CriticalPoint.XY_CENTER
+            if self._labware.get_has_quirk(labware_id, "centerMultichannelOnWells")
+            else None
+        )
+
+        return [
+            motion_planning.Waypoint(position=p, critical_point=critical_point)
+            for p in positions
+        ]

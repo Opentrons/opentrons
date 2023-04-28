@@ -52,15 +52,9 @@ class BlowOutInPlaceImplementation(
 
     async def execute(self, params: BlowOutInPlaceParams) -> BlowOutInPlaceResult:
         """Blow-out without moving the pipette."""
-        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
-            pipette_id=params.pipetteId,
-            attached_pipettes=self._hardware_api.attached_instruments,
+        await self._pipetting.blow_out_in_place(
+            pipette_id=params.pipetteId, flow_rate=params.flowRate
         )
-
-        with self._pipetting.set_flow_rate(
-            pipette=hw_pipette, blow_out_flow_rate=params.flowRate
-        ):
-            await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
         return BlowOutInPlaceResult()
 

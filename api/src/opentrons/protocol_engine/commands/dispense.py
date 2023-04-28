@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     VolumeMixin,
@@ -55,7 +56,10 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]
             flow_rate=params.flowRate,
         )
 
-        return DispenseResult(volume=volume, position=position)
+        return DispenseResult(
+            volume=volume,
+            position=DeckPoint(x=position.x, y=position.y, z=position.z),
+        )
 
 
 class Dispense(BaseCommand[DispenseParams, DispenseResult]):

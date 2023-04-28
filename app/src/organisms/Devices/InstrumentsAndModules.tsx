@@ -5,6 +5,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useModulesQuery,
   usePipettesQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
 import {
@@ -41,20 +42,22 @@ export function InstrumentsAndModules({
   robotName,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-
-  const attachedPipettes = usePipettesQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })?.data ?? { left: undefined, right: undefined }
+  const attachedPipettes = usePipettesQuery(
+    {},
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    }
+  )?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
-  // TODO(BC, 2022-12-05): replace with attachedGripper after RLAB-88 is done
-  const [tempAttachedGripper, tempSetAttachedGripper] = React.useState<{
-    model: string
-    serialNumber: string
-  } | null>(null)
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
+  // { refetchInterval: EQUIPMENT_POLL_MS, },
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
@@ -78,6 +81,7 @@ export function InstrumentsAndModules({
   const pipetteOffsetCalibrations =
     useAllPipetteOffsetCalibrationsQuery({
       refetchInterval: FETCH_PIPETTE_CAL_POLL,
+      enabled: !isOT3,
     })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,
@@ -136,17 +140,24 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
-                pipetteOffsetCalibration={leftMountOffsetCalibration}
+                isPipetteCalibrated={
+                  isOT3
+                    ? attachedInstruments?.data?.find(i => i.mount === 'left')
+                        ?.data?.calibratedOffset != null
+                    : leftMountOffsetCalibration != null
+                }
                 mount={LEFT}
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
-              {/* extension mount here */}
               {isOT3 ? (
                 <GripperCard
-                  robotName={robotName}
-                  attachedGripper={tempAttachedGripper}
-                  tempSetAttachedGripper={tempSetAttachedGripper}
+                  attachedGripper={extensionInstrument}
+                  isCalibrated={
+                    attachedInstruments?.data?.find(
+                      i => i.mount === 'extension'
+                    )?.data?.calibratedOffset != null
+                  }
                 />
               ) : null}
               {leftColumnModules.map((module, index) => (
@@ -174,7 +185,13 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
-                  pipetteOffsetCalibration={rightMountOffsetCalibration}
+                  isPipetteCalibrated={
+                    isOT3
+                      ? attachedInstruments?.data?.find(
+                          i => i.mount === 'right'
+                        )?.data?.calibratedOffset != null
+                      : rightMountOffsetCalibration != null
+                  }
                   mount={RIGHT}
                   robotName={robotName}
                   is96ChannelAttached={false}

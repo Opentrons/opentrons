@@ -1,4 +1,4 @@
-export * from './CheckboxField'
+export * from './DeprecatedCheckboxField'
 export * from './DropdownField'
 export * from './FormGroup'
 export * from './InputField'

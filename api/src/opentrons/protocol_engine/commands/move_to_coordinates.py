@@ -45,14 +45,15 @@ class MoveToCoordinatesImplementation(
 
     async def execute(self, params: MoveToCoordinatesParams) -> MoveToCoordinatesResult:
         """Move the requested pipette to the requested coordinates."""
-        position = await self._movement.move_to_coordinates(
+        x, y, z = await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
             deck_coordinates=params.coordinates,
             direct=params.forceDirect,
             additional_min_travel_z=params.minimumZHeight,
             speed=params.speed,
         )
-        return MoveToCoordinatesResult(position=position)
+
+        return MoveToCoordinatesResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class MoveToCoordinates(BaseCommand[MoveToCoordinatesParams, MoveToCoordinatesResult]):

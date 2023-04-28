@@ -68,12 +68,12 @@ def load_tip_length_calibration(
     load_name = definition["parameters"]["loadName"]
     try:
         return tip_lengths_for_pipette(pip_id)[labware_hash]
-    except KeyError:
+    except KeyError as e:
         raise local_types.TipLengthCalNotFound(
             f"Tip length of {load_name} has not been "
             f"calibrated for this pipette: {pip_id} and cannot"
             "be loaded"
-        )
+        ) from e
 
 
 def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:

@@ -144,13 +144,16 @@
       "$ref": "#/definitions/CalibratePipetteCreate"
     },
     {
+      "$ref": "#/definitions/CalibrateModuleCreate"
+    },
+    {
       "$ref": "#/definitions/MoveToMaintenancePositionCreate"
     }
   ],
   "definitions": {
     "WellOrigin": {
       "title": "WellOrigin",
-      "description": "Origin of WellLocation offset.",
+      "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
       "enum": ["top", "bottom", "center"],
       "type": "string"
     },
@@ -654,11 +657,40 @@
       },
       "required": ["params"]
     },
+    "DropTipWellOrigin": {
+      "title": "DropTipWellOrigin",
+      "description": "The origin of a DropTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DEFAULT: the default drop-tip location of the well,\n        based on pipette configuration and length of the tip.",
+      "enum": ["top", "bottom", "center", "default"],
+      "type": "string"
+    },
+    "DropTipWellLocation": {
+      "title": "DropTipWellLocation",
+      "description": "Like WellLocation, but for dropping tips.\n\nUnlike a typical WellLocation, the location for a drop tip\ndefaults to location based on the tip length rather than the well's top.",
+      "type": "object",
+      "properties": {
+        "origin": {
+          "default": "default",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DropTipWellOrigin"
+            }
+          ]
+        },
+        "offset": {
+          "$ref": "#/definitions/WellOffset"
+        }
+      }
+    },
     "DropTipParams": {
       "title": "DropTipParams",
       "description": "Payload required to drop a tip in a specific well.",
       "type": "object",
       "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
         "labwareId": {
           "title": "Labwareid",
           "description": "Identifier of labware to use.",
@@ -671,17 +703,12 @@
         },
         "wellLocation": {
           "title": "Welllocation",
-          "description": "Relative well location at which to perform the operation",
+          "description": "Relative well location at which to drop the tip.",
           "allOf": [
             {
-              "$ref": "#/definitions/WellLocation"
+              "$ref": "#/definitions/DropTipWellLocation"
             }
           ]
-        },
-        "pipetteId": {
-          "title": "Pipetteid",
-          "description": "Identifier of pipette to use for liquid handling.",
-          "type": "string"
         },
         "homeAfter": {
           "title": "Homeafter",
@@ -689,7 +716,7 @@
           "type": "boolean"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"]
+      "required": ["pipetteId", "labwareId", "wellName"]
     },
     "DropTipCreate": {
       "title": "DropTipCreate",
@@ -956,7 +983,7 @@
       "type": "object",
       "properties": {
         "model": {
-          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.",
+          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.\n\n For example, if you request a `temperatureModuleV1` here, Protocol Engine might load a `temperatureModuleV1` or a `temperatureModuleV2`.\n\n The model that it finds connected will be available through `result.model`.",
           "allOf": [
             {
               "$ref": "#/definitions/ModuleModel"
@@ -2858,6 +2885,62 @@
         },
         "params": {
           "$ref": "#/definitions/CalibratePipetteParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "CalibrateModuleParams": {
+      "title": "CalibrateModuleParams",
+      "description": "Payload required to calibrate-module.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "The unique id of module to calibrate.",
+          "type": "string"
+        },
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The unique id of module calibration adapter labware.",
+          "type": "string"
+        },
+        "mount": {
+          "description": "The instrument mount used to calibrate the module.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MountType"
+            }
+          ]
+        }
+      },
+      "required": ["moduleId", "labwareId", "mount"]
+    },
+    "CalibrateModuleCreate": {
+      "title": "CalibrateModuleCreate",
+      "description": "Create calibrate-module command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "calibration/calibrateModule",
+          "enum": ["calibration/calibrateModule"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/CalibrateModuleParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

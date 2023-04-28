@@ -19,13 +19,13 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_BLOCK,
   Icon,
+  PrimaryButton,
   COLORS,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
@@ -120,7 +120,6 @@ export function ChooseProtocolSlideoutComponent(
       logger.warn('failed to create protocol, no protocol selected')
     }
   }
-
   return (
     <Slideout
       isExpanded={showSlideout}
@@ -132,6 +131,9 @@ export function ChooseProtocolSlideoutComponent(
             offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}
             setShouldApplyOffsets={setShouldApplyOffsets}
+            commands={selectedProtocol?.mostRecentAnalysis?.commands ?? []}
+            labware={selectedProtocol?.mostRecentAnalysis?.labware ?? []}
+            modules={selectedProtocol?.mostRecentAnalysis?.modules ?? []}
           />
           <PrimaryButton
             onClick={handleProceed}

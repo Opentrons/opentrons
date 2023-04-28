@@ -8,13 +8,13 @@ export function getSlotLabwareName(
     command => command.commandType === 'loadLabware'
   )
   const loadLabwareCommand = loadLabwareCommands?.find(
-    command => command.result.labwareId === labwareId
+    command => command.result?.labwareId === labwareId
   )
   if (loadLabwareCommand == null) {
     return { slotName: '', labwareName: labwareId }
   }
   const labwareName = getLabwareDisplayName(
-    loadLabwareCommand.result.definition
+    loadLabwareCommand.result?.definition
   )
   let slotName = ''
   const labwareLocation =
@@ -28,7 +28,7 @@ export function getSlotLabwareName(
       command => command.commandType === 'loadModule'
     )
     const loadModuleCommand = loadModuleCommands?.find(
-      command => command.result.moduleId === labwareLocation.moduleId
+      command => command.result?.moduleId === labwareLocation.moduleId
     )
     slotName =
       loadModuleCommand != null && 'location' in loadModuleCommand.params

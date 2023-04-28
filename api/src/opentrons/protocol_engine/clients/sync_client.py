@@ -19,6 +19,7 @@ from ..types import (
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
+    DropTipWellLocation,
     LabwareOffsetVector,
     MotorAxis,
     Liquid,
@@ -221,7 +222,7 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
         home_after: Optional[bool],
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""

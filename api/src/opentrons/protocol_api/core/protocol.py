@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Dict, Generic, List, Optional, Union, Tuple
+from typing import Generic, List, Optional, Union, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -27,14 +27,6 @@ class AbstractProtocol(
     @abstractmethod
     def fixed_trash(self) -> LabwareCoreType:
         """Get the fixed trash labware core."""
-        ...
-
-    @abstractmethod
-    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
-        ...
-
-    @abstractmethod
-    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
         ...
 
     @abstractmethod
@@ -100,10 +92,6 @@ class AbstractProtocol(
 
     @abstractmethod
     def pause(self, msg: Optional[str]) -> None:
-        ...
-
-    @abstractmethod
-    def resume(self) -> None:
         ...
 
     @abstractmethod

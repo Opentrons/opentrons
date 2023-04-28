@@ -1,7 +1,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    'apiLevel': '2.12',
+    'apiLevel': '2.13',
     'protocolName': 'Serial Dilution Tutorial',
     'description': '''This protocol is the outcome of following the
                    Python Protocol API Tutorial located at

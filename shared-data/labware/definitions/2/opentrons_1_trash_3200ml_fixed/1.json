@@ -10,9 +10,9 @@
   "version": 1,
   "namespace": "opentrons",
   "dimensions": {
-    "xDimension": 210.75,
-    "yDimension": 79.75,
-    "zDimension": 187.5
+    "xDimension": 246.5,
+    "yDimension": 91.5,
+    "zDimension": 40
   },
   "parameters": {
     "format": "trash",
@@ -24,12 +24,12 @@
   "wells": {
     "A1": {
       "shape": "rectangular",
-      "yDimension": 165.67,
-      "xDimension": 107.11,
+      "yDimension": 78,
+      "xDimension": 225,
       "totalLiquidVolume": 3200000,
-      "depth": 187.5,
-      "x": 105.375,
-      "y": 39.875,
+      "depth": 40,
+      "x": 123.25,
+      "y": 45.75,
       "z": 0
     }
   },
@@ -43,8 +43,8 @@
     }
   ],
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": -94
+    "x": -17,
+    "y": -2.75,
+    "z": 0
   }
 }

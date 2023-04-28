@@ -22,7 +22,6 @@ HERE = os.path.dirname(__file__)
 # from script directory.
 CWD = HERE or '.'
 
-
 package_entries = {
     'api': PackageEntry('opentrons_api'),
     'update-server': PackageEntry('update_server'),
@@ -32,6 +31,7 @@ package_entries = {
     'hardware': PackageEntry('opentrons_hardware'),
     'usb-bridge': PackageEntry('usb_bridge'),
     'system-server': PackageEntry('system_server'),
+    'server-utils': PackageEntry('server_utils'),
 }
 
 project_entries = {
@@ -41,15 +41,15 @@ project_entries = {
 }
 
 
-def get_version(package, project, extra_tag=''):
-    builtin_ver = _latest_version_for_project(project)
+def get_version(package, project, extra_tag='', git_dir=None):
+    builtin_ver = _latest_version_for_project(project, git_dir)
     if extra_tag:
         version = builtin_ver + '.dev{}'.format(extra_tag)
     else:
         version = builtin_ver
     return version
 
-def normalize_version(package, project, extra_tag=''):
+def normalize_version(package, project, extra_tag='', git_dir=None):
     # Pipenv requires setuptools >= 36.2.1. Since 36.2.1, setuptools changed
     # the way they vendor dependencies, like the packaging module that
     # provides the way to normalize version numbers for wheel file names. So
@@ -60,14 +60,15 @@ def normalize_version(package, project, extra_tag=''):
     except ImportError:
         # old way
         from pkg_resources.extern import packaging
-    vers_obj = packaging.version.Version(get_version(package, project, extra_tag))
+    vers_obj = packaging.version.Version(get_version(package, project, extra_tag, git_dir))
     return str(vers_obj)
 
-def _latest_tag_for_prefix(prefix):
+def _latest_tag_for_prefix(prefix, git_dir):
+    check_dir = git_dir or CWD
     try:
         tags_result = subprocess.check_output(
             ['git', 'describe', '--tags', '--abbrev=0', '--match=' + prefix + '*'],
-            cwd=CWD)
+            cwd=check_dir)
     except subprocess.CalledProcessError:
         # This happens if a tag for the project didn't exist. This might be because
         # this is a new project that hasn't been tagged yet; it also might be because
@@ -75,15 +76,16 @@ def _latest_tag_for_prefix(prefix):
         # without its tags. We'll print an error (to stderr, since this is called as
         # a shell program by make and printing it to stdout would get captured).
         sys.stderr.write(
-            'Could not find tag matching {prefix} '.format(prefix=prefix)
+            'Could not find tag in {check_dir} matching {prefix} '.format(
+                check_dir=check_dir, prefix=prefix)
             + '- build before release or no tags. Using 0.0.0-dev\n')
         tags_result = prefix.encode() + b'0.0.0-dev'
     tags_matching = tags_result.strip().split(b'\n')
     return tags_matching[-1].decode()
 
-def _latest_version_for_project(project):
+def _latest_version_for_project(project, git_dir):
     prefix = project_entries[project].tag_prefix
-    tag = _latest_tag_for_prefix(prefix)
+    tag = _latest_tag_for_prefix(prefix, git_dir)
     return prefix.join(tag.split(prefix)[1:])
 
 def _ref_from_sha(sha):
@@ -118,13 +120,13 @@ def _ref_from_sha(sha):
     return sha[:12]
 
 
-def dump_br_version(package, project, extra_tag=''):
+def dump_br_version(package, project, extra_tag='', git_dir=None):
     """ Dump an enhanced version json including
     - The version from the latest git tag
     - The current branch (if it can be found)
     - The current sha
     """
-    normalized = get_version(package, project, extra_tag)
+    normalized = get_version(package, project, extra_tag, git_dir)
     sha = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD'], cwd=CWD).strip().decode()
     branch = _ref_from_sha(sha)

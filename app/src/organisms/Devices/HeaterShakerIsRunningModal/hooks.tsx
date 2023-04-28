@@ -17,7 +17,7 @@ export function useHeaterShakerModuleIdsFromRun(
 
   const moduleIdsFromRun =
     loadModuleCommands != null
-      ? loadModuleCommands?.map(command => command.result.moduleId)
+      ? loadModuleCommands?.map(command => command.result?.moduleId)
       : []
 
   return { moduleIdsFromRun }

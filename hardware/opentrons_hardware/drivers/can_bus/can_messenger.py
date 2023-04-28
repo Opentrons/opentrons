@@ -27,7 +27,6 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     Acknowledgement,
     ErrorMessage,
-    StopRequest,
 )
 
 from opentrons_hardware.firmware_bindings.messages.messages import (
@@ -268,7 +267,7 @@ class CanMessenger:
     def remove_listener(self, listener: MessageListenerCallback) -> None:
         """Remove a message listener."""
         if listener in self._listeners:
-            del self._listeners[listener]
+            self._listeners.pop(listener)
 
     async def _read_task_shield(self) -> None:
         try:
@@ -311,8 +310,6 @@ class CanMessenger:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
         error_payload: ErrorMessagePayload = err_msg.payload
         err_msg.log_error(log)
-        if error_payload.severity.value == ErrorSeverity.unrecoverable:
-            await self.send(NodeId.broadcast, StopRequest())
 
         if error_payload.message_index == 0:
             log.error(

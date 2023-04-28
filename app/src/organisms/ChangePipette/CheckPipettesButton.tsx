@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import {
@@ -9,41 +10,40 @@ import {
   ALIGN_CENTER,
   SPACING,
   SIZE_1,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
-
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import { usePipettesQuery } from '@opentrons/react-api-client'
+import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {
   robotName: string
   children?: React.ReactNode
-  actualPipette?: PipetteModelSpecs
+  direction?: 'detach' | 'attach'
   onDone?: () => void
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const { onDone, children, actualPipette } = props
+  const { onDone, children, direction } = props
   const { t } = useTranslation('change_pipette')
-
-  const {
-    status: pipetteQueryStatus,
-    refetch: refetchPipettes,
-  } = usePipettesQuery()
-
+  const [isPending, setIsPending] = React.useState(false)
+  const { refetch: refetchPipettes } = usePipettesQuery(
+    { refresh: true },
+    {
+      enabled: false,
+      onSettled: () => {
+        setIsPending(false)
+      },
+    }
+  )
   const handleClick = (): void => {
+    setIsPending(true)
     refetchPipettes()
-      .then(() => {})
+      .then(() => {
+        onDone?.()
+      })
       .catch(() => {})
   }
-  const isPending = pipetteQueryStatus === 'loading'
-
-  React.useEffect(() => {
-    if (pipetteQueryStatus === 'success' && onDone != null) onDone()
-  }, [onDone, pipetteQueryStatus])
-
   const icon = (
     <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
   )
@@ -68,7 +68,7 @@ export function CheckPipettesButton(
           marginRight={SPACING.spacing3}
         />
         <StyledText>
-          {actualPipette != null
+          {direction === DETACH
             ? t('confirming_detachment')
             : t('confirming_attachment')}
         </StyledText>
@@ -76,11 +76,15 @@ export function CheckPipettesButton(
     )
   } else if (children == null && !isPending) {
     body =
-      actualPipette != null ? t('confirm_detachment') : t('confirm_attachment')
+      direction === DETACH ? t('confirm_detachment') : t('confirm_attachment')
   }
 
   return (
-    <PrimaryButton onClick={handleClick} aria-label="Confirm">
+    <PrimaryButton
+      onClick={handleClick}
+      aria-label="Confirm"
+      disabled={isPending}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         color={COLORS.white}

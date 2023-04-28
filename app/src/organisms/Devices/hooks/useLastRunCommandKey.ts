@@ -31,12 +31,11 @@ export function useLastRunCommandKey(runId: string): string | null {
         runStatus != null && LIVE_RUN_STATUSES.includes(runStatus)
           ? LIVE_RUN_COMMANDS_POLL_MS
           : Infinity,
-      keepPreviousData: true,
     }
   )
-  return (
-    commandsData?.links?.current?.meta?.key ??
-    commandsData?.data?.[0]?.key ??
-    null
-  )
+  return commandsData?.data?.[0]?.intent !== 'setup'
+    ? commandsData?.links?.current?.meta?.key ??
+        commandsData?.data?.[0]?.key ??
+        null
+    : null
 }

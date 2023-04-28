@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.dispense import (
     DispenseParams,
@@ -39,7 +40,7 @@ async def test_dispense_implementation(
             well_name="A3",
             well_location=well_location,
         )
-    ).then_return(DeckPoint(x=1, y=2, z=3))
+    ).then_return(Point(x=1, y=2, z=3))
 
     decoy.when(
         await pipetting.dispense_in_place(

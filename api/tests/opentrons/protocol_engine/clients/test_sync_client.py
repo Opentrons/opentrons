@@ -26,6 +26,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     WellLocation,
+    DropTipWellLocation,
     MotorAxis,
     Liquid,
 )
@@ -300,7 +301,7 @@ def test_drop_tip(
             pipetteId="123",
             labwareId="456",
             wellName="A2",
-            wellLocation=WellLocation(),
+            wellLocation=DropTipWellLocation(),
             homeAfter=True,
         )
     )
@@ -312,7 +313,7 @@ def test_drop_tip(
         pipette_id="123",
         labware_id="456",
         well_name="A2",
-        well_location=WellLocation(),
+        well_location=DropTipWellLocation(),
         home_after=True,
     )
 

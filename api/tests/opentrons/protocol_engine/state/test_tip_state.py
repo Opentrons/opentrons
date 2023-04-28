@@ -11,7 +11,9 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
 from opentrons.protocol_engine.types import FlowRates, DeckPoint
-
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
+)
 
 _tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
 
@@ -164,15 +166,22 @@ def test_get_next_tip_skips_picked_up_tip(
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            channels=input_tip_amount,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
+            serial_number="pipette-serial",
+            config=LoadedStaticPipetteData(
+                channels=input_tip_amount,
+                max_volume=15,
+                min_volume=3,
+                model="gen a",
+                display_name="display name",
+                flow_rates=FlowRates(
+                    default_aspirate={},
+                    default_dispense={},
+                    default_blow_out={},
+                ),
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
             ),
         )
     )
@@ -213,15 +222,22 @@ def test_reset_tips(
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            channels=8,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
+            serial_number="pipette-serial",
+            config=LoadedStaticPipetteData(
+                channels=8,
+                max_volume=15,
+                min_volume=3,
+                model="gen a",
+                display_name="display name",
+                flow_rates=FlowRates(
+                    default_aspirate={},
+                    default_dispense={},
+                    default_blow_out={},
+                ),
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
             ),
         )
     )
@@ -242,15 +258,22 @@ def test_handle_pipette_config_action(subject: TipStore) -> None:
     subject.handle_action(
         actions.AddPipetteConfigAction(
             pipette_id="pipette-id",
-            channels=8,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
+            serial_number="pipette-serial",
+            config=LoadedStaticPipetteData(
+                channels=8,
+                max_volume=15,
+                min_volume=3,
+                model="gen a",
+                display_name="display name",
+                flow_rates=FlowRates(
+                    default_aspirate={},
+                    default_dispense={},
+                    default_blow_out={},
+                ),
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
             ),
         )
     )

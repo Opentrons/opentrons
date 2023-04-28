@@ -15,7 +15,7 @@ from otupdate.common.file_actions import (
     load_version_file,
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Any, Callable, Generator, Optional
+from typing import Any, Callable, Generator, Optional, Tuple
 import enum
 import subprocess
 
@@ -94,6 +94,13 @@ class PartitionManager:
         """
         return "/mnt"
 
+    @staticmethod
+    def get_partition_size(path: str) -> int:
+        """Gets the size of the given partition in bytes."""
+        return int(
+            subprocess.check_output(["blockdev", "--getsize64", path]).decode().strip()
+        )
+
 
 class RootFSInterface:
     """RootFS interface class."""
@@ -104,7 +111,7 @@ class RootFSInterface:
         part: Partition,
         progress_callback: Callable[[float], None],
         chunk_size: int = 1024,
-    ) -> None:
+    ) -> Tuple[bool, str]:
         total_size = 0
         written_size = 0
         try:
@@ -117,6 +124,14 @@ class RootFSInterface:
                     total_size += len(chunk)
                     if len(chunk) != chunk_size:
                         break
+
+            # check that the uncompressed size is greater than the partition size
+            partition_size = PartitionManager.get_partition_size(part.path)
+            if total_size >= partition_size:
+                msg = f"Write failed, update size ({total_size}) is larger than partition size {part.path} ({partition_size})."
+                LOG.error(msg)
+                return False, msg
+
             with lzma.open(rootfs_filepath, "rb") as fsrc, open(
                 part.path, "wb"
             ) as fdst:
@@ -127,8 +142,10 @@ class RootFSInterface:
                     progress_callback(written_size / total_size)
                     if len(chunk) != chunk_size:
                         break
+            return True, ""
         except Exception:
             LOG.exception("RootFSInterface::write_update exception reading")
+            return False, "Unknown error"
 
 
 class OT3UpdateActions(UpdateActionsInterface):
@@ -277,6 +294,8 @@ class OT3UpdateActions(UpdateActionsInterface):
             self.part_mngr.used_partition()
         )
         self.part_mngr.umount_fs(unused_partition.path)
-        self.root_FS_intf.write_update(
+        success, msg = self.root_FS_intf.write_update(
             downloaded_update_path, unused_partition, progress_callback
         )
+        if not success:
+            raise RuntimeError(msg)

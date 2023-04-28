@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { RunTimeCommand } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
-import { getLabwareSetupItemGroups } from './utils'
+import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { LabwareListItem } from './LabwareListItem'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 

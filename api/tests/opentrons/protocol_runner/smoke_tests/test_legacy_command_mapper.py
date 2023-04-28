@@ -32,7 +32,10 @@ async def simulate_and_get_commands(protocol_file: Path) -> List[commands.Comman
         files=[protocol_file],
         directory=None,
     )
-    subject = await create_simulating_runner(robot_type="OT-2 Standard")
+    subject = await create_simulating_runner(
+        robot_type="OT-2 Standard",
+        protocol_config=protocol_source.config,
+    )
     result = await subject.run(protocol_source)
     assert result.state_summary.errors == []
     assert result.state_summary.status == EngineStatus.SUCCEEDED
@@ -277,7 +280,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
     assert commands_result[8] == commands.PickUpTip.construct(
@@ -293,7 +296,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="A1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
 
@@ -325,7 +328,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
             wellName="B1",
         ),
         result=commands.PickUpTipResult(
-            tipVolume=300.0, position=DeckPoint(x=0, y=0, z=0)
+            tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
     )
     assert commands_result[11] == commands.Aspirate.construct(

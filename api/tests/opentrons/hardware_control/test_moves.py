@@ -86,7 +86,8 @@ def mock_home(ot3_hardware):
 async def test_home(ot3_hardware, mock_home):
     with mock.patch("opentrons.hardware_control.ot3api.deck_from_machine") as dfm_mock:
         dfm_mock.return_value = {OT3Axis.X: 20}
-        await ot3_hardware.home([OT3Axis.X])
+        await ot3_hardware._home([OT3Axis.X])
+
         mock_home.assert_called_once_with([OT3Axis.X])
         assert dfm_mock.call_count == 2
         dfm_mock.assert_called_with(

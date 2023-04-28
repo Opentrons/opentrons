@@ -34,7 +34,7 @@ class PipetteConfig:
     pick_up_speed: float
     aspirate_flow_rate: float
     dispense_flow_rate: float
-    channels: float
+    channels: int
     nozzle_offset: Tuple[float, float, float]
     plunger_current: float
     drop_tip_current: float

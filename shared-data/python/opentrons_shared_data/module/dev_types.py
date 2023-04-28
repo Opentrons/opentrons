@@ -17,24 +17,28 @@ MagneticModuleType = Literal["magneticModuleType"]
 TemperatureModuleType = Literal["temperatureModuleType"]
 ThermocyclerModuleType = Literal["thermocyclerModuleType"]
 HeaterShakerModuleType = Literal["heaterShakerModuleType"]
+MagneticBlockType = Literal["magneticBlockType"]
 
 ModuleType = Union[
     MagneticModuleType,
     TemperatureModuleType,
     ThermocyclerModuleType,
     HeaterShakerModuleType,
+    MagneticBlockType,
 ]
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
 TemperatureModuleModel = Literal["temperatureModuleV1", "temperatureModuleV2"]
 ThermocyclerModuleModel = Literal["thermocyclerModuleV1", "thermocyclerModuleV2"]
 HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
+MagneticBlockModel = Literal["magneticBlockV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
 ]
 
 ModuleSlotTransform = TypedDict(

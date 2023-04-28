@@ -13,6 +13,7 @@ import {
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
+  SecondaryButton,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
@@ -22,14 +23,14 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { SecondaryButton } from '../../atoms/buttons'
-import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
+import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useTrackEvent } from '../../redux/analytics'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../organisms/LabwareDetails'
+import { useToaster } from '../../organisms/ToasterOven'
 import {
   LabwareDefAndDate,
   useAllLabware,
@@ -77,7 +78,7 @@ export function Labware(): JSX.Element {
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
   const trackEvent = useTrackEvent()
   const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
 
   const labware = useAllLabware(sortBy, filterBy)
   const { labwareFailureMessage, clearLabwareFailure } = useLabwareFailure()

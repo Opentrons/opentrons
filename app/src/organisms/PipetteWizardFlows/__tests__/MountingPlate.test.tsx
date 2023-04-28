@@ -8,43 +8,35 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { MountingPlate } from '../MountingPlate'
-
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof MountingPlate>) => {
   return renderWithProviders(<MountingPlate {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('MountingPlate', () => {
   let props: React.ComponentProps<typeof MountingPlate>
   beforeEach(() => {
     props = {
-      robotName: 'otie',
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
+      isOnDevice: false,
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', () => {

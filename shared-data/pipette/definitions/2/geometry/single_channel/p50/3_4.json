@@ -1,0 +1,5 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
+  "pathTo3D": "pipette/definitions/2/geometry/single_channel/p50/placeholder.gltf",
+  "nozzleOffset": [-8.0, -22.0, -259.15]
+}

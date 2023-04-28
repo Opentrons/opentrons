@@ -21,7 +21,7 @@ export interface AspirateCreateCommand extends CommonCommandCreateInfo {
 export interface AspirateRunTimeCommand
   extends CommonCommandRunTimeInfo,
     AspirateCreateCommand {
-  result: BasicLiquidHandlingResult
+  result?: BasicLiquidHandlingResult
 }
 export interface DispenseCreateCommand extends CommonCommandCreateInfo {
   commandType: 'dispense'
@@ -30,7 +30,7 @@ export interface DispenseCreateCommand extends CommonCommandCreateInfo {
 export interface DispenseRunTimeCommand
   extends CommonCommandRunTimeInfo,
     DispenseCreateCommand {
-  result: BasicLiquidHandlingResult
+  result?: BasicLiquidHandlingResult
 }
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'blowout'
@@ -39,7 +39,7 @@ export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
 export interface BlowoutRunTimeCommand
   extends CommonCommandRunTimeInfo,
     BlowoutCreateCommand {
-  result: BasicLiquidHandlingResult
+  result?: BasicLiquidHandlingResult
 }
 export interface TouchTipCreateCommand extends CommonCommandCreateInfo {
   commandType: 'touchTip'
@@ -48,7 +48,7 @@ export interface TouchTipCreateCommand extends CommonCommandCreateInfo {
 export interface TouchTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
     TouchTipCreateCommand {
-  result: BasicLiquidHandlingResult
+  result?: BasicLiquidHandlingResult
 }
 export interface PickUpTipCreateCommand extends CommonCommandCreateInfo {
   commandType: 'pickUpTip'
@@ -57,7 +57,7 @@ export interface PickUpTipCreateCommand extends CommonCommandCreateInfo {
 export interface PickUpTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
     PickUpTipCreateCommand {
-  result: any
+  result?: any
 }
 export interface DropTipCreateCommand extends CommonCommandCreateInfo {
   commandType: 'dropTip'
@@ -66,7 +66,7 @@ export interface DropTipCreateCommand extends CommonCommandCreateInfo {
 export interface DropTipRunTimeCommand
   extends CommonCommandRunTimeInfo,
     DropTipCreateCommand {
-  result: any
+  result?: any
 }
 
 export type AspDispAirgapParams = FlowRateParams &
@@ -97,7 +97,8 @@ interface VolumeParams {
 interface WellLocationParam {
   wellLocation?: {
     // default value is 'top'
-    origin?: 'top' | 'bottom'
+    // value of 'default' is only valid for drop tip commands
+    origin?: 'top' | 'bottom' | 'center' | 'default'
     offset?: {
       // mm
       // all values default to 0
