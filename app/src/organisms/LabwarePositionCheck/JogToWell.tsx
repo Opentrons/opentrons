@@ -85,7 +85,9 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     if (mounted) {
       handleJog('x', 1, 0, setJoggedPosition)
     }
-    return () => { mounted = false }
+    return () => {
+      mounted = false
+    }
   }, [])
 
   let wellsToHighlight: string[] = []

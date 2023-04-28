@@ -18,7 +18,11 @@ export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
   AxiosError,
   CreateMaintenanceRunData
 > & {
-  createMaintenanceRun: UseMutateFunction<MaintenanceRun, AxiosError, CreateMaintenanceRunData>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError,
+    CreateMaintenanceRunData
+  >
 }
 
 export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<
@@ -33,9 +37,13 @@ export function useCreateMaintenanceRunMutation(
 ): UseCreateMaintenanceRunMutationResult {
   const contextHost = useHost()
   const host = hostOverride ?? contextHost
-  const mutation = useMutation<MaintenanceRun, AxiosError, CreateMaintenanceRunData>(
+  const mutation = useMutation<
+    MaintenanceRun,
+    AxiosError,
+    CreateMaintenanceRunData
+  >(
     [host, 'maintenance_runs'],
-    createMaintenanceRunData =>
+    (createMaintenanceRunData = {}) =>
       createMaintenanceRun(host as HostConfig, createMaintenanceRunData)
         .then(response => response.data)
         .catch(e => {

@@ -29,7 +29,11 @@ import { ExitConfirmation } from './ExitConfirmation'
 
 import type { GripperWizardFlowType } from './types'
 import type { AxiosError } from 'axios'
-import type { InstrumentData, MaintenanceRun } from '@opentrons/api-client'
+import type {
+  CreateMaintenanceRunData,
+  InstrumentData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 
 interface MaintenanceRunManagerProps {
@@ -94,7 +98,7 @@ interface GripperWizardProps {
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
     AxiosError<any>,
-    void,
+    CreateMaintenanceRunData,
     unknown
   >
   isCreateLoading: boolean

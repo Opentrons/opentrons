@@ -8,5 +8,10 @@ export function createMaintenanceRun(
   config: HostConfig,
   data: CreateMaintenanceRunData = {}
 ): ResponsePromise<MaintenanceRun> {
-  return request<MaintenanceRun, { data: CreateMaintenanceRunData }>(POST, '/maintenance_runs', { data }, config)
+  return request<MaintenanceRun, { data: CreateMaintenanceRunData }>(
+    POST,
+    '/maintenance_runs',
+    { data },
+    config
+  )
 }

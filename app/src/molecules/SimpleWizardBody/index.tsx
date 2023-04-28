@@ -63,11 +63,24 @@ const BUTTON_STYLE = css`
 `
 
 export function SimpleWizardBody(props: Props): JSX.Element {
-  const { iconColor, children, header, subHeader, isSuccess, isPending, ...styleProps } = props
+  const {
+    iconColor,
+    children,
+    header,
+    subHeader,
+    isSuccess,
+    isPending,
+    ...styleProps
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex height={isOnDevice ? '472px' : 'auto'}flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
+    <Flex
+      height={isOnDevice ? '472px' : 'auto'}
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      {...styleProps}
+    >
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -111,7 +124,9 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           </>
         )}
       </Flex>
-      <Flex flex="0 1 auto" css={BUTTON_STYLE}>{children}</Flex>
+      <Flex flex="0 1 auto" css={BUTTON_STYLE}>
+        {children}
+      </Flex>
     </Flex>
   )
 }

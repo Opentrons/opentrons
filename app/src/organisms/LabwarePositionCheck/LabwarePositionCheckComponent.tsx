@@ -47,7 +47,13 @@ interface LabwarePositionCheckModalProps {
 export const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { mostRecentAnalysis, onCloseClick, existingOffsets, runId, maintenanceRunId } = props
+  const {
+    mostRecentAnalysis,
+    onCloseClick,
+    existingOffsets,
+    runId,
+    maintenanceRunId,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
@@ -124,7 +130,9 @@ export const LabwarePositionCheckComponent = (
     { workingOffsets: [], tipPickUpOffset: null }
   )
   const [isExiting, setIsExiting] = React.useState(false)
-  const { createMaintenanceCommand: createSilentCommand } = useCreateMaintenanceCommandMutation(maintenanceRunId)
+  const {
+    createMaintenanceCommand: createSilentCommand,
+  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
@@ -213,9 +221,7 @@ export const LabwarePositionCheckComponent = (
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
-    Promise.all(
-      offsets.map(data => createLabwareOffset({ runId, data }))
-    )
+    Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
       .then(() => {
         onCloseClick()
       })

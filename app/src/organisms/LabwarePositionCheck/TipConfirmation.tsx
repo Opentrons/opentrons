@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,7 +7,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_CENTER,
-  TEXT_TRANSFORM_CAPITALIZE,
   COLORS,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
@@ -24,11 +22,6 @@ import { i18n } from '../../i18n'
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
-const CAPITALIZE_FIRST_LETTER_STYLE = css`
-  &:first-letter {
-    text-transform: uppercase;
-  }
-`
 interface TipConfirmationProps {
   invalidateTip: () => void
   confirmTip: () => void
@@ -47,12 +40,12 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
         <SmallButton
           buttonText={i18n.format(t('try_again'), 'capitalize')}
-          buttonType='alt'
+          buttonType="alt"
           onClick={invalidateTip}
         />
         <SmallButton
           buttonText={i18n.format(t('yes'), 'capitalize')}
-          buttonType='default'
+          buttonType="default"
           onClick={confirmTip}
         />
       </Flex>

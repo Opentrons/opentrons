@@ -56,7 +56,7 @@ export function LaunchLabwarePositionCheck(
   const handleClickViewCurrentOffsets: React.MouseEventHandler<HTMLAnchorElement> = () => {
     setShowCurrentOffsetsModal(true)
   }
-  const {launchLPC, LPCWizard} = useLaunchLPC(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
 
   return (
     <Flex

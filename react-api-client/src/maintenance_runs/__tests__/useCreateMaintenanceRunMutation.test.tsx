@@ -52,7 +52,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     )
 
     expect(result.current.data).toBeUndefined()
-    result.current.createMaintenanceRun()
+    result.current.createMaintenanceRun({})
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -74,7 +74,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
         wrapper,
       }
     )
-    act(() => result.current.createMaintenanceRun())
+    act(() => result.current.createMaintenanceRun({}))
 
     await waitFor(() => result.current.data != null)
 
