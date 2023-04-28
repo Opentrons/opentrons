@@ -166,14 +166,14 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           />
           <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
             <SmallButton
-              buttonType="alt"
+              buttonType="secondary"
               buttonText={t('move_pipette')}
               onClick={() => {
                 setShowFullJogControls(true)
               }}
             />
             <SmallButton
-              buttonType="default"
+              buttonType="primary"
               buttonText={t('shared:confirm_position')}
               onClick={handleConfirmPosition}
             />
@@ -203,7 +203,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   <SmallButton
                     width="100%"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonType="default"
+                    buttonType="primary"
                     buttonText={t('shared:close')}
                     onClick={() => {
                       setShowFullJogControls(false)

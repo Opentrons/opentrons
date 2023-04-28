@@ -44,7 +44,7 @@ import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
-import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
@@ -379,7 +379,11 @@ function PrepareToRun({
       </Flex>
       {LPCWizard}
       {showConfirmCancelModal ? (
-        <ConfirmCancelModal onClose={onConfirmCancelClose} runId={runId} />
+        <ConfirmCancelRunModal
+          runId={runId}
+          setShowConfirmCancelRunModal={setShowConfirmCancelModal}
+          isActiveRun={false}
+        />
       ) : null}
     </>
   )
