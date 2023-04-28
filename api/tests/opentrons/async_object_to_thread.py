@@ -17,8 +17,20 @@ def async_object_to_thread(
 ) -> typing.Generator[typing.Tuple[_T, asyncio.AbstractEventLoop], None, None]:
     """Enter an async context manager in a worker thread.
 
-    Returns the object that `async_object_context_manager` returned,
-    and the event loop that it's running in.
+    Entering this context manager:
+
+    1. Spawns a worker thread.
+    2. In that thread, starts an asyncio event loop.
+    3. In that event loop, enters the context manager that you passed in.
+    4. Returns: the result of entering that context manager, and the running event loop.
+       Use functions like `asyncio.run_coroutine_threadsafe()` to safely interact
+       with the returned object from your thread.
+
+    Exiting this context manager:
+
+    1. In the worker thread's event loop, exits the context manager that you passed in.
+    2. Stops and cleans up the worker thread's event loop.
+    3. Joins the worker thread.
     """
     with _run_loop_in_thread() as loop_in_thread:
         async_object = asyncio.run_coroutine_threadsafe(
