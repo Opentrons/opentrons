@@ -3,13 +3,131 @@ import argparse
 import asyncio
 from typing import List
 
+from opentrons.hardware_control.ot3api import OT3API
+
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 
 RETRACT_HEIGHT_REL_MM = 20
-UNGRIP_WIDTH = 87.0
+UNGRIP_WIDTH = 87
+
+
+def _get_answer(msg: str, fake_it: bool) -> bool:
+    return fake_it or ui.get_user_answer(msg)
+
+
+def _get_ready(msg: str, fake_it: bool) -> None:
+    if not fake_it:
+        ui.get_user_ready(msg)
+
+
+async def _find_labware_center(api: OT3API, force: float) -> Point:
+    while True:
+        await helpers_ot3.jog_mount_ot3(api, OT3Mount.GRIPPER)
+        _get_ready("about to GRIP", api.is_simulator)
+        await api.grip(force)
+        _get_ready("about to UNGRIP", api.is_simulator)
+        await api.hold_jaw_width(UNGRIP_WIDTH)
+        if _get_answer("does it look good", api.is_simulator):
+            break
+    labware_center = await api.gantry_position(OT3Mount.GRIPPER)
+    await api.hold_jaw_width(UNGRIP_WIDTH)
+    return labware_center
+
+
+async def _move_to_labware(api: OT3API, center: Point, offset: Point) -> None:
+    await helpers_ot3.move_to_arched_ot3(
+        api,
+        OT3Mount.GRIPPER,
+        center + offset,
+        safe_height=center.z + RETRACT_HEIGHT_REL_MM,
+    )
+
+
+async def _pick_up(
+    api: OT3API, center: Point, offset: Point, force: float, check: bool = False
+) -> bool:
+    await api.hold_jaw_width(UNGRIP_WIDTH)
+    await _move_to_labware(api, center, offset)
+    await api.grip(force)
+    await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
+    return _get_answer("good pick-up", not api.is_simulator and check)
+
+
+async def _drop(api: OT3API, center: Point, offset: Point, check: bool = False) -> bool:
+    await _move_to_labware(api, center, offset)
+    await api.hold_jaw_width(UNGRIP_WIDTH)
+    await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
+    return _get_answer("good drop", not api.is_simulator and check)
+
+
+async def _run_test_sequence(
+    api: OT3API,
+    center: Point,
+    action: str,
+    axis: OT3Axis,
+    trials: int,
+    max_error_pick_up: float,
+    max_error_drop: float,
+    step: float,
+    drop_offset: float,
+    force: float,
+) -> List[float]:
+    ui.print_title(f"{action.upper()}-{axis.name.upper()}")
+    check_pick_up = action == "pick-up"
+    check_drop = action == "drop"
+    max_error = max_error_pick_up if check_pick_up else max_error_drop
+    if axis == OT3Axis.X:
+        step_pnt = Point(x=step)
+    else:
+        step_pnt = Point(y=step)
+    good_offsets = []
+    for direction in [-1.0, 1.0]:
+        offset = Point()
+        while abs(offset.x) <= max_error and abs(offset.y) <= max_error:
+            ui.print_header(
+                f"{action.upper()}: X={round(offset.x, 2)}, Y={round(offset.y, 2)}"
+            )
+            result = False
+            for t in range(trials):
+                print(f"trial {t + 1}/{trials}")
+                _get_ready("about to use gripper", api.is_simulator)
+                picked_up = await _pick_up(
+                    api=api,
+                    center=center,
+                    offset=offset if check_pick_up else Point(),
+                    force=force,
+                    check=check_pick_up,
+                )
+                if not picked_up:
+                    dropped_off = False
+                    await api.hold_jaw_width(UNGRIP_WIDTH)
+                else:
+                    if check_pick_up and axis == OT3Axis.Y:
+                        # if pick-up is off along X, we don't want to re-center for drop
+                        offset_for_this_drop = Point()
+                    else:
+                        offset_for_this_drop = offset
+                    dropped_off = await _drop(
+                        api=api,
+                        center=center,
+                        offset=offset_for_this_drop + Point(z=drop_offset),
+                        check=check_drop,
+                    )
+                result = picked_up if check_pick_up else dropped_off
+                if not result:
+                    await api.hold_jaw_width(UNGRIP_WIDTH)
+                    await api.home([OT3Axis.Z_G])
+                    break
+                elif t + 1 == trials:
+                    good_offsets.append(offset.x if axis == OT3Axis.X else offset.y)
+            if not result and not ui.get_user_answer("test remaining offsets"):
+                break
+            offset += step_pnt * direction
+    print(good_offsets)
+    return good_offsets
 
 
 async def _main(
@@ -23,115 +141,36 @@ async def _main(
     test_drop: bool,
     test_pick_up: bool,
 ) -> None:
-    def _get_answer(msg: str) -> bool:
-        if api.is_simulator:
-            return True
-        return ui.get_user_answer(msg)
-
-    def _get_ready(msg: str) -> None:
-        if api.is_simulator:
-            return
-        return ui.get_user_ready(msg)
 
     ui.print_title("SETUP")
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, gripper="GRPV1120230403A01"
     )
 
-    async def _ungrip() -> None:
-        await api.hold_jaw_width(UNGRIP_WIDTH)
-
     print("homing...")
     await api.home()
-    await _ungrip()
+    await api.hold_jaw_width(UNGRIP_WIDTH)
+
     ui.print_title("JOG TO LABWARE CENTER")
-    while True:
-        await helpers_ot3.jog_mount_ot3(api, OT3Mount.GRIPPER)
-        _get_ready("about to GRIP")
-        await api.grip(force)
-        _get_ready("about to UNGRIP")
-        await _ungrip()
-        if _get_answer("does it look good"):
-            break
-    labware_center = await api.gantry_position(OT3Mount.GRIPPER)
+    labware_center = await _find_labware_center(api, force)
     print(f"labware center: {labware_center}")
-    await _ungrip()
+
     await api.home([OT3Axis.Z_G])
 
-    async def _move_to(offset: Point) -> None:
-        await helpers_ot3.move_to_arched_ot3(
+    async def _test(action: str, axis: OT3Axis) -> List[float]:
+        return await _run_test_sequence(
             api,
-            OT3Mount.GRIPPER,
-            labware_center + offset,
-            safe_height=labware_center.z + RETRACT_HEIGHT_REL_MM,
+            center=labware_center,
+            action=action,
+            axis=axis,
+            trials=trials,
+            max_error_pick_up=max_error_pick_up,
+            max_error_drop=max_error_drop,
+            step=step,
+            drop_offset=drop_offset,
+            force=force,
         )
 
-    async def _pick_up(offset: Point, check: bool = False) -> bool:
-        await _ungrip()
-        await _move_to(offset)
-        await api.grip(force)
-        await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
-        if check:
-            return _get_answer("good pick-up")
-        else:
-            return True
-
-    async def _drop(offset: Point, check: bool = False) -> bool:
-        await _move_to(offset + Point(z=drop_offset))
-        await _ungrip()
-        await api.move_rel(OT3Mount.GRIPPER, Point(z=RETRACT_HEIGHT_REL_MM))
-        if check:
-            return _get_answer("good drop")
-        else:
-            return True
-
-    async def _test(action: str, axis: OT3Axis) -> List[float]:
-        ui.print_title(f"{action.upper()}-{axis.name.upper()}")
-        check_pick_up = action == "pick-up"
-        check_drop = action == "drop"
-        max_error = max_error_pick_up if check_pick_up else max_error_drop
-        if axis == OT3Axis.X:
-            step_pnt = Point(x=step)
-        else:
-            step_pnt = Point(y=step)
-        good_offsets = []
-        for direction in [-1.0, 1.0]:
-            offset = Point()
-            while abs(offset.x) <= max_error and abs(offset.y) <= max_error:
-                ui.print_header(
-                    f"{action.upper()}: X={round(offset.x, 2)}, Y={round(offset.y, 2)}"
-                )
-                result = False
-                for t in range(trials):
-                    print(f"trial {t + 1}/{trials}")
-                    _get_ready("about to use gripper")
-                    picked_up = await _pick_up(
-                        offset if check_pick_up else Point(), check=check_pick_up
-                    )
-                    if not picked_up:
-                        dropped_off = False
-                        await _ungrip()
-                    elif check_pick_up and axis == OT3Axis.Y:
-                        # if pick-up is off along X, we don't want to re-center for drop
-                        dropped_off = await _drop(Point(), check=check_drop)
-                    else:
-                        dropped_off = await _drop(offset, check=check_drop)
-                    result = picked_up if check_pick_up else dropped_off
-                    if not result:
-                        await _ungrip()
-                        await api.home([OT3Axis.Z_G])
-                        break
-                    elif t + 1 == trials:
-                        good_offsets.append(offset.x if axis == OT3Axis.X else offset.y)
-                if not result and not ui.get_user_answer("test remaining offsets"):
-                    break
-                offset += step_pnt * direction
-        print(good_offsets)
-        return good_offsets
-
-    # NOTE: no need to test X axis during pick-up,
-    #       because an offset along there would be fine during pick-up,
-    #       but bad during drop.
     good_drop_x = []
     good_drop_y = []
     good_pick_up_x = []
