@@ -8,7 +8,7 @@ from .command_unions import CommandCreate
 
 # TODO(mm, 2023-04-28):
 # This implementation will not notice that commands are different if they have different params
-# but share the same commandType. We should also hash command params.
+# but share the same commandType. We should also hash command params. (Jira RCORE-326.)
 def hash_command_params(
     create: CommandCreate, last_hash: Optional[str]
 ) -> Optional[str]:
