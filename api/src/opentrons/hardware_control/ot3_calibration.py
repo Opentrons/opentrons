@@ -305,7 +305,11 @@ async def find_calibration_structure_height(
 
 
 async def _probe_deck_at(
-    api: OT3API, mount: OT3Mount, target: Point, settings: CapacitivePassSettings
+    api: OT3API,
+    mount: OT3Mount,
+    target: Point,
+    settings: CapacitivePassSettings,
+    speed: float = 50,
 ) -> float:
     here = await api.gantry_position(mount)
     abs_transit_height = max(
@@ -313,7 +317,7 @@ async def _probe_deck_at(
     )
     safe_height = max(here.z, target.z, abs_transit_height)
     await api.move_to(mount, here._replace(z=safe_height))
-    await api.move_to(mount, target._replace(z=safe_height))
+    await api.move_to(mount, target._replace(z=safe_height), speed=speed)
     await api.move_to(mount, target._replace(z=abs_transit_height))
     _found_pos = await api.capacitive_probe(
         mount, OT3Axis.by_mount(mount), target.z, settings
