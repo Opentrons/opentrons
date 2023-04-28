@@ -41,7 +41,6 @@ from opentrons_shared_data.deck import (
 
 from opentrons import config
 from opentrons import hardware_control as hc
-
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
     API,
@@ -280,7 +279,9 @@ def _make_ot3_pe_ctx(
 
 @pytest.fixture()
 def ctx(
-    request: pytest.FixtureRequest, robot_model: RobotModel, hardware: ThreadManagedHardware
+    request: pytest.FixtureRequest,
+    robot_model: RobotModel,
+    hardware: ThreadManagedHardware,
 ) -> Generator[ProtocolContext, None, None]:
     if robot_model == "OT-2 Standard":
         yield _make_ot2_non_pe_ctx(hardware=hardware)

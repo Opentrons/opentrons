@@ -85,7 +85,6 @@ def test_build_edges():
     assert res2 == new_correct_edges
 
 
-
 # TODO(mm, 2023-04-28): The build_edges() function is used both by ProtocolContexts
 # that are backed by Protocol Engine, and those that aren't. But this test is only runnable
 # with a non-Protocol-Engine ProtocolContext because it relies on the internal ctx._core.get_deck()
