@@ -14,7 +14,7 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import {
-  getGripperDisplayName,
+  // getGripperDisplayName,
   getPipetteNameSpecs,
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
@@ -106,7 +106,7 @@ export function ProtocolInstrumentMountItem(
             </MountLabel>
             <SpeccedInstrumentName>
               {mount === 'extension'
-                ? "Gripper" // getGripperDisplayName(speccedName as GripperModel)
+                ? 'Gripper' // getGripperDisplayName(speccedName as GripperModel)
                 : getPipetteNameSpecs(speccedName as PipetteName)?.displayName}
             </SpeccedInstrumentName>
           </Flex>

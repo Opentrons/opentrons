@@ -23,7 +23,7 @@ import {
   useProtocolQuery,
   useRunQuery,
   useAllPipetteOffsetCalibrationsQuery,
-  useInstrumentsQuery,
+  // useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -46,7 +46,7 @@ import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetup
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
-  getAreInstrumentsReady,
+  // getAreInstrumentsReady,
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
@@ -175,7 +175,7 @@ function PrepareToRun({
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
-  const attachedInstruments = undefined
+  // const attachedInstruments = undefined
   // const { data: attachedInstruments } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
@@ -251,7 +251,7 @@ function PrepareToRun({
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
-  const isReadyToRun = areInstrumentsReady && !isMissingModules
+  // const isReadyToRun = areInstrumentsReady && !isMissingModules
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
@@ -317,7 +317,8 @@ function PrepareToRun({
             <PlayButton
               disabled={false}
               // disabled={!isReadyToRun}
-              onPlay={onPlay} />
+              onPlay={onPlay}
+            />
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing4}>
@@ -376,8 +377,8 @@ function PrepareToRun({
           detail={
             liquidsInProtocol.length < 0
               ? t('initial_liquids_num', {
-                num: liquidsInProtocol.length,
-              })
+                  num: liquidsInProtocol.length,
+                })
               : t('liquids_not_in_setup')
           }
         />
@@ -452,7 +453,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing5}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => { }} />
+          <PlayButton disabled onPlay={() => {}} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
