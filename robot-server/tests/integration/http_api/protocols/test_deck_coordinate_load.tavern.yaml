@@ -3,6 +3,7 @@ test_name: Upload, analyze, and confirm correctness of loading via deck coordina
 marks:
   - usefixtures:
       - run_server
+      - set_enable_ot3_hardware_controller
       - clean_server_state
 stages:
   - name: Upload deck_coordinate_load protocol
@@ -25,7 +26,7 @@ stages:
             - name: deck_coordinate_load.py
               role: main
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          robotType: OT-2 Standard
+          robotType: OT-3 Standard
           metadata:
             protocolName: Deck Coordinate PAPIv2 Test
           analyses: []

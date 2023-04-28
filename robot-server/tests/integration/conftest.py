@@ -91,9 +91,23 @@ def set_disable_fast_analysis(
     request_session: requests.Session,
 ) -> Iterator[None]:
     """For integration tests that need to set then clear the
-    enableHttpProtocolSessions feature flag"""
+    disableFastProtocolUpload feature flag"""
     url = "http://localhost:31950/settings"
     data = {"id": "disableFastProtocolUpload", "value": True}
+    request_session.post(url, json=data)
+    yield None
+    data["value"] = None
+    request_session.post(url, json=data)
+
+
+@pytest.fixture
+def set_enable_ot3_hardware_controller(
+    request_session: requests.Session,
+) -> Iterator[None]:
+    """For integration tests that need to set then clear the
+    enableOT3HardwareController feature flag"""
+    url = "http://localhost:31950/settings"
+    data = {"id": "enableOT3HardwareController", "value": True}
     request_session.post(url, json=data)
     yield None
     data["value"] = None

@@ -74,7 +74,7 @@ def test_get_deck_slot(
 def test_get_deck_slot_display_name(
     decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
 ) -> None:
-    """It should return the correct deck slot string associated with the module and robot type"""
+    """It should return the correct deck slot string associated with the module and robot type."""
     decoy.when(mock_engine_client.state.modules.get_location("1234")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )

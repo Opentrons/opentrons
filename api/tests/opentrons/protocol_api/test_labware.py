@@ -155,24 +155,18 @@ def test_reset_tips(
     decoy.verify(mock_labware_core.reset_tips(), times=1)
 
 
-@pytest.mark.parametrize(
-    "labware_location, expected_result",
-    [(DeckSlotName.SLOT_1, "1"), (None, None)],
-)
 def test_parent_slot(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
     mock_protocol_core: ProtocolCore,
-    labware_location: Union[None, DeckSlotName],
-    expected_result: Optional[str],
 ) -> None:
     """Should get the labware's parent slot name or None."""
     decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
-        labware_location
+        "bloop"
     )
 
-    subject.parent == expected_result
+    assert subject.parent == "bloop"
 
 
 def test_parent_module_context(
@@ -194,7 +188,7 @@ def test_parent_module_context(
         mock_temp_module_context
     )
 
-    subject.parent == mock_temp_module_context
+    assert subject.parent == mock_temp_module_context
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
