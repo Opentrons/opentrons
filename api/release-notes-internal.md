@@ -37,6 +37,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - More focus on visuals around alignment, sizing, and spacing, especially between screens - this is mostly catchup from removing the menu bar
 - Recently-run protocols is now populated!
 - In general, it's pretty doable to run protocols and pre-protocol from the ODD; give it a try by sending a protocol to the flex with the "send to OT3" button in the desktop app
+- LPC shouldn't drag tipracks around anymore
 
 ### Robot Control
 - Even more acceleration changes from hardware testing

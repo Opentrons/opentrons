@@ -15,6 +15,7 @@ This is still pretty early in the process, so some things are known not to work,
   - Flex instrument calibration shows up now
   - 96-channels should show up in the instruments page and work in protocols
   - We don't cause a lot of instrument polling anymore on the robot
+- LPC shouldn't drag tipracks around anymore
 
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
