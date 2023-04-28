@@ -46,7 +46,6 @@ def run(
     pipette_channels: int,
     tip_volume: int,
     trials: int,
-    starting_tip: str,
     increment: bool,
     return_tip: bool,
     blank: bool,
@@ -65,7 +64,6 @@ def run(
             pipette_channels=pipette_channels,
             tip_volume=tip_volume,
             trials=trials,
-            starting_tip=starting_tip,
             labware_offsets=LABWARE_OFFSETS,
             slot_vial=protocol_cfg.SLOT_VIAL,  # type: ignore[attr-defined]
             slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
@@ -86,12 +84,6 @@ if __name__ == "__main__":
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
-    starting_tip_choices = [
-        f"{row}{col + 1}" for row in "ABCDEFGH" for col in list(range(12))
-    ]
-    parser.add_argument(
-        "--starting-tip", type=str, choices=starting_tip_choices, required=True
-    )
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
@@ -123,7 +115,6 @@ if __name__ == "__main__":
         args.channels,
         args.tip,
         args.trials,
-        args.starting_tip,
         args.increment,
         args.return_tip,
         args.blank,

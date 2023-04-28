@@ -105,6 +105,8 @@ def _build_measurement_data(
     segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
+    if simulating and len(segment) == 1:
+        segment.append(segment[0])
     if stable and not simulating:
         # try to isolate only "stable" scale readings if sample length >= 2
         stable_only = GravimetricRecording(

@@ -1,11 +1,11 @@
 """Gravimetric."""
 from inspect import getsource
 from statistics import stdev
-from typing import Optional, Tuple, List, Dict, Any
+from typing import Optional, Tuple, List, Dict, Union
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
+from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
-from opentrons.protocol_api.labware import OutOfTipsError
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
@@ -17,6 +17,12 @@ from . import config
 from .helpers import get_pipette_unique_name
 from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
 from .increments import get_volume_increments
+from .liquid_class.defaults import get_test_volumes, get_liquid_class
+from .liquid_class.pipetting import (
+    aspirate_with_liquid_class,
+    dispense_with_liquid_class,
+    PipettingCallbacks,
+)
 from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
 from .measurement import (
     MeasurementData,
@@ -30,13 +36,8 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from .liquid_class.defaults import get_test_volumes, get_liquid_class
-from .liquid_class.pipetting import (
-    aspirate_with_liquid_class,
-    dispense_with_liquid_class,
-    PipettingCallbacks,
-)
 from .radwag_pipette_calibration_vial import VIAL_DEFINITION
+from .tips import get_tips
 
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
@@ -148,7 +149,7 @@ def _get_channel_offset(cfg: config.GravimetricConfig, channel: int) -> Point:
 
 
 def _load_pipette(
-    ctx: ProtocolContext, cfg: config.GravimetricConfig, tipracks: List[Labware]
+    ctx: ProtocolContext, cfg: config.GravimetricConfig
 ) -> InstrumentContext:
     load_str_channels = {1: "single", 8: "multi", 96: "96"}
     if cfg.pipette_channels not in load_str_channels:
@@ -156,7 +157,7 @@ def _load_pipette(
     chnl_str = load_str_channels[cfg.pipette_channels]
     pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
-    pipette = ctx.load_instrument(pip_name, cfg.pipette_mount, tip_racks=tipracks)
+    pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
     pipette.default_speed = config.GANTRY_MAX_SPEED
     if cfg.increment:
         print("clearing pipette ul-per-mm table to be linear")
@@ -385,8 +386,11 @@ def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     cfg: config.GravimetricConfig,
-    location: Optional[Any] = None,
+    location: Location,
 ) -> None:
+    print(
+        f"picking tip {location.labware.as_well().well_name} from slot #{location.labware.parent.parent}"
+    )
     pipette.pick_up_tip(location)
     # NOTE: the accuracy-adjust function gets set on the Pipette
     #       each time we pick-up a new tip.
@@ -417,11 +421,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     initialize_liquid_from_deck(ctx, liquid_tracker)
 
     ui.print_header("LOAD PIPETTE")
-    pipette = _load_pipette(ctx, cfg, tipracks)
+    pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
     print(f'found pipette "{pipette_tag}"')
-    pipette.starting_tip = tipracks[0][cfg.starting_tip]
-    print(f"starting on tip {cfg.starting_tip}")
+    setup_tip = get_tips(ctx, pipette, channel=pipette.channels - 1)[-1]
+    setup_channel_offset = _get_channel_offset(cfg, pipette.channels - 1)
+    setup_tip_location = setup_tip.top().move(setup_channel_offset)
 
     if cfg.increment:
         pipette_tag += "-increment"
@@ -480,8 +485,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_title("FIND LIQUID HEIGHT")
     print("homing...")
     ctx.home()
-    print("picking up tip")
-    _pick_up_tip(ctx, pipette, cfg)
+    # actually pick-up the tip
+    _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
     print("moving to vial")
     well = vial["A1"]
     pipette.move_to(well.top())
@@ -507,10 +512,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
                 ui.print_header(f"BLANK {trial + 1}/{config.NUM_BLANK_TRIALS}")
-                print("picking up tip")
-                tip_rack = pipette.tip_racks[0]
-                hover_above_tip = tip_rack["A1"].top(20)
-                _pick_up_tip(ctx, pipette, cfg, hover_above_tip)
+                hover_above_setup_tip = setup_tip_location.move(Point(z=20))
+                _pick_up_tip(ctx, pipette, cfg, location=hover_above_setup_tip)
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx=ctx,
                     pipette=pipette,
@@ -552,6 +555,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             )
         test_count = 0
         test_total = len(test_volumes) * cfg.trials * cfg.pipette_channels
+        tips_per_channel = {
+            channel: get_tips(ctx, pipette, channel)
+            for channel in range(pipette.channels)
+        }
+        # remove the tip we used for liquid-height calibration
+        tips_per_channel[pipette.channels - 1].pop(-1)
         for volume in test_volumes:
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -576,19 +585,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         f"{volume} uL channel {channel + 1} ({trial + 1}/{cfg.trials})"
                     )
                     print(f"trial total {test_count}/{test_total}")
-                    print("picking up tip")
-
-                    try:
-                        _pick_up_tip(ctx, pipette, cfg)
-                    except OutOfTipsError:
-                        if not ctx.is_simulating():
-                            ui.get_user_ready(
-                                f"Adds tips for channel {channel + 1}."
-                                f" Trial {trial + 1}/{cfg.trials}"
-                            )
-                        pipette.reset_tipracks()
-                        _pick_up_tip(ctx, pipette, cfg)
-                    # NOTE: aspirate will be negative, dispense will be positive
+                    next_tip: Well = tips_per_channel[channel].pop(0)
+                    next_tip_location = next_tip.top().move(channel_offset)
+                    _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
                     (
                         actual_aspirate,
                         aspirate_data,
