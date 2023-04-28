@@ -8,8 +8,11 @@ from opentrons_shared_data.deck import load
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
-    find_deck_height,
-    _get_calibration_square_position_in_slot,
+    find_calibration_structure_height,
+    _probe_deck_at,
+)
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
 )
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, GripperProbe
@@ -99,12 +102,12 @@ class Pipette_Capacitance_Test:
             # "Z":"/dev/ttyUSB2",
         }
         self.gauge_offsets = {
-            # "X":Point(x=5, y=-5, z=9),
-            # "Y":Point(x=-5, y=-5, z=9),
-            # "Z":Point(x=0, y=0, z=9),
-            "X":Point(x=5, y=-6, z=7),
-            "Y":Point(x=-6, y=-5, z=7),
-            "Z":Point(x=0, y=0, z=7),
+            "X":Point(x=5, y=-5, z=9),
+            "Y":Point(x=-5, y=-5, z=9),
+            "Z":Point(x=0, y=0, z=9),
+            # "X":Point(x=5, y=-6, z=7),
+            # "Y":Point(x=-6, y=-5, z=7),
+            # "Z":Point(x=0, y=0, z=7),
         }
         self.probe_tag = {
             "1":"solid",
@@ -121,9 +124,7 @@ class Pipette_Capacitance_Test:
             self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
-        self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
-        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y + 0) # single-channel
-        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
+        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
@@ -270,7 +271,6 @@ class Pipette_Capacitance_Test:
     async def _measure_capacitance(
         self, api: OT3API, mount: OT3Mount, slot: int, cycle: int
     ) -> None:
-        nominal_center = _get_calibration_square_position_in_slot(slot)
         await api.add_tip(mount, api.config.calibration.probe_length)
         edge_position = self.edge._replace(z=self.deck_height)
         await api.move_to(mount, edge_position)
@@ -339,7 +339,7 @@ class Pipette_Capacitance_Test:
         await self.api.move_to(self.mount, above_slot_center, speed=10)
         # Move to edge position
         await self.api.move_to(self.mount, edge_position, speed=10)
-        input("PAUSE")
+        input("\nRight Edge found! Press ENTER to start probing:")
         return edge_position
 
     async def _calibrate_probe(
@@ -348,7 +348,7 @@ class Pipette_Capacitance_Test:
         # Calibrate pipette
         await api.add_tip(mount, api.config.calibration.probe_length)
         home = await api.gantry_position(mount)
-        self.deck_height = await find_deck_height(api, mount, nominal_center)
+        self.deck_height = await find_calibration_structure_height(api, mount, nominal_center)
         self.test_data["Deck Height"] = str(self.deck_height)
         print(f"Deck Height: {self.deck_height}")
         if self.edge_mode == 1:
@@ -366,7 +366,7 @@ class Pipette_Capacitance_Test:
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Home grantry
-        await api.home()
+        await api.home(self.axes)
         self.home = await api.gantry_position(mount)
 
     async def _reset(
@@ -390,7 +390,7 @@ class Pipette_Capacitance_Test:
                 if self.edge_mode == 2:
                     if len(self.gauges) > 0:
                         self._zero_gauges()
-                input(f"Add Calibration Tip to pipette, then press ENTER: ")
+                input(f"\nAdd Calibration Tip to pipette, then press ENTER:")
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
