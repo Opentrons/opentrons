@@ -295,7 +295,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                 rack = (load_complete_dict["slot_num"] - 1)
                 total_pick_ups = load_complete_dict["total_tip_pick_up"]
                 total_failures = load_complete_dict["total_failure"]
-                start_slot = rack
+                start_slot = rack + 1
                 start_row = load_complete_dict["row"]
                 start_col = load_complete_dict["col"]
                 start_tip_nums = load_complete_dict["tip_num"] + 1
@@ -311,7 +311,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         if i > 0:
             print("Replace tips before continuing test.")
             input("\n\t>> Press \"Enter\" to continue.")
-        for key in calibrated_slot_loc.keys():
+        for key_index, key in enumerate(calibrated_slot_loc.keys()):
+            if (key_index >= 12):
+                break
             rack += 1
             await api.home([AXIS])
             await api.move_to(mount, Point(calibrated_slot_loc[key][0],
@@ -416,6 +418,11 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
                 ### adjust column increment
                 print("Moving to next column...\n")
+            
+            # release start
+            start_col = 1
+            start_row = 1
+            start_tip_nums = 1
 
         print("=================================\n")
         print(f"CYCLE {i+1} COMPLETE\n")
