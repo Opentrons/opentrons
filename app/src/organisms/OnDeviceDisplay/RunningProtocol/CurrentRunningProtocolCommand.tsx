@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  truncateString,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -49,13 +50,13 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const RUN_TIMER_STYLE = css`
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
   line-height: 2.625rem;
   color: ${COLORS.darkBlackEnabled};
 `

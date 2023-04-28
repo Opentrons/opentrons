@@ -6,8 +6,10 @@ import {
   SPACING,
   BORDERS,
   Btn,
-  DIRECTION_ROW,
   Icon,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -70,7 +72,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing5};
     line-height: ${TYPOGRAPHY.lineHeight20};
-    max-height: 14.375rem;
+    /* max-height: 14.375rem; */
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
@@ -102,16 +104,17 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   `
   return (
     <Btn
+      display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
       aria-label={`LargeButton_${buttonType}`}
-      flexDirection={DIRECTION_ROW}
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}
       {...buttonProps}
     >
       <StyledText
         fontSize="2rem"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        paddingBottom="3.75rem"
         lineHeight="2.625rem"
       >
         {buttonText}
