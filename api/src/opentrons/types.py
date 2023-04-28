@@ -208,11 +208,7 @@ DECK_SLOT_NAME_TO_COORDINATE = {
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
 class DeckSlotName(enum.Enum):
-    """Deck slot identifiers.
-
-    The result of `.value` is a private implementation detail.
-    Use the custom methods and properties like `.id` and `.as_int()` instead.
-    """
+    """Deck slot identifiers."""
 
     SLOT_1 = "1"
     SLOT_2 = "2"
@@ -245,6 +241,8 @@ class DeckSlotName(enum.Enum):
         """This slot's unique ID, as it appears in the deck definition.
 
         This can be used to look up slot details in the deck definition.
+
+        This is preferred over `.value` or `.__str__()` for explicitness.
         """
         return self.value
 
