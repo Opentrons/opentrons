@@ -23,8 +23,8 @@ interface ColorsStorybookProps {
   colors: string[]
 }
 
-const Template: Story<ColorsStorybookProps[]> = args => {
-  const allColors = args.colors.filter(
+const Template: Story<ColorsStorybookProps> = args => {
+  const targetColors = args.colors.filter(
     c => !c[0].includes('opacity') || c.length > 2
   )
 
@@ -36,7 +36,7 @@ const Template: Story<ColorsStorybookProps[]> = args => {
       backgroundColor="#dadada"
       padding={SPACING.spacing5}
     >
-      {allColors.map((color, index) => (
+      {targetColors.map((color, index) => (
         <Flex
           key={`color_${index}`}
           flexDirection={DIRECTION_COLUMN}
@@ -44,7 +44,6 @@ const Template: Story<ColorsStorybookProps[]> = args => {
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={color[1]}
           padding={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing2}
           width="20rem"
           height="4rem"
