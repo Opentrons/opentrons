@@ -85,6 +85,14 @@ def test_build_edges():
     assert res2 == new_correct_edges
 
 
+
+# TODO(mm, 2023-04-28): The build_edges() function is used both by ProtocolContexts
+# that are backed by Protocol Engine, and those that aren't. But this test is only runnable
+# with a non-Protocol-Engine ProtocolContext because it relies on the internal ctx._core.get_deck()
+# property.
+#
+# Find a different way to test this so that both paths are covered.
+@pytest.mark.apiv2_non_pe_only
 def test_build_edges_left_pipette(ctx):
     test_lw = ctx.load_labware("corning_96_wellplate_360ul_flat", "2")
     test_lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", "6")
@@ -124,6 +132,8 @@ def test_build_edges_left_pipette(ctx):
     assert res2 == left_pip_edges
 
 
+# TODO(mm, 2023-04-28): See note on test_build_edges_left_pipette().
+@pytest.mark.apiv2_non_pe_only
 def test_build_edges_right_pipette(ctx):
     test_lw = ctx.load_labware("corning_96_wellplate_360ul_flat", "2")
     test_lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", "6")
@@ -141,7 +151,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw["A1"],
         1.0,
         Mount.RIGHT,
-        ctx._core._deck_layout,
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res == right_pip_edges
