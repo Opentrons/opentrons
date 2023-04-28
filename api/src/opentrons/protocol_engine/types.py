@@ -278,9 +278,7 @@ class ModuleModel(str, Enum):
         return model == cls.HEATER_SHAKER_MODULE_V1
 
     @classmethod
-    def is_magnetic_block(
-        cls, model: ModuleModel
-    ) -> TypeGuard[HeaterShakerModuleModel]:
+    def is_magnetic_block(cls, model: ModuleModel) -> TypeGuard[MagneticBlockModel]:
         """Whether a given model is a Magnetic block."""
         return model == cls.MAGNETIC_BLOCK_V1
 
@@ -295,6 +293,7 @@ ThermocyclerModuleModel = Literal[
     ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2
 ]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
+MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
 
 
 class ModuleDimensions(BaseModel):
