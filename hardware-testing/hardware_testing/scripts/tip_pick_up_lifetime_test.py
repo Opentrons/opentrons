@@ -167,6 +167,7 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
 
 
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+    path = '/data/testing_data/calibrated_slot_locations.json'
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     await api.home_plunger(mount)
@@ -196,12 +197,20 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     print("mount.id:{}".format(test_pip["pipette_id"]))
 
     test_name = "tip-pick-up-lifetime-test"
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
-
-    header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
-                'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
-    header_str = data.convert_list_to_csv_line(header)
-    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+    if args.restart_flag:
+        if(os.path.exists(path)):
+            with open(path, 'r') as openfile:
+                complete_dict = json.load(openfile)
+                file_name = complete_dict['csv_name']
+        else:
+            print("Slot locations calibration file not found.\n")
+            calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
+    else:
+        file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
+        header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
+                    'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
+        header_str = data.convert_list_to_csv_line(header)
+        data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
     
 
@@ -268,13 +277,35 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     total_tip_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[3])
     total_fail_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[4])
 
-    for i in range(start_slot-1):
-        del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
+    
 
     start_time = time.perf_counter()
     rack = start_slot - 1
     total_pick_ups = total_tip_num - 1
     total_failures = total_fail_num
+    start_tip_nums = 1
+
+    # load complete information
+    if args.restart_flag:
+        if(os.path.exists(path)):
+            with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
+                print("load complete information...\n")
+                load_complete_dict = json.load(openfile)
+                CYCLES = CYCLES - (load_complete_dict["cycle"] -1)
+                rack = (load_complete_dict["slot_num"] - 1)
+                total_pick_ups = load_complete_dict["total_tip_pick_up"]
+                total_failures = load_complete_dict["total_failure"]
+                start_slot = rack
+                start_row = load_complete_dict["row"]
+                start_col = load_complete_dict["col"]
+                start_tip_nums = load_complete_dict["tip_num"] + 1
+    else:
+        print("Failed to load complete information.\n")
+
+    for i in range(start_slot-1):
+        del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
+
+
     for i in range(CYCLES):
         print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
         if i > 0:
@@ -302,6 +333,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                     await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
                                 calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]))
                     for pick_up in range(PICKUPS_PER_TIP):
+                        if col == start_col -1 and row == start_row -1 and pick_up < start_tip_nums -1:
+                            continue
                         print("= = = = = = = = = = = = = = = = =\n")
                         print(f"Tip Pick Up #{pick_up+1}\n")
                         print("Picking up tip...\n")
@@ -355,6 +388,24 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                             total_pick_ups, tip_presence_pick_up_flag, tip_presence_eject_flag, total_failures]
                         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
                         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
+
+                        ### save the last complate information
+
+                        if(os.path.exists(path)):
+                            with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
+                                print("Recording...\n")
+                                calibrated_slot_loc = json.load(openfile)
+                                complete_dict = {"cycle": i+1, "slot_num": rack, "tip_num":pick_up+1, "total_tip_pick_up": total_pick_ups, 
+                                                 "total_failure": total_failures, "col":col + 1, "row":row + 1, "csv_name":file_name}
+                                calibrated_slot_loc.update(complete_dict)
+                                with open('/data/testing_data/calibrated_slot_locations.json', 'w') as writefile:
+                                    json.dump(calibrated_slot_loc, writefile)
+
+                        else:
+                            print("Slot locations calibration file not found.\n")
+                            print("Failed to record complete information.\n")
+                        
+
                         if tip_presence_eject_flag == True:
                             await api.home()
                             sys.exit()
@@ -390,6 +441,7 @@ if __name__ == "__main__":
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
     parser.add_argument("--test_robot", action="store_true")
+    parser.add_argument("--restart_flag", action="store_true")
     parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
     # parser.add_argument("--check_tip", action="store_true")
     args = parser.parse_args()
