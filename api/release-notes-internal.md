@@ -52,6 +52,8 @@ Some things are known not to work, and are listed below. Specific compatibility 
   - All the above is now in the robot-server unit logs, which can be accessed via `journalctl -u opentrons-robot-server`
 - Protocol analysis should be a _lot_ faster
 - Fixed an issue where pinging `GET /instruments` during automated calibration would cause calibration to fail
+- Increased reliability of automated calibration
+- Increased reliability of gripper pickups from modules
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
