@@ -152,9 +152,9 @@ async def _main(
     #       so disable gripper collision detection.
     if not api.is_simulator:
         await set_error_tolerance(
-            api._backend._messenger,
+            api._backend._messenger,  # type: ignore[union-attr]
             max_pos_error=0.1,
-            max_unwanted_movement=50.0  # much bigger than gripper's jaw width
+            max_unwanted_movement=50.0,  # much bigger than gripper's jaw width
         )
 
     print("homing...")
