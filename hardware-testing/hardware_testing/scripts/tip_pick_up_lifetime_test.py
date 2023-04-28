@@ -262,16 +262,19 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         print("Calibration data successfully loaded!\n")
 
     # add cfg start slot
-    start_slot = int(str(args.start_slot_row_col).split(':')[0])
-    start_row = int(str(args.start_slot_row_col).split(':')[1])
-    start_col = int(str(args.start_slot_row_col).split(':')[2])
+    start_slot = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[0])
+    start_row = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[1])
+    start_col = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[2])
+    total_tip_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[3])
+    total_fail_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[4])
+
     for i in range(start_slot-1):
         del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
 
     start_time = time.perf_counter()
-    rack = 0
-    total_pick_ups = 0
-    total_failures = 0
+    rack = start_slot - 1
+    total_pick_ups = total_tip_num - 1
+    total_failures = total_fail_num
     for i in range(CYCLES):
         print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
         if i > 0:
@@ -387,7 +390,7 @@ if __name__ == "__main__":
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
     parser.add_argument("--test_robot", action="store_true")
-    parser.add_argument("--start_slot_row_col", type=str, default="1:1:1")
+    parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
     # parser.add_argument("--check_tip", action="store_true")
     args = parser.parse_args()
     mount = mount_options[args.mount]
