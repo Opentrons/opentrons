@@ -24,16 +24,18 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         # Load a Magnetic Module GEN2 in deck slot 1.
-         magnetic_module=protocol.load_module(
-            module_name='magnetic module gen2', location=1)
-         
-         # Load a Temperature Module GEN1 in deck slot 3.
-         temperature_module=protocol.load_module(
-            module_name='temperature module', location=3)
+    # Load a Magnetic Module GEN2 in deck slot 1.
+    magnetic_module = protocol.load_module(
+        module_name="magnetic module gen2", location=1
+    )
+
+    # Load a Temperature Module GEN1 in deck slot 3.
+    temperature_module = protocol.load_module(
+        module_name="temperature module", location=3
+    )
 
 When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
 
@@ -87,14 +89,14 @@ Like specifying labware that will be placed directly on the deck of the OT-2, yo
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '2.3'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod=protocol.load_module(
-            module_name="temperature module gen2", location=1)
-        temp_labware=temp_mod.load_labware(
-            load_name="opentrons_24_aluminumblock_generic_2ml_screwcap",
-            label="Temperature-Controlled Tubes")
+    temp_mod = protocol.load_module(module_name="temperature module gen2", location=1)
+    temp_labware = temp_mod.load_labware(
+        load_name="opentrons_24_aluminumblock_generic_2ml_screwcap",
+        label="Temperature-Controlled Tubes",
+    )
 
 .. versionadded:: 2.0
 
@@ -136,13 +138,11 @@ The examples in this section will use a Temperature Module loaded in slot 3:
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '2.3'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod=protocol.load_module(
-            module_name='temperature module gen2', location='3')
-        plate=temp_mod.load_labware(
-            load_name='corning_96_wellplate_360ul_flat')
+        temp_mod = protocol.load_module(module_name="temperature module gen2", location="3")
+        plate = temp_mod.load_labware(load_name="corning_96_wellplate_360ul_flat")
 
 .. Perhaps put this bit 'o info in a note call-out?
 .. note::
@@ -206,13 +206,12 @@ The examples in this section will use a Magnetic Module loaded in slot 6:
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '2.3'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        mag_mod=protocol.load_module(
-            module_name='magnetic module gen2', location='6')
-        plate=mag_mod.load_labware(
-            load_name='nest_96_wellplate_100ul_pcr_full_skirt')
+        mag_mod = protocol.load_module(module_name="magnetic module gen2", location="6")
+        plate = mag_mod.load_labware(load_name="nest_96_wellplate_100ul_pcr_full_skirt")
+
 
 .. versionadded:: 2.0
 
@@ -256,8 +255,8 @@ Here are some examples of where the magnets will move when using the different p
 
   .. code-block:: python
 
-      mag_mod.engage(height_from_base=13.5)  # 13.5 mm
-      mag_mod.engage(offset=-2)              # 15.5 mm
+    mag_mod.engage(height_from_base=13.5)  # 13.5 mm
+    mag_mod.engage(offset=-2)  # 15.5 mm
 
 Note that ``offset`` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
@@ -303,12 +302,11 @@ The examples in this section will use a Thermocycler loaded as follows:
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '2.13'}
+    metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod=protocol.load_module(module_name='thermocyclerModuleV2')
-        plate=tc_mod.load_labware(
-            load_name='nest_96_wellplate_100ul_pcr_full_skirt')
+        tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
+        plate = tc_mod.load_labware(load_name="nest_96_wellplate_100ul_pcr_full_skirt")
         
 The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler, since it only has one valid deck location, which covers slots 7, 8, 10, and 11. Attempting to load any other modules or labware in these four slots will raise a ``DeckConflictError``. 
 
@@ -368,7 +366,8 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 .. code-block:: python
 
         tc_mod.set_block_temperature(
-            temperature=4, hold_time_minutes=4,hold_time_seconds=15)
+            temperature=4, hold_time_minutes=4, hold_time_seconds=15
+        )
 
 .. note ::
 
@@ -386,7 +385,8 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
 .. code-block:: python
 
         tc_mod.set_block_temperature(
-            temperature=4, hold_time_seconds=20,block_max_volume=80)
+            temperature=4, hold_time_seconds=20, block_max_volume=80
+        )
 
 If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
@@ -404,7 +404,7 @@ For example, this profile commands the Thermocycler to reach 10 °C and hold for
 
 .. code-block:: python
 
-        profile=[
+        profile = [
             {'temperature': 10, 'hold_time_seconds': 30},
             {'temperature': 60, 'hold_time_seconds': 45}
         ]
@@ -415,10 +415,10 @@ For instance, a PCR prep protocol might define and execute a profile like this:
 
 .. code-block:: python
 
-        profile=[
-            {'temperature': 95, 'hold_time_seconds': 30},
-            {'temperature': 57, 'hold_time_seconds': 30},
-            {'temperature': 72, 'hold_time_seconds': 60}
+        profile = [
+            {"temperature": 95, "hold_time_seconds": 30},
+            {"temperature": 57, "hold_time_seconds": 30},
+            {"temperature": 72, "hold_time_seconds": 60},
         ]
         tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
 
@@ -427,12 +427,15 @@ In terms of the actions that the Thermocycler performs, this would be equivalent
 .. code-block:: python
 
         for i in range(20):
-            tc_mod.set_block_temperature(
-                temperature=95, hold_time_seconds=30, block_max_volume=32)
-            tc_mod.set_block_temperature(
-                temperature=57, hold_time_seconds=30, block_max_volume=32)
-            tc_mod.set_block_temperature(
-                temperature=72, hold_time_seconds=60, block_max_volume=32)
+        tc_mod.set_block_temperature(
+            temperature=95, hold_time_seconds=30, block_max_volume=32
+        )
+        tc_mod.set_block_temperature(
+            temperature=57, hold_time_seconds=30, block_max_volume=32
+        )
+        tc_mod.set_block_temperature(
+            temperature=72, hold_time_seconds=60, block_max_volume=32
+        )
             
 However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
@@ -463,11 +466,10 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '2.13'}
+    metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         hs_mod=protocol.load_module(
-            module_name='heaterShakerModuleV1', location=1)
+        hs_mod = protocol.load_module(module_name="heaterShakerModuleV1", location=1)
 
 .. versionadded:: 2.13
 
@@ -574,14 +576,15 @@ Additionally, if you want to pipette while the module holds at a target for a ce
 
 .. code-block:: python
 
+    tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
     hs_mod.set_and_wait_for_temperature(celsius=75)
-    start_time=time.monotonic()  # set reference time
-    pipette.pick_up_tip()   
-    pipette.aspirate(volume=50, location=plate['A1'])
-    pipette.dispense(volume=50, location=plate['B1'])
+    start_time = time.monotonic()  # set reference time
+    pipette.pick_up_tip()
+    pipette.aspirate(volume=50, location=plate["A1"])
+    pipette.dispense(volume=50, location=plate["B1"])
     pipette.drop_tip()
     # delay for the difference between now and 60 seconds after the reference time
-    protocol.delay(max(0, start_time+60 - time.monotonic()))
+    protocol.delay(max(0, start_time + 60 - time.monotonic()))
     hs_mod.deactivate_heater()
 
 Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to ``protocol.delay`` will equal 0, and the protocol will continue immediately.
@@ -608,16 +611,22 @@ In order to send commands to the correct module on the deck, you need to load th
 
     from opentrons import protocol_api
 
-    metadata={'apiLevel': '2.3'}
+    metadata = {'apiLevel': '2.3'}
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot 4 on USB port 1
-        temperature_module_1=protocol.load_module(
-            module_name='temperature module gen2', location=4)
+        temperature_module_1 = protocol.load_module(
+            module_name="temperature module gen2", location=4
+        )
 
         # Load Temperature Module 2 in deck slot 3 on USB port 2
-        temperature_module_2=protocol.load_module(
-            module_name='temperature module gen2', location=3)
+        temperature_module_2 = protocol.load_module(
+        module_name="temperature module gen2", location=3
+        )
         
 For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, it's simplest to use ports 1 and 2, like this:
 
