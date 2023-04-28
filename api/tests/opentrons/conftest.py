@@ -53,7 +53,7 @@ from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
 
-from .threaded_protocol_engine import protocol_engine_in_thread
+from .protocol_engine_in_thread import protocol_engine_in_thread
 
 
 if TYPE_CHECKING:

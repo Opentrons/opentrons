@@ -1,8 +1,11 @@
+"""Tests for the `async_context_manager_in_thread` helper."""
+
+
 import asyncio
 
 import pytest
 
-from .async_object_to_thread import async_object_to_thread
+from .async_context_manager_in_thread import async_context_manager_in_thread
 
 
 def test_enters_and_exits() -> None:
@@ -27,7 +30,7 @@ def test_enters_and_exits() -> None:
     assert not context_manager.entered
     assert not context_manager.exited
 
-    with async_object_to_thread(context_manager) as (result, _):
+    with async_context_manager_in_thread(context_manager) as (result, _):
         assert context_manager.entered
         assert not context_manager.exited
         assert result == "Yay!"
@@ -48,7 +51,7 @@ def test_returns_matching_loop() -> None:
             pass
 
     context_manager = ContextManager()
-    with async_object_to_thread(context_manager) as (result, loop_in_thread):
+    with async_context_manager_in_thread(context_manager) as (result, loop_in_thread):
         assert result is loop_in_thread
 
 
@@ -68,7 +71,7 @@ def test_loop_lifetime() -> None:
         ) -> None:
             pass
 
-    with async_object_to_thread(NoOp()) as (_, loop_in_thread):
+    with async_context_manager_in_thread(NoOp()) as (_, loop_in_thread):
         asyncio.run_coroutine_threadsafe(asyncio.sleep(0.000001), loop_in_thread)
 
     with pytest.raises(RuntimeError, match="Event loop is closed"):
@@ -89,7 +92,7 @@ def test_propagates_exception_from_enter() -> None:
 
     context_manager = RaiseExceptionOnEnter()
     with pytest.raises(RuntimeError, match="Oh the humanity"):
-        with async_object_to_thread(context_manager):
+        with async_context_manager_in_thread(context_manager):
             assert False, "We should not reach here."
 
 
@@ -107,5 +110,5 @@ def test_propagates_exception_from_exit() -> None:
 
     context_manager = RaiseExceptionOnExit()
     with pytest.raises(RuntimeError, match="Oh the humanity"):
-        with async_object_to_thread(context_manager):
+        with async_context_manager_in_thread(context_manager):
             assert False, "We should not reach here."

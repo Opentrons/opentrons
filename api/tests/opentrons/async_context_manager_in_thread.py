@@ -1,3 +1,5 @@
+"""A test helper to enter an async context manager in a worker thread."""
+
 from __future__ import annotations
 
 import asyncio
@@ -12,12 +14,12 @@ _T = typing.TypeVar("_T")
 
 
 @contextlib.contextmanager
-def async_object_to_thread(
-    async_object_context_manager: typing.AsyncContextManager[_T],
+def async_context_manager_in_thread(
+    async_context_manager: typing.AsyncContextManager[_T],
 ) -> typing.Generator[typing.Tuple[_T, asyncio.AbstractEventLoop], None, None]:
     """Enter an async context manager in a worker thread.
 
-    Entering this context manager:
+    When you enter this context manager, it:
 
     1. Spawns a worker thread.
     2. In that thread, starts an asyncio event loop.
@@ -26,7 +28,7 @@ def async_object_to_thread(
        Use functions like `asyncio.run_coroutine_threadsafe()` to safely interact
        with the returned object from your thread.
 
-    Exiting this context manager:
+    When you exit this context manager, it:
 
     1. In the worker thread's event loop, exits the context manager that you passed in.
     2. Stops and cleans up the worker thread's event loop.
@@ -34,7 +36,7 @@ def async_object_to_thread(
     """
     with _run_loop_in_thread() as loop_in_thread:
         async_object = asyncio.run_coroutine_threadsafe(
-            async_object_context_manager.__aenter__(),
+            async_context_manager.__aenter__(),
             loop=loop_in_thread,
         ).result()
 
@@ -43,7 +45,7 @@ def async_object_to_thread(
 
         finally:
             exit = asyncio.run_coroutine_threadsafe(
-                async_object_context_manager.__aexit__(None, None, None),
+                async_context_manager.__aexit__(None, None, None),
                 loop=loop_in_thread,
             )
             exit.result()
