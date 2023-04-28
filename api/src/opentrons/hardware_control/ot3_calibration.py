@@ -534,12 +534,7 @@ async def _calibrate_mount(
     the plane of the deck. This value is suitable for vector-subtracting
     from the current instrument offset to set a new instrument offset.
     """
-<<<<<<< HEAD
-    nominal_center = _get_calibration_square_position_in_slot(slot)
-    await hcapi.reset_instrument_offset(mount)
-=======
     nominal_center = Point(*get_calibration_square_position_in_slot(slot))
->>>>>>> edge
     try:
         # find the center of the calibration sqaure
         offset = await find_calibration_structure_position(
