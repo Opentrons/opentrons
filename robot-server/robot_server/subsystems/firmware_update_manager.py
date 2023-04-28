@@ -15,9 +15,9 @@ from opentrons.hardware_control.types import (
     UpdateState,
     SubSystem,
 )
+from opentrons.hardware_control.errors import UpdateOngoingError
 from robot_server.service.task_runner import TaskRunner
 
-from .errors import SubSystemNotFound
 
 log = logging.getLogger(__name__)
 
@@ -33,9 +33,22 @@ class UpdateFailed(RuntimeError):
     """Error raised when the information from hardware controller points to a failed update."""
 
 
+class UncontrolledUpdateInProgress(RuntimeError):
+    """An update process started by something other than the server is running."""
+
+    def __init__(self, subsystem: SubSystem) -> None:
+        super().__init__()
+        self.subsystem = subsystem
+
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__}: subsystem={self.subsystem}>'
+
+    def __str__(self) -> str:
+        return ''
+
 class UpdateInProgress(RuntimeError):
     """Error raised when an update is already ongoing on the same device."""
-    def __init__(self, subsystem: Subsystem) -> None:
+    def __init__(self, subsystem: SubSystem) -> None:
         super().__init__()
         self.subsystem = subsystem
 
@@ -44,6 +57,18 @@ class UpdateInProgress(RuntimeError):
 
     def __str__(self) -> str:
         return f'Update for {self.subsystem} already in progress'
+
+class SubsystemNotFound(KeyError):
+    """Requested subsystem not attached."""
+    def __init__(self, subsystem: SubSystem) -> None:
+        super().__init__()
+        self.subsystem = subsystem
+
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__}: {self.subsystem}>'
+
+    def __str__(self) -> str:
+        return f'Subsystem {self.subsystem} is not attached'
 
 
 class _UpdatePacketType(Enum):
@@ -94,13 +119,6 @@ class _UpdateProcess:
         self._status_cache_lock = Lock()
         self._created_at = created_at
         self._complete_callback = complete_callback
-
-        if subsystem not in self._hw_handle.attached_subsystems:
-            raise SubsystemNotFound(subsystem)
-
-        in_progress = self._hw_handle.get_firmware_update_progress()
-        if subsystem in in_progress:
-            raise _UpdateInProgress(subsystem)
 
 
     @property
@@ -271,8 +289,13 @@ class FirmwareUpdateManager:
     async def _emplace(
         self, update_id: str, subsystem: SubSystem, creation_time: datetime
     ) -> _UpdateProcess:
+
+        if subsystem not in self._hw_handle.attached_subsystems:
+            raise SubsystemNotFound(subsystem)
+
         if update_id in self._all_updates_by_id:
             raise UpdateIdExists()
+
         if subsystem in self._running_updates_by_subsystem:
             raise UpdateInProgress(subsystem)
 

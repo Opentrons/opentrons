@@ -18,6 +18,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 
 from ..types import SubSystem, SubSystemState, UpdateStatus, UpdateState
 from .ot3utils import subsystem_to_target, target_to_subsystem
+from .errors import SubsystemUpdating
 
 
 log = logging.getLogger(__name__)
@@ -155,12 +156,15 @@ class SubsystemManager:
         # Check that there arent updates already running for given nodes
         current_subsystems = self.subsystems
 
-        subsystems = subsystems or set(current_subsystems)
+        subsystems_to_check = subsystems or set(current_subsystems)
         subsystems_updating = set(self._updates_ongoing)
-        subsystems_to_update = subsystems - subsystems_updating
+        subsystems_to_update = subsystems_to_check - subsystems_updating
         if not subsystems_to_update:
-            log.info("No viable subsystem to update.")
-            return
+            if subsystems:
+                raise SubsystemUpdating(f'Ongoing update for {subsystems}')
+            else:
+                log.info("No viable subsystem to update.")
+                return
 
         # Check if devices need an update, only checks nodes if given
         firmware_updates = self._get_required_fw_updates(

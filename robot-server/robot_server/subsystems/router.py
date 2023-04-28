@@ -34,6 +34,7 @@ from .firmware_update_manager import (
     InstrumentNotFound as _InstrumentNotFound,
     UpdateInProgress as _UpdateInProgress,
     NoOngoingUpdate as _NoOngoingUpdate,
+    SubsystemNotFound as _SubsystemNotFound,
     UpdateProcessSummary,
 )
 
@@ -331,15 +332,15 @@ async def begin_subsystem_update(
             created_at,
             UPDATE_CREATE_TIMEOUT_S,
         )
-    except _InstrumentNotFound:
-        raise InstrumentNotFound(
-            detail=f"No instrument found on {mount_to_update} mount."
-        ).as_error(status.HTTP_404_NOT_FOUND)
-    except _UpdateInProgress:
+    except _SubsystemNotFound as e:
+        raise SubsystemNotPresent(
+            detail=str(e),
+        ).as_error(status.HTTP_404_NOT_FOUND) from e
+    except _UpdateInProgress as e:
         raise UpdateInProgress(
             detail=f"{mount_to_update} is already either queued for update"
             f" or is currently updating"
-        ).as_error(status.HTTP_409_CONFLICT)
+        ).as_error(status.HTTP_409_CONFLICT) from e
     except _UpdateFailed as e:
         raise FirmwareUpdateFailed(detail=str(e)).as_error(
             status.HTTP_500_INTERNAL_SERVER_ERROR

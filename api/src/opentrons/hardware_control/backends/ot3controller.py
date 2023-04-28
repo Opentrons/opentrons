@@ -304,18 +304,6 @@ class OT3Controller:
 
         return set(_motor_node_for_devices(self._subsystem_manager.device_info))
 
-    def get_instrument_update(
-        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
-    ) -> InstrumentFWInfo:
-        """Check whether the given instrument requires an update."""
-        subsystem = mount_to_subsystem(mount)
-        node_id = sub_system_to_node_id(subsystem)
-        return self._subsystem_manager.target_needs_update(node_id)
-
-    def get_update_progress(self) -> Set[UpdateStatus]:
-        """Returns a set of UpdateStatus of the updates."""
-        return self._subsystem_manager.get_update_progress()
-
     async def update_firmware(
         self,
         targets: Optional[Set[FirmwareTarget]] = None,

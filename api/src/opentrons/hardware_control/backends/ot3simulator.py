@@ -497,14 +497,6 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def get_instrument_update(
-        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
-    ) -> InstrumentFWInfo:
-        return InstrumentFWInfo(mount, False, 0, 0)
-
-    def get_update_progress(self) -> Set[UpdateStatus]:
-        return set()
-
     async def update_firmware(
         self,
         attached_pipettes: Dict[OT3Mount, PipetteSubType],

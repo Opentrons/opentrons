@@ -64,6 +64,7 @@ from .backends.ot3utils import (
     axis_convert,
     sub_system_to_node_id,
 )
+from .backends.errors import SubsystemUpdating
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -94,7 +95,7 @@ from .types import (
     StatusBarState,
     SubSystemState,
 )
-from .errors import MustHomeError, GripperNotAttachedError
+from .errors import MustHomeError, GripperNotAttachedError, UpdateOngoingError
 from . import modules
 from .robot_calibration import (
     OT3Transforms,
@@ -396,12 +397,6 @@ class OT3API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
-    def get_firmware_update_progress(
-        self,
-    ) -> Dict[SubSystem, UpdateStatus]:
-        """Get the update progress for all devices currently updating."""
-        return self._backend.get_update_progress()
-
     async def update_firmware(
         self, subsystems: Optional[Set[SubSystem]] = None, force: bool = False
     ) -> AsyncIterator[Set[UpdateStatus]]:
@@ -414,8 +409,11 @@ class OT3API(
             else:
                 targets.add(sub_system_to_node_id(subsystem))
         # start the updates and yield the progress
-        async for update_status in self._backend.update_firmware(targets, force):
-            yield update_status
+        try:
+            async for update_status in self._backend.update_firmware(targets, force):
+                yield update_status
+        except SubsystemUpdating as e:
+            raise UpdateOngoingError(e.msg) from e
 
         # refresh Instrument cache
         await self.cache_instruments()
