@@ -1,5 +1,6 @@
 """Tests for opentrons.protocol_api.core.engine.ModuleCore."""
 import pytest
+import inspect
 from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
@@ -7,7 +8,7 @@ from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel, ModuleDefinition
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, validation as mock_validation
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.types import DeckSlotName
@@ -29,6 +30,13 @@ def mock_engine_client(decoy: Decoy) -> EngineClient:
 def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule]:
     """Get a mock synchronous module hardware."""
     return decoy.mock(name="SynchronousAdapter[AbstractModule]")  # type: ignore[no-any-return]
+
+
+@pytest.fixture(autouse=True)
+def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out opentrons.legacy.validation functions."""
+    for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
+        monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -61,6 +69,23 @@ def test_get_deck_slot(
     )
 
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
+
+
+def test_get_deck_slot_display_name(
+    decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return the correct deck slot string associated with the module and robot type"""
+    decoy.when(mock_engine_client.state.modules.get_location("1234")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    )
+
+    decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
+
+    decoy.when(
+        mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_1, "OT-3 Standard")
+    ).then_return("foo")
+
+    assert subject.get_deck_slot_display_name() == "foo"
 
 
 def test_get_model(
