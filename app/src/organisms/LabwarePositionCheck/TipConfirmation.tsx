@@ -40,12 +40,12 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
         <SmallButton
           buttonText={i18n.format(t('try_again'), 'capitalize')}
-          buttonType="alt"
+          buttonType="secondary"
           onClick={invalidateTip}
         />
         <SmallButton
           buttonText={i18n.format(t('yes'), 'capitalize')}
-          buttonType="default"
+          buttonType="primary"
           onClick={confirmTip}
         />
       </Flex>
