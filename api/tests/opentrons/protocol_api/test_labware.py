@@ -1,8 +1,6 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
 
-from typing import Optional, Union
-
 import pytest
 from decoy import Decoy
 
@@ -19,7 +17,7 @@ from opentrons.protocol_api.core.common import (
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api import TemperatureModuleContext
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import Point
 
 
 @pytest.fixture(autouse=True)
