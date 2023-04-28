@@ -59,8 +59,6 @@ class MoveToMaintenancePositionImplementation(
         """Move the requested mount to a maintenance deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
-        await self._hardware_api.home()
-
         calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
             offset=_INSTRUMENT_ATTACH_OFFSET
         )
