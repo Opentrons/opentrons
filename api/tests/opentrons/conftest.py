@@ -258,14 +258,16 @@ async def hardware(
         yield hw
 
 
-def _make_ot2_papi213_ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+def _make_ot2_non_pe_ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+    """Return a ProtocolContext configured for an OT-2 and not backed by Protocol Engine."""
     return create_protocol_context(api_version=APIVersion(2, 13), hardware_api=hardware)
 
 
 @contextlib.contextmanager
-def _make_ot3_papi214_ctx(
+def _make_ot3_pe_ctx(
     hardware: ThreadManagedHardware,
 ) -> Generator[ProtocolContext, None, None]:
+    """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
     with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
         yield create_protocol_context(
             api_version=APIVersion(2, 14),
@@ -278,13 +280,16 @@ def _make_ot3_papi214_ctx(
 
 @pytest.fixture()
 def ctx(
-    robot_model: RobotModel, hardware: ThreadManagedHardware
+    request: pytest.FixtureRequest, robot_model: RobotModel, hardware: ThreadManagedHardware
 ) -> Generator[ProtocolContext, None, None]:
     if robot_model == "OT-2 Standard":
-        yield _make_ot2_papi213_ctx(hardware=hardware)
+        yield _make_ot2_non_pe_ctx(hardware=hardware)
     elif robot_model == "OT-3 Standard":
-        with _make_ot3_papi214_ctx(hardware=hardware) as ctx:
-            yield ctx
+        if request.node.get_closest_marker("apiv2_non_pe_only"):
+            pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
+        else:
+            with _make_ot3_pe_ctx(hardware=hardware) as ctx:
+                yield ctx
 
 
 @pytest.fixture()
