@@ -55,17 +55,16 @@ const OffsetTableDatum = styled('td')`
   text-overflow: wrap;
 `
 
-interface CurrentOffsetsModalProps {
+interface CurrentOffsetsTableProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
-  onCloseClick: () => void
 }
-export function CurrentOffsetsModal(
-  props: CurrentOffsetsModalProps
+export function CurrentOffsetsTable(
+  props: CurrentOffsetsTableProps
 ): JSX.Element {
-  const { currentOffsets, commands, labware, modules, onCloseClick } = props
+  const { currentOffsets, commands, labware, modules } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
@@ -130,7 +129,6 @@ export function CurrentOffsetsModal(
     />
   )
   return (
-
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

@@ -7,7 +7,6 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   Link,
-  Icon,
   TOOLTIP_LEFT,
   useHoverTooltip,
   JUSTIFY_FLEX_END,
@@ -17,16 +16,10 @@ import { useRunQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { StyledText } from '../../../../atoms/text'
 import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
-import { CurrentOffsetsModal } from './CurrentOffsetsModal'
+import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { HowLPCWorksModal } from './HowLPCWorksModal'
-
-const ROBOT_CAL_HELP_ARTICLE =
-  'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
-const OFFSET_DATA_HELP_ARTICLE =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
 interface SetupLabwarePositionCheckProps {
   robotName: string
@@ -46,9 +39,6 @@ export function SetupLabwarePositionCheck(
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [showHelpModal, setShowHelpModal] = React.useState(false)
-  const [showCurrentOffsetsModal, setShowCurrentOffsetsModal] = React.useState(
-    false
-  )
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
@@ -60,12 +50,11 @@ export function SetupLabwarePositionCheck(
   return (
     <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4} gridGap={SPACING.spacing4}>
       {currentOffsets.length > 0 ? (
-        <CurrentOffsetsModal
+        <CurrentOffsetsTable
           currentOffsets={currentOffsets}
           commands={protocolData?.commands ?? []}
           labware={protocolData?.labware ?? []}
           modules={protocolData?.modules ?? []}
-          onCloseClick={() => setShowCurrentOffsetsModal(false)}
         />
       ) : null}
       <Flex
@@ -74,7 +63,10 @@ export function SetupLabwarePositionCheck(
         flex="1 0 auto"
         gridGap={SPACING.spacing4}
       >
-        
+        <Link
+          textDecoration={TYPOGRAPHY.textDecorationUnderline}
+          onClick={() => setShowHelpModal(true)}
+        />
         <SecondaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
