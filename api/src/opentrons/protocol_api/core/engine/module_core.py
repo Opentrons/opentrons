@@ -546,5 +546,5 @@ def create_module_core(
         )
 
     return ModuleCore(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
+        module_id=module_id, engine_client=engine_client, api_version=api_version
+    )
