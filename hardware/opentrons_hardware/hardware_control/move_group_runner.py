@@ -413,7 +413,7 @@ class MoveScheduler:
 
     def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
-        ack_id = MoveAckIdField(message.payload.ack_id.value)
+        ack_id = message.payload.ack_id.value
         stop_cond = self._stop_condition[group_id]
         try:
             # FIXME: revise this
@@ -441,8 +441,6 @@ class MoveScheduler:
             self._handle_move_completed(message)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
-        elif isinstance(message, Acknowledgement):
-            self._handle_acknowledge(message)
 
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
