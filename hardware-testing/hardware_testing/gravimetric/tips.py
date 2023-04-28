@@ -65,6 +65,7 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
 
 
 def get_tips_for_single(ctx: ProtocolContext) -> List[Well]:
+    """Get tips for single channel."""
     racks = _get_racks(ctx)
     return [tip for rack in racks.values() for tip in rack.wells()]
 
@@ -72,6 +73,7 @@ def get_tips_for_single(ctx: ProtocolContext) -> List[Well]:
 def get_tips_for_individual_channel_on_multi(
     ctx: ProtocolContext, channel: int
 ) -> List[Well]:
+    """Get tips for a multi's channel."""
     racks = _get_racks(ctx)
     slot_row = CHANNEL_TO_SLOT_ROW_LOOKUP[channel]
     tip_row = CHANNEL_TO_TIP_ROW_LOOKUP[channel]
@@ -89,6 +91,7 @@ def get_tips_for_individual_channel_on_multi(
 def get_tips(
     ctx: ProtocolContext, pipette: InstrumentContext, channel: int
 ) -> List[Well]:
+    """Get tips."""
     if pipette.channels == 1:
         assert channel == 0
         return get_tips_for_single(ctx)

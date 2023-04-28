@@ -1,7 +1,7 @@
 """Gravimetric."""
 from inspect import getsource
 from statistics import stdev
-from typing import Optional, Tuple, List, Dict, Union
+from typing import Optional, Tuple, List, Dict
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.types import Location
@@ -389,7 +389,8 @@ def _pick_up_tip(
     location: Location,
 ) -> None:
     print(
-        f"picking tip {location.labware.as_well().well_name} from slot #{location.labware.parent.parent}"
+        f"picking tip {location.labware.as_well().well_name} "
+        f"from slot #{location.labware.parent.parent}"
     )
     pipette.pick_up_tip(location)
     # NOTE: the accuracy-adjust function gets set on the Pipette
