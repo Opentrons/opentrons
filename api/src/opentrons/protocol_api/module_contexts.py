@@ -237,7 +237,7 @@ class ModuleContext(CommandPublisher):
 
         class_name = self.__class__.__name__
         display_name = self._core.get_display_name()
-        location = self._core.get_deck_slot().value
+        location = self._core.get_deck_slot().id
 
         return f"{class_name} at {display_name} on {location} lw {self.labware}"
 

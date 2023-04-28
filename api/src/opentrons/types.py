@@ -207,7 +207,7 @@ DECK_SLOT_NAME_TO_COORDINATE = {
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
-class DeckSlotName(str, enum.Enum):
+class DeckSlotName(enum.Enum):
     """Deck slot identifiers."""
 
     SLOT_1 = "1"
@@ -236,9 +236,22 @@ class DeckSlotName(str, enum.Enum):
     def as_coordinate(self) -> str:
         return DECK_SLOT_NAME_TO_COORDINATE[self.value]
 
+    @property
+    def id(self) -> str:
+        """This slot's unique ID, as it appears in the deck definition.
+
+        This can be used to look up slot details in the deck definition.
+
+        This is preferred over `.value` or `.__str__()` for explicitness.
+        """
+        return self.value
+
     def __str__(self) -> str:
-        """Stringify to a simple integer string."""
-        return str(self.value)
+        """Stringify to the unique ID.
+
+        For explicitness, prefer using `.id` instead.
+        """
+        return self.id
 
 
 class TransferTipPolicy(enum.Enum):
