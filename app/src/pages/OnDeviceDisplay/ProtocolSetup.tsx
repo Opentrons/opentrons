@@ -354,7 +354,7 @@ function PrepareToRun({
         <ProtocolSetupStep
           onClickSetupStep={launchLPC}
           title={t('labware_position_check')}
-          detail={t('optional')}
+          detail={t('recommended')}
           status="general"
         />
         <ProtocolSetupStep
@@ -371,8 +371,8 @@ function PrepareToRun({
           detail={
             liquidsInProtocol.length < 0
               ? t('initial_liquids_num', {
-                num: liquidsInProtocol.length,
-              })
+                  num: liquidsInProtocol.length,
+                })
               : t('liquids_not_in_setup')
           }
         />
@@ -443,7 +443,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing5}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => { }} />
+          <PlayButton disabled onPlay={() => {}} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>

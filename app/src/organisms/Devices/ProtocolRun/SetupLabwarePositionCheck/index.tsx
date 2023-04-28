@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
+  JUSTIFY_CENTER,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   TYPOGRAPHY,
@@ -11,6 +12,7 @@ import {
   useHoverTooltip,
   JUSTIFY_FLEX_END,
   SecondaryButton,
+  PrimaryButton,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -20,8 +22,10 @@ import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { HowLPCWorksModal } from './HowLPCWorksModal'
+import { StyledText } from '../../../../atoms/text'
 
 interface SetupLabwarePositionCheckProps {
+  expandLabwareStep: () => void
   robotName: string
   runId: string
 }
@@ -29,7 +33,7 @@ interface SetupLabwarePositionCheckProps {
 export function SetupLabwarePositionCheck(
   props: SetupLabwarePositionCheckProps
 ): JSX.Element {
-  const { robotName, runId } = props
+  const { robotName, runId, expandLabwareStep } = props
   const { t } = useTranslation('protocol_setup')
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
@@ -48,25 +52,23 @@ export function SetupLabwarePositionCheck(
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4} gridGap={SPACING.spacing4}>
-      {currentOffsets.length > 0 ? (
-        <CurrentOffsetsTable
-          currentOffsets={currentOffsets}
-          commands={protocolData?.commands ?? []}
-          labware={protocolData?.labware ?? []}
-          modules={protocolData?.modules ?? []}
-        />
-      ) : null}
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      marginTop={SPACING.spacing4}
+      gridGap={SPACING.spacing4}
+    >
       <Flex
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_FLEX_END}
+        justifyContent={JUSTIFY_CENTER}
         flex="1 0 auto"
         gridGap={SPACING.spacing4}
       >
         <Link
-          textDecoration={TYPOGRAPHY.textDecorationUnderline}
+          css={TYPOGRAPHY.linkPSemiBold}
           onClick={() => setShowHelpModal(true)}
-        />
+        >
+          {t('learn_how_it_works')}
+        </Link>
         <SecondaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           title={t('run_labware_position_check')}
@@ -84,8 +86,37 @@ export function SetupLabwarePositionCheck(
           <Tooltip tooltipProps={tooltipProps}>{lpcDisabledReason}</Tooltip>
         ) : null}
       </Flex>
+      {currentOffsets.length > 0 ? (
+        <CurrentOffsetsTable
+          currentOffsets={currentOffsets}
+          commands={protocolData?.commands ?? []}
+          labware={protocolData?.labware ?? []}
+          modules={protocolData?.modules ?? []}
+        />
+      ) : (
+        <Flex
+          paddingY={SPACING.spacing6}
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+        >
+          <StyledText as="p">{t('no_labware_offset_data')}</StyledText>
+        </Flex>
+      )}
+
+      <Flex justifyContent={JUSTIFY_CENTER}>
+        <PrimaryButton
+          onClick={expandLabwareStep}
+          id="ModuleSetup_proceedToLabwarePositionCheck"
+          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+          {...targetProps}
+        >
+          {t('proceed_to_labware_position_check')}
+        </PrimaryButton>
+      </Flex>
       {LPCWizard}
-      {showHelpModal ? <HowLPCWorksModal onCloseClick={() => setShowHelpModal(false)} /> : null}
+      {showHelpModal ? (
+        <HowLPCWorksModal onCloseClick={() => setShowHelpModal(false)} />
+      ) : null}
     </Flex>
   )
 }

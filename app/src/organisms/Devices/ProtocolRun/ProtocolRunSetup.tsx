@@ -143,7 +143,12 @@ export function ProtocolRunSetup({
       }),
     },
     [LPC_KEY]: {
-      stepInternals: (<SetupLabwarePositionCheck {...{runId, robotName}} />),
+      stepInternals: (
+        <SetupLabwarePositionCheck
+          {...{ runId, robotName }}
+          expandLabwareStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+        />
+      ),
       description: t('labware_position_check_step_description'),
     },
     [LABWARE_SETUP_KEY]: {

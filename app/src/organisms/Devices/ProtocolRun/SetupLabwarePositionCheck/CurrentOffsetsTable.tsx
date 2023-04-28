@@ -19,12 +19,11 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
+import { StyledText } from '../../../../atoms/text'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
 import { getLatestCurrentOffsets } from '../SetupLabware/utils'
-
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   RunTimeCommand,
@@ -42,6 +41,7 @@ const OffsetTable = styled('table')`
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
   padding: ${SPACING.spacing2};
 `
 const OffsetTableRow = styled('tr')`
@@ -132,7 +132,9 @@ export function CurrentOffsetsTable(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing4}
     >
+      <StyledText as="h6">{t('applied_offset_data')}</StyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}
