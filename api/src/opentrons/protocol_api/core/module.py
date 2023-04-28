@@ -29,10 +29,6 @@ class AbstractModuleCore(ABC):
         """Get the module's model identifier."""
 
     @abstractmethod
-    def get_serial_number(self) -> Optional[str]:
-        """Get the module's unique hardware serial number."""
-
-    @abstractmethod
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
 
@@ -47,6 +43,10 @@ class AbstractTemperatureModuleCore(AbstractModuleCore):
     """Core control interface for an attached Temperature Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.TEMPERATURE
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
 
     @abstractmethod
     def set_target_temperature(self, celsius: float) -> None:
@@ -81,6 +81,10 @@ class AbstractMagneticModuleCore(AbstractModuleCore):
     """Core control interface for an attached Magnetic Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.MAGNETIC
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
 
     @abstractmethod
     def engage(
@@ -126,6 +130,10 @@ class AbstractThermocyclerCore(AbstractModuleCore):
     """Core control interface for an attached Thermocycler Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.THERMOCYCLER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
 
     @abstractmethod
     def open_lid(self) -> ThermocyclerLidStatus:
@@ -264,6 +272,10 @@ class AbstractHeaterShakerCore(AbstractModuleCore):
     """Core control interface for an attached Heater-Shaker Module."""
 
     MODULE_TYPE: ClassVar = ModuleType.HEATER_SHAKER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
 
     @abstractmethod
     def set_target_temperature(self, celsius: float) -> None:

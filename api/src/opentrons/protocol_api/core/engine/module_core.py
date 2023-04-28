@@ -69,9 +69,15 @@ class ModuleCore(AbstractModuleCore):
             self._engine_client.state.modules.get_connected_model(self.module_id)
         )
 
-    def get_serial_number(self) -> Optional[str]:
+    def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        return self._engine_client.state.modules.get_serial_number(self.module_id)
+        module_serial = self._engine_client.state.modules.get_serial_number(
+            self.module_id
+        )
+        assert (
+            module_serial is not None
+        ), "Expected module serial number but got None instead."
+        return module_serial
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""

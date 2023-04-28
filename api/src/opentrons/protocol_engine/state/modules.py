@@ -603,18 +603,14 @@ class ModuleView(HasState[ModuleState]):
         """
         return self.get(module_id).model
 
-    def get_serial_number(self, module_id: str) -> str:
+    def get_serial_number(self, module_id: str) -> Optional[str]:
         """Get the hardware serial number of the given module.
 
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
+        If the module is not connected by serial, this will return None.
         """
-        module = self.get(module_id)
-        if module.serialNumber:
-            return module.serialNumber
-        raise errors.ModuleNotConnectedBySerial(
-            f"{module.model} is not connected by a serial port."
-        )
+        return self.get(module_id).serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
@@ -656,6 +652,9 @@ class ModuleView(HasState[ModuleState]):
 
         # add the calibrated module offset if there is one
         module_serial = self.get_serial_number(module_id)
+        assert (
+            module_serial is not None
+        ), "Expected module serial number but got None instead."
         offset = self._state.module_offset_by_serial.get(module_serial)
         if offset is not None:
             module_offset = array((offset.x, offset.y, offset.z, 1))
