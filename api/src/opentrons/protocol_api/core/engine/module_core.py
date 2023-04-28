@@ -25,6 +25,7 @@ from opentrons.protocol_engine.errors.exceptions import (
 
 from opentrons.protocols.api_support.types import APIVersion
 
+from ... import validation
 from ..module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
@@ -80,10 +81,9 @@ class ModuleCore(AbstractModuleCore):
 
     def get_deck_slot_display_name(self) -> str:
         slot_name = self.get_deck_slot()
-        if self._engine_client.state.config.robot_type == "OT-2 Standard":
-            return str(slot_name)
-        else:
-            return slot_name.as_coordinate()
+        return validation.ensure_deck_slot_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
 
     def get_display_name(self) -> str:
         """Get the module's display name."""

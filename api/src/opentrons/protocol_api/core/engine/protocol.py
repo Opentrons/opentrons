@@ -6,6 +6,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
@@ -27,6 +28,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
+from ... import validation
 from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -446,10 +448,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             labware_core.labware_id
         )
         if isinstance(labware_location, DeckSlotLocation):
-            if self._engine_client.state.config.robot_type == "OT-2 Standard":
-                return str(labware_location.slotName)
-            else:
-                return labware_location.slotName.as_coordinate()
+            return validation.ensure_deck_slot_string(
+                labware_location.slotName, self._engine_client.state.config.robot_type
+            )
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id.get(labware_location.moduleId)
         return None
