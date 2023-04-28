@@ -195,14 +195,3 @@ def test_module_type(
     decoy.when(mock_core.MODULE_TYPE).then_return(ModuleType("heaterShakerModuleType"))
     result = subject.type
     assert result == "heaterShakerModuleType"
-
-
-def test_serial_number(
-    decoy: Decoy,
-    mock_core: ModuleCore,
-    subject: ModuleContext,
-) -> None:
-    """It should get the module's unique serial number."""
-    decoy.when(mock_core.get_serial_number()).then_return("abc-123")
-    result = subject.serial_number
-    assert result == "abc-123"
