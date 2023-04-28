@@ -3,6 +3,8 @@ import argparse
 import asyncio
 from typing import List
 
+from opentrons_hardware.hardware_control.gripper_settings import set_error_tolerance
+
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.data import ui
@@ -146,6 +148,14 @@ async def _main(
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating, gripper="GRPV1120230403A01"
     )
+    # NOTE: we will be purposefully colliding with stuff,
+    #       so disable gripper collision detection.
+    if not api.is_simulator:
+        await set_error_tolerance(
+            api._backend._messenger,
+            max_pos_error=0.1,
+            max_unwanted_movement=50.0  # much bigger than gripper's jaw width
+        )
 
     print("homing...")
     await api.home()
