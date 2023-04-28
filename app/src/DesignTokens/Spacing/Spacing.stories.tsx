@@ -3,14 +3,9 @@ import {
   Flex,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   SPACING,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
   TYPOGRAPHY,
-  BORDERS,
   Box,
-  JUSTIFY_FLEX_START,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
 
