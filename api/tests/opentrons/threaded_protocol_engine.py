@@ -26,11 +26,8 @@ def protocol_engine_in_thread(
 async def _make_protocol_engine(
     hardware: ThreadManagedHardware,
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
-    assert (
-        hardware.managed_obj is not None
-    )  # TODO: Uhh what is managed_obj and why am I using it
     protocol_engine = await create_protocol_engine(
-        hardware_api=hardware.managed_obj,
+        hardware_api=hardware.wrapped(),
         config=Config(
             robot_type="OT-3 Standard",
             ignore_pause=True,
