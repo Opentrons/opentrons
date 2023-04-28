@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { TYPOGRAPHY, renderWithProviders } from '@opentrons/components'
 import { StyledText } from '../'
-import { fontSizeLabel } from '@opentrons/components/src/ui-style-constants/typography'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {
   return renderWithProviders(<StyledText {...props} />)[0]
@@ -118,7 +117,6 @@ describe('StyledText', () => {
   it('should render h2 semibold style', () => {
     props = {
       as: 'h2SemiBold',
-      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'h2SemiBold',
     }
     const { getByText } = render(props)
@@ -136,7 +134,6 @@ describe('StyledText', () => {
   it('should render h3 semibold style', () => {
     props = {
       as: 'h3SemiBold',
-      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'h3SemiBold',
     }
     const { getByText } = render(props)
@@ -154,7 +151,6 @@ describe('StyledText', () => {
   it('should render h6 semibold style', () => {
     props = {
       as: 'h6SemiBold',
-      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'h6SemiBold',
     }
     const { getByText } = render(props)
@@ -172,7 +168,6 @@ describe('StyledText', () => {
   it('should render p semibold style', () => {
     props = {
       as: 'pSemiBold',
-      ontWeight: TYPOGRAPHY.fontWeightSemiBold,
       children: 'pSemiBold',
     }
     const { getByText } = render(props)
@@ -189,14 +184,101 @@ describe('StyledText', () => {
 
   it('should render label semibold style', () => {
     props = {
-      as: 'label',
-      fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+      as: 'labelSemiBold',
       children: 'labelSemiBold',
     }
     const { getByText } = render(props)
-    const label = getByText('labelSemiBold')
-    expect(label).toHaveStyle(`fontSize: ${TYPOGRAPHY.fontSizeLabel}`)
-    expect(label).toHaveStyle(`fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(label).toHaveStyle(`lineHeight: ${TYPOGRAPHY.lineHeight12}`)
+    expect(getByText('labelSemiBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeLabel}`
+    )
+    expect(getByText('labelSemiBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
+    )
+    expect(getByText('labelSemiBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight12}`
+    )
+  })
+
+  it('should render header level 2 bold style', () => {
+    props = {
+      as: 'h2Bold',
+      children: 'h2Bold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('h2Bold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize38}`
+    )
+    expect(getByText('h2Bold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+    )
+    expect(getByText('h2Bold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight48}`
+    )
+  })
+
+  it('should render header level 3 bold style', () => {
+    props = {
+      as: 'h3Bold',
+      children: 'h3Bold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('h3Bold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize32}`
+    )
+    expect(getByText('h3Bold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+    )
+    expect(getByText('h3Bold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight42}`
+    )
+  })
+
+  it('should render header level 4 bold style', () => {
+    props = {
+      as: 'h4Bold',
+      children: 'h4Bold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('h4Bold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize28}`
+    )
+    expect(getByText('h4Bold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+    )
+    expect(getByText('h4Bold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight36}`
+    )
+  })
+
+  it('should render p bold style - bodyText bold', () => {
+    props = {
+      as: 'pBold',
+      children: 'pBold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('pBold')).toHaveStyle(`fontSize: ${TYPOGRAPHY.fontSize22}`)
+    expect(getByText('pBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+    )
+    expect(getByText('pBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight28}`
+    )
+  })
+
+  it('should render label bold style - smallBodyText bold', () => {
+    props = {
+      as: 'labelBold',
+      children: 'labelBold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('labelBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize20}`
+    )
+    expect(getByText('labelBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+    )
+    expect(getByText('labelBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight24}`
+    )
   })
 })
