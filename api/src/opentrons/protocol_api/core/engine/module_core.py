@@ -6,6 +6,7 @@ from typing import Optional, List, Union
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
+    ModuleType,
     TemperatureStatus,
     MagneticStatus,
     ThermocyclerStep,
@@ -497,6 +498,7 @@ class MagneticBlockCore(ModuleCore, AbstractMagneticBlockCore):
 
 
 def create_module_core(
+    module_type: ModuleType,
     module_id: str,
     engine_client: ProtocolEngineClient,
     api_version: APIVersion,
@@ -537,7 +539,12 @@ def create_module_core(
                 api_version=api_version,
                 sync_module_hardware=SynchronousAdapter(sync_module_hardware),
             )
-    # is it ok to think that if the hardware layer is none it's a mag block?
-    return MagneticBlockCore(
-        module_id=module_id, engine_client=engine_client, api_version=api_version
-    )
+
+    elif module_type == ModuleType.MAGNETIC_BLOCK:
+        return MagneticBlockCore(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )
+
+    return ModuleCore(
+            module_id=module_id, engine_client=engine_client, api_version=api_version
+        )

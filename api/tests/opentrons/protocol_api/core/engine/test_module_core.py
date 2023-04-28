@@ -11,6 +11,7 @@ from opentrons.hardware_control.modules import (
     MagDeck,
     TempDeck,
     Thermocycler,
+    ModuleType,
 )
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -130,23 +131,41 @@ def test_get_display_name(
 
 
 @pytest.mark.parametrize(
-    "hw_module, expected_module_core",
+    "input_module_type, hw_module, expected_module_core",
     [
-        (lazy_fixture("mock_hw_thermocycler"), ThermocyclerModuleCore),
-        (lazy_fixture("mock_hw_mag_deck"), MagneticModuleCore),
-        (lazy_fixture("mock_hw_temp_deck"), TemperatureModuleCore),
-        (lazy_fixture("mock_hw_heater_shaker"), HeaterShakerModuleCore),
-        (None, MagneticBlockCore),
+        (
+            ModuleType.THERMOCYCLER,
+            lazy_fixture("mock_hw_thermocycler"),
+            ThermocyclerModuleCore,
+        ),
+        (
+            ModuleType.MAGNETIC_BLOCK,
+            lazy_fixture("mock_hw_mag_deck"),
+            MagneticModuleCore,
+        ),
+        (
+            ModuleType.TEMPERATURE,
+            lazy_fixture("mock_hw_temp_deck"),
+            TemperatureModuleCore,
+        ),
+        (
+            ModuleType.HEATER_SHAKER,
+            lazy_fixture("mock_hw_heater_shaker"),
+            HeaterShakerModuleCore,
+        ),
+        (ModuleType.MAGNETIC_BLOCK, None, MagneticBlockCore),
     ],
 )
 def test_create_module_core(
     api_version: APIVersion,
     mock_engine_client: EngineClient,
+    input_module_type: ModuleType,
     hw_module: Union[HeaterShaker, MagDeck, TempDeck, Thermocycler, None],
     expected_module_core: Type[ModuleCore],
 ) -> None:
     """It should get the proper module_core."""
     result = create_module_core(
+        module_type=input_module_type,
         module_id="123",
         engine_client=mock_engine_client,
         api_version=api_version,

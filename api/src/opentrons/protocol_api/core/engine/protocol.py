@@ -319,6 +319,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             )
 
         module_core = create_module_core(
+            module_type=module_type,
             module_id=result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,
