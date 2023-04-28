@@ -74,6 +74,7 @@ def generate_device_info(
                     None,
                     PCBARevision(revision, None),
                     subidentifier=0,
+                    ok=True,
                 )
             }
         )
@@ -90,6 +91,7 @@ def generate_device_info(
                     None,
                     PCBARevision(revision, None),
                     subidentifier=0,
+                    ok=True,
                 )
             }
         )
@@ -147,9 +149,14 @@ def test_revision_defaulting_for_core(
 ) -> None:
     """We should pass through non-default revs and default ones that are not present."""
     _, rev = _update_type_for_device(
-        {},
         DeviceInfoCache(
-            node, 2, "abcdef12", None, PCBARevision(main=reported_rev), subidentifier=0
+            node,
+            2,
+            "abcdef12",
+            None,
+            PCBARevision(main=reported_rev),
+            subidentifier=0,
+            ok=True,
         ),
     )
     if reported_rev:
@@ -188,7 +195,6 @@ def test_revision_defaulting_for_pipette(
 ) -> None:
     """We should pass through non-default revs and default ones that are not present."""
     _, rev = _update_type_for_device(
-        {node: pipette_type} if pipette_type else {},
         DeviceInfoCache(
             node,
             2,
@@ -196,6 +202,7 @@ def test_revision_defaulting_for_pipette(
             None,
             PCBARevision(main=reported_rev),
             subidentifier=subidentifier,
+            ok=True,
         ),
     )
     if reported_rev:
@@ -348,9 +355,7 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
         "opentrons_hardware.firmware_update.utils.load_firmware_manifest",
         mock.Mock(return_value=known_firmware_updates),
     ):
-        firmware_updates = check_firmware_updates(
-            device_info_cache, attached_pipettes={}
-        )
+        firmware_updates = check_firmware_updates(device_info_cache)
         assert firmware_updates
         assert len(firmware_updates) == len(device_info_cache)
         for node_id in firmware_updates:

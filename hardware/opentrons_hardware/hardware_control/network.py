@@ -3,7 +3,7 @@ import asyncio
 from dataclasses import dataclass
 from itertools import chain
 import logging
-from typing import Any, Dict, Set, Optional, Union, cast
+from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple
 from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -74,9 +74,17 @@ class NetworkInfo:
         """Dictionary containing known devices and their device info."""
         return {
             k: v
-            for k, v in chain(
-                self._can_network_info.device_info.items(),
-                self._usb_network_info.device_info.items(),
+            for k, v in cast(  # necessary because chain erases key types
+                Iterable[
+                    Union[
+                        Tuple[NodeId, DeviceInfoCache],
+                        Tuple[USBTarget, DeviceInfoCache],
+                    ]
+                ],
+                chain(
+                    self._can_network_info.device_info.items(),
+                    self._usb_network_info.device_info.items(),
+                ),
             )
         }
 
