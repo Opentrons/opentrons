@@ -56,7 +56,6 @@ def _run_loop_in_thread() -> typing.Generator[asyncio.AbstractEventLoop, None, N
         # so we will always reach this point to unblock the parent thread.
         loop_queue.put(loop)
 
-        asyncio.set_event_loop(loop)
         loop.run_forever()
 
         # If we've reached here, the loop has been stopped from outside this thread. Clean it up.
