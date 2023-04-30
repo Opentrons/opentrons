@@ -30,7 +30,7 @@ const Template: Story<ColorsStorybookProps> = args => {
 
   const [copiedColor, setCopiedColor] = React.useState<string | null>(null)
 
-  const invertColor = (hex: string) => {
+  const invertColor = (hex: string): string => {
     if (hex.indexOf('#') === 0) {
       hex = hex.slice(1)
     }
