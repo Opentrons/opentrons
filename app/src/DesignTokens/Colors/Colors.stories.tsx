@@ -98,7 +98,9 @@ const Template: Story<ColorsStorybookProps> = args => {
           </StyledText>
           <Flex height="1rem">
             {copiedColor === color[0] ? (
-              <StyledText as="p">{'copied'}</StyledText>
+              <StyledText as="p" color={invertColor(color[1])}>
+                {'copied'}
+              </StyledText>
             ) : null}
           </Flex>
         </Flex>
