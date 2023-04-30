@@ -25,8 +25,39 @@ interface ColorsStorybookProps {
 
 const Template: Story<ColorsStorybookProps> = args => {
   const targetColors = args.colors.filter(
-    c => !c[0].includes('opacity') || c.length > 2
+    c => (!c[0].includes('opacity') || c.length > 2) && typeof c[1] === 'string'
   )
+
+  const [copiedColor, setCopiedColor] = React.useState<string | null>(null)
+
+  const invertColor = (hex: string) => {
+    if (hex.indexOf('#') === 0) {
+      hex = hex.slice(1)
+    }
+
+    if (hex.length !== 6) {
+      hex = hex.slice(0, 6)
+    }
+    // hex = hex.toUpperCase()
+    const r = (255 - parseInt(hex.slice(0, 2), 16))
+      .toString(16)
+      .padStart(2, '0')
+    const g = (255 - parseInt(hex.slice(2, 4), 16))
+      .toString(16)
+      .padStart(2, '0')
+    const b = (255 - parseInt(hex.slice(4, 6), 16))
+      .toString(16)
+      .padStart(2, '0')
+    return `#${r}${g}${b}`
+  }
+
+  const handleClick = (colorName: string) => {
+    navigator.clipboard.writeText(`COLORS.${colorName}`)
+    setCopiedColor(colorName)
+    setTimeout(() => {
+      setCopiedColor(null)
+    }, 2000)
+  }
 
   return (
     <Flex
@@ -46,11 +77,13 @@ const Template: Story<ColorsStorybookProps> = args => {
           padding={SPACING.spacing4}
           gridGap={SPACING.spacing2}
           width="20rem"
-          height="4rem"
+          height="6rem"
           borderRadius={BORDERS.size_two}
+          onClick={() => handleClick(color[0])}
+          style={{ cursor: 'pointer' }}
         >
           <StyledText
-            color="#cacaca"
+            color={invertColor(color[1])}
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
@@ -58,11 +91,16 @@ const Template: Story<ColorsStorybookProps> = args => {
           </StyledText>
           <StyledText
             as="p"
-            color="#cacaca"
+            color={invertColor(color[1])}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
             {color[1]}
           </StyledText>
+          <Flex height="1rem">
+            {copiedColor === color[0] ? (
+              <StyledText as="p">{'copied'}</StyledText>
+            ) : null}
+          </Flex>
         </Flex>
       ))}
     </Flex>
