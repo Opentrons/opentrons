@@ -51,7 +51,7 @@ const Template: Story<ColorsStorybookProps> = args => {
     return `#${r}${g}${b}`
   }
 
-  const handleClick = (colorName: string) => {
+  const handleClick = (colorName: string): void => {
     navigator.clipboard.writeText(`COLORS.${colorName}`)
     setCopiedColor(colorName)
     setTimeout(() => {
