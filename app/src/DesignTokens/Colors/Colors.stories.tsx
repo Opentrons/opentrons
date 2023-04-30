@@ -64,7 +64,6 @@ const Template: Story<ColorsStorybookProps> = args => {
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing3}
       flexWrap="wrap"
-      backgroundColor="#dadada"
       padding={SPACING.spacing5}
     >
       {targetColors.map((color, index) => (
@@ -81,6 +80,7 @@ const Template: Story<ColorsStorybookProps> = args => {
           borderRadius={BORDERS.size_two}
           onClick={() => handleClick(color[0])}
           style={{ cursor: 'pointer' }}
+          border={`2px solid ${COLORS.darkBlackEnabled}`}
         >
           <StyledText
             color={invertColor(color[1])}
