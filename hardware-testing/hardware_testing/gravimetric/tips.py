@@ -33,7 +33,7 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentCon
 #      - 3x volumes
 #      - 12x trials
 
-CHANNEL_TEST_ORDER = [0, 1, 2, 3, 7, 6, 5, 4]  # zero indexed
+MULTI_CHANNEL_TEST_ORDER = [0, 1, 2, 3, 7, 6, 5, 4]  # zero indexed
 CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
     0: "H",
     1: "G",

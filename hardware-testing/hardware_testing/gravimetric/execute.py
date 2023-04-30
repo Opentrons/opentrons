@@ -38,7 +38,7 @@ from .measurement.record import (
     GravimetricRecorderConfig,
 )
 from .radwag_pipette_calibration_vial import VIAL_DEFINITION
-from .tips import get_tips
+from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
 
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
@@ -590,8 +590,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             trial_disp_dict: Dict[int, List[float]] = {
                 trial: [] for trial in range(cfg.trials)
             }
-
-            for channel in range(cfg.pipette_channels):
+            if cfg.pipette_channels == 8 and not cfg.increment:
+                # NOTE: only test channels separately when QC'ing a 8ch
+                channels_to_test = MULTI_CHANNEL_TEST_ORDER
+            else:
+                channels_to_test = [0]
+            for channel in channels_to_test:
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
                 actual_disp_list_channel = []
