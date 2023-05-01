@@ -91,24 +91,19 @@ def get_tips_for_individual_channel_on_multi(
 def get_tips_for_all_channels_on_multi(ctx: ProtocolContext) -> List[Well]:
     """Get tips for all the multi's channels."""
     racks = _get_racks(ctx)
-    return [
-        rack[f"A{col + 1}"]
-        for _, rack in racks.items()
-        for col in range(12)
-    ]
+    return [rack[f"A{col + 1}"] for _, rack in racks.items() for col in range(12)]
 
 
 def get_tips_for_96_channel(ctx: ProtocolContext) -> List[Well]:
     """Get tips for all the multi's channels."""
     racks = _get_racks(ctx)
-    return [
-        rack["A1"]
-        for _, rack in racks.items()
-    ]
+    return [rack["A1"] for _, rack in racks.items()]
 
 
 def get_tips(
-    ctx: ProtocolContext, pipette: InstrumentContext, all_channels: bool = True,
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    all_channels: bool = True,
 ) -> Dict[int, List[Well]]:
     """Get tips."""
     if pipette.channels == 1:
@@ -125,9 +120,12 @@ def get_tips(
         if all_channels:
             return {0: get_tips_for_96_channel(ctx)}
         else:
-            # TODO: use this for liquid calibration?
-            raise NotImplementedError("don't supprt 96ch single-channel stuff yet")
+            raise NotImplementedError(
+                "no support for individual channel testing on the 96ch pipette"
+            )
     else:
-        raise ValueError(f"unexpected state when getting tips: "
-                         f"pipette.channels={pipette.channels}, "
-                         f"all_channels={all_channels}")
+        raise ValueError(
+            f"unexpected state when getting tips: "
+            f"pipette.channels={pipette.channels}, "
+            f"all_channels={all_channels}"
+        )

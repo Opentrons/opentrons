@@ -441,10 +441,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
     print(f'found pipette "{pipette_tag}"')
-    tips_for_channel_zero = get_tips(ctx, pipette, all_channels=False)[0]
-    setup_tip = tips_for_channel_zero[0]
-    setup_channel_offset = _get_channel_offset(cfg, channel=0)
-    setup_tip_location = setup_tip.top().move(setup_channel_offset)
+    # gather all available tips
+    tips = get_tips(ctx, pipette, all_channels=cfg.increment)
 
     if cfg.increment:
         pipette_tag += "-increment"
@@ -503,7 +501,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_title("FIND LIQUID HEIGHT")
     print("homing...")
     ctx.home()
-    # actually pick-up the tip
+    # get the first channel's first-used tip
+    # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
+    #       and so we can use pick-up-tip from there again
+    setup_tip = tips[0][0]
+    setup_channel_offset = _get_channel_offset(cfg, channel=0)
+    setup_tip_location = setup_tip.top().move(setup_channel_offset)
     _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
     print("moving to vial")
     well = vial["A1"]
@@ -518,6 +521,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     print(f"software thinks there is {vial_volume} uL of liquid in the vial")
     print("dropping tip")
     _drop_tip(ctx, pipette, cfg)
+    if not ctx.is_simulating():
+        ui.get_user_ready("REPLACE first Tip with NEW Tip")
 
     try:
         if not cfg.blank or cfg.inspect:
@@ -572,11 +577,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_aspirate_evaporation_ul,
                 average_dispense_evaporation_ul,
             )
-        if not ctx.is_simulating():
-            ui.get_user_ready("REPLACE first Tip with NEW Tip")
         test_count = 0
         test_total = len(test_volumes) * cfg.trials * cfg.pipette_channels
-        tips_per_channel = get_tips(ctx, pipette, all_channels=cfg.increment)
         for volume in test_volumes:
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -605,7 +607,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         f"{volume} uL channel {channel + 1} ({trial + 1}/{cfg.trials})"
                     )
                     print(f"trial total {test_count}/{test_total}")
-                    next_tip: Well = tips_per_channel[channel].pop(0)
+                    # remove it so it's not used again
+                    next_tip: Well = tips[channel].pop(0)
                     next_tip_location = next_tip.top().move(channel_offset)
                     _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
                     (
