@@ -35,7 +35,7 @@ import { ProtocolSetup } from '../ProtocolSetup'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data/js/helpers')
-jest.mock('../../../LabwarePositionCheck/useLaunchLPC')
+jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
