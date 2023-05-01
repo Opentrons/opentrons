@@ -55,6 +55,17 @@ async def get_engine_store(
     return engine_store
 
 
+async def get_protocol_run_has_been_played(
+    engine_store: EngineStore = Depends(get_engine_store),
+) -> bool:
+    """Whether the current protocol run, if any, has been played."""
+    try:
+        protocol_run_state = engine_store.engine.state_view
+    except AssertionError:
+        return False
+    return protocol_run_state.commands.has_been_played()
+
+
 async def get_run_data_manager(
     task_runner: TaskRunner = Depends(get_task_runner),
     engine_store: EngineStore = Depends(get_engine_store),

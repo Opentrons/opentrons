@@ -45,6 +45,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
@@ -85,6 +91,12 @@ jobs:
       - uses: 'actions/checkout@v3'
         with:
           fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
@@ -116,6 +128,12 @@ jobs:
       - uses: 'actions/checkout@v3'
         with:
           fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
@@ -153,6 +171,12 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
@@ -160,7 +184,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -170,13 +194,18 @@ jobs:
         with:
           name: pd-artifact
           path: ./dist
-      - name: 'deploy builds to s3'
+      - name: 'configure ot3 s3 deploy creds and deploy'
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
-        with:
-          domain: 'designer.opentrons.com'
-          distPath: './dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PD_S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PD_S3_SANDBOX_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.PD_S3_SANDBOX_KEY_ID }} --profile identity
+          aws configure set aws_secret_access_key ${{ secrets.PD_S3_SANDBOX_SECRET }} --profile identity
+          aws configure set region us-east-2 --profile identity
+          aws configure set output json --profile identity
+          aws configure set region us-east-2 --profile deploy
+          aws configure set role_arn ${{ secrets.OT_PD_DEPLOY_ROLE }} --profile deploy
+          aws configure set source_profile identity --profile deploy
+          aws s3 sync ./dist s3://sandbox.designer.opentrons.com/${{ env.OT_BRANCH }} --acl=public-read --profile=deploy
+        shell: bash

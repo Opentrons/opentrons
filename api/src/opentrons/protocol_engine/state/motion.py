@@ -172,10 +172,10 @@ class MotionView:
         pipette_blocking = True
         current_well = self._pipettes.get_current_well()
         if current_well is not None:
-            pipette_deck_slot = int(
-                self._geometry.get_ancestor_slot_name(current_well.labware_id)
-            )
-            hs_deck_slot = int(self._modules.get_location(hs_module_id).slotName)
+            pipette_deck_slot = self._geometry.get_ancestor_slot_name(
+                current_well.labware_id
+            ).as_int()
+            hs_deck_slot = self._modules.get_location(hs_module_id).slotName.as_int()
             conflicting_slots = get_east_west_slots(hs_deck_slot) + [hs_deck_slot]
             pipette_blocking = pipette_deck_slot in conflicting_slots
         return pipette_blocking
@@ -187,10 +187,10 @@ class MotionView:
         pipette_blocking = True
         current_well = self._pipettes.get_current_well()
         if current_well is not None:
-            pipette_deck_slot = int(
-                self._geometry.get_ancestor_slot_name(current_well.labware_id)
-            )
-            hs_deck_slot = int(self._modules.get_location(hs_module_id).slotName)
+            pipette_deck_slot = self._geometry.get_ancestor_slot_name(
+                current_well.labware_id
+            ).as_int()
+            hs_deck_slot = self._modules.get_location(hs_module_id).slotName.as_int()
             conflicting_slots = get_adjacent_slots(hs_deck_slot) + [hs_deck_slot]
             pipette_blocking = pipette_deck_slot in conflicting_slots
         return pipette_blocking

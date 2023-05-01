@@ -13,7 +13,7 @@ const render = (props: React.ComponentProps<typeof TabbedButton>) => {
   return renderWithProviders(<TabbedButton {...props} />)[0]
 }
 
-describe('Background TabbedButton', () => {
+describe('Unselected TabbedButton', () => {
   let props: React.ComponentProps<typeof TabbedButton>
 
   beforeEach(() => {
@@ -22,7 +22,7 @@ describe('Background TabbedButton', () => {
     }
   })
 
-  it('renders background tabbed button with text', () => {
+  it('renders unselected tabbed button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
@@ -46,7 +46,7 @@ describe('Background TabbedButton', () => {
     expect(button).toHaveStyle(`color: ${String(COLORS.darkBlack_hundred)}`)
   })
 
-  it('renders background tabbed button with text and disabled', () => {
+  it('renders unselected tabbed button with text and disabled', () => {
     props.disabled = true
     const { getByText } = render(props)
     const button = getByText('tabbed button')
@@ -55,7 +55,7 @@ describe('Background TabbedButton', () => {
     expect(button).toHaveStyle(`color: #16212d99`)
   })
 
-  it('applies the correct states to the background tabbed button - active', () => {
+  it('applies the correct states to the unselected tabbed button - active', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
@@ -67,7 +67,7 @@ describe('Background TabbedButton', () => {
     )
   })
 
-  it('applies the correct states to the background tabbed button - focus', () => {
+  it('applies the correct states to the unselected tabbed button - focus', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule('box-shadow', 'none', {
@@ -75,7 +75,7 @@ describe('Background TabbedButton', () => {
     })
   })
 
-  it('applies the correct states to the background tabbed button - focus-visible', () => {
+  it('applies the correct states to the unselected tabbed button - focus-visible', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
@@ -88,17 +88,17 @@ describe('Background TabbedButton', () => {
   })
 })
 
-describe('Foreground TabbedButton', () => {
+describe('Selected TabbedButton', () => {
   let props: React.ComponentProps<typeof TabbedButton>
 
   beforeEach(() => {
     props = {
-      foreground: true,
+      isSelected: true,
       children: 'tabbed button',
     }
   })
 
-  it('renders foreground tabbed button with text', () => {
+  it('renders selected tabbed button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
@@ -122,7 +122,7 @@ describe('Foreground TabbedButton', () => {
     expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
   })
 
-  it('renders foreground tabbed button with text and disabled', () => {
+  it('renders selected tabbed button with text and disabled', () => {
     props.disabled = true
     const { getByText } = render(props)
     const button = getByText('tabbed button')
@@ -131,7 +131,7 @@ describe('Foreground TabbedButton', () => {
     expect(button).toHaveStyle(`color: #16212d99`)
   })
 
-  it('applies the correct states to the foreground tabbed button - active', () => {
+  it('applies the correct states to the selected tabbed button - active', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
@@ -143,7 +143,7 @@ describe('Foreground TabbedButton', () => {
     )
   })
 
-  it('applies the correct states to the foreground tabbed button - focus', () => {
+  it('applies the correct states to the selected tabbed button - focus', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule('box-shadow', 'none', {
@@ -151,7 +151,7 @@ describe('Foreground TabbedButton', () => {
     })
   })
 
-  it('applies the correct states to the foreground tabbed button - focus-visible', () => {
+  it('applies the correct states to the selected tabbed button - focus-visible', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(

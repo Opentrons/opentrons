@@ -45,6 +45,7 @@ def test_initial_state() -> None:
         slot_by_module_id={},
         hardware_by_module_id={},
         substate_by_module_id={},
+        module_offset_by_serial={},
     )
 
 
@@ -155,6 +156,7 @@ def test_load_module(
             )
         },
         substate_by_module_id={"module-id": expected_substate},
+        module_offset_by_serial={},
     )
 
 
@@ -240,6 +242,7 @@ def test_add_module_action(
             )
         },
         substate_by_module_id={"module-id": expected_substate},
+        module_offset_by_serial={},
     )
 
 

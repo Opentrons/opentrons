@@ -11,6 +11,7 @@
   "complete_cal": "Complete calibration",
   "pip_cal_success": "{{pipetteName}} successfully attached and calibrated",
   "recalibrate_pipette": "recalibrate {{mount}} pipette",
+  "calibrate_pipette": "calibrate {{mount}} pipette",
   "pip_recal_success": "{{pipetteName}} successfully recalibrated",
   "stand_back": "Stand Back, robot is in motion",
   "pipette_calibrating": "Stand back, connect and secure, {{pipetteName}} is calibrating",

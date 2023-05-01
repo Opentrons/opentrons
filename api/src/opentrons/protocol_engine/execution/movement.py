@@ -78,9 +78,9 @@ class MovementHandler:
         #  fails saying that h/s latch is closed even when it is not.
         log.info(f"H/S movement restrictors: {hs_movement_restrictors}")
 
-        dest_slot_int = int(
-            self._state_store.geometry.get_ancestor_slot_name(labware_id)
-        )
+        dest_slot_int = self._state_store.geometry.get_ancestor_slot_name(
+            labware_id
+        ).as_int()
 
         self._hs_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,

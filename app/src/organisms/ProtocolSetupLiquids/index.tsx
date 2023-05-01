@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
@@ -20,7 +19,6 @@ import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
 import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ContinueButton } from '../ProtocolSetupModules'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid } from '@opentrons/api-client'
@@ -43,14 +41,10 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex>
         <BackButton onClick={() => setSetupScreen('prepare to run')}>
           {t('liquids')}
         </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          {/* TODO(jr, 3/21/23):  wire up this */}
-          <ContinueButton onClick={() => console.log('run!')} />
-        </Flex>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}

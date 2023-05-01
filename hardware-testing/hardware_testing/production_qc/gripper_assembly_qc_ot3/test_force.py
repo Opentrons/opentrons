@@ -127,15 +127,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.home([z_ax, g_ax])
     # MOVE TO GAUGE
     await api.ungrip()
-    hover_pos, target_pos = _get_force_gauge_hover_and_grip_positions(api)
-    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+    hover_pos, _ = _get_force_gauge_hover_and_grip_positions(api)
+    target_pos = Point(x=64.0, y=123.3, z=67.6)
+    await helpers_ot3.move_to_arched_ot3(api, mount, target_pos._replace(z=87.6))
     if not api.is_simulator:
-        ui.get_user_ready("ATTACH the jaw extenders")
-        ui.get_user_ready("confirm jaw extenders are pressed down again PADDLES")
+        ui.get_user_ready("please make sure the gauge in the middle of the gripper")
     await api.move_to(mount, target_pos)
-    if not api.is_simulator:
-        ui.get_user_ready("jog gripper to align with gauge")
-    await helpers_ot3.jog_mount_ot3(api, mount)
     if not api.is_simulator:
         ui.get_user_ready("prepare to grip")
 
@@ -155,16 +152,18 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # GRIP AND MEASURE FORCE
         print(f"gripping at {duty_cycle}% duty cycle")
         found_forces = list()
-        for i in range(NUM_DUTY_CYCLE_TRIALS):
+        # take 2x extra samples, because we'll remove min/max later
+        for i in range(NUM_DUTY_CYCLE_TRIALS + 2):
             actual_force = await _grip_and_read_force(api, gauge, duty=duty_cycle)
             print(f" - trial {i + 1}/{NUM_DUTY_CYCLE_TRIALS} = {actual_force} N")
             found_forces.append(actual_force)
-        actual_force = sum(found_forces) / float(NUM_DUTY_CYCLE_TRIALS)
+        # remove min/max forces
+        forces_without_outliers = sorted(found_forces)[1:-1]
+        # calculate average
+        actual_force = sum(forces_without_outliers) / float(NUM_DUTY_CYCLE_TRIALS)
         print(f"average = {actual_force} N")
         tag = _get_test_tag(duty_cycle=duty_cycle)
         report(section, tag, [duty_cycle, actual_force, CSVResult.PASS])
     # RETRACT
     print("done")
     await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
-    if not api.is_simulator:
-        ui.get_user_ready("REMOVE the jaw extenders")

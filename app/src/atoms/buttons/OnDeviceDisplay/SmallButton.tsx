@@ -7,18 +7,19 @@ import {
   BORDERS,
   Btn,
   Flex,
-  styleProps,
   Icon,
   DIRECTION_ROW,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type SmallButtonTypes =
-  | 'alt'
   | 'alert'
-  | 'default'
+  | 'primary'
+  | 'secondary'
   | 'tertiaryLowLight'
   | 'tertiaryHighLight'
 
@@ -26,7 +27,7 @@ type SmallButtonCategory = 'default' | 'rounded'
 
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
-  onClick: () => void
+  onClick: React.MouseEventHandler
   buttonType: SmallButtonTypes
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement
@@ -37,18 +38,14 @@ interface SmallButtonProps extends StyleProps {
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
   const {
-    onClick,
     buttonType,
     buttonText,
     buttonCategory = 'default',
     disabled,
     iconPlacement,
     iconName,
+    ...buttonProps
   } = props
-  const buttonProps = {
-    onClick,
-    disabled,
-  }
 
   const SMALL_BUTTON_PROPS_BY_TYPE: Record<
     SmallButtonTypes,
@@ -60,10 +57,10 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       defaultColor: string
     }
   > = {
-    alt: {
+    secondary: {
       defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.foundationalBlue,
-      activeBackgroundColor: COLORS.medBluePressed,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },
@@ -74,7 +71,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
       disabledColor: `${COLORS.darkBlack_sixty}`,
     },
-    default: {
+    primary: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
       activeBackgroundColor: COLORS.bluePressed,
@@ -107,10 +104,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       : BORDERS.size_four};
     box-shadow: none;
     padding: ${SPACING.spacing4} ${SPACING.spacing5};
-    text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
-    ${styleProps}
     &:focus {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
@@ -143,13 +138,15 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
   return (
     <Btn
-      {...buttonProps}
       css={SMALL_BUTTON_STYLE}
       aria-label={`SmallButton_${buttonType}`}
+      disabled={disabled}
+      {...buttonProps}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        alignItems={TYPOGRAPHY.textAlignCenter}
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
           <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
