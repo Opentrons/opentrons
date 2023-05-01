@@ -41,8 +41,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: Welcome,
     exact: true,
-    name: 'Get started',
-    path: '/get-started',
+    name: 'Welcome',
+    path: '/welcome',
   },
   {
     Component: TempODDMenu,
