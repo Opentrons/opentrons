@@ -51,9 +51,9 @@ class DevServer:
         """Run the robot server in a background process."""
         # This environment is only for the subprocess so it should
         # not have any side effects.
-        env_file: str = "dev.env" if not self.is_ot3 else "dev_ot3.env"
         env = {
-            "OT_ROBOT_SERVER_DOT_ENV_PATH": env_file,
+            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
+            "OT_API_FF_enableOT3HardwareController": "true" if self.is_ot3 else "false",
             "OT_API_CONFIG_DIR": str(self.ot_api_config_dir),
             "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
         }
