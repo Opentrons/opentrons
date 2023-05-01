@@ -110,32 +110,43 @@ export const darkBlack_hundred = darkBlackEnabled
 export const darkBlack_ninety = `${darkBlackEnabled}${opacity90HexCode}`
 export const darkBlack_seventy = `${darkBlackEnabled}${opacity70HexCode}`
 export const darkBlack_sixty = `${darkBlackEnabled}${opacity60HexCode}`
-export const darkBlack_fourty = `${darkBlackEnabled}${opacity40HexCode}`
+export const darkBlack_forty = `${darkBlackEnabled}${opacity40HexCode}`
 export const darkBlack_twenty = `${darkBlackEnabled}${opacity20HexCode}`
 
+export const grey_one = '#57575c'
+export const grey_two = '#6d6d74'
+export const grey_three = '#d0d0d0'
+export const grey_four = '#e0e0e0'
+
 export const light_one = '#d0d0d0'
+export const light_one_pressed = '#b4b6b8'
 export const light_two = '#e0e0e0'
 
 export const highlightPurple_one = '#9c3ba4'
-export const highlightPurple_one_pressed = '#af62b6'
+export const highlightPurple_one_pressed = '#883792'
 export const highlightPurple_two = '#e7c3e9'
-export const highlightPurple_two_pressed = '#bda3c3'
+export const highlightPurple_two_pressed = '#c8abcd'
 
 // touchscreen foundational color
-export const foundationalBlue = '#b4d4ff'
+export const mediumBlueEnabled = '#b4d4ff'
+export const mediumBluePressed = '#9cb9e0'
 
 // touchscreen communication colors
 export const green_one = '#027e23'
 export const green_two = '#2ebd55'
 export const green_three = '#a1ffbc'
+export const green_three_pressed = '#8cdea7'
 export const green_four = '#baffcd'
 
 export const yellow_one = '#7a5200'
 export const yellow_two = '#ec930f'
 export const yellow_three = '#ffe1a4'
+export const yellow_three_pressed = '#dcc492'
 export const yellow_four = '#ffe9be'
 
 export const red_one = errorText
 export const red_two = '#e31e1e'
+export const red_two_pressed = '#c41e20'
 export const red_three = '#fbcdcd'
-// export const red_four = errorText
+export const red_three_pressed = '#d9b3b5'
+export const red_four = '#ffdddd'

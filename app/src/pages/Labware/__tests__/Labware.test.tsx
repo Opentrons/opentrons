@@ -3,17 +3,17 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { useToast } from '../../../atoms/Toast'
 import { useTrackEvent } from '../../../redux/analytics'
 import { LabwareCard } from '../../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
-jest.mock('../../../atoms/Toast')
 jest.mock('../../../organisms/LabwareCard')
 jest.mock('../../../organisms/AddCustomLabwareSlideout')
+jest.mock('../../../organisms/ToasterOven')
 jest.mock('../hooks')
 jest.mock('../../../redux/analytics')
 
@@ -33,9 +33,10 @@ const mockUseNewLabwareName = useNewLabwareName as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseToast = useToast as jest.MockedFunction<typeof useToast>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 let mockTrackEvent: jest.Mock
+const mockMakeSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 
@@ -67,7 +68,8 @@ describe('Labware', () => {
       newLabwareName: null,
       clearLabwareName: jest.fn(),
     })
-    mockUseToast.mockReturnValue({
+    mockUseToaster.mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })

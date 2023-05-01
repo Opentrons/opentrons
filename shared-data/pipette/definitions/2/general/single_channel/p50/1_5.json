@@ -3,6 +3,8 @@
   "displayName": "P50 Single-Channel GEN1",
   "model": "p50",
   "displayCategory": "GEN1",
+  "majorVersion": 1,
+  "minorVersion": 5,
   "pickUpTipConfigurations": {
     "current": 0.1,
     "speed": 30.0,
@@ -29,5 +31,8 @@
     "partialTipSupported": false,
     "availableConfigurations": null
   },
-  "channels": 1
+  "channels": 1,
+  "shaftDiameter": 2.0,
+  "shaftULperMM": 3.142,
+  "backCompatNames": []
 }

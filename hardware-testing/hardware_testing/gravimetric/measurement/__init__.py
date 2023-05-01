@@ -77,13 +77,15 @@ class MeasurementData(EnvironmentData):
         )
 
 
-def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
+def create_measurement_tag(
+    t: str, volume: Optional[float], channel: int, trial: int
+) -> str:
     """Create measurement tag."""
     if volume is None:
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-{trial + 1}"
+    return f"{t}-{vol_in_tag}-ul-channel_{channel + 1}-trial-{trial + 1}"
 
 
 class UnstableMeasurementError(Exception):
@@ -104,10 +106,12 @@ def _build_measurement_data(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
     if stable and not simulating:
-        # isolate "stable" scale measurements
-        segment = GravimetricRecording([sample for sample in segment if sample.stable])
-        if segment.duration < MIN_DURATION_STABLE_SEGMENT:
-            raise UnstableMeasurementError(f"duration is {segment.duration} seconds")
+        # try to isolate only "stable" scale readings if sample length >= 2
+        stable_only = GravimetricRecording(
+            [sample for sample in segment if sample.stable]
+        )
+        if len(stable_only) >= 2:
+            segment = stable_only
 
     recording_grams_as_list = segment.grams_as_list
     return MeasurementData(

@@ -1,6 +1,6 @@
 import typing
 
-from robot_server.util import duration
+from server_utils.util import duration
 from .base_executor import CommandExecutor
 from .command import Command, CompletedCommand, CommandResult
 

@@ -702,6 +702,20 @@ def test_get_max_volume(
     assert subject.get_max_volume() == 4.56
 
 
+def test_get_working_volume(
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should get the pipette's working volume."""
+    decoy.when(
+        mock_engine_client.state.pipettes.get_working_volume(
+            pipette_id=subject.pipette_id
+        )
+    ).then_return(7.89)
+    assert subject.get_working_volume() == 7.89
+
+
 def test_get_channels(
     decoy: Decoy,
     subject: InstrumentCore,

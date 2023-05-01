@@ -8,6 +8,7 @@ import fs from 'fs-extra'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
+import systemd from '../systemd'
 import { createLogger } from '../log'
 import { DEFAULTS_V12, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
@@ -46,7 +47,10 @@ let _log: Logger | undefined
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = (new Store({ defaults: DEFAULTS_V12 }) as unknown) as Store<Config>
+    _store = (new Store({
+      defaults: DEFAULTS_V12,
+      cwd: '/data/ODD',
+    }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
   return _store
@@ -77,6 +81,14 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
           action as ConfigValueChangeAction,
           getFullConfig()
         )
+
+        if (path === 'devtools') {
+          systemd.setRemoteDevToolsEnabled(Boolean(nextValue)).catch(err =>
+            log().debug('Something wrong when setting remote dev tools', {
+              err,
+            })
+          )
+        }
 
         // Note (kj:03/02/2023)  this is to change brightness
         if (path === 'onDeviceDisplaySettings.brightness') {

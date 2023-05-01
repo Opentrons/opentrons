@@ -284,7 +284,7 @@ export function ProtocolSetupModules({
         ) : null}
       </Portal>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
+        <BackButton onClick={() => setSetupScreen('instruments')}>
           {t('modules')}
         </BackButton>
         <Flex gridGap="2.5rem">

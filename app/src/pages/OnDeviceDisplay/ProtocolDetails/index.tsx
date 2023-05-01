@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
-  useDeleteProtocolMutation,
+  useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
@@ -31,14 +31,17 @@ import {
 } from '../../../atoms/buttons/OnDeviceDisplay'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
-import { TooManyPinsModal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
+import { Liquids } from './Liquids'
 
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 const ProtocolHeader = (props: {
   title: string
@@ -92,6 +95,7 @@ const ProtocolHeader = (props: {
             fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
             lineHeight={TYPOGRAPHY.lineHeight48}
             onClick={toggleTruncate}
+            overflowWrap="anywhere"
           >
             {displayedTitle}
           </StyledText>
@@ -231,6 +235,7 @@ const ProtocolSectionContent = (
       protocolSection = <Labware protocolId={protocolId} />
       break
     case 'Liquids':
+      protocolSection = <Liquids protocolId={props.protocolId} />
       break
     case 'Initial Deck Layout':
       protocolSection = <Deck protocolId={protocolId} />
@@ -240,10 +245,12 @@ const ProtocolSectionContent = (
 }
 
 export function ProtocolDetails(): JSX.Element | null {
-  const { t } = useTranslation(['protocol_details', 'protocol_info'])
+  const { t } = useTranslation(['protocol_details', 'protocol_info', 'shared'])
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
+  const host = useHost()
+  const { makeSnackbar } = useToaster()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -268,21 +275,43 @@ export function ProtocolDetails(): JSX.Element | null {
         setShowMaxPinsAlert(true)
       } else {
         pinnedProtocolIds.push(protocolId)
+        makeSnackbar(t('protocol_info:pinned_protocol'))
       }
     } else {
       pinnedProtocolIds = pinnedProtocolIds.filter(p => p !== protocolId)
+      makeSnackbar(t('protocol_info:unpinned_protocol'))
     }
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
-    //  TODO(ew, 3/23/23): show user result via snackbar component
   }
 
   const handleRunProtocol = (): void => {
     createRun({ protocolId })
   }
 
-  const { deleteProtocol } = useDeleteProtocolMutation(protocolId)
+  const handleDeleteClick = (): void => {
+    if (host != null) {
+      getProtocol(host, protocolId)
+        .then(
+          response =>
+            response.data.links?.referencingRuns.map(({ id }) => id) ?? []
+        )
+        .then(referencingRunIds =>
+          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
+        )
+        .then(() => deleteProtocol(host, protocolId))
+        .then(() => history.goBack())
+        .catch((e: Error) => {
+          console.error(`error deleting resources: ${e.message}`)
+          history.goBack()
+        })
+    } else {
+      console.error(
+        'could not delete resources because the robot host is unknown'
+      )
+    }
+  }
 
   if (protocolRecord == null) return null
   const displayName =
@@ -292,7 +321,10 @@ export function ProtocolDetails(): JSX.Element | null {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
       {showMaxPinsAlert && (
-        <TooManyPinsModal
+        <SmallModalChildren
+          header={t('too_many_pins_header')}
+          subText={t('too_many_pins_body')}
+          buttonText={t('shared:close')}
           handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
         />
       )}
@@ -322,19 +354,16 @@ export function ProtocolDetails(): JSX.Element | null {
               : t('protocol_info:pin_protocol')
           }
           buttonType="secondary"
-          iconName="push-pin"
+          iconName="pin"
           onClick={handlePinClick}
-          width="30.375rem"
+          width="29.25rem"
         />
         <MediumButton
           buttonText={t('protocol_info:delete_protocol')}
           buttonType="alertSecondary"
-          iconName="delete"
-          onClick={() => {
-            deleteProtocol()
-            history.goBack()
-          }}
-          width="30.375rem"
+          iconName="trash"
+          onClick={handleDeleteClick}
+          width="29.25rem"
         />
       </Flex>
     </Flex>

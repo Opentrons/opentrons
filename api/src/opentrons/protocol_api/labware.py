@@ -215,8 +215,8 @@ class Well:
         """
         Load a liquid into a well.
 
-        :param liquid: The type of liquid to load into the well.
-        :param volume: The volume of liquid to load, in µL.
+        :param Liquid liquid: The liquid to load into the well.
+        :param float volume: The volume of liquid to load, in µL.
         """
         self._core.load_liquid(
             liquid=liquid,
@@ -313,6 +313,9 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError("Labware.separate_calibration has been removed")
+
         _log.warning(
             "Labware.separate_calibrations is a deprecated internal property."
             " It no longer has meaning, but will always return `False`"
@@ -360,7 +363,7 @@ class Labware:
         if isinstance(labware_location, AbstractModuleCore):
             return self._core_map.get(labware_location)
 
-        return labware_location
+        return None if labware_location is None else labware_location.id
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -432,8 +435,16 @@ class Labware:
 
     def set_calibration(self, delta: Point) -> None:
         """
-        Called by save calibration in order to update the offset on the object.
+        An internal, deprecated method used for updating the offset on the object.
+
+        .. deprecated:: 2.14
         """
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "Labware.set_calibration() is not supported when apiLevel is 2.14 or higher."
+                " Use a lower apiLevel"
+                " or use the Opentrons App's Labware Position Check."
+            )
         self._core.set_calibration(delta)
 
     @requires_version(2, 12)
@@ -874,7 +885,12 @@ class Labware:
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tiprack."""
+        """Reset all tips in a tip rack.
+
+        .. versionchanged:: 2.14
+            This method will raise an exception if you call it on a labware that isn't
+            a tip rack. Formerly, it would do nothing.
+        """
         self._core.reset_tips()
 
 

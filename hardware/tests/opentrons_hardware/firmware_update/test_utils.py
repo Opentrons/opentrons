@@ -7,6 +7,7 @@ import secrets
 from typing import Any, Dict, Optional
 import mock
 import pytest
+from typing import cast
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteType,
@@ -67,7 +68,12 @@ def generate_device_info(
         device_info_cache.update(
             {
                 node_id: DeviceInfoCache(
-                    node_id, version, shortsha, None, PCBARevision(revision, None)
+                    node_id,
+                    version,
+                    shortsha,
+                    None,
+                    PCBARevision(revision, None),
+                    subidentifier=0,
                 )
             }
         )
@@ -78,7 +84,12 @@ def generate_device_info(
         device_info_cache.update(
             {
                 target: DeviceInfoCache(
-                    target, version, shortsha, None, PCBARevision(revision, None)
+                    target,
+                    version,
+                    shortsha,
+                    None,
+                    PCBARevision(revision, None),
+                    subidentifier=0,
                 )
             }
         )
@@ -112,7 +123,7 @@ def generate_update_info(
 @pytest.mark.parametrize("node", list(NodeId))
 def all_nodes_covered_by_defaults(node: NodeId) -> None:
     """Every non-pipette node should have a default for its node id and bootloader."""
-    assert node in _DEFAULT_PCBA_REVS or "pipette" in node.name
+    assert node.application_for() in _DEFAULT_PCBA_REVS or "pipette" in node.name
 
 
 @pytest.mark.parametrize("pipette_type", list(PipetteType))
@@ -123,7 +134,12 @@ def all_pipette_types_covered_by_defaults(pipette: PipetteType) -> None:
 
 @pytest.mark.parametrize(
     "node,default_rev",
-    [(node, default_rev) for node, default_rev in _DEFAULT_PCBA_REVS.items()],
+    [(node, default_rev) for node, default_rev in _DEFAULT_PCBA_REVS.items()]
+    + [
+        (cast(NodeId, node).bootloader_for(), default_rev)
+        for node, default_rev in _DEFAULT_PCBA_REVS.items()
+        if node in NodeId
+    ],
 )
 @pytest.mark.parametrize("reported_rev", ["a1", "b2", None])
 def test_revision_defaulting_for_core(
@@ -132,7 +148,9 @@ def test_revision_defaulting_for_core(
     """We should pass through non-default revs and default ones that are not present."""
     _, rev = _update_type_for_device(
         {},
-        DeviceInfoCache(node, 2, "abcdef12", None, PCBARevision(main=reported_rev)),
+        DeviceInfoCache(
+            node, 2, "abcdef12", None, PCBARevision(main=reported_rev), subidentifier=0
+        ),
     )
     if reported_rev:
         assert rev == reported_rev
@@ -150,23 +168,35 @@ def test_revision_defaulting_for_core(
     ],
 )
 @pytest.mark.parametrize(
-    "pipette_type,default_rev",
+    "pipette_type,default_rev,subidentifier",
     [
-        (pipette_type, default_rev)
+        (cast(Optional[PipetteType], pipette_type), default_rev, 0)
+        for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
+    ]
+    + [
+        (None, default_rev, pipette_type.value)
         for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
     ],
 )
 @pytest.mark.parametrize("reported_rev", ["a1", "b2", None])
 def test_revision_defaulting_for_pipette(
     node: NodeId,
-    pipette_type: PipetteType,
+    pipette_type: Optional[PipetteType],
     default_rev: str,
+    subidentifier: int,
     reported_rev: Optional[str],
 ) -> None:
     """We should pass through non-default revs and default ones that are not present."""
     _, rev = _update_type_for_device(
-        {node: pipette_type},
-        DeviceInfoCache(node, 2, "abcdef12", None, PCBARevision(main=reported_rev)),
+        {node: pipette_type} if pipette_type else {},
+        DeviceInfoCache(
+            node,
+            2,
+            "abcdef12",
+            None,
+            PCBARevision(main=reported_rev),
+            subidentifier=subidentifier,
+        ),
     )
     if reported_rev:
         assert rev == reported_rev
@@ -400,7 +430,7 @@ def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
     """Don't do updates if the FirmwareUpdateType is unknown."""
     device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
         NodeId.head: DeviceInfoCache(
-            NodeId.head, 2, "12345678", None, PCBARevision(None)
+            NodeId.head, 2, "12345678", None, PCBARevision(None), subidentifier=0
         )
     }
     known_firmware_updates = generate_update_info(mock_manifest)

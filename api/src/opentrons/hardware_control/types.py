@@ -83,7 +83,10 @@ class OT3Mount(enum.Enum):
 
     @classmethod
     def from_mount(
-        cls, mount: Union[top_types.Mount, top_types.MountType, "OT3Mount"]
+        cls,
+        mount: Union[
+            top_types.Mount, top_types.MountType, top_types.OT3MountType, "OT3Mount"
+        ],
     ) -> "OT3Mount":
         return cls[mount.name]
 
@@ -542,6 +545,28 @@ class HardwareAction(enum.Enum):
 class PauseType(enum.Enum):
     PAUSE = 0
     DELAY = 1
+
+
+class StatusBarState(enum.Enum):
+    IDLE = 0
+    RUNNING = 1
+    PAUSED = 2
+    HARDWARE_ERROR = 3
+    SOFTWARE_ERROR = 4
+    CONFIRMATION = 5
+    RUN_COMPLETED = 6
+    UPDATING = 7
+    ACTIVATION = 8
+    DISCO = 9
+    OFF = 10
+
+    def transient(self) -> bool:
+        return self.value in {
+            StatusBarState.CONFIRMATION.value,
+            StatusBarState.RUN_COMPLETED.value,
+            StatusBarState.ACTIVATION.value,
+            StatusBarState.DISCO.value,
+        }
 
 
 @dataclass

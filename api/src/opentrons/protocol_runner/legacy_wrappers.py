@@ -96,6 +96,8 @@ class LegacyFileReader:
         )
 
 
+# TODO (spp, 2023-04-05): Remove 'legacy' wording since this is the context we are using
+#  for all python protocols.
 class LegacyContextCreator:
     """Interface to construct Protocol API v2 contexts."""
 
