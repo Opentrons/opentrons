@@ -469,9 +469,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     for v in test_volumes:
         print(f"\t{v} uL")
     tips = get_tips(ctx, pipette, all_channels=cfg.increment)
+    total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
     trial_total = len(test_volumes) * cfg.trials * len(channels_to_test)
-    assert trial_total <= len(tips), f"more trials ({trial_total}) than tips ({len(tips)})"
+    assert trial_total <= total_tips, f"more trials ({trial_total}) than tips ({total_tips})"
 
     ui.print_header("LOAD SCALE")
     print(
