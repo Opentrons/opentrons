@@ -605,7 +605,6 @@ class PipetteHandlerProvider:
             ul = volume
 
         distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
-        # breakpoint()
         return LiquidActionSpec(
             axis=OT3Axis.of_main_tool_actuator(mount),
             volume=0,
@@ -644,7 +643,6 @@ class PipetteHandlerProvider:
 
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
-        print(f"has tip = {instrument.has_tip}")
         if instrument.has_tip:
             raise TipAttachedError("Cannot pick up tip with a tip attached")
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
@@ -825,7 +823,6 @@ class PipetteHandlerProvider:
             (OT3Axis.of_main_tool_actuator(mount),),
             is_96_chan,
         )
-        # breakpoint()
 
         seq_ot3 = seq_builder_ot3()
         return (

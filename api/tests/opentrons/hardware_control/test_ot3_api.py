@@ -227,17 +227,6 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
     ) as mock_refresh:
         yield mock_refresh
 
-# @pytest.fixture
-# async def mock_pick_up_tip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
-#     with patch.object(
-#         ot3_hardware.managed_obj,
-#         "pick_up_tip",
-#         AsyncMock(
-#             spec=ot3_hardware.managed_obj.pick_up_tip,
-#         )
-#     ) as mock_pick_up:
-#         yield mock_pick_up
-
 
 @pytest.fixture
 async def mock_instrument_handlers(
@@ -402,17 +391,16 @@ def mock_backend_capacitive_pass(
         {OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"}},
         {OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"}},
         {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)}},
-    ]
+    ],
 )
 @given(blowout_volume=strategies.floats(min_value=1, max_value=10))
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
-async def test_blow_out(
-        ot3_hardware: ThreadManager[OT3API],
-        load_configs: Dict[str, Union[int, str, Tuple[int, int]]],
-        blowout_volume: float,
+async def test_blow_out_position(
+    ot3_hardware: ThreadManager[OT3API],
+    load_configs: Dict[str, Union[int, str, Tuple[int, int]]],
+    blowout_volume: float,
 ) -> None:
     for mount, configs in load_configs.items():
-        print(f"\nmount = {mount}, configs = {configs}\nblowout vol = {blowout_volume}")
         pipette_config = ot3_pipette_config.load_ot3_pipette(
             ot3_pipette_config.PipetteModelVersionType(
                 PipetteModelType(configs["model"]),
@@ -423,32 +411,82 @@ async def test_blow_out(
         instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
         await ot3_hardware.cache_pipette(mount, instr_data, None)
         with patch.object(
-                ot3_hardware, "drop_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
-        ) as mock_tip_drop:
-            mock_tip_drop.side_effect = ot3_hardware._pipette_handler.attached_instruments[mount]['has_tip'] = False
-            if ot3_hardware._pipette_handler.attached_instruments[mount]['has_tip']:
-                await ot3_hardware.drop_tip(mount)
-        with patch.object(
-                ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
+            ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
         ) as mock_tip_pickup:
-            mock_tip_pickup.side_effect = ot3_hardware._pipette_handler.attached_instruments[mount]['has_tip'] = True
-            await ot3_hardware.pick_up_tip(mount, 100)
+            mock_tip_pickup.side_effect = (
+                ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]
+            ) = (True)
+            if not ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]:
+                await ot3_hardware.pick_up_tip(mount, 100)
 
-        max_blowout_dist = instr_data['config'].plunger_positions_configurations.blow_out
-        print(f"test conversion rate = {instr_data['config'].shaft_ul_per_mm}")
-        max_blowout_vol = max_blowout_dist * instr_data['config'].shaft_ul_per_mm
-        print(f"test blowout distance = {blowout_volume * instr_data['config'].shaft_ul_per_mm}")
-        print(f"test max blowout dist = {max_blowout_dist}\ntest max blowout vol = {max_blowout_vol}")
-        assume(blowout_volume < max_blowout_vol)
+        max_allowed_input_distance = (
+            instr_data["config"].plunger_positions_configurations.blow_out
+            - instr_data["config"].plunger_positions_configurations.bottom
+        )
+        max_input_vol = (
+            max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm
+        )
+        assume(blowout_volume < max_input_vol)
 
         await ot3_hardware.blow_out(mount, blowout_volume)
-        # breakpoint()
+        pipette_axis = OT3Axis.of_main_tool_actuator(mount)
+        position_result = await ot3_hardware.current_position_ot3(mount)
+        expected_position = (
+            blowout_volume / instr_data["config"].shaft_ul_per_mm
+        ) + instr_data["config"].plunger_positions_configurations.bottom
+        assert (
+            position_result[pipette_axis]
+            < instr_data["config"].plunger_positions_configurations.blow_out
+        )
+        assert position_result[pipette_axis] == pytest.approx(expected_position)
 
-            # assume(blowout_volume > max_blowout_vol)
-            # with pytest.raises(ValueError):
-            #     await ot3_hardware.blow_out(mount, blowout_volume)
-            # breakpoint()
 
+@pytest.mark.parametrize(
+    "load_configs",
+    [
+        {OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"}},
+        {OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"}},
+        {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)}},
+    ],
+)
+@given(blowout_volume=strategies.floats(min_value=1, max_value=100))
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+async def test_blow_out_error(
+    ot3_hardware: ThreadManager[OT3API],
+    load_configs: Dict[str, Union[int, str, Tuple[int, int]]],
+    blowout_volume: float,
+) -> None:
+    for mount, configs in load_configs.items():
+        pipette_config = ot3_pipette_config.load_ot3_pipette(
+            ot3_pipette_config.PipetteModelVersionType(
+                PipetteModelType(configs["model"]),
+                PipetteChannelType(configs["channels"]),
+                PipetteVersionType(*configs["version"]),
+            )
+        )
+        instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(mount, instr_data, None)
+        with patch.object(
+            ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
+        ) as mock_tip_pickup:
+            mock_tip_pickup.side_effect = (
+                ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]
+            ) = (True)
+            if not ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]:
+                await ot3_hardware.pick_up_tip(mount, 100)
+
+        max_allowed_input_distance = (
+            instr_data["config"].plunger_positions_configurations.blow_out
+            - instr_data["config"].plunger_positions_configurations.bottom
+        )
+        max_input_vol = (
+            max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm
+        )
+        assume(blowout_volume > max_input_vol)
+
+        # check that blowout does not allow input values that would blow out too far
+        with pytest.raises(ValueError):
+            await ot3_hardware.blow_out(mount, blowout_volume)
 
 
 @pytest.mark.parametrize(

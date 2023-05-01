@@ -1488,17 +1488,15 @@ class OT3API(
         blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
 
         max_blowout_pos = instrument.plunger_positions.blow_out
-        print(f"instrument type = {type(instrument)}")
-        # breakpoint()
         # start at the bottom position and move additional distance det. by plan_check_blow_out
         blowout_distance = (
             instrument.plunger_positions.bottom + blowout_spec.plunger_distance
         )
-        print(f"blowout dist = {blowout_distance}, max blowout = {max_blowout_pos}")
         if blowout_distance > max_blowout_pos:
-            print(f"VALUE ERROR, blowout dist = {blowout_distance}, max blowout = {max_blowout_pos}")
-            raise ValueError(f"Blow out distance exceeds plunger position limit\n blowout dist = {blowout_distance}"
-                             f"max blowout = {max_blowout_pos}")
+            raise ValueError(
+                f"Blow out distance exceeds plunger position limit\n blowout dist = {blowout_distance}"
+                f"\nmax blowout distance = {max_blowout_pos}"
+            )
 
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
@@ -1582,7 +1580,6 @@ class OT3API(
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
-        # breakpoint()
 
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)

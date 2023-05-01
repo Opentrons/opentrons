@@ -472,7 +472,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         if action == "aspirate":
             sequence = self._active_tip_settings.aspirate[specific_tip]
         elif action == "blowout":
-            print(f"ul per mm = {self._config.shaft_ul_per_mm}")
             return self._config.shaft_ul_per_mm
         else:
             sequence = self._active_tip_settings.dispense[specific_tip]
