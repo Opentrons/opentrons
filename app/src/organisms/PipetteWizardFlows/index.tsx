@@ -77,7 +77,7 @@ export const PipetteWizardFlows = (
     false
   )
   const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset.offset != null
+    attachedPipettes[mount]?.data.calibratedOffset.last_modified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex

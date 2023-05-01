@@ -142,7 +142,7 @@ export function PipetteOffsetCalibrationItems({
                     pipetteName={
                       isOT3
                         ? attachedPipetteFromInstrumentQuery[calibration.mount]
-                            ?.instrumentName
+                            ?.instrumentName ?? null
                         : attachedPipettesFromPipetteQuery[calibration.mount]
                             ?.name ?? null
                     }
