@@ -457,8 +457,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
     print(f'found pipette "{pipette_tag}"')
-    # gather all available tips
-    tips = get_tips(ctx, pipette, all_channels=cfg.increment)
     if cfg.increment:
         pipette_tag += "-increment"
     elif cfg.user_volumes:
@@ -466,11 +464,14 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     else:
         pipette_tag += "-qc"
 
-    # GET TEST VOLUMES
+    ui.print_header("GET PARAMETERS")
     test_volumes = _get_volumes(ctx, cfg)
-    print("test volumes:")
     for v in test_volumes:
         print(f"\t{v} uL")
+    tips = get_tips(ctx, pipette, all_channels=cfg.increment)
+    channels_to_test = _get_test_channels(cfg)
+    trial_total = len(test_volumes) * cfg.trials * len(channels_to_test)
+    assert trial_total <= len(tips), f"more trials ({trial_total}) than tips ({len(tips)})"
 
     ui.print_header("LOAD SCALE")
     print(
@@ -592,8 +593,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_aspirate_evaporation_ul,
                 average_dispense_evaporation_ul,
             )
-        test_count = 0
-        test_total = len(test_volumes) * cfg.trials * cfg.pipette_channels
+        trial_count = 0
         for volume in test_volumes:
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -605,7 +605,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             trial_disp_dict: Dict[int, List[float]] = {
                 trial: [] for trial in range(cfg.trials)
             }
-            channels_to_test = _get_test_channels(cfg)
             for channel in channels_to_test:
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
@@ -613,11 +612,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 aspirate_data_list = []
                 dispense_data_list = []
                 for trial in range(cfg.trials):
-                    test_count += 1
+                    trial_count += 1
                     ui.print_header(
                         f"{volume} uL channel {channel + 1} ({trial + 1}/{cfg.trials})"
                     )
-                    print(f"trial total {test_count}/{test_total}")
+                    print(f"trial total {trial_count}/{trial_total}")
                     # remove it so it's not used again
                     next_tip: Well = tips[channel].pop(0)
                     next_tip_location = next_tip.top().move(channel_offset)
@@ -792,7 +791,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     finally:
         print("ending recording")
         recorder.stop()
-        recorder.deactivate()  # stop the server
+        recorder.deactivate()
+        # FIXME: instead keep motors engaged, and move to an ATTACH position
         hw_api = ctx._core.get_hardware()
         hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
