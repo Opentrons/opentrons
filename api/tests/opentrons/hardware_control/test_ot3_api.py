@@ -449,7 +449,7 @@ async def test_blow_out_position(
         {OT3Mount.LEFT: {"channels": 96, "model": "p1000", "version": (3, 3)}},
     ],
 )
-@given(blowout_volume=strategies.floats(min_value=1, max_value=100))
+@given(blowout_volume=strategies.floats(min_value=1, max_value=200))
 @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
