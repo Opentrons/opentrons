@@ -6,14 +6,14 @@ import type {
   SelectablePipettes,
 } from './types'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { AttachedPipettesByMount } from '@opentrons/api-client'
+import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
   isGantryEmpty: boolean,
-  attachedPipettes: AttachedPipettesByMount
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery
 ): PipetteWizardStep[] => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {

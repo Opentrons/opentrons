@@ -133,5 +133,6 @@
   "missing_pipettes_plural": "missing {{count}} pipettes",
   "missing_both": "missing hardware",
   "have_not_run": "No recent runs",
-  "have_not_run_description": "After you run some protocols, they will appear here."
+  "have_not_run_description": "After you run some protocols, they will appear here.",
+  "calibration_needed": "Calibration needed. <calLink>Calibrate now</calLink>"
 }

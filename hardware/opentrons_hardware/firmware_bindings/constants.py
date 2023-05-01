@@ -225,6 +225,7 @@ class ErrorCode(int, Enum):
     labware_dropped = 0x09
     estop_released = 0x0A
     motor_busy = 0x0B
+    stop_requested = 0x0C
 
 
 @unique
@@ -339,3 +340,14 @@ class MoveStopCondition(int, Enum):
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10
+
+
+@unique
+class MotorUsageValueType(int, Enum):
+    """Type of motor Usage value types."""
+
+    linear_motor_distance = 0x0
+    left_gear_motor_distance = 0x1
+    right_gear_motor_distance = 0x2
+    force_application_time = 0x3
+    total_error_count = 0x4

@@ -118,15 +118,17 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.yellow_two : COLORS.errorEnabled}`,
+      color: `${showODDStyle ? COLORS.red_two : COLORS.errorEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.yellow_four : COLORS.errorBackgroundLight
+        showODDStyle ? COLORS.red_four : COLORS.errorBackgroundLight
       }`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: COLORS.darkGreyEnabled,
-      backgroundColor: COLORS.darkGreyDisabled,
+      color: `${showODDStyle ? COLORS.grey_two : COLORS.darkGreyEnabled}`,
+      backgroundColor: `${
+        showODDStyle ? COLORS.grey_four : COLORS.darkGreyDisabled
+      }`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
@@ -270,10 +272,20 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText.length > 0 && (
         <Link role="button" height={SPACING.spacing5}>
           <StyledText
-            color={COLORS.darkBlack_hundred}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            fontSize={TYPOGRAPHY.fontSize22}
-            lineHeight={TYPOGRAPHY.lineHeight28}
+            color={
+              showODDStyle ? COLORS.darkBlack_hundred : COLORS.darkBlackEnabled
+            }
+            fontSize={
+              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+            }
+            fontWeight={
+              showODDStyle
+                ? TYPOGRAPHY.fontWeightSemiBold
+                : TYPOGRAPHY.fontWeightRegular
+            }
+            lineHeight={
+              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             whiteSpace="nowrap"
           >

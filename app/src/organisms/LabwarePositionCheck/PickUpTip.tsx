@@ -204,20 +204,20 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     chainRunCommands(
       [
         {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
-        {
           commandType: 'moveToWell' as const,
           params: {
             pipetteId: pipetteId,
             labwareId: FIXED_TRASH_ID,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
+          },
+        },
+        {
+          commandType: 'moveLabware' as const,
+          params: {
+            labwareId: labwareId,
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
           },
         },
       ],
