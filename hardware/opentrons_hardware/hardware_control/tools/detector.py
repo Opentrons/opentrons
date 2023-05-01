@@ -139,12 +139,13 @@ def _need_type_query(attached: ToolDetectionResult) -> Set[NodeId]:
 async def _resolve_tool_types(
     messenger: CanMessenger,
     wc: WaitableCallback,
-    summary: ToolDetectionResult,
+    attached: ToolDetectionResult,
     timeout_sec: float,
 ) -> ToolSummary:
-    attached = await _await_one_result(wc)
 
     should_respond = _need_type_query(attached)
+    if not should_respond:
+        return ToolSummary(left=None, right=None, gripper=None)
     await messenger.send(
         node_id=NodeId.broadcast,
         message=message_definitions.InstrumentInfoRequest(),
