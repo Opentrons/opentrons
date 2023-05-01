@@ -1953,6 +1953,7 @@ class OT3API(
         moving_axis: OT3Axis,
         target_pos: float,
         pass_settings: CapacitivePassSettings,
+        retract_after: bool = True,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -2027,7 +2028,8 @@ class OT3API(
                 probe=InstrumentProbeType.PRIMARY,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, pass_start_pos)
+        if retract_after:
+            await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
     async def capacitive_sweep(
