@@ -4,9 +4,9 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.5.0
+# Internal Release 0.6.0
 
-This is internal release 0.5.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+This is internal release 0.6.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
 
 Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
 
@@ -34,26 +34,11 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## Reasonably Sized New Things
 ### ODD
-- More focus on visuals around alignment, sizing, and spacing, especially between screens - this is mostly catchup from removing the menu bar
-- Recently-run protocols is now populated!
-- In general, it's pretty doable to run protocols and pre-protocol from the ODD; give it a try by sending a protocol to the flex with the "send to OT3" button in the desktop app
-- LPC shouldn't drag tipracks around anymore
+- Protocol result screens! No more do you have to stare at those big buttons forever
 
 ### Robot Control
-- Even more acceleration changes from hardware testing
-- Improved trash bin positioning should mean dropped tips don't go quite as "everywhere"
-- DVT multis return tips a little better now
-- Fixed a bunch of behavior stuff around the 96 with plunger stalls, breaking instruments endpoints, etc. Should be usable now.
-- You should be able to cancel a protocol now without breaking the robot
-- Calibration should raise an error if it got a really bizarre output now
-- Logging overhaul:
-  - CANbus messages (and USB rear panel messages) are logged now; you can see them by downloading serial logs or running `journalctl -t opentrons-api-serial`
-  - We limited what goes in the api logs, removing HTTP access logs and SQL logs and move command spam; they should be more useful now. You can see them by downloading API logs or running `journalctl -t opentrons-api`.
-  - All the above is now in the robot-server unit logs, which can be accessed via `journalctl -u opentrons-robot-server`
-- Protocol analysis should be a _lot_ faster
-- Fixed an issue where pinging `GET /instruments` during automated calibration would cause calibration to fail
-- Increased reliability of automated calibration
-- Increased reliability of gripper pickups from modules
+- Rerunning a protocol should no longer result in being on step ?
+- DVT gripper sets its force more accurately now
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
@@ -66,7 +51,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Cancelling a protocol run. We're even more sure we fixed this so definitely tell us if it's not.
 
 ### ODD
-- Protocol execution
+- Protocol execution including end-of-protocol screen
 - Protocol run monitoring
 - Attach and calibrate
 - Network connection management, including viewing IP addresses and connecting to wifi networks
