@@ -441,7 +441,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
     print(f'found pipette "{pipette_tag}"')
-    setup_tip = get_tips(ctx, pipette, channel=0)[0]
+    tips_for_channel_zero = get_tips(ctx, pipette, all_channels=False)[0]
+    setup_tip = tips_for_channel_zero[0]
     setup_channel_offset = _get_channel_offset(cfg, channel=0)
     setup_tip_location = setup_tip.top().move(setup_channel_offset)
 
@@ -575,10 +576,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             ui.get_user_ready("REPLACE first Tip with NEW Tip")
         test_count = 0
         test_total = len(test_volumes) * cfg.trials * cfg.pipette_channels
-        tips_per_channel = {
-            channel: get_tips(ctx, pipette, channel)
-            for channel in range(pipette.channels)
-        }
+        tips_per_channel = get_tips(ctx, pipette, all_channels=cfg.increment)
         for volume in test_volumes:
             actual_asp_list_all = []
             actual_disp_list_all = []
