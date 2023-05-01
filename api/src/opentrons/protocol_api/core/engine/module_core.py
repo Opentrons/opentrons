@@ -100,13 +100,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        module_serial = self._engine_client.state.modules.get_serial_number(
-            self.module_id
-        )
-        assert (
-            module_serial is not None
-        ), "Expected module serial number but got None instead."
-        return module_serial
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
@@ -160,13 +154,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        module_serial = self._engine_client.state.modules.get_serial_number(
-            self.module_id
-        )
-        assert (
-            module_serial is not None
-        ), "Expected module serial number but got None instead."
-        return module_serial
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def engage(
         self,
@@ -261,13 +249,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        module_serial = self._engine_client.state.modules.get_serial_number(
-            self.module_id
-        )
-        assert (
-            module_serial is not None
-        ), "Expected module serial number but got None instead."
-        return module_serial
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
@@ -424,13 +406,7 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        module_serial = self._engine_client.state.modules.get_serial_number(
-            self.module_id
-        )
-        assert (
-            module_serial is not None
-        ), "Expected module serial number but got None instead."
-        return module_serial
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""

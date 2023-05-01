@@ -237,7 +237,8 @@ def test_get_properties_by_id(
         slotName=DeckSlotName.SLOT_2
     )
 
-    assert subject.get_serial_number("module-3") is None
+    with pytest.raises(AssertionError):
+        subject.get_serial_number("module-3")
 
     with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_definition("Not a module ID oh no")
