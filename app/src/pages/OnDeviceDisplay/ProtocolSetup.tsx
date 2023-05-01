@@ -252,7 +252,7 @@ function PrepareToRun({
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
-  // const isReadyToRun = areInstrumentsReady && !isMissingModules
+  const isReadyToRun = areInstrumentsReady && !isMissingModules
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
@@ -315,7 +315,7 @@ function PrepareToRun({
           </Flex>
           <Flex gridGap={SPACING.spacing5}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={false} onPlay={onPlay} />
+            <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing4}>
