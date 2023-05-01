@@ -375,20 +375,20 @@ describe('PickUpTip', () => {
       3,
       [
         {
-          commandType: 'moveLabware',
-          params: {
-            labwareId: 'labwareId1',
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
-        {
           commandType: 'moveToWell',
           params: {
             pipetteId: 'pipetteId1',
             labwareId: 'fixedTrash',
             wellName: 'A1',
             wellLocation: { origin: 'top' },
+          },
+        },
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
           },
         },
       ],
