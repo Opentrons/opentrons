@@ -10,6 +10,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import {
+  useAttachedPipettesFromInstrumentsQuery,
   useIsOT3,
   usePipetteOffsetCalibrations,
 } from '../../organisms/Devices/hooks'
@@ -33,6 +34,22 @@ export function RobotSettingsPipetteOffsetCalibration({
   const isOT3 = useIsOT3(robotName)
 
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
+  const ot3AttachedLeftPipetteOffsetCal =
+    useAttachedPipettesFromInstrumentsQuery().left?.data.calibratedOffset
+      .lastModified ?? null
+  const ot3AttachedRightPipetteOffsetCal =
+    useAttachedPipettesFromInstrumentsQuery().right?.data.calibratedOffset
+      .lastModified ?? null
+
+  let showPipetteOffsetCalItems = false
+  if (!isOT3 && pipetteOffsetCalibrations != null) {
+    showPipetteOffsetCalItems = true
+  } else if (
+    isOT3 &&
+    (ot3AttachedLeftPipetteOffsetCal != null ||
+      ot3AttachedRightPipetteOffsetCal != null)
+  )
+    showPipetteOffsetCalItems = true
 
   return (
     <Flex
@@ -48,7 +65,7 @@ export function RobotSettingsPipetteOffsetCalibration({
       {isOT3 ? (
         <StyledText as="p">{t('pipette_calibrations_description')}</StyledText>
       ) : null}
-      {pipetteOffsetCalibrations != null ? (
+      {showPipetteOffsetCalItems ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}
           formattedPipetteOffsetCalibrations={
