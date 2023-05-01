@@ -72,9 +72,9 @@ class Plot:
     def get_increment(self, df, axis):
         axis = axis.lower()
         if axis == "x":
-            increment = round(abs(df["X Position"].iloc[-1] - df["X Position"].iloc[0]) / (df["X Step"].max() - 1), 3)
+            increment = round(abs(df["X Position"].iloc[-1] - df["X Position"].iloc[0]) / (df["X Step"].max() - 1), 2)
         elif axis == "z":
-            increment = round(abs(df["Z Position"].iloc[-1] - df["Z Position"].iloc[0]) / (df["Z Step"].max() - 1), 3)
+            increment = round(abs(df["Z Position"].iloc[-1] - df["Z Position"].iloc[0]) / (df["Z Step"].max() - 1), 2)
         return increment
 
     def get_max_value(self, df, column):
@@ -151,7 +151,10 @@ class Plot:
         self.plot_param["x_title"] = "Time (min)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [4, 14]
+        self.plot_param["y_range"] = [4, 14] # 1ch
+        # self.plot_param["y_range"] = [14, 24] # 8ch
+        # self.plot_param["y_range"] = [9, 18] # 96ch
+        # self.plot_param["y_range"] = [13, 20] # gripper
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
@@ -197,9 +200,10 @@ class Plot:
         self.plot_param["x_title"] = "Distance from Deck (mm)"
         self.plot_param["y_title"] = "Capacitance (pF)"
         self.plot_param["x_range"] = [x_first, x_last]
-        # self.plot_param["y_range"] = [5, 12]
-        self.plot_param["y_range"] = [13, 20]
-        # self.plot_param["y_range"] = [14, 26]
+        self.plot_param["y_range"] = [5, 12] # 1ch
+        # self.plot_param["y_range"] = [14, 24] # 8ch
+        # self.plot_param["y_range"] = [9, 18] # 96ch
+        # self.plot_param["y_range"] = [13, 20] # gripper
         self.plot_param["legend"] = "Probe Side to Edge"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
@@ -207,9 +211,10 @@ class Plot:
         zoom_param["filename"] = "plot_absolute_all_zoom"
         zoom_param["title"] = f"Absolute Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
-        # zoom_param["y_range"] = [5.6, 6.6]
-        zoom_param["y_range"] = [13.6, 14.6]
-        # zoom_param["y_range"] = [15.8, 16.8]
+        zoom_param["y_range"] = [5.6, 6.6] # 1ch
+        # zoom_param["y_range"] = [14.4, 15.4] # 8ch
+        # zoom_param["y_range"] = [10, 11] # 96ch
+        # zoom_param["y_range"] = [13.6, 14.6] # gripper
         self.write_plot(zoom_param)
 
     def relative_all_plot(self):
@@ -233,7 +238,7 @@ class Plot:
         self.plot_param["x_title"] = "Distance from Deck (mm)"
         self.plot_param["y_title"] = "∆C/C<sub>O</sub>"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [0, 2.25]
+        self.plot_param["y_range"] = [0, 1]
         self.plot_param["legend"] = "Probe Side to Edge"
         self.plot_param["annotation"] = None
         zoom_param = self.plot_param.copy()
@@ -241,7 +246,7 @@ class Plot:
         zoom_param["filename"] = "plot_relative_all_zoom"
         zoom_param["title"] = f"Relative Capacitance vs. Deck Height Zoomed"
         zoom_param["x_range"] = [x_first, 1]
-        zoom_param["y_range"] = [0, 0.2]
+        zoom_param["y_range"] = [0, 0.05]
         self.write_plot(zoom_param)
 
 if __name__ == '__main__':
