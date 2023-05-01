@@ -4,7 +4,7 @@ import type {
   LoadedModule,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { RunCommandSummary } from '../runs'
+import type { RunCommandSummary, LabwareOffsetCreateData } from '../runs'
 
 export const ENGINE_STATUS_IDLE = 'idle' as const
 export const ENGINE_STATUS_RUNNING = 'running' as const
@@ -76,4 +76,8 @@ export interface MaintenanceRunError {
   errorType: string
   createdAt: string
   detail: string
+}
+
+export interface CreateMaintenanceRunData {
+  labwareOffsets?: LabwareOffsetCreateData[]
 }

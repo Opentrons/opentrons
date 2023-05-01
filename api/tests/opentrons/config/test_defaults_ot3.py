@@ -27,10 +27,10 @@ def test_load_calibration_cals() -> None:
     )
 
     # altered values are preserved
-    mostly_right["calibration"]["edge_sense"]["overrun_tolerance_mm"] += 0.2
+    mostly_right["calibration"]["edge_sense"]["overrun_tolerance_mm"] -= 0.2
     mostly_right["calibration"]["z_offset"]["pass_settings"][
         "max_overrun_distance_mm"
-    ] += 5
+    ] -= 0.5
     built_with_overrides = defaults_ot3._build_default_calibration(
         mostly_right["calibration"], defaults_ot3.DEFAULT_CALIBRATION_SETTINGS
     )

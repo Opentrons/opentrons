@@ -3,22 +3,26 @@ For more details about this release, please see the full [technical changelog][]
 
 ---
 
-# Internal Release 0.4.0
+# Internal Release 0.5.0
 
-This is 0.4.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.5.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
 ## New Stuff In This Release
-- No real big changes in the desktop app this week
+- Protocol analysis of Flex protocols is faster
+- Overhaul of pipette data generally should mean that 
+  - Flex instrument calibration shows up now
+  - 96-channels should show up in the instruments page and work in protocols
+  - We don't cause a lot of instrument polling anymore on the robot
+- LPC shouldn't drag tipracks around anymore
 
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 - Attach, detach, and calibration flows for anything from the protocol setup page
 - USB connectivity
 - Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot
-- If you leave the app on the device page it will very frequently ask what instrument is connected, which causes problems; don't leave the app on the device page of the robot for a really long time
-- The app always says instrument calibration is out of date
+
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 - Connecting to a Flex
