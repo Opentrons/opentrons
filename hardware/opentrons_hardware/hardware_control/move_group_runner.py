@@ -493,7 +493,7 @@ class MoveScheduler:
                     self._event.wait(),
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
-                self._send_stop_if_necessary(can_messenger, group_id)
+                await self._send_stop_if_necessary(can_messenger, group_id)
                 if self._error is not None:
                     raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:
