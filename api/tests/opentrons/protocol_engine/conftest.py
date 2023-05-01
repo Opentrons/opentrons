@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out HardwareControlAPI of unspecified robot type."""
-    return decoy.mock(cls=OT2HardwareControlAPI.__origin__)  # type: ignore
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
