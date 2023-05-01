@@ -182,7 +182,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
         return (
           <SmallButton
             key={index}
-            buttonType={currentStepSize === stepSize ? 'default' : 'alt'}
+            buttonType={currentStepSize === stepSize ? 'primary' : 'secondary'}
             onClick={() => {
               setCurrentStepSize(stepSize)
             }}

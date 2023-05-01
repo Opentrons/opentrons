@@ -11,7 +11,10 @@ import {
   GRIPPER_LOADNAME,
   CAL_PIN_LOADNAME,
 } from './constants'
-import type { MaintenanceRun } from '@opentrons/api-client'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
 import { CreateCommand, LEFT } from '@opentrons/shared-data'
@@ -45,7 +48,7 @@ interface BeforeBeginningProps extends GripperWizardStepProps {
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
     AxiosError<any>,
-    void,
+    CreateMaintenanceRunData,
     unknown
   >
   isCreateLoading: boolean
@@ -64,7 +67,7 @@ export const BeforeBeginning = (
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun()
+    createMaintenanceRun({})
   }, [])
 
   let commandsOnProceed: CreateCommand[] = [

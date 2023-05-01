@@ -145,7 +145,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           isOnDevice ? (
             <SmallButton
               buttonText={proceedButtonText}
-              buttonType="default"
+              buttonType="primary"
               onClick={proceed}
             />
           ) : (

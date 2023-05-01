@@ -6,6 +6,7 @@ import logging
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
+    AsyncGenerator,
     cast,
     Callable,
     Dict,
@@ -186,6 +187,7 @@ class OT3API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        self._instrument_cache_lock = asyncio.Lock()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -585,8 +587,12 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        await self._cache_instruments(require)
-        await self._configure_instruments()
+        if self._instrument_cache_lock.locked():
+            self._log.info("Instrument cache is locked, not refreshing")
+            return
+        async with self.instrument_cache_lock():
+            await self._cache_instruments(require)
+            await self._configure_instruments()
 
     async def _cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -2009,6 +2015,11 @@ class OT3API(
         end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
+
+    @contextlib.asynccontextmanager
+    async def instrument_cache_lock(self) -> AsyncGenerator[None, None]:
+        async with self._instrument_cache_lock:
+            yield
 
     async def capacitive_sweep(
         self,

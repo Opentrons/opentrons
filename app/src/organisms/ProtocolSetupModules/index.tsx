@@ -284,15 +284,12 @@ export function ProtocolSetupModules({
         ) : null}
       </Portal>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <BackButton onClick={() => setSetupScreen('instruments')}>
+        <BackButton onClick={() => setSetupScreen('prepare to run')}>
           {t('modules')}
         </BackButton>
-        <Flex gridGap="2.5rem">
-          <SetupInstructionsButton
-            onClick={() => setShowSetupInstructionsModal(true)}
-          />
-          <ContinueButton onClick={() => setSetupScreen('labware')} />
-        </Flex>
+        <SetupInstructionsButton
+          onClick={() => setShowSetupInstructionsModal(true)}
+        />
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}

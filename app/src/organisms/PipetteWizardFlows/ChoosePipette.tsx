@@ -200,7 +200,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               onClick={proceed}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               buttonText={t('continue')}
-              buttonType="default"
+              buttonType="primary"
             />
           </Flex>
         </Flex>
