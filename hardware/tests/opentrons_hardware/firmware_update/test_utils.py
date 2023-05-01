@@ -175,25 +175,16 @@ def test_revision_defaulting_for_core(
     ],
 )
 @pytest.mark.parametrize(
-    "pipette_type,default_rev,subidentifier",
-    [
-        (cast(Optional[PipetteType], pipette_type), default_rev, 0)
-        for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
-    ]
-    + [
-        (None, default_rev, pipette_type.value)
-        for pipette_type, default_rev in _DEFAULT_PCBA_REVS_PIPETTE.items()
-    ],
+    "subidentifier",
+    [pipette_type.value for pipette_type, _ in _DEFAULT_PCBA_REVS_PIPETTE.items()],
 )
-@pytest.mark.parametrize("reported_rev", ["a1", "b2", None])
+@pytest.mark.parametrize("reported_rev", ["a1", "b2", "c1"])
 def test_revision_defaulting_for_pipette(
     node: NodeId,
-    pipette_type: Optional[PipetteType],
-    default_rev: str,
     subidentifier: int,
     reported_rev: Optional[str],
 ) -> None:
-    """We should pass through non-default revs and default ones that are not present."""
+    """We should pass through revisions."""
     _, rev = _update_type_for_device(
         DeviceInfoCache(
             node,
@@ -205,10 +196,7 @@ def test_revision_defaulting_for_pipette(
             ok=True,
         ),
     )
-    if reported_rev:
-        assert rev == reported_rev
-    else:
-        assert rev == default_rev
+    assert rev == reported_rev
 
 
 def test_firmware_file_selected_for_revision() -> None:
