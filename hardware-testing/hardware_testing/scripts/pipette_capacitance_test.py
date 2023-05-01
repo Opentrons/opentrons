@@ -414,7 +414,10 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
     probe_type = int(input("Choose Probe Type: [Default = 1]\n 1. Solid\n 2. Hole\n") or "1")
     edge_mode = int(input("Choose Find Edge Mode: [Default = 1]\n 1. Calibration\n 2. Dial Indicator\n") or "1")
-    zero_mode = int(input("Dial Zero Mode: [Default = 1]\n 1. Auto\n 2. Manual\n") or "1")
+    if edge_mode == 1:
+        zero_mode = 1
+    elif edge_mode == 2:
+        zero_mode = int(input("Dial Zero Mode: [Default = 1]\n 1. Auto\n 2. Manual\n") or "1")
 
     if probe_type == 1:
         print("Probe Type = Solid")
@@ -424,10 +427,10 @@ if __name__ == '__main__':
         print("Find Edge = Calibration")
     elif edge_mode == 2:
         print("Find Edge = Dial Indicator")
-    if zero_mode == 1:
-        print("Dial Zero = Auto")
-    elif zero_mode == 2:
-        print("Dial Zero = Manual")
+        if zero_mode == 1:
+            print("Dial Zero = Auto")
+        elif zero_mode == 2:
+            print("Dial Zero = Manual")
 
     test = Pipette_Capacitance_Test(args.simulate, args.cycles, args.slot, args.x_increment, args.z_increment, args.x_steps, args.z_steps, probe_type, edge_mode, zero_mode)
     asyncio.run(test.run())
