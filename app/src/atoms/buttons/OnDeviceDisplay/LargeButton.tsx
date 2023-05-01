@@ -72,7 +72,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing5};
     line-height: ${TYPOGRAPHY.lineHeight20};
-    /* max-height: 14.375rem; */
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
