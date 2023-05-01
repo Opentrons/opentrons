@@ -71,7 +71,7 @@ def test_get_deck_slot(
     assert subject.get_deck_slot() == DeckSlotName.SLOT_1
 
 
-def test_get_deck_slot_display_name(
+def test_get_deck_slot_id(
     decoy: Decoy, subject: ModuleCore, mock_engine_client: EngineClient
 ) -> None:
     """It should return the correct deck slot string associated with the module and robot type."""
@@ -85,7 +85,7 @@ def test_get_deck_slot_display_name(
         mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_1, "OT-3 Standard")
     ).then_return("foo")
 
-    assert subject.get_deck_slot_display_name() == "foo"
+    assert subject.get_deck_slot_id() == "foo"
 
 
 def test_get_model(

@@ -79,7 +79,7 @@ class ModuleCore(AbstractModuleCore):
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
-    def get_deck_slot_display_name(self) -> str:
+    def get_deck_slot_id(self) -> str:
         slot_name = self.get_deck_slot()
         return validation.ensure_deck_slot_string(
             slot_name, robot_type=self._engine_client.state.config.robot_type

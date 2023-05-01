@@ -165,7 +165,7 @@ def test_load_labware_from_definition(
 
 def test_parent(decoy: Decoy, mock_core: ModuleCore, subject: ModuleContext) -> None:
     """Should get the parent slot name."""
-    decoy.when(mock_core.get_deck_slot_display_name()).then_return("bar")
+    decoy.when(mock_core.get_deck_slot_id()).then_return("bar")
     assert subject.parent == "bar"
 
 
