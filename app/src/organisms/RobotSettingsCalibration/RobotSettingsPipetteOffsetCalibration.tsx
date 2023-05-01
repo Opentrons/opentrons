@@ -35,11 +35,11 @@ export function RobotSettingsPipetteOffsetCalibration({
 
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const ot3AttachedLeftPipetteOffsetCal =
-    useAttachedPipettesFromInstrumentsQuery().left?.data.calibratedOffset
-      .last_modified ?? null
+    useAttachedPipettesFromInstrumentsQuery().left?.data.calibratedOffset ??
+    null
   const ot3AttachedRightPipetteOffsetCal =
-    useAttachedPipettesFromInstrumentsQuery().right?.data.calibratedOffset
-      .last_modified ?? null
+    useAttachedPipettesFromInstrumentsQuery().right?.data.calibratedOffset ??
+    null
 
   let showPipetteOffsetCalItems = false
   if (!isOT3 && pipetteOffsetCalibrations != null) {

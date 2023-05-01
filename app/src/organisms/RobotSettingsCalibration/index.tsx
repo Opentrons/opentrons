@@ -220,7 +220,7 @@ export function RobotSettingsCalibration({
       mount: 'left' as Mount,
       lastCalibrated:
         attachedPipettesFromInstrumentQuery.left?.data.calibratedOffset
-          .last_modified,
+          ?.last_modified,
     })
     formattedPipetteOffsetCalibrations.push({
       modelName: attachedPipettesFromInstrumentQuery.right?.displayName,
@@ -228,7 +228,7 @@ export function RobotSettingsCalibration({
       mount: 'right' as Mount,
       lastCalibrated:
         attachedPipettesFromInstrumentQuery.right?.data.calibratedOffset
-          .last_modified,
+          ?.last_modified,
     })
   }
 

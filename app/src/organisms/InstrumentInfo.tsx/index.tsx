@@ -85,9 +85,10 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       >
         <InfoItem
           label={t('last_calibrated')}
-          value={formatTimestamp(
-            instrument.data.calibratedOffset.last_modified
-          )}
+          value={
+            formatTimestamp(instrument.data.calibratedOffset?.last_modified) ??
+            'TODO'
+          }
         />
         <InfoItem label={t('firmware_version')} value="TODO" />
         <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
