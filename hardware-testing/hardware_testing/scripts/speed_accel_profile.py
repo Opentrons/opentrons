@@ -4,6 +4,7 @@ import asyncio
 import csv
 import numpy as np
 import time
+import os
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -385,6 +386,11 @@ async def _main(is_simulating: bool) -> None:
     try:
         #run the test while recording raw results
         table_results = {}
+
+        #check if directory exists, make if doesn't
+        if not os.path.exists(BASE_DIRECTORY):
+            os.makedirs(BASE_DIRECTORY)
+
         with open(BASE_DIRECTORY + SAVE_NAME + AXIS + '.csv', mode='w') as csv_file:
             fieldnames = ['axis','speed', 'acceleration', 'error', 'cycles']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
