@@ -130,7 +130,7 @@ export function RecentRunProtocolCard({
       <Flex width="100%" height="14rem">
         <StyledText
           fontSize={TYPOGRAPHY.fontSize32}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight42}
           css={PROTOCOL_TEXT_STYLE}
         >

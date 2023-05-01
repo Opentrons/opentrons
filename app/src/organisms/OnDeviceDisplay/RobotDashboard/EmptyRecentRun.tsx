@@ -41,7 +41,7 @@ export function EmptyRecentRun(): JSX.Element {
         <StyledText
           fontSize={TYPOGRAPHY.fontSize32}
           lineHeight={TYPOGRAPHY.lineHeight42}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('no_recent_runs')}
         </StyledText>

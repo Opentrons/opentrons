@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
+  Icon,
   Flex,
   COLORS,
   SPACING,
@@ -12,12 +13,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
-  ALIGN_END,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../../atoms/text'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
 import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
@@ -25,23 +24,19 @@ import type { RouteProps } from '../../../App/types'
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
-  const [showNavMenu, setNavMenu] = React.useState<boolean>(false)
+  const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
   const NavigationLink = styled(NavLink)`
+    ${TYPOGRAPHY.level3HeaderSemiBold}
     color: ${COLORS.darkBlack_seventy};
-    display: flex;
-    grid-gap: ${SPACING.spacing3};
-    border-bottom: 0.3125rem solid transparent;
+    border-bottom: 5px solid transparent;
     height: 3.5rem;
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 
     &.active {
       color: ${COLORS.black};
-      font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
-      border-bottom: 0.3125rem solid transparent;
       border-image: linear-gradient(
         to right,
         white 33.3%,
@@ -58,7 +53,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing5}
+        height="124px"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -66,33 +61,50 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing3}
         >
-          <NavigationLink to="/dashboard">
-            <StyledText as="h3">{robotName}</StyledText>
-          </NavigationLink>
+          <NavigationLink to="/dashboard">{robotName}</NavigationLink>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing6}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <NavigationLink key={name} to={navLinkTo as string}>
-              <StyledText as="h3" marginRight={SPACING.spacing6}>
-                {name}
-              </StyledText>
-            </NavigationLink>
+            <NavigationLink key={name} to={navLinkTo as string}>{name}</NavigationLink>
           ))}
         </Flex>
-        <Flex alignItems={ALIGN_END}>
-          <OverflowBtn
-            isOnDevice={true}
-            onClick={() => setNavMenu(true)}
-            aria-label="Navigation_OverflowBtn"
+        <IconButton onClick={() => setShowNavMenu(true)}>
+          <Icon
+            name="overflow-btn-touchscreen"
+            height="60px"
+            width="48px"
+            color={COLORS.darkBlack_seventy}
+            aria-label="OverflowBtn_OnDeviceDisplay_icon"
           />
-        </Flex>
+        </IconButton>
       </Flex>
       {showNavMenu && (
         <NavigationMenu
-          onClick={() => setNavMenu(false)}
+          onClick={() => setShowNavMenu(false)}
           robotName={robotName}
         />
       )}
     </>
   )
 }
+
+export const IconButton = styled('button')`
+    border-radius: ${SPACING.spacing2};
+    max-height: 100%;
+    background-color: ${COLORS.white};
+
+    &:hover {
+      background-color: ${COLORS.darkBlack_twenty};
+    }
+    &:active,
+    &:focus {
+      background-color: ${COLORS.darkBlack_twenty};
+    }
+    &:focus-visible {
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+      background-color: ${COLORS.darkBlack_twenty};
+    }
+    &:disabled {
+      background-color: transparent;
+    }
+`

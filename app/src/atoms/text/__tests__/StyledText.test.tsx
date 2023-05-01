@@ -209,7 +209,7 @@ describe('StyledText', () => {
       `fontSize: ${TYPOGRAPHY.fontSize38}`
     )
     expect(getByText('h2Bold')).toHaveStyle(
-      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
     expect(getByText('h2Bold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight48}`
@@ -226,7 +226,7 @@ describe('StyledText', () => {
       `fontSize: ${TYPOGRAPHY.fontSize32}`
     )
     expect(getByText('h3Bold')).toHaveStyle(
-      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
     expect(getByText('h3Bold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight42}`
@@ -243,7 +243,7 @@ describe('StyledText', () => {
       `fontSize: ${TYPOGRAPHY.fontSize28}`
     )
     expect(getByText('h4Bold')).toHaveStyle(
-      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
     expect(getByText('h4Bold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight36}`
@@ -258,7 +258,7 @@ describe('StyledText', () => {
     const { getByText } = render(props)
     expect(getByText('pBold')).toHaveStyle(`fontSize: ${TYPOGRAPHY.fontSize22}`)
     expect(getByText('pBold')).toHaveStyle(
-      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
     expect(getByText('pBold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight28}`
@@ -275,7 +275,7 @@ describe('StyledText', () => {
       `fontSize: ${TYPOGRAPHY.fontSize20}`
     )
     expect(getByText('labelBold')).toHaveStyle(
-      `fontWeight: ${TYPOGRAPHY.fontWeightLevel2_bold}`
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
     expect(getByText('labelBold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight24}`

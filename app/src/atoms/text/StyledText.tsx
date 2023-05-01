@@ -50,20 +50,20 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
     }
   `,
   h3SemiBold: css`
-    ${TYPOGRAPHY.h3SemiBold} @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.h3SemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.level3HeaderSemiBold}
     }
   `,
   h4SemiBold: TYPOGRAPHY.level4HeaderSemiBold,
   h6SemiBold: TYPOGRAPHY.h6SemiBold,
   pSemiBold: css`
-    ${TYPOGRAPHY.pSemiBold} @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.pSemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       ${TYPOGRAPHY.bodyTextSemiBold}
     }
   `,
-  labelSemiBold: css`
-    ${TYPOGRAPHY.labelSemiBold}
-  `,
+  labelSemiBold: TYPOGRAPHY.labelSemiBold,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
   h3Bold: TYPOGRAPHY.level3HeaderBold,
   h4Bold: TYPOGRAPHY.level4HeaderBold,
@@ -76,7 +76,7 @@ export const StyledText = styled(Text)<Props>`
     let fontWeight = ''
     if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {
       fontWeight = 'SemiBold'
-    } else if (props.fontWeight === TYPOGRAPHY.fontWeightLevel2_bold) {
+    } else if (props.fontWeight === TYPOGRAPHY.fontWeightBold) {
       fontWeight = 'Bold'
     }
     return styleMap[`${props.as}${fontWeight}`]

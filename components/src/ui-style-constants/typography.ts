@@ -19,8 +19,7 @@ export const fontSizeLabel = '0.6875rem' // 11px
 export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
-export const fontWeightBold = 800
-export const fontWeightLevel2_bold = 700
+export const fontWeightBold = 700
 export const fontWeightSemiBold = 600
 export const fontWeightRegular = 400
 export const fontWeightLight = 300
@@ -136,14 +135,14 @@ export const linkPSemiBold = css`
 // font styles for touchscreen
 export const level1Header = css`
   font-size: ${fontSize80};
-  font-weight: ${fontWeightLevel2_bold};
+  font-weight: ${fontWeightBold};
   line-height: ${lineHeight96};
 `
 
 export const level2HeaderBold = css`
   font-size: ${fontSize38};
   line-height: ${lineHeight48};
-  font-weight: ${fontWeightLevel2_bold};
+  font-weight: ${fontWeightBold};
 `
 
 export const level2HeaderSemiBold = css`
@@ -161,7 +160,7 @@ export const level2HeaderRegular = css`
 export const level3HeaderBold = css`
   font-size: ${fontSize32};
   line-height: ${lineHeight42};
-  font-weight: ${fontWeightLevel2_bold};
+  font-weight: ${fontWeightBold};
 `
 
 export const level3HeaderSemiBold = css`
@@ -179,7 +178,7 @@ export const level3HeaderRegular = css`
 export const level4HeaderBold = css`
   font-size: ${fontSize28};
   line-height: ${lineHeight36};
-  font-weight: ${fontWeightLevel2_bold};
+  font-weight: ${fontWeightBold};
 `
 
 export const level4HeaderSemiBold = css`
@@ -197,7 +196,7 @@ export const level4HeaderRegular = css`
 export const bodyTextBold = css`
   font-size: ${fontSize22};
   line-height: ${lineHeight28};
-  font-weight: ${fontWeightLevel2_bold};
+  font-weight: ${fontWeightBold};
 `
 
 export const bodyTextSemiBold = css`
@@ -215,7 +214,7 @@ export const bodyTextRegular = css`
 export const smallBodyTextBold = css`
   font-size: ${fontSize20};
   line-height: ${lineHeight24};
-  font-weight: ${fontWeightLevel2_bold};
+  font-weight: ${fontWeightBold};
 `
 
 export const smallBodyTextRegular = css`
