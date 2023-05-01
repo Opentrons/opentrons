@@ -315,11 +315,7 @@ function PrepareToRun({
           </Flex>
           <Flex gridGap={SPACING.spacing5}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton
-              disabled={false}
-              // disabled={!isReadyToRun}
-              onPlay={onPlay}
-            />
+            <PlayButton disabled={false} onPlay={onPlay} />
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing4}>
