@@ -14,6 +14,7 @@ from .dev_server import DevServer
 # Must match our Tavern config in common.yaml.
 _SESSION_SERVER_HOST = "http://localhost"
 _SESSION_SERVER_PORT = "31950"
+_OT3_SESSION_SERVER_PORT = "31960"
 
 
 def pytest_tavern_beta_before_every_test_run(
@@ -75,6 +76,40 @@ def run_server(
 
 
 @pytest.fixture(scope="session")
+def ot3_run_server(
+    request_session: requests.Session,
+    server_temp_directory: str,
+) -> Iterator[None]:
+    """Run the robot server in a background process."""
+    with DevServer(
+        port=_OT3_SESSION_SERVER_PORT,
+        is_ot3=True,
+        ot_api_config_dir=Path(server_temp_directory),
+    ) as dev_server:
+        dev_server.start()
+
+        # Wait for a bit to get started by polling /hcpealth
+        from requests.exceptions import ConnectionError
+
+        while True:
+            try:
+                request_session.get(
+                    f"{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}/health"
+                )
+            except ConnectionError:
+                pass
+            else:
+                break
+            time.sleep(0.5)
+        request_session.post(
+            f"{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}/home",
+            json={"target": "robot"},
+        )
+
+        yield
+
+
+@pytest.fixture(scope="session")
 def session_server_host(run_server: object) -> str:
     """Return the host of the running session-scoped dev server."""
     return _SESSION_SERVER_HOST
@@ -94,20 +129,6 @@ def set_disable_fast_analysis(
     disableFastProtocolUpload feature flag"""
     url = "http://localhost:31950/settings"
     data = {"id": "disableFastProtocolUpload", "value": True}
-    request_session.post(url, json=data)
-    yield None
-    data["value"] = None
-    request_session.post(url, json=data)
-
-
-@pytest.fixture
-def set_enable_ot3_hardware_controller(
-    request_session: requests.Session,
-) -> Iterator[None]:
-    """For integration tests that need to set then clear the
-    enableOT3HardwareController feature flag"""
-    url = "http://localhost:31950/settings"
-    data = {"id": "enableOT3HardwareController", "value": True}
     request_session.post(url, json=data)
     yield None
     data["value"] = None

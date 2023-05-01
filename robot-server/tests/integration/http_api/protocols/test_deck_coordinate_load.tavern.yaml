@@ -2,13 +2,12 @@ test_name: Upload, analyze, and confirm correctness of loading via deck coordina
 
 marks:
   - usefixtures:
-      - run_server
-      - set_enable_ot3_hardware_controller
-      - clean_server_state
+      - ot3_run_server
+      - ot3_clean_server_state
 stages:
   - name: Upload deck_coordinate_load protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{port_ot3:d}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/deck_coordinate_load.py'
@@ -37,7 +36,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{host:s}:{port_ot3:d}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:
