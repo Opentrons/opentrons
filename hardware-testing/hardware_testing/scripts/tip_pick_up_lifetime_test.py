@@ -21,7 +21,7 @@ def convert(seconds):
     hours, seconds = divmod(seconds, 60*60)
     minutes, seconds = divmod(seconds, 60)
 
-    return "%02d:%02d:%02d:%02d" % (weeks, hours, minutes, seconds)
+    return "%02d:%02d:%02d:%02d:%02d" % (weeks, days, hours, minutes, seconds)
 
 def getch():
     """
