@@ -168,10 +168,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
-            if not ModuleModel.is_magnetic_block(command.result.model):
-                assert (
-                    command.result.serialNumber is not None
-                ), "Expected serial number, got None instead."
             self._add_module_substate(
                 module_id=command.result.moduleId,
                 serial_number=command.result.serialNumber,
