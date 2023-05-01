@@ -168,12 +168,13 @@ def _load_pipette(
         f"but got a {pipette.max_volume} uL pipette"
     )
     pipette.default_speed = cfg.gantry_speed
-    if cfg.increment:
-        print("clearing pipette ul-per-mm table to be linear")
-        clear_pipette_ul_per_mm(
-            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
-            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
-        )
+    # NOTE: 8ch QC testing means testing 1 channel at a time,
+    #       so we need to decrease the pick-up current to work with 1 tip.
+    if pipette.channels == 8 and not cfg.increment:
+        hwapi = get_sync_hw_api(ctx)
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
+        hwpipette.pick_up_configurations.current = 0.2
     return pipette
 
 
@@ -428,6 +429,21 @@ def _drop_tip(
         pipette.drop_tip(home_after=False)
 
 
+def _get_test_channels(cfg: config.GravimetricConfig) -> List[int]:
+    if cfg.pipette_channels == 8 and not cfg.increment:
+        # NOTE: only test channels separately when QC'ing a 8ch
+        return MULTI_CHANNEL_TEST_ORDER
+    else:
+        return [0]
+
+
+def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
+    if cfg.pipette_channels == 8 and not cfg.increment:
+        return 1.0
+    else:
+        return float(cfg.pipette_channels)
+
+
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -443,7 +459,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     print(f'found pipette "{pipette_tag}"')
     # gather all available tips
     tips = get_tips(ctx, pipette, all_channels=cfg.increment)
-
     if cfg.increment:
         pipette_tag += "-increment"
     elif cfg.user_volumes:
@@ -590,11 +605,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             trial_disp_dict: Dict[int, List[float]] = {
                 trial: [] for trial in range(cfg.trials)
             }
-            if cfg.pipette_channels == 8 and not cfg.increment:
-                # NOTE: only test channels separately when QC'ing a 8ch
-                channels_to_test = MULTI_CHANNEL_TEST_ORDER
-            else:
-                channels_to_test = [0]
+            channels_to_test = _get_test_channels(cfg)
             for channel in channels_to_test:
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
@@ -641,8 +652,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     )
                     asp_with_evap = actual_aspirate - average_aspirate_evaporation_ul
                     disp_with_evap = actual_dispense + average_dispense_evaporation_ul
+                    chnl_div = _get_channel_divider(cfg)
+                    disp_with_evap /= chnl_div
+                    asp_with_evap /= chnl_div
                     print(
-                        "measured volumes with evaporation:\n"
+                        "per-channel volume, with evaporation:\n"
                         f"\taspirate: {round(asp_with_evap, 2)} uL\n"
                         f"\tdispense: {round(disp_with_evap, 2)} uL"
                     )
