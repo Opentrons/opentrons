@@ -82,7 +82,10 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
         gridGap={SPACING.spacing3}
         marginTop={SPACING.spacing5}
       >
-        <InfoItem label={t('last_calibrated')} value="TODO" />
+        <InfoItem
+          label={t('last_calibrated')}
+          value={instrument.data.calibratedOffset.last_modified}
+        />
         <InfoItem label={t('firmware_version')} value="TODO" />
         <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
       </Flex>

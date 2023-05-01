@@ -16,7 +16,11 @@ import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
-import { useAttachedPipettes, useIsOT3 } from '../../../organisms/Devices/hooks'
+import {
+  useAttachedPipettes,
+  useIsOT3,
+  useAttachedPipettesFromInstrumentsQuery,
+} from '../../../organisms/Devices/hooks'
 
 import type { State } from '../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
@@ -59,8 +63,12 @@ export function PipetteOffsetCalibrationItems({
   const customLabwareDefs = useSelector((state: State) => {
     return getCustomLabwareDefinitions(state)
   })
-  const attachedPipettes = useAttachedPipettes()
+  const attachedPipettesFromPipetteQuery = useAttachedPipettes()
+  const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
   const isOT3 = useIsOT3(robotName)
+  const attachedPipettes = Boolean(isOT3)
+    ? attachedPipetteFromInstrumentQuery
+    : attachedPipettesFromPipetteQuery
 
   return (
     <StyledTable>
@@ -132,7 +140,11 @@ export function PipetteOffsetCalibrationItems({
                     serialNumber={calibration.serialNumber ?? null}
                     updateRobotStatus={updateRobotStatus}
                     pipetteName={
-                      attachedPipettes[calibration.mount]?.name ?? null
+                      isOT3
+                        ? attachedPipetteFromInstrumentQuery[calibration.mount]
+                            ?.instrumentName
+                        : attachedPipettesFromPipetteQuery[calibration.mount]
+                            ?.name ?? null
                     }
                   />
                 </StyledTableCell>
