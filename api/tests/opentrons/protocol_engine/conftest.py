@@ -16,7 +16,7 @@ from opentrons.protocols.api_support.constants import (
 )
 from opentrons.protocol_engine.types import ModuleDefinition
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out HardwareControlAPI of unspecified robot type."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI.__origin__)  # type: ignore
 
 
 @pytest.fixture

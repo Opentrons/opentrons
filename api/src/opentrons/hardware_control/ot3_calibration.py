@@ -25,7 +25,6 @@ from opentrons_shared_data.deck import (
 from .robot_calibration import (
     RobotCalibration,
     DeckCalibration,
-    RobotCalibrationProvider,
 )
 from opentrons.calibration_storage import types
 from opentrons.calibration_storage.ot3.deck_attitude import (
@@ -896,7 +895,7 @@ def load() -> DeckCalibration:
     return load_attitude_matrix()
 
 
-class OT3RobotCalibrationProvider(RobotCalibrationProvider):
+class OT3RobotCalibrationProvider:
     def __init__(self, config: OT3Config) -> None:
         self._robot_calibration = OT3Transforms(
             deck_calibration=load(),

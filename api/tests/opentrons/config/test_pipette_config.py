@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast
+from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast, Union, Type
 from unittest.mock import patch
 
 import pytest
@@ -8,10 +8,16 @@ from decoy import Decoy
 from numpy import isclose
 
 from opentrons.config import CONFIG, pipette_config, feature_flags as ff
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.api import API
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons.types import Mount
+from opentrons.hardware_control.types import OT3Mount
+
+from opentrons.hardware_control.backends import Simulator
+from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
 
 defs = json.loads(load_shared_data("pipette/definitions/1/pipetteModelSpecs.json"))
 
@@ -279,7 +285,7 @@ def test_validate_overrides_pass(
 # configurations are ported over to the new format.
 @pytest.fixture
 async def attached_pipettes(
-    hardware: HardwareControlAPI,
+    hardware: Union[OT3API, API],
     request: pytest.FixtureRequest,
 ) -> AsyncGenerator[Dict[str, PipetteSpec], None]:
     """Fixture the robot to have attached pipettes
@@ -303,16 +309,28 @@ async def attached_pipettes(
     right_name = right_mod.split("_v")[0]
     left_id = marker_with_default("attach_left_id", "abc123")
     right_id = marker_with_default("attach_right_id", "abcd123")
-    mount_type = type(list(hardware._backend._attached_instruments.keys())[0])  # type: ignore[attr-defined]
 
-    hardware._backend._attached_instruments = {  # type: ignore[attr-defined]
-        mount_type.RIGHT: {"model": right_mod, "id": right_id, "name": right_name},
-        mount_type.LEFT: {"model": left_mod, "id": left_id, "name": left_name},
+    backend = cast(Union[Simulator, OT3Simulator], hardware._backend)
+
+    mount_type = cast(
+        Union[Type[Mount], Type[OT3Mount]],
+        type(list(backend._attached_instruments.keys())[0]),
+    )
+
+    backend._attached_instruments = {  # type: ignore[assignment]
+        mount_type.RIGHT: {
+            "model": right_mod,
+            "id": right_id,
+            "name": right_name,
+        },
+        mount_type.LEFT: {
+            "model": left_mod,
+            "id": left_id,
+            "name": left_name,
+        },
     }
     await hardware.cache_instruments()
-    yield {
-        k.name.lower(): v for k, v in hardware._backend._attached_instruments.items()  # type: ignore[attr-defined]
-    }
+    yield {k.name.lower(): v for k, v in backend._attached_instruments.items()}  # type: ignore[misc]
 
     # Delete created config files
     (CONFIG["pipette_config_overrides_dir"] / "abc123.json").unlink()

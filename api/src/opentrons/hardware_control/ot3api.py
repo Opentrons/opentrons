@@ -69,7 +69,6 @@ from .backends.ot3utils import (
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
-from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
@@ -98,10 +97,9 @@ from .types import (
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
-from .robot_calibration import RobotCalibration
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -147,13 +145,13 @@ mod_log = logging.getLogger(__name__)
 
 class OT3API(
     ExecutionManagerProvider,
+    OT3RobotCalibrationProvider,
     # This MUST be kept last in the inheritance list so that it is
     # deprioritized in the method resolution order; otherwise, invocations
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
-    OT3RobotCalibrationProvider,
+    HardwareControlInterface[OT3Transforms],
 ):
     """This API is the primary interface to the hardware controller.
 
