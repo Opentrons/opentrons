@@ -398,10 +398,7 @@ class MoveScheduler:
         log.info(f"error code: {code}")
         severity = message.payload.severity.value
         log.info(f"error severity: {severity}")
-        if (
-            code == ErrorCode.collision_detected
-            or severity == ErrorSeverity.unrecoverable
-        ):
+        if severity == ErrorSeverity.unrecoverable:
             self._should_stop = True
         self._event.set()
 
