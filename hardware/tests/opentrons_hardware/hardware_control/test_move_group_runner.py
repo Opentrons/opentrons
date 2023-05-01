@@ -336,14 +336,14 @@ async def test_send_ignore_stalls_requests(
     All of the moves sent should have the ignore_stalls as part of
     their stop condition.
     """
-    move_group = [
+    move_group: MoveGroups = [
         [
             {
                 NodeId.head: MoveGroupSingleAxisStep(
                     distance_mm=float64(246),
                     velocity_mm_sec=float64(2),
                     duration_sec=float64(1),
-                    stop_condition=MoveStopConditionField(stop_condition),
+                    stop_condition=stop_condition,
                 )
             }
         ]
@@ -675,14 +675,17 @@ class MockGripperSendMoveCompleter:
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
                 for node, move in moves.items():
+                    ack_id = UInt8Field(1)
                     assert isinstance(move, MoveGroupSingleGripperStep)
+                    if move.stop_condition == MoveStopCondition.limit_switch:
+                        ack_id = UInt8Field(2)
                     payload = MoveCompletedPayload(
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(0)),
                         encoder_position_um=Int32Field(int(0)),
                         position_flags=MotorPositionFlagsField(0),
-                        ack_id=UInt8Field(1),
+                        ack_id=ack_id,
                     )
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)

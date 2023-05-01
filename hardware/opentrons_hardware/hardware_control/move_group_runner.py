@@ -29,6 +29,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipActionResponse,
     Acknowledgement,
     ErrorMessage,
+    StopRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -59,7 +60,6 @@ from opentrons_hardware.firmware_bindings.utils import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
     MoveStopConditionField,
-    MoveAckIdField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -88,6 +88,7 @@ class MoveGroupRunner:
         Args:
             move_groups: The move groups to run.
             start_at_index: The index the MoveGroupManager will start at
+            ignore_stalls: Depends on the disableStallDetection feature flag
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
@@ -357,6 +358,7 @@ class MoveScheduler:
         self._event = asyncio.Event()
         self._error: Optional[ErrorMessage] = None
         self._current_group: Optional[int] = None
+        self._should_stop = False
 
     def _remove_move_group(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
@@ -392,32 +394,27 @@ class MoveScheduler:
         self, message: ErrorMessage, arbitration_id: ArbitrationId
     ) -> None:
         self._error = message
-        node_id = arbitration_id.parts.originating_node_id
-
-        if self._current_group is None:
-            # Without the _current_group variable, we have no idea what group
-            # to clear. Just have to flag the event and bail.
-            self._event.set()
-        else:
-            for move in self._moves[self._current_group].copy():
-                if move[0] == node_id:
-                    self._moves[self._current_group].discard(move)
-
-            if len(self._moves[self._current_group]) == 0:
-                # Only raise _event if this is the last active axis
-                self._event.set()
-        log.warning(f"Error during move group: {message}")
-        if message.payload.severity == ErrorSeverity.unrecoverable:
-            self._event.set()
-            raise RuntimeError("Firmware Error Received", message)
+        code = message.payload.error_code.value
+        log.info(f"error code: {code}")
+        severity = message.payload.severity.value
+        log.info(f"error severity: {severity}")
+        if (
+            code == ErrorCode.collision_detected
+            or severity == ErrorSeverity.unrecoverable
+        ):
+            self._should_stop = True
+        self._event.set()
 
     def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
-        stop_cond = self._stop_condition[group_id]
         try:
+            stop_cond = self._stop_condition[group_id]
             # FIXME: revise this
-            if stop_cond == MoveStopCondition.limit_switch and ack_id != MoveAckId.stopped_by_condition:
+            if (
+                stop_cond == MoveStopCondition.limit_switch
+                and ack_id != MoveAckId.stopped_by_condition
+            ):
                 condition = "Homing timed out."
                 log.warning(f"Homing failed. Condition: {condition}")
                 raise MoveConditionNotMet()
@@ -448,6 +445,15 @@ class MoveScheduler:
             if node_id not in nodes:
                 nodes.append(NodeId(node_id))
         return nodes
+
+    async def _send_stop(self, can_messenger: CanMessenger, group_id: int) -> None:
+        err = await can_messenger.ensure_send(
+            node_id=NodeId.broadcast,
+            message=StopRequest(payload=EmptyPayload()),
+            expected_nodes=self._get_nodes_in_move_group(group_id),
+        )
+        if err != ErrorCode.stop_requested:
+            log.warning("Stop request failed")
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
@@ -484,6 +490,8 @@ class MoveScheduler:
                     self._event.wait(),
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
+                if self._should_stop:
+                    self._send_stop(can_messenger, group_id)
                 if self._error is not None:
                     raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:

@@ -355,7 +355,7 @@ class MotorUsageValueType(int, Enum):
 
 
 class MoveAckId(int, Enum):
-    """Move Ack IDs. """
+    """Move Ack IDs."""
 
     complete_without_condition = 0x1
     stopped_by_condition = 0x2

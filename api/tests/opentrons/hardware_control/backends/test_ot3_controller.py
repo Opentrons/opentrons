@@ -38,7 +38,6 @@ from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
-    MustHomeError,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition

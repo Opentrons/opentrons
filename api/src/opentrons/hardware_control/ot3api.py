@@ -956,8 +956,8 @@ class OT3API(
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
         # Cache current position from backend
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        if not self._current_position:
+            await self.refresh_positions()
 
         if not self._backend.check_encoder_status(axes_moving):
             # a moving axis has not been homed before, homing robot now
@@ -1003,6 +1003,9 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
+        if not self._current_position:
+            await self.refresh_positions()
+
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
