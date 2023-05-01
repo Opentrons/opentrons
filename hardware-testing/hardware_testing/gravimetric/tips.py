@@ -4,7 +4,7 @@ from typing import List, Dict
 from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
 
 # Rows by Channel:
-#  - Rear Racks
+#  - Rear Racks (slot-row=C)
 #     - 7
 #     - 6
 #     - empty
@@ -13,7 +13,7 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentCon
 #     - empty
 #     - 4
 #     - empty
-#  - Front Racks
+#  - Front Racks (slot-row=B)
 #     - empty
 #     - 3
 #     - empty
@@ -45,14 +45,14 @@ CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
     7: "A",
 }
 CHANNEL_TO_SLOT_ROW_LOOKUP = {  # zero indexed
-    0: "A",
-    1: "A",
-    2: "A",
-    3: "A",
-    4: "B",
-    5: "B",
-    6: "B",
-    7: "B",
+    0: "B",
+    1: "B",
+    2: "B",
+    3: "B",
+    4: "C",
+    5: "C",
+    6: "C",
+    7: "C",
 }
 
 
@@ -78,7 +78,7 @@ def get_tips_for_individual_channel_on_multi(
     slot_row = CHANNEL_TO_SLOT_ROW_LOOKUP[channel]
     tip_row = CHANNEL_TO_TIP_ROW_LOOKUP[channel]
     # FIXME: need custom deck to support 3x racks horizontally
-    slots = [5, 6] if slot_row == "A" else [8, 9]
+    slots = [5, 6] if slot_row == "B" else [8, 9]
     tips = [
         tip
         for slot in slots
