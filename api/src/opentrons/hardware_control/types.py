@@ -10,6 +10,7 @@ from typing import (
     Callable,
     Dict,
     TypeVar,
+    Type
 )
 from typing_extensions import Literal
 from opentrons import types as top_types
@@ -302,14 +303,16 @@ class SubSystem(enum.Enum):
     def of_mount(
         cls: Type[SubSystem], mount: Union[top_types.Mount, OT3Mount]
     ) -> Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]:
-        return cast(Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper],
-                    {
-                        top_types.Mount.LEFT: cls.pipette_left,
-                        top_types.Mount.RIGHT: cls.pipette_right,
-                        OT3Mount.LEFT: cls.pipette_left,
-                        OT3Mount.RIGHT: cls.pipette_right,
-                        OT3Mount.GRIPPER: cls.gripper,
-                    }[mount])
+        return cast(
+            Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper],
+            {
+                top_types.Mount.LEFT: cls.pipette_left,
+                top_types.Mount.RIGHT: cls.pipette_right,
+                OT3Mount.LEFT: cls.pipette_left,
+                OT3Mount.RIGHT: cls.pipette_right,
+                OT3Mount.GRIPPER: cls.gripper,
+            }[mount],
+        )
 
 
 class PipetteSubType(enum.Enum):

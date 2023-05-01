@@ -106,12 +106,8 @@ class SubsystemManager:
             subsystem: SubSystemState(
                 ok=info.ok,
                 current_fw_version=info.version,
-                next_fw_version=self._updates_required[
-                    target
-                ].target_version,
-                fw_update_needed=self._updates_required[
-                    target
-                ].update_needed,
+                next_fw_version=self._updates_required[target].target_version,
+                fw_update_needed=self._updates_required[target].update_needed,
                 current_fw_sha=info.shortsha,
                 pcba_revision=str(info.revision),
                 update_state=self._updates_ongoing.get(target_to_subsystem(target)),
