@@ -48,6 +48,7 @@ export function ProtocolSetupInstruments({
         (i): i is GripperData => i.instrumentType === 'gripper'
       ) ?? null
     : null
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

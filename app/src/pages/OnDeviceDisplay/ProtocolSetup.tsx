@@ -176,6 +176,7 @@ function PrepareToRun({
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+
   const { data: attachedInstruments } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,

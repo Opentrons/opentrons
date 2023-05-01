@@ -16,6 +16,7 @@ import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
+import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
 import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 
 jest.mock('../../pages/OnDeviceDisplay/Welcome')
@@ -29,6 +30,7 @@ jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
+jest.mock('../../pages/OnDeviceDisplay/RunSummary')
 
 const mockWelcome = Welcome as jest.MockedFunction<typeof Welcome>
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
@@ -61,6 +63,7 @@ const mockInstrumentsDashboard = InstrumentsDashboard as jest.MockedFunction<
 const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
   typeof RunningProtocol
 >
+const mockRunSummary = RunSummary as jest.MockedFunction<typeof RunSummary>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -88,6 +91,7 @@ describe('OnDeviceDisplayApp', () => {
       <div>Mock RobotSettingsDashboard</div>
     )
     mockRunningProtocol.mockReturnValue(<div>Mock RunningProtocol</div>)
+    mockRunSummary.mockReturnValue(<div>Mock RunSummary</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -141,5 +145,9 @@ describe('OnDeviceDisplayApp', () => {
   it('renders RunningProtocol component from /protocols/:runId/run', () => {
     const [{ getByText }] = render('/protocols/my-run-id/run')
     getByText('Mock RunningProtocol')
+  })
+  it('renders a RunSummary component from /protocols/:runId/summary', () => {
+    const [{ getByText }] = render('/protocols/my-run-id/summary')
+    getByText('Mock RunSummary')
   })
 })
