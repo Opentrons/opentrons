@@ -609,14 +609,15 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
 
     @overload
+
     def plan_check_blow_out(
-        self, mount: top_types.Mount, microliters: Optional[float] = None
+        self, mount: top_types.Mount, volume: Optional[float] = None
     ) -> LiquidActionSpec[Axis]:
         ...
 
     @overload
     def plan_check_blow_out(
-        self, mount: OT3Mount, microliters: Optional[float] = None
+        self, mount: OT3Mount, volume: Optional[float] = None
     ) -> LiquidActionSpec[OT3Axis]:
         ...
 

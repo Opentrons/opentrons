@@ -1477,7 +1477,7 @@ class OT3API(
     async def blow_out(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        microliters: Optional[float] = None,
+        volume: Optional[float] = None,
     ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
@@ -1485,15 +1485,20 @@ class OT3API(
         """
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
-        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, microliters)
+        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
 
         max_blowout_pos = instrument.plunger_positions.blow_out
+        print(f"instrument type = {type(instrument)}")
+        # breakpoint()
         # start at the bottom position and move additional distance det. by plan_check_blow_out
         blowout_distance = (
             instrument.plunger_positions.bottom + blowout_spec.plunger_distance
         )
+        print(f"blowout dist = {blowout_distance}, max blowout = {max_blowout_pos}")
         if blowout_distance > max_blowout_pos:
-            raise ValueError("Blow out distance exceeds plunger position limit")
+            print(f"VALUE ERROR, blowout dist = {blowout_distance}, max blowout = {max_blowout_pos}")
+            raise ValueError(f"Blow out distance exceeds plunger position limit\n blowout dist = {blowout_distance}"
+                             f"max blowout = {max_blowout_pos}")
 
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
