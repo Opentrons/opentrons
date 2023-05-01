@@ -432,7 +432,6 @@ def test_add_labware_definition(
     assert result == LabwareLoadParams("hello", "world", 123)
 
 
-# TODO(mc, 2022-10-25): move to module core factory function
 @pytest.mark.parametrize(
     (
         "requested_model",
