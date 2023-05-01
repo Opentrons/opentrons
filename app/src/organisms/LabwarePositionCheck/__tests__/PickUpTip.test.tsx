@@ -233,7 +233,7 @@ describe('PickUpTip', () => {
       false
     )
     getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
-    getByRole('button', { name: 'try again' }).click()
+    getByRole('button', { name: 'Try again' }).click()
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       3,
       [
@@ -369,7 +369,7 @@ describe('PickUpTip', () => {
       false
     )
     getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
-    await getByRole('button', { name: 'yes' }).click()
+    await getByRole('button', { name: 'Yes' }).click()
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       3,

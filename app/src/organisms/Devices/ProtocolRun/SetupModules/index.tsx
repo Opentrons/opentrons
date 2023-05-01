@@ -15,13 +15,13 @@ import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 
 interface SetupModulesProps {
-  expandLabwareSetupStep: () => void
+  expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
 }
 
 export const SetupModules = ({
-  expandLabwareSetupStep,
+  expandLabwarePositionCheckStep,
   robotName,
   runId,
 }: SetupModulesProps): JSX.Element => {
@@ -46,12 +46,12 @@ export const SetupModules = ({
       <Flex justifyContent={JUSTIFY_CENTER}>
         <PrimaryButton
           disabled={missingModuleIds.length > 0 || runHasStarted}
-          onClick={expandLabwareSetupStep}
-          id="ModuleSetup_proceedToLabwareSetup"
+          onClick={expandLabwarePositionCheckStep}
+          id="ModuleSetup_proceedToLabwarePositionCheck"
           padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_setup_step')}
+          {t('proceed_to_labware_position_check')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 || runHasStarted ? (
