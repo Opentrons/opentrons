@@ -96,14 +96,11 @@ describe('ProtocolSetupLabware', () => {
     getByText('Labware')
     getByText('Labware Name')
     getByText('Location')
-    getByRole('button', { name: 'continue' })
     getByRole('button', { name: 'Deck Map' })
   })
 
   it('correctly navigates with the nav buttons', () => {
-    const [{ getByRole, getAllByRole }] = render()
-    getByRole('button', { name: 'continue' }).click()
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('lpc')
+    const [{ getAllByRole }] = render()
     getAllByRole('button')[0].click()
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })

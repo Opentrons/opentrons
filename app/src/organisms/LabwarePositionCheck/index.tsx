@@ -1,13 +1,17 @@
 import * as React from 'react'
-import { useRunQuery } from '@opentrons/react-api-client'
 import { useLogger } from '../../logger'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
-import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { FatalErrorModal } from './FatalErrorModal'
+
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void
   runId: string
+  maintenanceRunId: string
+  existingOffsets: LabwareOffset[]
+  mostRecentAnalysis: CompletedProtocolAnalysis | null
   caughtError?: Error
 }
 
@@ -20,21 +24,13 @@ export const LabwarePositionCheck = (
 ): JSX.Element => {
   const logger = useLogger(__filename)
 
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
-
-  const existingOffsets =
-    useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
-
   return (
     <ErrorBoundary
       logger={logger}
       ErrorComponent={FatalErrorModal}
       onClose={props.onCloseClick}
     >
-      <LabwarePositionCheckComponent
-        {...props}
-        {...{ mostRecentAnalysis, existingOffsets }}
-      />
+      <LabwarePositionCheckComponent {...props} />
     </ErrorBoundary>
   )
 }

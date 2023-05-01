@@ -23,7 +23,7 @@ describe('HowLPCWorksModal', () => {
   it('should render the correct body', () => {
     const { getByText } = render(props)
     getByText(
-      'A Labware Offset is a type of positional adjustment that accounts for small, real-world variances in the overall position of the labware on an OT-2’s deck. Labware Offset data is unique to a specific combination of labware definition, deck slot, and OT-2.'
+      'A Labware Offset is a type of positional adjustment that accounts for small, real-world variances in the overall position of the labware on a robot’s deck. Labware Offset data is unique to a specific combination of labware definition, deck slot, and robot.'
     )
     getByText(
       'Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.'
