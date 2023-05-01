@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import {
   Icon,
   Flex,
+  Box,
   COLORS,
   SPACING,
   DIRECTION_ROW,
@@ -14,6 +15,7 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
@@ -29,24 +31,26 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
-  const NavigationLink = styled(NavLink)`
+  const TouchNavLink = styled(NavLink)`
     ${TYPOGRAPHY.level3HeaderSemiBold}
     color: ${COLORS.darkBlack_seventy};
-    border-bottom: 5px solid transparent;
     height: 3.5rem;
-
+    display: flex;
+    flex-direction: ${DIRECTION_COLUMN};
+    align-items: ${ALIGN_CENTER};
     &.active {
       color: ${COLORS.black};
-      border-image: linear-gradient(
-        to right,
-        white 33.3%,
-        ${COLORS.highlightPurple_one} 33.3%,
-        ${COLORS.highlightPurple_one} 66.6%,
-        white 66.6%
-      );
-      border-image-slice: 1;
+    }
+    &.active > div {
+      background-color: ${COLORS.highlightPurple_one};
     }
   `
+  const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
+    <TouchNavLink to={props.to}>
+      {props.name}
+      <Box width="2.5rem" height="5px" borderRadius="2px" />
+    </TouchNavLink>
+  )
   return (
     <>
       <Flex
@@ -61,11 +65,11 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing3}
         >
-          <NavigationLink to="/dashboard">{robotName}</NavigationLink>
+          <NavigationLink to="/dashboard" name={robotName} />
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing6}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <NavigationLink key={name} to={navLinkTo as string}>{name}</NavigationLink>
+            <NavigationLink key={name} to={navLinkTo as string} name={name} />
           ))}
         </Flex>
         <IconButton onClick={() => setShowNavMenu(true)}>
@@ -89,22 +93,22 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
 }
 
 export const IconButton = styled('button')`
-    border-radius: ${SPACING.spacing2};
-    max-height: 100%;
-    background-color: ${COLORS.white};
+  border-radius: ${SPACING.spacing2};
+  max-height: 100%;
+  background-color: ${COLORS.white};
 
-    &:hover {
-      background-color: ${COLORS.darkBlack_twenty};
-    }
-    &:active,
-    &:focus {
-      background-color: ${COLORS.darkBlack_twenty};
-    }
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${COLORS.darkBlack_twenty};
-    }
-    &:disabled {
-      background-color: transparent;
-    }
+  &:hover {
+    background-color: ${COLORS.darkBlack_twenty};
+  }
+  &:active,
+  &:focus {
+    background-color: ${COLORS.darkBlack_twenty};
+  }
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.darkBlack_twenty};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
 `
