@@ -1,6 +1,7 @@
 test_name: Upload, analyze, and confirm correctness of loading via deck coordinate names
 
 marks:
+  - ot3_only
   - usefixtures:
       - ot3_run_server
       - ot3_clean_server_state
