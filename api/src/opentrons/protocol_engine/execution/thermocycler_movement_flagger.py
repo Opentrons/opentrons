@@ -116,9 +116,6 @@ class ThermocyclerMovementFlagger:
         thermocycler_serial = self._state_store.modules.get_serial_number(
             module_id=module_id
         )
-        assert (
-            thermocycler_serial is not None
-        ), "Expected a module serial number and got None."
         thermocycler = await self._find_thermocycler_by_serial(
             serial_number=thermocycler_serial
         )

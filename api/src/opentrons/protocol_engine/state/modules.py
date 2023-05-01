@@ -603,14 +603,17 @@ class ModuleView(HasState[ModuleState]):
         """
         return self.get(module_id).model
 
-    def get_serial_number(self, module_id: str) -> Optional[str]:
+    def get_serial_number(self, module_id: str) -> str:
         """Get the hardware serial number of the given module.
 
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
-        If the module is not connected by serial, this will return None.
         """
-        return self.get(module_id).serialNumber
+        module = self.get(module_id)
+        assert (
+            module.serialNumber is not None
+        ), f"Expected a connected module and got a {module.model.name}"
+        return module.serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
@@ -651,11 +654,12 @@ class ModuleView(HasState[ModuleState]):
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
 
         # add the calibrated module offset if there is one
-        module_serial = self.get_serial_number(module_id)
-        assert (
-            module_serial is not None
-        ), "Expected module serial number but got None instead."
-        offset = self._state.module_offset_by_serial.get(module_serial)
+        module = self.get(module_id)
+        if module.serialNumber is None:
+            raise errors.ModuleNotConnectedError(
+                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected by a serial."
+            )
+        offset = self._state.module_offset_by_serial.get(module.serialNumber)
         if offset is not None:
             module_offset = array((offset.x, offset.y, offset.z, 1))
             xformed = add(xformed, module_offset)

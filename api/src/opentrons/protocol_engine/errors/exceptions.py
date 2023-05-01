@@ -102,6 +102,10 @@ class ModuleNotOnDeckError(ProtocolEngineError):
     """Raised when trying to use a module that is loaded off the deck."""
 
 
+class ModuleNotConnectedError(ProtocolEngineError):
+    """Raised when trying to use a module that is not connected by a serial."""
+
+
 class SlotDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a deck slot that does not exist."""
 
