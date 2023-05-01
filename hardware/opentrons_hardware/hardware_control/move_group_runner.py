@@ -446,14 +446,17 @@ class MoveScheduler:
                 nodes.append(NodeId(node_id))
         return nodes
 
-    async def _send_stop(self, can_messenger: CanMessenger, group_id: int) -> None:
-        err = await can_messenger.ensure_send(
-            node_id=NodeId.broadcast,
-            message=StopRequest(payload=EmptyPayload()),
-            expected_nodes=self._get_nodes_in_move_group(group_id),
-        )
-        if err != ErrorCode.stop_requested:
-            log.warning("Stop request failed")
+    async def _send_stop_if_necessary(
+        self, can_messenger: CanMessenger, group_id: int
+    ) -> None:
+        if self._should_stop:
+            err = await can_messenger.ensure_send(
+                node_id=NodeId.broadcast,
+                message=StopRequest(payload=EmptyPayload()),
+                expected_nodes=self._get_nodes_in_move_group(group_id),
+            )
+            if err != ErrorCode.stop_requested:
+                log.warning("Stop request failed")
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
@@ -490,8 +493,7 @@ class MoveScheduler:
                     self._event.wait(),
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
-                if self._should_stop:
-                    self._send_stop(can_messenger, group_id)
+                self._send_stop_if_necessary(can_messenger, group_id)
                 if self._error is not None:
                     raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:

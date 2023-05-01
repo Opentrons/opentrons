@@ -332,10 +332,7 @@ async def test_send_ignore_stalls_requests(
     mock_can_messenger: AsyncMock,
     stop_condition: MoveStopCondition,
 ) -> None:
-    """
-    All of the moves sent should have the ignore_stalls as part of
-    their stop condition.
-    """
+    """Moves sent should have ignore_stalls as part of the stop condition."""
     move_group: MoveGroups = [
         [
             {
