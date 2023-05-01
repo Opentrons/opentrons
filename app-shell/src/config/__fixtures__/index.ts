@@ -19,6 +19,7 @@ import type {
   ConfigV13,
   ConfigV14,
   ConfigV15,
+  ConfigV16,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -213,5 +214,15 @@ export const MOCK_CONFIG_V15: ConfigV15 = {
     sleepMs: 60 * 1000 * 60 * 24 * 7,
     brightness: 4,
     textSize: 1,
+  },
+}
+
+export const MOCK_CONFIG_V16: ConfigV16 = {
+  ...MOCK_CONFIG_V15,
+  version: 16,
+  onDeviceDisplaySettings: {
+    ...MOCK_CONFIG_V15.onDeviceDisplaySettings,
+    isInitialSetup: true,
+    targetPath: '/welcome',
   },
 }

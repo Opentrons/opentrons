@@ -24,6 +24,8 @@ export interface OnDeviceDisplaySettings {
   sleepMs: number
   brightness: number
   textSize: number
+  isInitialSetup: boolean
+  targetPath: string
 }
 
 export interface ConfigV0 {
@@ -199,4 +201,12 @@ export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
   }
 }
 
-export type Config = ConfigV15
+export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
+  version: 16
+  onDeviceDisplaySettings: ConfigV15['onDeviceDisplaySettings'] & {
+    isInitialSetup: boolean
+    targetPath: string
+  }
+}
+
+export type Config = ConfigV16
