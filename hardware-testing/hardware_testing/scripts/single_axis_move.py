@@ -17,7 +17,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 MOUNT = OT3Mount.LEFT
-LOAD = GantryLoad.NONE
+LOAD = GantryLoad.LOW_THROUGHPUT
 CYCLES = 1
 SPEED_X = 500
 SPEED_Z = 200
