@@ -1219,8 +1219,8 @@ class OT3API(
                 except ZeroLengthMoveError:
                     self._log.info(f"{axis} already at home position, skip homing")
                     continue
-                except (MoveConditionNotMet, Exception):
-                    self._log.exception("Homing failed")
+                except (MoveConditionNotMet, Exception) as e:
+                    self._log.exception(f"Homing failed: {e}")
                     self._current_position.clear()
                     raise
                 else:

@@ -387,34 +387,29 @@ class MoveScheduler:
             # moves from a group we don't own
             return
 
-    def _handle_acknowledge(self, message: Acknowledgement) -> None:
-        log.debug("recieved ack")
-
     def _handle_error(
         self, message: ErrorMessage, arbitration_id: ArbitrationId
     ) -> None:
         self._error = message
-        code = message.payload.error_code.value
-        log.info(f"error code: {code}")
         severity = message.payload.severity.value
-        log.info(f"error severity: {severity}")
+        log.error(f"Error during move group: {message}")
         if severity == ErrorSeverity.unrecoverable:
             self._should_stop = True
         self._event.set()
 
-    def _handle_move_completed(self, message: _AcceptableMoves) -> None:
+    def _handle_move_completed(self, message: _AcceptableMoves, arbitration_id: ArbitrationId) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
+        node_id = arbitration_id.parts.originating_node_id
         try:
             stop_cond = self._stop_condition[group_id]
-            # FIXME: revise this
             if (
                 stop_cond == MoveStopCondition.limit_switch
                 and ack_id != MoveAckId.stopped_by_condition
             ):
-                condition = "Homing timed out."
-                log.warning(f"Homing failed. Condition: {condition}")
-                raise MoveConditionNotMet()
+                log.warning(f"Homing time out for {node_id}")
+                self._should_stop = True
+                self._event.set()
         except IndexError:
             # If we have two move group runners running at once, they each
             # pick up groups they don't care about, and need to not fail.
@@ -426,7 +421,7 @@ class MoveScheduler:
         """Incoming message handler."""
         if isinstance(message, MoveCompleted):
             self._remove_move_group(message, arbitration_id)
-            self._handle_move_completed(message)
+            self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, TipActionResponse):
             gear_id = GearMotorId(message.payload.gear_motor_id.value)
             self._expected_tip_action_motors.remove(gear_id)
@@ -454,6 +449,13 @@ class MoveScheduler:
             )
             if err != ErrorCode.stop_requested:
                 log.warning("Stop request failed")
+            if self._error:
+                raise RuntimeError(f"Unrecoverable firmware error during move group {group_id}: {self._error}")
+            else:
+                # This happens when the move completed without stop condition
+                raise MoveConditionNotMet
+        elif self._error is not None:
+            log.warning(f"Recoverable firmware error during {group_id}: {self._error}")
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
@@ -491,8 +493,6 @@ class MoveScheduler:
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
                 await self._send_stop_if_necessary(can_messenger, group_id)
-                if self._error is not None:
-                    raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:
                 log.warning(
                     f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
@@ -500,7 +500,7 @@ class MoveScheduler:
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
                 )
-            except RuntimeError as e:
+            except (RuntimeError, MoveConditionNotMet) as e:
                 log.error("canceling move group scheduler")
                 raise e
 
