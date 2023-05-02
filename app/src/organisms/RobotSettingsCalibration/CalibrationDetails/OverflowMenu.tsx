@@ -23,8 +23,10 @@ import { Divider } from '../../../atoms/structure'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
-import { useTrackEvent } from '../../../redux/analytics'
-import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+} from '../../../redux/analytics'
 import { useRunStatuses } from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
@@ -106,7 +108,7 @@ export function OverflowMenu({
   const handleDownload = (e: React.MouseEvent): void => {
     e.preventDefault()
     doTrackEvent({
-      name: EVENT_CALIBRATION_DOWNLOADED,
+      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: {},
     })
 

@@ -363,7 +363,7 @@ class Labware:
         if isinstance(labware_location, AbstractModuleCore):
             return self._core_map.get(labware_location)
 
-        return labware_location
+        return None if labware_location is None else labware_location.id
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)

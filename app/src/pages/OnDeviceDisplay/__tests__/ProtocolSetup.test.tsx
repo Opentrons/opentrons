@@ -25,15 +25,17 @@ import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
+import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
 import { ProtocolSetup } from '../ProtocolSetup'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 jest.mock('@opentrons/shared-data/js/helpers')
+jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -89,6 +91,9 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
   typeof useAllPipetteOffsetCalibrationsQuery
 >
+const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
+  typeof useLaunchLPC
+>
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
@@ -134,7 +139,9 @@ const mockEmptyAnalysis = ({
 const mockPlay = jest.fn()
 
 describe('ProtocolSetup', () => {
+  let mockLaunchLPC: jest.Mock
   beforeEach(() => {
+    mockLaunchLPC = jest.fn()
     mockUseAttachedModules.mockReturnValue([])
     mockProtocolSetupModules.mockReturnValue(
       <div>Mock ProtocolSetupModules</div>
@@ -191,6 +198,12 @@ describe('ProtocolSetup', () => {
     when(mockUseAllPipetteOffsetCalibrationsQuery)
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
+    when(mockUseLaunchLPC)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        launchLPC: mockLaunchLPC,
+        LPCWizard: <div>mock LPC Wizard</div>,
+      })
   })
 
   afterEach(() => {
@@ -244,5 +257,11 @@ describe('ProtocolSetup', () => {
     expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
     getByText('Liquids').click()
     getByText('Mock ProtocolSetupLiquids')
+  })
+
+  it('should launch LPC when clicked', () => {
+    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    getByText('Labware Position Check').click()
+    expect(mockLaunchLPC).toHaveBeenCalled()
   })
 })

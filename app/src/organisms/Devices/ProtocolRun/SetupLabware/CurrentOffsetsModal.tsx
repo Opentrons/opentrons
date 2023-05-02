@@ -23,7 +23,7 @@ import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from './utils'
+import { getLatestCurrentOffsets } from '../SetupLabwarePositionCheck/utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {

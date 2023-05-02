@@ -116,22 +116,30 @@ def _get_approach_submerge_retract_heights(
 
 
 def _submerge(
-    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+    pipette: InstrumentContext,
+    well: Well,
+    height: float,
+    channel_offset: Point,
+    speed: float,
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
-        speed=config.TIP_SPEED_WHILE_SUBMERGING,
+        speed=speed,
     )
 
 
 def _retract(
-    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+    pipette: InstrumentContext,
+    well: Well,
+    height: float,
+    channel_offset: Point,
+    speed: float,
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
-        speed=config.TIP_SPEED_WHILE_RETRACTING,
+        speed=speed,
     )
     pipette.move_to(
         well.top().move(channel_offset),
@@ -197,6 +205,14 @@ def _pipette_with_liquid_settings(
         channel_count,
     )
 
+    # SET Z SPEEDS DURING SUBMERGE/RETRACT
+    if aspirate:
+        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
+        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
+    else:
+        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_DISPENSE
+        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_DISPENSE
+
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
         # set plunger speeds
@@ -217,10 +233,10 @@ def _pipette_with_liquid_settings(
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
                 _retract(
-                    pipette, well, approach_mm, channel_offset
+                    pipette, well, approach_mm, channel_offset, retract_speed
                 )  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
-                _submerge(pipette, well, submerge_mm, channel_offset)
+                _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -259,12 +275,12 @@ def _pipette_with_liquid_settings(
 
     # PHASE 2: SUBMERGE
     callbacks.on_submerging()
-    _submerge(pipette, well, submerge_mm, channel_offset)
+    _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
     _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract(pipette, well, retract_mm, channel_offset)
+    _retract(pipette, well, retract_mm, channel_offset, retract_speed)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
