@@ -39,20 +39,6 @@ class RobotCalibration:
     deck_calibration: DeckCalibration
 
 
-def build_temporary_identity_calibration() -> RobotCalibration:
-    """
-    Get a temporary identity deck cal suitable for use during
-    calibration
-    """
-    return RobotCalibration(
-        deck_calibration=DeckCalibration(
-            attitude=default_deck_calibration(),
-            source=types.SourceType.default,
-            status=types.CalibrationStatus(),
-        )
-    )
-
-
 def validate_attitude_deck_calibration(
     deck_cal: DeckCalibration,
 ) -> DeckTransformState:
@@ -216,3 +202,16 @@ class RobotCalibrationProvider:
         Once decorators are more fully supported, we can remove this.
         """
         return self._validate()
+
+    def build_temporary_identity_calibration(self) -> RobotCalibration:
+        """
+        Get a temporary identity deck cal suitable for use during
+        calibration
+        """
+        return RobotCalibration(
+            deck_calibration=DeckCalibration(
+                attitude=default_deck_calibration(),
+                source=types.SourceType.default,
+                status=types.CalibrationStatus(),
+            )
+        )

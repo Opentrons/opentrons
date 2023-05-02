@@ -30,3 +30,10 @@ class Calibratable(Protocol[CalibrationType]):
     def validate_calibration(self) -> DeckTransformState:
         """Check whether the current calibration is valid."""
         ...
+
+    def build_temporary_identity_calibration(self) -> CalibrationType:
+        """
+        Get temporary default calibration data suitable for use during
+        calibration
+        """
+        ...

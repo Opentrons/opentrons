@@ -953,6 +953,19 @@ class OT3RobotCalibrationProvider:
         """
         return self._validate()
 
+    def build_temporary_identity_calibration(self) -> OT3Transforms:
+        """
+        Get temporary default calibration data suitable for use during
+        calibration
+        """
+        return OT3Transforms(
+            deck_calibration=load(),
+            carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
+            left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
+            right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),
+            gripper_mount_offset=Point(*defaults_ot3.DEFAULT_GRIPPER_MOUNT_OFFSET),
+        )
+
 
 @dataclass
 class OT3Transforms(RobotCalibration):
