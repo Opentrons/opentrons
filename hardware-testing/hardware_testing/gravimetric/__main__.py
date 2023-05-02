@@ -68,7 +68,7 @@ def run(
             tip_volume=tip_volume,
             trials=trials,
             labware_offsets=LABWARE_OFFSETS,
-            slot_vial=protocol_cfg.SLOT_VIAL,  # type: ignore[attr-defined]
+            slot_scale=protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
             slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
             increment=increment,
             return_tip=return_tip,

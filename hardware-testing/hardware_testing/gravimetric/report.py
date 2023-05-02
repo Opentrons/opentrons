@@ -30,7 +30,7 @@ CSV Test Report:
    - pipette_mount
    - tip_volume
    - trials
-   - slot_vial
+   - slot_scale
    - slot_tiprack
    - increment
    - low_volume

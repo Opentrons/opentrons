@@ -197,7 +197,7 @@ def _apply_labware_offsets(
 def _load_labware(
     ctx: ProtocolContext, cfg: config.GravimetricConfig
 ) -> Tuple[Labware, List[Labware]]:
-    vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_vial)
+    vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_scale)
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,

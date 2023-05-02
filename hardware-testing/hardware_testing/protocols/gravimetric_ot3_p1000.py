@@ -5,7 +5,7 @@ metadata = {"protocolName": "gravimetric-ot3-p1000"}
 # FIXME: bump to v2.14 to utilize protocol engine
 requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
 
-SLOT_VIAL = 4
+SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     50: [3],
     200: [6],
@@ -20,7 +20,7 @@ def run(ctx: ProtocolContext) -> None:
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]
-    vial = ctx.load_labware("radwag_pipette_calibration_vial", SLOT_VIAL)
+    vial = ctx.load_labware("radwag_pipette_calibration_vial", SLOT_SCALE)
     pipette = ctx.load_instrument("p1000_single_gen3", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
