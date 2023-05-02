@@ -111,9 +111,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     return (
       <InProgressModal
         alternativeSpinner={isExiting ? null : pipetteProbeVid}
-        description={t('pipette_calibrating', {
-          pipetteName: displayName,
-        })}
+        description={
+          isExiting
+            ? t('stand_back')
+            : t('pipette_calibrating', {
+                pipetteName: displayName,
+              })
+        }
       >
         {isExiting ? undefined : (
           <Flex marginX={isOnDevice ? '4.5rem' : '8.5625rem'}>
