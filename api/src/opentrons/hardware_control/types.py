@@ -30,12 +30,14 @@ class MotionChecks(enum.Enum):
 
 
 class Axis(enum.Enum):
-    X = 0
-    Y = 1
-    Z = 2
-    A = 3
-    B = 4
-    C = 5
+    X = 0  # Gantry X
+    Y = 1  # Gantry Y
+    Z = 2  # left pipette mount Z
+    A = 3  # right pipette mount Z
+    B = 4  # left pipette plunger
+    C = 5  # right pipette plunger
+    Z_G = 6  # Gripper Z
+    G = 7  # Gripper Jaws
 
     @classmethod
     def by_mount(cls, mount: top_types.Mount) -> "Axis":
@@ -156,6 +158,8 @@ class OT3Axis(enum.Enum):
             Axis.A: cls.Z_R,
             Axis.B: cls.P_L,
             Axis.C: cls.P_R,
+            Axis.Z_G: cls.Z_G,
+            Axis.G: cls.G,
         }
         try:
             return am[axis]  # type: ignore
@@ -170,6 +174,8 @@ class OT3Axis(enum.Enum):
             OT3Axis.Z_R: Axis.A,
             OT3Axis.P_L: Axis.B,
             OT3Axis.P_R: Axis.C,
+            OT3Axis.Z_G: Axis.Z_G,
+            OT3Axis.G: Axis.G,
         }
         return am[self]
 

@@ -22,6 +22,8 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_Z: HardwareAxis.A,
     MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
+    MotorAxis.EXTENSION_Z: HardwareAxis.Z_G,
+    MotorAxis.EXTENSION_JAW: HardwareAxis.G,
 }
 
 # The height of the bottom of the pipette nozzle at home position without any tips.
