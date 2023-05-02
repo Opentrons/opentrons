@@ -843,8 +843,8 @@ def apply_machine_transform(
     belt_attitude: types.AttitudeMatrix,
 ) -> types.AttitudeMatrix:
     belt_attitude_arr = np.array(belt_attitude)
-    machine_attitude_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
-    deck_attitude_arr = np.dot(belt_attitude_arr, machine_attitude_arr)  # type: ignore[no-untyped-call]
+    machine_transform_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
+    deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)  # type: ignore[no-untyped-call]
     deck_attitude = deck_attitude_arr.round(4).tolist()
     return deck_attitude  # type: ignore[no-any-return]
 
