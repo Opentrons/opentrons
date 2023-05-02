@@ -42,7 +42,7 @@ from .module_core import (
     MagneticModuleCore,
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
-    NotConnectedModuleCore,
+    NonConnectedModuleCore,
     MagneticBlockCore,
 )
 from .exceptions import InvalidModuleLocationError
@@ -72,7 +72,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self._last_mount: Optional[Mount] = None
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
         self._module_cores_by_id: MutableMapping[
-            str, Union[ModuleCore, NotConnectedModuleCore]
+            str, Union[ModuleCore, NonConnectedModuleCore]
         ]
         self._module_cores_by_id = {}
         self._load_fixed_trash()
@@ -246,7 +246,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> Union[ModuleCore, NotConnectedModuleCore]:
+    ) -> Union[ModuleCore, NonConnectedModuleCore]:
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
 
@@ -271,7 +271,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             selected_hardware = self._resolve_module_hardware(
                 result.serialNumber, model.value
             )
-        module_core: Union[ModuleCore, NotConnectedModuleCore]
+        module_core: Union[ModuleCore, NonConnectedModuleCore]
         # TODO(mc, 2022-10-25): move to module core factory functio
         if not ProtocolEngineModuleModel.is_magnetic_block(result.model):
             module_core_cls: Type[ModuleCore] = ModuleCore
@@ -291,7 +291,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
                 sync_module_hardware=SynchronousAdapter(selected_hardware),
             )
         else:
-            module_core = NotConnectedModuleCore(
+            module_core = NonConnectedModuleCore(
                 module_id=result.moduleId,
                 engine_client=self._engine_client,
                 api_version=self.api_version,
@@ -394,7 +394,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_slot_item(
         self, slot_name: DeckSlotName
-    ) -> Union[LabwareCore, ModuleCore, NotConnectedModuleCore, None]:
+    ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
             slot_name=slot_name,
@@ -432,7 +432,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get all loaded labware cores."""
         return list(self._labware_cores_by_id.values())
 
-    def get_module_cores(self) -> List[Union[ModuleCore, NotConnectedModuleCore]]:
+    def get_module_cores(self) -> List[Union[ModuleCore, NonConnectedModuleCore]]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
 
@@ -458,7 +458,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[DeckSlotName, ModuleCore, NotConnectedModuleCore, None]:
+    ) -> Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, None]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id

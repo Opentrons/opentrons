@@ -36,50 +36,6 @@ from ..module import (
 from .exceptions import InvalidMagnetEngageHeightError
 
 
-class NotConnectedModuleCore(AbstractModuleCore):
-    """Not connected Module core logic implementation for Python protocols.
-
-    Args:
-        module_id: ProtocolEngine ID of the loaded modules.
-    """
-
-    def __init__(
-        self,
-        module_id: str,
-        engine_client: ProtocolEngineClient,
-        api_version: APIVersion,
-    ) -> None:
-        self._module_id = module_id
-        self._engine_client = engine_client
-        self._api_version = api_version
-
-    @property
-    def api_version(self) -> APIVersion:
-        """Get the api version protocol module target."""
-        return self._api_version
-
-    @property
-    def module_id(self) -> str:
-        """The module's unique ProtocolEngine ID."""
-        return self._module_id
-
-    def get_model(self) -> ModuleModel:
-        """Get the module's model identifier."""
-        return module_model_from_string(
-            self._engine_client.state.modules.get_connected_model(self.module_id)
-        )
-
-    def get_deck_slot(self) -> DeckSlotName:
-        """Get the module's deck slot."""
-        return self._engine_client.state.modules.get_location(self.module_id).slotName
-
-    def get_display_name(self) -> str:
-        """Get the module's display name."""
-        return self._engine_client.state.modules.get_definition(
-            self.module_id
-        ).displayName
-
-
 class ModuleCore(AbstractModuleCore):
     """Module core logic implementation for Python protocols.
     Args:
@@ -117,6 +73,50 @@ class ModuleCore(AbstractModuleCore):
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._engine_client.state.modules.get_serial_number(self.module_id)
+
+    def get_deck_slot(self) -> DeckSlotName:
+        """Get the module's deck slot."""
+        return self._engine_client.state.modules.get_location(self.module_id).slotName
+
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
+
+
+class NonConnectedModuleCore(AbstractModuleCore):
+    """Not connected Module core logic implementation for Python protocols.
+
+    Args:
+        module_id: ProtocolEngine ID of the loaded modules.
+    """
+
+    def __init__(
+        self,
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ) -> None:
+        self._module_id = module_id
+        self._engine_client = engine_client
+        self._api_version = api_version
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol module target."""
+        return self._api_version
+
+    @property
+    def module_id(self) -> str:
+        """The module's unique ProtocolEngine ID."""
+        return self._module_id
+
+    def get_model(self) -> ModuleModel:
+        """Get the module's model identifier."""
+        return module_model_from_string(
+            self._engine_client.state.modules.get_connected_model(self.module_id)
+        )
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
@@ -449,5 +449,5 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
 
 
-class MagneticBlockCore(NotConnectedModuleCore, AbstractMagneticBlockCore):
+class MagneticBlockCore(NonConnectedModuleCore, AbstractMagneticBlockCore):
     """Magnetic Block control interface via a ProtocolEngine."""
