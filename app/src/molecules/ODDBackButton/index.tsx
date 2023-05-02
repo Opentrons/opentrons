@@ -30,7 +30,6 @@ export function ODDBackButton(
         width="3rem"
       >
         <Icon
-
           color={COLORS.darkBlack_hundred}
           data-testid="back_icon"
           name="back"

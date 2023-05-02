@@ -34,7 +34,7 @@ import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../organisms/ODDBackButton'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -138,10 +138,6 @@ export function ProtocolSetupModules({
 }: ProtocolSetupModulesProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [
-    showModuleMismatchModal,
-    setShowModuleMismatchModal,
-  ] = React.useState<boolean>(false)
-  const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
@@ -182,14 +178,6 @@ export function ProtocolSetupModules({
   return (
     <>
       <Portal level="top">
-        {showModuleMismatchModal ? (
-          <Modal
-            title={t('module_mismatch_error')}
-            onClose={() => setShowModuleMismatchModal(false)}
-          >
-            TODO: module mismatch modal
-          </Modal>
-        ) : null}
         {showMultipleModulesModal ? (
           <MultipleModulesModal
             onCloseClick={() => setShowMultipleModulesModal(false)}
@@ -265,7 +253,6 @@ export function ProtocolSetupModules({
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
             type="alert"
-            onClick={() => setShowModuleMismatchModal(true)}
             onCloseClick={e => {
               e.stopPropagation()
               setClearModuleMismatchBanner(true)

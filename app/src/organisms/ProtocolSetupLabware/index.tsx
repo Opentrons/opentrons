@@ -32,7 +32,7 @@ import {
 
 import { FloatingActionButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../organisms/ODDBackButton'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
@@ -359,7 +359,7 @@ function LabwareLatch({
             </StyledText>
             <Icon
               name={icon}
-              size={SPACING.spacingXXL}
+              size="2.5rem"
               color={latchStatus === 'idle_open' ? COLORS.blueEnabled : ''}
             />
           </>
@@ -466,7 +466,6 @@ function RowLabware({
         width="86%"
       >
         <StyledText
-          color={COLORS.darkBlackEnabled}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}

@@ -14,7 +14,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { ODDBackButton } from '../../organisms/ODDBackButton'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
