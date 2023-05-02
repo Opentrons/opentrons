@@ -98,7 +98,7 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 class HardwareModule:
     """Data describing an actually connected module."""
 
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
@@ -221,7 +221,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _add_module_substate(
         self,
         module_id: str,
-        serial_number: str,
+        serial_number: Optional[str],
         definition: ModuleDefinition,
         slot_name: Optional[DeckSlotName],
         requested_model: Optional[ModuleModel],
@@ -273,6 +273,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
+            assert (
+                module_serial is not None
+            ), "Expected a module SN and got None instead."
             self._state.module_offset_by_serial[module_serial] = module_offset
 
     def _handle_heater_shaker_commands(
@@ -602,7 +605,11 @@ class ModuleView(HasState[ModuleState]):
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
         """
-        return self.get(module_id).serialNumber
+        module = self.get(module_id)
+        assert (
+            module.serialNumber is not None
+        ), f"Expected a connected module and got a {module.model.name}"
+        return module.serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
@@ -643,8 +650,12 @@ class ModuleView(HasState[ModuleState]):
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
 
         # add the calibrated module offset if there is one
-        module_serial = self.get_serial_number(module_id)
-        offset = self._state.module_offset_by_serial.get(module_serial)
+        module = self.get(module_id)
+        if module.serialNumber is None:
+            raise errors.ModuleNotConnectedError(
+                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected by a serial."
+            )
+        offset = self._state.module_offset_by_serial.get(module.serialNumber)
         if offset is not None:
             module_offset = array((offset.x, offset.y, offset.z, 1))
             xformed = add(xformed, module_offset)
@@ -815,6 +826,17 @@ class ModuleView(HasState[ModuleState]):
                 neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
 
         return neighbor_slot in self._state.slot_by_module_id.values()
+
+    def ensure_module_not_present(
+        self, model: ModuleModel, location: DeckSlotLocation
+    ) -> None:
+        """Ensure a different module is not preset in the slot we are trying to load into."""
+        for module in self.get_all():
+            if module.location == location and model != module.model:
+                raise errors.ModuleAlreadyPresentError(
+                    f"A {module.model.value} is already"
+                    f" present in {location.slotName.value}"
+                )
 
     def select_hardware_module_to_load(
         self,
