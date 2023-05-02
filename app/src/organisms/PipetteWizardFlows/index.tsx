@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
+import { useHistory } from 'react-router-dom'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
@@ -62,6 +63,7 @@ export const PipetteWizardFlows = (
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const history = useHistory()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(
@@ -120,6 +122,9 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
+    if (currentStepIndex === totalStepCount && isOnDevice) {
+      history.push('/instruments')
+    }
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
@@ -322,7 +327,7 @@ export const PipetteWizardFlows = (
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)
   } else if (showConfirmExit || errorMessage != null) {
-    exitWizardButton = handleCleanUpAndClose
+    exitWizardButton = handleCleanUpAndClose()
   }
 
   const wizardHeader = (

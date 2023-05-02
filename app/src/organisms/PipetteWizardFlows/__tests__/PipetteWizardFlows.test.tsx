@@ -47,6 +47,16 @@ jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks/useAttachedPipetteCalibrations')
 jest.mock('../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery')
 
+const mockPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
+
 const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
   typeof useAttachedPipetteCalibrations
 >
