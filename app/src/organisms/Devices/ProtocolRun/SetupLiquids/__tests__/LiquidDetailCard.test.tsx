@@ -7,7 +7,10 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { useTrackEvent } from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+} from '../../../../../redux/analytics'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
@@ -60,7 +63,7 @@ describe('LiquidDetailCard', () => {
     const { getByTestId } = render(props)
     fireEvent.click(getByTestId('LiquidDetailCard_box'))
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'highlightLiquidInDetailModal',
+      name: ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
       properties: {},
     })
   })

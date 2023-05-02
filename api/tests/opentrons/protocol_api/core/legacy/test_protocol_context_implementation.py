@@ -358,7 +358,9 @@ def test_load_module(
     decoy.when(mock_hw_mod_2.model()).then_return("model-2")
 
     decoy.when(
-        mock_deck.resolve_module_location(ModuleType.TEMPERATURE, DeckSlotName.SLOT_1)
+        mock_deck.resolve_module_location(
+            ModuleType.TEMPERATURE, DeckSlotName.SLOT_1.id
+        )
     ).then_return(42)
 
     decoy.when(mock_deck.position_for(42)).then_return(Location(Point(1, 2, 3), None))

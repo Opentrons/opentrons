@@ -18,11 +18,14 @@ def _git(*args: str) -> str:
 def _build_git_description_string() -> str:
     if IS_ROBOT:
         raise RuntimeError("unable to run git describe on robot")
-    description = _git("describe")
+    raw_description = _git("describe")
+    description_split = raw_description.split("-")
+    # separate everything but git hash with an underscore
+    description = "_".join(description_split[:-1]) + "-" + description_split[-1]
     mods = _git("ls-files", "-m").replace("\n", " ")
     if not mods:
         return description
-    return f"{description} [{mods}]"
+    return f"{description}-[{mods}]"
 
 
 def get_git_description() -> str:

@@ -47,7 +47,10 @@ let _log: Logger | undefined
 const store = (): Store => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = (new Store({ defaults: DEFAULTS_V12 }) as unknown) as Store<Config>
+    _store = (new Store({
+      defaults: DEFAULTS_V12,
+      cwd: '/data/ODD',
+    }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
   return _store
