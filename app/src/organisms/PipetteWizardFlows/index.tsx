@@ -41,6 +41,8 @@ import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import { InstrumentInfo } from '../InstrumentInfo.tsx'
+import { InstrumentData } from '@opentrons/api-client'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -109,7 +111,9 @@ export const PipetteWizardFlows = (
     null
   )
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-
+  const [showInstrumentInfo, setShowInstrumentInfo] = React.useState<boolean>(
+    false
+  )
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
@@ -123,12 +127,20 @@ export const PipetteWizardFlows = (
     setIsExiting(false)
     closeFlow()
     if (
-      //  only if you complete attach or detach flow, you're directed to instruments dashboard
+      //  only if you complete detach flow, you're directed to instruments dashboard
       currentStepIndex === totalStepCount &&
       isOnDevice &&
-      flowType !== FLOWS.CALIBRATE
+      flowType === FLOWS.DETACH
     ) {
       history.push('/instruments')
+    } else if (
+      //  only if you complete an attach flow, you're directed to InstrumentInfo
+      currentStepIndex === totalStepCount &&
+      isOnDevice &&
+      flowType === FLOWS.ATTACH &&
+      attachedPipettes[mount] != null
+    ) {
+      setShowInstrumentInfo(true)
     }
   }
 
@@ -195,6 +207,11 @@ export const PipetteWizardFlows = (
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
+  }
+  if (showInstrumentInfo) {
+    modalContent = (
+      <InstrumentInfo instrument={attachedPipettes[mount] as InstrumentData} />
+    )
   }
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
