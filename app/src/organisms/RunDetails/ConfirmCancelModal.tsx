@@ -23,6 +23,7 @@ import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -45,7 +46,7 @@ export function ConfirmCancelModal(
     setIsCanceling(true)
     stopRun(runId, {
       onSuccess: () => {
-        trackProtocolRunEvent({ name: 'runCancel' })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
       },
       onError: () => {
         setIsCanceling(false)

@@ -41,7 +41,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
           />
         ) : null}
         <StyledText
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
         >

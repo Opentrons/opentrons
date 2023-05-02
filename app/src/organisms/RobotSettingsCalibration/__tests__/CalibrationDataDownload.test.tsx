@@ -5,7 +5,10 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+} from '../../../redux/analytics'
 import { mockDeckCalData } from '../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -131,7 +134,7 @@ describe('CalibrationDataDownload', () => {
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'calibrationDataDownloaded',
+      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: {},
     })
   })

@@ -37,7 +37,11 @@ import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+} from '../../redux/analytics'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
@@ -162,7 +166,7 @@ export function AdvancedSettings(): JSX.Element {
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
     trackEvent({
-      name: 'changePathToPythonDirectory',
+      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
       properties: {},
     })
   }
@@ -314,7 +318,7 @@ export function AdvancedSettings(): JSX.Element {
               onClick={() => {
                 dispatch(CustomLabware.changeCustomLabwareDirectory())
                 trackEvent({
-                  name: 'changeCustomLabwareSourceFolder',
+                  name: ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
                   properties: {},
                 })
               }}

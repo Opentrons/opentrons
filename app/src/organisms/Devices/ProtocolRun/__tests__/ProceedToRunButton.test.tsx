@@ -5,7 +5,10 @@ import { StaticRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../../redux/analytics'
 import {
   useRunCalibrationStatus,
   useRunHasStarted,
@@ -94,7 +97,7 @@ describe('ProceedToRunButton', () => {
     const button = getByRole('link', { name: 'Proceed to run' })
     button.click()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'test run button' },
     })
   })
