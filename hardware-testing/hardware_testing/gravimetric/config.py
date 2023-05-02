@@ -14,9 +14,9 @@ class GravimetricConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
-    starting_tip: str
     labware_offsets: List[dict]
-    slot_vial: int
+    labware_on_scale: str
+    slot_scale: int
     slots_tiprack: List[int]
     increment: bool
     return_tip: bool
@@ -24,6 +24,8 @@ class GravimetricConfig:
     mix: bool
     inspect: bool
     user_volumes: bool
+    gantry_speed: int
+    scale_delay: int
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
