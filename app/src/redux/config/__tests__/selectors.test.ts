@@ -210,7 +210,6 @@ describe('shell selectors', () => {
             sleepMs: 180000,
             brightness: 1,
             textSize: 2,
-            isInitialSetup: false,
             targetPath: '/robot-settings/rename-robot',
           },
         },
@@ -219,7 +218,6 @@ describe('shell selectors', () => {
         sleepMs: 180000,
         brightness: 1,
         textSize: 2,
-        isInitialSetup: false,
         targetPath: '/robot-settings/rename-robot',
       })
     })

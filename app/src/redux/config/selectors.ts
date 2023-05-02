@@ -107,7 +107,6 @@ export const getOnDeviceDisplaySettings: (
       sleepMs: config?.onDeviceDisplaySettings?.sleepMs ?? SLEEP_NEVER_MS,
       brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
       textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
-      isInitialSetup: config?.onDeviceDisplaySettings.isInitialSetup ?? true,
       targetPath: config?.onDeviceDisplaySettings.targetPath ?? '/welcome',
     }
 )

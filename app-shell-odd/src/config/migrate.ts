@@ -118,7 +118,6 @@ const toVersion16 = (prevConfig: ConfigV15): ConfigV16 => {
     version: 16 as const,
     onDeviceDisplaySettings: {
       ...prevConfig.onDeviceDisplaySettings,
-      isInitialSetup: true,
       targetPath: '/welcome',
     },
   }
