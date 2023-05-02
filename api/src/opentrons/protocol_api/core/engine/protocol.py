@@ -1,6 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing_extensions import Literal
-from typing import Dict, Optional, cast, Union, List, Tuple, overload
+from typing import Dict, Optional, Union, List, Tuple, Type, MutableMapping
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -8,21 +8,11 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
-from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules import (
-    TempDeck,
-    MagDeck,
-    Thermocycler,
-    HeaterShaker,
-)
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
-    module_model_from_string,
-    HeaterShakerModuleModel,
-    ThermocyclerModuleModel,
-    TemperatureModuleModel,
-    MagneticModuleModel,
 )
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -37,6 +27,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
 )
+from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
@@ -45,7 +36,15 @@ from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
-from .module_core import ModuleCore, create_module_core
+from .module_core import (
+    ModuleCore,
+    TemperatureModuleCore,
+    MagneticModuleCore,
+    ThermocyclerModuleCore,
+    HeaterShakerModuleCore,
+    NotConnectedModuleCore,
+    MagneticBlockCore,
+)
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
@@ -72,7 +71,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
-        self._module_cores_by_id: Dict[str, ModuleCore] = {}
+        self._module_cores_by_id: MutableMapping[
+            str, Union[ModuleCore, NotConnectedModuleCore]
+        ]
+        self._module_cores_by_id = {}
         self._load_fixed_trash()
 
     @property
@@ -226,70 +228,25 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             drop_offset=_drop_offset,
         )
 
-    @overload
     def _resolve_module_hardware(
-        self,
-        serial_number: str,
-        model: Literal["temperatureModuleV1", "temperatureModuleV2"],
-    ) -> TempDeck:
+        self, serial_number: str, model: ModuleModel
+    ) -> AbstractModule:
         """Resolve a module serial number to module hardware API."""
-        ...
-
-    @overload
-    def _resolve_module_hardware(
-        self,
-        serial_number: str,
-        model: Literal["magneticModuleV1", "magneticModuleV2"],
-    ) -> MagDeck:
-        """Resolve a module serial number to module hardware API."""
-        ...
-
-    @overload
-    def _resolve_module_hardware(
-        self,
-        serial_number: str,
-        model: Literal["thermocyclerModuleV1", "thermocyclerModuleV2"],
-    ) -> Thermocycler:
-        """Resolve a module serial number to module hardware API."""
-        ...
-
-    def _resolve_module_hardware(
-        self,
-        serial_number: str,
-        model: Literal[
-            "heaterShakerModuleV1",
-            "thermocyclerModuleV1",
-            "thermocyclerModuleV2",
-            "magneticModuleV1",
-            "magneticModuleV2",
-            "temperatureModuleV1",
-            "temperatureModuleV2",
-        ],
-    ) -> Union[HeaterShaker, MagDeck, TempDeck, Thermocycler]:
-        """Resolve a module serial number to module hardware API."""
-        module_model = module_model_from_string(model)
         if self.is_simulating():
-            return self._sync_hardware.create_simulating_module(module_model)  # type: ignore[no-any-return]
+            return self._sync_hardware.create_simulating_module(model)  # type: ignore[no-any-return]
 
         for module_hardware in self._sync_hardware.attached_modules:
             if serial_number == module_hardware.device_info["serial"]:
-                if isinstance(module_model, HeaterShakerModuleModel):
-                    return cast(HeaterShaker, module_hardware)
-                elif isinstance(module_model, ThermocyclerModuleModel):
-                    return cast(Thermocycler, module_hardware)
-                elif isinstance(module_model, TemperatureModuleModel):
-                    return cast(TempDeck, module_hardware)
-                elif isinstance(module_model, MagneticModuleModel):
-                    return cast(MagDeck, module_hardware)
+                return module_hardware  # type: ignore[no-any-return]
 
-        raise RuntimeError(f"Could not find specified module: {model}")
+        raise RuntimeError(f"Could not find specified module: {model.value}")
 
     def load_module(
         self,
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> ModuleCore:
+    ) -> Union[ModuleCore, NotConnectedModuleCore]:
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
 
@@ -307,9 +264,6 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         )
         module_type = result.model.as_type()
 
-        selected_hardware: Union[
-            HeaterShaker, MagDeck, TempDeck, Thermocycler, None
-        ] = None
         if module_type != ModuleType.MAGNETIC_BLOCK:
             assert (
                 result.serialNumber is not None
@@ -317,14 +271,31 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             selected_hardware = self._resolve_module_hardware(
                 result.serialNumber, model.value
             )
+        module_core: Union[ModuleCore, NotConnectedModuleCore]
+        # TODO(mc, 2022-10-25): move to module core factory functio
+        if not ProtocolEngineModuleModel.is_magnetic_block(result.model):
+            module_core_cls: Type[ModuleCore] = ModuleCore
+            if module_type == ModuleType.TEMPERATURE:
+                module_core_cls = TemperatureModuleCore
+            elif module_type == ModuleType.MAGNETIC:
+                module_core_cls = MagneticModuleCore
+            elif module_type == ModuleType.THERMOCYCLER:
+                module_core_cls = ThermocyclerModuleCore
+            elif module_type == ModuleType.HEATER_SHAKER:
+                module_core_cls = HeaterShakerModuleCore
 
-        module_core = create_module_core(
-            module_type=module_type,
-            module_id=result.moduleId,
-            engine_client=self._engine_client,
-            api_version=self.api_version,
-            sync_module_hardware=selected_hardware,
-        )
+            module_core = module_core_cls(
+                module_id=result.moduleId,
+                engine_client=self._engine_client,
+                api_version=self.api_version,
+                sync_module_hardware=SynchronousAdapter(selected_hardware),
+            )
+        else:
+            module_core = NotConnectedModuleCore(
+                module_id=result.moduleId,
+                engine_client=self._engine_client,
+                api_version=self.api_version,
+            )
 
         # FIXME(mm, 2023-02-21):
         # We're wrongly doing this conflict check *after* we've already loaded the
@@ -423,7 +394,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_slot_item(
         self, slot_name: DeckSlotName
-    ) -> Union[LabwareCore, ModuleCore, None]:
+    ) -> Union[LabwareCore, ModuleCore, NotConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
             slot_name=slot_name,
@@ -461,7 +432,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Get all loaded labware cores."""
         return list(self._labware_cores_by_id.values())
 
-    def get_module_cores(self) -> List[ModuleCore]:
+    def get_module_cores(self) -> List[Union[ModuleCore, NotConnectedModuleCore]]:
         """Get all loaded module cores."""
         return list(self._module_cores_by_id.values())
 
@@ -487,7 +458,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[DeckSlotName, ModuleCore, None]:
+    ) -> Union[DeckSlotName, ModuleCore, NotConnectedModuleCore, None]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id

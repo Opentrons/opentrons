@@ -6,7 +6,6 @@ from typing import Optional, List, Union
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
-    ModuleType,
     TemperatureStatus,
     MagneticStatus,
     ThermocyclerStep,
@@ -37,8 +36,8 @@ from ..module import (
 from .exceptions import InvalidMagnetEngageHeightError
 
 
-class ModuleCore(AbstractModuleCore):
-    """Module core logic implementation for Python protocols.
+class NotConnectedModuleCore(AbstractModuleCore):
+    """Not connected Module core logic implementation for Python protocols.
 
     Args:
         module_id: ProtocolEngine ID of the loaded modules.
@@ -81,26 +80,59 @@ class ModuleCore(AbstractModuleCore):
         ).displayName
 
 
-class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
-    """Temperature Module core logic implementation for Python protocols."""
-
-    _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
+class ModuleCore(AbstractModuleCore):
+    """Module core logic implementation for Python protocols.
+    Args:
+        module_id: ProtocolEngine ID of the loaded modules.
+    """
 
     def __init__(
         self,
-        sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck],
         module_id: str,
         engine_client: ProtocolEngineClient,
         api_version: APIVersion,
-    ):
-        super().__init__(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
+        sync_module_hardware: SynchronousAdapter[hw_modules.AbstractModule],
+    ) -> None:
+        self._module_id = module_id
+        self._engine_client = engine_client
+        self._api_version = api_version
         self._sync_module_hardware = sync_module_hardware
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol module target."""
+        return self._api_version
+
+    @property
+    def module_id(self) -> str:
+        """The module's unique ProtocolEngine ID."""
+        return self._module_id
+
+    def get_model(self) -> ModuleModel:
+        """Get the module's model identifier."""
+        return module_model_from_string(
+            self._engine_client.state.modules.get_connected_model(self.module_id)
+        )
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._engine_client.state.modules.get_serial_number(self.module_id)
+
+    def get_deck_slot(self) -> DeckSlotName:
+        """Get the module's deck slot."""
+        return self._engine_client.state.modules.get_location(self.module_id).slotName
+
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
+
+
+class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
+    """Temperature Module core logic implementation for Python protocols."""
+
+    _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
@@ -110,7 +142,6 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
-
         Specifying a value for ``celsius`` that is different than
         the module's current target temperature may behave unpredictably.
         """
@@ -140,31 +171,13 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
 
-    def __init__(
-        self,
-        sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck],
-        module_id: str,
-        engine_client: ProtocolEngineClient,
-        api_version: APIVersion,
-    ):
-        super().__init__(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
-        self._sync_module_hardware = sync_module_hardware
-
-    def get_serial_number(self) -> str:
-        """Get the module's unique hardware serial number."""
-        return self._engine_client.state.modules.get_serial_number(self.module_id)
-
     def engage(
         self,
         height_from_base: Optional[float] = None,
         height_from_home: Optional[float] = None,
     ) -> None:
         """Raise the module's magnets.
-
         Only one of `height_from_base` or `height_from_home` may be specified.
-
         Args:
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
@@ -188,7 +201,6 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
         self, offset: float = 0, preserve_half_mm: bool = False
     ) -> None:
         """Raise the module's magnets up to its loaded labware.
-
         Args:
             offset: Offset from the labware's default engage height.
             preserve_half_mm: For labware whose definitions
@@ -234,22 +246,6 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
     _repetitions: Optional[int] = None
     _step_count: Optional[int] = None
-
-    def __init__(
-        self,
-        sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler],
-        module_id: str,
-        engine_client: ProtocolEngineClient,
-        api_version: APIVersion,
-    ):
-        super().__init__(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
-        self._sync_module_hardware = sync_module_hardware
-
-    def get_serial_number(self) -> str:
-        """Get the module's unique hardware serial number."""
-        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def open_lid(self) -> ThermocyclerLidStatus:
         """Open the Thermocycler's lid."""
@@ -392,22 +388,6 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
 
-    def __init__(
-        self,
-        sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker],
-        module_id: str,
-        engine_client: ProtocolEngineClient,
-        api_version: APIVersion,
-    ):
-        super().__init__(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
-        self._sync_module_hardware = sync_module_hardware
-
-    def get_serial_number(self) -> str:
-        """Get the module's unique hardware serial number."""
-        return self._engine_client.state.modules.get_serial_number(self.module_id)
-
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
         self._engine_client.heater_shaker_set_target_temperature(
@@ -469,58 +449,5 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
 
 
-class MagneticBlockCore(ModuleCore, AbstractMagneticBlockCore):
+class MagneticBlockCore(NotConnectedModuleCore, AbstractMagneticBlockCore):
     """Magnetic Block control interface via a ProtocolEngine."""
-
-
-def create_module_core(
-    module_type: ModuleType,
-    module_id: str,
-    engine_client: ProtocolEngineClient,
-    api_version: APIVersion,
-    sync_module_hardware: Union[
-        hw_modules.HeaterShaker,
-        hw_modules.MagDeck,
-        hw_modules.TempDeck,
-        hw_modules.Thermocycler,
-        None,
-    ],
-) -> ModuleCore:
-    if sync_module_hardware:
-        if isinstance(sync_module_hardware, hw_modules.TempDeck):
-            return TemperatureModuleCore(
-                module_id=module_id,
-                engine_client=engine_client,
-                api_version=api_version,
-                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
-            )
-        elif isinstance(sync_module_hardware, hw_modules.MagDeck):
-            return MagneticModuleCore(
-                module_id=module_id,
-                engine_client=engine_client,
-                api_version=api_version,
-                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
-            )
-        elif isinstance(sync_module_hardware, hw_modules.Thermocycler):
-            return ThermocyclerModuleCore(
-                module_id=module_id,
-                engine_client=engine_client,
-                api_version=api_version,
-                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
-            )
-        elif isinstance(sync_module_hardware, hw_modules.HeaterShaker):
-            return HeaterShakerModuleCore(
-                module_id=module_id,
-                engine_client=engine_client,
-                api_version=api_version,
-                sync_module_hardware=SynchronousAdapter(sync_module_hardware),
-            )
-
-    elif module_type == ModuleType.MAGNETIC_BLOCK:
-        return MagneticBlockCore(
-            module_id=module_id, engine_client=engine_client, api_version=api_version
-        )
-
-    return ModuleCore(
-        module_id=module_id, engine_client=engine_client, api_version=api_version
-    )

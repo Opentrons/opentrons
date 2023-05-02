@@ -20,7 +20,6 @@ from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.core.engine.module_core import (
     ModuleCore,
-    create_module_core,
     ThermocyclerModuleCore,
     MagneticBlockCore,
     MagneticModuleCore,
@@ -49,30 +48,6 @@ def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[AbstractModule
 
 
 @pytest.fixture
-def mock_hw_thermocycler(decoy: Decoy) -> Thermocycler:
-    """Mock hw Thermocycler."""
-    return decoy.mock(cls=Thermocycler)
-
-
-@pytest.fixture
-def mock_hw_mag_deck(decoy: Decoy) -> MagDeck:
-    """Mock hw MagDeck."""
-    return decoy.mock(cls=MagDeck)
-
-
-@pytest.fixture
-def mock_hw_temp_deck(decoy: Decoy) -> TempDeck:
-    """Mock hw TempDeck."""
-    return decoy.mock(cls=TempDeck)
-
-
-@pytest.fixture
-def mock_hw_heater_shaker(decoy: Decoy) -> HeaterShaker:
-    """Mock hw HeaterShaker."""
-    return decoy.mock(cls=HeaterShaker)
-
-
-@pytest.fixture
 def subject(
     mock_engine_client: EngineClient,
     api_version: APIVersion,
@@ -83,6 +58,7 @@ def subject(
         module_id="1234",
         engine_client=mock_engine_client,
         api_version=api_version,
+        sync_module_hardware=mock_sync_module_hardware,
     )
 
 
@@ -128,47 +104,3 @@ def test_get_display_name(
     )
 
     assert subject.get_display_name() == "abra kadabra"
-
-
-@pytest.mark.parametrize(
-    "input_module_type, hw_module, expected_module_core",
-    [
-        (
-            ModuleType.THERMOCYCLER,
-            lazy_fixture("mock_hw_thermocycler"),
-            ThermocyclerModuleCore,
-        ),
-        (
-            ModuleType.MAGNETIC_BLOCK,
-            lazy_fixture("mock_hw_mag_deck"),
-            MagneticModuleCore,
-        ),
-        (
-            ModuleType.TEMPERATURE,
-            lazy_fixture("mock_hw_temp_deck"),
-            TemperatureModuleCore,
-        ),
-        (
-            ModuleType.HEATER_SHAKER,
-            lazy_fixture("mock_hw_heater_shaker"),
-            HeaterShakerModuleCore,
-        ),
-        (ModuleType.MAGNETIC_BLOCK, None, MagneticBlockCore),
-    ],
-)
-def test_create_module_core(
-    api_version: APIVersion,
-    mock_engine_client: EngineClient,
-    input_module_type: ModuleType,
-    hw_module: Union[HeaterShaker, MagDeck, TempDeck, Thermocycler, None],
-    expected_module_core: Type[ModuleCore],
-) -> None:
-    """It should get the proper module_core."""
-    result = create_module_core(
-        module_type=input_module_type,
-        module_id="123",
-        engine_client=mock_engine_client,
-        api_version=api_version,
-        sync_module_hardware=hw_module,
-    )
-    assert isinstance(result, expected_module_core)

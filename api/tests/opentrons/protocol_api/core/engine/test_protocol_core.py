@@ -64,7 +64,7 @@ from opentrons.protocol_api.core.engine.module_core import (
     MagneticModuleCore,
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
-    MagneticBlockCore,
+    NotConnectedModuleCore,
 )
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
@@ -385,6 +385,7 @@ def test_load_labware_on_module(
         module_id="module-id",
         engine_client=mock_engine_client,
         api_version=api_version,
+        sync_module_hardware=mock_sync_module_hardware,
     )
 
     result = subject.load_labware(
@@ -583,7 +584,7 @@ def test_load_mag_block(
         configuration=None,
     )
 
-    assert isinstance(result, MagneticBlockCore)
+    assert isinstance(result, NotConnectedModuleCore)
     assert result.module_id == "abc123"
     assert subject.get_module_cores() == [result]
 
