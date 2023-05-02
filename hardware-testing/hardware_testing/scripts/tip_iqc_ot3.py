@@ -91,7 +91,7 @@ def _get_tip_offset_in_rack(tip_name: str) -> Point:
     return Point(x=col_mm, y=-row_mm)
 
 
-async def _main(is_simulating: bool) -> None:
+async def _main(is_simulating: bool, volume: float) -> None:
     ui.print_title("TIP IQC")
 
     # CONNECT
@@ -175,7 +175,7 @@ async def _main(is_simulating: bool) -> None:
         print("testing pressure while SUBMERGED")
         await api.move_to(mount, fixture_actual + Point(z=-fixture.depth))
         await _read_and_store_pressure_data(report, tip, "submerged", fixture)
-        await api.aspirate(mount, fixture.aspirate_volume)
+        await api.aspirate(mount, volume)
         print("testing pressure while ASPIRATED")
         await _read_and_store_pressure_data(report, tip, "aspirated", fixture)
         await api.dispense(mount)
@@ -196,5 +196,6 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--volume", type=float, default=1.0)
     args = parser.parse_args()
-    run(_main(args.simulate))
+    run(_main(args.simulate, args.volume))
