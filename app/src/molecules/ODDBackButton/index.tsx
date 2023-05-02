@@ -19,7 +19,7 @@ export function ODDBackButton(
     <Flex
       alignItems={ALIGN_CENTER}
       fontSize={TYPOGRAPHY.fontSize38}
-      fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+      fontWeight={TYPOGRAPHY.fontWeightBold}
       gridGap={SPACING.spacing4}
       lineHeight={TYPOGRAPHY.lineHeight48}
     >
