@@ -15,6 +15,7 @@ class GravimetricConfig:
     tip_volume: int
     trials: int
     labware_offsets: List[dict]
+    labware_on_scale: str
     slot_scale: int
     slots_tiprack: List[int]
     increment: bool

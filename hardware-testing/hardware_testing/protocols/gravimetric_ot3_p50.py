@@ -9,6 +9,7 @@ SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     50: [3],
 }
+LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -18,7 +19,7 @@ def run(ctx: ProtocolContext) -> None:
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]
-    vial = ctx.load_labware("radwag_pipette_calibration_vial", SLOT_SCALE)
+    vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     pipette = ctx.load_instrument("p50_single_gen3", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])

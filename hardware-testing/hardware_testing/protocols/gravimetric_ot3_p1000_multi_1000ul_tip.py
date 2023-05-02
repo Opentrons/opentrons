@@ -9,6 +9,7 @@ SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     1000: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
+LABWARE_ON_SCALE = "nest_12_reservoir_15ml"
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -18,7 +19,7 @@ def run(ctx: ProtocolContext) -> None:
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]
-    vial = ctx.load_labware("nest_12_reservoir_15ml", SLOT_SCALE)
+    vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     pipette = ctx.load_instrument("p1000_multi_gen3", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])

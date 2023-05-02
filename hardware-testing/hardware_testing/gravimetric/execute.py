@@ -179,7 +179,7 @@ def _load_pipette(
 
 
 def _apply_labware_offsets(
-    cfg: config.GravimetricConfig, tip_racks: List[Labware], vial: Labware
+    cfg: config.GravimetricConfig, tip_racks: List[Labware], labware_on_scale: Labware
 ) -> None:
     def _apply(labware: Labware) -> None:
         o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
@@ -189,7 +189,7 @@ def _apply_labware_offsets(
         )
         labware.set_calibration(o)
 
-    _apply(vial)
+    _apply(labware_on_scale)
     for rack in tip_racks:
         _apply(rack)
 
@@ -197,7 +197,15 @@ def _apply_labware_offsets(
 def _load_labware(
     ctx: ProtocolContext, cfg: config.GravimetricConfig
 ) -> Tuple[Labware, List[Labware]]:
-    vial = ctx.load_labware_from_definition(VIAL_DEFINITION, location=cfg.slot_scale)
+    print(f'Loading labware on scale: "{cfg.labware_on_scale}"')
+    if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
+        labware_on_scale = ctx.load_labware_from_definition(
+            VIAL_DEFINITION, location=cfg.slot_scale
+        )
+    else:
+        labware_on_scale = ctx.load_labware(
+            cfg.labware_on_scale, location=cfg.slot_scale
+        )
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,
@@ -208,8 +216,8 @@ def _load_labware(
     for ls in tiprack_load_settings:
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     tipracks = [ctx.load_labware(ls[1], location=ls[0]) for ls in tiprack_load_settings]
-    _apply_labware_offsets(cfg, tipracks, vial)
-    return vial, tipracks
+    _apply_labware_offsets(cfg, tipracks, labware_on_scale)
+    return labware_on_scale, tipracks
 
 
 def _jog_to_find_liquid_height(
@@ -449,7 +457,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     run_id, start_time = create_run_id_and_start_time()
 
     ui.print_header("LOAD LABWARE")
-    vial, tipracks = _load_labware(ctx, cfg)
+    labware_on_scale, tipracks = _load_labware(ctx, cfg)
     liquid_tracker = LiquidTracker()
     initialize_liquid_from_deck(ctx, liquid_tracker)
 
@@ -472,7 +480,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
     trial_total = len(test_volumes) * cfg.trials * len(channels_to_test)
-    assert trial_total <= total_tips, f"more trials ({trial_total}) than tips ({total_tips})"
+    assert (
+        trial_total <= total_tips
+    ), f"more trials ({trial_total}) than tips ({total_tips})"
 
     ui.print_header("LOAD SCALE")
     print(
@@ -526,13 +536,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     setup_tip_location = setup_tip.top().move(setup_channel_offset)
     _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
     print("moving to vial")
-    well = vial["A1"]
+    well = labware_on_scale["A1"]
     pipette.move_to(well.top())
     _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
     height_below_top = well.depth - _liquid_height
     print(f"liquid is {height_below_top} mm below top of vial")
     liquid_tracker.set_start_volume_from_liquid_height(
-        vial["A1"], _liquid_height, name="Water"
+        labware_on_scale["A1"], _liquid_height, name="Water"
     )
     vial_volume = liquid_tracker.get_volume(well)
     print(f"software thinks there is {vial_volume} uL of liquid in the vial")
@@ -557,7 +567,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx=ctx,
                     pipette=pipette,
-                    well=vial["A1"],
+                    well=labware_on_scale["A1"],
                     channel_offset=Point(),  # first channel
                     tip_volume=cfg.tip_volume,
                     volume=test_volumes[-1],
@@ -630,7 +640,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     ) = _run_trial(
                         ctx=ctx,
                         pipette=pipette,
-                        well=vial["A1"],
+                        well=labware_on_scale["A1"],
                         channel_offset=channel_offset,
                         tip_volume=cfg.tip_volume,
                         volume=volume,
