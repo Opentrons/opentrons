@@ -122,7 +122,12 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
-    if (currentStepIndex === totalStepCount && isOnDevice) {
+    if (
+      //  only if you complete attach or detach flow, you're directed to instruments dashboard
+      currentStepIndex === totalStepCount &&
+      isOnDevice &&
+      flowType !== FLOWS.CALIBRATE
+    ) {
       history.push('/instruments')
     }
   }
