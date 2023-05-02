@@ -88,17 +88,9 @@ export function RobotSettingsDashboard(): JSX.Element {
   return (
     // This top level Flexbox only exists to position the temporary
     // "To ODD Menu" button on the bottom. When it goes, so can this.
-    <Flex
-      padding="0"
-      flexDirection={DIRECTION_COLUMN}
-      columnGap={SPACING.spacing3}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
       {currentOption != null ? (
-        <Flex
-          padding={SPACING.spacingXXL}
-          flexDirection={DIRECTION_COLUMN}
-          columnGap={SPACING.spacing3}
-        >
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
           <SettingsContent
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
@@ -235,7 +227,6 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
-  robotName,
   isUpdateAvailable,
   iconName,
   enabledDevTools,

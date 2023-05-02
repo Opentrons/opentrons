@@ -232,7 +232,7 @@ const SplashBody = styled.h4`
 `
 
 const SummaryHeader = styled.h4`
-  font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};

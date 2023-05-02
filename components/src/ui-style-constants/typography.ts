@@ -2,6 +2,7 @@ import { css } from 'styled-components'
 import { COLORS } from './'
 
 // Font Sizes
+export const fontSize80 = '5rem' // 80px
 export const fontSize38 = '2.375rem' // 38px
 export const fontSize32 = '2rem' // 32px
 export const fontSize28 = '1.75rem' // 28px
@@ -18,13 +19,13 @@ export const fontSizeLabel = '0.6875rem' // 11px
 export const fontSizeCaption = '0.625rem' // 10px
 
 // Font Weights
-export const fontWeightBold = 800
-export const fontWeightLevel2_bold = 700
+export const fontWeightBold = 700
 export const fontWeightSemiBold = 600
 export const fontWeightRegular = 400
 export const fontWeightLight = 300
 
 // Line Heights
+export const lineHeight96 = '6rem' // 96px
 export const lineHeight48 = '3rem' // 48px
 export const lineHeight42 = '2.625rem' // 42px
 export const lineHeight36 = '2.25rem' // 36px
@@ -131,6 +132,97 @@ export const linkPSemiBold = css`
   }
 `
 
+// font styles for touchscreen
+export const level1Header = css`
+  font-size: ${fontSize80};
+  font-weight: ${fontWeightBold};
+  line-height: ${lineHeight96};
+`
+
+export const level2HeaderBold = css`
+  font-size: ${fontSize38};
+  line-height: ${lineHeight48};
+  font-weight: ${fontWeightBold};
+`
+
+export const level2HeaderSemiBold = css`
+  font-size: ${fontSize38};
+  line-height: ${lineHeight48};
+  font-weight: ${fontWeightSemiBold};
+`
+
+export const level2HeaderRegular = css`
+  font-size: ${fontSize38};
+  line-height: ${lineHeight48};
+  font-weight: ${fontWeightRegular};
+`
+
+export const level3HeaderBold = css`
+  font-size: ${fontSize32};
+  line-height: ${lineHeight42};
+  font-weight: ${fontWeightBold};
+`
+
+export const level3HeaderSemiBold = css`
+  font-size: ${fontSize32};
+  line-height: ${lineHeight42};
+  font-weight: ${fontWeightSemiBold};
+`
+
+export const level3HeaderRegular = css`
+  font-size: ${fontSize32};
+  line-height: ${lineHeight42};
+  font-weight: ${fontWeightRegular};
+`
+
+export const level4HeaderBold = css`
+  font-size: ${fontSize28};
+  line-height: ${lineHeight36};
+  font-weight: ${fontWeightBold};
+`
+
+export const level4HeaderSemiBold = css`
+  font-size: ${fontSize28};
+  line-height: ${lineHeight36};
+  font-weight: ${fontWeightSemiBold};
+`
+
+export const level4HeaderRegular = css`
+  font-size: ${fontSize28};
+  line-height: ${lineHeight36};
+  font-weight: ${fontWeightRegular};
+`
+
+export const bodyTextBold = css`
+  font-size: ${fontSize22};
+  line-height: ${lineHeight28};
+  font-weight: ${fontWeightBold};
+`
+
+export const bodyTextSemiBold = css`
+  font-size: ${fontSize22};
+  line-height: ${lineHeight28};
+  font-weight: ${fontWeightSemiBold};
+`
+
+export const bodyTextRegular = css`
+  font-size: ${fontSize22};
+  line-height: ${lineHeight28};
+  font-weight: ${fontWeightRegular};
+`
+
+export const smallBodyTextBold = css`
+  font-size: ${fontSize20};
+  line-height: ${lineHeight24};
+  font-weight: ${fontWeightBold};
+`
+
+export const smallBodyTextRegular = css`
+  font-size: ${fontSize20};
+  line-height: ${lineHeight24};
+  font-weight: ${fontWeightRegular};
+`
+
 export const darkLinkH4SemiBold = css`
   font-size: ${fontSizeH4};
   font-weight: ${fontWeightSemiBold};
@@ -151,10 +243,9 @@ export const darkLinkLabelSemiBold = css`
 `
 
 export const darkLinkLabelSemiBoldDisabled = css`
-font-size: ${fontSizeLabel};
+  font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
   color: ${COLORS.medGreyHover};
   cursor: not-allowed;
-  }
 `

@@ -55,7 +55,7 @@ const TITLE_TEXT_STYLE = css`
 
 const RUN_TIMER_STYLE = css`
   font-size: 2rem;
-  font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
   color: ${COLORS.darkBlackEnabled};
 `

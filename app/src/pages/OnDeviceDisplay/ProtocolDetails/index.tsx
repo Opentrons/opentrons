@@ -92,7 +92,7 @@ const ProtocolHeader = (props: {
           </Flex>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize38}
-            fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+            fontWeight={TYPOGRAPHY.fontWeightBold}
             lineHeight={TYPOGRAPHY.lineHeight48}
             onClick={toggleTruncate}
             overflowWrap="anywhere"
@@ -116,7 +116,7 @@ const ProtocolHeader = (props: {
         >
           <StyledText
             fontSize="2.333125rem"
-            fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+            fontWeight={TYPOGRAPHY.fontWeightBold}
             lineHeight={TYPOGRAPHY.lineHeight48}
             textTransform={TYPOGRAPHY.textTransformNone}
           >
