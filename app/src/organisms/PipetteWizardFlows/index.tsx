@@ -349,7 +349,7 @@ export const PipetteWizardFlows = (
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)
   } else if (showConfirmExit || errorMessage != null) {
-    exitWizardButton = handleCleanUpAndClose()
+    exitWizardButton = handleCleanUpAndClose
   }
 
   const wizardHeader = (
