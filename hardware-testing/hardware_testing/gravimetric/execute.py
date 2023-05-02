@@ -302,6 +302,7 @@ def _run_trial(
     tip_volume: int,
     volume: float,
     channel: int,
+    channel_count: int,
     trial: int,
     recorder: GravimetricRecorder,
     test_report: report.CSVReport,
@@ -360,6 +361,7 @@ def _run_trial(
         volume,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=blank,
@@ -378,6 +380,7 @@ def _run_trial(
         volume,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks=pipetting_callbacks,
         blank=blank,
@@ -479,6 +482,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     tips = get_tips(ctx, pipette, all_channels=cfg.increment)
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
+    if len(channels_to_test) > 1:
+        num_channels_per_transfer = 1
+    else:
+        num_channels_per_transfer = cfg.pipette_channels
     trial_total = len(test_volumes) * cfg.trials * len(channels_to_test)
     assert (
         trial_total <= total_tips
@@ -572,6 +579,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     tip_volume=cfg.tip_volume,
                     volume=test_volumes[-1],
                     channel=0,  # first channel
+                    channel_count=num_channels_per_transfer,
                     trial=trial,
                     recorder=recorder,
                     test_report=test_report,
@@ -645,6 +653,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         tip_volume=cfg.tip_volume,
                         volume=volume,
                         channel=channel,
+                        channel_count=num_channels_per_transfer,
                         trial=trial,
                         recorder=recorder,
                         test_report=test_report,

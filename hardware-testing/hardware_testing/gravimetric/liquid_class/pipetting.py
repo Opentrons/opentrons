@@ -89,7 +89,13 @@ def _get_approach_submerge_retract_heights(
     aspirate: Optional[float],
     dispense: Optional[float],
     blank: bool,
+    channel_count: int,
 ) -> Tuple[float, float, float]:
+    # the actual volume of liquid moved depends on how many channels are being tested
+    if aspirate:
+        aspirate *= channel_count
+    elif dispense:
+        dispense *= channel_count
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
@@ -139,6 +145,7 @@ def _pipette_with_liquid_settings(
     liquid_class: LiquidClassSettings,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     aspirate: Optional[float] = None,
@@ -180,7 +187,14 @@ def _pipette_with_liquid_settings(
 
     # CALCULATE TIP HEIGHTS FOR EACH PHASE
     approach_mm, submerge_mm, retract_mm = _get_approach_submerge_retract_heights(
-        pipette, well, liquid_tracker, liquid_class, aspirate, dispense, blank
+        pipette,
+        well,
+        liquid_tracker,
+        liquid_class,
+        aspirate,
+        dispense,
+        blank,
+        channel_count,
     )
 
     # CREATE CALLBACKS FOR EACH PHASE
@@ -265,6 +279,7 @@ def aspirate_with_liquid_class(
     aspirate_volume: float,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -281,6 +296,7 @@ def aspirate_with_liquid_class(
         liquid_class,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks,
         aspirate=aspirate_volume,
@@ -297,6 +313,7 @@ def dispense_with_liquid_class(
     dispense_volume: float,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -313,6 +330,7 @@ def dispense_with_liquid_class(
         liquid_class,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks,
         dispense=dispense_volume,
