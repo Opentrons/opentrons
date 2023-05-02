@@ -107,7 +107,7 @@ describe('AttachProbe', () => {
       isExiting: true,
     }
     const { getByText } = render(props)
-    getByText('Stand Back, robot is in motion')
+    getByText('Stand back, robot is in motion')
     expect(
       screen.queryByText(
         'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
