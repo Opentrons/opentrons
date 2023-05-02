@@ -16,7 +16,7 @@ import { StyledText } from '../text'
 
 import type { StyleProps } from '@opentrons/components'
 
-export type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
+type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 
 export interface InlineNotificationProps extends StyleProps {
   /** name constant of the icon to display */
@@ -24,10 +24,8 @@ export interface InlineNotificationProps extends StyleProps {
   /** InlineNotification contents */
   heading: string
   message?: string
-  /** Dynamic width based on contents */
+  /** Optional dynamic width based on contents */
   hug?: boolean
-  /** optional function to run when clicked */
-  onClick?: () => void
   /** optional handler to show close button/clear alert  */
   onCloseClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
 }
@@ -61,7 +59,7 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
 export function InlineNotification(
   props: InlineNotificationProps
 ): JSX.Element {
-  const { heading, hug = false, onClick, onCloseClick, message, type } = props
+  const { heading, hug = false, onCloseClick, message, type } = props
   const fullHeading = `${heading}${message ? '. ' : ''}`
   const fullmessage = `${message}.`
   const inlineNotificationProps = INLINE_NOTIFICATION_PROPS_BY_TYPE[type]
@@ -79,7 +77,6 @@ export function InlineNotification(
       flexDirection={DIRECTION_ROW}
       gridGap="0.75rem"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      onClick={onClick}
       padding={`0.75rem ${SPACING.spacing4}`}
       width={hug ? 'max-content' : '100%'}
     >
@@ -105,12 +102,7 @@ export function InlineNotification(
           data-testid="InlineNotification_close-button"
           onClick={onCloseClick}
         >
-          <Icon
-            width={SPACING.spacing7}
-            height={SPACING.spacing7}
-            name="close"
-            aria-label="close_icon"
-          />
+          <Icon aria-label="close_icon" name="close" size="3rem" />
         </Btn>
       )}
     </Flex>

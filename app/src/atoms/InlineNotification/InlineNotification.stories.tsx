@@ -18,7 +18,6 @@ export default {
       },
       defaultValue: 'success',
     },
-    onClick: { action: 'clicked' },
     onCloseClick: {
       control: {
         type: 'boolean',
