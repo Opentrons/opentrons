@@ -24,12 +24,19 @@ import {
   SIZE_2,
 } from '@opentrons/components'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import {
+  useProtocolQuery,
+  useRunQuery,
+  useStopRunMutation,
+} from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
-import { useRunCreatedAtTimestamp } from '../../organisms/Devices/hooks'
+import {
+  useRunCreatedAtTimestamp,
+  useTrackProtocolRunEvent,
+} from '../../organisms/Devices/hooks'
 import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
 import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
@@ -63,6 +70,8 @@ export function RunSummary(): JSX.Element {
       : EMPTY_TIMESTAMP
 
   const [showSplash, setShowSplash] = React.useState(true)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { stopRun } = useStopRunMutation()
 
   const runStatusText = isRunSucceeded
     ? t('run_complete')
@@ -81,6 +90,15 @@ export function RunSummary(): JSX.Element {
     console.log('will be added')
   }
 
+  const handleClickSplash = (): void => {
+    stopRun(runId, {
+      onSuccess: () => {
+        trackProtocolRunEvent({ name: 'runCancel' })
+      },
+    })
+    setShowSplash(false)
+  }
+
   return (
     <>
       <Flex
@@ -88,9 +106,7 @@ export function RunSummary(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
-        onClick={() => {
-          setShowSplash(false)
-        }}
+        onClick={handleClickSplash}
       >
         {showSplash ? (
           <Flex
