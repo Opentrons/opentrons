@@ -99,16 +99,6 @@ async def _main(is_simulating: bool) -> None:
         is_simulating=is_simulating, pipette_left="p50_single_v3.4"
     )
     mount = OT3Mount.LEFT
-    fixture = _connect_to_fixture(is_simulating)
-
-    # NOMINAL POSITIONS
-    fixture_nominal = helpers_ot3.get_slot_bottom_left_position_ot3(
-        SLOT_FIXTURE
-    ) + fixture.position_in_slot("left")
-    tip_rack_nominal = helpers_ot3.get_theoretical_a1_position(
-        SLOT_TIP_RACK, f"opentrons_ot3_96_tiprack_{fixture.tip_volume}ul"
-    )
-    tip_length = helpers_ot3.get_default_tip_length(fixture.tip_volume)
 
     # CREATE CSV REPORT
     report = CSVReport(
@@ -132,6 +122,22 @@ async def _main(is_simulating: bool) -> None:
         report.set_operator(input("enter OPERATOR: "))
         report.set_tag(input("enter TAG: "))
     report.set_version(get_git_description())
+
+    # SETUP DECK
+    if not api.is_simulator:
+        ui.get_user_ready(f"add tip-rack to slot #{SLOT_TIP_RACK}")
+        ui.get_user_ready(f"add pressure-fixture to slot #{SLOT_FIXTURE}")
+        ui.get_user_ready("connect pressure-fixture to OT3 over USB")
+    fixture = _connect_to_fixture(is_simulating)
+
+    # NOMINAL POSITIONS
+    fixture_nominal = helpers_ot3.get_slot_bottom_left_position_ot3(
+        SLOT_FIXTURE
+    ) + fixture.position_in_slot("left")
+    tip_rack_nominal = helpers_ot3.get_theoretical_a1_position(
+        SLOT_TIP_RACK, f"opentrons_ot3_96_tiprack_{fixture.tip_volume}ul"
+    )
+    tip_length = helpers_ot3.get_default_tip_length(fixture.tip_volume)
 
     print("homing")
     await api.home()
