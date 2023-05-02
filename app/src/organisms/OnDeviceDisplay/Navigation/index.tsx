@@ -31,26 +31,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
-  const TouchNavLink = styled(NavLink)`
-    ${TYPOGRAPHY.level3HeaderSemiBold}
-    color: ${COLORS.darkBlack_seventy};
-    height: 3.5rem;
-    display: flex;
-    flex-direction: ${DIRECTION_COLUMN};
-    align-items: ${ALIGN_CENTER};
-    &.active {
-      color: ${COLORS.black};
-    }
-    &.active > div {
-      background-color: ${COLORS.highlightPurple_one};
-    }
-  `
-  const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
-    <TouchNavLink to={props.to}>
-      {props.name}
-      <Box width="2.5rem" height="5px" borderRadius="2px" />
-    </TouchNavLink>
-  )
+
   return (
     <>
       <Flex
@@ -72,13 +53,15 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
             <NavigationLink key={name} to={navLinkTo as string} name={name} />
           ))}
         </Flex>
-        <IconButton onClick={() => setShowNavMenu(true)}>
+        <IconButton
+          aria-label="overflow menu button"
+          onClick={() => setShowNavMenu(true)}
+        >
           <Icon
             name="overflow-btn-touchscreen"
             height="60px"
             width="48px"
             color={COLORS.darkBlack_seventy}
-            aria-label="OverflowBtn_OnDeviceDisplay_icon"
           />
         </IconButton>
       </Flex>
@@ -92,7 +75,29 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
 }
 
-export const IconButton = styled('button')`
+const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
+  <TouchNavLink to={props.to}>
+    {props.name}
+    <Box width="2.5rem" height="5px" borderRadius="2px" />
+  </TouchNavLink>
+)
+
+const TouchNavLink = styled(NavLink)`
+  ${TYPOGRAPHY.level3HeaderSemiBold}
+  color: ${COLORS.darkBlack_seventy};
+  height: 3.5rem;
+  display: flex;
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_CENTER};
+  &.active {
+    color: ${COLORS.black};
+  }
+  &.active > div {
+    background-color: ${COLORS.highlightPurple_one};
+  }
+`
+
+const IconButton = styled('button')`
   border-radius: ${SPACING.spacing2};
   max-height: 100%;
   background-color: ${COLORS.white};
