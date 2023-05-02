@@ -26,6 +26,7 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../Devices/hooks'
+import { InstrumentInfo } from '../InstrumentInfo.tsx'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -39,10 +40,9 @@ import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
+import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
-import { InstrumentInfo } from '../InstrumentInfo.tsx'
-import { InstrumentData } from '@opentrons/api-client'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
