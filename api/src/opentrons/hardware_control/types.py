@@ -1,17 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import (
-    Optional,
-    cast,
-    Tuple,
-    Union,
-    List,
-    Callable,
-    Dict,
-    TypeVar,
-    Type
-)
+from typing import Optional, cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType

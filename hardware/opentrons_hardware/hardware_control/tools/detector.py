@@ -188,17 +188,22 @@ class ToolDetector:
         """
         self._messenger = messenger
 
+    async def check_once(self) -> None:
+        """Send one tool status ping. Useful only if something is waiting for responses."""
+        attached_tool_request_message = message_definitions.AttachedToolsRequest()
+        await self._messenger.send(
+            node_id=NodeId.head, message=attached_tool_request_message
+        )
+
     async def detect(
         self,
     ) -> AsyncIterator[ToolDetectionResult]:
         """Detect tool changes."""
         with WaitableCallback(self._messenger) as wc:
             # send request message once, to establish initial state
-            attached_tool_request_message = message_definitions.AttachedToolsRequest()
-            await self._messenger.send(
-                node_id=NodeId.head, message=attached_tool_request_message
-            )
-            yield await _await_one_result(wc)
+            await self.check_once()
+            while True:
+                yield await _await_one_result(wc)
 
     async def resolve(
         self, with_tools: ToolDetectionResult, timeout_sec: float = 1.0
