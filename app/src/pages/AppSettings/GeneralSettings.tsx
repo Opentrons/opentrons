@@ -35,7 +35,10 @@ import {
   alertPermanentlyIgnored,
   alertUnignored,
 } from '../../redux/alerts'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
+} from '../../redux/analytics'
 import { UpdateAppModal } from '../../organisms/UpdateAppModal'
 import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
@@ -49,7 +52,6 @@ const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
-const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
 
 export function GeneralSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -83,7 +85,7 @@ export function GeneralSettings(): JSX.Element {
       )
 
       trackEvent({
-        name: EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED,
+        name: ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
         // this looks weird, but the control is a toggle, which makes the next
         // "enabled" setting `!enabled`. Therefore the next "ignored" setting is
         // `!!enabled`, or just `enabled`

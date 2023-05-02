@@ -22,8 +22,10 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../organisms/Devices/hooks'
-import { useTrackEvent } from '../../redux/analytics'
-import { EVENT_CALIBRATION_DOWNLOADED } from '../../redux/calibration'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+} from '../../redux/analytics'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'
@@ -68,7 +70,7 @@ export function CalibrationDataDownload({
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
-      name: EVENT_CALIBRATION_DOWNLOADED,
+      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: {},
     })
     saveAs(

@@ -88,12 +88,11 @@ describe('ProtocolSetupModules', () => {
 
   it('should render text and buttons', () => {
     const [{ getByRole, getByText }] = render()
-    getByText('Modules')
     getByText('Module Name')
     getByText('Location')
     getByText('Status')
+    getByRole('button', { name: 'Modules' })
     getByRole('button', { name: 'Setup Instructions' })
-    getByRole('button', { name: 'continue' })
     getByRole('button', { name: 'Deck Map' })
   })
 
