@@ -66,7 +66,7 @@ describe('Chip', () => {
     expect(chip).toHaveStyle(`background-color: ${String(COLORS.yellow_three)}`)
     expect(chipText).toHaveStyle(`color: ${String(COLORS.yellow_one)}`)
     const icon = getByLabelText('icon_mockWarning')
-    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow_two)}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow_one)}`)
   })
 
   it('should render text, icon, no bgcolor with warning colors and bg false', () => {
@@ -81,7 +81,7 @@ describe('Chip', () => {
     expect(chip).toHaveStyle(`background-color: ${String(COLORS.transparent)}`)
     expect(chipText).toHaveStyle(`color: ${String(COLORS.yellow_one)}`)
     const icon = getByLabelText('icon_mockWarning')
-    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow_two)}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow_one)}`)
   })
 
   it('should render text, icon, bgcolor with neutral colors', () => {

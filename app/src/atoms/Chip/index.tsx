@@ -59,7 +59,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   warning: {
     backgroundColor: COLORS.yellow_three,
     borderRadius: BORDERS.size_six,
-    iconColor: COLORS.yellow_two,
+    iconColor: COLORS.yellow_one,
     textColor: COLORS.yellow_one,
   },
 }
@@ -98,8 +98,8 @@ export function Chip({
         />
       )}
       <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
+        fontSize={TYPOGRAPHY.fontSize22}
+        lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         color={CHIP_PROPS_BY_TYPE[type].textColor}
       >
