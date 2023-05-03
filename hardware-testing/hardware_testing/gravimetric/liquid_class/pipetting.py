@@ -304,7 +304,7 @@ def aspirate_with_liquid_class(
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), tip_volume, int(aspirate_volume)
+        int(pipette.max_volume), pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -338,7 +338,7 @@ def dispense_with_liquid_class(
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), tip_volume, int(dispense_volume)
+        int(pipette.max_volume), pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
