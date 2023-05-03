@@ -11,6 +11,7 @@ import {
   getIncompatiblePipetteNames,
   getLabwareDefURI,
   getLabwareDisplayName,
+  OT3_PIPETTES,
 } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
@@ -109,6 +110,7 @@ export function PipetteFields(props: Props): JSX.Element {
     const pipetteName = values[mount].pipetteName
     return (
       <PipetteSelect
+        nameBlocklist={OT3_PIPETTES}
         enableNoneOption
         tabIndex={tabIndex}
         pipetteName={pipetteName != null ? pipetteName : null}
