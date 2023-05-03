@@ -963,13 +963,13 @@ class API(
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
     async def blow_out(
-        self, mount: top_types.Mount, microliters: Optional[float] = None
+        self, mount: top_types.Mount, volume: Optional[float] = None
     ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        blowout_spec = self.plan_check_blow_out(mount, microliters)
+        blowout_spec = self.plan_check_blow_out(mount, volume)
 
         instrument = self.get_pipette(mount)
         max_blowout_pos = instrument.config.blow_out

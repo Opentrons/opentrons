@@ -64,7 +64,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteVersionType,
 )
-from hypothesis import given, strategies, settings, HealthCheck, assume
+from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 
 @pytest.fixture
@@ -418,8 +418,9 @@ async def prepare_for_mock_blowout(
 
 
 @pytest.mark.parametrize("load_configs", load_blowout_configs)
-@given(blowout_volume=strategies.floats(min_value=1, max_value=10))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@given(blowout_volume=strategies.floats(min_value=0, max_value=10))
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
+@example(blowout_volume=0.0)
 async def test_blow_out_position(
     ot3_hardware: ThreadManager[OT3API],
     load_configs: List[Dict[str, Any]],
@@ -457,8 +458,8 @@ async def test_blow_out_position(
 
 
 @pytest.mark.parametrize("load_configs", load_blowout_configs)
-@given(blowout_volume=strategies.floats(min_value=1, max_value=200))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@given(blowout_volume=strategies.floats(min_value=0, max_value=200))
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
     load_configs: List[Dict[str, Any]],
