@@ -32,7 +32,10 @@ import {
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
+import {
+  useRunTimestamps,
+  useRunControls,
+} from '../../organisms/RunTimeControl/hooks'
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
@@ -40,8 +43,13 @@ import {
 import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
 import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
-import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_RUN_CANCEL,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+} from '../../redux/analytics'
 
+import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
 
 export function RunSummary(): JSX.Element {
@@ -73,6 +81,10 @@ export function RunSummary(): JSX.Element {
   const [showSplash, setShowSplash] = React.useState(true)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { stopRun } = useStopRunMutation()
+  const onResetSuccess = (createRunResponse: Run): void =>
+    history.push(`protocols/${runId}/setup`)
+  const { reset } = useRunControls(runId, onResetSuccess)
+  const trackEvent = useTrackEvent()
 
   const runStatusText = isRunSucceeded
     ? t('run_complete')
@@ -83,8 +95,12 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleRunAgain = (): void => {
-    // clone the run
-    history.push(`/protocols/${runId}/setup`)
+    reset()
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RunSummary' },
+    })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
   }
 
   const handleViewErrorDetails = (): void => {
