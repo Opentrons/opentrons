@@ -61,7 +61,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing3}
           overflowWrap="anywhere"
         >
-          {`${truncateString(displayName, 80)}; ${t(
+          {`${truncateString(displayName, 80, 65)}; ${t(
             `run_details:status_${currentRunStatus}`
           )}`}
         </StyledText>
