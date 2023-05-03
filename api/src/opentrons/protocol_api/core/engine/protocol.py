@@ -76,8 +76,7 @@ class ProtocolCore(
         self._labware_cores_by_id: Dict[str, LabwareCore] = {}
         self._module_cores_by_id: MutableMapping[
             str, Union[ModuleCore, NonConnectedModuleCore]
-        ]
-        self._module_cores_by_id = {}
+        ] = {}
         self._load_fixed_trash()
 
     @property
