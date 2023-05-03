@@ -256,6 +256,9 @@ class EquipmentHandler:
                 assigned to the requested location.
         """
         definition = self._module_data_provider.get_definition(model)
+        # when loading a hardware module select_hardware_module_to_load
+        # will ensure a module of a different type is not loaded at the same slot.
+        # this is for non-connected modules.
         self._state_store.modules.ensure_module_not_present(
             model=model, location=location
         )
