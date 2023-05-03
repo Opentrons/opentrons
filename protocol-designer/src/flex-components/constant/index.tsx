@@ -38,6 +38,9 @@ export const blockedTipRackListForFlex: string[] = [
   'Opentrons 96 Tip Rack 20 µL',
   'Opentrons 96 Tip Rack 300 µL',
   '(Retired) TipOne 96 Tip Rack 200 µL',
+  'Opentrons 96 Filter Tip Rack 200 µ',
+  'Opentrons 96 Filter Tip Rack 1000 µL',
+  'Opentrons 96 Filter Tip Rack 200 µL',
 ]
 
 // Custom tiprack option object
@@ -74,13 +77,13 @@ export const pipetteNameBlocklist: string[] = [
 ]
 
 interface pipetteSlots {
-  firstPipette: string
-  secondPipette: string
+  left: string
+  right: string
 }
 
 export const pipetteSlot: pipetteSlots = {
-  firstPipette: 'firstPipette',
-  secondPipette: 'secondPipette',
+  left: 'left',
+  right: 'right',
 }
 
 export const blockMount: string[] = ['p1000_96']

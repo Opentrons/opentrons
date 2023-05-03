@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import assert from 'assert'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -17,6 +18,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleModel,
   SPAN7_8_10_11_SLOT,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import { i18n } from '../../localization'
@@ -28,33 +31,32 @@ import { mountSide, navPillTabListLength, pipetteSlot } from '../constant'
 import { RoundTabs } from './RoundTab'
 import { SelectPipetteOption } from './SelectPipette'
 import { DeckSlot } from '../../types'
+import { useDispatch } from 'react-redux'
+import { PipetteFieldsData } from '../../components/modals/FilePipettesModal'
+import { reduce } from 'lodash'
+
+import { actions as loadFileActions } from '../../load-file'
 
 export interface FormModule {
   onDeck: boolean
   model: ModuleModel | null
   slot: DeckSlot
 }
-interface InitialValues {
-  fields: {
-    pndName: string
-    pndOrgAuthor: string
-    pndDescription: string
-  }
+
+export interface FormPipette {
+  pipetteName: string | null | undefined
+  mount: string | null | undefined
+  tipRackList: any[]
+  isSelected: boolean
+}
+export interface FormPipettesByMount {
+  left: FormPipette
+  right: FormPipette
+}
+export interface InitialValues {
+  fields: { name: string; author: string; description: string }
   mountSide: string
-  pipetteSelectionData: {
-    firstPipette: {
-      pipetteName: string
-      mount: string
-      tipRackList: any[]
-      isSelected: boolean
-    }
-    secondPipette: {
-      pipetteName: string
-      mount: string
-      tipRackList: any[]
-      isSelected: boolean
-    }
-  }
+  pipettesByMount: FormPipettesByMount
   modulesByType: {
     magneticModuleType: FormModule
     temperatureModuleType: FormModule
@@ -65,19 +67,19 @@ interface InitialValues {
 
 const getInitialValues: InitialValues = {
   fields: {
-    pndName: '',
-    pndOrgAuthor: '',
-    pndDescription: '',
+    name: '',
+    author: '',
+    description: '',
   },
   mountSide,
-  pipetteSelectionData: {
-    firstPipette: {
+  pipettesByMount: {
+    left: {
       pipetteName: '',
       mount: 'left',
       tipRackList: [],
       isSelected: false,
     },
-    secondPipette: {
+    right: {
       pipetteName: '',
       mount: 'right',
       tipRackList: [],
@@ -92,12 +94,12 @@ const getInitialValues: InitialValues = {
     },
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
-      slot: '1',
+      model: MAGNETIC_MODULE_V1,
+      slot: '4',
     },
     [TEMPERATURE_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
+      model: TEMPERATURE_MODULE_V2,
       slot: '3',
     },
     [THERMOCYCLER_MODULE_TYPE]: {
@@ -113,12 +115,12 @@ interface Props {
 }
 
 const selectComponent = (selectedTab: number, props: any): any => {
-  const comp = (selectedTab: number): any => {
-    const { firstPipette, secondPipette } = pipetteSlot
+  const twoPipetteOption = (selectedTab: number): any => {
+    const { left, right } = pipetteSlot
     return selectedTab === 1 ? (
-      <SelectPipetteOption formProps={props} pipetteName={firstPipette} />
+      <SelectPipetteOption pipetteName={left} />
     ) : (
-      <SelectPipetteOption formProps={props} pipetteName={secondPipette} />
+      <SelectPipetteOption pipetteName={right} />
     )
   }
 
@@ -127,7 +129,7 @@ const selectComponent = (selectedTab: number, props: any): any => {
       return <FlexProtocolName formProps={props} />
     case 1:
     case 2:
-      return comp(selectedTab)
+      return twoPipetteOption(selectedTab)
     case 3:
       return <FlexModules formProps={props} />
     default:
@@ -135,9 +137,10 @@ const selectComponent = (selectedTab: number, props: any): any => {
   }
 }
 
-function FlexProtocolEditor(): JSX.Element {
+function FlexProtocolEditor(props: any): JSX.Element {
+  const { onSave } = props
   const [selectedTab, setTab] = useState<number>(0)
-
+  const dispatch = useDispatch()
   // Next button click
   const handleNext = ({ selectedTab }: Props): void => {
     const setTabNumber =
@@ -179,7 +182,38 @@ function FlexProtocolEditor(): JSX.Element {
             initialValues={getInitialValues}
             validateOnChange={false}
             onSubmit={(values, actions) => {
-              console.log({ values, actions })
+              console.log({ values })
+              // const newProtocolFields = values.fields
+              // const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
+              //   values.pipettesByMount,
+              //   (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
+              //     assert(
+              //       mount === 'left' || mount === 'right',
+              //       `invalid mount: ${mount}`
+              //     ) // this is mostly for flow
+              //     // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
+              //     return formPipette &&
+              //       formPipette.pipetteName &&
+              //       formPipette.tipRackList &&
+              //       (mount === 'left' || mount === 'right')
+              //       ? [
+              //           ...acc,
+              //           {
+              //             mount,
+              //             name: formPipette.pipetteName,
+              //             tiprackDefURI: formPipette.tipRackList,
+              //           },
+              //         ]
+              //       : acc
+              //   },
+              //   []
+              // )
+
+              // //  To check code output
+              // const modules: any = []
+              // selectedTab === 2 &&
+              //   onSave({ modules, newProtocolFields, pipettes })
+              // selectedTab === 4 && dispatch(loadFileActions.saveProtocolFile())
             }}
           >
             {(props: any) => (

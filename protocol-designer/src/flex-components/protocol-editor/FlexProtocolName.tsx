@@ -1,12 +1,11 @@
-/* eslint-disable react/prop-types */
 import * as React from 'react'
 import { FormGroup, InputField } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 
-function FlexProtocolNameComponent(formProps: any): JSX.Element {
-  const { formProps: props } = formProps
+function FlexProtocolNameComponent({ formProps }: any): JSX.Element {
+  const { values, handleChange, handleBlur } = formProps
 
   return (
     <>
@@ -27,10 +26,10 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
           autoFocus
           tabIndex={1}
           type="text"
-          onChange={props.handleChange}
-          onBlur={props.handleBlur}
-          value={props.values.fields.pndName}
-          name="fields.pndName"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          value={values.fields.name}
+          name="fields.name"
         />
         <StyledText as="label">
           {i18n.t('flex.name_and_description.supporting_error_text')}
@@ -50,10 +49,10 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
         <InputField
           tabIndex={2}
           type="text"
-          onChange={props.handleChange}
-          onBlur={props.handleBlur}
-          value={props.values.fields.pndOrgAuthor}
-          name="fields.pndOrgAuthor"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          value={values.fields.author}
+          name="fields.author"
         />
         <StyledText as="label">
           {i18n.t('flex.name_and_description.supporting_error_text')}
@@ -68,10 +67,10 @@ function FlexProtocolNameComponent(formProps: any): JSX.Element {
           tabIndex={3}
           className={styles.textarea_input}
           rows={4}
-          onChange={props.handleChange}
-          onBlur={props.handleBlur}
-          value={props.values.fields.pndDescription}
-          name="fields.pndDescription"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          value={values.fields.description}
+          name="fields.description"
         />
         <StyledText as="label">
           {i18n.t('flex.name_and_description.supporting_error_text')}
