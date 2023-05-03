@@ -17,6 +17,7 @@ from opentrons.hardware_control.dev_types import (
     OT3AttachedPipette,
     GripperDict,
 )
+from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
     GripperHandler,
@@ -35,6 +36,7 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
 from opentrons.hardware_control.types import (
     OT3Mount,
     OT3Axis,
+    OT3AxisKind,
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
@@ -127,6 +129,32 @@ def mock_home_plunger(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock
         "home_plunger",
         AsyncMock(
             spec=ot3_hardware.managed_obj.home_plunger,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_move_to_plunger_bottom(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_move_to_plunger_bottom",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._move_to_plunger_bottom,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_move",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._move,
         ),
     ) as mock_move:
         yield mock_move
@@ -892,6 +920,114 @@ async def test_gripper_move_to(
             OT3Axis.Y,
             OT3Axis.Z_G,
         ]
+
+
+async def test_home_plunger(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to_plunger_bottom: AsyncMock,
+    mock_home: AsyncMock,
+):
+    mount = OT3Mount.LEFT
+    instr_data = OT3AttachedPipette(
+        config=ot3_pipette_config.load_ot3_pipette(
+            ot3_pipette_config.PipetteModelVersionType(
+                PipetteModelType("p1000"),
+                PipetteChannelType(1),
+                PipetteVersionType(3, 4),
+            )
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()]
+
+    await ot3_hardware.home_plunger(mount)
+    mock_home.assert_called_once()
+    mock_move_to_plunger_bottom.assert_called_once_with(mount, 1.0, False)
+
+
+async def test_prepare_for_aspirate(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to_plunger_bottom: AsyncMock,
+):
+    mount = OT3Mount.LEFT
+    instr_data = OT3AttachedPipette(
+        config=ot3_pipette_config.load_ot3_pipette(
+            ot3_pipette_config.PipetteModelVersionType(
+                PipetteModelType("p1000"),
+                PipetteChannelType(1),
+                PipetteVersionType(3, 4),
+            )
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()]
+
+    await ot3_hardware.add_tip(mount, 100)
+    await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
+    mock_move_to_plunger_bottom.assert_called_once_with(OT3Mount.LEFT, 1.0)
+
+
+async def test_move_to_plunger_bottom(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+):
+    mount = OT3Mount.LEFT
+    instr_data = OT3AttachedPipette(
+        config=ot3_pipette_config.load_ot3_pipette(
+            ot3_pipette_config.PipetteModelVersionType(
+                PipetteModelType("p1000"),
+                PipetteChannelType(1),
+                PipetteVersionType(3, 4),
+            )
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
+    assert pipette
+
+    max_speeds = ot3_hardware.config.motion_settings.default_max_speed
+    target_pos = target_position_from_plunger(
+        OT3Mount.from_mount(mount),
+        pipette.plunger_positions.bottom,
+        ot3_hardware._current_position,
+    )
+
+    # no tip attached
+    await ot3_hardware.home()
+    speed_no_tip = max_speeds[ot3_hardware.gantry_load][OT3AxisKind.P]
+    mock_move.reset_mock()
+    await ot3_hardware.home_plunger(mount)
+    mock_move.assert_called_once_with(
+        target_pos, speed=speed_no_tip, acquire_lock=False
+    )
+
+    # tip attached, dispensing
+    await ot3_hardware.home()
+    await ot3_hardware.add_tip(mount, 100)
+    speed_dispense = ot3_hardware._pipette_handler.plunger_speed(
+        pipette, pipette.blow_out_flow_rate, "dispense"
+    )
+    mock_move.reset_mock()
+    await ot3_hardware.prepare_for_aspirate(mount)
+    mock_move.assert_called_once_with(
+        target_pos, speed=speed_dispense, acquire_lock=True
+    )
+
+    # tip attached, aspirating
+    # NOTE: _move() is mocked, so we need to update the coordinate in the test
+    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
+    speed_aspirate = ot3_hardware._pipette_handler.plunger_speed(
+        pipette, pipette.aspirate_flow_rate, "aspirate"
+    )
+    mock_move.reset_mock()
+    await ot3_hardware.prepare_for_aspirate(mount)
+    mock_move.assert_called_once_with(
+        target_pos, speed=speed_aspirate, acquire_lock=True
+    )
 
 
 @pytest.mark.parametrize("enable_stalls", [True, False])
