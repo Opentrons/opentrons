@@ -58,18 +58,39 @@ const mockGripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: 'ghi789',
+  data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: 'fake_timestamp',
+    },
+  },
 }
 const mockRightPipetteData = {
   instrumentModel: 'p300_single_v2',
   instrumentType: 'p300',
   mount: 'right',
   serialNumber: 'abc123',
+  data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: 'fake_timestamp',
+    },
+  },
 }
 const mockLeftPipetteData = {
   instrumentModel: 'p1000_single_v2',
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
+  data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: 'fake_timestamp',
+    },
+  },
 }
 describe('InstrumentsDashboard', () => {
   beforeEach(() => {

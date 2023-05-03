@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
-import { useHistory } from 'react-router-dom'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
@@ -26,7 +25,6 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../Devices/hooks'
-import { InstrumentInfo } from '../InstrumentInfo.tsx'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -40,7 +38,6 @@ import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
@@ -49,23 +46,16 @@ interface PipetteWizardFlowsProps {
   mount: PipetteMount
   selectedPipette: SelectablePipettes
   closeFlow: () => void
-  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
+  onComplete?: () => void
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const {
-    flowType,
-    mount,
-    closeFlow,
-    selectedPipette,
-    setSelectedPipette,
-  } = props
+  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const history = useHistory()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = getPipetteWizardSteps(
@@ -111,9 +101,6 @@ export const PipetteWizardFlows = (
     null
   )
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [showInstrumentInfo, setShowInstrumentInfo] = React.useState<boolean>(
-    false
-  )
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
@@ -126,22 +113,7 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
-    if (
-      //  only if you complete detach flow, you're directed to instruments dashboard
-      currentStepIndex === totalStepCount &&
-      isOnDevice &&
-      flowType === FLOWS.DETACH
-    ) {
-      history.push('/instruments')
-    } else if (
-      //  only if you complete an attach flow, you're directed to InstrumentInfo
-      currentStepIndex === totalStepCount &&
-      isOnDevice &&
-      flowType === FLOWS.ATTACH &&
-      attachedPipettes[mount] != null
-    ) {
-      setShowInstrumentInfo(true)
-    }
+    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
@@ -149,7 +121,6 @@ export const PipetteWizardFlows = (
   })
 
   const handleCleanUpAndClose = (): void => {
-    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
@@ -207,11 +178,6 @@ export const PipetteWizardFlows = (
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back')} />
-  }
-  if (showInstrumentInfo) {
-    modalContent = (
-      <InstrumentInfo instrument={attachedPipettes[mount] as InstrumentData} />
-    )
   }
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
