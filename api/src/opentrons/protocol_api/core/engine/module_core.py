@@ -1,7 +1,7 @@
 """Protocol API module implementation logic."""
 from __future__ import annotations
 
-from typing import Optional, List, Union
+from typing import Optional, List
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (

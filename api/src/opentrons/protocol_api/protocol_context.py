@@ -30,6 +30,7 @@ from opentrons.protocols.api_support.util import (
 
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
+from .core.engine.module_core import NonConnectedModuleCore
 from .core.module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
@@ -835,7 +836,7 @@ class ProtocolContext(CommandPublisher):
 
 
 def _create_module_context(
-    module_core: ModuleCore,
+    module_core: Union[ModuleCore, NonConnectedModuleCore],
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,

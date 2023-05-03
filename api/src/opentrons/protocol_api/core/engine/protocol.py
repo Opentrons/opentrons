@@ -43,14 +43,17 @@ from .module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
     NonConnectedModuleCore,
-    MagneticBlockCore,
 )
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
 
 
-class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
+class ProtocolCore(
+    AbstractProtocol[
+        InstrumentCore, LabwareCore, Union[ModuleCore, NonConnectedModuleCore]
+    ]
+):
     """Protocol API core using a ProtocolEngine.
 
     Args:
@@ -120,14 +123,16 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore],
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         module_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(location, ModuleCore):
+        if isinstance(location, ModuleCore) or isinstance(
+            location, NonConnectedModuleCore
+        ):
             module_location = ModuleLocation(moduleId=location.module_id)
         else:
             module_location = DeckSlotLocation(slotName=location)
@@ -183,7 +188,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def move_labware(
         self,
         labware_core: LabwareCore,
-        new_location: Union[DeckSlotName, ModuleCore],
+        new_location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
@@ -192,7 +197,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     ) -> None:
         """Move the given labware to a new location."""
         to_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(new_location, ModuleCore):
+        if isinstance(new_location, ModuleCore) or isinstance(
+            new_location, NonConnectedModuleCore
+        ):
             to_location = ModuleLocation(moduleId=new_location.module_id)
         else:
             to_location = DeckSlotLocation(slotName=new_location)
@@ -410,7 +417,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
         return None
 
-    def get_labware_on_module(self, module_core: ModuleCore) -> Optional[LabwareCore]:
+    def get_labware_on_module(
+        self, module_core: Union[ModuleCore, NonConnectedModuleCore]
+    ) -> Optional[LabwareCore]:
         """Get the item on top of a given module, if any."""
         try:
             labware_id = self._engine_client.state.labware.get_id_by_module(

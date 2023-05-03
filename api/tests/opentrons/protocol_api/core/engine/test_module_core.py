@@ -1,31 +1,15 @@
 """Tests for opentrons.protocol_api.core.engine.ModuleCore."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
-from typing import Type, Union
 
 from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    HeaterShaker,
-    MagDeck,
-    TempDeck,
-    Thermocycler,
-    ModuleType,
-)
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel, ModuleDefinition
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.engine.module_core import (
-    ModuleCore,
-    ThermocyclerModuleCore,
-    MagneticBlockCore,
-    MagneticModuleCore,
-    TemperatureModuleCore,
-    HeaterShakerModuleCore,
-)
+from opentrons.protocol_api.core.engine.module_core import ModuleCore
 from opentrons.types import DeckSlotName
 
 
