@@ -13,6 +13,7 @@ import {
   ALIGN_CENTER,
   StyleProps,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
@@ -77,6 +78,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
   return (
     <Flex
       height={isOnDevice ? '472px' : 'auto'}
+      minHeight="394px"
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       {...styleProps}
@@ -124,7 +126,12 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           </>
         )}
       </Flex>
-      <Flex flex="0 1 auto" css={BUTTON_STYLE}>
+      <Flex
+        position={POSITION_ABSOLUTE}
+        bottom={0}
+        right={0}
+        css={BUTTON_STYLE}
+      >
         {children}
       </Flex>
     </Flex>

@@ -4,7 +4,7 @@ export interface GripperData {
   data: {
     jawState: string
     calibratedOffset: {
-      offset: [number, number, number]
+      offset: { x: number; y: number; z: number }
       source: string
       last_modified?: string
     }
@@ -20,7 +20,7 @@ export interface PipetteData {
     min_volume: number
     max_volume: number
     calibratedOffset: {
-      offset: [number, number, number]
+      offset: { x: number; y: number; z: number }
       source: string
       last_modified?: string
     }

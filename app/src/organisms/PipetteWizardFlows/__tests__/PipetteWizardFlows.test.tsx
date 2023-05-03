@@ -17,13 +17,8 @@ import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
 import { getIsOnDevice } from '../../../redux/config'
-import { useAttachedPipetteCalibrations } from '../../Devices/hooks/useAttachedPipetteCalibrations'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
@@ -31,8 +26,6 @@ import { ExitModal } from '../ExitModal'
 import { FLOWS, SECTIONS } from '../constants'
 import { UnskippableModal } from '../UnskippableModal'
 import { PipetteWizardFlows } from '..'
-
-import type { PipetteCalibrationsByMount } from '../../../redux/pipettes/types'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')
@@ -44,22 +37,8 @@ jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../UnskippableModal')
 jest.mock('../../../redux/config')
-jest.mock('../../Devices/hooks/useAttachedPipetteCalibrations')
 jest.mock('../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery')
 
-const mockPush = jest.fn()
-
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
-
-const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof useAttachedPipetteCalibrations
->
 const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
   typeof useAttachedPipettesFromInstrumentsQuery
 >
@@ -78,7 +57,6 @@ const mockUseCreateMaintenanceRunMutation = useCreateMaintenanceRunMutation as j
 const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
   typeof useDeleteMaintenanceRunMutation
 >
-
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
@@ -95,14 +73,6 @@ const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
   })[0]
 }
 
-const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
-  left: {
-    offset: mockPipetteOffsetCalibration1,
-  },
-  right: {
-    offset: mockPipetteOffsetCalibration2,
-  },
-} as any
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   let mockCreateMaintenanceRun: jest.Mock
@@ -116,10 +86,6 @@ describe('PipetteWizardFlows', () => {
       closeFlow: jest.fn(),
       onComplete: jest.fn(),
     }
-    mockUseAttachedPipetteCalibrations.mockReturnValue({
-      left: {},
-      right: {},
-    } as any)
     mockCreateMaintenanceRun = jest.fn()
     mockDeleteMaintenanceRun = jest.fn()
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
@@ -166,9 +132,6 @@ describe('PipetteWizardFlows', () => {
     mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
     const { getByText, getByRole } = render(props)
     //  first page
     getByText('Recalibrate Left Pipette')
@@ -250,9 +213,6 @@ describe('PipetteWizardFlows', () => {
     // })
   })
   it('renders the correct first page for calibrating single mount when rendering from on device display', () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
     mockGetIsOnDevice.mockReturnValue(true)
     const { getByText } = render(props)
     getByText('Recalibrate Left Pipette')

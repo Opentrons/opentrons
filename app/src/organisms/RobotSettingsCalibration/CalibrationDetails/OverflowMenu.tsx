@@ -27,7 +27,10 @@ import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '../../../redux/analytics'
-import { useRunStatuses } from '../../../organisms/Devices/hooks'
+import {
+  useRunStatuses,
+  useAttachedPipettesFromInstrumentsQuery,
+} from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 
@@ -80,6 +83,9 @@ export function OverflowMenu({
     setShowPipetteWizardFlows,
   ] = React.useState<boolean>(false)
   const isGen3Pipette = isOT3Pipette(pipetteName as PipetteName)
+  const ot3PipCal =
+    useAttachedPipettesFromInstrumentsQuery()[mount]?.data.calibratedOffset
+      .offset ?? null
 
   const applicablePipetteOffsetCal = pipetteOffsetCalibrations?.find(
     p => p.mount === mount && p.pipette === serialNumber
@@ -195,7 +201,11 @@ export function OverflowMenu({
         >
           {isGen3Pipette ? (
             <MenuItem onClick={handleRecalibrate}>
-              {t('robot_calibration:recalibrate_pipette')}
+              {t(
+                ot3PipCal == null
+                  ? 'robot_calibration:calibrate_pipette'
+                  : 'robot_calibration:recalibrate_pipette'
+              )}
             </MenuItem>
           ) : (
             <>

@@ -16,8 +16,8 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
-import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
@@ -41,11 +41,10 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <Flex>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('liquids')}
-        </BackButton>
-      </Flex>
+      <ODDBackButton
+        label={t('liquids')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}
