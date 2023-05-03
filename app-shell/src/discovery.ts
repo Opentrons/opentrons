@@ -210,7 +210,20 @@ export function registerDiscovery(
         usbHttpAgent = httpAgent as Agent
         // destroyHttpAgent = httpAgent?.destroy ?? (() => {})
 
+        
         ipcMain.handle('usb:request', usbListener)
+        
+        const cachedUsbRobotName = client
+          .getRobots()
+          .find(robot =>
+            robot.addresses.some(address => address.ip === 'opentrons-usb')
+          )?.name
+
+        if (cachedUsbRobotName != null) {
+          log.debug(`deleting old opentrons-usb entry with name ${cachedUsbRobotName}`)
+          client.removeRobot(cachedUsbRobotName)
+        }
+
         client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
           manualAddresses: [
@@ -284,6 +297,6 @@ export function registerDiscovery(
   }
 
   function clearCache(): void {
-    client.start({ initialRobots: [] })
+    client.start({ initialRobots: [], manualAddresses: [] })
   }
 }

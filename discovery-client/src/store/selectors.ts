@@ -33,7 +33,11 @@ export const getAddresses: (state: State) => Address[] = createSelector(
   state => state.manualAddresses,
   getHostStates,
   (manualAddresses, hosts) => {
-    const trackedAddresses = hosts.map(({ ip, port }) => ({ ip, port }))
+    const trackedAddresses = hosts.map(({ ip, port, agent }) => ({
+      ip,
+      port,
+      agent,
+    }))
     return unionBy(trackedAddresses, manualAddresses, 'ip')
   }
 )
