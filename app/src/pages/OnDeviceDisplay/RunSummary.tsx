@@ -40,6 +40,7 @@ import {
 import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
 import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
+import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -82,6 +83,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleRunAgain = (): void => {
+    // clone the run
     history.push(`/protocols/${runId}/setup`)
   }
 
@@ -93,7 +95,7 @@ export function RunSummary(): JSX.Element {
   const handleClickSplash = (): void => {
     stopRun(runId, {
       onSuccess: () => {
-        trackProtocolRunEvent({ name: 'runCancel' })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
       },
     })
     setShowSplash(false)
