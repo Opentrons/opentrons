@@ -31,6 +31,9 @@ class Plot:
         self.create_folder()
         self.df_data = self.import_file(self.data)
         self.df_avg = self.avg_df(self.df_data)
+        self.gauge_zero = self.get_gauge_zero(self.df_data)
+        self.max_error = 0.05
+        print(f"Z Gauge Zero = {self.gauge_zero}")
 
     def import_file(self, file):
         df = pd.read_csv(file)
@@ -42,6 +45,10 @@ class Plot:
         path = self.PLOT_PATH.replace("/","")
         if not os.path.exists(path):
             os.makedirs(path)
+
+    def get_gauge_zero(self, df):
+        gauge_zero = round(df["Z Zero"].iloc[0], 2)
+        return gauge_zero
 
     def avg_df(self, df):
         df_avg = pd.DataFrame()
@@ -136,7 +143,8 @@ class Plot:
         self.plot_param["x_title"] = "Trial Number"
         self.plot_param["y_title"] = "Z-Axis Gauge (mm)"
         self.plot_param["x_range"] = [x_first, x_last]
-        self.plot_param["y_range"] = [3, 3.5]
+        self.plot_param["y_range"] = [3, 3.5] # dial with o-ring
+        self.plot_param["y_range"] = [1.7, 1.9] # dial without o-ring
         self.plot_param["legend"] = "Threshold"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
@@ -156,7 +164,7 @@ class Plot:
         self.plot_param["x_title"] = "Threshold (pF)"
         self.plot_param["y_title"] = "Z Gauge Average (mm)"
         self.plot_param["x_range"] = None
-        self.plot_param["y_range"] = [3.2, 3.25]
+        self.plot_param["y_range"] = [self.gauge_zero, self.gauge_zero + self.max_error]
         self.write_plot(self.plot_param)
 
     def avg_error_plot(self):
@@ -174,7 +182,7 @@ class Plot:
         self.plot_param["x_title"] = "Threshold (pF)"
         self.plot_param["y_title"] = "Z Gauge Error Average (mm)"
         self.plot_param["x_range"] = None
-        self.plot_param["y_range"] = [0, 0.05]
+        self.plot_param["y_range"] = [0, self.max_error]
         self.write_plot(self.plot_param)
 
 if __name__ == '__main__':
