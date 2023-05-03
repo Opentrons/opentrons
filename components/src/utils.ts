@@ -50,7 +50,7 @@ export function truncateString(
         breakPoint - maxLength + dots.length
       )}`
     } else {
-      return `${text.slice(0, maxLength)}...`
+      return `${text.slice(0, maxLength - dots.length)}...`
     }
   else return text
 }
