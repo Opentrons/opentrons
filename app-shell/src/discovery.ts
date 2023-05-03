@@ -209,9 +209,8 @@ export function registerDiscovery(
         usbHttpAgent = httpAgent as Agent
         // destroyHttpAgent = httpAgent?.destroy ?? (() => {})
 
-        
         ipcMain.handle('usb:request', usbListener)
-        
+
         const cachedUsbRobotName = client
           .getRobots()
           .find(robot =>
@@ -219,7 +218,9 @@ export function registerDiscovery(
           )?.name
 
         if (cachedUsbRobotName != null) {
-          log.debug(`deleting old opentrons-usb entry with name ${cachedUsbRobotName}`)
+          log.debug(
+            `deleting old opentrons-usb entry with name ${cachedUsbRobotName}`
+          )
           client.removeRobot(cachedUsbRobotName)
         }
 
