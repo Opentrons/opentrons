@@ -14,7 +14,7 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, Mount, MountType, Point
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter, API
 from opentrons.hardware_control.modules import (
     AbstractModule,
     TempDeck,
@@ -337,6 +337,47 @@ def test_move_labware(
             drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
         )
     )
+    
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
+def test_move_labware_on_non_connected_module(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    mock_engine_client: EngineClient,
+    api_version: APIVersion
+) -> None:
+    """It should issue a move labware command to the engine."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition("labware-id")
+    ).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+    non_connected_module_core = NonConnectedModuleCore(
+        module_id="module-id",
+        engine_client=mock_engine_client,
+        api_version=APIVersion,
+    )
+    subject.move_labware(
+        labware_core=labware,
+        new_location=non_connected_module_core,
+        use_gripper=False,
+        use_pick_up_location_lpc_offset=False,
+        use_drop_location_lpc_offset=False,
+        pick_up_offset=None,
+        drop_offset=None,
+    )
+    decoy.verify(
+        mock_engine_client.move_labware(
+            labware_id="labware-id",
+            new_location=ModuleLocation(moduleId="module-id"),
+            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+            use_pick_up_location_lpc_offset=False,
+            use_drop_location_lpc_offset=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
@@ -413,6 +454,80 @@ def test_load_labware_on_module(
     ).then_return("abc123")
 
     assert subject.get_labware_on_module(module_core) is result
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
+def test_load_labware_on_non_connected_module(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+    api_version: APIVersion,
+) -> None:
+    """It should issue a LoadLabware command."""
+    decoy.when(
+        mock_engine_client.state.labware.find_custom_labware_load_params()
+    ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
+
+    decoy.when(
+        load_labware_params.resolve(
+            "some_labware",
+            "a_namespace",
+            456,
+            [EngineLabwareLoadParams("hello", "world", 654)],
+        )
+    ).then_return(("some_namespace", 9001))
+
+    decoy.when(
+        mock_engine_client.load_labware(
+            location=ModuleLocation(moduleId="module-id"),
+            load_name="some_labware",
+            display_name="some_display_name",
+            namespace="some_namespace",
+            version=9001,
+        )
+    ).then_return(
+        commands.LoadLabwareResult(
+            labwareId="abc123",
+            definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
+            offsetId=None,
+        )
+    )
+
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+
+    non_connected_module_core = NonConnectedModuleCore(
+        module_id="module-id",
+        engine_client=mock_engine_client,
+        api_version=api_version,
+    )
+
+    result = subject.load_labware(
+        load_name="some_labware",
+        location=non_connected_module_core,
+        label="some_display_name",  # maps to optional display name
+        namespace="a_namespace",
+        version=456,
+    )
+
+    assert isinstance(result, LabwareCore)
+    assert result.labware_id == "abc123"
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="abc123",
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.state.labware.get_id_by_module("module-id")
+    ).then_return("abc123")
+
+    assert subject.get_labware_on_module(non_connected_module_core) is result
 
 
 def test_add_labware_definition(
