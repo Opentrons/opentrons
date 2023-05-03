@@ -50,15 +50,6 @@ TARGETS: Final[Dict[str, NodeId]] = {
     "gripper": NodeId.gripper,
 }
 
-BOOTLOADER_MAP: Final[Dict[NodeId, NodeId]] = {
-    NodeId.head: NodeId.head_bootloader,
-    NodeId.gantry_x: NodeId.gantry_x_bootloader,
-    NodeId.gantry_y: NodeId.gantry_y_bootloader,
-    NodeId.pipette_left: NodeId.pipette_left_bootloader,
-    NodeId.pipette_right: NodeId.pipette_right_bootloader,
-    NodeId.gripper: NodeId.gripper_bootloader,
-}
-
 
 async def run(args: argparse.Namespace) -> None:
     """Script entrypoint."""
@@ -98,7 +89,7 @@ async def clear_eeprom(
     # give it a second to jump to the boot loader and start it's can task
     await asyncio.sleep(1)
     await messenger.send(
-        BOOTLOADER_MAP[node],
+        node.bootloader_for(),
         message_definitions.FirmwareUpdateStartApp(payload=payloads.EmptyPayload()),
     )
 
