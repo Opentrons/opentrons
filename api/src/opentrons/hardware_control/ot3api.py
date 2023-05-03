@@ -62,7 +62,6 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
     axis_convert,
-    sub_system_to_node_id,
 )
 from .backends.errors import SubsystemUpdating
 from .execution_manager import ExecutionManagerProvider
@@ -77,10 +76,8 @@ from .types import (
     ErrorMessageNotification,
     HardwareEventHandler,
     HardwareAction,
-    InstrumentUpdateStatus,
     MotionChecks,
     SubSystem,
-    PipetteSubType,
     PauseType,
     OT3Axis,
     OT3AxisKind,
@@ -139,8 +136,6 @@ from .dev_types import (
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
-
-from opentrons_hardware.firmware_bindings.constants import FirmwareTarget, USBTarget
 
 from .status_bar_state import StatusBarStateController
 
@@ -402,15 +397,9 @@ class OT3API(
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
-        targets: Set[FirmwareTarget] = set()
-        for subsystem in subsystems:
-            if subsystem is SubSystem.rear_panel:
-                targets.add(USBTarget.rear_panel)
-            else:
-                targets.add(sub_system_to_node_id(subsystem))
         # start the updates and yield the progress
         try:
-            async for update_status in self._backend.update_firmware(targets, force):
+            async for update_status in self._backend.update_firmware(subsystems, force):
                 yield update_status
         except SubsystemUpdating as e:
             raise UpdateOngoingError(e.msg) from e
@@ -494,17 +483,12 @@ class OT3API(
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
 
-        pipete_subtype = (
-            PipetteSubType.from_channels(config.channels) if config else None
-        )
-        fw_update_info = self._backend.get_instrument_update(mount, pipete_subtype)
         p, _ = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
             pip_offset_cal,
-            fw_update_info,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
@@ -512,13 +496,11 @@ class OT3API(
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
-        fw_update_info = self._backend.get_instrument_update(OT3Mount.GRIPPER)
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
         g = compare_gripper_config_and_check_skip(
             instrument_data,
             self._gripper_handler._gripper,
             grip_cal,
-            fw_update_info,
         )
         self._gripper_handler.gripper = g
 

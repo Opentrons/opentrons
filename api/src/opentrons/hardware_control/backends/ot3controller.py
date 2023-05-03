@@ -27,14 +27,12 @@ from typing import (
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import ot3_pipette_config, gripper_config
 from .ot3utils import (
-    UpdateProgress,
     axis_convert,
     create_move_group,
     axis_to_node,
     get_current_settings,
     create_home_group,
     node_to_axis,
-    pipette_type_for_subtype,
     sensor_node_for_mount,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
@@ -42,7 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_tip_action_group,
     PipetteAction,
-    sub_system_to_node_id,
+    subsystem_to_target,
 )
 
 try:
@@ -82,9 +80,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
     SensorId,
-    PipetteType,
-    USBTarget,
-    FirmwareTarget,
 )
 from opentrons_hardware.hardware_control import status_bar
 
@@ -93,13 +88,11 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     BinaryMessageDefinition,
     DoorSwitchStateInfo,
 )
-from opentrons_hardware import firmware_update
 
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
-    InstrumentFWInfo,
     OT3Axis,
     AionotifyEvent,
     OT3Mount,
@@ -107,9 +100,7 @@ from opentrons.hardware_control.types import (
     CurrentConfig,
     MotorStatus,
     InstrumentProbeType,
-    PipetteSubType,
     UpdateStatus,
-    mount_to_subsystem,
     DoorState,
     SubSystemState,
     SubSystem,
@@ -125,7 +116,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroup,
 )
 from opentrons_hardware.hardware_control.types import NodeMap
-from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
+from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
 
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
@@ -137,6 +128,7 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     set_deck_light,
     get_deck_light_state,
 )
+from opentrons_hardware.hardware_control.network import DeviceInfoCache
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -203,6 +195,7 @@ class OT3Controller:
 
         inst = cls(config, driver=driver, usb_driver=usb_driver)
         await inst._subsystem_manager.start()
+        return inst
 
     def __init__(
         self,
@@ -227,7 +220,6 @@ class OT3Controller:
         self._motor_status = {}
         self._initialized = False
         self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
-        self._update_tracker = {}
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -242,13 +234,13 @@ class OT3Controller:
         """True when the hardware controller has initialized and is ready."""
         return self._initialized
 
-    @property
-    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
-        return self._subsystem_manager.subsystems
-
     @initialized.setter
     def initialized(self, value: bool) -> None:
         self._initialized = value
+
+    @property
+    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return self._subsystem_manager.subsystems
 
     @property
     def fw_version(self) -> Optional[str]:
@@ -270,25 +262,14 @@ class OT3Controller:
             usb_messenger.start()
             return RemoteOT3GPIO(usb_messenger), usb_messenger
 
-    @staticmethod
-    def _attached_pipettes_to_nodes(
-        attached_pipettes: Dict[OT3Mount, PipetteSubType]
-    ) -> Dict[NodeId, PipetteType]:
-        pipette_nodes = {}
-        for mount, subtype in attached_pipettes.items():
-            subsystem = mount_to_subsystem(mount)
-            node_id = sub_system_to_node_id(subsystem)
-            pipette_type = pipette_type_for_subtype(subtype)
-            pipette_nodes[node_id] = pipette_type
-        return pipette_nodes
-
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
 
         def _motor_node_for_device(
-            devices: Dict[FirmwareTarget, DeviceInfoCache]
+            devices: Dict[SubSystem, DeviceInfoCache]
         ) -> Iterator[NodeId]:
-            for node, device in devices.items():
+            for subsystem, device in devices.items():
+                node = subsystem_to_target(subsystem)
                 if not isinstance(node, NodeId):
                     continue
                 if not device.ok:
@@ -302,15 +283,16 @@ class OT3Controller:
                 else:
                     yield node
 
-        return set(_motor_node_for_devices(self._subsystem_manager.device_info))
+        return set(_motor_node_for_device(self._subsystem_manager.device_info))
 
     async def update_firmware(
         self,
-        targets: Optional[Set[FirmwareTarget]] = None,
+        subsystems: Set[SubSystem],
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""
-        return await self._subsystem_manager.update_firmware(targets, force)
+        async for update in self._subsystem_manager.update_firmware(subsystems, force):
+            yield update
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(

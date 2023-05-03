@@ -36,7 +36,6 @@ from .ot3utils import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
-    FirmwareTarget,
 )
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -47,15 +46,14 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
-    InstrumentFWInfo,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
-    PipetteSubType,
     UpdateStatus,
+    SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -499,8 +497,7 @@ class OT3Simulator:
 
     async def update_firmware(
         self,
-        attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[FirmwareTarget]] = None,
+        subsystems: Set[SubSystem],
         force: bool = False,
     ) -> AsyncIterator[Set[UpdateStatus]]:
         """Updates the firmware on the OT3."""

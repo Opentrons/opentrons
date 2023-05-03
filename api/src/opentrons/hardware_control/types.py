@@ -1,7 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import Optional, cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
+from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
@@ -291,8 +291,8 @@ class SubSystem(enum.Enum):
 
     @classmethod
     def of_mount(
-        cls: Type[SubSystem], mount: Union[top_types.Mount, OT3Mount]
-    ) -> Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]:
+        cls: "Type[SubSystem]", mount: Union[top_types.Mount, OT3Mount]
+    ) -> "Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]":
         return cast(
             Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper],
             {

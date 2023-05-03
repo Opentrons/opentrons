@@ -47,7 +47,7 @@ class SubsystemManager:
     _usb_messenger: Optional[binary_usb.BinaryMessenger]
     _tool_detector: tools.detector.ToolDetector
     _network_info: network.NetworkInfo
-    _tool_detection_task: Optional[asyncio.Task[None]]
+    _tool_detection_task: "Optional[asyncio.Task[None]]"
     _expected_core_targets: Set[FirmwareTarget]
     _present_tools: tools.types.ToolSummary
     _refreshed: asyncio.Event
