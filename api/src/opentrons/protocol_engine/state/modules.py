@@ -830,7 +830,7 @@ class ModuleView(HasState[ModuleState]):
     def ensure_module_not_present(
         self, model: ModuleModel, location: DeckSlotLocation
     ) -> None:
-        """Ensure a different module is not preset in the slot we are trying to load into."""
+        """Ensure a different module is not present in the slot we are trying to load into."""
         for module in self.get_all():
             if module.location == location and model != module.model:
                 raise errors.ModuleAlreadyPresentError(
