@@ -108,7 +108,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }}
         />
       }
-      back={goBack}
+      back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
         isOnDevice ? (
           <SmallButton
