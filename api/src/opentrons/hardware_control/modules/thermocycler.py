@@ -233,6 +233,21 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
         return ThermocyclerLidStatus.OPEN
 
+    async def extra_lift(self) -> None:
+        """Move lid an extra bit."""
+        if self.is_simulated:
+            return
+        await self.wait_for_is_running()
+        await self._driver.jog_lid(20)
+
+    async def return_from_extra_lift(self) -> None:
+        """Move lid an extra bit."""
+        if self.is_simulated:
+            return
+        await self.wait_for_is_running()
+        await self._driver.jog_lid(-23)
+        await self.open()
+
     async def set_temperature(
         self,
         temperature: float,
