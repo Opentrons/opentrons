@@ -61,8 +61,13 @@ export const loadProtocolFile = (
 
       try {
         parsedProtocol = JSON.parse((result as any) as string)
-        // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
         parsedProtocol && dispatch(loadFileAction(parsedProtocol))
+        if (parsedProtocol && parsedProtocol.robot.model === "OT-2 Standard") {
+          document.getElementsByClassName("ot-2")[1].click();
+        } else {
+          document.getElementsByClassName("file_tab")[0].click();
+        }
+        // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
       } catch (error) {
         console.error(error)
         fileError('INVALID_JSON_FILE', error.message)

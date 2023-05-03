@@ -255,10 +255,10 @@ export function FileSidebar(props: Props): JSX.Element {
             Create New
           </OutlineButton>
 
-          <OutlineButton Component="label" className={cx(styles.upload_button)}>
+          {/* <OutlineButton Component="label" className={cx(styles.upload_button)}>
             Import
             <input type="file" onChange={loadFile} />
-          </OutlineButton>
+          </OutlineButton> */}
 
           <div className={styles.button}>
             <DeprecatedPrimaryButton

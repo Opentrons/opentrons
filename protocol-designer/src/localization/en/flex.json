@@ -38,5 +38,24 @@
     "pippette_ocuupies_both_mount":"Note: 96 Channel occupies both the mount.",
     "choose_first_pipette": "Choose First Pipeptte",
     "choose_second_pipette": "Choose Second Pipeptte"
+  },
+  "file_tab": {
+    "heading": "Protocol Information",
+    "subheading": "Opentrons Flex Protocol",
+    "export": "Export Protocol",
+    "close_export": "Close Protocol",
+    "name_desc_title": "Name and Description",
+    "name": "Name : ",
+    "author": "Author : ",
+    "description": "Description : ",
+    "date_created": "Date Created : ",
+    "last_exported": "Last Exported : ",
+    "pipette": "Pipettes",
+    "swap_pipette": "Swap Pipette",
+    "additional_items": "Additional Items?",
+    "add_items": "Add Items",
+    "edit": "Edit",
+    "left": "Left mount -",
+    "right": "Right mount -"
   }
 }
