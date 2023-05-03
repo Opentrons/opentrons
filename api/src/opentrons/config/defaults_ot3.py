@@ -39,7 +39,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
     z_offset=ZSenseSettings(
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=4.0,
-            max_overrun_distance_mm=2.0,
+            max_overrun_distance_mm=5.0,
             speed_mm_per_s=1.0,
             sensor_threshold_pf=3.0,
         ),
