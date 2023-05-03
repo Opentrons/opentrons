@@ -99,9 +99,11 @@ function ProtocolSetupStep({
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText as="h1">{title}</StyledText>
+        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {title}
+        </StyledText>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
-          <StyledText as="h2" textAlign={TEXT_ALIGN_RIGHT}>
+          <StyledText as="p" textAlign={TEXT_ALIGN_RIGHT}>
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
