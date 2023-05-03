@@ -171,6 +171,12 @@ async def test_move_labware_with_gripper(
         state_store.labware.get_labware_offset_vector("my-teleporting-labware")
     ).then_return(LabwareOffsetVector(x=0.1, y=0.2, z=0.3))
 
+    decoy.when(
+        thermocycler_plate_lifter.lift_plate_for_labware_movement(
+            labware_location=from_location
+        )
+    ).then_enter_with(value=None)
+
     decoy.when(state_store.labware.get_labware_offset("new-offset-id")).then_return(
         LabwareOffset(
             id="new-offset-id",
@@ -210,7 +216,6 @@ async def test_move_labware_with_gripper(
     gripper = OT3Mount.GRIPPER
     decoy.verify(
         await ot3_hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]),
-        await thermocycler_plate_lifter.lift_plate_for_labware_movement(from_location),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
         ),
