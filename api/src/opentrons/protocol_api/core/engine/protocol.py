@@ -270,16 +270,16 @@ class ProtocolCore(
         )
         module_type = result.model.as_type()
 
-        if module_type != ModuleType.MAGNETIC_BLOCK:
+        module_core: Union[ModuleCore, NonConnectedModuleCore]
+        # TODO(mc, 2022-10-25): move to module core factory functio
+        if not ProtocolEngineModuleModel.is_magnetic_block(result.model):
             assert (
                 result.serialNumber is not None
             ), "Expected a connected module but did not get a serial number."
             selected_hardware = self._resolve_module_hardware(
-                result.serialNumber, model.value
+                result.serialNumber, model
             )
-        module_core: Union[ModuleCore, NonConnectedModuleCore]
-        # TODO(mc, 2022-10-25): move to module core factory functio
-        if not ProtocolEngineModuleModel.is_magnetic_block(result.model):
+
             module_core_cls: Type[ModuleCore] = ModuleCore
             if module_type == ModuleType.TEMPERATURE:
                 module_core_cls = TemperatureModuleCore
