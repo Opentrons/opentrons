@@ -184,7 +184,6 @@ export function registerDiscovery(
   function startUsbHttpRequests(): void {
     fetchSerialPortList()
       .then((list: PortInfo[]) => {
-        console.log({list})
         const ot3UsbSerialPort = list.find(
           port =>
             port.productId === DEFAULT_PRODUCT_ID &&
