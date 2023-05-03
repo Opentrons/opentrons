@@ -257,7 +257,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
         assert (
             result.serialNumber is not None
-        ), "Expected a module SN and got None instead."
+        ), "Magnetic block is not supported in PAPI yet."
         selected_hardware = self._resolve_module_hardware(result.serialNumber, model)
 
         # TODO(mc, 2022-10-25): move to module core factory function
