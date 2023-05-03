@@ -86,7 +86,7 @@ class ModuleCore(AbstractModuleCore):
 
 
 class NonConnectedModuleCore(AbstractModuleCore):
-    """Not connected Module core logic implementation for Python protocols.
+    """Not connected module core logic implementation for Python protocols.
 
     Args:
         module_id: ProtocolEngine ID of the loaded modules.
