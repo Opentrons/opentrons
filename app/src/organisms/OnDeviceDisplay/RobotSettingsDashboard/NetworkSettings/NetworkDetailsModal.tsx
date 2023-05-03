@@ -55,15 +55,11 @@ export function NetworkDetailsModal({
         gridGap={SPACING.spacing3}
         width="100%"
       >
-        {/* ip address */}
         <ListItem itemName={t('ip_address')} itemValue={ipAddress} />
-        {/* security type */}
         {securityType != null ? (
           <ListItem itemName={t('security_type')} itemValue={securityType} />
         ) : null}
-        {/* subnet mask */}
         <ListItem itemName={t('subnet_mask')} itemValue={subnetMask} />
-        {/* mac address */}
         <ListItem itemName={t('mac_address')} itemValue={macAddress} />
       </Flex>
     </Modal>
