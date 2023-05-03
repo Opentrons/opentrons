@@ -1488,14 +1488,15 @@ class OT3API(
         blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
 
         max_blowout_pos = instrument.plunger_positions.blow_out
-        # start at the bottom position and move additional distance det. by plan_check_blow_out
+        # start at the bottom position and move additional distance
+        # determined by plan_check_blow_out
         blowout_distance = (
             instrument.plunger_positions.bottom + blowout_spec.plunger_distance
         )
         if blowout_distance > max_blowout_pos:
             raise ValueError(
-                f"Blow out distance exceeds plunger position limit\n blowout dist = {blowout_distance}"
-                f"\nmax blowout distance = {max_blowout_pos}"
+                f"Blow out distance exceeds plunger position limit: blowout dist = {blowout_distance}, "
+                f"max blowout distance = {max_blowout_pos}"
             )
 
         await self._backend.set_active_current(
