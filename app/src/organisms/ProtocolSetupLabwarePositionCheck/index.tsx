@@ -3,17 +3,15 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { BackButton } from '../../atoms/buttons'
-import { ContinueButton } from '../ProtocolSetupModules'
 import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
 export interface ProtocolSetupLabwarePositionCheckProps {
   runId: string
@@ -35,14 +33,10 @@ export function ProtocolSetupLabwarePositionCheck({
       width="100%"
       gridGap={SPACING.spacing3}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <BackButton onClick={() => setSetupScreen('labware')}>
-          {t('labware_position_check')}
-        </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          <ContinueButton onClick={() => setSetupScreen('liquids')} />
-        </Flex>
-      </Flex>
+      <ODDBackButton
+        label={t('labware_position_check')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         height="20rem"
         width="100%"
