@@ -42,8 +42,6 @@ export function RecentRunProtocolCard({
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-
-  // const currentRunId = useCurrentRunId()
   const { data: allRuns } = useAllRunsQuery()
   const runId =
     allRuns?.data.find(run => run.protocolId === protocolId)?.id ?? null
