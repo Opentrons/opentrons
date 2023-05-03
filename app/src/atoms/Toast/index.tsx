@@ -233,7 +233,7 @@ export function Toast(props: ToastProps): JSX.Element {
               }
               fontWeight={
                 showODDStyle
-                  ? TYPOGRAPHY.fontWeightLevel2_bold
+                  ? TYPOGRAPHY.fontWeightBold
                   : TYPOGRAPHY.fontWeightRegular
               }
               lineHeight={

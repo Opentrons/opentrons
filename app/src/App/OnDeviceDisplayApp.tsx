@@ -188,8 +188,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const isIdle = useIdle(sleepTime, options)
 
   return (
-    <ApiHostProvider hostname="10.13.11.65">
-      <Box width="100%">
+    <ApiHostProvider hostname="localhost">
+      <Box width="100%" css="user-select: none;">
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (

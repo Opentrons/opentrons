@@ -84,8 +84,8 @@ describe('Navigation', () => {
     expect(queryByText('Get started')).not.toBeInTheDocument()
   })
   it('should render the overflow btn and clicking on it renders the menu', () => {
-    const [{ getByLabelText, getByText }] = render(props)
-    getByLabelText('Navigation_OverflowBtn').click()
+    const [{ getByRole, getByText }] = render(props)
+    getByRole('button', { name: 'overflow menu button' }).click()
     getByText('mock NavigationMenu')
   })
 })
