@@ -8,8 +8,9 @@ import {
 } from '@opentrons/shared-data'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import { RadioGroup } from '@opentrons/components'
-import { pipetteNameBlocklist } from '../constant'
+import { pipetteNameBlocklist } from './constant'
 import { useFormikContext } from 'formik'
+import type { ActionMeta } from 'react-select'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
@@ -32,6 +33,7 @@ export interface PipetteSelectProps {
 }
 
 const PIPETTE_SORT = ['maxVolume', 'channels'] as const
+// @ts-expect-error(mc, 2021-04-27): use TS type guard for filter
 const allPipetteNameSpecs: PipetteNameSpecs[] = getAllPipetteNames(
   ...PIPETTE_SORT
 )
@@ -54,7 +56,7 @@ export interface SelectOption {
   isDisabled?: boolean
 }
 
-export const RadioSelect = ({ pipetteName, pipetteType }: any): any => {
+export const RadioSelect = ({ pipetteName, pipetteType }: any): JSX.Element => {
   const { handleChange } = useFormikContext<any>()
   const allowlist = ({ value }: SelectOption): boolean => {
     return !pipetteNameBlocklist.some(n => n === value)

@@ -1,6 +1,6 @@
 import React from 'react'
 import { RoundTab } from '@opentrons/components'
-import { navPillsNameTabList } from '../constant'
+import { navPillsNameTabList } from './constant'
 import { StyledText } from './StyledText'
 
 interface RoundTabsProps {
@@ -11,7 +11,7 @@ interface RoundTabsProps {
 export const RoundTabs: React.FC<RoundTabsProps> = ({
   setCurrentTab,
   currentTab,
-}) => {
+}): JSX.Element => {
   return (
     <>
       {navPillsNameTabList.map(({ name, navPillPage }, index) => {

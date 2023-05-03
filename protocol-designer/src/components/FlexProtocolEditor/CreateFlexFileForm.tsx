@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { SecondaryButton } from '@opentrons/components'
-import { Link } from 'react-router-dom'
 import { i18n } from '../../localization'
 import { FlexProtocolEditorComponent } from './FlexProtocolEditor'
 import { StyledText } from './StyledText'
@@ -8,7 +7,6 @@ import styles from './FlexComponents.css'
 import { useDispatch } from 'react-redux'
 import {
   actions as fileActions,
-  selectors as loadFileSelectors,
 } from '../../load-file'
 import { PipetteOnDeck, actions as stepFormActions } from '../../step-forms'
 import { actions as steplistActions } from '../../steplist'
@@ -16,8 +14,10 @@ import { uuid } from '../../utils'
 import { mapValues, omit } from 'lodash'
 import { NormalizedPipette } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { selectPageForms } from './constant'
+import { PageProps } from '../LandingPage'
 
-function FlexFormComponent(): JSX.Element {
+function FlexFormComponent(props: PageProps): JSX.Element {
   const dispatch = useDispatch()
   const onSave = (fields: any): any => {
     const { newProtocolFields, pipettes } = fields
@@ -60,20 +60,20 @@ function FlexFormComponent(): JSX.Element {
     <div className={styles.flex_header}>
       <div className={styles.flex_title}>
         <StyledText as="h1">{i18n.t('flex.header.title')}</StyledText>
-        <Link to={'/'}>
-          <SecondaryButton className={styles.cancel_button} tabIndex={0}>
-            <StyledText as="h3">
-              {i18n.t('flex.header.cancel_button')}
-            </StyledText>
-          </SecondaryButton>
-        </Link>
+        <SecondaryButton
+          className={styles.cancel_button}
+          tabIndex={0}
+          onClick={() => props.setPageProps(selectPageForms.defaultLandingPage)}
+        >
+          <StyledText as="h3">{i18n.t('flex.header.cancel_button')}</StyledText>
+        </SecondaryButton>
       </div>
       <StyledText as="h5" className={styles.required_fields}>
         {i18n.t('flex.header.required_fields')}
       </StyledText>
-      <FlexProtocolEditorComponent onSave={onSave} />
+      <FlexProtocolEditorComponent/>
     </div>
   )
 }
 
-export const FlexForm = FlexFormComponent
+export const CreateFlexFileForm = FlexFormComponent

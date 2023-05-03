@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import assert from 'assert'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -27,15 +26,10 @@ import { FlexModules } from './FlexModules'
 import { FlexProtocolName } from './FlexProtocolName'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
-import { mountSide, navPillTabListLength, pipetteSlot } from '../constant'
+import { mountSide, navPillTabListLength, pipetteSlot } from './constant'
 import { RoundTabs } from './RoundTab'
 import { SelectPipetteOption } from './SelectPipette'
 import { DeckSlot } from '../../types'
-import { useDispatch } from 'react-redux'
-import { PipetteFieldsData } from '../../components/modals/FilePipettesModal'
-import { reduce } from 'lodash'
-
-import { actions as loadFileActions } from '../../load-file'
 
 export interface FormModule {
   onDeck: boolean
@@ -114,8 +108,8 @@ interface Props {
   selectedTab: number
 }
 
-const selectComponent = (selectedTab: number, props: any): any => {
-  const twoPipetteOption = (selectedTab: number): any => {
+const selectComponent = (selectedTab: number): JSX.Element | null => {
+  const twoPipetteOption = (selectedTab: number): JSX.Element => {
     const { left, right } = pipetteSlot
     return selectedTab === 1 ? (
       <SelectPipetteOption pipetteName={left} />
@@ -126,21 +120,19 @@ const selectComponent = (selectedTab: number, props: any): any => {
 
   switch (selectedTab) {
     case 0:
-      return <FlexProtocolName formProps={props} />
+      return <FlexProtocolName />
     case 1:
     case 2:
       return twoPipetteOption(selectedTab)
     case 3:
-      return <FlexModules formProps={props} />
+      return <FlexModules />
     default:
       return null
   }
 }
 
-function FlexProtocolEditor(props: any): JSX.Element {
-  const { onSave } = props
+function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
-  const dispatch = useDispatch()
   // Next button click
   const handleNext = ({ selectedTab }: Props): void => {
     const setTabNumber =
@@ -183,43 +175,12 @@ function FlexProtocolEditor(props: any): JSX.Element {
             validateOnChange={false}
             onSubmit={(values, actions) => {
               console.log({ values })
-              // const newProtocolFields = values.fields
-              // const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
-              //   values.pipettesByMount,
-              //   (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
-              //     assert(
-              //       mount === 'left' || mount === 'right',
-              //       `invalid mount: ${mount}`
-              //     ) // this is mostly for flow
-              //     // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
-              //     return formPipette &&
-              //       formPipette.pipetteName &&
-              //       formPipette.tipRackList &&
-              //       (mount === 'left' || mount === 'right')
-              //       ? [
-              //           ...acc,
-              //           {
-              //             mount,
-              //             name: formPipette.pipetteName,
-              //             tiprackDefURI: formPipette.tipRackList,
-              //           },
-              //         ]
-              //       : acc
-              //   },
-              //   []
-              // )
-
-              // //  To check code output
-              // const modules: any = []
-              // selectedTab === 2 &&
-              //   onSave({ modules, newProtocolFields, pipettes })
-              // selectedTab === 4 && dispatch(loadFileActions.saveProtocolFile())
             }}
           >
-            {(props: any) => (
+            {(props: { handleSubmit: () => void }) => (
               <form onSubmit={props.handleSubmit}>
                 <section className={styles.editor_form}>
-                  {selectComponent(selectedTab, props)}
+                  {selectComponent(selectedTab)}
                 </section>
                 <div className={styles.flex_round_tabs_button_wrapper}>
                   {selectedTab !== 0 && (

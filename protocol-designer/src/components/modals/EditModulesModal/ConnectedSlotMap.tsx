@@ -5,7 +5,7 @@ import styles from './EditModules.css'
 
 interface ConnectedSlotMapProps {
   fieldName: string
-  robotType: string
+  robotType?: string
 }
 
 export const ConnectedSlotMap = (

@@ -3,9 +3,20 @@ import { FormGroup, InputField } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
+import { useFormikContext } from 'formik'
 
-function FlexProtocolNameComponent({ formProps }: any): JSX.Element {
-  const { values, handleChange, handleBlur } = formProps
+interface flexProtocolName {
+  fields: any
+  handleChange: () => void
+  handleBlur: () => void
+}
+
+function FlexProtocolNameComponent(): JSX.Element {
+  const {
+    values,
+    handleChange,
+    handleBlur,
+  } = useFormikContext<flexProtocolName>()
 
   return (
     <>

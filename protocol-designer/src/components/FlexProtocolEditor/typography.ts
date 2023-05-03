@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-import { COLORS } from './colors'
 
 // Font Sizes
 export const fontSize19 = '1.188rem' // 19px
@@ -76,16 +75,16 @@ export const labelItalic = css`
   font-style: ${fontStyleItalic};
 `
 
-export const linkPSemiBold = css`
-  font-size: ${fontSize10};
-  font-weight: ${fontWeightRegular};
-  line-height: ${lineHeight16};
-  color: ${COLORS.blueLink};
+// export const linkPSemiBold = css`
+//   font-size: ${fontSize10};
+//   font-weight: ${fontWeightRegular};
+//   line-height: ${lineHeight16};
+//   color: ${COLORS.C_BLUE};
 
-  &:hover {
-    opacity: 70%;
-  }
-`
+//   &:hover {
+//     opacity: 70%;
+//   }
+// `
 
 export const TYPOGRAPHY = {
   fontSize19,
@@ -114,5 +113,4 @@ export const TYPOGRAPHY = {
   h5Default,
   pRegular,
   labelItalic,
-  linkPSemiBold,
 }

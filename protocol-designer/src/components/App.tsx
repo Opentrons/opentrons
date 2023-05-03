@@ -1,13 +1,9 @@
-import * as React from 'react'
-
+import React, { useState } from 'react'
 import '../css/reset.css'
-import { RouterProvider } from 'react-router-dom'
-import { router } from '../flex-components'
+import { selectPageForms } from './FlexProtocolEditor/constant'
+import { selectRobotPage } from './LandingPage'
 
 export function App(): JSX.Element {
-  return (
-    <div className="container">
-      <RouterProvider router={router} />
-    </div>
-  )
+  const [page, setPage] = useState(selectPageForms.defaultLandingPage)
+  return <div className="container">{selectRobotPage(page, setPage)}</div>
 }

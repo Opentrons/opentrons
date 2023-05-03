@@ -10,23 +10,23 @@ import {
 import { i18n } from '../../localization'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
-
 import {
   ModuleType,
   ModuleModel,
   OT3_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-import { ModuleOnDeck } from 'protocol-designer/src/step-forms/types'
-import { ModelModuleInfo } from 'protocol-designer/src/components/EditModules'
-import { ModuleDiagram } from 'protocol-designer/src/components/modules'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_FLEX_MODULE_TYPE,
 } from '../../constants'
 import { MiniCard } from './MiniCard'
-import { ConnectedSlotMap } from '../../components/modals/EditModulesModal/ConnectedSlotMap'
+import { ConnectedSlotMap } from '../modals/EditModulesModal/ConnectedSlotMap'
 import { getAllFlexModuleSlotsByType } from './FlexModuleData'
-import { PDAlert } from '../../components/alerts/PDAlert'
+import { PDAlert } from '../alerts/PDAlert'
+import { ModuleOnDeck } from '../../step-forms'
+import { ModelModuleInfo } from '../EditModules'
+import { ModuleDiagram } from '../modules'
+import { useFormikContext } from 'formik'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
@@ -42,22 +42,29 @@ export interface EditModulesFormValues {
   selectedSlot: string
 }
 
-function FlexModulesComponent({ formProps }: any): JSX.Element {
+interface FormValues {
+  modulesByType: any
+  selectedSlot: string
+}
+
+function FlexModulesComponent(): JSX.Element {
   const {
     values: { modulesByType },
     handleChange,
     handleBlur,
     setFieldValue,
-    touched,
     errors,
-  } = formProps
+  } = useFormikContext<FormValues>()
+  // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(modulesByType)
 
   const [selectedModules, setSelectedModules] = useState<string[]>([])
   const toggleModuleSelection = (moduleType: string): void => {
     setSelectedModules([...selectedModules, moduleType])
     if (selectedModules.includes(moduleType)) {
-      setSelectedModules(selectedModules.filter(name => name !== moduleType))
+      setSelectedModules(
+        selectedModules.filter((name: string) => name !== moduleType)
+      )
       setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
     } else {
       setSelectedModules([...selectedModules, moduleType])
@@ -68,7 +75,7 @@ function FlexModulesComponent({ formProps }: any): JSX.Element {
   const slotIssue =
     errors?.selectedSlot && errors.selectedSlot.includes('occupied')
 
-  const [targetProps, tooltipProps] = useHoverTooltip({
+  const [targetProps] = useHoverTooltip({
     placement: 'top',
   })
 
@@ -138,7 +145,7 @@ function FlexModulesComponent({ formProps }: any): JSX.Element {
                           tabIndex={1}
                           name={`modulesByType.${moduleType}.slot`}
                           options={getAllFlexModuleSlotsByType(moduleType)}
-                          value={selectedModel}
+                          value={modulesByType[moduleType].slot}
                           onChange={handleChange}
                           onBlur={handleBlur}
                         />

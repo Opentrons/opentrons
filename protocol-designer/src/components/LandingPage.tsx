@@ -1,0 +1,61 @@
+import React from 'react'
+import { Icon, OutlineButton } from '@opentrons/components'
+import { i18n } from '../localization'
+import { CreateFlexFileForm } from './FlexProtocolEditor'
+import styles from './FlexProtocolEditor/FlexComponents.css'
+import { StyledText } from './FlexProtocolEditor/StyledText'
+import { selectPageForms } from './FlexProtocolEditor/constant'
+import { ProtocolEditor } from './ProtocolEditor'
+
+export interface PageProps {
+  setPageProps: (type: string) => void
+}
+
+function LandingPageComponent(props: PageProps): JSX.Element {
+  return (
+    <div className={styles.pd_landing_page}>
+      <StyledText as="h1">{i18n.t('flex.landing_page.welcome')}</StyledText>
+      <Icon name={'ot-flex-logo'} className={styles.ot_flex_logo} />
+      <div className={styles.flex_landing_buttons_wrapper}>
+        <OutlineButton
+          className={styles.flex_landing_button}
+          onClick={() => props.setPageProps(selectPageForms.newFlexFileForm)}
+        >
+          <StyledText as="h4">
+            {i18n.t('flex.landing_page.create_flex_protocol')}
+          </StyledText>
+        </OutlineButton>
+        <OutlineButton
+          className={styles.flex_landing_button}
+          onClick={() => props.setPageProps(selectPageForms.protocolEditor)}
+        >
+          <StyledText as="h4">
+            {i18n.t('flex.landing_page.create_ot2_protocol')}
+          </StyledText>
+        </OutlineButton>
+        <OutlineButton Component="label" className={styles.flex_landing_button}>
+          <StyledText as="h4">
+            {i18n.t('flex.landing_page.import_protocol')}
+          </StyledText>
+          <input type="file" />
+        </OutlineButton>
+      </div>
+    </div>
+  )
+}
+
+export const selectRobotPage = (
+  page: string,
+  setPage: (newPage: string) => void
+): JSX.Element | null => {
+  switch (page) {
+    case selectPageForms.newFlexFileForm:
+      return <CreateFlexFileForm setPageProps={setPage} />
+    case selectPageForms.protocolEditor:
+      return <ProtocolEditor />
+    case selectPageForms.defaultLandingPage:
+      return <LandingPageComponent setPageProps={setPage} />
+    default:
+      return null
+  }
+}

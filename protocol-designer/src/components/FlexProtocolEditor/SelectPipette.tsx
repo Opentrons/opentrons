@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { Flex, RadioGroup } from '@opentrons/components'
-import { blockMount, pipetteSlot } from '../constant'
+import { blockMount, pipetteSlot } from './constant'
 import { StyledText } from './StyledText'
 import { RadioSelect } from './RadioSelect'
 import { i18n } from '../../localization'
@@ -56,11 +56,13 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   )
 }
 
-const checkSelectedPipette = (pipetteName: any): any => {
+const checkSelectedPipette = (pipetteName: string): boolean => {
   return blockMount.includes(pipetteName)
 }
 
-const channel96SelectionNote = (is96ChannelSelected: boolean): any => {
+const channel96SelectionNote = (
+  is96ChannelSelected: boolean
+): JSX.Element | boolean => {
   return (
     is96ChannelSelected && (
       <StyledText as={'p'}>
@@ -70,7 +72,7 @@ const channel96SelectionNote = (is96ChannelSelected: boolean): any => {
   )
 }
 
-const SelectPipetteMount = ({ pipetteName }: any): JSX.Element => {
+const SelectPipetteMount = (props: { pipetteName: string }): JSX.Element => {
   const {
     values: { pipettesByMount, mountSide },
     handleChange,
@@ -81,8 +83,8 @@ const SelectPipetteMount = ({ pipetteName }: any): JSX.Element => {
       {
         <RadioGroup
           inline
-          name={`pipettesByMount.${pipetteName}.mount`}
-          value={pipettesByMount[pipetteName].mount}
+          name={`pipettesByMount.${props.pipetteName}.mount`}
+          value={pipettesByMount[props.pipetteName].mount}
           options={mountSide}
           onChange={handleChange}
         />

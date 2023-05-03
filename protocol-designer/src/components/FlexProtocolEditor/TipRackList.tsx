@@ -6,7 +6,7 @@ import {
   blockedTipRackListForFlex,
   customTiprackOption,
   fontSize14,
-} from '../constant'
+} from './constant'
 import {
   CheckboxField,
   DropdownOption,
