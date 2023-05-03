@@ -87,7 +87,8 @@ class LoadModuleResult(BaseModel):
 
     serialNumber: Optional[str] = Field(
         ...,
-        description="Hardware serial number of the connected module.",
+        description="Hardware serial number of the connected module. 
+        Will be `None` if a module is not electrically connected to the robot (like the Magnetic Block).",
     )
 
 
