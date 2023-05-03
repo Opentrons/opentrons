@@ -255,7 +255,7 @@ class EquipmentHandler:
             ModuleAlreadyPresentError: A module of a different type is already
                 assigned to the requested location.
         """
-        assert not ModuleModel.is_magnetic_block(
+        assert ModuleModel.is_magnetic_block(
             model
         ), f"Expected Magnetic block and got {model.name}"
         definition = self._module_data_provider.get_definition(model)
