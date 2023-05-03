@@ -118,14 +118,14 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
-      padding={SPACING.spacing6}
+      paddingX={SPACING.spacingXXL}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
         <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+            fontWeight={TYPOGRAPHY.fontWeightBold}
             lineHeight={TYPOGRAPHY.lineHeight28}
             marginBottom="0.5rem"
           >
@@ -151,7 +151,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('protocol_name_title')}
                 buttonType={
                   sortBy === 'alphabetical' || sortBy === 'reverse'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -170,7 +170,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('last_run')}
                 buttonType={
                   sortBy === 'recentRun' || sortBy === 'oldRun'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -189,7 +189,7 @@ export function ProtocolDashboard(): JSX.Element {
                 buttonText={t('date_added')}
                 buttonType={
                   sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                    ? 'alt'
+                    ? 'secondary'
                     : 'tertiaryLowLight'
                 }
                 iconName={
@@ -212,7 +212,7 @@ export function ProtocolDashboard(): JSX.Element {
 
               return (
                 <ProtocolCard
-                  key={protocol.key}
+                  key={protocol.id}
                   lastRun={lastRun}
                   protocol={protocol}
                 />
@@ -233,7 +233,7 @@ export function ProtocolDashboard(): JSX.Element {
               <img title={t('nothing_here_yet')} src={imgSrc} />
               <StyledText
                 fontSize={TYPOGRAPHY.fontSize32}
-                fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                fontWeight={TYPOGRAPHY.fontWeightBold}
                 lineHeight={TYPOGRAPHY.lineHeight42}
                 marginTop={SPACING.spacing4}
                 marginBottom={SPACING.spacing3}

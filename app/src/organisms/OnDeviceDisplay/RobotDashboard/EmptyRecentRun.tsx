@@ -8,6 +8,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -21,6 +22,7 @@ export function EmptyRecentRun(): JSX.Element {
       width="100%"
       height="27.25rem"
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity15HexCode}`}
+      borderRadius={BORDERS.size_three}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       padding="5.25rem 3.75rem"
@@ -41,7 +43,7 @@ export function EmptyRecentRun(): JSX.Element {
         <StyledText
           fontSize={TYPOGRAPHY.fontSize32}
           lineHeight={TYPOGRAPHY.lineHeight42}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('no_recent_runs')}
         </StyledText>

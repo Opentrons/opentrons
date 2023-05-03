@@ -4,7 +4,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../../redux/config'
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import {
@@ -77,7 +80,7 @@ describe('ProtocolOverflowMenu', () => {
     const runButton = getByText('Start setup')
     fireEvent.click(runButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsLanding' },
     })
     expect(mockHandleRunProtocol).toHaveBeenCalledWith(storedProtocolData)

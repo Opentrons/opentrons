@@ -1,12 +1,14 @@
 """Gravimetric."""
 from inspect import getsource
 from statistics import stdev
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Any
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
+from opentrons.protocol_api.labware import OutOfTipsError
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
+from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
@@ -43,6 +45,7 @@ _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 def _generate_callbacks_for_trial(
     recorder: GravimetricRecorder,
     volume: Optional[float],
+    channel: int,
     trial: int,
     blank_measurement: bool,
 ) -> PipettingCallbacks:
@@ -53,22 +56,22 @@ def _generate_callbacks_for_trial(
         volume = None
     return PipettingCallbacks(
         on_submerging=lambda: recorder.set_sample_tag(
-            create_measurement_tag("submerge", volume, trial)
+            create_measurement_tag("submerge", volume, channel, trial)
         ),
         on_mixing=lambda: recorder.set_sample_tag(
-            create_measurement_tag("mix", volume, trial)
+            create_measurement_tag("mix", volume, channel, trial)
         ),
         on_aspirating=lambda: recorder.set_sample_tag(
-            create_measurement_tag("aspirate", volume, trial)
+            create_measurement_tag("aspirate", volume, channel, trial)
         ),
         on_retracting=lambda: recorder.set_sample_tag(
-            create_measurement_tag("retract", volume, trial)
+            create_measurement_tag("retract", volume, channel, trial)
         ),
         on_dispensing=lambda: recorder.set_sample_tag(
-            create_measurement_tag("dispense", volume, trial)
+            create_measurement_tag("dispense", volume, channel, trial)
         ),
         on_blowing_out=lambda: recorder.set_sample_tag(
-            create_measurement_tag("blowout", volume, trial)
+            create_measurement_tag("blowout", volume, channel, trial)
         ),
         on_exiting=recorder.clear_sample_tag,
     )
@@ -151,7 +154,7 @@ def _load_pipette(
     if cfg.pipette_channels not in load_str_channels:
         raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
     chnl_str = load_str_channels[cfg.pipette_channels]
-    pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
+    pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount, tip_racks=tipracks)
     pipette.default_speed = config.GANTRY_MAX_SPEED
@@ -223,6 +226,55 @@ def _jog_to_find_liquid_height(
     return _liquid_height
 
 
+def _calculate_average(volume_list: List[float]) -> float:
+    return sum(volume_list) / len(volume_list)
+
+
+def _calculate_stats(
+    volume_list: List[float], total_volume: float
+) -> Tuple[float, float, float]:
+    average = _calculate_average(volume_list)
+    if len(volume_list) <= 1:
+        print("skipping CV, only 1x trial per volume")
+        cv = -0.01  # negative number is impossible
+    else:
+        cv = stdev(volume_list) / average
+    d = (average - total_volume) / total_volume
+    return average, cv, d
+
+
+def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
+    print(
+        f"{mode}:\n"
+        f"\tavg: {round(average, 2)} uL\n"
+        f"\tcv: {round(cv * 100.0, 2)}%\n"
+        f"\td: {round(d * 100.0, 2)}%"
+    )
+
+
+def _print_final_results(
+    volumes: List[float], channel_count: int, test_report: CSVReport
+) -> None:
+    for vol in volumes:
+        print(f"  * {vol}ul channel all:")
+        for mode in ["aspirate", "dispense"]:
+            avg, cv, d = report.get_volume_results_all(test_report, mode, vol)
+            print(f"    - {mode}:")
+            print(f"        avg: {avg}ul")
+            print(f"        cv:  {cv}%")
+            print(f"        d:   {d}%")
+        for channel in range(channel_count):
+            print(f"  * vol {vol}ul channel {channel + 1}:")
+            for mode in ["aspirate", "dispense"]:
+                avg, cv, d = report.get_volume_results_per_channel(
+                    test_report, mode, vol, channel
+                )
+                print(f"    - {mode}:")
+                print(f"        avg: {avg}ul")
+                print(f"        cv:  {cv}%")
+                print(f"        d:   {d}%")
+
+
 def _run_trial(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -230,6 +282,7 @@ def _run_trial(
     channel_offset: Point,
     tip_volume: int,
     volume: float,
+    channel: int,
     trial: int,
     recorder: GravimetricRecorder,
     test_report: report.CSVReport,
@@ -239,10 +292,12 @@ def _run_trial(
     mix: bool = False,
     stable: bool = True,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
-    pipetting_callbacks = _generate_callbacks_for_trial(recorder, volume, trial, blank)
+    pipetting_callbacks = _generate_callbacks_for_trial(
+        recorder, volume, channel, trial, blank
+    )
 
     def _tag(m_type: MeasurementType) -> str:
-        return create_measurement_tag(m_type, None if blank else volume, trial)
+        return create_measurement_tag(m_type, None if blank else volume, channel, trial)
 
     def _record_measurement_and_store(m_type: MeasurementType) -> MeasurementData:
         m_tag = _tag(m_type)
@@ -319,6 +374,39 @@ def _get_operator_name(is_simulating: bool) -> str:
         return "simulation"
 
 
+def _get_robot_serial(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("ROBOT SERIAL NUMBER:").strip()
+    else:
+        return "simulation-serial-number"
+
+
+def _pick_up_tip(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    cfg: config.GravimetricConfig,
+    location: Optional[Any] = None,
+) -> None:
+    pipette.pick_up_tip(location)
+    # NOTE: the accuracy-adjust function gets set on the Pipette
+    #       each time we pick-up a new tip.
+    if cfg.increment:
+        print("clearing pipette ul-per-mm table to be linear")
+        clear_pipette_ul_per_mm(
+            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
+            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
+        )
+
+
+def _drop_tip(
+    ctx: ProtocolContext, pipette: InstrumentContext, cfg: config.GravimetricConfig
+) -> None:
+    if cfg.return_tip:
+        pipette.return_tip(home_after=False)
+    else:
+        pipette.drop_tip(home_after=False)
+
+
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -335,11 +423,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     pipette.starting_tip = tipracks[0][cfg.starting_tip]
     print(f"starting on tip {cfg.starting_tip}")
 
-    def _drop_tip() -> None:
-        if cfg.return_tip:
-            pipette.return_tip(home_after=False)
-        else:
-            pipette.drop_tip(home_after=False)
+    if cfg.increment:
+        pipette_tag += "-increment"
+    elif cfg.user_volumes:
+        pipette_tag += "-user-volume"
+    else:
+        pipette_tag += "-qc"
 
     # GET TEST VOLUMES
     test_volumes = _get_volumes(ctx, cfg)
@@ -367,11 +456,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         simulate=ctx.is_simulating(),
     )
     print(f'found scale "{recorder.serial_number}"')
-    if recorder.is_simulator:
-        if cfg.pipette_volume == 50 or cfg.tip_volume == 50:
-            recorder.set_simulation_mass(15)
-        else:
-            recorder.set_simulation_mass(200)
+    if ctx.is_simulating():
+        start_sim_mass = {50: 15, 200: 200, 1000: 200}
+        recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
@@ -379,10 +466,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_report = report.create_csv_test_report(test_volumes, cfg, run_id=run_id)
     test_report.set_tag(pipette_tag)
     test_report.set_operator(_get_operator_name(ctx.is_simulating()))
+    serial_number = _get_robot_serial(ctx.is_simulating())
     test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
-        robot="ot3",
+        robot=serial_number,
         pipette=pipette_tag,
         scale=recorder.serial_number,
         environment="None",
@@ -393,7 +481,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     print("homing...")
     ctx.home()
     print("picking up tip")
-    pipette.pick_up_tip()
+    _pick_up_tip(ctx, pipette, cfg)
     print("moving to vial")
     well = vial["A1"]
     pipette.move_to(well.top())
@@ -406,7 +494,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     vial_volume = liquid_tracker.get_volume(well)
     print(f"software thinks there is {vial_volume} uL of liquid in the vial")
     print("dropping tip")
-    _drop_tip()
+    _drop_tip(ctx, pipette, cfg)
 
     try:
         if not cfg.blank or cfg.inspect:
@@ -415,25 +503,26 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         else:
             ui.print_title("MEASURE EVAPORATION")
             print(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-            actual_asp_list: List[float] = list()
-            actual_disp_list: List[float] = list()
+            actual_asp_list_evap: List[float] = []
+            actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
                 ui.print_header(f"BLANK {trial + 1}/{config.NUM_BLANK_TRIALS}")
                 print("picking up tip")
                 tip_rack = pipette.tip_racks[0]
                 hover_above_tip = tip_rack["A1"].top(20)
-                pipette.pick_up_tip(hover_above_tip)
+                _pick_up_tip(ctx, pipette, cfg, hover_above_tip)
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
-                    ctx,
-                    pipette,
-                    vial["A1"],
-                    Point(),  # first channel
-                    cfg.tip_volume,
-                    test_volumes[-1],
-                    trial,
-                    recorder,
-                    test_report,
-                    liquid_tracker,
+                    ctx=ctx,
+                    pipette=pipette,
+                    well=vial["A1"],
+                    channel_offset=Point(),  # first channel
+                    tip_volume=cfg.tip_volume,
+                    volume=test_volumes[-1],
+                    channel=0,  # first channel
+                    trial=trial,
+                    recorder=recorder,
+                    test_report=test_report,
+                    liquid_tracker=liquid_tracker,
                     blank=True,  # stay away from the liquid
                     inspect=cfg.inspect,
                     mix=cfg.mix,
@@ -444,17 +533,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     f"\taspirate: {evap_aspirate} uL\n"
                     f"\tdispense: {evap_dispense} uL"
                 )
-                actual_asp_list.append(evap_aspirate)
-                actual_disp_list.append(evap_dispense)
+                actual_asp_list_evap.append(evap_aspirate)
+                actual_disp_list_evap.append(evap_dispense)
                 print("dropping tip")
-                _drop_tip()
+                _drop_tip(ctx, pipette, cfg)
             ui.print_header("EVAPORATION AVERAGE")
-            average_aspirate_evaporation_ul = sum(actual_asp_list) / len(
-                actual_asp_list
-            )
-            average_dispense_evaporation_ul = sum(actual_disp_list) / len(
-                actual_disp_list
-            )
+            average_aspirate_evaporation_ul = _calculate_average(actual_asp_list_evap)
+            average_dispense_evaporation_ul = _calculate_average(actual_disp_list_evap)
             print(
                 "average:\n"
                 f"\taspirate: {average_aspirate_evaporation_ul} uL\n"
@@ -466,21 +551,43 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_dispense_evaporation_ul,
             )
         test_count = 0
-        test_total = len(test_volumes) * cfg.trials
+        test_total = len(test_volumes) * cfg.trials * cfg.pipette_channels
         for volume in test_volumes:
+            actual_asp_list_all = []
+            actual_disp_list_all = []
             ui.print_title(f"{volume} uL")
+
+            trial_asp_dict: Dict[int, List[float]] = {
+                trial: [] for trial in range(cfg.trials)
+            }
+            trial_disp_dict: Dict[int, List[float]] = {
+                trial: [] for trial in range(cfg.trials)
+            }
+
             for channel in range(cfg.pipette_channels):
                 channel_offset = _get_channel_offset(cfg, channel)
-                actual_asp_list = list()
-                actual_disp_list = list()
+                actual_asp_list_channel = []
+                actual_disp_list_channel = []
                 aspirate_data_list = []
                 dispense_data_list = []
                 for trial in range(cfg.trials):
                     test_count += 1
-                    ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
+                    ui.print_header(
+                        f"{volume} uL channel {channel + 1} ({trial + 1}/{cfg.trials})"
+                    )
                     print(f"trial total {test_count}/{test_total}")
                     print("picking up tip")
-                    pipette.pick_up_tip()
+
+                    try:
+                        _pick_up_tip(ctx, pipette, cfg)
+                    except OutOfTipsError:
+                        if not ctx.is_simulating():
+                            ui.get_user_ready(
+                                f"Adds tips for channel {channel + 1}."
+                                f" Trial {trial + 1}/{cfg.trials}"
+                            )
+                        pipette.reset_tipracks()
+                        _pick_up_tip(ctx, pipette, cfg)
                     # NOTE: aspirate will be negative, dispense will be positive
                     (
                         actual_aspirate,
@@ -488,16 +595,17 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         actual_dispense,
                         dispense_data,
                     ) = _run_trial(
-                        ctx,
-                        pipette,
-                        vial["A1"],
-                        channel_offset,
-                        cfg.tip_volume,
-                        volume,
-                        trial,
-                        recorder,
-                        test_report,
-                        liquid_tracker,
+                        ctx=ctx,
+                        pipette=pipette,
+                        well=vial["A1"],
+                        channel_offset=channel_offset,
+                        tip_volume=cfg.tip_volume,
+                        volume=volume,
+                        channel=channel,
+                        trial=trial,
+                        recorder=recorder,
+                        test_report=test_report,
+                        liquid_tracker=liquid_tracker,
                         blank=False,
                         inspect=cfg.inspect,
                         mix=cfg.mix,
@@ -515,31 +623,35 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         f"\taspirate: {round(asp_with_evap, 2)} uL\n"
                         f"\tdispense: {round(disp_with_evap, 2)} uL"
                     )
-                    actual_asp_list.append(asp_with_evap)
-                    actual_disp_list.append(disp_with_evap)
+
+                    actual_asp_list_channel.append(asp_with_evap)
+                    actual_disp_list_channel.append(disp_with_evap)
+
+                    trial_asp_dict[trial].append(asp_with_evap)
+                    trial_disp_dict[trial].append(disp_with_evap)
+
                     aspirate_data_list.append(aspirate_data)
                     dispense_data_list.append(dispense_data)
+
                     report.store_trial(
-                        test_report, trial, volume, asp_with_evap, disp_with_evap
+                        test_report,
+                        trial,
+                        volume,
+                        channel,
+                        asp_with_evap,
+                        disp_with_evap,
                     )
                     print("dropping tip")
-                    _drop_tip()
+                    _drop_tip(ctx, pipette, cfg)
 
-                ui.print_header(f"{volume} uL CALCULATIONS")
-                # AVERAGE
-                dispense_average = sum(actual_disp_list) / len(actual_disp_list)
-                aspirate_average = sum(actual_asp_list) / len(actual_asp_list)
-                # %CV
-                if len(actual_asp_list) <= 1:
-                    print("skipping CV, only 1x trial per volume")
-                    aspirate_cv = -0.01  # negative number is impossible
-                    dispense_cv = -0.01
-                else:
-                    aspirate_cv = stdev(actual_asp_list) / aspirate_average
-                    dispense_cv = stdev(actual_disp_list) / dispense_average
-                # %D
-                aspirate_d = (aspirate_average - volume) / volume
-                dispense_d = (dispense_average - volume) / volume
+                ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
+                aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
+                    actual_asp_list_channel, volume
+                )
+                dispense_average, dispense_cv, dispense_d = _calculate_stats(
+                    actual_disp_list_channel, volume
+                )
+
                 # Average Celsius
                 aspirate_celsius_avg = sum(
                     a_data.environment.celsius_pipette for a_data in dispense_data_list
@@ -554,38 +666,92 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 dispense_humidity_avg = sum(
                     d_data.environment.humidity_pipette for d_data in aspirate_data_list
                 ) / len(dispense_data_list)
-                print(
-                    "aspirate:\n"
-                    f"\tavg: {round(aspirate_average, 2)} uL\n"
-                    f"\tcv: {round(aspirate_cv * 100.0, 2)}%\n"
-                    f"\td: {round(aspirate_d * 100.0, 2)}%"
+
+                _print_stats("aspirate", aspirate_average, aspirate_cv, aspirate_d)
+                _print_stats("dispense", dispense_average, dispense_cv, dispense_d)
+
+                report.store_volume_per_channel(
+                    report=test_report,
+                    mode="aspirate",
+                    volume=volume,
+                    channel=channel,
+                    average=aspirate_average,
+                    cv=aspirate_cv,
+                    d=aspirate_d,
+                    celsius=aspirate_celsius_avg,
+                    humidity=aspirate_humidity_avg,
                 )
-                print(
-                    "dispense:\n"
-                    f"\tavg: {round(dispense_average, 2)} uL\n"
-                    f"\tcv: {round(dispense_cv * 100.0, 2)}%\n"
-                    f"\td: {round(dispense_d * 100.0, 2)}%"
+                report.store_volume_per_channel(
+                    report=test_report,
+                    mode="dispense",
+                    volume=volume,
+                    channel=channel,
+                    average=dispense_average,
+                    cv=dispense_cv,
+                    d=dispense_d,
+                    celsius=dispense_celsius_avg,
+                    humidity=dispense_humidity_avg,
                 )
-                report.store_volume(
-                    test_report,
-                    "aspirate",
-                    volume,
-                    aspirate_average,
-                    aspirate_cv,
-                    aspirate_d,
-                    aspirate_celsius_avg,
-                    aspirate_humidity_avg,
+                actual_asp_list_all.extend(actual_asp_list_channel)
+                actual_disp_list_all.extend(actual_disp_list_channel)
+
+            for trial in range(cfg.trials):
+                trial_asp_list = trial_asp_dict[trial]
+                trial_disp_list = trial_disp_dict[trial]
+
+                aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
+                    trial_asp_list, volume
                 )
-                report.store_volume(
-                    test_report,
-                    "dispense",
-                    volume,
-                    dispense_average,
-                    dispense_cv,
-                    dispense_d,
-                    dispense_celsius_avg,
-                    dispense_humidity_avg,
+                dispense_average, dispense_cv, dispense_d = _calculate_stats(
+                    trial_disp_list, volume
                 )
+
+                report.store_volume_per_trial(
+                    report=test_report,
+                    mode="aspirate",
+                    volume=volume,
+                    trial=trial,
+                    average=aspirate_average,
+                    cv=aspirate_cv,
+                    d=aspirate_d,
+                )
+                report.store_volume_per_trial(
+                    report=test_report,
+                    mode="dispense",
+                    volume=volume,
+                    trial=trial,
+                    average=dispense_average,
+                    cv=dispense_cv,
+                    d=dispense_d,
+                )
+
+            ui.print_header(f"{volume} uL channel all CALCULATIONS")
+            aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
+                actual_asp_list_all, volume
+            )
+            dispense_average, dispense_cv, dispense_d = _calculate_stats(
+                actual_disp_list_all, volume
+            )
+
+            _print_stats("aspirate", aspirate_average, aspirate_cv, aspirate_d)
+            _print_stats("dispense", dispense_average, dispense_cv, dispense_d)
+
+            report.store_volume_all(
+                report=test_report,
+                mode="aspirate",
+                volume=volume,
+                average=aspirate_average,
+                cv=aspirate_cv,
+                d=aspirate_d,
+            )
+            report.store_volume_all(
+                report=test_report,
+                mode="dispense",
+                volume=volume,
+                average=dispense_average,
+                cv=dispense_cv,
+                d=dispense_d,
+            )
     finally:
         print("ending recording")
         recorder.stop()
@@ -593,11 +759,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         hw_api = ctx._core.get_hardware()
         hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
-    for vol in test_volumes:
-        print(f"  * {vol}:")
-        for mode in ["aspirate", "dispense"]:
-            avg, cv, d = report.get_volume_results(test_report, mode, vol)
-            print(f"    - {mode}:")
-            print(f"        avg: {avg}ul")
-            print(f"        cv:  {cv}%")
-            print(f"        d:   {d}%")
+    _print_final_results(
+        volumes=test_volumes,
+        channel_count=cfg.pipette_channels,
+        test_report=test_report,
+    )

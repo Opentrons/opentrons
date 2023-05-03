@@ -16,7 +16,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
   >(null)
 
   return (
-    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+    <Flex paddingX={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
         <AttachedInstrumentMountItem

@@ -77,13 +77,15 @@ class MeasurementData(EnvironmentData):
         )
 
 
-def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
+def create_measurement_tag(
+    t: str, volume: Optional[float], channel: int, trial: int
+) -> str:
     """Create measurement tag."""
     if volume is None:
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-{trial + 1}"
+    return f"{t}-{vol_in_tag}-ul-channel_{channel + 1}-trial-{trial + 1}"
 
 
 class UnstableMeasurementError(Exception):
