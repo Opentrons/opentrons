@@ -53,9 +53,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
-  //  hard coding calibration slot number for now in case it changes
-  //  in the future
-  const calSlotNum = 'D2'
+  const calSlotNum = 'C2'
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
