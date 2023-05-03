@@ -69,7 +69,11 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     return !nameBlocklist.some(n => n === value)
   }
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
-  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
+  //  p1000_96 is the first gen 96 channel but is only available for Opentrons Flex
+  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(
+    option => allowlist(option) && option.value !== 'p1000_96'
+  )
+
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),

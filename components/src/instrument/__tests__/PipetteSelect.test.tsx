@@ -49,7 +49,9 @@ describe('PipetteSelect', () => {
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
-    const gen1Specs = pipetteSpecs.filter(s => s.displayCategory === GEN1)
+    const gen1Specs = pipetteSpecs.filter(
+      s => s.displayCategory === GEN1 && s.name !== 'p1000_96'
+    )
 
     expect(wrapper.find(Select).prop('options')).toEqual([
       {
