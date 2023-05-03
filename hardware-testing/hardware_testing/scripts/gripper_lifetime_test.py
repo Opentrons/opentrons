@@ -50,28 +50,40 @@ LOG_CONFIG = {
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Lifetime Test')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
+    arg_parser.add_argument('-f', '--force', type=int, required=False, help='Set the gripper force in Newtons', default=20)
+    arg_parser.add_argument('-t', '--time', type=int, required=False, help='Set the gripper hold time in seconds', default=10)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Lifetime_Test:
     def __init__(
-        self, simulate: bool, cycles: int
+        self, simulate: bool, cycles: int, force: float, time: float
     ) -> None:
         self.simulate = simulate
         self.cycles = cycles
+        self.grip_force = force
+        self.hold_time = time
         self.api = None
         self.mount = None
         self.home = None
         self.gripper_id = None
-        self.GRIP_FORCE = 20 # N
+        self.cycle = None
+        self.current_state = None
         self.GRIP_HEIGHT = Point(0, 0, -100) # mm
-        self.HOLD_TIME = 10 # s
         self.axes = [OT3Axis.G, OT3Axis.Z_G]
-        self.test_data ={
+        self.test_data = {
             "Time":"None",
             "Cycle":"None",
             "Gripper":"None",
-            "Position":"None",
+            "State":"None",
+            "Jaw State":"None",
+            "Jaw Width":"None",
+            "Encoder Position":"None",
+        }
+        self.states = {
+            "HOLD":"Holding",
+            "PICK":"Picking",
+            "DROP":"Dropping",
         }
         self.class_name = self.__class__.__name__
         print(self.class_name)
@@ -93,7 +105,7 @@ class Gripper_Lifetime_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"force_20"
+        self.test_tag = f"force_{self.grip_force}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -108,44 +120,64 @@ class Gripper_Lifetime_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
-    def _encoder_tolist(self, encoder_position):
-        encoders = []
-        for key in encoder_position:
-            encoders.append(round(encoder_position[key], 3))
-        return encoders
+    def _encoder_to_point(self, encoder_position):
+        point = Point(0, 0, 0)
+        for index, key in enumerate(encoder_position):
+            point[index] = round(encoder_position[key], 3)
+        return point
 
     async def _get_encoder(self):
-        encoder_position = await self.api.encoder_current_position(self.mount)
-        return self._encoder_tolist(encoder_position)
+        encoder_position = await self.api.encoder_current_position_ot3(self.mount)
+        encoder = self._encoder_to_point(encoder_position)
+        return encoder
 
-    async def _record_data(self, cycle):
+    def _get_jaw_state(self):
+        jaw_state = self.api._gripper_handler.gripper.state
+        return jaw_state
+
+    def _get_jaw_width(self):
+        jaw_width = self.api._gripper_handler.gripper.current_jaw_displacement
+        return jaw_width
+
+    async def _record_data(self):
         elapsed_time = (time.time() - self.start_time)/60
         self.test_data["Time"] = str(round(elapsed_time, 3))
-        self.test_data["Cycle"] = str(cycle)
+        self.test_data["Cycle"] = str(self.cycle)
+        self.test_data["State"] = str(self.current_state)
+        self.test_data["Jaw State"] = str(self._get_jaw_state()).split('.')[1]
+        self.test_data["Jaw Width"] = str(self._get_jaw_width())
+        # self.test_data["Encoder Position"] = str(await self._get_encoder())
+        self.test_data["Encoder Position"] = "(0.0;0.0;0.0)"
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
 
     async def _pick(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
+        self.current_state = self.states["PICK"]
         target_position = target_position_from_relative(mount, self.GRIP_HEIGHT, api._current_position)
         await api._move(target_position)
         time.sleep(1.0)
-        await api.grip(self.GRIP_FORCE)
+        await api.grip(self.grip_force)
+        await self._record_data()
 
     async def _hold(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
+        self.current_state = self.states["HOLD"]
         await api.home_z(mount)
-        time.sleep(self.HOLD_TIME)
+        time.sleep(self.hold_time)
+        await self._record_data()
 
     async def _drop(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
+        self.current_state = self.states["DROP"]
         target_position = target_position_from_relative(mount, self.GRIP_HEIGHT, api._current_position)
         await api._move(target_position)
         time.sleep(1.0)
         await api.ungrip()
+        await self._record_data()
 
     async def _home_gripper(
         self, api: OT3API, mount: OT3Mount
@@ -162,8 +194,8 @@ class Gripper_Lifetime_Test:
             await self.test_setup()
             if self.api and self.mount:
                 for i in range(self.cycles):
-                    cycle = i + 1
-                    print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
+                    self.cycle = i + 1
+                    print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
                     await self._home_gripper(self.api, self.mount)
                     await self._pick(self.api, self.mount)
                     await self._hold(self.api, self.mount)
@@ -183,5 +215,5 @@ if __name__ == '__main__':
     dictConfig(LOG_CONFIG)
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Lifetime_Test(args.simulate, args.cycles)
+    test = Gripper_Lifetime_Test(args.simulate, args.cycles, args.force, args.time)
     asyncio.run(test.run())
