@@ -233,20 +233,20 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
         return ThermocyclerLidStatus.OPEN
 
-    async def extra_lift(self) -> None:
+    async def raise_plate(self) -> None:
         """Move lid an extra bit."""
-        if self.is_simulated:
-            return
+        if not self.lid_status == ThermocyclerLidStatus.OPEN:
+            raise RuntimeError("Lid must be open")
         await self.wait_for_is_running()
         await self._driver.jog_lid(20)
+        await self._wait_for_lid_status(ThermocyclerLidStatus.IN_BETWEEN)
 
-    async def return_from_extra_lift(self) -> None:
+    async def return_from_raise_plate(self) -> None:
         """Move lid an extra bit."""
-        if self.is_simulated:
-            return
         await self.wait_for_is_running()
         await self._driver.jog_lid(-23)
         await self.open()
+        await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
 
     async def set_temperature(
         self,

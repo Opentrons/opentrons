@@ -68,9 +68,9 @@ class ThermocyclerPlateLifter:
         if thermocycler_hardware is not None:
             try:
                 await thermocycler_hardware.lift_plate()
-                await thermocycler_hardware.extra_lift()
+                await thermocycler_hardware.raise_plate()
                 yield
             finally:
-                await thermocycler_hardware.return_from_extra_lift()
+                await thermocycler_hardware.return_from_raise_plate()
         else:
             yield

@@ -96,6 +96,29 @@ async def test_plate_lift(
     await subject_v2.open()
     await subject_v2.lift_plate()
 
+async def test_raise_plate(
+    subject: modules.Thermocycler, subject_v2: modules.Thermocycler
+) -> None:
+    # First test Gen1 behavior
+    await subject.open()
+    with pytest.raises(NotImplementedError):
+        await subject.raise_plate()
+    
+    with pytest.raises(NotImplementedError):
+        await subject.return_from_raise_plate()
+
+    # Now emulate a V2 thermocycler
+    await subject_v2.close()
+    with pytest.raises(RuntimeError):
+        await subject_v2.raise_plate()
+
+    await subject_v2.open()
+    assert subject_v2.lid_status == "open"
+
+    await subject_v2.raise_plate()
+    assert subject_v2.lid_status == "in_between"
+    await subject_v2.return_from_raise_plate()
+    assert subject_v2.lid_status == "open"
 
 async def test_sim_state(subject: modules.Thermocycler) -> None:
     assert subject.temperature == 23

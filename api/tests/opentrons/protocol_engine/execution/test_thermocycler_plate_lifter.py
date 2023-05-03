@@ -91,10 +91,10 @@ async def test_lift_plate_for_labware_movement_from_tc_gen2(
         decoy.verify(
             await movement.home(axes=None),
             await tc_hardware.lift_plate(),
-            await tc_hardware.extra_lift(),
+            await tc_hardware.raise_plate(),
         )
     decoy.verify(
-        await tc_hardware.return_from_extra_lift(),
+        await tc_hardware.return_from_raise_plate(),
     )
 
 
