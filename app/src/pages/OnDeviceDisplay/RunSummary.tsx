@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
@@ -22,13 +23,10 @@ import {
   DIRECTION_ROW,
   DISPLAY_FLEX,
   SIZE_2,
+  Btn,
 } from '@opentrons/components'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import {
-  useProtocolQuery,
-  useRunQuery,
-  useStopRunMutation,
-} from '@opentrons/react-api-client'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
@@ -39,18 +37,22 @@ import {
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
+import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
 import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
 import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
 import {
   useTrackEvent,
-  ANALYTICS_PROTOCOL_RUN_CANCEL,
+  // ANALYTICS_PROTOCOL_RUN_CANCEL,
   ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
+import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -78,13 +80,16 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(true)
+  const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const { stopRun } = useStopRunMutation()
   const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(`protocols/${runId}/setup`)
+    history.push(`/protocols/${runId}/setup`)
   const { reset } = useRunControls(runId, onResetSuccess)
   const trackEvent = useTrackEvent()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? 'no name'
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const runStatusText = isRunSucceeded
     ? t('run_complete')
@@ -109,21 +114,24 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleClickSplash = (): void => {
-    stopRun(runId, {
-      onSuccess: () => {
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
-      },
+    trackProtocolRunEvent({
+      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      properties: robotAnalyticsData ?? undefined,
     })
+    closeCurrentRun()
     setShowSplash(false)
   }
 
   return (
     <>
-      <Flex
+      <Btn
+        display={DISPLAY_FLEX}
+        width="100%"
         height="100vh"
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
+        disabled={isClosingCurrentRun}
         onClick={handleClickSplash}
       >
         {showSplash ? (
@@ -232,7 +240,7 @@ export function RunSummary(): JSX.Element {
             </Flex>
           </Flex>
         )}
-      </Flex>
+      </Btn>
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
