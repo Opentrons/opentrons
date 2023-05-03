@@ -798,7 +798,7 @@ async def test_load_magnetic_block(
     mag_block_v1_def: ModuleDefinition,
     subject: EquipmentHandler,
 ) -> None:
-    """It should load a module, returning its ID, serial & definition in result."""
+    """It should load a mag block, returning its ID & definition in result."""
     decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
 
     decoy.when(
