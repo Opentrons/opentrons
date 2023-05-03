@@ -70,7 +70,6 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   }
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
-
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
