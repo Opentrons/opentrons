@@ -24,9 +24,10 @@ import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
+import { PipetteWizardStepProps } from '../PipetteWizardFlows/types'
 
 interface InstrumentInfoProps {
-  instrument: InstrumentData
+  instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t } = useTranslation('instruments_dashboard')
@@ -36,39 +37,53 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
-  const sharedPipetteWizardProps = {
-    mount: instrument.mount as PipetteMount,
-    selectedPipette:
-      instrument.instrumentModel === 'p1000_96'
-        ? NINETY_SIX_CHANNEL
-        : SINGLE_MOUNT_PIPETTES,
-    setSelectedPipette: () => {},
-    closeFlow: () => {
-      setWizardProps(null)
-    },
+  const sharedPipetteWizardProps: Pick<React.ComponentProps<typeof PipetteWizardFlows>, 'setSelectedPipette' | 'closeFlow'> = {
+    setSelectedPipette: () => { },
+    closeFlow: () => { setWizardProps(null) },
   }
-  const sharedGripperWizardProps = {
+
+  const sharedGripperWizardProps: Pick<React.ComponentProps<typeof GripperWizardFlows>, 'attachedGripper' | 'closeFlow'> = {
     attachedGripper: instrument,
     closeFlow: () => {
       setWizardProps(null)
     },
   }
   const handleDetach: React.MouseEventHandler = () => {
-    setWizardProps(
-      instrument.mount === 'extension'
-        ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
-        : { ...sharedPipetteWizardProps, flowType: FLOWS.DETACH }
-    )
+    if (instrument != null) {
+      setWizardProps(
+        instrument.mount === 'extension'
+          ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
+          : {
+            ...sharedPipetteWizardProps,
+            mount: instrument.mount as PipetteMount,
+            selectedPipette:
+              instrument.instrumentModel === 'p1000_96'
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
+            flowType: FLOWS.DETACH
+          }
+      )
+    }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
-    setWizardProps(
-      instrument.mount === 'extension'
-        ? {
+    if (instrument != null) {
+      setWizardProps(
+        instrument.mount === 'extension'
+          ? {
             ...sharedGripperWizardProps,
             flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
           }
-        : { ...sharedPipetteWizardProps, flowType: FLOWS.CALIBRATE }
-    )
+          : {
+            ...sharedPipetteWizardProps,
+            mount: instrument.mount as PipetteMount,
+            selectedPipette:
+              instrument.instrumentModel === 'p1000_96'
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
+            flowType: FLOWS.CALIBRATE
+          }
+      )
+    }
   }
 
   return (
@@ -77,15 +92,17 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing5}
-      >
-        <InfoItem label={t('last_calibrated')} value="TODO" />
-        <InfoItem label={t('firmware_version')} value="TODO" />
-        <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
-      </Flex>
+      {instrument != null ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+          marginTop={SPACING.spacing5}
+        >
+          <InfoItem label={t('last_calibrated')} value={instrument.data.calibratedOffset.last_modified ?? ''} />
+          <InfoItem label={t('firmware_version')} value="TODO" />
+          <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
+        </Flex>
+      ) : null}
       <Flex gridGap={SPACING.spacing3}>
         <MediumButton
           buttonType="secondary"
