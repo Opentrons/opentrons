@@ -82,6 +82,7 @@ class GripForceProfile(GripperBaseModel):
     )
     default_grip_force: _StrictNonNegativeFloat
     default_home_force: _StrictNonNegativeFloat
+    default_idle_force: _StrictNonNegativeFloat
     min: _StrictNonNegativeFloat
     max: _StrictNonNegativeFloat
 

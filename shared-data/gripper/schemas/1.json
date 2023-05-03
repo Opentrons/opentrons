@@ -6,7 +6,9 @@
     "schemaVersion": {
       "title": "Schemaversion",
       "description": "Which schema version a gripper is using",
-      "enum": [1],
+      "enum": [
+        1
+      ],
       "type": "integer"
     },
     "displayName": {
@@ -35,7 +37,10 @@
     "GripperModel": {
       "title": "GripperModel",
       "description": "Gripper models.",
-      "enum": ["gripperV1"],
+      "enum": [
+        "gripperV1",
+        "gripperV1.1"
+      ],
       "type": "string"
     },
     "Geometry": {
@@ -152,6 +157,11 @@
           "minimum": 0.0,
           "type": "number"
         },
+        "defaultIdleForce": {
+          "title": "Defaultidleforce",
+          "minimum": 0.0,
+          "type": "number"
+        },
         "min": {
           "title": "Min",
           "minimum": 0.0,
@@ -167,6 +177,7 @@
         "polynomial",
         "defaultGripForce",
         "defaultHomeForce",
+        "defaultIdleForce",
         "min",
         "max"
       ]
