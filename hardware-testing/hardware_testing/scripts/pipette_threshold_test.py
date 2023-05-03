@@ -8,9 +8,11 @@ from opentrons_shared_data.deck import load
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
-    find_deck_height,
+    find_calibration_structure_height,
     _probe_deck_at,
-    _get_calibration_square_position_in_slot,
+)
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
 )
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, GripperProbe
@@ -51,7 +53,7 @@ class Pipette_Threshold_Test:
         self.nominal_center = None
         self.jog_step_forward = 0.1
         self.jog_step_backward = -0.01
-        self.jog_speed = 10 # mm/s
+        self.jog_speed = 1 # mm/s
         self.START_HEIGHT = 3 # mm
         self.PROBE_DIA = 4 # mm
         self.CUTOUT_SIZE = 20 # mm
@@ -100,9 +102,7 @@ class Pipette_Threshold_Test:
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
-        self.nominal_center = _get_calibration_square_position_in_slot(self.slot)
-        # self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y) # single-channel
-        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 6) # multi-channel
+        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
@@ -166,7 +166,7 @@ class Pipette_Threshold_Test:
         elif axis == "Z":
             jog_position = self.nominal_center._replace(z=self.deck_height)
         # Move to gauge position
-        await self.api.move_to(self.mount, gauge_position, speed=10)
+        await self.api.move_to(self.mount, gauge_position, speed=self.jog_speed)
         # Move to jog position
         await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
         # Read gauge
@@ -284,6 +284,7 @@ class Pipette_Threshold_Test:
                         for k in range(self.trials):
                             trial = k + 1
                             print(f"\n-->> Measuring Trial {trial}/{self.trials} (Threshold = {threshold})")
+                            await self._home(self.api, self.mount)
                             await self._calibrate_probe(self.api, self.mount, self.slot, self.nominal_center)
                             await self._measure_gauge(self.api, self.mount, self.slot)
                             self._record_data(cycle, trial, threshold)
