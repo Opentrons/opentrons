@@ -5,7 +5,6 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
-import { BackButton } from '../../../atoms/buttons'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { getTotalVolumePerLiquidId } from '../../Devices/ProtocolRun/SetupLiquids/utils'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -36,7 +35,6 @@ const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.Mocked
 const mockLiquidDetails = LiquidDetails as jest.MockedFunction<
   typeof LiquidDetails
 >
-const mockBackButton = BackButton as jest.MockedFunction<typeof BackButton>
 const mockgetTotalVolumePerLiquidId = getTotalVolumePerLiquidId as jest.MockedFunction<
   typeof getTotalVolumePerLiquidId
 >
@@ -58,7 +56,6 @@ describe('ProtocolSetupLiquids', () => {
       MOCK_PROTOCOL_ANALYSIS as CompletedProtocolAnalysis
     )
     mockLiquidDetails.mockReturnValue(<div>mock liquid details</div>)
-    mockBackButton.mockReturnValue(<div>mock back button</div>)
     mockgetTotalVolumePerLiquidId.mockReturnValue(50)
   })
 
@@ -67,7 +64,6 @@ describe('ProtocolSetupLiquids', () => {
     getByText('mock liquid 1')
     getByText('mock liquid 2')
     getAllByText('50 µL')
-    getByText('mock back button')
     getByLabelText('Liquids_1').click()
     getByText('mock liquid details')
   })
