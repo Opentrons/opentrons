@@ -18,7 +18,10 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../redux/analytics'
 import * as Calibration from '../../redux/calibration'
 import * as Config from '../../redux/config'
 import * as Pipettes from '../../redux/pipettes'
@@ -126,7 +129,7 @@ export function CalibrationHealthCheck({
   const handleHealthCheckClick = (): void => {
     handleHealthCheck(null)
     doTrackEvent({
-      name: 'calibrationHealthCheckButtonClicked',
+      name: ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
       properties: {},
     })
   }

@@ -3,29 +3,20 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useQueryClient } from 'react-query'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  JUSTIFY_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Flex, Icon, SPACING } from '@opentrons/components'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { StyledText } from '../../../atoms/text'
-import { ModalShell } from '../../../molecules/Modal'
+import { MenuList } from '../../../atoms/MenuList'
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 
-import type { Dispatch } from '../../../redux/types'
 import type { UseLongPressResult } from '@opentrons/components'
+import type { Dispatch } from '../../../redux/types'
 
 export function LongPressModal(props: {
   longpress: UseLongPressResult
@@ -70,7 +61,7 @@ export function LongPressModal(props: {
       getProtocol(host, protocolId)
         .then(
           response =>
-            response.data.links?.referencingRunIds.map(({ id }) => id) ?? []
+            response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds => {
           return Promise.all(
@@ -137,73 +128,30 @@ export function LongPressModal(props: {
           handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
         />
       ) : (
-        <ModalShell
-          borderRadius={BORDERS.size_three}
-          onOutsideClick={handleCloseModal}
-          width="15.625rem"
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-          >
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacingSM}
-              height="4.875rem"
-              padding={SPACING.spacing5}
-              onClick={handleRunClick}
-              as="button"
-            >
-              <Icon name="play-circle" size="1.75rem" color={COLORS.black} />
-              <StyledText
-                fontSize="1.375rem"
-                lineHeight="1.5rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TYPOGRAPHY.textAlignCenter}
-              >
+        <MenuList onClick={handleCloseModal} isOnDevice={true}>
+          <MenuItem onClick={handleRunClick} key="play-circle">
+            <Flex>
+              <Icon name="play-circle" size="1.75rem" />
+              <StyledText marginLeft={SPACING.spacing5}>
                 {t('run_protocol')}
               </StyledText>
             </Flex>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacingSM}
-              height="4.875rem"
-              padding={SPACING.spacing5}
-              onClick={handlePinClick}
-              as="button"
-            >
-              <Icon name="pin" size="1.875rem" color={COLORS.black} />
-              <StyledText
-                fontSize="1.375rem"
-                lineHeight="1.5rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TYPOGRAPHY.textAlignCenter}
-              >
+          </MenuItem>
+          <MenuItem onClick={handlePinClick} key="pin">
+            <Flex>
+              <Icon name="pin" size="1.875rem" />
+              <StyledText marginLeft={SPACING.spacing5}>
                 {pinned ? t('unpin_protocol') : t('pin_protocol')}
               </StyledText>
             </Flex>
-            <Flex
-              alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.errorEnabled}
-              gridGap={SPACING.spacingSM}
-              height="4.875rem"
-              padding={SPACING.spacing5}
-              onClick={handleDeleteClick}
-              as="button"
-            >
-              <Icon name="trash" size="1.875rem" color={COLORS.white} />
-              <StyledText
-                color={COLORS.white}
-                fontSize="1.375rem"
-                lineHeight="1.5rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TYPOGRAPHY.textAlignCenter}
-              >
-                {t('delete_protocol')}
-              </StyledText>
+          </MenuItem>
+          <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
+            <Flex>
+              <Icon name="trash" size="1.875rem" />
+              <StyledText>{t('delete_protocol')}</StyledText>
             </Flex>
-          </Flex>
-        </ModalShell>
+          </MenuItem>
+        </MenuList>
       )}
     </>
   )

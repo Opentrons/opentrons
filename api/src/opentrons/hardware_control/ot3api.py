@@ -6,6 +6,7 @@ import logging
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
+    AsyncGenerator,
     cast,
     Callable,
     Dict,
@@ -190,6 +191,7 @@ class OT3API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        self._instrument_cache_lock = asyncio.Lock()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -602,8 +604,12 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        await self._cache_instruments(require)
-        await self._configure_instruments()
+        if self._instrument_cache_lock.locked():
+            self._log.info("Instrument cache is locked, not refreshing")
+            return
+        async with self.instrument_cache_lock():
+            await self._cache_instruments(require)
+            await self._configure_instruments()
 
     async def _cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -704,7 +710,7 @@ class OT3API(
 
     async def halt(self) -> None:
         """Immediately stop motion."""
-        await self._backend.hard_halt()
+        await self._backend.halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
     async def stop(self, home_after: bool = True) -> None:
@@ -1111,7 +1117,7 @@ class OT3API(
             self._log.info(f"{str(zero_length_error)}, ignoring")
             return
         self._log.info(
-            f"move: {target_position} becomes {machine_pos} from {origin} "
+            f"move: deck {target_position} becomes machine {machine_pos} from {origin} "
             f"requiring {moves}"
         )
         async with contextlib.AsyncExitStack() as stack:
@@ -1717,6 +1723,22 @@ class OT3API(
         else:
             self._pipette_handler.reset_instrument(checked_mount)
 
+    def get_instrument_offset(
+        self, mount: OT3Mount
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetByPipetteMount, None]:
+        """Get instrument calibration data."""
+        # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
+        #  PipetteDict because the dict is shared with OT2 pipettes which have
+        #  different offset type. Once we figure out if we want the calibration data
+        #  to be a part of the dict, this getter can be updated to fetch pipette offset
+        #  from the dict, or just remove this getter entirely.
+
+        if mount == OT3Mount.GRIPPER:
+            gripper_dict = self._gripper_handler.get_gripper_dict()
+            return gripper_dict["calibration_offset"] if gripper_dict else None
+        else:
+            return self._pipette_handler.get_instrument_offset(mount=mount)
+
     async def reset_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
     ) -> None:
@@ -1937,6 +1959,7 @@ class OT3API(
         moving_axis: OT3Axis,
         target_pos: float,
         pass_settings: CapacitivePassSettings,
+        retract_after: bool = True,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -2011,8 +2034,14 @@ class OT3API(
                 probe=InstrumentProbeType.PRIMARY,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, pass_start_pos)
+        if retract_after:
+            await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
+
+    @contextlib.asynccontextmanager
+    async def instrument_cache_lock(self) -> AsyncGenerator[None, None]:
+        async with self._instrument_cache_lock:
+            yield
 
     async def capacitive_sweep(
         self,

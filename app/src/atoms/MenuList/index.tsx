@@ -3,17 +3,36 @@ import {
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
-  ButtonProps,
   Flex,
   SPACING,
+  BORDERS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { ModalShell } from '../../molecules/Modal'
 
 interface MenuListProps {
-  buttons: Array<ButtonProps | null | undefined>
+  children: React.ReactNode
+  isOnDevice?: boolean
+  onClick?: React.MouseEventHandler
 }
 
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
-  return (
+  const { children, isOnDevice = false, onClick = null } = props
+  return isOnDevice && onClick != null ? (
+    <ModalShell
+      borderRadius={BORDERS.size_three}
+      width="18.0625rem"
+      onOutsideClick={onClick}
+    >
+      <Flex
+        boxShadow={BORDERS.shadowSmall}
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_CENTER}
+      >
+        {children}
+      </Flex>
+    </ModalShell>
+  ) : (
     <Flex
       borderRadius="4px 4px 0px 0px"
       zIndex={10}
@@ -23,8 +42,9 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       top="2.6rem"
       right={`calc(50% + ${String(SPACING.spacing2)})`}
       flexDirection={DIRECTION_COLUMN}
+      width="max-content"
     >
-      {props.buttons}
+      {children}
     </Flex>
   )
 }

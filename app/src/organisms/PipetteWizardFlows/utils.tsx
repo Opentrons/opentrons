@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { css } from 'styled-components'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { SPACING } from '@opentrons/components'
 import { FLOWS, SECTIONS } from './constants'
 
 import attachLeft18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
@@ -14,18 +15,18 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 
-import type { AttachedPipettesByMount } from '@opentrons/api-client'
+import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import type { PipetteWizardStep } from './types'
 
 export function getIsGantryEmpty(
-  attachedPipette: AttachedPipettesByMount
+  attachedPipette: AttachedPipettesFromInstrumentsQuery
 ): boolean {
   return attachedPipette[LEFT] == null && attachedPipette[RIGHT] == null
 }
 
 interface PipetteAnimationProps {
   pipetteWizardStep: PipetteWizardStep
-  channel?: 1 | 8
+  channel?: number
 }
 export function getPipetteAnimations(
   props: PipetteAnimationProps
@@ -66,6 +67,7 @@ export function getPipetteAnimations(
   return (
     <video
       css={css`
+        padding-top: ${SPACING.spacing2};
         max-width: 100%;
         max-height: ${section === SECTIONS.ATTACH_PROBE ||
         section === SECTIONS.DETACH_PROBE

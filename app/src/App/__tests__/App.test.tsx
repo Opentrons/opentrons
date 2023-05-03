@@ -5,7 +5,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
-import { getIsOnDevice } from '../../redux/config'
+import { getIsOnDevice, getConfig } from '../../redux/config'
 
 import { DesktopApp } from '../DesktopApp'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
@@ -30,6 +30,7 @@ const mockOnDeviceDisplayApp = OnDeviceDisplayApp as jest.MockedFunction<
 const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
   typeof getIsOnDevice
 >
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 const render = () => {
   return renderWithProviders(<App />, {
@@ -42,14 +43,18 @@ describe('App', () => {
   beforeEach(() => {
     mockDesktopApp.mockReturnValue(<div>mock DesktopApp</div>)
     mockOnDeviceDisplayApp.mockReturnValue(<div>mock OnDeviceDisplayApp</div>)
-    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(null)
+    when(mockGetConfig)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue(MOCK_STATE.config)
+    when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
   })
 
-  it('renders null before isOnDevice initializes', () => {
+  it('renders null before config initializes', () => {
+    when(mockGetConfig).calledWith(MOCK_STATE).mockReturnValue(null)
     const [{ container }] = render()
     expect(container).toBeEmptyDOMElement()
   })

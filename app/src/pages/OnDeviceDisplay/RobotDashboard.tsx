@@ -1,76 +1,59 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
 import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
-  COLORS,
   TYPOGRAPHY,
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  BORDERS,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
+import {
+  useAllProtocolsQuery,
+  useAllRunsQuery,
+} from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import {
+  EmptyRecentRun,
+  RecentRunProtocolCarousel,
+} from '../../organisms/OnDeviceDisplay/RobotDashboard'
+import { sortProtocols } from './ProtocolDashboard/utils'
 
-import abstractImage from '../../assets/images/odd/abstract@x2.png'
+export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
+const SORT_KEY = 'recentRun'
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
+  const protocols = useAllProtocolsQuery()
+  const runs = useAllRunsQuery()
+  const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  const runData = runs.data?.data != null ? runs.data?.data : []
 
-  // ToDo kj 12/07/2022 get protocol runs and add conditional rendering
-  // if there is no run data, shows the following
+  /** Currently the max number of displaying recent run protocol is 8 */
+  const sortedProtocols = sortProtocols(SORT_KEY, protocolsData, runData).slice(
+    0,
+    MAXIMUM_RECENT_RUN_PROTOCOLS
+  )
   return (
-    <Flex padding={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
+    <Flex paddingX={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex
-        width="100%"
-        height="27.25rem"
-        backgroundColor={COLORS.fundamentalsBackground}
-        borderRadius={BORDERS.radiusRoundEdge}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-      >
-        <img
-          src={abstractImage}
-          alt="Robot Dashboard no protocol run data"
-          width="864px"
-          height="108px"
-        />
-        <StyledText
-          fontSize="1.5rem"
-          lineHeight="2.25rem"
-          fontWeight="700"
-          color={COLORS.black}
-        >
-          {t('have_not_run')}
-        </StyledText>
-        <StyledText
-          fontSize="1.375rem"
-          lineHeight="1.875rem"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.black}
-        >
-          {t('have_not_run_description')}
-        </StyledText>
-      </Flex>
-
-      {/* temp button to robot dashboard until we can detect setup status */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        {sortedProtocols.length === 0 ? (
+          <EmptyRecentRun />
+        ) : (
+          <>
+            <StyledText
+              fontSize={TYPOGRAPHY.fontSize20}
+              lineHeight={TYPOGRAPHY.lineHeight28}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
+              {t('run_again')}
+            </StyledText>
+            <RecentRunProtocolCarousel sortedProtocols={sortedProtocols} />
+          </>
+        )}
       </Flex>
     </Flex>
   )

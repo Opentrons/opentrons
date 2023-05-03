@@ -109,7 +109,13 @@ def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
     files = os.listdir(config.get_opentrons_path("module_calibration_dir"))
     for file in files:
         try:
-            calibrations.append(v1.ModuleOffsetModel(**io.read_cal_file(Path(file))))
+            calibrations.append(
+                v1.ModuleOffsetModel(
+                    **io.read_cal_file(
+                        Path(config.get_opentrons_path("module_calibration_dir") / file)
+                    )
+                )
+            )
         except (json.JSONDecodeError, ValidationError):
             log.warning(
                 f"Malformed module calibrations for {file}. Please factory reset your calibrations."

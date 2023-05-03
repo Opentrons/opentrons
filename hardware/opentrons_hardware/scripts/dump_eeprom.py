@@ -81,6 +81,7 @@ async def run(args: argparse.Namespace) -> None:
                 TARGETS[args.target],
                 256 if args.old_version else 16384,
             )
+            await asyncio.sleep(3)
 
 
 async def dump_eeprom(messenger: CanMessenger, node: NodeId, limit: int) -> None:

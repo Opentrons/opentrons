@@ -11,9 +11,9 @@ import { useTranslation } from 'react-i18next'
 import { BackButton } from '../../atoms/buttons'
 import { ContinueButton } from '../ProtocolSetupModules'
 import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { LabwarePositionCheck } from '../LabwarePositionCheck'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
 export interface ProtocolSetupLabwarePositionCheckProps {
   runId: string
@@ -25,20 +25,10 @@ export function ProtocolSetupLabwarePositionCheck({
   setSetupScreen,
 }: ProtocolSetupLabwarePositionCheckProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
 
-  const [
-    showLabwarePositionCheck,
-    setShowLabwarePositionCheck,
-  ] = React.useState(false)
-  const handleLaunchLPC = (): void => {
-    setShowLabwarePositionCheck(true)
-  }
-
-  return showLabwarePositionCheck ? (
-    <LabwarePositionCheck
-      onCloseClick={() => setShowLabwarePositionCheck(false)}
-      runId={runId}
-    />
+  return LPCWizard != null ? (
+    LPCWizard
   ) : (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -60,17 +50,11 @@ export function ProtocolSetupLabwarePositionCheck({
         justifyContent={JUSTIFY_CENTER}
       >
         <MediumButton
-          onClick={handleLaunchLPC}
+          onClick={() => launchLPC()}
           buttonType="secondary"
           buttonText="Start Labware Position Check"
         />
       </Flex>
-      {showLabwarePositionCheck && (
-        <LabwarePositionCheck
-          onCloseClick={() => setShowLabwarePositionCheck(false)}
-          runId={runId}
-        />
-      )}
     </Flex>
   )
 }

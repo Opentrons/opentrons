@@ -66,8 +66,12 @@ def test_ensure_pipette_input_invalid() -> None:
     [
         ("1", DeckSlotName.SLOT_1),
         (1, DeckSlotName.SLOT_1),
+        ("d1", DeckSlotName.SLOT_1),
+        ("D1", DeckSlotName.SLOT_1),
         (12, DeckSlotName.FIXED_TRASH),
         ("12", DeckSlotName.FIXED_TRASH),
+        ("a3", DeckSlotName.FIXED_TRASH),
+        ("A3", DeckSlotName.FIXED_TRASH),
     ],
 )
 def test_ensure_deck_slot(input_value: Union[str, int], expected: DeckSlotName) -> None:

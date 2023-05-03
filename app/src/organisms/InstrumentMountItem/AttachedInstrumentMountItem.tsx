@@ -6,15 +6,15 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import type { InstrumentData } from '@opentrons/api-client'
-import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 import { LabeledMount } from './LabeledMount'
+import type { InstrumentData } from '@opentrons/api-client'
+import type { Mount } from '../../redux/pipettes/types'
+import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 
 interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'
