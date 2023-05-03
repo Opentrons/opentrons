@@ -31,7 +31,7 @@ export function Welcome(): JSX.Element {
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText
           fontSize={TYPOGRAPHY.fontSize38}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight48}
         >
           {t('welcome_title')}
