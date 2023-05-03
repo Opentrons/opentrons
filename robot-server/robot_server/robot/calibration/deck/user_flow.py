@@ -10,6 +10,7 @@ from typing import (
     Optional,
     Tuple,
     Union,
+    cast,
 )
 
 from opentrons.calibration_storage import (
@@ -19,7 +20,12 @@ from opentrons.calibration_storage import (
     load_tip_length_calibration,
 )
 from opentrons.hardware_control import robot_calibration as robot_cal
-from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
+from opentrons.hardware_control import (
+    HardwareControlAPI,
+    OT2HardwareControlAPI,
+    CriticalPoint,
+    Pipette,
+)
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -81,7 +87,7 @@ def tuplefy_cal_point_dicts(
 
 class DeckCalibrationUserFlow:
     def __init__(self, hardware: HardwareControlAPI):
-        self._hardware = hardware
+        self._hardware = cast(OT2HardwareControlAPI, hardware)
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
 
@@ -111,8 +117,8 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.exit: self.exit_session,
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
-        self.hardware.set_robot_calibration(
-            self.hardware.build_temporary_identity_calibration()
+        self._hardware.set_robot_calibration(
+            self._hardware.build_temporary_identity_calibration()
         )
         self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._supported_commands = SupportedCommands(namespace="calibration")
@@ -123,7 +129,7 @@ class DeckCalibrationUserFlow:
         return self._deck
 
     @property
-    def hardware(self) -> HardwareControlAPI:
+    def hardware(self) -> OT2HardwareControlAPI:
         return self._hardware
 
     @property

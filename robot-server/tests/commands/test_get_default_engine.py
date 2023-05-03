@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.protocol_engine import ProtocolEngine
 
@@ -15,7 +15,7 @@ from robot_server.commands.get_default_engine import get_default_engine
 @pytest.fixture()
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out HardwareControlAPI."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture()
