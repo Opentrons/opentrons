@@ -653,7 +653,7 @@ class ModuleView(HasState[ModuleState]):
         module = self.get(module_id)
         if module.serialNumber is None:
             raise errors.ModuleNotConnectedError(
-                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected by a serial."
+                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected to the robot and can provide the robot with a serial number."
             )
         offset = self._state.module_offset_by_serial.get(module.serialNumber)
         if offset is not None:
