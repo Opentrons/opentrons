@@ -259,9 +259,7 @@ class EquipmentHandler:
         # when loading a hardware module select_hardware_module_to_load
         # will ensure a module of a different type is not loaded at the same slot.
         # this is for non-connected modules.
-        self._state_store.modules.ensure_module_not_present(
-            model=model, location=location
-        )
+        self._state_store.modules.raise_if_module_in_location(location=location)
         return LoadedModuleData(
             module_id=self._model_utils.ensure_id(module_id),
             serial_number=None,

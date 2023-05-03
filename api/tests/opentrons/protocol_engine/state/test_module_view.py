@@ -237,7 +237,15 @@ def test_get_properties_by_id(
         slotName=DeckSlotName.SLOT_2
     )
 
-    with pytest.raises(AssertionError):
+    assert subject.get_definition("module-3") == mag_block_v1_def
+    assert subject.get_dimensions("module-3") == mag_block_v1_def.dimensions
+    assert subject.get_requested_model("module-3") == ModuleModel.MAGNETIC_BLOCK_V1
+    assert subject.get_connected_model("module-3") == ModuleModel.MAGNETIC_BLOCK_V1
+    assert subject.get_location("module-3") == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_3
+    )
+
+    with pytest.raises(errors.ModuleNotConnectedError):
         subject.get_serial_number("module-3")
 
     with pytest.raises(errors.ModuleNotLoadedError):
@@ -1664,27 +1672,3 @@ def test_is_edge_move_unsafe(
     result = subject.is_edge_move_unsafe(mount=mount, target_slot=target_slot)
 
     assert result is expected_result
-
-
-def test_ensure_module_not_present_rejects_location_reassignment(
-    magdeck_v1_def: ModuleDefinition,
-    tempdeck_v1_def: ModuleDefinition,
-) -> None:
-    """It should raise if a non-matching module is already present in the slot."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "module-1": DeckSlotName.SLOT_1,
-        },
-        hardware_by_module_id={
-            "module-1": HardwareModule(
-                serial_number="serial-1",
-                definition=magdeck_v1_def,
-            )
-        },
-    )
-
-    with pytest.raises(errors.ModuleAlreadyPresentError):
-        subject.ensure_module_not_present(
-            model=ModuleModel.MAGNETIC_BLOCK_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        )

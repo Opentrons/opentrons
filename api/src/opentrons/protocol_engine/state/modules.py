@@ -29,6 +29,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
 from opentrons.types import DeckSlotName, MountType
+from ..errors import ModuleNotConnectedError
 
 from ..types import (
     LoadedModule,
@@ -606,9 +607,10 @@ class ModuleView(HasState[ModuleState]):
         provided by the hardware API.
         """
         module = self.get(module_id)
-        assert (
-            module.serialNumber is not None
-        ), f"Expected a connected module and got a {module.model.name}"
+        if module.serialNumber is None:
+            raise ModuleNotConnectedError(
+                f"Expected a connected module and got a {module.model.name}"
+            )
         return module.serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
@@ -826,17 +828,6 @@ class ModuleView(HasState[ModuleState]):
                 neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
 
         return neighbor_slot in self._state.slot_by_module_id.values()
-
-    def ensure_module_not_present(
-        self, model: ModuleModel, location: DeckSlotLocation
-    ) -> None:
-        """Ensure a different module is not present in the slot we are trying to load into."""
-        for module in self.get_all():
-            if module.location == location and model != module.model:
-                raise errors.ModuleAlreadyPresentError(
-                    f"A {module.model.value} is already"
-                    f" present in {location.slotName.value}"
-                )
 
     def select_hardware_module_to_load(
         self,
