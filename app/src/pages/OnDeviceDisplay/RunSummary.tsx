@@ -291,6 +291,12 @@ const ProtocolName = styled.h4`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   color: ${COLORS.darkBlack_seventy};
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const SummaryDatum = styled.div`
