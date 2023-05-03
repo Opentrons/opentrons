@@ -156,6 +156,10 @@ class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
     """Raised when Heater-Shaker latch is not open when it is expected to be so."""
 
 
+class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
+    """Raised when Heater-Shaker latch has not been set before moving to it."""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """Raised when a Magnetic Module engage height is out of bounds."""
 

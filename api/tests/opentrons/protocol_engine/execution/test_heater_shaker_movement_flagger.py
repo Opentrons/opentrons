@@ -2,7 +2,7 @@
 
 import pytest
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Any, NamedTuple
+from typing import ContextManager, Any, NamedTuple, Optional
 from decoy import Decoy
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.errors import (
     PipetteMovementRestrictedByHeaterShakerError,
     HeaterShakerLabwareLatchNotOpenError,
+    HeaterShakerLabwareLatchStatusUnknown,
     WrongModuleTypeError,
 )
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
@@ -284,10 +285,19 @@ async def test_does_not_raise_when_idle_and_latch_closed(
         )
 
 
+@pytest.mark.parametrize(
+    argnames=["latch_status", "expected_raise_cm"],
+    argvalues=[
+        (True, pytest.raises(HeaterShakerLabwareLatchNotOpenError)),
+        (None, pytest.raises(HeaterShakerLabwareLatchStatusUnknown)),
+    ],
+)
 async def test_raises_depending_on_heater_shaker_substate_latch_status(
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
     decoy: Decoy,
+    latch_status: Optional[bool],
+    expected_raise_cm: ContextManager[Any],
 ) -> None:
     """It should flag movement depending on engine's h/s state."""
     decoy.when(
@@ -295,13 +305,13 @@ async def test_raises_depending_on_heater_shaker_substate_latch_status(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=True,
+            is_labware_latch_closed=latch_status,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
     )
 
-    with pytest.raises(HeaterShakerLabwareLatchNotOpenError):
+    with expected_raise_cm:
         await subject.raise_if_labware_latched_on_heater_shaker(
             labware_parent=ModuleLocation(moduleId="module-id")
         )

@@ -10,9 +10,11 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 from ..errors import (
     PipetteMovementRestrictedByHeaterShakerError,
     HeaterShakerLabwareLatchNotOpenError,
+    HeaterShakerLabwareLatchStatusUnknown,
     WrongModuleTypeError,
 )
 from ..state import StateStore
+from ..state.module_substates import HeaterShakerModuleSubState
 from ..types import HeaterShakerMovementRestrictors, LabwareLocation, ModuleLocation
 from ...hardware_control import HardwareControlAPI
 from ...hardware_control.modules import HeaterShaker as HardwareHeaterShaker
@@ -58,25 +60,34 @@ class HeaterShakerMovementFlagger:
             raise HeaterShakerLabwareLatchNotOpenError(
                 "Heater-Shaker labware latch must be open when moving labware to/from it."
             )
+        elif hs_substate.is_labware_latch_closed is None:
+            raise HeaterShakerLabwareLatchStatusUnknown(
+                "Heater-Shaker labware latch must be opened before moving labware to/from it."
+            )
 
         # There is a chance that the engine might not have the latest latch status;
         # do a hardware state check to be sure that the latch is truly open
         if not self._state_store.config.use_virtual_modules:
-            try:
-                hs_latch_status = await self._get_hardware_heater_shaker_latch_status(
-                    module_id=hs_substate.module_id
-                )
-            except self._HardwareHeaterShakerMissingError as e:
-                raise HeaterShakerLabwareLatchNotOpenError(
-                    "H/S labware latch must be open when moving a labware on it,"
-                    " but can't confirm its current status."
-                ) from e
+            await self._check_hardware_module_latch_status(hs_substate)
 
-            if hs_latch_status != HeaterShakerLabwareLatchStatus.IDLE_OPEN:
-                raise HeaterShakerLabwareLatchNotOpenError(
-                    f"H/S latch must be open when moving a labware on it,"
-                    f" but the latch is currently {hs_latch_status}"
-                )
+    async def _check_hardware_module_latch_status(
+        self, hs_substate: HeaterShakerModuleSubState
+    ) -> None:
+        try:
+            hs_latch_status = await self._get_hardware_heater_shaker_latch_status(
+                module_id=hs_substate.module_id
+            )
+        except self._HardwareHeaterShakerMissingError as e:
+            raise HeaterShakerLabwareLatchNotOpenError(
+                "H/S labware latch must be open when moving a labware on it,"
+                " but can't confirm its current status."
+            ) from e
+
+        if hs_latch_status != HeaterShakerLabwareLatchStatus.IDLE_OPEN:
+            raise HeaterShakerLabwareLatchNotOpenError(
+                f"H/S latch must be open when moving a labware on it,"
+                f" but the latch is currently {hs_latch_status}"
+            )
 
     async def _get_hardware_heater_shaker_latch_status(
         self,

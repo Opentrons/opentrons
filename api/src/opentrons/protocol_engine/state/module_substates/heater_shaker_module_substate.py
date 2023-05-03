@@ -27,7 +27,7 @@ class HeaterShakerModuleSubState:
     """
 
     module_id: HeaterShakerModuleId
-    is_labware_latch_closed: bool
+    is_labware_latch_closed: Optional[bool]
     is_plate_shaking: bool
     plate_target_temperature: Optional[float]
 
@@ -70,7 +70,11 @@ class HeaterShakerModuleSubState:
 
     def raise_if_labware_latch_not_closed(self) -> None:
         """Raise an error if labware is not latched on the heater-shaker."""
-        if not self.is_labware_latch_closed:
+        if self.is_labware_latch_closed is None:
+            raise CannotPerformModuleAction(
+                "Heater-Shaker cannot start shaking if the labware latch status has not been set to closed."
+            )
+        elif not self.is_labware_latch_closed:
             raise CannotPerformModuleAction(
                 "Heater-Shaker cannot start shaking while the labware latch is open."
             )

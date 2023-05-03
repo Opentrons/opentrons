@@ -1187,7 +1187,33 @@ def test_raise_if_labware_latch_not_closed(
         },
     )
     subject = module_view.get_heater_shaker_module_substate("module-id")
-    with pytest.raises(errors.CannotPerformModuleAction):
+    with pytest.raises(errors.CannotPerformModuleAction, match="is open"):
+        subject.raise_if_labware_latch_not_closed()
+
+
+def test_raise_if_labware_latch_unknown(
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise an error if labware latch is not closed."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=None,
+                is_plate_shaking=False,
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+    with pytest.raises(errors.CannotPerformModuleAction, match="set to closed"):
         subject.raise_if_labware_latch_not_closed()
 
 

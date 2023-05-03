@@ -243,12 +243,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
+            # Set latch status to None to prevent false positives for labware movement safety
+            labware_latch_status = (
+                None
+                if live_data is None
+                else live_data["labwareLatchStatus"] == "idle_closed"
+            )
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=(
-                    live_data is not None
-                    and live_data["labwareLatchStatus"] == "idle_closed"
-                ),
+                is_labware_latch_closed=labware_latch_status,
                 is_plate_shaking=(
                     live_data is not None and live_data["targetSpeed"] is not None
                 ),
