@@ -1,0 +1,200 @@
+test_name: Make sure the server normalizes deck slots according to its robot type
+
+marks:
+  - usefixtures:
+    - run_server
+    - clean_server_state
+  - parametrize:
+      key:
+        - input_slot_1
+        - input_slot_2
+        - normalized_slot_1
+        - normalized_slot_2
+      vals:
+        # TODO(mm, 2023-05-04): Figure out how to get this test to also run on an OT-3 server,
+        # and test that it normalizes deck slots to the OT-3 style.
+        - ['1', '2', '1', '2']
+        - ['D1', 'D2', '1', '2']
+
+stages:
+  - name: Create a run with a labware offset, and make sure it normalizes the offset's deck slot
+    request:
+      method: POST
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data:
+          labwareOffsets:
+            - definitionUri: &definition_uri opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
+              location:
+                slotName: '{input_slot_1}'
+                moduleModel: &module_model temperatureModuleV2
+              vector:
+                x: 1
+                y: 2
+                z: 3
+    response:
+      status_code: 201
+      strict:
+        - json:off
+      json:
+        data:
+          labwareOffsets:
+            - location:
+                slotName: '{normalized_slot_1}'
+      save:
+        json:
+          run_id: data.id
+          offset_id_1: data.labwareOffsets[0].id
+
+  - name: Add a labware offset to the run, and make sure it normalizes the offset's deck slot
+    request:
+      method: POST
+      url: '{host:s}:{port:d}/runs/{run_id}/labware_offsets'
+      json:
+        data:
+          definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
+          location:
+            slotName: '{input_slot_2}'
+          vector:
+            x: 4
+            y: 5
+            z: 6
+    response:
+      status_code: 201
+      strict:
+        - json:off
+      json:
+        data:
+          location:
+            slotName: '{normalized_slot_2}'
+      save:
+        json:
+          offset_id_2: data.id
+
+  - name: Run a loadModule command, and make sure it normalizes the deck slot
+    request:
+      method: POST
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      params:
+        waitUntilComplete: 'true'
+      json:
+        data:
+          commandType: loadModule
+          params:
+            moduleId: module_id
+            model: *module_model
+            location:
+              slotName: '{input_slot_1}'
+    response:
+      status_code: 201
+      json:
+        data:
+          commandType: loadModule
+          params:
+            moduleId: module_id
+            model: *module_model
+            location:
+              slotName: '{normalized_slot_1}'
+          status: succeeded
+          intent: setup
+          id: !anystr
+          key: !anystr
+          result: !anydict
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+
+  - name: Load a labware on the module, and make sure and the 1st labware offset applies to it
+    request:
+      method: POST
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      params:
+        waitUntilComplete: 'true'
+      json:
+        data:
+          commandType: loadLabware
+          params:
+            namespace: &namespace opentrons
+            loadName: &load_name armadillo_96_wellplate_200ul_pcr_full_skirt
+            version: &version 1
+            location:
+              moduleId: module_id
+    response:
+      status_code: 201
+      json:
+        data:
+          commandType: loadLabware
+          params:
+            namespace: *namespace
+            loadName: *load_name
+            version: *version
+            location:
+              moduleId: module_id
+          result:
+            labwareId: !anystr
+            definition: !anydict
+            offsetId: '{offset_id_1}'
+          status: succeeded
+          intent: setup
+          id: !anystr
+          key: !anystr
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+
+  - name: Load a labware on the deck, and make sure it normalizes the deck slot, and make sure the 2nd labware offset applies to it
+    request:
+      method: POST
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      params:
+        waitUntilComplete: 'true'
+      json:
+        data:
+          commandType: loadLabware
+          params:
+            namespace: *namespace
+            loadName: *load_name
+            version: *version
+            location:
+              slotName: '{input_slot_2}'
+    response:
+      status_code: 201
+      json:
+        data:
+          commandType: loadLabware
+          params:
+            namespace: *namespace
+            loadName: *load_name
+            version: *version
+            location:
+              slotName: '{normalized_slot_2}'
+          result:
+            labwareId: !anystr
+            definition: !anydict
+            offsetId: '{offset_id_2}'
+          status: succeeded
+          intent: setup
+          id: !anystr
+          key: !anystr
+          createdAt: !anystr
+          startedAt: !anystr
+          completedAt: !anystr
+
+  - name: Make sure the run summary shows the normalized deck slots
+    request:
+      method: GET
+      url: '{host:s}:{port:d}/runs/{run_id}'
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          modules:
+            - location:
+                slotName: '{normalized_slot_1}'
+          labware:
+            - location:
+                moduleId: module_id
+            - location:
+                slotName: '{normalized_slot_2}'
