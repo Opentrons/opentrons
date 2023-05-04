@@ -29,14 +29,16 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     update_pick_up_current,
     update_pick_up_distance,
     update_drop_tip_current,
-    _get_pipette_from_mount
+    _get_pipette_from_mount,
 )
 
 from hardware_testing import data
 from hardware_testing.drivers.mark10 import Mark10
 
+
 def dict_keys_to_line(dict):
     return str.join(",", list(dict.keys())) + "\n"
+
 
 def file_setup(test_data, details):
     today = datetime.date.today()
@@ -178,10 +180,12 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
         )
         print("\r", end="")
 
+
 async def update_drop_tip_distance(api, mount, position) -> None:
     pipette = _get_pipette_from_mount(api, mount)
     pipette.plunger_positions.drop_tip = position
     print(pipette.plunger_positions)
+
 
 async def update_drop_tip_speed(api, mount, speed) -> None:
     """Update drop-tip current."""
@@ -190,6 +194,7 @@ async def update_drop_tip_speed(api, mount, speed) -> None:
     config_model.speed = speed
     pipette._drop_configurations = config_model
     print(pipette._drop_configurations)
+
 
 async def _main() -> None:
     today = datetime.date.today()
@@ -242,22 +247,20 @@ async def _main() -> None:
         fg_loc = await jog(hw_api, current_position, cp)
         fg_loc = [fg_loc[OT3Axis.X], fg_loc[OT3Axis.Y], fg_loc[OT3Axis.by_mount(mount)]]
 
-
     try:
         cycle = 1
         drop_tip_distance = pipette.plunger_positions.drop_tip + 12
-        await update_drop_tip_distance(hw_api, mount,  drop_tip_distance)
-        await update_drop_tip_speed(hw_api, mount,  10)
-        await hw_api._backend.set_hold_current({OT3Axis.X: 1.0,
-                                                OT3Axis.Y: 1.0,
-                                                OT3Axis.Z_L: 1.0,
-                                                OT3Axis.Z_R: 1.0})
+        await update_drop_tip_distance(hw_api, mount, drop_tip_distance)
+        await update_drop_tip_speed(hw_api, mount, 10)
+        await hw_api._backend.set_hold_current(
+            {OT3Axis.X: 1.0, OT3Axis.Y: 1.0, OT3Axis.Z_L: 1.0, OT3Axis.Z_R: 1.0}
+        )
 
         while True:
             d_current = float(input("Enter Drop Tip Current: "))
             await hw_api.add_tip(mount, tip_length[args.tip_size])
             # --------------------Drop Tip--------------------------------------
-            details = [pipette_model, d_current, stop_event = Event()]
+            details = [pipette_model, d_current]
             # Move the plunger to the bottom position
             await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
             if cycle == 1:
@@ -276,11 +279,8 @@ async def _main() -> None:
             await update_drop_tip_current(hw_api, mount, d_current)
 
             # obtain the encoder position
-            final_drop_tip_position = await hw_api.drop_tip(mount, home_after = False)
-            details = [
-                pipette_model,
-                d_current
-            ]
+            final_drop_tip_position = await hw_api.drop_tip(mount, home_after=False)
+            details = [pipette_model, d_current]
             await asyncio.sleep(1)
             motion = False
             await hw_api.home_plunger(mount)
@@ -308,7 +308,7 @@ def force_record(t_data, header):
         )
     )
     print(file_name)
-    with open(file_name,"w", newline="") as f:
+    with open(file_name, "w", newline="") as f:
         test_data = {
             "Time(s)": None,
             "Pipette Model": None,

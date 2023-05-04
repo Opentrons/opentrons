@@ -372,7 +372,6 @@ def get_plunger_positions_ot3(
     )
 
 
-
 async def update_pick_up_current(
     api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
