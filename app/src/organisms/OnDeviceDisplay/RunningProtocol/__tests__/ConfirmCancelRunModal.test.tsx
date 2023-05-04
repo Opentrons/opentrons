@@ -114,6 +114,6 @@ describe('ConfirmCancelRunModal', () => {
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/dashboard')
+    expect(mockPush).toHaveBeenCalledWith(`/protocols/${RUN_ID}/summary`)
   })
 })
