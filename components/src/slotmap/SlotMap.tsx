@@ -14,7 +14,7 @@ export interface SlotMapProps {
   collisionSlots?: string[]
   /** Optional error styling */
   isError?: boolean
-  /** Optional robot type for OT-3 Robot*/
+  /** Optional robot type for OT-3 Robot */
   robotType?: string
 }
 
