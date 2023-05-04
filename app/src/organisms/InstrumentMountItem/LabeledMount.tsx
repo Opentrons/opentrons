@@ -76,7 +76,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             {instrumentName == null ? t('empty') : instrumentName}
           </StyledText>
         </Flex>
-        <Icon name="more" size="1.5rem" />
+        <Icon name="more" size="3rem" />
       </Flex>
     </MountButton>
   )

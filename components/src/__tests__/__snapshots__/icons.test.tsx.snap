@@ -203,11 +203,11 @@ exports[`icons back renders correctly 1`] = `
   className=" c0 foo"
   fill="currentColor"
   version="1.1"
-  viewBox="0 0 19 34"
+  viewBox="0 0 40 40"
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M16.6667 33.6668L0 17.0002L16.6667 0.333496L19 2.7085L4.70833 17.0002L19 31.2918L16.6667 33.6668Z"
+    d="M16.6667 36.6666L0 20L16.6667 3.33331L19 5.70831L4.70833 20L19 34.2916L16.6667 36.6666Z\\" fill=\\"#16212D"
     fillRule="evenodd"
   />
 </svg>
@@ -1451,11 +1451,11 @@ exports[`icons more renders correctly 1`] = `
   className=" c0 foo"
   fill="currentColor"
   version="1.1"
-  viewBox="0 0 15 25"
+  viewBox="0 0 48 48"
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M15.075 12.675L3.07505 24.675L0.925049 22.525L10.825 12.675L0.975047 2.82505L3.12505 0.675049L15.075 12.675Z"
+    d="M31.075 23.675L19.075 35.675L16.925 33.525L26.825 23.675L16.975 13.8251L19.125 11.675L31.075 23.675Z"
     fillRule="evenodd"
   />
 </svg>
