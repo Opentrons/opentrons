@@ -38,13 +38,7 @@ TIP_RACK_96_ADAPTER_HEIGHT = 11  # DVT adapter
 # move to same spot over labware, regardless of number of tips attached
 OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
-PARTIAL_CURRENTS = {
-    1: 0.05,
-    8: 0.55,
-    12: 0.8,
-    16: 1.1,
-    24: 1.5
-}
+PARTIAL_CURRENTS = {1: 0.05, 8: 0.55, 12: 0.8, 16: 1.1, 24: 1.5}
 
 PARTIAL_TESTS = {
     # test-name: [offset-from-A1, z-current]
@@ -69,8 +63,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     all_tips_test = [CSVLine("droplets-96-tips", [float, CSVResult])]
     partial_tests = [
-        CSVLine(f"droplets-{name}", [float, CSVResult])
-        for name in PARTIAL_TESTS.keys()
+        CSVLine(f"droplets-{name}", [float, CSVResult]) for name in PARTIAL_TESTS.keys()
     ]
     return all_tips_test + partial_tests
 
@@ -111,10 +104,14 @@ def get_tiprack_partial_nominal() -> Point:
     return tip_rack_a1_nominal
 
 
-async def aspirate_and_wait(api: OT3API, reservoir: Point, seconds: int = 30) -> Tuple[bool, float]:
+async def aspirate_and_wait(
+    api: OT3API, reservoir: Point, seconds: int = 30
+) -> Tuple[bool, float]:
     """Aspirate and wait."""
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, reservoir)
-    await api.move_to(OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_ASPIRATE))
+    await api.move_to(
+        OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_ASPIRATE)
+    )
     await api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
     await api.move_to(OT3Mount.LEFT, reservoir + Point(z=HOVER_HEIGHT_MM))
 
@@ -134,21 +131,23 @@ async def aspirate_and_wait(api: OT3API, reservoir: Point, seconds: int = 30) ->
     duration_seconds = time() - start_time
     print(f"waited for {duration_seconds} seconds")
 
-    await api.move_to(OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_DISPENSE))
+    await api.move_to(
+        OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_DISPENSE)
+    )
     await api.dispense(OT3Mount.LEFT)
     return result, duration_seconds
 
 
 async def _drop_tip(api: OT3API, trash: Point) -> None:
     print("drop in trash")
-    await helpers_ot3.move_to_arched_ot3(
-        api, OT3Mount.LEFT, trash + Point(z=20)
-    )
+    await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, trash + Point(z=20))
     await api.move_to(OT3Mount.LEFT, trash)
     await api.drop_tip(OT3Mount.LEFT)
 
 
-async def _partial_pick_up_z_motion(api: OT3API, current: float, distance: float, speed: float) -> None:
+async def _partial_pick_up_z_motion(
+    api: OT3API, current: float, distance: float, speed: float
+) -> None:
     async with api._backend.restore_current():
         await api._backend.set_active_current({OT3Axis.Z_L: current})
         target_down = target_position_from_relative(
@@ -200,7 +199,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # SELECT DELAY TIME
     try:
         assert not api.is_simulator
-        inp = input(f"wait default seconds ({NUM_SECONDS_TO_WAIT}), or enter new seconds: ")
+        inp = input(
+            f"wait default seconds ({NUM_SECONDS_TO_WAIT}), or enter new seconds: "
+        )
         delay_seconds = int(inp.strip())
         print(f"delaying {delay_seconds} seconds")
     except (AssertionError, ValueError):
@@ -208,7 +209,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     if not api.is_simulator:
         if ui.get_user_answer("drop old tips?"):
-            await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+            await api.add_tip(
+                OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME)
+            )
             await _drop_tip(api, trash_nominal)
 
     if not api.is_simulator and ui.get_user_answer("test all 96 tips"):
@@ -222,18 +225,24 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             )
             await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
             print("picking up tips")
-            await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+            await api.pick_up_tip(
+                OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME)
+            )
             await api.home_z(OT3Mount.LEFT)
             if not api.is_simulator:
                 ui.get_user_ready("check tips are OK")
         else:
-            await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+            await api.add_tip(
+                OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME)
+            )
             await api.prepare_for_aspirate(OT3Mount.LEFT)
 
         # TEST DROPLETS for 96 TIPS
         ui.print_header("96 Tips: ASPIRATE and WAIT")
         await _find_reservoir_pos()
-        result, duration = await aspirate_and_wait(api, reservoir_a1_actual, seconds=delay_seconds)
+        result, duration = await aspirate_and_wait(
+            api, reservoir_a1_actual, seconds=delay_seconds
+        )
         report(section, f"droplets-96-tips", [duration, CSVResult.from_bool(result)])
         await _drop_tip(api, trash_nominal)
 
@@ -255,11 +264,17 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator and not ui.get_user_answer("test"):
             continue
         pick_up_position = tip_rack_partial_a1_actual + details[0]
-        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, pick_up_position + Point(z=50))
+        await helpers_ot3.move_to_arched_ot3(
+            api, OT3Mount.LEFT, pick_up_position + Point(z=50)
+        )
         if not api.is_simulator:
             ui.get_user_ready(f"about to pick-up ({test_name})")
         await _partial_pick_up(api, pick_up_position, current=details[1])
         await _find_reservoir_pos()
-        result, duration = await aspirate_and_wait(api, reservoir_a1_actual, seconds=delay_seconds)
-        report(section, f"droplets-{test_name}", [duration, CSVResult.from_bool(result)])
+        result, duration = await aspirate_and_wait(
+            api, reservoir_a1_actual, seconds=delay_seconds
+        )
+        report(
+            section, f"droplets-{test_name}", [duration, CSVResult.from_bool(result)]
+        )
         await _drop_tip(api, trash_nominal)

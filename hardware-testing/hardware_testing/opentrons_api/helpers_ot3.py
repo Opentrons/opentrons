@@ -675,11 +675,18 @@ async def get_capacitance_ot3(
 
 
 async def _get_temp_humidity(
-    messenger: CanMessenger, mount: OT3Mount
+    messenger: CanMessenger,
+    mount: OT3Mount,
+    channel: Optional[str] = None,
 ) -> Tuple[float, float]:
     node_id = sensor_node_for_mount(mount)
-    # FIXME: allow SensorId to specify which sensor on the device to read from
-    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
+    if not channel or channel == "rear":
+        sensor_id = SensorId.S0
+    elif channel == "front":
+        sensor_id = SensorId.S1
+    else:
+        raise ValueError(f"unexpected channel for pressure sensor: {channel}")
+    environment = sensor_types.EnvironmentSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
@@ -690,17 +697,21 @@ async def _get_temp_humidity(
 
 
 async def get_temperature_humidity_ot3(
-    api: OT3API, mount: OT3Mount
+    api: OT3API,
+    mount: OT3Mount,
+    channel: Optional[str] = None,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
     messenger = api._backend._messenger  # type: ignore[union-attr]
-    return await _get_temp_humidity(messenger, mount)
+    return await _get_temp_humidity(messenger, mount, channel)
 
 
 def get_temperature_humidity_outside_api_ot3(
-    mount: OT3Mount, is_simulating: bool = False
+    mount: OT3Mount,
+    is_simulating: bool = False,
+    channel: Optional[str] = None,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette outside of a protocol."""
     settings = DriverSettings(
@@ -717,7 +728,7 @@ def get_temperature_humidity_outside_api_ot3(
         async with build.driver(settings) as driver:
             messenger = CanMessenger(driver=driver)
             messenger.start()
-            ret = await _get_temp_humidity(messenger, mount)
+            ret = await _get_temp_humidity(messenger, mount, channel)
             await messenger.stop()
             return ret
 

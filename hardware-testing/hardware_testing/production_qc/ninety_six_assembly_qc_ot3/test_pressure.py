@@ -69,6 +69,7 @@ async def _read_from_sensor(
             r = await read_once(api, driver, sensor)
             sequential_failures = 0
             readings.append(r)
+            print(f"\t{r}")
             if not api.is_simulator:
                 await sleep(0.2)
         except helpers_ot3.SensorResponseBad as e:
@@ -88,7 +89,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Sensor: {probe}")
-        pressure_sensor = sensor_types.PressureSensor.build(sensor_id, NodeId.pipette_left)
+        pressure_sensor = sensor_types.PressureSensor.build(
+            sensor_id, NodeId.pipette_left
+        )
 
         # OPEN-Pa
         open_pa = 0.0
@@ -123,26 +126,34 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
         if not api.is_simulator:
             try:
-                aspirate_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+                aspirate_pa = await _read_from_sensor(
+                    api, s_driver, pressure_sensor, 10
+                )
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"aspirate-pa: {aspirate_pa}")
         # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, CSVResult.PASS])
+        report(
+            section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, CSVResult.PASS]
+        )
 
         # DISPENSE-Pa
         dispense_pa = 0.0
         await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
         if not api.is_simulator:
             try:
-                dispense_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+                dispense_pa = await _read_from_sensor(
+                    api, s_driver, pressure_sensor, 10
+                )
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
         print(f"dispense-pa: {dispense_pa}")
         # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, CSVResult.PASS])
+        report(
+            section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, CSVResult.PASS]
+        )
 
         if not api.is_simulator:
             ui.get_user_ready(f"REMOVE tip")

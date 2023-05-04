@@ -76,6 +76,7 @@ async def _read_from_sensor(
             r = await read_once(api, driver, sensor)
             sequential_failures = 0
             readings.append(r)
+            print(f"\t{r}")
             if not api.is_simulator:
                 await sleep(0.2)
         except helpers_ot3.SensorResponseBad as e:
@@ -185,7 +186,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         found_pos = await api.gantry_position(OT3Mount.LEFT)
         deck_mm = found_pos.z
         pass_threshold = (PROBE_MAX_OVERRUN - 0.001) * -1.0
-        deck_mm_is_valid = (deck_mm >= pass_threshold)
+        deck_mm_is_valid = deck_mm >= pass_threshold
         print(f"deck-mm: {deck_mm} ({deck_mm_is_valid})")
         report(
             section,
