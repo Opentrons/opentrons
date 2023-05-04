@@ -60,7 +60,7 @@ class LoadModuleParams(BaseModel):
     def canonicalize(self, robot_type: RobotType) -> LoadModuleParams:
         return self.copy(
             update={
-                "deckSlot": DeckSlotLocation.construct(
+                "location": DeckSlotLocation.construct(
                     slotName=self.location.slotName.to_equivalent_by_robot_type(
                         robot_type
                     )
