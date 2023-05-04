@@ -1,6 +1,6 @@
 import uniqBy from 'lodash/uniqBy'
 import orderBy from 'lodash/orderBy'
-import { useWifiList } from '@opentrons/react-api-client'
+import { useWifiQuery } from '@opentrons/react-api-client'
 
 const LIST_ORDER = [
   ['active', 'ssid'],
@@ -9,7 +9,7 @@ const LIST_ORDER = [
 
 export const useWifiList = (robotName: string): any[] => {
   const wifiQuery = useWifiQuery()
-  const wifiList = wifiQuery.data?.data != null ? wifiQuery.data?.data : []
+  const wifiList = wifiQuery.data?.list != null ? wifiQuery.data?.list : []
 
   return uniqBy(orderBy(wifiList, ...LIST_ORDER), 'ssid')
 }
