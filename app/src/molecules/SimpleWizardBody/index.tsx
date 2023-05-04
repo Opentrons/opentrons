@@ -10,12 +10,16 @@ import {
   SPACING,
   TYPOGRAPHY,
   RESPONSIVENESS,
+  ALIGN_CENTER,
+  StyleProps,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
 
-interface Props {
+interface Props extends StyleProps {
   iconColor: string
   header: string
   isSuccess: boolean
@@ -60,17 +64,30 @@ const BUTTON_STYLE = css`
 `
 
 export function SimpleWizardBody(props: Props): JSX.Element {
-  const { iconColor, children, header, subHeader, isSuccess, isPending } = props
+  const {
+    iconColor,
+    children,
+    header,
+    subHeader,
+    isSuccess,
+    isPending,
+    ...styleProps
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      height={isOnDevice ? '472px' : 'auto'}
+      minHeight="394px"
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      {...styleProps}
+    >
       <Flex
-        alignItems={TYPOGRAPHY.textAlignCenter}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        height="100%"
-        marginBottom={isOnDevice ? '3.9365rem' : '5.6875rem'}
-        marginTop="6.8125rem"
+        flex="1 0 auto"
       >
         {isPending ? (
           <Flex
@@ -109,7 +126,14 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           </>
         )}
       </Flex>
-      <Flex css={BUTTON_STYLE}>{children}</Flex>
+      <Flex
+        position={POSITION_ABSOLUTE}
+        bottom={0}
+        right={0}
+        css={BUTTON_STYLE}
+      >
+        {children}
+      </Flex>
     </Flex>
   )
 }

@@ -106,7 +106,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height={Boolean(isOnDevice) ? '30rem' : '24.625rem'}
+      height={isOnDevice ? '30rem' : '24.625rem'}
       padding={SPACING.spacing6}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
@@ -145,7 +145,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           isOnDevice ? (
             <SmallButton
               buttonText={proceedButtonText}
-              buttonType="default"
+              buttonType="primary"
               onClick={proceed}
             />
           ) : (

@@ -34,7 +34,7 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
           </StyledText>
 
           <StyledText as="p" data-testid="UnMatchedModuleWarning_body">
-            {t('module_mismatch_body')}
+            {`${t('module_mismatch_body')}.`}
           </StyledText>
         </Flex>
       </Banner>

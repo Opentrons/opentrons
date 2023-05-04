@@ -99,7 +99,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           as="h4"
           fontSize="1.75rem"
           lineHeight="2.25rem"
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >

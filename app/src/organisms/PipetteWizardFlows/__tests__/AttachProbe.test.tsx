@@ -1,30 +1,20 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
-  mockAttachedPipette,
-  mockGen3P1000Pipette8ChannelSpecs,
-  mockGen3P1000PipetteSpecs,
+  mock8ChannelAttachedPipetteInformation,
+  mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
-}
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
-const mock8ChannelPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000Pipette8ChannelSpecs,
 }
 
 describe('AttachProbe', () => {
@@ -37,8 +27,8 @@ describe('AttachProbe', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -82,7 +72,10 @@ describe('AttachProbe', () => {
   it('returns the correct info when the pipette is a 8 channel', () => {
     props = {
       ...props,
-      attachedPipettes: { left: mock8ChannelPipette, right: null },
+      attachedPipettes: {
+        left: mock8ChannelAttachedPipetteInformation,
+        right: null,
+      },
     }
     const { getByText } = render(props)
     getByText(
@@ -98,13 +91,26 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
     }
     const { getByText, getByTestId } = render(props)
+    getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
     getByText(
-      'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
-    )
-    getByText(
-      'The calibration probe will touch the sides of the calibration square in slot 2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
     )
     getByTestId('Pipette_Probing_1.webm')
+  })
+
+  it('returns the correct information when robot is in motion during exiting', () => {
+    props = {
+      ...props,
+      isRobotMoving: true,
+      isExiting: true,
+    }
+    const { getByText } = render(props)
+    getByText('Stand back, robot is in motion')
+    expect(
+      screen.queryByText(
+        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      )
+    ).not.toBeInTheDocument()
   })
 
   it('renders the error modal screen when errorMessage is true', () => {
@@ -147,5 +153,13 @@ describe('AttachProbe', () => {
     })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
+  })
+
+  it('does not render the goBack button when following a results screen from attach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+    }
+    expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
 })

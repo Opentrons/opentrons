@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
@@ -17,10 +16,9 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
-import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ContinueButton } from '../ProtocolSetupModules'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid } from '@opentrons/api-client'
@@ -43,15 +41,10 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <BackButton onClick={() => setSetupScreen('lpc')}>
-          {t('liquids')}
-        </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          {/* TODO(jr, 3/21/23):  wire up this */}
-          <ContinueButton onClick={() => console.log('run!')} />
-        </Flex>
-      </Flex>
+      <ODDBackButton
+        label={t('liquids')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}

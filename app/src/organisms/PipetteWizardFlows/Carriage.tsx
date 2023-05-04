@@ -108,13 +108,13 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }}
         />
       }
-      back={goBack}
+      back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
         isOnDevice ? (
           <SmallButton
             onClick={handleCheckZAxis}
             buttonText={capitalize(t('shared:continue'))}
-            buttonType="default"
+            buttonType="primary"
           />
         ) : (
           <PrimaryButton onClick={handleCheckZAxis}>

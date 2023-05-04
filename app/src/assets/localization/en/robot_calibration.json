@@ -51,6 +51,7 @@
   "health_check_title": "calibration health check",
   "if_tip_bent_replace_it": "If you bent a tip, be sure to replace it with an undamaged tip in position A1 of the tip rack before resuming calibration.",
   "important_to_use_listed_equipment": "It’s extremely important to perform this calibration using the equipment specified above, as the robot determines accuracy based on the known measurements of these objects.",
+  "jog_controls": "jog controls",
   "jog_pipette_to_touch_block": "Jog the pipette until the tip is barely touching (less than 0.1 mm) the block in slot 6.",
   "jog_pipette_to_touch_slot": "<block>Jog the pipette until the tip is barely touching (less than 0.1 mm) the deck in slot 5.</block><block>If the pipette is over the embossed 5, on the ridge of the slot, or hard to see, switch to the x- and y-axis controls to move the pipette across the deck.</block>",
   "jog_pipette_to_touch_trash": "Jog the pipette until the tip is barely touching (less than 0.1 mm) the flat surface of the trash bin.",
@@ -126,6 +127,7 @@
   "custom": "custom",
   "confirm_tip_rack": "Confirm tip rack",
   "recalibrate_pipette": "Recalibrate pipette",
+  "calibrate_pipette": "Calibrate pipette",
   "return_tip_and_continue": "Return tip and continue to next pipette",
   "return_tip_and_exit": "Return tip and see calibration health check results",
   "return_tip": "Return tip"
