@@ -17,7 +17,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 MOUNT = OT3Mount.LEFT
-LOAD = GantryLoad.LOW_THROUGHPUT
+LOAD = GantryLoad.HIGH_THROUGHPUT
 CYCLES = 1
 SPEED_X = 500
 SPEED_Z = 200
@@ -88,8 +88,9 @@ async def _single_axis_move(api: OT3API, cycles: int = 1) -> None:
             MOUNT = MOUNT = OT3Mount.RIGHT
         else:
             MOUNT = MOUNT = OT3Mount.LEFT
+        input("FOWARD")
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[AXIS], speed=AXIS_SPEED)
-        input()
+        input("BACK")
         await api.move_rel(mount=MOUNT, delta=POINT_MAP[AXIS], speed=AXIS_SPEED)
 
 
@@ -99,7 +100,8 @@ async def _main(is_simulating: bool) -> None:
         await set_gantry_load_per_axis_settings_ot3(api,
                                         SETTINGS,
                                         load=None)
-        #await api.home([AXIS_MAP[AXIS]])
+        print("HOME")
+        await api.home([AXIS_MAP[AXIS]])
         await _single_axis_move(api, cycles=CYCLES)
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])

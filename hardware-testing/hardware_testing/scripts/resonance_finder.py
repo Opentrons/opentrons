@@ -20,10 +20,19 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 import logging
 logging.basicConfig(level=logging.INFO)
 
-BASE_DIRECTORY = '/userfs/data/testing_data/speed_accel_profile/'
-SAVE_NAME = 'speed_test_output_'
+BASE_DIRECTORY = '/userfs/data/testing_data/resonance_finder/'
+SAVE_NAME = 'resonance_finder_'
 
 CYCLES = 1
+
+AXIS_MICROSTEP = {'X': 16,
+                  'Y': 16,
+                  'Z': 16}
+
+#units of mm/ustep
+AXIS_FSTEP_CONVERT = {'X': (12.7*np.pi)/(200*AXIS_MICROSTEP['X']),
+                  'Y': (12.7254*np.pi)/(200*AXIS_MICROSTEP['Y']),
+                  'Z': 3/(200*AXIS_MICROSTEP['Z'])}
 
 TEST_LIST = {}
 
@@ -37,7 +46,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 800,
                 'MAX': 3000,
-                'INC': 400}},
+                'INC': 400},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.5}},
         'Y': {
             'SPEED': {
                 'MIN': 450,
@@ -46,7 +59,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 800,
                 'MAX': 2200,
-                'INC': 400}},
+                'INC': 400},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}},
         'L': {
             'SPEED': {
                 'MIN': 40,
@@ -55,7 +72,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}},
         'R': {
             'SPEED': {
                 'MIN': 40,
@@ -64,7 +85,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
-                'INC': 100}}
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}}
     },
     GantryLoad.HIGH_THROUGHPUT: {
         'X': {
@@ -75,7 +100,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 300,
                 'MAX': 1800,
-                'INC': 200}},
+                'INC': 200},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}},
         'Y': {
             'SPEED': {
                 'MIN': 275,
@@ -84,7 +113,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 700,
                 'MAX': 1200,
-                'INC': 50}},
+                'INC': 50},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}},
         'L': {
             'SPEED': {
                 'MIN': 40,
@@ -93,7 +126,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}},
         'R': {
             'SPEED': {
                 'MIN': 40,
@@ -102,7 +139,11 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.5,
+                'INC': 0.1}}
     }
 }
 
@@ -162,6 +203,10 @@ step_x = 500
 step_y = 300
 xy_home_offset = 5
 step_z = 200
+
+MAX_MOVES = {'X':step_x,
+             'Y':step_y,
+             'Z':step_z}
 HOME_POINT_MAP = {'Y': Point(y=-xy_home_offset),
              'X': Point(x=-xy_home_offset),
              'L': Point(z=0),
@@ -210,6 +255,35 @@ def get_move_correction(actual_move, axis, direction):
 
     return move_correction
 
+def determine_move_distance(speed, acceleration, axis, direction):
+    #find acceleration and braking distance
+    ramp_distance = 2 * 0.5 * (speed**2/acceleration)
+
+    #add some distance to get ~1000 steps at max speed
+    #steps * (usteps/step) * mm/ustep
+    const_distance = 1000 * AXIS_MICROSTEP[axis] * AXIS_FSTEP_CONVERT[axis]
+
+    #take the lower of the time traveled in 2 second and the 1k step distance
+    distance = ramp_distance + min(const_distance, speed*2)
+    print("Distance: " + str(distance))
+    print("Ramp Distance: " + str(ramp_distance))
+    print("Constant Distance: " + str(min(const_distance, speed)))
+
+    if distance > MAX_MOVES[axis]:
+        print("TOO LONG")
+        distance = MAX_MOVES[axis]
+
+    if axis == 'Y':
+        distance = Point(y=distance*direction)
+    elif axis == 'X':
+        distance = Point(x=distance*direction)
+    elif axis == 'Z':
+        distance = Point(z=distance*direction)
+    else:
+        distance = 0
+
+    return distance
+
 async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     avg_error = []
     if(axis == 'L'):
@@ -217,19 +291,29 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     else:
         MOUNT = OT3Mount.RIGHT
 
+
     #move away from the limit switch before cycling
-    await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
+    #await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
 
     for c in range(cycles):
         #move away from homed position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
+        move_distance = determine_move_distance(cur_speed,
+                                SETTINGS[AXIS_MAP[axis]].acceleration,
+                                axis, -1)
+
         print('Executing Move: ' + str(c))
         print(' Speed - ' + str(cur_speed))
+        fstep = AXIS_FSTEP_CONVERT[axis]
+        print(' MicroStep Frequency - ' + str(cur_speed/fstep))
+        fstep = fstep * 16
+        print(' Step Frequency - ' + str(cur_speed/fstep))
         print(' Acceleration - ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
+        print(' Current - ' + str(SETTINGS[AXIS_MAP[axis]].run_current))
 
-        await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
+        await api.move_rel(mount=MOUNT, delta=move_distance, speed=cur_speed)
 
         #check if we moved to correct position with encoder
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
@@ -237,7 +321,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         print("mov_pos: " + str(move_pos))
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
         delta_move_axis = delta_move_pos[AXIS_MAP[axis]]
-        move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis)
+        move_error = check_move_error(delta_move_axis, (move_distance*-1), axis)
         #if we had error in the move stop move
         print(axis + ' Error: ' + str(move_error))
         if(move_error >= 0.1):
@@ -262,13 +346,17 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         #record the current position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
 
+        move_distance = determine_move_distance(cur_speed,
+                                SETTINGS[AXIS_MAP[axis]].acceleration,
+                                axis, 1)
+
         #move back to near homed position
-        await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=cur_speed)
+        await api.move_rel(mount=MOUNT, delta=move_distance, speed=cur_speed)
 
         final_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         delta_pos = get_pos_delta(final_pos, inital_pos)
         delta_pos_axis = delta_pos[AXIS_MAP[axis]]
-        move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis) #this is wrong!!!!
+        move_error = check_move_error(delta_move_axis, move_distance, axis)
         print(axis + ' Error: ' + str(move_error))
         if(abs(move_error) >= 0.1):
             print('ERROR IN POS MOVE')
@@ -291,12 +379,14 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     return (sum(avg_error)/len(avg_error), c+1)
 
 
-async def match_z_settings(axis, speed, accel):
+async def match_z_settings(axis, speed, accel, current):
     if(axis == 'L' or axis == 'R'):
         SETTINGS[AXIS_MAP['L']].acceleration = accel
         SETTINGS[AXIS_MAP['L']].max_speed = speed
+        SETTINGS[AXIS_MAP['L']].run_current = current
         SETTINGS[AXIS_MAP['R']].acceleration = accel
         SETTINGS[AXIS_MAP['R']].max_speed = speed
+        SETTINGS[AXIS_MAP['R']].run_current = current
 
     return True
 
@@ -313,7 +403,7 @@ async def _main(is_simulating: bool) -> None:
             os.makedirs(BASE_DIRECTORY)
 
         with open(BASE_DIRECTORY + SAVE_NAME + AXIS + '.csv', mode='w') as csv_file:
-            fieldnames = ['axis','speed', 'acceleration', 'error', 'cycles']
+            fieldnames = ['axis','speed', 'acceleration', 'current', 'error']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -326,13 +416,14 @@ async def _main(is_simulating: bool) -> None:
                 for p in axis_parameters:
                     print("Testing Parameters:")
                     print(p)
-                    SETTINGS[AXIS_MAP[test_axis]].acceleration = p['ACCEL']
+                    SETTINGS[AXIS_MAP[test_axis]].run_current = p['CURRENT']
                     SETTINGS[AXIS_MAP[test_axis]].max_speed = p['SPEED']
 
                     #update the robot settings to use test speed/accel
                     await match_z_settings(test_axis,
                                      SETTINGS[AXIS_MAP[test_axis]].max_speed,
-                                     SETTINGS[AXIS_MAP[test_axis]].acceleration)
+                                     SETTINGS[AXIS_MAP[test_axis]].acceleration,
+                                     SETTINGS[AXIS_MAP[test_axis]].run_current)
 
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
@@ -348,44 +439,20 @@ async def _main(is_simulating: bool) -> None:
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
 
-                    #record results to dictionary for neat formatting later
-                    if p['SPEED'] in table_results[test_axis].keys():
-                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
-                    else:
-                        table_results[test_axis][p['SPEED']] = {}
-                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    # #record results to dictionary for neat formatting later
+                    # if p['SPEED'] in table_results[test_axis].keys():
+                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    # else:
+                    #     table_results[test_axis][p['SPEED']] = {}
+                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
 
                     #record results of cycles to raw csv
                     print("Cycles complete")
                     print("Speed: " + str(p['SPEED']))
-                    print("Acceleration: " + str(p['ACCEL']))
+                    print("Acceleration: " + str(SETTINGS[AXIS_MAP[test_axis]].acceleration))
+                    print("Current: " + str(p['CURRENT']))
                     print("Error: " + str(run_avg_error))
-                    writer.writerow({'axis': test_axis,
-                                     'speed': p['SPEED'],
-                                     'acceleration': p['ACCEL'],
-                                     'error': run_avg_error,
-                                     'cycles': cycles_completed})
 
-        #create tableized output csv for neat presentation
-        # print(table_results)
-        test_axis_list = list(AXIS)
-        for test_axis in test_axis_list:
-            with open(BASE_DIRECTORY + SAVE_NAME + test_axis + '_table.csv', mode='w') as csv_file:
-                fieldnames = ['Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
-                # print(fieldnames)
-                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                td = {'Speed': LOAD}
-                writer.writerow(td)
-                td = {'Speed': test_axis}
-                writer.writerow(td)
-                td = {'Speed': 'Acceleration'}
-                writer.writerow(td)
-                writer.writeheader()
-                for i in parameter_range(LOAD, test_axis, 'SPEED'):
-                    td = {'Speed': i}
-                    td.update(table_results[test_axis][i])
-                    writer.writerow(td)
-                # print(table_results[test_axis])
 
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -398,18 +465,31 @@ def parameter_range(test_load, test_axis, p_type):
     step = TEST_PARAMETERS[test_load][test_axis][p_type]['INC']
     #add step to stop to make range inclusive
     stop = TEST_PARAMETERS[test_load][test_axis][p_type]['MAX'] + step
-    return range(start, stop, step)
+    return np.arange(start, stop, step)
+
+def speed_range_from_freq(test_axis):
+    # freq_range = np.arange(730*AXIS_MICROSTEP[test_axis],
+    #                    750*AXIS_MICROSTEP[test_axis],
+    #                    1*AXIS_MICROSTEP[test_axis])
+    freq_range = np.arange(730*AXIS_MICROSTEP[test_axis],
+                       750*AXIS_MICROSTEP[test_axis],
+                       1*AXIS_MICROSTEP[test_axis])
+
+    #ustep/s * mm/ustep
+    return freq_range*AXIS_FSTEP_CONVERT[test_axis]
+
 
 #dictionary containing lists of all speed/accel combinations to for each axis
 def make_test_list(test_axis, test_load):
-    test_axis = list(test_axis)
+    test_axis = list(test_axis) #convert axis string from arg to list
     complete_test_list = {}
+    #make dictionary with axes to test as keys
     for axis_t in test_axis:
         axis_test_list = []
-        for speed_t in parameter_range(test_load, axis_t, 'SPEED'):
-            for accel_t in parameter_range(test_load, axis_t, 'ACCEL'):
-                axis_test_list.append({'SPEED': speed_t,
-                                       'ACCEL': accel_t})
+        for current_t in parameter_range(test_load, axis_t, 'CURRENT'):
+            for speed_t in speed_range_from_freq(axis_t):
+                axis_test_list.append({'CURRENT': current_t,
+                                       'SPEED': speed_t})
 
         complete_test_list[axis_t] = axis_test_list
 
