@@ -13,6 +13,7 @@ import { StepMeter } from '../../atoms/StepMeter'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
+import { useWifiList } from '../../resources/networking/hooks'
 import {
   CONNECT,
   JOIN_OTHER,
@@ -51,9 +52,7 @@ export function ConnectViaWifi(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
-  const list = useSelector((state: State) =>
-    Networking.getWifiList(state, robotName)
-  )
+  const list = useWifiList(robotName)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
