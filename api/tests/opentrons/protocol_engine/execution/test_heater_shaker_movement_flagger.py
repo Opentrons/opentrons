@@ -103,7 +103,7 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=True, latch_closed=True, deck_slot=5
+            plate_shaking=True, latch_closed=HeaterShakerLatchStatus.CLOSED, deck_slot=5
         )
     ]
 
@@ -159,7 +159,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open2(
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=False, deck_slot=5
+            plate_shaking=False, latch_closed=HeaterShakerLatchStatus.OPEN, deck_slot=5
         )
     ]
     decoy.when(state_store.config.robot_type).then_return(robot_type)
@@ -222,7 +222,9 @@ def test_raises_on_restricted_movement_with_multi_channel(
     """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=True, deck_slot=5
+            plate_shaking=False,
+            latch_closed=HeaterShakerLatchStatus.CLOSED,
+            deck_slot=5,
         )
     ]
     decoy.when(state_store.config.robot_type).then_return("OT-2 Standard")
@@ -243,7 +245,9 @@ def test_does_not_raise_on_movement_with_multi_channel_on_ot3(
     """It should not raise when pipetting with multichannel around a H/S on OT3."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=True, deck_slot=5
+            plate_shaking=False,
+            latch_closed=HeaterShakerLatchStatus.CLOSED,
+            deck_slot=5,
         )
     ]
     decoy.when(state_store.config.robot_type).then_return("OT-3 Standard")
@@ -273,7 +277,9 @@ async def test_does_not_raise_when_idle_and_latch_closed(
     """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=True, deck_slot=5
+            plate_shaking=False,
+            latch_closed=HeaterShakerLatchStatus.CLOSED,
+            deck_slot=5,
         )
     ]
 
