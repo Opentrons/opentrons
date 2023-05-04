@@ -237,7 +237,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                       <React.Fragment key={index}>
                         <StyledText
                           as="p"
-                          marginLeft={index > 0 ? SPACING.spacing3 : 0}
+                          marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >

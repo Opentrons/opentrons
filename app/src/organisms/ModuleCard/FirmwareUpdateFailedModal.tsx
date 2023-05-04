@@ -36,7 +36,7 @@ export const FirmwareUpdateFailedModal = (
         name="information"
         aria-label="information"
       />
-      <StyledText marginLeft={SPACING.spacing3}>
+      <StyledText marginLeft={SPACING.spacing8}>
         {t('firmware_update_failed')}
       </StyledText>
     </Flex>

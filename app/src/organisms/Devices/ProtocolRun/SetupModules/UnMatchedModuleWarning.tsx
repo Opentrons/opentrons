@@ -16,10 +16,10 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
   if (!showBanner) return null
 
   return (
-    <Box marginTop={SPACING.spacing3}>
+    <Box marginTop={SPACING.spacing8}>
       <Banner
         iconMarginRight={SPACING.spacing16}
-        iconMarginLeft={SPACING.spacing3}
+        iconMarginLeft={SPACING.spacing8}
         type="warning"
         size={SPACING.spacingM}
         onCloseClick={() => setShowBanner(false)}

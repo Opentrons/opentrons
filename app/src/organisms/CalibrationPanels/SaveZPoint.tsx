@@ -95,7 +95,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignSelf={ALIGN_STRETCH}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
             <StyledText as="h1" marginBottom={SPACING.spacing16}>
@@ -105,7 +105,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+                block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
               }}
             />
           </Flex>

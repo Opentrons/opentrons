@@ -92,7 +92,7 @@ export function Banner(props: BannerProps): JSX.Element {
   const iconProps = {
     ...(icon ?? bannerProps.icon),
     size: size ?? SIZE_1,
-    marginRight: iconMarginRight ?? SPACING.spacing3,
+    marginRight: iconMarginRight ?? SPACING.spacing8,
     marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
@@ -119,7 +119,7 @@ export function Banner(props: BannerProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      padding={padding ?? SPACING.spacing3}
+      padding={padding ?? SPACING.spacing8}
       onClick={e => e.stopPropagation()}
       data-testid={`Banner_${type}`}
       {...styleProps}

@@ -27,7 +27,7 @@ export function IpHostnameField({
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        paddingRight={SPACING.spacing3}
+        paddingRight={SPACING.spacing8}
         marginTop={SPACING.spacing4}
       >
         <input

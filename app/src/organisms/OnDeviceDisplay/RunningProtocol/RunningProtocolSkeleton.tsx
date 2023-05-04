@@ -34,7 +34,7 @@ export function RunningProtocolSkeleton({
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Skeleton
                 width="6.9375rem"
                 height="2rem"
@@ -76,7 +76,7 @@ export function RunningProtocolSkeleton({
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             marginBottom={SPACING.spacingXXL}
           >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Skeleton
                 width="6.9375rem"
                 height="2rem"
@@ -93,7 +93,7 @@ export function RunningProtocolSkeleton({
               <PlayPauseButton buttonSize="6.25rem" iconSize="2.5rem" />
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Skeleton
               width="59rem"
               height="3.25rem"

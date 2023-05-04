@@ -102,7 +102,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
         <Flex flexDirection={DIRECTION_ROW} marginX={SPACING.spacing16}>
           <Box
             width="60%"
-            padding={SPACING.spacing3}
+            padding={SPACING.spacing8}
             data-testid="HeaterShakerWizard_deckMap"
           >
             {moduleFromProtocol != null ? (

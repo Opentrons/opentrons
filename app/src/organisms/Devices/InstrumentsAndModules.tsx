@@ -112,7 +112,7 @@ export function InstrumentsAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
@@ -127,11 +127,11 @@ export function InstrumentsAndModules({
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex gridGap={SPACING.spacing3} width="100%">
+          <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
@@ -174,7 +174,7 @@ export function InstrumentsAndModules({
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               {!Boolean(is96ChannelAttached) ? (
                 <PipetteCard

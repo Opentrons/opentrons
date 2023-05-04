@@ -33,7 +33,7 @@ const Table = styled('table')`
 const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3} ${SPACING.spacing5};
+  padding: 0 ${SPACING.spacing5} ${SPACING.spacing8} ${SPACING.spacing5};
   color: ${COLORS.darkBlack_seventy};
 `
 
@@ -129,7 +129,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                   backgroundColor={COLORS.darkBlack_twenty}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
-                  padding={`${SPACING.spacing3} 0.75rem`}
+                  padding={`${SPACING.spacing8} 0.75rem`}
                   width="max-content"
                   alignItems={TYPOGRAPHY.textAlignCenter}
                   marginRight={SPACING.spacingAuto}

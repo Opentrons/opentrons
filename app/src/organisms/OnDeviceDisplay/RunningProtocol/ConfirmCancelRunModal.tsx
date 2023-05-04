@@ -85,7 +85,7 @@ export function ConfirmCancelRunModal({
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           width="100%"
         >
           <SmallButton

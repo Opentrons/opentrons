@@ -105,7 +105,7 @@ export function NetworkSettings({
             paddingX={SPACING.spacingXXL}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {/* wifi */}
             <NetworkSettingButton
@@ -198,8 +198,8 @@ function NetworkSettingButton({
         onClick={displayDetailsTab}
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
-          <Flex gridGap={SPACING.spacing3} width="34.8125rem">
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          <Flex gridGap={SPACING.spacing8} width="34.8125rem">
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
               <Icon name={iconName} size="3rem" />
               <StyledText
                 fontSize="1.5rem"

@@ -43,7 +43,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         <StyledText as="h1" marginTop={SPACING.spacing5}>
           {t('exit_screen_title')}
         </StyledText>
-        <StyledText as="p" marginTop={SPACING.spacing3}>
+        <StyledText as="p" marginTop={SPACING.spacing8}>
           {t('exit_screen_subtitle')}
         </StyledText>
       </Flex>
@@ -54,7 +54,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={onGoBack}>
             {t('shared:go_back')}
           </SecondaryButton>

@@ -121,7 +121,7 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing3}>
+              <StyledText as="h6" marginTop={SPACING.spacing8}>
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -162,7 +162,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
         <Link
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={() => setIsReadMore(!isReadMore)}
         >

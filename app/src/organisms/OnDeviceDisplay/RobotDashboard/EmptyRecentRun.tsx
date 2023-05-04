@@ -37,7 +37,7 @@ export function EmptyRecentRun(): JSX.Element {
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         <StyledText

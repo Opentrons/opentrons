@@ -73,7 +73,7 @@ const FINISH_UPDATE_INSTRUCTIONS = (
     </Text>
     <Box as="ol" paddingLeft={SPACING.spacing16}>
       <li>
-        <Text marginBottom={SPACING.spacing3}>
+        <Text marginBottom={SPACING.spacing8}>
           After updating the Opentrons App, <strong>update your OT-2</strong> to
           ensure the app and robot software is in sync.
         </Text>
@@ -165,7 +165,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           fontSize={FONT_SIZE_HEADER}
           fontWeight={FONT_WEIGHT_REGULAR}
         >
-          <Icon name="alert" width="1em" marginRight={SPACING.spacing3} />
+          <Icon name="alert" width="1em" marginRight={SPACING.spacing8} />
           {updatesIgnored
             ? YOUVE_TURNED_OFF_NOTIFICATIONS
             : `${APP_VERSION} ${version} ${

@@ -125,7 +125,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         Once the team have an agreement for grid system, we could refactor */}
       <Box
         marginTop={`-${String(SPACING.spacingSM)}`}
-        paddingRight={SPACING.spacing3}
+        paddingRight={SPACING.spacing8}
       >
         {modified != null && filename != null && (
           <Flex

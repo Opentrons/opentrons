@@ -107,7 +107,7 @@ function RowModule({
         {isDuplicateModuleModel ? (
           <Icon
             name="information"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
             size="1.5rem"
           />
         ) : null}
@@ -261,7 +261,7 @@ export function ProtocolSetupModules({
             message={t('module_mismatch_body')}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <Flex
             color={COLORS.darkBlack_seventy}
             fontSize={TYPOGRAPHY.fontSize22}

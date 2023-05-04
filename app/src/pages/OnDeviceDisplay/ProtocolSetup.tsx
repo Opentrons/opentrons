@@ -102,7 +102,7 @@ function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon marginLeft={SPACING.spacing3} name="more" size="3rem" />
+        <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
       </Flex>
     </Btn>
   )
@@ -330,7 +330,7 @@ function PrepareToRun({
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
@@ -445,7 +445,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
           <PlayButton disabled onPlay={() => {}} />
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />

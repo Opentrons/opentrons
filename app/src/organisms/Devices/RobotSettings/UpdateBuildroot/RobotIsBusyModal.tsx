@@ -38,7 +38,7 @@ export function RobotIsBusyModal({
         <Flex
           justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           <Btn
             onClick={closeModal}

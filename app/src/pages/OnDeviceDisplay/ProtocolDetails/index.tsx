@@ -72,7 +72,7 @@ const ProtocolHeader = (props: {
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        marginBottom={SPACING.spacing3}
+        marginBottom={SPACING.spacing8}
       >
         <Btn
           paddingLeft="0rem"
@@ -84,7 +84,7 @@ const ProtocolHeader = (props: {
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           maxWidth="42.625rem"
         >
           <Flex maxWidth="15.125rem">
@@ -145,7 +145,7 @@ interface ProtocolSectionTabsProps {
 const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   const { currentOption, setCurrentOption } = props
   return (
-    <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing16}>
+    <Flex gridGap={SPACING.spacing8} margin={SPACING.spacing16}>
       {protocolSectionTabOptions.map(option => {
         return (
           <TabbedButton
@@ -196,7 +196,7 @@ const Summary = (props: {
         lineHeight={TYPOGRAPHY.lineHeight28}
         marginTop={SPACING.spacing5}
         maxWidth="22rem"
-        padding={`${SPACING.spacing3} 0.75rem`}
+        padding={`${SPACING.spacing8} 0.75rem`}
       >
         <StyledText>{`${t('protocol_info:date_added')}: ${
           date != null
@@ -343,7 +343,7 @@ export function ProtocolDetails(): JSX.Element | null {
       />
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         margin={SPACING.spacing16}
       >

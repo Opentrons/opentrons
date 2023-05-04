@@ -120,7 +120,7 @@ export const HeaterShakerModuleData = (
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
           >
             {t('heater')}
           </StyledText>
@@ -154,7 +154,7 @@ export const HeaterShakerModuleData = (
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           {t('shaker')}
         </StyledText>
@@ -190,7 +190,7 @@ export const HeaterShakerModuleData = (
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             title="latch_status"
           >
             {t('labware_latch', { ns: 'heater_shaker' })}

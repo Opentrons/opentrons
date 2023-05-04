@@ -50,7 +50,7 @@ export function CompleteConfirmation(
           {t('flow_complete', { flowName })}
         </StyledText>
         {body != null ? (
-          <StyledText as="p" marginTop={SPACING.spacing3}>
+          <StyledText as="p" marginTop={SPACING.spacing8}>
             {body}
           </StyledText>
         ) : null}

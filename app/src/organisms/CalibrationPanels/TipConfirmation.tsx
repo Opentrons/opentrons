@@ -67,7 +67,7 @@ export function TipConfirmation(props: CalibrationPanelProps): JSX.Element {
         marginTop={SPACING.spacing16}
       >
         <NeedHelpLink />
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton
             onClick={invalidateTip}
             css={CAPITALIZE_FIRST_LETTER_STYLE}

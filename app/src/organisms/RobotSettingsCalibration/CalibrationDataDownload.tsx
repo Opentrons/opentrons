@@ -95,7 +95,7 @@ export function CalibrationDataDownload({
       alignItems={ALIGN_CENTER}
       paddingTop={SPACING.spacing5}
     >
-      <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isOT3
             ? t('about_calibration_title')
@@ -133,7 +133,7 @@ export function CalibrationDataDownload({
         disabled={isOT3 ? !ot3DownloadIsPossible : !downloadIsPossible}
       >
         <Flex alignItems={ALIGN_CENTER}>
-          <Icon name="download" size="0.75rem" marginRight={SPACING.spacing3} />
+          <Icon name="download" size="0.75rem" marginRight={SPACING.spacing8} />
           {t('download_calibration_data')}
         </Flex>
       </TertiaryButton>

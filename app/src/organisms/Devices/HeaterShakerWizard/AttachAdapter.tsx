@@ -69,7 +69,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
               {t('attach_adapter_to_module')}
             </Flex>
             <Flex
-              marginTop={SPACING.spacing3}
+              marginTop={SPACING.spacing8}
               backgroundColor={COLORS.fundamentalsBackground}
               paddingTop={SPACING.spacing16}
               paddingRight={SPACING.spacing16}
@@ -87,7 +87,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                paddingLeft={SPACING.spacing3}
+                paddingLeft={SPACING.spacing8}
                 fontSize={TYPOGRAPHY.fontSizeP}
                 paddingBottom={SPACING.spacing16}
               >

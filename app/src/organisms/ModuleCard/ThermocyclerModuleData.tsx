@@ -82,7 +82,7 @@ export const ThermocyclerModuleData = (
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           {t('tc_lid')}
         </StyledText>
@@ -128,7 +128,7 @@ export const ThermocyclerModuleData = (
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           {t('tc_block')}
         </StyledText>

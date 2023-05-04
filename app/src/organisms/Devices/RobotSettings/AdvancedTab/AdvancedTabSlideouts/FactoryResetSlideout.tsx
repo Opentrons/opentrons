@@ -156,7 +156,7 @@ export function FactoryResetSlideout({
           <Icon
             name="alert-circle"
             size={SIZE_1}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             color={COLORS.warningEnabled}
           />
           <StyledText as="p" color={COLORS.warningText}>
@@ -168,7 +168,7 @@ export function FactoryResetSlideout({
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
               {t('robot_calibration_data')}
@@ -182,7 +182,7 @@ export function FactoryResetSlideout({
             </Link>
           </Flex>
           {isOT3 ? null : (
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
+            <StyledText as="p" marginBottom={SPACING.spacing8}>
               {t('calibration_description')}
             </StyledText>
           )}
@@ -226,7 +226,7 @@ export function FactoryResetSlideout({
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
               {t('protocol_run_history')}
@@ -239,7 +239,7 @@ export function FactoryResetSlideout({
               {t('download')}
             </Link>
           </Flex>
-          <StyledText as="p" marginBottom={SPACING.spacing3}>
+          <StyledText as="p" marginBottom={SPACING.spacing8}>
             {t('protocol_run_history_description')}
           </StyledText>
           {runHistoryOption.map(opt => (
@@ -260,7 +260,7 @@ export function FactoryResetSlideout({
           <StyledText
             as="p"
             css={TYPOGRAPHY.pSemiBold}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             {t('boot_scripts')}
           </StyledText>

@@ -52,7 +52,7 @@ export function ProtocolAnalysisFailure(
   return (
     <Banner type="warning" marginRight={SPACING.spacing5}>
       <Flex
-        columnGap={SPACING.spacing3}
+        columnGap={SPACING.spacing8}
         flex="1"
         flexWrap={WRAP_REVERSE}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

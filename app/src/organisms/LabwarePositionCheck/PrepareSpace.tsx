@@ -72,7 +72,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <StyledText as="h1">{header}</StyledText>
           {body}

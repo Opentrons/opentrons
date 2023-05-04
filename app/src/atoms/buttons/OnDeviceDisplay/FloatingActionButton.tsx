@@ -76,7 +76,7 @@ export function FloatingActionButton(
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Icon
           color={contentColor}

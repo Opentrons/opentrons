@@ -107,7 +107,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         {t('step_4_of_4')}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing3}
+        marginTop={SPACING.spacing8}
         marginBottom={SPACING.spacing16}
         backgroundColor={COLORS.fundamentalsBackground}
         paddingTop={SPACING.spacing16}
@@ -124,7 +124,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          paddingLeft={SPACING.spacing3}
+          paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
           paddingBottom={SPACING.spacing16}
         >

@@ -78,7 +78,7 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
       <StyledText
         as="label"
         id={props.labelFor}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.label}
@@ -139,7 +139,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
         )}
       </Field>
       <StyledText
-        paddingLeft={SPACING.spacing3}
+        paddingLeft={SPACING.spacing8}
         paddingTop={SPACING.spacingXXS}
       >
         {displayName}

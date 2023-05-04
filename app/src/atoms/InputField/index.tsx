@@ -87,7 +87,7 @@ function Input(props: InputFieldProps): JSX.Element {
     display: flex;
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
-    padding: ${SPACING.spacing3};
+    padding: ${SPACING.spacing8};
     border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};

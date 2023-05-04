@@ -131,7 +131,7 @@ export function RunSummary(): JSX.Element {
               alignItems={ALIGN_FLEX_START}
               gridGap={SPACING.spacing16}
             >
-              <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+              <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                 <Icon
                   name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
                   size={SIZE_2}
@@ -142,7 +142,7 @@ export function RunSummary(): JSX.Element {
                 <SummaryHeader>{runStatusText}</SummaryHeader>
               </Flex>
               <ProtocolName>{protocolName}</ProtocolName>
-              <Flex gridGap={SPACING.spacing3}>
+              <Flex gridGap={SPACING.spacing8}>
                 <SummaryDatum>{`${t(
                   'run'
                 )}: ${createdAtTimestamp}`}</SummaryDatum>
@@ -263,7 +263,7 @@ const SummaryDatum = styled.div`
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_CENTER};
-  padding: ${SPACING.spacing3} 0.75rem;
+  padding: ${SPACING.spacing8} 0.75rem;
   grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;

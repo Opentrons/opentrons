@@ -65,7 +65,7 @@ export function HistoricalProtocolRun(
       <Flex
         justifyContent={JUSTIFY_SPACE_AROUND}
         alignItems={ALIGN_CENTER}
-        padding={SPACING.spacing3}
+        padding={SPACING.spacing8}
         borderTop={BORDERS.lineBorder}
         backgroundColor={
           run.status === 'running' ? COLORS.lightBlue : COLORS.white
@@ -79,7 +79,7 @@ export function HistoricalProtocolRun(
           <Icon
             name={offsetDrawerOpen ? 'chevron-up' : 'chevron-down'}
             width="15px"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             css={{ cursor: 'pointer' }}
           />
         </Box>

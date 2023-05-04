@@ -160,7 +160,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.radiusSoftCorners}
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
               data-testid="ProtocolList_SortByMenu"
@@ -168,7 +168,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                paddingLeft={SPACING.spacing3}
+                paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
                 paddingY={SPACING.spacing4}
                 data-testid="sortBy-label"
@@ -176,7 +176,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 {sortByLabelType[sortBy].label}
               </StyledText>
               <Icon
-                paddingRight={SPACING.spacing3}
+                paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
@@ -220,7 +220,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       </Flex>
       <Flex
         flexDirection="column"
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacingXXL}
       >
         {sortedStoredProtocols.map(storedProtocol => (

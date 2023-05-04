@@ -256,7 +256,7 @@ export function ProtocolSetupLabware({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginTop={SPACING.spacing6}
       >
         <Flex
@@ -337,7 +337,7 @@ function LabwareLatch({
       }
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSize22}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight28}
       minWidth="11.0625rem"

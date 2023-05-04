@@ -89,7 +89,7 @@ export function UpdateChannel({
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginTop={SPACING.spacing5}
       >
         {modifiedChannelOptions.map(radio => (

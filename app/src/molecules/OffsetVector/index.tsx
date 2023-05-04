@@ -22,7 +22,7 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
       >
         X
       </StyledText>
-      <StyledText as={as} marginRight={SPACING.spacing3}>
+      <StyledText as={as} marginRight={SPACING.spacing8}>
         {x.toFixed(2)}
       </StyledText>
       <StyledText
@@ -32,7 +32,7 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
       >
         Y
       </StyledText>
-      <StyledText as={as} marginRight={SPACING.spacing3}>
+      <StyledText as={as} marginRight={SPACING.spacing8}>
         {y.toFixed(2)}
       </StyledText>
       <StyledText
@@ -42,7 +42,7 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
       >
         Z
       </StyledText>
-      <StyledText as={as} marginRight={SPACING.spacing3}>
+      <StyledText as={as} marginRight={SPACING.spacing8}>
         {z.toFixed(2)}
       </StyledText>
     </Flex>

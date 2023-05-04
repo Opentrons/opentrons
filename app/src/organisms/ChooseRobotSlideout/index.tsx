@@ -166,7 +166,7 @@ export function ChooseRobotSlideout(
       title={title}
       footer={footer}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         {isAnalysisError ? (
           <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
         ) : null}
@@ -205,7 +205,7 @@ export function ChooseRobotSlideout(
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
             height={SIZE_4}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             <Icon name="alert-circle" size={SIZE_1} />
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -243,7 +243,7 @@ export function ChooseRobotSlideout(
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing4}`}
-                    marginBottom={SPACING.spacing3}
+                    marginBottom={SPACING.spacing8}
                   >
                     {runCreationErrorCode === 409 ? (
                       <Trans

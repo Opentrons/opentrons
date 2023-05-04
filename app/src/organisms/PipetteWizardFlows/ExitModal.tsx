@@ -46,7 +46,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     >
       {isOnDevice ? (
         <>
-          <Flex marginRight={SPACING.spacing3}>
+          <Flex marginRight={SPACING.spacing8}>
             <SmallButton
               onClick={proceed}
               buttonText={capitalize(t('shared:exit'))}

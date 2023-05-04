@@ -86,7 +86,7 @@ export const ConfirmAttachmentModal = (
         />
         <StyledText
           paddingTop={SPACING.spacingXXS}
-          paddingLeft={SPACING.spacing3}
+          paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}

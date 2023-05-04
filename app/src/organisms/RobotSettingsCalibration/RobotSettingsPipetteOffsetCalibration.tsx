@@ -54,7 +54,7 @@ export function RobotSettingsPipetteOffsetCalibration({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       paddingY={SPACING.spacing5}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {isOT3

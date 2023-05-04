@@ -189,7 +189,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <StyledText
             css={TYPOGRAPHY.h1Default}
@@ -236,9 +236,9 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
               {t('opentrons_tip_racks_recommended')}
             </StyledText>
           </Banner>
-          <Divider marginY={SPACING.spacing3} width="100%" />
+          <Divider marginY={SPACING.spacing8} width="100%" />
           <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
-          <Divider marginY={SPACING.spacing3} width="100%" />
+          <Divider marginY={SPACING.spacing8} width="100%" />
           <StyledText as="label" color={COLORS.darkGreyEnabled}>
             {t('calibration_on_opentrons_tips_is_important')}
           </StyledText>
@@ -251,7 +251,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink />
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <Link
             role="button"
             css={TYPOGRAPHY.darkLinkH4SemiBold}

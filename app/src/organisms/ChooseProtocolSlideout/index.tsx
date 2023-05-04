@@ -150,7 +150,7 @@ export function ChooseProtocolSlideoutComponent(
       }
     >
       {storedProtocols.length > 0 ? (
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {storedProtocols.map(storedProtocol => {
             const isSelected =
               selectedProtocol != null &&
@@ -216,7 +216,7 @@ export function ChooseProtocolSlideoutComponent(
                     overflowWrap="anywhere"
                     display={DISPLAY_BLOCK}
                     marginTop={`-${SPACING.spacing4}`}
-                    marginBottom={SPACING.spacing3}
+                    marginBottom={SPACING.spacing8}
                   >
                     {runCreationErrorCode === 409 ? (
                       <Trans
@@ -261,14 +261,14 @@ export function ChooseProtocolSlideoutComponent(
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             role="heading"
           >
             {t('no_protocols_found')}
           </StyledText>
           <StyledText
             as="p"
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             <Trans

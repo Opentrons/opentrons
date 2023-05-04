@@ -80,7 +80,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginTop={SPACING.spacing5}
       >
         <InfoItem
@@ -93,7 +93,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
         <InfoItem label={t('firmware_version')} value="TODO" />
         <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
       </Flex>
-      <Flex gridGap={SPACING.spacing3}>
+      <Flex gridGap={SPACING.spacing8}>
         <MediumButton
           buttonType="secondary"
           flex="1"

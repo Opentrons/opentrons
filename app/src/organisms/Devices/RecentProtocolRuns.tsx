@@ -46,7 +46,7 @@ export function RecentProtocolRuns({
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing16}
-      padding={`0 0 ${String(SPACING.spacing3)}`}
+      padding={`0 0 ${String(SPACING.spacing8)}`}
       width="100%"
       marginBottom="6rem"
     >
@@ -71,7 +71,7 @@ export function RecentProtocolRuns({
           <>
             <Flex
               justifyContent={JUSTIFY_SPACE_AROUND}
-              padding={SPACING.spacing3}
+              padding={SPACING.spacing8}
               width="100%"
             >
               <StyledText

@@ -62,7 +62,7 @@ const Template: Story<ColorsStorybookProps> = args => {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       flexWrap="wrap"
       padding={SPACING.spacing5}
     >

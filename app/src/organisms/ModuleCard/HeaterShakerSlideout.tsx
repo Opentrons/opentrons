@@ -111,7 +111,7 @@ export const HeaterShakerSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}
         </StyledText>

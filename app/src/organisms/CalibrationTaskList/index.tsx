@@ -143,7 +143,7 @@ export function CalibrationTaskList({
         <>
           <Flex
             alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
             padding={SPACING.spacing16}
             paddingBottom={SPACING.spacing6}
           >

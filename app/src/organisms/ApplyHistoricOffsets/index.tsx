@@ -132,7 +132,7 @@ export function ApplyHistoricOffsets(
                   i18nKey={'robot_has_no_offsets_from_previous_runs'}
                   components={{
                     block: (
-                      <StyledText as="p" marginBottom={SPACING.spacing3} />
+                      <StyledText as="p" marginBottom={SPACING.spacing8} />
                     ),
                   }}
                 />
@@ -142,7 +142,7 @@ export function ApplyHistoricOffsets(
                 </StyledText>
               )}
               <ExternalLink
-                marginTop={noOffsetData ? '0px' : SPACING.spacing3}
+                marginTop={noOffsetData ? '0px' : SPACING.spacing8}
                 href={HOW_OFFSETS_WORK_SUPPORT_URL}
               >
                 {t('see_how_offsets_work')}

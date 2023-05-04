@@ -241,16 +241,16 @@ export function AdvancedSettings(): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_updatedChannel"
             >
               {t('update_channel')}
             </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+            <StyledText as="p" paddingBottom={SPACING.spacing8}>
               {t('update_description')}
             </StyledText>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <StyledText css={TYPOGRAPHY.labelSemiBold}>
               {t('channel')}
             </StyledText>
@@ -275,12 +275,12 @@ export function AdvancedSettings(): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_customLabware"
             >
               {t('additional_labware_folder_title')}
             </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+            <StyledText as="p" paddingBottom={SPACING.spacing8}>
               {t('additional_folder_description')}
             </StyledText>
             <StyledText
@@ -304,7 +304,7 @@ export function AdvancedSettings(): JSX.Element {
                 {labwarePath}
                 <Icon
                   height="0.75rem"
-                  marginLeft={SPACING.spacing3}
+                  marginLeft={SPACING.spacing8}
                   name="open-in-new"
                 />
               </Link>
@@ -334,7 +334,7 @@ export function AdvancedSettings(): JSX.Element {
         <Box>
           <StyledText
             css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing3}
+            paddingBottom={SPACING.spacing8}
             id="AdvancedSettings_tipLengthCalibration"
           >
             {t('tip_length_cal_method')}
@@ -373,7 +373,7 @@ export function AdvancedSettings(): JSX.Element {
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_unavailableRobots"
             >
               {t('prevent_robot_caching')}
@@ -411,7 +411,7 @@ export function AdvancedSettings(): JSX.Element {
           <Box>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_clearRobots"
             >
               {t('clear_unavail_robots')}
@@ -431,7 +431,7 @@ export function AdvancedSettings(): JSX.Element {
           <Box>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_u2eInformation"
             >
               {t('usb_to_ethernet_adapter_info')}
@@ -507,7 +507,7 @@ export function AdvancedSettings(): JSX.Element {
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_showHeaterShakerAttachmentModal"
             >
               {t('heater_shaker_attach_visible')}
@@ -528,7 +528,7 @@ export function AdvancedSettings(): JSX.Element {
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_showLink"
             >
               {t('show_labware_offset_snippets')}
@@ -554,7 +554,7 @@ export function AdvancedSettings(): JSX.Element {
               <Box width="70%">
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  paddingBottom={SPACING.spacing3}
+                  paddingBottom={SPACING.spacing8}
                   id="AdvancedSettings_showLink"
                 >
                   {t('allow_sending_all_protocols_to_ot3')}
@@ -577,12 +577,12 @@ export function AdvancedSettings(): JSX.Element {
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_overridePathToPython"
             >
               {t('override_path_to_python')}
             </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+            <StyledText as="p" paddingBottom={SPACING.spacing8}>
               {t('opentrons_app_will_use_interpreter')}
             </StyledText>
             <StyledText
@@ -606,7 +606,7 @@ export function AdvancedSettings(): JSX.Element {
                 {pathToPythonInterpreter}
                 <Icon
                   height="0.75rem"
-                  marginLeft={SPACING.spacing3}
+                  marginLeft={SPACING.spacing8}
                   name="open-in-new"
                 />
               </Link>
@@ -639,7 +639,7 @@ export function AdvancedSettings(): JSX.Element {
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_devTools"
             >
               {t('enable_dev_tools')}

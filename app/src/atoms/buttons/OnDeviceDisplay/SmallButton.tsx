@@ -152,7 +152,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
             <Icon
               size="1.75rem"
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               name={iconName}
             />
           </Flex>
@@ -169,7 +169,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
             <Icon
               size="1.75rem"
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
               name={iconName}
             />
           </Flex>

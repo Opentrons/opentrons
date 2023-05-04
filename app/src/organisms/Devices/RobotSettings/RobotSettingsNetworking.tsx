@@ -96,7 +96,7 @@ export function RobotSettingsNetworking({
               size="1.25rem"
               name="ot-check"
               color={COLORS.successEnabled}
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
@@ -117,7 +117,7 @@ export function RobotSettingsNetworking({
           {wifi?.ipAddress != null ? (
             <>
               <Flex marginBottom={SPACING.spacing5}>
-                <Flex marginRight={SPACING.spacing3}>
+                <Flex marginRight={SPACING.spacing8}>
                   <SelectNetwork
                     robotName={robotName}
                     isRobotBusy={isRobotBusy}
@@ -179,7 +179,7 @@ export function RobotSettingsNetworking({
               size="1.25rem"
               name="ot-check"
               color={COLORS.successEnabled}
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
@@ -249,7 +249,7 @@ export function RobotSettingsNetworking({
               <StyledText
                 as="p"
                 marginTop={SPACING.spacing16}
-                marginBottom={SPACING.spacing3}
+                marginBottom={SPACING.spacing8}
               >
                 {t('usb_to_ethernet_description')}
               </StyledText>
@@ -268,7 +268,7 @@ export function RobotSettingsNetworking({
                   size="1.25rem"
                   name="ot-check"
                   color={COLORS.successEnabled}
-                  marginRight={SPACING.spacing3}
+                  marginRight={SPACING.spacing8}
                   data-testid="RobotSettings_Networking_check_circle"
                 />
               ) : (

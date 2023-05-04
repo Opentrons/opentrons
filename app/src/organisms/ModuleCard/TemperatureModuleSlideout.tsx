@@ -97,7 +97,7 @@ export const TemperatureModuleSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}
         </StyledText>

@@ -162,13 +162,13 @@ export function Labware(): JSX.Element {
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.radiusSoftCorners}
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
-                paddingLeft={SPACING.spacing3}
+                paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
                 paddingY={SPACING.spacing4}
                 data-testid="sortBy-label"
@@ -178,7 +178,7 @@ export function Labware(): JSX.Element {
                   : t('shared:reverse')}
               </StyledText>
               <Icon
-                paddingRight={SPACING.spacing3}
+                paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
@@ -229,7 +229,7 @@ export function Labware(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
           marginTop={SPACING.spacing6}
         >

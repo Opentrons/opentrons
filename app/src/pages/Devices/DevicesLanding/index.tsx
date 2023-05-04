@@ -67,12 +67,12 @@ export function DevicesLanding(): JSX.Element {
   return (
     <Box
       minWidth={SIZE_6}
-      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing16)}`}
+      padding={`${String(SPACING.spacing8)} ${String(SPACING.spacing16)}`}
     >
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING.spacing3}
+        marginTop={SPACING.spacing8}
         height="2.25rem"
       >
         <StyledText as="h1" id="DevicesLanding_title">
@@ -86,7 +86,7 @@ export function DevicesLanding(): JSX.Element {
         <>
           <CollapsibleSection
             gridGap={SPACING.spacing4}
-            marginY={SPACING.spacing3}
+            marginY={SPACING.spacing8}
             title={t('available', {
               count: [...healthyReachableRobots, ...unhealthyReachableRobots]
                 .length,

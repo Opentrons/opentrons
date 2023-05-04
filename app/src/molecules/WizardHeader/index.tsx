@@ -68,7 +68,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
                   `
                 : TYPOGRAPHY.pSemiBold
             }
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
           >
             {title}
           </StyledText>

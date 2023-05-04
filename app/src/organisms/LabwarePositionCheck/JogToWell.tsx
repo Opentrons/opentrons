@@ -119,7 +119,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_START}
         >
           <StyledText as="h1">{header}</StyledText>
@@ -165,7 +165,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
             buttonText={t('shared:go_back')}
             onClick={handleGoBack}
           />
-          <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <SmallButton
               buttonType="secondary"
               buttonText={t('move_pipette')}
@@ -236,7 +236,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
             alignItems={ALIGN_CENTER}
           >
             <NeedHelpLink href={LPC_HELP_LINK_URL} />
-            <Flex gridGap={SPACING.spacing3}>
+            <Flex gridGap={SPACING.spacing8}>
               <SecondaryButton onClick={handleGoBack}>
                 {t('shared:go_back')}
               </SecondaryButton>

@@ -79,7 +79,7 @@ export function DisplayWifiList({
             height="4rem"
             key={nw.ssid}
             backgroundColor="#d6d6d6"
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
             borderRadius={BORDERS.size_three}
             css={NETWORK_ROW_STYLE}
             onClick={() => handleClick(nw)}
@@ -106,7 +106,7 @@ export function DisplayWifiList({
       )}
       <Btn
         onClick={() => setChangeState({ type: JOIN_OTHER, ssid: null })}
-        marginTop={SPACING.spacing3}
+        marginTop={SPACING.spacing8}
         height="4rem"
         backgroundColor="#d6d6d6"
         borderRadius={BORDERS.size_three}

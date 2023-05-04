@@ -85,7 +85,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_END}
           position={POSITION_FIXED}
           right={SPACING.spacing6}

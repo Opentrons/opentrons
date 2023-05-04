@@ -108,7 +108,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignSelf={ALIGN_STRETCH}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       {...styleProps}
     >
       {controls}

@@ -246,7 +246,7 @@ export function ProtocolDashboard(): JSX.Element {
                 fontWeight={TYPOGRAPHY.fontWeightBold}
                 lineHeight={TYPOGRAPHY.lineHeight42}
                 marginTop={SPACING.spacing16}
-                marginBottom={SPACING.spacing3}
+                marginBottom={SPACING.spacing8}
               >
                 {t('nothing_here_yet')}
               </StyledText>
@@ -291,7 +291,7 @@ export function ProtocolCard(props: {
       borderRadius={BORDERS.size_four}
       fontSize={TYPOGRAPHY.fontSize22}
       lineHeight={TYPOGRAPHY.lineHeight28}
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing8}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing5}
       ref={longpress.ref}

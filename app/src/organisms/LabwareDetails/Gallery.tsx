@@ -58,7 +58,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
           {images.map((img, index) => {
             return (
               <Box
-                padding={SPACING.spacing3}
+                padding={SPACING.spacing8}
                 key={index}
                 onClick={() => setCurrentImage(index)}
                 data-testid="gallery_mini_image"

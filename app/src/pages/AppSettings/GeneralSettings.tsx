@@ -141,13 +141,13 @@ export function GeneralSettings(): JSX.Element {
             <Box width="65%">
               <StyledText
                 css={TYPOGRAPHY.h3SemiBold}
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
               >
                 {t('software_version')}
               </StyledText>
               <StyledText
                 as="p"
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
                 id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
@@ -183,7 +183,7 @@ export function GeneralSettings(): JSX.Element {
             )}
           </Flex>
           <Box width="70%">
-            <StyledText as="p" paddingY={SPACING.spacing3}>
+            <StyledText as="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
             </StyledText>
           </Box>
@@ -209,7 +209,7 @@ export function GeneralSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing5} />
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('update_alerts')}
         </StyledText>
@@ -235,7 +235,7 @@ export function GeneralSettings(): JSX.Element {
         >
           <StyledText
             css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing3}
+            paddingBottom={SPACING.spacing8}
           >
             {t('connect_ip')}
           </StyledText>

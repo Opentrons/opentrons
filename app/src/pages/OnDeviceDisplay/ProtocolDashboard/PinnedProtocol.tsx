@@ -84,7 +84,7 @@ export function PinnedProtocol(props: {
       backgroundColor={COLORS.light_one}
       borderRadius={BORDERS.size_four}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       height={cardStyleBySize[cardSize].height}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
@@ -103,7 +103,7 @@ export function PinnedProtocol(props: {
       </StyledText>
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
       >

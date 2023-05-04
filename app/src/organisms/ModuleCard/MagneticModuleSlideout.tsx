@@ -156,7 +156,7 @@ export const MagneticModuleSlideout = (
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingTop={SPACING.spacing16}
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
       >
         {t('height_ranges', { gen: info.version })}
@@ -173,10 +173,10 @@ export const MagneticModuleSlideout = (
           flexDirection={DIRECTION_COLUMN}
           data-testid={`MagneticModuleSlideout_body_data_text_${module.serialNumber}`}
         >
-          <StyledText paddingBottom={SPACING.spacing3}>
+          <StyledText paddingBottom={SPACING.spacing8}>
             {t('max_engage_height')}
           </StyledText>
-          <StyledText paddingBottom={SPACING.spacing3}>
+          <StyledText paddingBottom={SPACING.spacing8}>
             {t('labware_bottom')}
           </StyledText>
           <StyledText>{t('disengaged')}</StyledText>
@@ -187,14 +187,14 @@ export const MagneticModuleSlideout = (
           data-testid={`MagneticModuleSlideout_body_data_num_${module.serialNumber}`}
         >
           <StyledText
-            paddingLeft={SPACING.spacing3}
-            paddingBottom={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
+            paddingBottom={SPACING.spacing8}
           >
             {max}
           </StyledText>
           <StyledText
             paddingLeft={SPACING.spacing16}
-            paddingBottom={SPACING.spacing3}
+            paddingBottom={SPACING.spacing8}
           >
             {labwareBottom}
           </StyledText>
@@ -210,7 +210,7 @@ export const MagneticModuleSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGreyEnabled}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('set_engage_height')}
         </StyledText>

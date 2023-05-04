@@ -42,7 +42,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
               color:
                 type === 'error' ? COLORS.errorEnabled : COLORS.warningEnabled,
               size: SPACING.spacingM,
-              marginRight: SPACING.spacing3,
+              marginRight: SPACING.spacing8,
             }
           : undefined
       }

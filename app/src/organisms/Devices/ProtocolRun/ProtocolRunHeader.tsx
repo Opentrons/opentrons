@@ -271,7 +271,7 @@ export function ProtocolRunHeader({
           backgroundColor={COLORS.fundamentalsBackground}
           display="grid"
           gridTemplateColumns="4fr 6fr 4fr"
-          padding={SPACING.spacing3}
+          padding={SPACING.spacing8}
         >
           <LabeledValue
             label={t('protocol_start')}
@@ -544,7 +544,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
           <Icon
             name={buttonIconName}
             size={SIZE_1}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             spin={
               isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
             }

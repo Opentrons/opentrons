@@ -48,15 +48,15 @@ export const ProtocolRunModuleControls = ({
     </Flex>
   ) : (
     <Flex
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       paddingTop={SPACING.spacing16}
-      paddingBottom={SPACING.spacing3}
+      paddingBottom={SPACING.spacing8}
       paddingX={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="50%"
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         {leftColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
@@ -74,7 +74,7 @@ export const ProtocolRunModuleControls = ({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="50%"
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         {rightColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (

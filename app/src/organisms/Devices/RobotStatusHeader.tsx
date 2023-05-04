@@ -58,7 +58,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
         <StyledText
           as="label"
-          paddingRight={SPACING.spacing3}
+          paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
           {`${truncateString(displayName, 80, 65)}; ${t(
@@ -89,7 +89,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <StyledText
               as="h3"
               id={`RobotStatusHeader_${String(name)}_robotName`}
@@ -99,7 +99,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
             </StyledText>
             <Btn
               {...targetProps}
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               onClick={() =>
                 history.push(`/devices/${name}/robot-settings/networking`)
               }

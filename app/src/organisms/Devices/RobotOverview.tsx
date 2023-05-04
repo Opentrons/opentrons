@@ -65,7 +65,7 @@ export function RobotOverview({
         alignItems={ALIGN_START}
         backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         position={POSITION_RELATIVE}
         width="100%"
       >
@@ -84,14 +84,14 @@ export function RobotOverview({
               id="RobotOverview_robotImage"
             />
           </Flex>
-          <Box padding={SPACING.spacing3} width="100%">
-            <Box marginBottom={SPACING.spacing3}>
+          <Box padding={SPACING.spacing8} width="100%">
+            <Box marginBottom={SPACING.spacing8}>
               <ReachableBanner robot={robot} />
             </Box>
             {robot != null ? (
               <UpdateRobotBanner
                 robot={robot}
-                marginBottom={SPACING.spacing3}
+                marginBottom={SPACING.spacing8}
               />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
@@ -114,7 +114,7 @@ export function RobotOverview({
                   >
                     {t('controls')}
                   </StyledText>
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                     <Flex paddingBottom={SPACING.spacing4}>
                       <ToggleButton
                         label={t('lights')}

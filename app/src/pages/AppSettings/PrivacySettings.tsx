@@ -36,11 +36,11 @@ export function PrivacySettings(): JSX.Element {
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('share_analytics')}
         </StyledText>
-        <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing8}>
           {t('analytics_description')}
         </StyledText>
       </Box>

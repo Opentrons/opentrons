@@ -133,7 +133,7 @@ const DIRECTION_CONTROL_LAYOUT = css`
 const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
-  grid-gap: ${SPACING.spacing3};
+  grid-gap: ${SPACING.spacing8};
   min-width: 9.8125rem;
 
   @media (max-width: 750px) {
@@ -149,8 +149,8 @@ const DEFAULT_BUTTON_STYLE = css`
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
-  grid-gap: ${SPACING.spacing3};
-  padding: ${SPACING.spacing3};
+  grid-gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
 
   &:focus {
     background-color: ${COLORS.white};
@@ -398,7 +398,7 @@ export function TouchDirectionControl(
       border={`1px solid ${COLORS.darkBlack_forty}`}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing16}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <TouchControlLabel>{t('jog_controls')}</TouchControlLabel>
       <Flex css={DIRECTION_CONTROL_LAYOUT}>

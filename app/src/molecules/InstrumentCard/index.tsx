@@ -63,7 +63,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       {...styleProps}

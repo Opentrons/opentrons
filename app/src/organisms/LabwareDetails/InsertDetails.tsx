@@ -32,7 +32,7 @@ export function InsertDetails(props: InsertDetailsProps): JSX.Element {
             <Box padding={SPACING.spacing16}>
               <StyledText
                 css={TYPOGRAPHY.h2SemiBold}
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
               >
                 {wellProps.metadata.displayName}
               </StyledText>

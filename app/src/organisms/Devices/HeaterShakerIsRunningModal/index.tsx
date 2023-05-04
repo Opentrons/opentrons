@@ -48,7 +48,7 @@ export const HeaterShakerIsRunningModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         name="alert-circle"
-        marginX={SPACING.spacing3}
+        marginX={SPACING.spacing8}
         size={SPACING.spacingM}
         color={COLORS.warningEnabled}
         data-testid="HeaterShakerIsRunning_warning_icon"
@@ -94,7 +94,7 @@ export const HeaterShakerIsRunningModal = (
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton
           marginTop={SPACING.spacing5}
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
           padding={SPACING.spacingSM}
           onClick={handleStopShake}
           id="HeaterShakerIsRunningModal_stop_shaking"

@@ -47,7 +47,7 @@ export function ProtocolSetupLiquids({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginTop="2.375rem"
       >
         {liquidsInLoadOrder?.map(liquid => (
@@ -123,9 +123,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
             backgroundColor={COLORS.darkBlack_twenty}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
-            padding={`${SPACING.spacing3} 0.75rem`}
+            padding={`${SPACING.spacing8} 0.75rem`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}

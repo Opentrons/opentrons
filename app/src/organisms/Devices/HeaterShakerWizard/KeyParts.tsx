@@ -19,14 +19,14 @@ export function KeyParts(): JSX.Element {
   return (
     <>
       <StyledText
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightBold}
         data-testid="heater_shaker_wizard_keyparts_title"
       >
         {t('heater_shaker_key_parts')}
       </StyledText>
       <StyledText
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         data-testid="heater_shaker_wizard_keyparts_subtitle"
       >

@@ -45,7 +45,7 @@ export function WizardRequiredEquipmentList(
             fontSize="1.25rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="1.5rem"
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
           </StyledText>
@@ -88,7 +88,7 @@ export function WizardRequiredEquipmentList(
           ))}
           {footer != null ? (
             <StyledText
-              marginTop={SPACING.spacing3}
+              marginTop={SPACING.spacing8}
               as="label"
               color={COLORS.darkGreyEnabled}
             >

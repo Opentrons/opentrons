@@ -106,7 +106,7 @@ export function SetupLabwarePositionCheck(
         <PrimaryButton
           onClick={expandLabwareStep}
           id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing16)}`}
+          padding={`${String(SPACING.spacing8)} ${String(SPACING.spacing16)}`}
           {...targetProps}
         >
           {t('proceed_to_labware_setup_step')}

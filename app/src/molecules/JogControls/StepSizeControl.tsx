@@ -36,7 +36,7 @@ const stepSizeTranslationKeyByStep: { [stepSize: number]: string } = {
 const BUTTON_WRAPPER_STYLE = css`
   display: grid;
   grid-auto-flow: column;
-  grid-gap: ${SPACING.spacing3};
+  grid-gap: ${SPACING.spacing8};
   margin-top: ${SPACING.spacing16};
 
   @media (max-width: 750px) {
@@ -126,7 +126,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             <StyledText
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               css={TYPOGRAPHY.pSemiBold}
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
             >
               {t('jump_size')}
             </StyledText>
@@ -175,7 +175,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
       border={`1px solid ${COLORS.darkBlack_forty}`}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing16}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <TouchControlLabel>{t('jump_size')}</TouchControlLabel>
       {stepSizes.map((stepSize: StepSize, index) => {

@@ -26,7 +26,7 @@ export function TipLengthCalibrationInfoBox(
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         paddingLeft={SPACING.spacing16}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
       >
         {title}
       </Text>

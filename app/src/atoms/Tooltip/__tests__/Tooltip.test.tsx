@@ -22,7 +22,7 @@ const tooltipStyle = {
 const arrowRef = jest.fn()
 const arrowStyle = {
   position: POSITION_ABSOLUTE,
-  left: SPACING.spacing3,
+  left: SPACING.spacing8,
 } as const
 
 const MockTooltipProps = {

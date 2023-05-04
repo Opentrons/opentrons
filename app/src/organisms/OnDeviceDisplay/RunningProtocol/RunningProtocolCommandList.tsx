@@ -133,7 +133,7 @@ export function RunningProtocolCommandList({
         <Flex
           ref={viewPortRef}
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           height="20.25rem"
           position={POSITION_RELATIVE}
           overflow={OVERFLOW_HIDDEN}
@@ -153,7 +153,7 @@ export function RunningProtocolCommandList({
                 <Flex
                   key={command.id}
                   alignItems={ALIGN_CENTER}
-                  gridGap={SPACING.spacing3}
+                  gridGap={SPACING.spacing8}
                 >
                   <Flex
                     padding={`0.75rem ${SPACING.spacing5}`}

@@ -153,7 +153,7 @@ export function RenameRobotSlideout({
         <StyledText
           as="label"
           css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('robot_name')}
         </StyledText>

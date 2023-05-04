@@ -114,7 +114,7 @@ export function ProtocolInstrumentMountItem(
           <Flex
             flex="1"
             alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
             justifyContent={JUSTIFY_FLEX_START}
           >
             <Icon

@@ -30,14 +30,14 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       marginY={SPACING.spacing6}
-      paddingBottom={SPACING.spacing3}
+      paddingBottom={SPACING.spacing8}
       width="96.5%"
     >
       <StyledText
         role="complementary"
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing3}
+        marginBottom={SPACING.spacing8}
       >
         {props.title}
       </StyledText>
@@ -51,7 +51,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_LIBRARY_URL}
             id="EmptyStateLinks_protocolLibraryButton"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             external
           >
             {t('browse_protocol_library')}
@@ -67,7 +67,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_DESIGNER_URL}
             id="EmptyStateLinks_protocolDesignerButton"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             external
           >
             {t('launch_protocol_designer')}

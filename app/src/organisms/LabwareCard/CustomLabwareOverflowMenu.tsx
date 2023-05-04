@@ -143,7 +143,7 @@ export function CustomLabwareOverflowMenu(
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
-              <StyledText as="p" paddingTop={SPACING.spacing3}>
+              <StyledText as="p" paddingTop={SPACING.spacing8}>
                 {t('cannot-run-python-missing-labware')}
               </StyledText>
               <Flex

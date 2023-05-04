@@ -130,7 +130,7 @@ export function DeviceReset({
       </Flex>
       <Flex
         marginTop={SPACING.spacing5}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
       >
         {availableOptions.map(option => (

@@ -78,7 +78,7 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
         </StyledText>
         <StyledText as="p">{t('ip_description_second')}</StyledText>
@@ -106,7 +106,7 @@ export function ConnectRobotSlideout({
               <StyledText
                 as="p"
                 color={COLORS.darkGreyEnabled}
-                marginRight={SPACING.spacing3}
+                marginRight={SPACING.spacing8}
               >
                 {t('searching')}
               </StyledText>{' '}

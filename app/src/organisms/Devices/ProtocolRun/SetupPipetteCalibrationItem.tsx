@@ -107,7 +107,7 @@ export function SetupPipetteCalibrationItem({
           marginLeft={SPACING.spacing16}
           flexWrap={WRAP}
           justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <Flex>{pipetteMismatchInfo}</Flex>
           <RRDLink

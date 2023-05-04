@@ -180,7 +180,7 @@ export function NameRobot(): JSX.Element {
                       name="ot-spinner"
                       size="1.25rem"
                       spin
-                      marginRight={SPACING.spacing3}
+                      marginRight={SPACING.spacing8}
                     />
                   ) : null}
                   {t('shared:confirm')}

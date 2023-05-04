@@ -195,9 +195,9 @@ export function Toast(props: ToastProps): JSX.Element {
       padding={
         showODDStyle
           ? `${String(SPACING.spacing16)} ${String(SPACING.spacing5)}`
-          : `${heading != null ? SPACING.spacing4 : SPACING.spacing3} ${
-              SPACING.spacing3
-            } ${heading != null ? SPACING.spacing4 : SPACING.spacing3} 0.75rem`
+          : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing8
+            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} 0.75rem`
       }
       data-testid={`Toast_${type}`}
       height={showODDStyle ? '5.76rem' : 'auto'}
@@ -216,7 +216,7 @@ export function Toast(props: ToastProps): JSX.Element {
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
           width={showODDStyle ? SPACING.spacing6 : SPACING.spacing16}
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />

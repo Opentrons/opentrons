@@ -49,8 +49,8 @@ const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3};
-  margin-bottom: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
+  margin-bottom: ${SPACING.spacing8};
   width: 100%;
   cursor: pointer;
 
@@ -72,7 +72,7 @@ const ON_DEVICE_UNSELECTED_OPTIONS_STYLE = css`
   background-color: #cccccc;
   border-radius: ${BORDERS.size_four};
   padding: ${SPACING.spacing5};
-  margin-bottom: ${SPACING.spacing3};
+  margin-bottom: ${SPACING.spacing8};
   height: 5.25rem;
   width: 57.8125rem;
 `

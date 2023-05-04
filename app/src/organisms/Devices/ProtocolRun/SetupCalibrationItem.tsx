@@ -59,7 +59,7 @@ export function SetupCalibrationItem({
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="2.5rem" // 40px
-      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing16)}`}
+      padding={`${String(SPACING.spacing8)} ${String(SPACING.spacing16)}`}
     >
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>

@@ -125,7 +125,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
       flexDirection={DIRECTION_ROW}
       padding={`${String(SPACING.spacing4)} 0 ${String(
         SPACING.spacing4
-      )} ${String(SPACING.spacing3)}`}
+      )} ${String(SPACING.spacing8)}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1

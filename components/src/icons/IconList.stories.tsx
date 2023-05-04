@@ -75,8 +75,8 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.size_three}
-          marginRight={SPACING.spacing3}
-          marginBottom={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
+          marginBottom={SPACING.spacing8}
           padding={SPACING.spacing16}
           onClick={() => handleCopy(name, index)}
           border={
@@ -88,7 +88,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           <IconComponent name={name as IconName} size="4rem" />
           <Text
             textAlign={TYPOGRAPHY.textAlignCenter}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             fontSize={TYPOGRAPHY.fontSizeP}
           >
             {name}

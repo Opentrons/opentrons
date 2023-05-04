@@ -44,7 +44,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <NavigationLink to="/dashboard" name={robotName} />
         </Flex>

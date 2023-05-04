@@ -27,7 +27,7 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
       borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
       data-testid={`InfoMessage_${title}`}
     >

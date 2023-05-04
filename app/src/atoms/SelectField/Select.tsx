@@ -153,7 +153,7 @@ function DropdownIndicator(
       <Box
         position={POSITION_ABSOLUTE}
         top="0.55rem"
-        right={SPACING.spacing3}
+        right={SPACING.spacing8}
         width={SPACING.spacingM}
       >
         {Boolean(props.selectProps.menuIsOpen) ? (

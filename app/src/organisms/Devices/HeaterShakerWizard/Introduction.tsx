@@ -40,7 +40,7 @@ interface IntroContainerProps {
 
 const IntroItem = (props: IntroContainerProps): JSX.Element => {
   let multiText: JSX.Element = <div></div>
-  const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing3
+  const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing8
 
   if (props.subtext != null) {
     multiText = (
@@ -48,7 +48,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
           paddingLeft={leftPadding}
-          paddingTop={SPACING.spacing3}
+          paddingTop={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
         >
           {props.text}
@@ -68,7 +68,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
       <Flex
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingLeft={leftPadding}
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         {props.text}
@@ -77,17 +77,17 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   }
   return (
     <Flex
-      marginTop={SPACING.spacing3}
+      marginTop={SPACING.spacing8}
       border={`${String(SPACING.spacingXXS)} ${String(
         BORDERS.styleSolid
       )} ${String(COLORS.medGreyEnabled)}`}
       flexDirection={DIRECTION_ROW}
       width="21.5rem"
-      paddingBottom={SPACING.spacing3}
+      paddingBottom={SPACING.spacing8}
     >
       {props.image != null ? (
         <>
-          <Flex paddingLeft={SPACING.spacingXS} paddingTop={SPACING.spacing3}>
+          <Flex paddingLeft={SPACING.spacingXS} paddingTop={SPACING.spacing8}>
             {props.image}
           </Flex>
           {multiText}

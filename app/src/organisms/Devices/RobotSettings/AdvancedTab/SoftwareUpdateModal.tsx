@@ -76,13 +76,13 @@ export function SoftwareUpdateModal({
         <StyledText as="p">
           {'None in the Opentrons (Here will be change logs)'}
         </StyledText>
-        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing8}>
           {t('new_features')}
         </StyledText>
         <StyledText as="p">
           {'None in the Opentrons (Here will be features info)'}
         </StyledText>
-        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing8}>
           {t('bug_fixes')}
         </StyledText>
         <StyledText as="p" marginBottom={SPACING.spacing16}>
@@ -94,7 +94,7 @@ export function SoftwareUpdateModal({
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateTechnicalChangeLogLink"
           marginTop={SPACING.spacing16}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('view_opentrons_technical_change_log')}
         </ExternalLink>
@@ -102,7 +102,7 @@ export function SoftwareUpdateModal({
           href={ISSUE_TRACKER_URL}
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateIssueTrackerLink"
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('view_opentrons_issue_tracker')}
         </ExternalLink>
@@ -110,12 +110,12 @@ export function SoftwareUpdateModal({
           href={RELEASE_NOTES_URL}
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateReleaseNotesLink"
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('view_opentrons_release_notes')}
         </ExternalLink>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <SecondaryButton onClick={closeModal} marginRight={SPACING.spacing3}>
+          <SecondaryButton onClick={closeModal} marginRight={SPACING.spacing8}>
             {t('remind_me_later')}
           </SecondaryButton>
           <PrimaryButton

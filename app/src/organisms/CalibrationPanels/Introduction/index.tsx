@@ -135,7 +135,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <StyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('before_you_begin')}
@@ -166,7 +166,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink />
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ? (
             <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
               {t('change_tip_rack')}

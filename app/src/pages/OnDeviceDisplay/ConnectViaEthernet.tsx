@@ -258,7 +258,7 @@ const DisplayEthernetInfo = ({
             {isConnected ? t('ethernet') : t('no_network_found')}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
             fontSize="1.5rem"
             lineHeight="2.0625rem"

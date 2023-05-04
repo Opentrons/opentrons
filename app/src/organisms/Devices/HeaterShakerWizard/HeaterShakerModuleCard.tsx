@@ -32,19 +32,19 @@ export const HeaterShakerModuleCard = (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={SPACING.spacing4}
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing8}
       padding={`${String(SPACING.spacing16)} ${String(
-        SPACING.spacing3
-      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing3)}`}
+        SPACING.spacing8
+      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing8)}`}
       width="20rem"
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingRight={SPACING.spacing3}
+        paddingRight={SPACING.spacing8}
         alignItems={ALIGN_FLEX_START}
       >
         <img src={heaterShakerModule} alt="Heater-Shaker" />
-        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing8}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}

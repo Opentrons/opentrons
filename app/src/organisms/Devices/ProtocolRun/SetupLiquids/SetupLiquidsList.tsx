@@ -65,7 +65,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       maxHeight="31.25rem"
       overflowY="auto"
       data-testid="SetupLiquidsList_ListView"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
@@ -150,7 +150,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             justifyContent={JUSTIFY_FLEX_START}
             gridGap={SPACING.spacing16}
             marginTop={SPACING.spacing16}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             <StyledText
               as="label"
@@ -194,7 +194,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
                 borderRadius="4px"
-                marginBottom={SPACING.spacing3}
+                marginBottom={SPACING.spacing8}
                 padding={SPACING.spacing16}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${String(index)}`}
@@ -290,7 +290,7 @@ export const LiquidsListItemDetails = (
         borderRadius={BORDERS.radiusSoftCorners}
         height="max-content"
         paddingY={SPACING.spacing4}
-        paddingX={SPACING.spacing3}
+        paddingX={SPACING.spacing8}
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >

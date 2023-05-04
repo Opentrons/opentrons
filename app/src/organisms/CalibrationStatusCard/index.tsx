@@ -66,10 +66,10 @@ export function CalibrationStatusCard({
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginRight={SPACING.spacingXXL}
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <StyledText css={TYPOGRAPHY.h2SemiBold}>
             {t('calibration_status')}
           </StyledText>

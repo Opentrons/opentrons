@@ -19,10 +19,10 @@ export function RobotSettingsGripperCalibration(): JSX.Element {
     <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing4}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box marginRight={SPACING.spacing6}>
-          <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+          <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing8}>
             {t('gripper_calibration_title')}
           </Box>
-          <StyledText as="p" marginBottom={SPACING.spacing3}>
+          <StyledText as="p" marginBottom={SPACING.spacing8}>
             {t('gripper_calibration_description')}
           </StyledText>
         </Box>

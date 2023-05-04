@@ -28,7 +28,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
     <>
       <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
           <StyledText as="p">
             When clicking the button, the Snackbar shows up in the bottom.
           </StyledText>

@@ -32,7 +32,7 @@ const BACKGROUND_SIZE = '47rem'
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
   margin-top: ${SPACING.spacing5};
-  margin-bottom: ${SPACING.spacing3};
+  margin-bottom: ${SPACING.spacing8};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;

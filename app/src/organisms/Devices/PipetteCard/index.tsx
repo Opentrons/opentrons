@@ -169,10 +169,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         />
       )}
       <Box
-        padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing3)}`}
+        padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing8)}`}
         width="100%"
       >
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START}>
             {pipetteInfo === null ? null : (
               <InstrumentDiagram
@@ -187,7 +187,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
           >
             {isOT3PipetteAttached && !isPipetteCalibrated ? (
               <Banner type="error" marginBottom={SPACING.spacing4}>

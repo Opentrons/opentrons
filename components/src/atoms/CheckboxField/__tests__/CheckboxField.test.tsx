@@ -111,7 +111,7 @@ describe('CheckboxField', () => {
     )
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
     expect(checkBoxFieldBox).toHaveStyle(
-      `padding: ${String(SPACING.spacing3)} ${String(SPACING.spacing3)}`
+      `padding: ${String(SPACING.spacing8)} ${String(SPACING.spacing8)}`
     )
     expect(checkBoxFieldBox).toHaveStyleRule('padding', '0', {
       modifier: ':empty',

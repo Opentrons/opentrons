@@ -47,7 +47,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
           marginBottom={SPACING.spacing5}
         />
         {heading != null ? (
-          <StyledText as="h1" marginBottom={SPACING.spacing3}>
+          <StyledText as="h1" marginBottom={SPACING.spacing8}>
             {heading}
           </StyledText>
         ) : null}
@@ -60,7 +60,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <NeedHelpLink />
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={back}>{t('go_back')}</SecondaryButton>
           <AlertPrimaryButton
             onClick={exit}

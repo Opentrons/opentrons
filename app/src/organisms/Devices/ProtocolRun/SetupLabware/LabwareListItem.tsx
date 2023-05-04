@@ -238,7 +238,7 @@ export function LabwareListItem(
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           <StyledText as="p">{slotInfo}</StyledText>

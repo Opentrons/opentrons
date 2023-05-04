@@ -80,10 +80,10 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         />
       ) : null}
       {hasADuplicateModule ? (
-        <Box marginTop={SPACING.spacing3}>
+        <Box marginTop={SPACING.spacing8}>
           <Banner
             iconMarginRight={SPACING.spacing16}
-            iconMarginLeft={SPACING.spacing3}
+            iconMarginLeft={SPACING.spacing8}
             size={SPACING.spacingM}
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
@@ -91,7 +91,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
               <StyledText
                 as="p"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                marginRight={SPACING.spacing3}
+                marginRight={SPACING.spacing8}
               >
                 {t('learn_more')}
               </StyledText>
@@ -119,7 +119,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       >
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
           data-testid="SetupModulesList_module_name"
           width="45%"
         >

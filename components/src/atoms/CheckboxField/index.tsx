@@ -100,7 +100,7 @@ const LABEL_TEXT_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   color: ${COLORS.darkBlackEnabled};
   flex: 0 0 auto;
-  padding: ${SPACING.spacing3} ${SPACING.spacing3};
+  padding: ${SPACING.spacing8} ${SPACING.spacing8};
 
   &:empty {
     padding: 0;

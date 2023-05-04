@@ -37,7 +37,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
       iconColor={COLORS.warningEnabled}
       header={t('did_pipette_pick_up_tip')}
     >
-      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
         <SmallButton
           buttonText={i18n.format(t('try_again'), 'capitalize')}
           buttonType="secondary"
@@ -66,7 +66,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
         marginTop={SPACING.spacing16}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={invalidateTip}>
             {i18n.format(t('try_again'), 'capitalize')}
           </SecondaryButton>

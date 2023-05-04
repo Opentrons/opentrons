@@ -32,7 +32,7 @@ export function ChosenTipRackRender(
     <Flex
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
-      marginLeft={SPACING.spacing3}
+      marginLeft={SPACING.spacing8}
     >
       <img
         css={css`

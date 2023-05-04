@@ -120,7 +120,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                       height="1.77125rem"
                       minHeight="1.77125rem"
                       minWidth="1.77125rem"
-                      marginRight={SPACING.spacing3}
+                      marginRight={SPACING.spacing8}
                     />
                   ) : (
                     <Flex marginLeft={SPACING.spacingM} />

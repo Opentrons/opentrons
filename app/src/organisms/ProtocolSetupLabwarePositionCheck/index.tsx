@@ -31,7 +31,7 @@ export function ProtocolSetupLabwarePositionCheck({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <ODDBackButton
         label={t('labware_position_check')}

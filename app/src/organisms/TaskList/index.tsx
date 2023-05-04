@@ -62,7 +62,7 @@ function ProgressTrackerItem({
       // shorten connector length when subtasks are present
       marginBottom={
         hasSubTasks
-          ? `-${String(SPACING.spacing3)}`
+          ? `-${String(SPACING.spacing8)}`
           : `-${String(SPACING.spacingM)}`
       }
       height="100%"
@@ -174,12 +174,12 @@ function ProgressTrackerItem({
                       ? COLORS.blueEnabled
                       : COLORS.medGreyEnabled
                   }
-                  marginTop={`-${String(SPACING.spacing3)}`}
+                  marginTop={`-${String(SPACING.spacing8)}`}
                   marginBottom={
                     // extend connector for last subtask
                     isLastSubTask
                       ? `-${String(SPACING.spacingM)}`
-                      : `-${String(SPACING.spacing3)}`
+                      : `-${String(SPACING.spacing8)}`
                   }
                   height="100%"
                 />
@@ -238,7 +238,7 @@ function SubTask({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {title}
           </Flex>
@@ -249,7 +249,7 @@ function SubTask({
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               {markedBad === true && (
                 <Icon
@@ -390,7 +390,7 @@ function Task({
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_ROW}
-                gridGap={SPACING.spacing3}
+                gridGap={SPACING.spacing8}
               >
                 {markedBad === true && (
                   <Icon
@@ -410,7 +410,7 @@ function Task({
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing3}
+                  gridGap={SPACING.spacing8}
                 >
                   {footer}
                 </Flex>
@@ -477,7 +477,7 @@ function Task({
           <Flex
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing16}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {subTasks.map(
               (
@@ -513,7 +513,7 @@ export function TaskList({
   generalTaskDisabledReason,
 }: TaskListProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       {taskList.map(
         (
           { title, description, cta, footer, subTasks, isComplete, markedBad },

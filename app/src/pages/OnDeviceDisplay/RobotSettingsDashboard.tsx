@@ -49,7 +49,7 @@ import type { Dispatch, State } from '../../redux/types'
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   height: 6.875rem;
-  margin-bottom: ${SPACING.spacing3};
+  margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.medGreyEnabled};
   padding: 1.5rem;
   border-radius: ${BORDERS.size_four};
@@ -88,9 +88,9 @@ export function RobotSettingsDashboard(): JSX.Element {
   return (
     // This top level Flexbox only exists to position the temporary
     // "To ODD Menu" button on the bottom. When it goes, so can this.
-    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing8}>
       {currentOption != null ? (
-        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing8}>
           <SettingsContent
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}

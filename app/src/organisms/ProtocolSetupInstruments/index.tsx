@@ -53,7 +53,7 @@ export function ProtocolSetupInstruments({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <ODDBackButton
         label={t('instruments')}

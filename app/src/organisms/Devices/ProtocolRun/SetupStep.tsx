@@ -109,7 +109,7 @@ export function SetupStep({
                         ? COLORS.successEnabled
                         : COLORS.warningEnabled
                     }
-                    marginRight={SPACING.spacing3}
+                    marginRight={SPACING.spacing8}
                     name={
                       calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }

@@ -26,7 +26,7 @@ export function SmallModalChildren(
     <Modal onOutsideClick={handleCloseMaxPinsAlert} modalSize="small">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         width="100%"
       >
         <StyledText

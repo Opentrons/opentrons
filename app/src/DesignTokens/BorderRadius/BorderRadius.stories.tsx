@@ -29,7 +29,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       padding={SPACING.spacing5}
     >
       {targetBorderRadiuses.map((br, index) => (
@@ -38,7 +38,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_FLEX_START}
           padding={SPACING.spacing16}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           width="100%"
           height="6rem"
         >

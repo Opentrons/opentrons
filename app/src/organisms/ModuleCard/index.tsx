@@ -246,10 +246,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         />
       )}
       <Box
-        padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing3)}`}
+        padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing8)}`}
         width="100%"
       >
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
               width="60px"
@@ -261,7 +261,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
             {latestRequest != null && latestRequest.status === FAILURE && (
@@ -301,7 +301,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
                 paddingRight={SPACING.spacingM}
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
                 data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
               >
                 <Banner type="warning" icon={hotToTouch}>
@@ -328,7 +328,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   spin
                   aria-label="ot-spinner"
                 />
-                <StyledText marginLeft={SPACING.spacing3}>
+                <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
                 </StyledText>
               </Flex>

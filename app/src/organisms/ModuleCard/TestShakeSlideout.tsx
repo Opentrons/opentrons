@@ -163,7 +163,7 @@ export const TestShakeSlideout = (
       )}
       <Flex
         borderRadius={SPACING.spacingS}
-        marginBottom={SPACING.spacing3}
+        marginBottom={SPACING.spacing8}
         backgroundColor={COLORS.fundamentalsBackground}
         paddingY={SPACING.spacing16}
         paddingLeft={SPACING.spacing4}
@@ -198,7 +198,7 @@ export const TestShakeSlideout = (
           marginY={SPACING.spacingSM}
           alignItems={ALIGN_CENTER}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>
             <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
@@ -209,7 +209,7 @@ export const TestShakeSlideout = (
             <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
-              marginTop={SPACING.spacing3}
+              marginTop={SPACING.spacing8}
               data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
@@ -244,7 +244,7 @@ export const TestShakeSlideout = (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             paddingRight={SPACING.spacing16}
           >
             <InputField
@@ -269,7 +269,7 @@ export const TestShakeSlideout = (
           <TertiaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginLeft={SIZE_AUTO}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             onClick={isShaking ? sendCommands : confirmAttachment}
             disabled={
               !isLatchClosed ||

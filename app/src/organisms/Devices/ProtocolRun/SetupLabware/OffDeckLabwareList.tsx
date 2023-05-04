@@ -23,7 +23,7 @@ export function OffDeckLabwareList(
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         margin={`${String(SPACING.spacing16)} ${String(
           SPACING.spacing16
-        )} ${String(SPACING.spacing3)}`}
+        )} ${String(SPACING.spacing8)}`}
       >
         {t('additional_off_deck_labware')}
       </StyledText>

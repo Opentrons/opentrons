@@ -41,7 +41,7 @@ export function EthernetConnectionDetails(): JSX.Element {
   }, [robotName, dispatch])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       {/* IP Address */}
       <EthernetDetailsRow
         title={t('ip_address')}

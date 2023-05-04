@@ -169,7 +169,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         gridGap={SPACING.spacing16}
       >
         {/* error and protocol name section */}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
@@ -190,7 +190,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             {t('loading_data')}
           </StyledText>
         ) : (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex gridGap={SPACING.spacing16}>
               <Flex
                 flex={`0 0 ${String(SIZE_2)}`}
@@ -261,7 +261,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                           color={COLORS.darkGreyEnabled}
                           moduleType={moduleType}
                           height="1rem"
-                          marginRight={SPACING.spacing3}
+                          marginRight={SPACING.spacing8}
                         />
                       ))}
                     </Flex>
