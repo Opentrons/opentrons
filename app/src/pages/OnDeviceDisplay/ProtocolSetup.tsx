@@ -108,6 +108,7 @@ function ProtocolSetupStep({
   )
 }
 
+// TODO(ew, 05/03/2023): refactor the run buttons into a shared component
 interface CloseButtonProps {
   onClose: () => void
 }
