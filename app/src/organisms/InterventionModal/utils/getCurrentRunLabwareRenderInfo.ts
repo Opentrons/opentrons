@@ -1,9 +1,10 @@
+import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+
 import type { RunData } from '@opentrons/api-client'
-import {
+import type {
   DeckDefinition,
   LabwareDefinition2,
   LabwareDefinitionsByUri,
-  getSlotHasMatingSurfaceUnitVector,
 } from '@opentrons/shared-data'
 
 export interface RunLabwareInfo {

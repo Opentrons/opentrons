@@ -1,12 +1,29 @@
 import deepClone from 'lodash/cloneDeep'
 
-import { mockRunData } from '../__fixtures__'
+import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
+
+import { mockLabwareDefinitions, mockRunData } from '../__fixtures__'
 import {
+  getCurrentRunLabwareRenderInfo,
+  getCurrentRunModulesRenderInfo,
   getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
   getModuleModelFromRunData,
 } from '../utils'
+
+jest.mock('@opentrons/shared-data', () => {
+  const actualHelpers = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualHelpers,
+    getSlotHasMatingSurfaceUnitVector: jest.fn(),
+  }
+})
+
+const mockGetSlotHasMatingSurfaceUnitVector = getSlotHasMatingSurfaceUnitVector as jest.MockedFunction<
+  typeof getSlotHasMatingSurfaceUnitVector
+>
 
 describe('getLabwareDisplayLocationFromRunData', () => {
   const mockTranslator = jest.fn()
@@ -148,5 +165,69 @@ describe('getModuleModelFromRunData', () => {
     const res = getModuleModelFromRunData(mockRunData, 'mockBadModuleID')
 
     expect(res).toEqual(null)
+  })
+})
+
+describe('getCurrentRunLabwareRenderInfo', () => {
+  beforeEach(() => {
+    mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(true)
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it('returns an empty array if there is no loaded labware for the run', () => {
+    const res = getCurrentRunLabwareRenderInfo(
+      { labware: [] } as any,
+      {},
+      {} as any
+    )
+
+    expect(res).toBeInstanceOf(Array)
+    expect(res).toHaveLength(0)
+  })
+
+  it('returns run labware render info', () => {
+    const res = getCurrentRunLabwareRenderInfo(
+      mockRunData,
+      mockLabwareDefinitions,
+      deckDefFixture as any
+    )
+    const labwareInfo = res[0]
+    expect(labwareInfo).toBeTruthy()
+    expect(labwareInfo.x).toEqual(0) // taken from deckDef fixture
+    expect(labwareInfo.y).toEqual(0)
+    expect(labwareInfo.labwareDef.metadata.displayName).toEqual(
+      'mock labware display name'
+    )
+    expect(labwareInfo.labwareId).toEqual('mockLabwareID2')
+  })
+})
+
+describe('getCurrentRunModuleRenderInfo', () => {
+  it('returns an empty array if there is no loaded module for the run', () => {
+    const res = getCurrentRunModulesRenderInfo(
+      { modules: [] } as any,
+      {} as any,
+      {}
+    )
+    expect(res).toBeInstanceOf(Array)
+    expect(res).toHaveLength(0)
+  })
+
+  it('returns run module render info', () => {
+    const res = getCurrentRunModulesRenderInfo(
+      mockRunData,
+      deckDefFixture as any,
+      mockLabwareDefinitions
+    )
+    const moduleInfo = res[0]
+    expect(moduleInfo).toBeTruthy()
+    expect(moduleInfo.x).toEqual(265.0) // taken from the deckDef fixture
+    expect(moduleInfo.y).toEqual(0)
+    expect(moduleInfo.moduleDef.moduleType).toEqual('heaterShakerModuleType')
+    expect(moduleInfo.moduleId).toEqual('mockModuleID')
+    expect(moduleInfo.nestedLabwareDef).not.toEqual(null)
+    expect(moduleInfo.nestedLabwareId).toEqual('mockLabwareID')
   })
 })
