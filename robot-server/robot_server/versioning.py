@@ -20,7 +20,7 @@ Version history:
     - Reformatted the `GET /modules` response and removed unused endpoints
 4. Introduced in v6.3 of the Opentrons software
     - Deprecated and removed the `/labware/calibrations` endpoints
-5. Introduced in v6.4 (???) of the Opentrons software
+5. TODO: Introduced in v6.4 (???) of the Opentrons software
     - Added `authenticationBearer` header to accept auth tokens for requests
 """
 
