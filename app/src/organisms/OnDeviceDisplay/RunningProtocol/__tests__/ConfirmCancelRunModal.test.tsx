@@ -65,7 +65,7 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
-      isActiveRun: false,
+      isActiveRun: true,
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
     }
@@ -125,7 +125,23 @@ describe('ConfirmCancelRunModal', () => {
     const button = getByText('Cancel run')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockPush).toHaveBeenCalledWith(`/protocols/${RUN_ID}/summary`)
+  })
+
+  it('when tapping cancel run the modal - in prepare to run', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      protocolId: 'mockProtocolId',
+    }
+    const [{ getByText }] = render(props)
+    const button = getByText('Cancel run')
+    fireEvent.click(button)
+    expect(mockStopRun).toHaveBeenCalled()
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocolId')
   })
 })

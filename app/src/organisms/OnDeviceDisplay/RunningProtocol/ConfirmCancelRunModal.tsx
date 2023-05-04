@@ -27,12 +27,14 @@ interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   isActiveRun: boolean
+  protocolId?: string | null
 }
 
 export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
+  protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
@@ -56,7 +58,15 @@ export function ConfirmCancelRunModal({
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
         dismissCurrentRun(runId)
-        history.push(`/protocols/${runId}/summary`)
+        if (isActiveRun) {
+          history.push(`/protocols/${runId}/summary`)
+        } else {
+          if (protocolId != null) {
+            history.push(`/protocols/${protocolId}`)
+          } else {
+            history.push(`/protocols`)
+          }
+        }
       },
       onError: () => {
         setIsCanceling(false)
