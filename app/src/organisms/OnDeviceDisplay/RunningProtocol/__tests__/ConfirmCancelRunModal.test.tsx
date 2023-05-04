@@ -97,7 +97,7 @@ describe('ConfirmCancelRunModal', () => {
     props.isActiveRun = true
     const [{ getByLabelText }] = render(props)
     expect(getByLabelText('modal_medium')).toHaveStyle(
-      `backgroundColor: ${COLORS.red_two}`
+      `backgroundColor: ${COLORS.red2}`
     )
   })
 

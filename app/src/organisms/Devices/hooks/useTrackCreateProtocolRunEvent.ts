@@ -22,12 +22,12 @@ export function useTrackCreateProtocolRunEvent(
 ): { trackCreateProtocolRunEvent: TrackCreateProtocolRunEvent } {
   const trackEvent = useTrackEvent()
 
-  const storedProtocolAnaylsis = parseProtocolAnalysisOutput(
+  const storedProtocolAnalysis = parseProtocolAnalysisOutput(
     protocol?.mostRecentAnalysis ?? null
   )
 
   const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
-    storedProtocolAnaylsis,
+    storedProtocolAnalysis,
     protocol,
     null
   )

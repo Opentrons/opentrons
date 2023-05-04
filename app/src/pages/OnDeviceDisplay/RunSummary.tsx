@@ -102,7 +102,7 @@ export function RunSummary(): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacingXXL}
             padding={SPACING.spacingXXL}
-            backgroundColor={isRunSucceeded ? COLORS.green_two : COLORS.red_two}
+            backgroundColor={isRunSucceeded ? COLORS.green2 : COLORS.red2}
           >
             <SplashFrame>
               <Flex gridGap={SPACING.spacing6} alignItems={ALIGN_CENTER}>
@@ -256,7 +256,7 @@ const ProtocolName = styled.h4`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `
 
 const SummaryDatum = styled.div`
@@ -268,7 +268,7 @@ const SummaryDatum = styled.div`
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;
-  color: ${COLORS.darkBlack_ninety};
+  color: ${COLORS.darkBlack90};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};

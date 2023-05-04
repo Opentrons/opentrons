@@ -16,7 +16,7 @@ export default {
         presetColors: [
           COLORS.black,
           COLORS.fundamentalsFocus,
-          COLORS.red_two,
+          COLORS.red2,
           COLORS.successText,
         ],
       },
