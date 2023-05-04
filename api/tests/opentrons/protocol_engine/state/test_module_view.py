@@ -401,7 +401,7 @@ def test_get_magnetic_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
@@ -455,7 +455,7 @@ def test_get_heater_shaker_module_substate(
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
                 plate_target_temperature=432,
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=True,
             ),
         },
@@ -467,7 +467,7 @@ def test_get_heater_shaker_module_substate(
     assert hs_substate.module_id == "heatshake-module-id"
     assert hs_substate.plate_target_temperature == 432
     assert hs_substate.is_plate_shaking is True
-    assert hs_substate.is_labware_latch_closed == HeaterShakerLatchStatus.UNKNOWN
+    assert hs_substate.labware_latch_status == HeaterShakerLatchStatus.UNKNOWN
 
     with pytest.raises(errors.WrongModuleTypeError):
         subject.get_heater_shaker_module_substate(module_id="magnetic-module-gen2-id")
@@ -513,7 +513,7 @@ def test_get_temperature_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
@@ -552,7 +552,7 @@ def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) ->
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=12.3,
             )
@@ -577,7 +577,7 @@ def test_get_plate_target_temperature_no_target(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1016,7 +1016,7 @@ def test_validate_heater_shaker_target_temperature_raises(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1044,7 +1044,7 @@ def test_validate_heater_shaker_target_temperature(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1125,7 +1125,7 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1154,7 +1154,7 @@ def test_validate_heater_shaker_target_speed_raises_error(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1181,7 +1181,7 @@ def test_raise_if_labware_latch_not_closed(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
+                labware_latch_status=HeaterShakerLatchStatus.OPEN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1207,7 +1207,7 @@ def test_raise_if_labware_latch_unknown(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             )
@@ -1233,7 +1233,7 @@ def test_heater_shaker_raise_if_shaking(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=True,
                 plate_target_temperature=None,
             )
@@ -1267,7 +1267,7 @@ def test_get_heater_shaker_movement_data(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=HeaterShakerLatchStatus.CLOSED,
+                labware_latch_status=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
@@ -1281,7 +1281,7 @@ def test_get_heater_shaker_movement_data(
     assert len(subject) == 1
     for hs_movement_data in subject:
         assert not hs_movement_data.plate_shaking
-        assert hs_movement_data.latch_closed
+        assert hs_movement_data.latch_status
         assert hs_movement_data.deck_slot == 1
 
 

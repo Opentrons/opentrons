@@ -103,7 +103,7 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=True, latch_closed=HeaterShakerLatchStatus.CLOSED, deck_slot=5
+            plate_shaking=True, latch_status=HeaterShakerLatchStatus.CLOSED, deck_slot=5
         )
     ]
 
@@ -159,7 +159,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open2(
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=HeaterShakerLatchStatus.OPEN, deck_slot=5
+            plate_shaking=False, latch_status=HeaterShakerLatchStatus.OPEN, deck_slot=5
         )
     ]
     decoy.when(state_store.config.robot_type).then_return(robot_type)
@@ -223,7 +223,7 @@ def test_raises_on_restricted_movement_with_multi_channel(
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
             plate_shaking=False,
-            latch_closed=HeaterShakerLatchStatus.CLOSED,
+            latch_status=HeaterShakerLatchStatus.CLOSED,
             deck_slot=5,
         )
     ]
@@ -246,7 +246,7 @@ def test_does_not_raise_on_movement_with_multi_channel_on_ot3(
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
             plate_shaking=False,
-            latch_closed=HeaterShakerLatchStatus.CLOSED,
+            latch_status=HeaterShakerLatchStatus.CLOSED,
             deck_slot=5,
         )
     ]
@@ -278,7 +278,7 @@ async def test_does_not_raise_when_idle_and_latch_closed(
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
             plate_shaking=False,
-            latch_closed=HeaterShakerLatchStatus.CLOSED,
+            latch_status=HeaterShakerLatchStatus.CLOSED,
             deck_slot=5,
         )
     ]
@@ -318,7 +318,7 @@ async def test_raises_depending_on_heater_shaker_substate_latch_status(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=latch_status,
+            labware_latch_status=latch_status,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -384,7 +384,7 @@ async def test_raises_depending_on_heater_shaker_latch_status(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -418,7 +418,7 @@ async def test_raises_if_hardware_module_has_gone_missing(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         ),
@@ -447,7 +447,7 @@ async def test_passes_if_virtual_module_latch_open(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         ),

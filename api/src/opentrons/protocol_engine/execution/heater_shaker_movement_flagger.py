@@ -60,14 +60,14 @@ class HeaterShakerMovementFlagger:
         except WrongModuleTypeError:
             return  # Labware on a module, but not a Heater-Shaker.
 
-        if hs_substate.is_labware_latch_closed == HeaterShakerLatchStatus.CLOSED:
+        if hs_substate.labware_latch_status == HeaterShakerLatchStatus.CLOSED:
             # TODO (spp, 2022-10-27): This only raises if latch status is 'idle_closed'.
             #  We need to update the flagger to raise if latch status is anything other
             #  than 'idle_open'
             raise HeaterShakerLabwareLatchNotOpenError(
                 "Heater-Shaker labware latch must be open when moving labware to/from it."
             )
-        elif hs_substate.is_labware_latch_closed == HeaterShakerLatchStatus.UNKNOWN:
+        elif hs_substate.labware_latch_status == HeaterShakerLatchStatus.UNKNOWN:
             raise HeaterShakerLabwareLatchStatusUnknown(
                 "Heater-Shaker labware latch must be opened before moving labware to/from it."
             )
@@ -175,11 +175,11 @@ class HeaterShakerMovementFlagger:
                 )
 
             # If Heater-Shaker's latch is open, can't move to it or east and west of it
-            elif hs_movement_restrictor.latch_closed != HeaterShakerLatchStatus.CLOSED:
+            elif hs_movement_restrictor.latch_status != HeaterShakerLatchStatus.CLOSED:
                 if dest_heater_shaker:
                     raise PipetteMovementRestrictedByHeaterShakerError(
                         f"Cannot move pipette to Heater-Shaker while labware latch"
-                        f" {'has not been closed' if hs_movement_restrictor.latch_closed == HeaterShakerLatchStatus.CLOSED else 'is open'}."
+                        f" {'has not been closed' if hs_movement_restrictor.latch_status == HeaterShakerLatchStatus.CLOSED else 'is open'}."
                     )
                 if (
                     dest_east_west
@@ -187,7 +187,7 @@ class HeaterShakerMovementFlagger:
                 ):
                     raise PipetteMovementRestrictedByHeaterShakerError(
                         "Cannot move pipette to left or right of Heater-Shaker while labware latch "
-                        f" {'has not been closed' if hs_movement_restrictor.latch_closed == HeaterShakerLatchStatus.CLOSED else 'is open'}."
+                        f" {'has not been closed' if hs_movement_restrictor.latch_status == HeaterShakerLatchStatus.CLOSED else 'is open'}."
                     )
 
             elif (

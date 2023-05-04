@@ -252,7 +252,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                     labware_latch_status = HeaterShakerLatchStatus.OPEN
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=labware_latch_status,
+                labware_latch_status=labware_latch_status,
                 is_plate_shaking=(
                     live_data is not None and live_data["targetSpeed"] is not None
                 ),
@@ -302,42 +302,42 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=None,
             )
         elif isinstance(command.result, heater_shaker.SetAndWaitForShakeSpeedResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=True,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.DeactivateShakerResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=False,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.OpenLabwareLatchResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
+                labware_latch_status=HeaterShakerLatchStatus.OPEN,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.CloseLabwareLatchResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=HeaterShakerLatchStatus.CLOSED,
+                labware_latch_status=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
@@ -885,7 +885,7 @@ class ModuleView(HasState[ModuleState]):
         hs_restrictors = [
             HeaterShakerMovementRestrictors(
                 plate_shaking=substate.is_plate_shaking,
-                latch_closed=substate.is_labware_latch_closed,
+                latch_status=substate.labware_latch_status,
                 deck_slot=self.get_location(substate.module_id).slotName.as_int(),
             )
             for substate in hs_substates
