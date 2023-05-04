@@ -26,9 +26,7 @@ describe('FloatingActionButton', () => {
   it('renders floating action button with text', () => {
     const { getByRole } = render(props)
     const button = getByRole('button')
-    expect(button).toHaveStyle(
-      `background-color: ${COLORS.highlightPurple_one}`
-    )
+    expect(button).toHaveStyle(`background-color: ${COLORS.highlightPurple1}`)
     expect(button).toHaveStyle(`padding: 0.75rem ${SPACING.spacing5}`)
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
@@ -55,7 +53,7 @@ describe('FloatingActionButton', () => {
     const button = getByRole('button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${COLORS.highlightPurple_one_pressed}`,
+      `${COLORS.highlightPurple1Pressed}`,
       {
         modifier: ':active',
       }

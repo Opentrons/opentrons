@@ -72,9 +72,9 @@ function ProtocolSetupStep({
   subDetail,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: COLORS.green_three,
-    'not ready': COLORS.yellow_three,
-    general: COLORS.light_one,
+    ready: COLORS.green3,
+    'not ready': COLORS.yellow3,
+    general: COLORS.light1,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">
@@ -87,7 +87,7 @@ function ProtocolSetupStep({
       >
         {status !== 'general' ? (
           <Icon
-            color={status === 'ready' ? COLORS.green_two : COLORS.yellow_two}
+            color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
@@ -117,7 +117,7 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red_two}
+      backgroundColor={COLORS.red2}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -140,7 +140,7 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.darkBlack_twenty : COLORS.blueEnabled}
+      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.blueEnabled}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -151,7 +151,7 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
       aria-label="play"
     >
       <Icon
-        color={disabled ? COLORS.darkBlack_sixty : COLORS.white}
+        color={disabled ? COLORS.darkBlack60 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />

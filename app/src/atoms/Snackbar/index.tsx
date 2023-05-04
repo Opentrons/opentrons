@@ -50,7 +50,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.size_three}
       boxShadow={BORDERS.shadowSmall}
-      backgroundColor={COLORS.darkBlack_hundred}
+      backgroundColor={COLORS.darkBlack100}
       maxWidth="29.25rem"
       padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
       data-testid="Snackbar"
