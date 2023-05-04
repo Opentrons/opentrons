@@ -1,3 +1,5 @@
+import { SPAN7_8_10_11_SLOT } from '@opentrons/shared-data'
+
 import type { RunData } from '@opentrons/api-client'
 import type {
   LabwareDefinitionsByUri,
@@ -93,6 +95,15 @@ export const mockModule: LoadedModule = {
     slotName: '3',
   },
   serialNumber: 'dummySerialHS',
+}
+
+export const mockThermocyclerModule: LoadedModule = {
+  id: 'mockTCModuleID',
+  model: 'thermocyclerModuleV1',
+  location: {
+    slotName: SPAN7_8_10_11_SLOT,
+  },
+  serialNumber: 'dummySerialTC',
 }
 
 export const mockRunData: RunData = {

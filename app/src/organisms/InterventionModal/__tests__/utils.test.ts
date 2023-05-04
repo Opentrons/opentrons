@@ -3,7 +3,13 @@ import deepClone from 'lodash/cloneDeep'
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
 
-import { mockLabwareDefinitions, mockRunData } from '../__fixtures__'
+import {
+  mockLabwareDefinitions,
+  mockLabwareOnSlot,
+  mockModule,
+  mockRunData,
+  mockThermocyclerModule,
+} from '../__fixtures__'
 import {
   getCurrentRunLabwareRenderInfo,
   getCurrentRunModulesRenderInfo,
@@ -202,6 +208,35 @@ describe('getCurrentRunLabwareRenderInfo', () => {
     )
     expect(labwareInfo.labwareId).toEqual('mockLabwareID2')
   })
+
+  it('does not add labware to results array if the labwares slot does not have a mating surface vector', () => {
+    mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(false)
+    const res = getCurrentRunLabwareRenderInfo(
+      mockRunData,
+      mockLabwareDefinitions,
+      deckDefFixture as any
+    )
+    expect(res).toHaveLength(0)
+  })
+
+  it('defaults labware x, y coordinates to 0,0 if slot position not found in deck definition', () => {
+    const mockBadSlotLabware = {
+      id: 'mockBadLabwareID',
+      loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+      definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+      location: {
+        slotName: '0',
+      },
+    }
+    const res = getCurrentRunLabwareRenderInfo(
+      { labware: [mockBadSlotLabware] } as any,
+      mockLabwareDefinitions,
+      deckDefFixture as any
+    )
+
+    expect(res[0].x).toEqual(0)
+    expect(res[0].y).toEqual(0)
+  })
 })
 
 describe('getCurrentRunModuleRenderInfo', () => {
@@ -215,7 +250,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
     expect(res).toHaveLength(0)
   })
 
-  it('returns run module render info', () => {
+  it('returns run module render info with nested labware', () => {
     const res = getCurrentRunModulesRenderInfo(
       mockRunData,
       deckDefFixture as any,
@@ -229,5 +264,38 @@ describe('getCurrentRunModuleRenderInfo', () => {
     expect(moduleInfo.moduleId).toEqual('mockModuleID')
     expect(moduleInfo.nestedLabwareDef).not.toEqual(null)
     expect(moduleInfo.nestedLabwareId).toEqual('mockLabwareID')
+  })
+
+  it('returns run module render info without nested labware', () => {
+    const mockRunDataNoNesting = {
+      labware: [mockLabwareOnSlot],
+      modules: [mockModule],
+    } as any
+
+    const res = getCurrentRunModulesRenderInfo(
+      mockRunDataNoNesting,
+      deckDefFixture as any,
+      mockLabwareDefinitions
+    )
+
+    const moduleInfo = res[0]
+    expect(moduleInfo.nestedLabwareDef).toEqual(null)
+    expect(moduleInfo.nestedLabwareId).toEqual(null)
+  })
+
+  it('returns the correct x,y coords for a thermocycler that spans slots 7, 8, 10, and 11', () => {
+    const mockRunDataWithTC = {
+      labware: [],
+      modules: [mockThermocyclerModule],
+    } as any
+
+    const res = getCurrentRunModulesRenderInfo(
+      mockRunDataWithTC,
+      deckDefFixture as any,
+      mockLabwareDefinitions
+    )
+
+    expect(res[0].x).toEqual(0)
+    expect(res[0].y).toEqual(181.0)
   })
 })
