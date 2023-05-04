@@ -12,6 +12,8 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     SetDeckLightRequest,
     GetDeckLightRequest,
     GetDeckLightResponse,
+    EstopButtonPresentRequest,
+    EstopButtonDetectionChange,
     Ack,
 )
 from opentrons_hardware.firmware_bindings import utils
@@ -79,17 +81,20 @@ async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinStat
     current_state = RearPinState()
     if messenger is None:
         return current_state
-    # TODO add estop port detection request
-    """
-    #estop port detection pins
+
+    # estop port detection pins
     response = await messenger.send_and_receive(
-        message=[*estop button detection request*](),
+        message=EstopButtonPresentRequest(),
         response_type=EstopButtonDetectionChange,
     )
     if response is not None:
-        current_state.aux1_estop_det = bool(cast(EstopButtonDetectionChange, response).aux1_detected.value)
-        current_state.aux2_estop_det = bool(cast(EstopButtonDetectionChange, response).aux2_detected.value)
-    """
+        current_state.aux1_estop_det = bool(
+            cast(EstopButtonDetectionChange, response).aux1_detected.value
+        )
+        current_state.aux2_estop_det = bool(
+            cast(EstopButtonDetectionChange, response).aux2_detected.value
+        )
+
     # Aux port detection pins
     response = await messenger.send_and_receive(
         message=AuxPresentRequest(),
