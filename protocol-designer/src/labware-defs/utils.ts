@@ -1,7 +1,7 @@
 import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
-  PD_DO_NOT_LIST,
+  PD_V2_DO_NOT_LIST,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
@@ -24,7 +24,7 @@ export function getAllDefinitions(): LabwareDefByDefURI {
     _definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def: LabwareDefinition2 = definitionsContext(filename)
       const labwareDefURI = getLabwareDefURI(def)
-      return PD_DO_NOT_LIST.includes(def.parameters.loadName)
+      return PD_V2_DO_NOT_LIST.includes(def.parameters.loadName)
         ? acc
         : { ...acc, [labwareDefURI]: def }
     }, {})

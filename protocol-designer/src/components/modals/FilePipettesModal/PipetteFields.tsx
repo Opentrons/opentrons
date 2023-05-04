@@ -87,11 +87,7 @@ export function PipetteFields(props: Props): JSX.Element {
   const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc: DropdownOption[], def: Values<typeof allLabware>) => {
-      if (
-        def.metadata.displayCategory !== 'tipRack' ||
-        def.brand.brand === 'opentrons OT-3'
-      )
-        return acc
+      if (def.metadata.displayCategory !== 'tipRack') return acc
       return [
         ...acc,
         {
