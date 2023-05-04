@@ -80,7 +80,7 @@ const ProtocolHeader = (props: {
           onClick={() => history.goBack()}
           width="2.5rem"
         >
-          <Icon name="back" width="1.25rem" color={COLORS.darkBlack_hundred} />
+          <Icon name="back" width="2.5rem" color={COLORS.darkBlack_hundred} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
