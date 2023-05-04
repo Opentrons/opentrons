@@ -11,7 +11,7 @@ export const OverflowBtn = React.forwardRef(
       <Btn
         css={css`
           border-radius: ${SPACING.spacing4};
-          max-height: ${SPACING.spacing6};
+          max-height: ${SPACING.spacing32};
 
           &:hover {
             background-color: ${COLORS.lightGreyHover};

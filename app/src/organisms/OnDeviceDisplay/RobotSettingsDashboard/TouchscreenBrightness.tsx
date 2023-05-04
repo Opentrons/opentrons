@@ -103,7 +103,7 @@ export function TouchscreenBrightness({
         marginTop="7.625rem"
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
       >
         <Btn
           disabled={brightness === LOWEST_BRIGHTNESS}

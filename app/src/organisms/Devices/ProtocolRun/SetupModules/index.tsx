@@ -35,7 +35,7 @@ export const SetupModules = ({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <>
-      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing6}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
         {toggleGroup}
         {selectedValue === t('list_view') ? (
           <SetupModulesList robotName={robotName} runId={runId} />

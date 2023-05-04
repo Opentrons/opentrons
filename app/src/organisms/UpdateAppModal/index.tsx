@@ -97,7 +97,7 @@ const SPINNER = (
   >
     <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
       <Icon spin name="ot-spinner" width={SIZE_4} />
-      <Text marginTop={SPACING.spacing6}>{DOWNLOAD_IN_PROGRESS}</Text>
+      <Text marginTop={SPACING.spacing32}>{DOWNLOAD_IN_PROGRESS}</Text>
     </Flex>
   </BaseModal>
 )

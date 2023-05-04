@@ -108,7 +108,7 @@ export const ConfirmAttachmentModal = (
             role="button"
             onClick={onCloseClick}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}

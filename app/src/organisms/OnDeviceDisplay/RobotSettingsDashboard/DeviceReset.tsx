@@ -39,7 +39,7 @@ const OptionButton = styled.input`
 `
 
 const OptionLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing16} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border: 2px solid
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light_two};
@@ -115,7 +115,7 @@ export function DeviceReset({
           backgroundColor={COLORS.warningBackgroundMed}
           alignItems={ALIGN_CENTER}
           gridGap="0.75rem"
-          padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           borderRadius={BORDERS.size_three}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
@@ -129,7 +129,7 @@ export function DeviceReset({
         </Flex>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         gridGap={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
       >
@@ -162,7 +162,7 @@ export function DeviceReset({
         ))}
       </Flex>
       <AlertPrimaryButton
-        paddingY={SPACING.spacing5}
+        paddingY={SPACING.spacing24}
         marginTop="3.5rem"
         disabled={
           Object.keys(resetOptions).length === 0 ||

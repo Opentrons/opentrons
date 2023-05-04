@@ -300,7 +300,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <Flex
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacingM}
+                paddingRight={SPACING.spacing20}
                 paddingBottom={SPACING.spacing8}
                 data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
               >

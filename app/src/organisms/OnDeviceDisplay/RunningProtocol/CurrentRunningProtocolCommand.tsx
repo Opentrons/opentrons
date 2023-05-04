@@ -155,7 +155,7 @@ export function CurrentRunningProtocolCommand({
 
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
@@ -166,7 +166,7 @@ export function CurrentRunningProtocolCommand({
         />
       </Flex>
       <Flex
-        padding={`0.75rem ${SPACING.spacing5}`}
+        padding={`0.75rem ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
         borderRadius={BORDERS.size_two}
         justifyContent={JUSTIFY_CENTER}

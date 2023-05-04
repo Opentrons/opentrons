@@ -40,7 +40,7 @@ export function KeyParts(): JSX.Element {
       </StyledText>
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginY={SPACING.spacing6}
+        marginY={SPACING.spacing32}
         alignItems={ALIGN_FLEX_START}
       >
         <img
@@ -54,7 +54,7 @@ export function KeyParts(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           marginTop="8rem"
-          marginRight={SPACING.spacing6}
+          marginRight={SPACING.spacing32}
         >
           <Trans
             t={t}

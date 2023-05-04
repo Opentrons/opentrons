@@ -65,7 +65,7 @@ export function ConfirmCancelRunModal({
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          padding={SPACING.spacing6}
+          padding={SPACING.spacing32}
           gridGap="0.75rem"
         >
           <StyledText

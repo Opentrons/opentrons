@@ -38,7 +38,7 @@ export function DeviceDetails(): JSX.Element | null {
         overflow={OVERFLOW_SCROLL}
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
-        paddingBottom={SPACING.spacing7}
+        paddingBottom={SPACING.spacing48}
       >
         <Flex
           alignItems={ALIGN_CENTER}

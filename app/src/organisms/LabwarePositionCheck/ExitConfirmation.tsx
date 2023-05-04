@@ -30,7 +30,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
       <Flex
@@ -40,7 +40,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
       >
         <Icon name="ot-check" size={SIZE_3} color={COLORS.warningEnabled} />
-        <StyledText as="h1" marginTop={SPACING.spacing5}>
+        <StyledText as="h1" marginTop={SPACING.spacing24}>
           {t('exit_screen_title')}
         </StyledText>
         <StyledText as="p" marginTop={SPACING.spacing8}>
@@ -49,7 +49,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
       </Flex>
       <Flex
         width="100%"
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >

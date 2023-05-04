@@ -88,7 +88,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               lineHeight={TYPOGRAPHY.lineHeight24}
-              paddingLeft={SPACING.spacing5}
+              paddingLeft={SPACING.spacing24}
             >
               {t('location')}
             </StyledText>
@@ -99,7 +99,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               lineHeight={TYPOGRAPHY.lineHeight24}
-              paddingLeft={SPACING.spacing5}
+              paddingLeft={SPACING.spacing24}
             >
               {t('hardware')}
             </StyledText>
@@ -114,7 +114,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
                 <StyledText
                   color={COLORS.darkBlack_hundred}
                   lineHeight={TYPOGRAPHY.lineHeight28}
-                  paddingLeft={SPACING.spacing5}
+                  paddingLeft={SPACING.spacing24}
                 >
                   {getHardwareLocation(hardware, t)}
                 </StyledText>
@@ -123,7 +123,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
                 <StyledText
                   color={COLORS.darkBlack_hundred}
                   lineHeight={TYPOGRAPHY.lineHeight28}
-                  paddingLeft={SPACING.spacing5}
+                  paddingLeft={SPACING.spacing24}
                 >
                   {getHardwareName(hardware)}
                 </StyledText>

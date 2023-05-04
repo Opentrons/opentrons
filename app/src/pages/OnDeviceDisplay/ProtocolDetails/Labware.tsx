@@ -83,7 +83,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               lineHeight={TYPOGRAPHY.lineHeight24}
-              paddingLeft={SPACING.spacing5}
+              paddingLeft={SPACING.spacing24}
             >
               {t('labware_name')}
             </StyledText>
@@ -111,7 +111,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
-                  paddingLeft={SPACING.spacing5}
+                  paddingLeft={SPACING.spacing24}
                 >
                   {definition?.namespace === 'opentrons' ? (
                     <Icon
@@ -123,7 +123,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                       marginRight={SPACING.spacing8}
                     />
                   ) : (
-                    <Flex marginLeft={SPACING.spacingM} />
+                    <Flex marginLeft={SPACING.spacing20} />
                   )}
                   <StyledText
                     alignItems={ALIGN_CENTER}

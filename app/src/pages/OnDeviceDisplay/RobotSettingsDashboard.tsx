@@ -247,11 +247,11 @@ const RobotSettingButton = ({
     <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           <Icon name={iconName} size="3rem" />
           <Flex
             flexDirection={DIRECTION_COLUMN}

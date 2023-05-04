@@ -50,7 +50,7 @@ export function ProtocolAnalysisFailure(
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
-    <Banner type="warning" marginRight={SPACING.spacing5}>
+    <Banner type="warning" marginRight={SPACING.spacing24}>
       <Flex
         columnGap={SPACING.spacing8}
         flex="1"

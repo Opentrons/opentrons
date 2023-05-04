@@ -55,8 +55,8 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
     <>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        paddingX={SPACING.spacing6}
-        paddingTop={SPACING.spacing6}
+        paddingX={SPACING.spacing32}
+        paddingTop={SPACING.spacing32}
         height="100%"
       >
         <Flex
@@ -90,7 +90,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
                     css={css`
                       display: list-item;
                     `}
-                    marginLeft={SPACING.spacing6}
+                    marginLeft={SPACING.spacing32}
                     as="p"
                   />
                 ),
@@ -100,7 +100,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
           <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
         </Flex>
       </Flex>
-      <Flex justifyContent={JUSTIFY_FLEX_END} margin={SPACING.spacing6}>
+      <Flex justifyContent={JUSTIFY_FLEX_END} margin={SPACING.spacing32}>
         <PrimaryButton onClick={confirm}>{t('confirm_level')}</PrimaryButton>
       </Flex>
     </>

@@ -49,7 +49,7 @@ export const HeaterShakerIsRunningModal = (
       <Icon
         name="alert-circle"
         marginX={SPACING.spacing8}
-        size={SPACING.spacingM}
+        size={SPACING.spacing20}
         color={COLORS.warningEnabled}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
@@ -93,7 +93,7 @@ export const HeaterShakerIsRunningModal = (
 
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           marginRight={SPACING.spacing8}
           padding={SPACING.spacingSM}
           onClick={handleStopShake}
@@ -102,7 +102,7 @@ export const HeaterShakerIsRunningModal = (
           {t('stop_shaking_start_run')}
         </SecondaryButton>
         <PrimaryButton
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           padding={SPACING.spacingSM}
           onClick={handleContinueShaking}
           id="HeaterShakerIsRunningModal_keep_shaking"

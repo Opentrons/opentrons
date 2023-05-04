@@ -128,7 +128,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
       <Flex gridGap={SPACING.spacingXXL}>
@@ -161,7 +161,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       </Flex>
       <Flex
         width="100%"
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >

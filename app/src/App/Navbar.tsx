@@ -104,7 +104,7 @@ const NavbarIcon = styled(Icon)`
 
 const LogoImg = styled('img')`
   align-self: ${ALIGN_CENTER};
-  margin: ${SPACING.spacing5} 0;
+  margin: ${SPACING.spacing24} 0;
 `
 
 export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {

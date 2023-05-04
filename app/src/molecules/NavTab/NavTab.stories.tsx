@@ -20,7 +20,7 @@ const Template: Story<React.ComponentProps<typeof NavTab>> = args => (
     marginTop={SPACING.spacing16}
     alignItems={ALIGN_START}
     flexDirection={DIRECTION_ROW}
-    gridGap={SPACING.spacingM}
+    gridGap={SPACING.spacing20}
   >
     <MemoryRouter initialEntries={['/general']}>
       <NavTab to="/general" tabName="General" />

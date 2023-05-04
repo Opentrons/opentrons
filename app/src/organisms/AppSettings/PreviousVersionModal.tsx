@@ -48,7 +48,7 @@ export function PreviousVersionModal(
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <PrimaryButton
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           onClick={props.closeModal}
           id="PreviousVersionModal_closeButton"
         >

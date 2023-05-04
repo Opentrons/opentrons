@@ -88,7 +88,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_END}
           position={POSITION_FIXED}
-          right={SPACING.spacing6}
+          right={SPACING.spacing32}
           bottom={SPACING.spacing16}
           zIndex={1000}
         >

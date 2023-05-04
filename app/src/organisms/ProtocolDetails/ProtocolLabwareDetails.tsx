@@ -114,7 +114,7 @@ export const ProtocolLabwareDetailItem = (
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           width="66%"
-          marginRight={SPACING.spacingM}
+          marginRight={SPACING.spacing20}
         >
           {namespace === 'opentrons' ? (
             <Icon
@@ -126,9 +126,9 @@ export const ProtocolLabwareDetailItem = (
               marginRight={SPACING.spacing8}
             />
           ) : (
-            <Flex marginLeft={SPACING.spacingM} />
+            <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText as="p" paddingRight={SPACING.spacing6}>
+          <StyledText as="p" paddingRight={SPACING.spacing32}>
             {displayName}
           </StyledText>
         </Flex>

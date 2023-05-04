@@ -275,7 +275,7 @@ export function ChooseRobotSlideout(
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
             textAlign={TYPOGRAPHY.textAlignCenter}
-            marginTop={SPACING.spacing5}
+            marginTop={SPACING.spacing24}
           >
             <StyledText as="p" color={COLORS.darkGreyEnabled}>
               {showIdleOnly

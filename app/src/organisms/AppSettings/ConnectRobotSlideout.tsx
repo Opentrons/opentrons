@@ -90,14 +90,14 @@ export function ConnectRobotSlideout({
         >
           {t('connect_ip_link')}
         </ExternalLink>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
           {t('add_ip_hostname')}
         </StyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           marginBottom={SPACING.spacing16}
           justifyContent={ALIGN_FLEX_END}
         >

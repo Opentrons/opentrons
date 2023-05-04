@@ -108,8 +108,8 @@ export function RecentRunProtocolCard({
       aria-label="RecentRunCard"
       css={CARD_STYLE}
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing5}
-      gridGap={SPACING.spacing5}
+      padding={SPACING.spacing24}
+      gridGap={SPACING.spacing24}
       backgroundColor={
         isReadyToBeReRun ? COLORS.green_three : COLORS.yellow_three
       }

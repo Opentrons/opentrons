@@ -63,7 +63,7 @@ export function WifiConnectionDetails({
   }, [robotName, dispatch])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
       {showHeader && <TitleHeader />}
       <DisplayConnectionStatus connected={wifi != null} />
       <DisplayConnectedNetworkInfo
@@ -74,7 +74,7 @@ export function WifiConnectionDetails({
       <DisplayButtons showWifiListButton={showWifiListButton} />
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
       >
         <Link to="menu">
@@ -114,7 +114,7 @@ const DisplayConnectionStatus = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+      padding={`${String(SPACING.spacing24)} ${String(SPACING.spacingXXL)}`}
       backgroundColor={
         connected ? COLORS.successBackgroundMed : COLORS.light_two
       }
@@ -128,7 +128,7 @@ const DisplayConnectionStatus = ({
         color={connected ? COLORS.successEnabled : COLORS.light_two}
       />
       <StyledText
-        marginLeft={SPACING.spacing5}
+        marginLeft={SPACING.spacing24}
         fontSize="1.625rem"
         fontWeight="700"
         lineHeight="2.1875rem"
@@ -164,8 +164,8 @@ const DisplayConnectedNetworkInfo = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      paddingX={SPACING.spacing6}
-      paddingY={SPACING.spacing5}
+      paddingX={SPACING.spacing32}
+      paddingY={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.darkGreyDisabled}
       borderRadius={BORDERS.size_three}

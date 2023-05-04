@@ -80,8 +80,8 @@ function RowModule({
       }
       borderRadius={BORDERS.size_three}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
-      gridGap={SPACING.spacing5}
-      padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
+      gridGap={SPACING.spacing24}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       onClick={() =>
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }
@@ -247,8 +247,8 @@ export function ProtocolSetupModules({
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing24}
+        marginTop={SPACING.spacing32}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
@@ -266,10 +266,10 @@ export function ProtocolSetupModules({
             color={COLORS.darkBlack_seventy}
             fontSize={TYPOGRAPHY.fontSize22}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            gridGap={SPACING.spacing5}
+            gridGap={SPACING.spacing24}
             lineHeight={TYPOGRAPHY.lineHeight28}
           >
-            <Flex paddingLeft={SPACING.spacing5} width="22.75rem">
+            <Flex paddingLeft={SPACING.spacing24} width="22.75rem">
               <StyledText>{'Module Name'}</StyledText>
             </Flex>
             <Flex width="13.8125rem" paddingLeft="0.9375rem">

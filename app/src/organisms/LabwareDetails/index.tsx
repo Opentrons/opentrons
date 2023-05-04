@@ -113,7 +113,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           data-testid="labwareDetails_slideout_close_button"
         >
-          <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
+          <Icon name="close" height={SPACING.spacing24} css={CLOSE_ICON_STYLE} />
         </Link>
       </Flex>
       {!isCustomDefinition && (
@@ -161,7 +161,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       <Box
         backgroundColor={COLORS.fundamentalsBackground}
         padding={SPACING.spacing16}
-        marginBottom={SPACING.spacing5}
+        marginBottom={SPACING.spacing24}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">

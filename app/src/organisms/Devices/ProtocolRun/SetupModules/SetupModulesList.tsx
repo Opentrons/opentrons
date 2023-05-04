@@ -84,7 +84,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
           <Banner
             iconMarginRight={SPACING.spacing16}
             iconMarginLeft={SPACING.spacing8}
-            size={SPACING.spacingM}
+            size={SPACING.spacing20}
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
             closeButton={
@@ -114,7 +114,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginTop={SPACING.spacing16}
-        marginLeft={SPACING.spacingM}
+        marginLeft={SPACING.spacing20}
         marginBottom={SPACING.spacing4}
       >
         <StyledText
@@ -148,7 +148,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         overflowY="auto"
         data-testid="SetupModulesList_ListView"
         gridGap={SPACING.spacing4}
-        marginBottom={SPACING.spacing5}
+        marginBottom={SPACING.spacing24}
       >
         {map(
           moduleRenderInfoForProtocolById,
@@ -237,13 +237,13 @@ export const ModulesListItem = ({
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
-              marginLeft={SPACING.spacingM}
+              marginLeft={SPACING.spacing20}
             >
               {displayName}
             </StyledText>
             {moduleModel === HEATERSHAKER_MODULE_V1 ? (
               <Btn
-                marginLeft={SPACING.spacingM}
+                marginLeft={SPACING.spacing20}
                 css={css`
                   color: ${COLORS.darkGreyEnabled};
 

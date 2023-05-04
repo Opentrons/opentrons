@@ -53,7 +53,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
       type="error"
       marginBottom={SPACING.spacing16}
       paddingRight={SPACING.spacing16}
-      marginRight={SPACING.spacing5}
+      marginRight={SPACING.spacing24}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {t('module_error')}

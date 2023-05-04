@@ -28,7 +28,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing8}
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
     >
       {targetSpacings.map((spacing, index) => (
         <Flex

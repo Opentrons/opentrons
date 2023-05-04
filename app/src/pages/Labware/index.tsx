@@ -121,7 +121,7 @@ export function Labware(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
-          paddingBottom={SPACING.spacing5}
+          paddingBottom={SPACING.spacing24}
         >
           <StyledText
             as="h1"
@@ -137,7 +137,7 @@ export function Labware(): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_FLEX_END}
-          paddingBottom={SPACING.spacing5}
+          paddingBottom={SPACING.spacing24}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -231,7 +231,7 @@ export function Labware(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
         >
           <StyledText
             as="p"

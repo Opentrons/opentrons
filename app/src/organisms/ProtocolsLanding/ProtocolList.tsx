@@ -140,7 +140,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing5}
+        marginBottom={SPACING.spacing24}
       >
         <StyledText as="h1">{t('protocols')}</StyledText>
         <Flex flexDirection={DIRECTION_ROW}>

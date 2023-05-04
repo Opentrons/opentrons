@@ -50,7 +50,7 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
       font-size: ${TYPOGRAPHY.fontSize22};
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       line-height: ${TYPOGRAPHY.lineHeight28};
-      padding: ${SPACING.spacing16} ${SPACING.spacing5};
+      padding: ${SPACING.spacing16} ${SPACING.spacing24};
       text-transform: ${TYPOGRAPHY.textTransformNone};
 
       ${props.isSelected === true ? SELECTED_STYLE : UNSELECTED_STYLE}

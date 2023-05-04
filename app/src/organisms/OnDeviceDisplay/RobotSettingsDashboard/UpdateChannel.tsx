@@ -34,7 +34,7 @@ const SettingButton = styled.input`
 `
 
 const SettingButtonLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing5};
+  padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.size_four};
   cursor: pointer;
   background: ${({ isSelected }) =>
@@ -90,7 +90,7 @@ export function UpdateChannel({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
       >
         {modifiedChannelOptions.map(radio => (
           <React.Fragment key={`channel_setting_${radio.label}`}>

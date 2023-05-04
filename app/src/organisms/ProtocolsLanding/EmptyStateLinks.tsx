@@ -29,7 +29,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      marginY={SPACING.spacing6}
+      marginY={SPACING.spacing32}
       paddingBottom={SPACING.spacing8}
       width="96.5%"
     >

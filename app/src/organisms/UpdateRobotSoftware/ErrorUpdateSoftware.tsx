@@ -62,7 +62,7 @@ export function ErrorUpdateSoftware({
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         gridGap="0.75rem"
       >
         <SecondaryButton

@@ -33,7 +33,7 @@ const Table = styled('table')`
 const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing8} ${SPACING.spacing5};
+  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8} ${SPACING.spacing24};
   color: ${COLORS.darkBlack_seventy};
 `
 
@@ -42,7 +42,7 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing16} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
   background-color: ${COLORS.light_one};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;

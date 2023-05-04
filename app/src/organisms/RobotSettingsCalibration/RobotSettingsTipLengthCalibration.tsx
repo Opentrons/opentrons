@@ -80,7 +80,7 @@ export function RobotSettingsTipLengthCalibration({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      paddingY={SPACING.spacing5}
+      paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

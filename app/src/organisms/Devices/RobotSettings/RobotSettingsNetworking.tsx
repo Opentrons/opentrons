@@ -116,7 +116,7 @@ export function RobotSettingsNetworking({
         <Box paddingLeft="3.75rem">
           {wifi?.ipAddress != null ? (
             <>
-              <Flex marginBottom={SPACING.spacing5}>
+              <Flex marginBottom={SPACING.spacing24}>
                 <Flex marginRight={SPACING.spacing8}>
                   <SelectNetwork
                     robotName={robotName}

@@ -60,7 +60,7 @@ export function FailedToConnect({
         height="26.5625rem"
         backgroundColor={COLORS.errorBackgroundMed}
         justifyContent={JUSTIFY_CENTER}
-        marginBottom={SPACING.spacing6}
+        marginBottom={SPACING.spacing32}
       >
         <Flex
           justifyContent={JUSTIFY_CENTER}

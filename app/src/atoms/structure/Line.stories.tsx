@@ -17,9 +17,9 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof Line>> = args => (
   <>
-    <Box paddingBottom={SPACING.spacing5}>
+    <Box paddingBottom={SPACING.spacing24}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box marginRight={SPACING.spacing6}>
+        <Box marginRight={SPACING.spacing32}>
           <Box marginBottom={SPACING.spacing8}>
             <StyledText as="h3SemiBold">{'About Calibration'}</StyledText>
           </Box>
@@ -30,9 +30,9 @@ const Template: Story<React.ComponentProps<typeof Line>> = args => (
       </Flex>
     </Box>
     <Line {...args} />
-    <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+    <Box paddingTop={SPACING.spacing24} paddingBottom={SPACING.spacing24}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box marginRight={SPACING.spacing6}>
+        <Box marginRight={SPACING.spacing32}>
           <Box marginBottom={SPACING.spacing8}>
             <StyledText as="h3SemiBold">{'Deck Calibration'}</StyledText>
           </Box>

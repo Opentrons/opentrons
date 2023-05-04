@@ -29,7 +29,7 @@ export function ConfirmCrashRecovery(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>

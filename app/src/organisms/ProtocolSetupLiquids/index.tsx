@@ -81,7 +81,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
       borderRadius={BORDERS.size_four}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
       width="100%"
     >
       <Flex

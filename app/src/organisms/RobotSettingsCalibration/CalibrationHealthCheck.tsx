@@ -136,7 +136,7 @@ export function CalibrationHealthCheck({
 
   return (
     <Flex
-      paddingY={SPACING.spacing5}
+      paddingY={SPACING.spacing24}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >

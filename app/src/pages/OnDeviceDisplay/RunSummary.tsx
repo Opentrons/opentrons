@@ -105,7 +105,7 @@ export function RunSummary(): JSX.Element {
             backgroundColor={isRunSucceeded ? COLORS.green_two : COLORS.red_two}
           >
             <SplashFrame>
-              <Flex gridGap={SPACING.spacing6} alignItems={ALIGN_CENTER}>
+              <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
                 <Icon
                   name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
                   size="4.5rem"
@@ -202,9 +202,9 @@ export function RunSummary(): JSX.Element {
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
-        paddingRight={SPACING.spacing6}
+        paddingRight={SPACING.spacing32}
       >
         <Link to="/dashboard">
           <TertiaryButton>back to RobotDashboard</TertiaryButton>

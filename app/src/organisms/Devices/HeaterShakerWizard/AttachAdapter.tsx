@@ -55,7 +55,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           <Flex
             padding={`${String(SPACING.spacing4)} 5rem ${String(
               SPACING.spacing16
-            )} ${String(SPACING.spacing7)}`}
+            )} ${String(SPACING.spacing48)}`}
             data-testid="attach_adapter_screw_in_adapter_image"
           >
             <img height="160px" src={screwInAdapter} alt="screw_in_adapter" />
@@ -134,7 +134,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           width="100%"
         >
           <Flex
-            padding={`${String(SPACING.spacingM)} ${String(
+            padding={`${String(SPACING.spacing20)} ${String(
               SPACING.spacingXXL
             )} ${String(SPACING.spacingXL)} ${String(SPACING.spacingXL)}`}
             data-testid="attach_adapter_alignment_image"
@@ -173,8 +173,8 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           padding={`${String(SPACING.spacing16)} ${String(
-            SPACING.spacingM
-          )} ${String(SPACING.spacingM)} ${String(SPACING.spacing16)}`}
+            SPACING.spacing20
+          )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
           width="100%"
           marginBottom={SPACING.spacingSM}
           data-testid="attach_adapter_check_alignment_instructions"

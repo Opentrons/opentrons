@@ -59,7 +59,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
       >
         {toggleGroup}
         {selectedValue === t('list_view') ? (

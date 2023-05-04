@@ -55,7 +55,7 @@ export function RunningProtocolSkeleton({
 
           <Flex
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing6}
+            gridGap={SPACING.spacing32}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
             marginBottom={SPACING.spacingXXL}

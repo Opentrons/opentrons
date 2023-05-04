@@ -99,7 +99,7 @@ export function UpdateRobot(): JSX.Element {
 
   return (
     <Flex
-      padding={`${String(SPACING.spacing5)} ${String(
+      padding={`${String(SPACING.spacing24)} ${String(
         SPACING.spacingXXL
       )} ${String(SPACING.spacingXXL)}`}
     >

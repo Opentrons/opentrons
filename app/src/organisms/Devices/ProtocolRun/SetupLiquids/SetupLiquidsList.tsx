@@ -163,7 +163,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             <StyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              marginRight={SPACING.spacing6}
+              marginRight={SPACING.spacing32}
             >
               {t('labware_name')}
             </StyledText>

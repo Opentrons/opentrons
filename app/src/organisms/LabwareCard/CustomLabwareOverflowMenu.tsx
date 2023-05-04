@@ -112,7 +112,7 @@ export function CustomLabwareOverflowMenu(
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top={SPACING.spacing6}
+          top={SPACING.spacing32}
           right={0}
           flexDirection={DIRECTION_COLUMN}
           whiteSpace="nowrap"
@@ -149,12 +149,12 @@ export function CustomLabwareOverflowMenu(
               <Flex
                 justifyContent={JUSTIFY_FLEX_END}
                 alignItems={ALIGN_CENTER}
-                marginTop={SPACING.spacing5}
+                marginTop={SPACING.spacing24}
               >
                 <Btn
                   onClick={handleCancelModal}
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  marginRight={SPACING.spacing5}
+                  marginRight={SPACING.spacing24}
                   css={TYPOGRAPHY.linkPSemiBold}
                 >
                   {t('shared:cancel')}

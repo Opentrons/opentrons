@@ -94,7 +94,7 @@ export function SetupLabwarePositionCheck(
         />
       ) : (
         <Flex
-          paddingY={SPACING.spacing6}
+          paddingY={SPACING.spacing32}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >

@@ -29,7 +29,7 @@ describe('FloatingActionButton', () => {
     expect(button).toHaveStyle(
       `background-color: ${COLORS.highlightPurple_one}`
     )
-    expect(button).toHaveStyle(`padding: 0.75rem ${SPACING.spacing5}`)
+    expect(button).toHaveStyle(`padding: 0.75rem ${SPACING.spacing24}`)
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)

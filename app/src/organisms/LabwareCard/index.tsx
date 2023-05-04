@@ -54,7 +54,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         1fr
       )"
     >
-      <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing5}>
+      <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
           viewBox={`0 0 ${String(definition.dimensions.xDimension)} ${String(
             definition.dimensions.yDimension

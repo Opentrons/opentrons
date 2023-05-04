@@ -112,7 +112,7 @@ const ProtocolHeader = (props: {
           borderRadius={BORDERS.size_six}
           boxShadow="none"
           onClick={handleRunProtocol}
-          padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         >
           <StyledText
             fontSize="2.333125rem"
@@ -194,7 +194,7 @@ const Summary = (props: {
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         maxWidth="22rem"
         padding={`${SPACING.spacing8} 0.75rem`}
       >
@@ -319,7 +319,7 @@ export function ProtocolDetails(): JSX.Element | null {
     protocolRecord?.data.files[0].name
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
       {showMaxPinsAlert && (
         <SmallModalChildren
           header={t('too_many_pins_header')}

@@ -114,7 +114,7 @@ export const DisconnectModal = ({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {isError ? (
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {requestState != null &&
             'error' in requestState &&
             'message' in requestState?.error
@@ -122,11 +122,11 @@ export const DisconnectModal = ({
               : t('shared:unknown_error')}
           </StyledText>
         ) : null}
-        <StyledText as="p" marginBottom={SPACING.spacing5}>
+        <StyledText as="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
         </StyledText>
         {isError ? (
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {t('shared:general_error_message')}
           </StyledText>
         ) : null}
@@ -139,7 +139,7 @@ export const DisconnectModal = ({
                 role="button"
                 onClick={handleCancel}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginRight={SPACING.spacing5}
+                marginRight={SPACING.spacing24}
                 css={TYPOGRAPHY.linkPSemiBold}
               >
                 {t('shared:cancel')}

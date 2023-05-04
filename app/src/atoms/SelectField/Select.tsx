@@ -154,7 +154,7 @@ function DropdownIndicator(
         position={POSITION_ABSOLUTE}
         top="0.55rem"
         right={SPACING.spacing8}
-        width={SPACING.spacingM}
+        width={SPACING.spacing20}
       >
         {Boolean(props.selectProps.menuIsOpen) ? (
           <Icon transform="rotate(180deg)" name="menu-down" height="1.25rem" />

@@ -455,7 +455,7 @@ export function ProtocolDetails(
                 </StyledText>
                 <StyledText
                   as="p"
-                  marginRight={SPACING.spacingM}
+                  marginRight={SPACING.spacing20}
                   overflowWrap="anywhere"
                 >
                   {analysisStatus === 'loading' ? t('shared:loading') : author}
@@ -523,8 +523,8 @@ export function ProtocolDetails(
                 disabled={analysisStatus !== 'complete'}
                 display={DISPLAY_FLEX}
                 justifyContent={JUSTIFY_CENTER}
-                height={SPACING.spacing5}
-                width={SPACING.spacing5}
+                height={SPACING.spacing24}
+                width={SPACING.spacing24}
                 css={ZOOM_ICON_STYLE}
                 onClick={() => setShowDeckViewModal(true)}
               >

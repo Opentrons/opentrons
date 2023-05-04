@@ -225,7 +225,7 @@ export function LabwareListItem(
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
           marginLeft={SPACING.spacing16}
-          marginRight={SPACING.spacing5}
+          marginRight={SPACING.spacing24}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
@@ -253,7 +253,7 @@ export function LabwareListItem(
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginTop={SPACING.spacingS}
+              marginTop="3px"
             >
               <ToggleButton
                 label={`heater_shaker_${

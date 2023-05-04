@@ -37,8 +37,8 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
       padding={`${String(SPACING.spacingXXL)} ${String(
-        SPACING.spacing7
-      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing7)}`}
+        SPACING.spacing48
+      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing48)}`}
       data-testid="interstitial"
       {...outerProps}
     >

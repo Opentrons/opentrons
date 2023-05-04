@@ -196,7 +196,7 @@ export function AdvancedSettings(): JSX.Element {
 
   return (
     <>
-      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing5}>
+      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing24}>
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -224,7 +224,7 @@ export function AdvancedSettings(): JSX.Element {
                       textTransform={TYPOGRAPHY.textTransformCapitalize}
                       color={COLORS.blueEnabled}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                      marginRight={SPACING.spacing6}
+                      marginRight={SPACING.spacing32}
                     >
                       {t('shared:cancel')}
                     </Btn>
@@ -266,7 +266,7 @@ export function AdvancedSettings(): JSX.Element {
             />
           </Flex>
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -330,7 +330,7 @@ export function AdvancedSettings(): JSX.Element {
             </TertiaryButton>
           }
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Box>
           <StyledText
             css={TYPOGRAPHY.h3SemiBold}
@@ -368,7 +368,7 @@ export function AdvancedSettings(): JSX.Element {
             ]}
           />
         </Box>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
@@ -402,7 +402,7 @@ export function AdvancedSettings(): JSX.Element {
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -426,7 +426,7 @@ export function AdvancedSettings(): JSX.Element {
             {t('clear_robots_button')}
           </TertiaryButton>
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box>
             <StyledText
@@ -502,7 +502,7 @@ export function AdvancedSettings(): JSX.Element {
             )}
           </Box>
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
@@ -523,7 +523,7 @@ export function AdvancedSettings(): JSX.Element {
             id="AdvancedSettings_showHeaterShakerAttachmentBtn"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
@@ -544,7 +544,7 @@ export function AdvancedSettings(): JSX.Element {
             id="AdvancedSettings_showLinkToggleButton"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         {enableExtendedHardware ? (
           <>
             <Flex
@@ -570,7 +570,7 @@ export function AdvancedSettings(): JSX.Element {
                 id="AdvancedSettings_sendAllProtocolsToggleButton"
               />
             </Flex>
-            <Divider marginY={SPACING.spacing5} />
+            <Divider marginY={SPACING.spacing24} />
           </>
         ) : null}
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -634,7 +634,7 @@ export function AdvancedSettings(): JSX.Element {
             </TertiaryButton>
           )}
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText

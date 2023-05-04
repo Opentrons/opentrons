@@ -43,8 +43,8 @@ const OUTER_STYLE = css`
 `
 
 const INNER_STYLE_VALUE = css`
-  width: ${SPACING.spacingM};
-  min-width: ${SPACING.spacingM};
+  width: ${SPACING.spacing20};
+  min-width: ${SPACING.spacing20};
   color: ${COLORS.blueEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
@@ -69,8 +69,8 @@ const INNER_STYLE_VALUE = css`
 `
 
 const INNER_STYLE_NO_VALUE = css`
-  width: ${SPACING.spacingM};
-  min-width: ${SPACING.spacingM};
+  width: ${SPACING.spacing20};
+  min-width: ${SPACING.spacing20};
   color: ${COLORS.darkGreyEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};

@@ -69,12 +69,12 @@ export function RobotSystemVersion({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           marginTop="3rem"
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
         >
           {isUpdateAvailable ? (
             <Flex
               flexDirection={DIRECTION_ROW}
-              padding={`${SPACING.spacing5} ${SPACING.spacing16}`}
+              padding={`${SPACING.spacing24} ${SPACING.spacing16}`}
               gridGap={SPACING.spacing16}
               borderRadius={BORDERS.size_three}
               alignItems={ALIGN_CENTER}
@@ -90,7 +90,7 @@ export function RobotSystemVersion({
               </StyledText>
             </Flex>
           ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing5}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <StyledText
               fontSize="1.5rem"
               lineHeight="2.0625rem"
@@ -101,7 +101,7 @@ export function RobotSystemVersion({
             <Flex
               backgroundColor={COLORS.light_two}
               flexDirection={DIRECTION_ROW}
-              padding={SPACING.spacing5}
+              padding={SPACING.spacing24}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               borderRadius={BORDERS.size_three}
             >
@@ -122,7 +122,7 @@ export function RobotSystemVersion({
         </Flex>
         {isUpdateAvailable ? (
           <PrimaryButton
-            paddingY={SPACING.spacing5}
+            paddingY={SPACING.spacing24}
             marginTop="7.8125rem"
             onClick={() => console.log('open update modal')}
           >

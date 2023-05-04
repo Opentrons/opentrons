@@ -118,7 +118,7 @@ export function RobotSettings(): JSX.Element | null {
           <Box
             color={COLORS.black}
             css={TYPOGRAPHY.h1Default}
-            padding={`${String(SPACING.spacing5)} 0`}
+            padding={`${String(SPACING.spacing24)} 0`}
           >
             {t('robot_settings')}
           </Box>
@@ -164,7 +164,7 @@ export function RobotSettings(): JSX.Element | null {
         </Box>
         <Line />
         <Box
-          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing16)}`}
+          padding={`${String(SPACING.spacing24)} ${String(SPACING.spacing16)}`}
         >
           <ApiHostProvider
             hostname={robot?.ip ?? null}

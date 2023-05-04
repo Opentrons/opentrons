@@ -57,13 +57,13 @@ export function AppSettings(): JSX.Element {
         minHeight="95%"
       >
         <Box padding={SPACING.spacing16} paddingBottom="0">
-          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
+          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing24}>
             {t('app_settings')}
           </Text>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacingM}
+            gridGap={SPACING.spacing20}
           >
             <NavTab to="/app-settings/general" tabName={t('general')} />
             <NavTab to="/app-settings/privacy" tabName={t('privacy')} />

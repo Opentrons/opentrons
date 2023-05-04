@@ -194,7 +194,7 @@ export function Toast(props: ToastProps): JSX.Element {
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
-          ? `${String(SPACING.spacing16)} ${String(SPACING.spacing5)}`
+          ? `${String(SPACING.spacing16)} ${String(SPACING.spacing24)}`
           : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
               SPACING.spacing8
             } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} 0.75rem`
@@ -215,7 +215,7 @@ export function Toast(props: ToastProps): JSX.Element {
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
-          width={showODDStyle ? SPACING.spacing6 : SPACING.spacing16}
+          width={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
           marginRight={SPACING.spacing8}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
@@ -270,7 +270,7 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText.length > 0 && (
-        <Link role="button" height={SPACING.spacing5}>
+        <Link role="button" height={SPACING.spacing24}>
           <StyledText
             color={
               showODDStyle ? COLORS.darkBlack_hundred : COLORS.darkBlackEnabled

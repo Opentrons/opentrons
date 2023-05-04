@@ -116,7 +116,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         data-testid="test_shake_banner_info"
       >
         <Flex
-          size={SPACING.spacing6}
+          size={SPACING.spacing32}
           color={COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing16}
         >
@@ -144,7 +144,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -221,7 +221,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_FLEX_START}
-          marginY={SPACING.spacing6}
+          marginY={SPACING.spacing32}
         >
           <StyledText width="22rem">{t('troubleshoot_step_1')}</StyledText>
           <TertiaryButton

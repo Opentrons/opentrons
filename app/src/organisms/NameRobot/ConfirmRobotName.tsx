@@ -32,7 +32,7 @@ export function ConfirmRobotName({
     <>
       <StepMeter totalSteps={5} currentStep={5} OnDevice />
       <Flex
-        padding={`${String(SPACING.spacing6)} ${String(
+        padding={`${String(SPACING.spacing32)} ${String(
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
         flexDirection={DIRECTION_COLUMN}

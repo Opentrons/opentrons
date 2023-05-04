@@ -81,7 +81,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
       >
         <InfoItem
           label={t('last_calibrated')}
@@ -130,7 +130,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
     <Flex
       borderRadius={BORDERS.size_three}
       backgroundColor={COLORS.lightGreyPressed}
-      padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight36}
       {...props}

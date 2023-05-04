@@ -44,7 +44,7 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '100%',
-  margin: SPACING.spacing5,
+  margin: SPACING.spacing24,
   border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
@@ -55,7 +55,7 @@ const HEADER_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${String(SPACING.spacing6)}`,
+  padding: `0px ${String(SPACING.spacing32)}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
@@ -67,8 +67,8 @@ const CONTENT_STYLE = {
   display: DISPLAY_FLEX,
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
-  gridGap: SPACING.spacing5,
-  padding: `${String(SPACING.spacing6)}`,
+  gridGap: SPACING.spacing24,
+  padding: `${String(SPACING.spacing32)}`,
   borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
     BORDERS.radiusSoftCorners
   )}`,

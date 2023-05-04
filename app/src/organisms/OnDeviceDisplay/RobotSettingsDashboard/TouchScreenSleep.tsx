@@ -72,7 +72,7 @@ export function TouchScreenSleep({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
       >
         {settingsButtons.map(radio => (
           <RadioButton

@@ -23,7 +23,7 @@ const CARD_BUTTON_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   border-radius: ${BORDERS.size_four};
-  padding: ${SPACING.spacing6};
+  padding: ${SPACING.spacing32};
   box-shadow: none;
 
   &:focus {

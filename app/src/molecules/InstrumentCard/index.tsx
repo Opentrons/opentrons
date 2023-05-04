@@ -91,7 +91,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         alignItems={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing2}
-        paddingRight={SPACING.spacing5}
+        paddingRight={SPACING.spacing24}
       >
         {banner}
         <StyledText

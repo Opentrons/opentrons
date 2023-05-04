@@ -52,7 +52,7 @@ export function SmallModalChildren(
           backgroundColor={COLORS.blueEnabled}
           borderRadius={BORDERS.size_three}
           flexDirection={DIRECTION_COLUMN}
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
           onClick={handleCloseMaxPinsAlert}
           padding={SPACING.spacing16}
         >

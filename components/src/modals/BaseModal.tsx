@@ -16,7 +16,7 @@ const BASE_STYLE = {
   left: 0,
   width: '100%',
   height: '100%',
-  padding: `${SPACING.spacing16}, ${SPACING.spacing5}`,
+  padding: `${SPACING.spacing16}, ${SPACING.spacing24}`,
 } as const
 
 const MODAL_STYLE = {
@@ -43,8 +43,8 @@ const FOOTER_STYLE = {
 
 const CONTENT_STYLE = {
   paddingTop: SPACING.spacing16,
-  paddingX: SPACING.spacing5,
-  paddingBottom: SPACING.spacing5,
+  paddingX: SPACING.spacing24,
+  paddingBottom: SPACING.spacing24,
 } as const
 
 export interface BaseModalProps extends StyleProps {

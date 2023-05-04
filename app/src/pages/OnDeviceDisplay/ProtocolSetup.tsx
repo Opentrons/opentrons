@@ -83,7 +83,7 @@ function ProtocolSetupStep({
         backgroundColor={backgroundColorByStepStatus[status]}
         borderRadius={BORDERS.size_four}
         gridGap={SPACING.spacing16}
-        padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+        padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
         {status !== 'general' ? (
           <Icon
@@ -300,7 +300,7 @@ function PrepareToRun({
       {/* Protocol Setup Header */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         marginBottom={SPACING.spacingXXL}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -440,7 +440,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
           <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
         </Flex>
-        <Flex gridGap={SPACING.spacing5}>
+        <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
           <PlayButton disabled onPlay={() => {}} />
         </Flex>

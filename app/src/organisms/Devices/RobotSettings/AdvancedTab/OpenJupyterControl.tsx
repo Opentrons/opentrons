@@ -54,7 +54,7 @@ export function OpenJupyterControl({
         onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
         as={Link}
         href={href}
-        marginLeft={SPACING.spacing6}
+        marginLeft={SPACING.spacing32}
         external
       >
         {t('launch_jupyter_notebook')}

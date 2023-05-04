@@ -38,7 +38,7 @@ export function DeckCalibrationConfirmModal({
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         >
           {t('deck_calibration_modal_pipette_description')}
         </StyledText>
@@ -47,7 +47,7 @@ export function DeckCalibrationConfirmModal({
             role="button"
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             color={COLORS.blueEnabled}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

@@ -222,7 +222,7 @@ export function FactoryResetSlideout({
             />
           ) : null}
         </Box>
-        <Box marginTop={SPACING.spacing5}>
+        <Box marginTop={SPACING.spacing24}>
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -256,7 +256,7 @@ export function FactoryResetSlideout({
             />
           ))}
         </Box>
-        <Box marginTop={SPACING.spacing5}>
+        <Box marginTop={SPACING.spacing24}>
           <StyledText
             as="p"
             css={TYPOGRAPHY.pSemiBold}

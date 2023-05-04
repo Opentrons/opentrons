@@ -71,7 +71,7 @@ const SELECTED_OPTIONS_STYLE = css`
 const ON_DEVICE_UNSELECTED_OPTIONS_STYLE = css`
   background-color: #cccccc;
   border-radius: ${BORDERS.size_four};
-  padding: ${SPACING.spacing5};
+  padding: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
   height: 5.25rem;
   width: 57.8125rem;
@@ -151,7 +151,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           ) : (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              paddingX={SPACING.spacing6}
+              paddingX={SPACING.spacing32}
               paddingY="1.75rem"
             >
               <StyledText
@@ -191,7 +191,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           )}
           <Flex
             alignItems={ALIGN_FLEX_END}
-            paddingX={SPACING.spacing6}
+            paddingX={SPACING.spacing32}
             paddingBottom="1.75rem"
             justifyContent={JUSTIFY_FLEX_END}
             marginTop="7.5rem"

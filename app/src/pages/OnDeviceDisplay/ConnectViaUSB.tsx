@@ -32,7 +32,7 @@ export function ConnectViaUSB(): JSX.Element {
     <>
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
-        padding={`${String(SPACING.spacing6)} ${String(
+        padding={`${String(SPACING.spacing32)} ${String(
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
         flexDirection={DIRECTION_COLUMN}
@@ -87,7 +87,7 @@ export function ConnectViaUSB(): JSX.Element {
             src={usbImage}
           />
           <StyledText
-            marginTop={SPACING.spacing6}
+            marginTop={SPACING.spacing32}
             marginX={SPACING.spacingXXL}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
@@ -132,7 +132,7 @@ const ConnectedViaDesktopApp = ({
         {description}
       </StyledText>
     </Flex>
-    <PrimaryButton marginTop={SPACING.spacing5} height="4.4375rem" width="100%">
+    <PrimaryButton marginTop={SPACING.spacing24} height="4.4375rem" width="100%">
       <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
         {buttonLabel}
       </StyledText>

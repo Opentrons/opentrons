@@ -103,7 +103,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       ? BORDERS.size_five
       : BORDERS.size_four};
     box-shadow: none;
-    padding: ${SPACING.spacing16} ${SPACING.spacing5};
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {

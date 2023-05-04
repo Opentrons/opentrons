@@ -136,8 +136,8 @@ export function Banner(props: BannerProps): JSX.Element {
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
-              width={SPACING.spacing5}
-              height={SPACING.spacing5}
+              width={SPACING.spacing24}
+              height={SPACING.spacing24}
               marginTop="0.375rem"
               name="close"
               aria-label="close_icon"

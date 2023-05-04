@@ -66,7 +66,7 @@ export const SecureLabwareModal = (
                 width="288px"
                 height="100%"
                 src={secureMagModBracketImage}
-                style={{ marginBottom: SPACING.spacing5 }}
+                style={{ marginBottom: SPACING.spacing24 }}
               />
             </Flex>
           )}

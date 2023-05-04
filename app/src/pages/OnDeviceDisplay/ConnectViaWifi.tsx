@@ -191,7 +191,7 @@ export function ConnectViaWifi(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${String(SPACING.spacing6)} ${String(
+        padding={`${String(SPACING.spacing32)} ${String(
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
       >

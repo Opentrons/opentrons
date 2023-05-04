@@ -293,7 +293,7 @@ export function ProtocolCard(props: {
       lineHeight={TYPOGRAPHY.lineHeight28}
       marginBottom={SPACING.spacing8}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
       ref={longpress.ref}
     >
       <Flex width="30.8125rem" overflowWrap="anywhere">

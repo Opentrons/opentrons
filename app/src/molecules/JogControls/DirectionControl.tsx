@@ -293,7 +293,7 @@ const ARROW_GRID_STYLES = css`
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     max-width: 415px;
-    grid-gap: ${SPACING.spacingM};
+    grid-gap: ${SPACING.spacing20};
     grid-template-areas:
       '.         .         ArrowUp   ArrowUp   .          .         '
       'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'

@@ -46,7 +46,7 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        paddingX={SPACING.spacing5}
+        paddingX={SPACING.spacing24}
         paddingY={SPACING.spacing16}
       >
         <Flex>
@@ -67,8 +67,8 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
               >
                 <Icon
                   name="close"
-                  width={SPACING.spacing5}
-                  height={SPACING.spacing5}
+                  width={SPACING.spacing24}
+                  height={SPACING.spacing24}
                 />
               </Btn>
             )}

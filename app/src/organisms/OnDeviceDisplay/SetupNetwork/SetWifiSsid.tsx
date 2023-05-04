@@ -26,8 +26,8 @@ import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const SSID_INPUT_FIELD_STYLE = css`
-  padding-top: ${SPACING.spacing5};
-  padding-bottom: ${SPACING.spacing5};
+  padding-top: ${SPACING.spacing24};
+  padding-bottom: ${SPACING.spacing24};
   font-size: 2.5rem;
   line-height: 3.25rem;
   text-align: center;

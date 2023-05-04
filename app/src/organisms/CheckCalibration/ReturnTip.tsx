@@ -54,7 +54,7 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="32rem"
     >
       <Flex alignSelf={ALIGN_STRETCH}>

@@ -24,13 +24,13 @@ interface Props {
 
 const DESCRIPTION_STYLE = css`
   ${TYPOGRAPHY.h1Default}
-  margin-top: ${SPACING.spacing5};
+  margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightBold};
     font-size: ${TYPOGRAPHY.fontSize32};
-    margin-top: ${SPACING.spacing6};
+    margin-top: ${SPACING.spacing32};
     margin-bottom: ${SPACING.spacing4};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
@@ -48,7 +48,7 @@ export function InProgressModal(props: Props): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
       height={isOnDevice ? '31.5625rem' : '24.625rem'}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
     >
       {alternativeSpinner ?? (
         <Icon

@@ -57,7 +57,7 @@ export function WizardRequiredEquipmentList(
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
               <Box
-                paddingX={SPACING.spacingM}
+                paddingX={SPACING.spacing20}
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >

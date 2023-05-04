@@ -62,15 +62,15 @@ export function FloatingActionButton(
 
   return (
     <Btn
-      bottom={SPACING.spacing5}
+      bottom={SPACING.spacing24}
       css={FLOATING_ACTION_BUTTON_STYLE}
       disabled={disabled}
       fontSize={TYPOGRAPHY.fontSize28}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       lineHeight={TYPOGRAPHY.lineHeight36}
-      padding={`0.75rem ${SPACING.spacing5}`}
+      padding={`0.75rem ${SPACING.spacing24}`}
       position={POSITION_FIXED}
-      right={SPACING.spacing5}
+      right={SPACING.spacing24}
       {...buttonProps}
     >
       <Flex

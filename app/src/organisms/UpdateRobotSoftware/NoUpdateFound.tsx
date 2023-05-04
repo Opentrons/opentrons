@@ -44,7 +44,7 @@ export function NoUpdateFound(): JSX.Element {
         </StyledText>
       </Flex>
       <PrimaryButton
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         height="4.4375rem"
         onClick={() => history.push('/robot-settings/rename-robot')}
       >

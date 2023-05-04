@@ -17,6 +17,7 @@ import {
   ALIGN_CENTER,
   useConditionalConfirm,
   PrimaryButton,
+  BORDERS,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
@@ -162,7 +163,7 @@ export const TestShakeSlideout = (
         </Portal>
       )}
       <Flex
-        borderRadius={SPACING.spacingS}
+        borderRadius={BORDERS.radiusSoftCorners}
         marginBottom={SPACING.spacing8}
         backgroundColor={COLORS.fundamentalsBackground}
         paddingY={SPACING.spacing16}
@@ -174,7 +175,7 @@ export const TestShakeSlideout = (
         <Flex color={COLORS.darkGreyEnabled}>
           <Icon
             name="information"
-            size={SPACING.spacing6}
+            size={SPACING.spacing32}
             paddingBottom={SPACING.spacing16}
             aria-label="information"
           />
@@ -189,8 +190,8 @@ export const TestShakeSlideout = (
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         padding={`${String(SPACING.spacing16)} ${String(
-          SPACING.spacingM
-        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing16)}`}
+          SPACING.spacing20
+        )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
         width="100%"
       >
         <Flex

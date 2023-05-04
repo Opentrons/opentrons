@@ -43,7 +43,7 @@ export function RobotIsBusyModal({
           <Btn
             onClick={closeModal}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}

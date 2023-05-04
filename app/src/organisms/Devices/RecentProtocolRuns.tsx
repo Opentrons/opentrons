@@ -75,7 +75,7 @@ export function RecentProtocolRuns({
               width="100%"
             >
               <StyledText
-                marginLeft={SPACING.spacing5}
+                marginLeft={SPACING.spacing24}
                 width="25%"
                 as="label"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}

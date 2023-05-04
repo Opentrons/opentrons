@@ -131,7 +131,7 @@ function CalibrationSteps({
         {steps.map(step => (
           <li
             css={css`
-              margin-left: ${SPACING.spacing5};
+              margin-left: ${SPACING.spacing24};
             `}
             key={step}
           >

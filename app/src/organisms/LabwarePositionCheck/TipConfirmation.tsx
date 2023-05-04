@@ -54,7 +54,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
       <StyledText as="h1" marginBottom={SPACING.spacing16}>

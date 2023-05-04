@@ -31,7 +31,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="27rem"
     >
       <Flex
@@ -44,7 +44,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
           name="ot-alert"
           size="2.5rem"
           color={COLORS.warningEnabled}
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         />
         {heading != null ? (
           <StyledText as="h1" marginBottom={SPACING.spacing8}>

@@ -63,11 +63,11 @@ export function HistoricalProtocolRunOffsetDrawer(
         width="100%"
         padding={`${String(SPACING.spacing16)} ${String(
           SPACING.spacing8
-        )} ${String(SPACING.spacing16)} ${String(SPACING.spacing7)}`}
+        )} ${String(SPACING.spacing16)} ${String(SPACING.spacing48)}`}
       >
         <Box
           backgroundColor={COLORS.white}
-          padding={SPACING.spacing5}
+          padding={SPACING.spacing24}
           textAlign="center"
         >
           <StyledText as="label">{t('no_offsets_available')}</StyledText>
@@ -88,7 +88,7 @@ export function HistoricalProtocolRunOffsetDrawer(
       width="100%"
       padding={`${String(SPACING.spacing16)} ${String(
         SPACING.spacing8
-      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing7)}`}
+      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing48)}`}
     >
       {isOutOfDate ? (
         <Banner type="warning" marginTop={SPACING.spacing8}>

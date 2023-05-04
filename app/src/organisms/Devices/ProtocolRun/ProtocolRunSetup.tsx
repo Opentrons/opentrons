@@ -217,7 +217,7 @@ export function ProtocolRunSetup({
                   {StepDetailMap[stepKey].stepInternals}
                 </SetupStep>
                 {index !== stepsKeysInOrder.length - 1 ? (
-                  <Line marginTop={SPACING.spacing5} />
+                  <Line marginTop={SPACING.spacing24} />
                 ) : null}
               </Flex>
             ))

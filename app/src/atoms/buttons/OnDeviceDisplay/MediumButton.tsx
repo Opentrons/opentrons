@@ -143,8 +143,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       gridGap={SPACING.spacingSM}
       padding={
         iconName !== undefined
-          ? `${SPACING.spacingM} ${SPACING.spacing5}`
-          : `${SPACING.spacingM} ${SPACING.spacingXXL}`
+          ? `${SPACING.spacing20} ${SPACING.spacing24}`
+          : `${SPACING.spacing20} ${SPACING.spacingXXL}`
       }
       {...buttonProps}
     >

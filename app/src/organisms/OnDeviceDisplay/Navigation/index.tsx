@@ -48,7 +48,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
         >
           <NavigationLink to="/dashboard" name={robotName} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing6}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
             <NavigationLink key={name} to={navLinkTo as string} name={name} />
           ))}

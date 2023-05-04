@@ -38,7 +38,7 @@ export function ModuleIcon(props: ModuleIconProps): JSX.Element {
         />
       </Flex>
 
-      <Flex position={POSITION_RELATIVE} marginTop={SPACING.spacingM}>
+      <Flex position={POSITION_RELATIVE} marginTop={SPACING.spacing20}>
         <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
       </Flex>
     </>

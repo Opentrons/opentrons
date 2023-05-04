@@ -54,7 +54,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           css={TYPOGRAPHY.linkPSemiBold}
           href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}
           marginTop={SPACING.spacing16}
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         >
           {t('learn_more_about_troubleshooting_connection')}
         </Link>
@@ -85,7 +85,7 @@ function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
         {steps.map(step => (
           <li
             css={css`
-              margin-left: ${SPACING.spacing5};
+              margin-left: ${SPACING.spacing24};
             `}
             key={step}
           >

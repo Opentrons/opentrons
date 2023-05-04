@@ -58,7 +58,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
         }
       >
         <Flex
-          padding={SPACING.spacing6}
+          padding={SPACING.spacing32}
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}

@@ -102,7 +102,7 @@ export function GeneralSettings(): JSX.Element {
       <Box
         height="calc(100vh - 8.5rem)"
         paddingX={SPACING.spacing16}
-        paddingY={SPACING.spacing5}
+        paddingY={SPACING.spacing24}
       >
         {showUpdateBanner && (
           <Box
@@ -176,7 +176,7 @@ export function GeneralSettings(): JSX.Element {
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
                 color={COLORS.darkGreyEnabled}
-                paddingY={SPACING.spacing5}
+                paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}
               </StyledText>
@@ -206,7 +206,7 @@ export function GeneralSettings(): JSX.Element {
             </Flex>
           </Box>
         </Box>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
@@ -228,7 +228,7 @@ export function GeneralSettings(): JSX.Element {
             id="GeneralSettings_softwareUpdateAlerts"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}

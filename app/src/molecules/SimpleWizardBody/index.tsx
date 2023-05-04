@@ -31,7 +31,7 @@ const BACKGROUND_SIZE = '47rem'
 
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
-  margin-top: ${SPACING.spacing5};
+  margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -55,11 +55,11 @@ const SUBHEADER_STYLE = css`
 `
 const BUTTON_STYLE = css`
   justify-content: ${JUSTIFY_FLEX_END};
-  padding-right: ${SPACING.spacing6};
-  padding-bottom: ${SPACING.spacing6};
+  padding-right: ${SPACING.spacing32};
+  padding-bottom: ${SPACING.spacing32};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    padding-bottom: ${SPACING.spacing6};
+    padding-bottom: ${SPACING.spacing32};
   }
 `
 
@@ -91,7 +91,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
       >
         {isPending ? (
           <Flex
-            gridGap={SPACING.spacing5}
+            gridGap={SPACING.spacing24}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >

@@ -76,7 +76,7 @@ export function InterstitialTitleBar(
           <Btn
             size="1.5rem"
             onClick={exit.onClick}
-            paddingTop={SPACING.spacingS}
+            paddingTop="3px"
             aria-label="close_btn"
           >
             <Icon name="close" aria-label="close" color={COLORS.white} />

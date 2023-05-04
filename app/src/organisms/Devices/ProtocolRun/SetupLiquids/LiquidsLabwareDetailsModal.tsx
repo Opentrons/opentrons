@@ -144,7 +144,7 @@ export const LiquidsLabwareDetailsModal = (
         {liquidCard}
       </Flex>
       <Flex width="38.75rem">
-        <Flex marginLeft={SPACING.spacing6}>
+        <Flex marginLeft={SPACING.spacing32}>
           <svg
             viewBox="0.5 2.2 127 78"
             height="100%"
@@ -207,7 +207,7 @@ export const LiquidsLabwareDetailsModal = (
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                marginLeft={SPACING.spacing5}
+                marginLeft={SPACING.spacing24}
               >
                 <StyledText
                   as="h6"

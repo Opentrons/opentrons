@@ -44,7 +44,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
 
   if (props.subtext != null) {
     multiText = (
-      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacingM}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing20}>
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
           paddingLeft={leftPadding}
@@ -131,7 +131,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
 
   return (
     <Flex
-      padding={SPACING.spacingM}
+      padding={SPACING.spacing20}
       flexDirection={DIRECTION_COLUMN}
       marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >

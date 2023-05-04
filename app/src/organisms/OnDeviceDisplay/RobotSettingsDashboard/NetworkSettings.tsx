@@ -152,7 +152,7 @@ export function NetworkSettings({
   return (
     <>
       <Flex
-        padding={`${SPACING.spacing6} ${SPACING.spacingXXL}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacingXXL}`}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_START}
       >
@@ -192,12 +192,12 @@ function NetworkSettingButton({
     <>
       <Btn
         width="100%"
-        padding={SPACING.spacing5}
+        padding={SPACING.spacing24}
         backgroundColor={buttonBackgroundColor}
         borderRadius={BORDERS.size_three}
         onClick={displayDetailsTab}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           <Flex gridGap={SPACING.spacing8} width="34.8125rem">
             <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
               <Icon name={iconName} size="3rem" />

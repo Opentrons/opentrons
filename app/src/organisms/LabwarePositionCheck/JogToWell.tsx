@@ -112,7 +112,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
       <Flex gridGap={SPACING.spacingL}>
@@ -126,7 +126,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           {body}
           <LiveOffsetValue {...liveOffset} />
         </Flex>
-        <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacingM}>
+        <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
               <>
@@ -156,7 +156,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       {isOnDevice ? (
         <Flex
           width="100%"
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
         >
@@ -184,7 +184,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               <ModalShell
                 width="60rem"
                 height="33.5rem"
-                padding={SPACING.spacing6}
+                padding={SPACING.spacing32}
                 display="flex"
                 flexDirection={DIRECTION_COLUMN}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -231,7 +231,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           />
           <Flex
             width="100%"
-            marginTop={SPACING.spacing6}
+            marginTop={SPACING.spacing32}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >

@@ -84,7 +84,7 @@ export function RunFailedModal({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
       >
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}

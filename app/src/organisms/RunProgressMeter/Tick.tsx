@@ -90,7 +90,7 @@ export function Tick(props: TickProps): JSX.Element {
             alignItems={ALIGN_CENTER}
           >
             {!isAggregatedTick && iconName != null ? (
-              <Icon name={iconName} size={SPACING.spacingM} />
+              <Icon name={iconName} size={SPACING.spacing20} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="label">

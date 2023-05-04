@@ -76,7 +76,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -89,7 +89,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
                 icon: <Icon name="counter-clockwise-arrow" size="1.313rem" />,
@@ -157,7 +157,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -175,7 +175,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -188,7 +188,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
                 icon: <Icon name="clockwise-arrow" size="1.313rem" />,
@@ -229,8 +229,8 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         padding={`${String(SPACING.spacing16)} ${String(
-          SPACING.spacingM
-        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing16)}`}
+          SPACING.spacing20
+        )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
         width="100%"
         marginBottom={SPACING.spacing16}
       >

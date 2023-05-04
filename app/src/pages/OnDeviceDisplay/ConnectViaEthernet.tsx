@@ -56,11 +56,11 @@ export function ConnectViaEthernet(): JSX.Element {
     <>
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
-        margin={`${String(SPACING.spacing6)} ${String(
+        margin={`${String(SPACING.spacing32)} ${String(
           SPACING.spacingXXL
         )} ${String(SPACING.spacingXXL)}`}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
       >
         <TitleHeader title={headerTitle} />
         <DisplayConnectionStatus isConnected={isConnected} />
@@ -152,14 +152,14 @@ const DisplayConnectionStatus = ({
       {isConnected ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+          padding={`${String(SPACING.spacing24)} ${String(SPACING.spacingXXL)}`}
           backgroundColor={COLORS.successBackgroundMed}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
           <Icon name="ot-check" size="2.5rem" color={COLORS.successEnabled} />
           <StyledText
-            marginLeft={SPACING.spacing5}
+            marginLeft={SPACING.spacing24}
             fontSize="1.625rem"
             fontWeight="700"
             lineHeight="2.1875rem"
@@ -180,14 +180,14 @@ const DisplayConnectionStatus = ({
       ) : (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+          padding={`${String(SPACING.spacing24)} ${String(SPACING.spacingXXL)}`}
           backgroundColor={COLORS.light_two}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
           <Flex flexDirection={DIRECTION_ROW}>
             <StyledText
-              marginLeft={SPACING.spacing5}
+              marginLeft={SPACING.spacing24}
               fontSize="1.625rem"
               fontWeight="700"
               lineHeight="2.1875rem"
@@ -239,7 +239,7 @@ const DisplayEthernetInfo = ({
   return (
     <Flex backgroundColor={COLORS.light_two} flexDirection={DIRECTION_COLUMN}>
       <Flex
-        padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing6)}}`}
+        padding={`${String(SPACING.spacing24)} ${String(SPACING.spacing32)}}`}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >

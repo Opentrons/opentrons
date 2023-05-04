@@ -63,7 +63,7 @@ function ProgressTrackerItem({
       marginBottom={
         hasSubTasks
           ? `-${String(SPACING.spacing8)}`
-          : `-${String(SPACING.spacingM)}`
+          : `-${String(SPACING.spacing20)}`
       }
       height="100%"
     />
@@ -178,7 +178,7 @@ function ProgressTrackerItem({
                   marginBottom={
                     // extend connector for last subtask
                     isLastSubTask
-                      ? `-${String(SPACING.spacingM)}`
+                      ? `-${String(SPACING.spacing20)}`
                       : `-${String(SPACING.spacing8)}`
                   }
                   height="100%"
@@ -226,7 +226,7 @@ function SubTask({
       padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing5}
+      gridGap={SPACING.spacing24}
       width="100%"
     >
       <Flex
@@ -376,7 +376,7 @@ function Task({
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
           // click to open the subtask drawer if subtasks are present
           cursor={hasSubTasks ? 'pointer' : ''}
           onClick={() => (hasSubTasks ? setIsTaskOpen(!isTaskOpen) : null)}

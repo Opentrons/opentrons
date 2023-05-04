@@ -64,7 +64,7 @@ const Template: Story<ColorsStorybookProps> = args => {
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing8}
       flexWrap="wrap"
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
     >
       {targetColors.map((color, index) => (
         <Flex

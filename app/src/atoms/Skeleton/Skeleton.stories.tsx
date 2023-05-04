@@ -25,9 +25,9 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
       <Flex flexDirection={DIRECTION_COLUMN} height="24.6rem">
         <Flex
           flexDirection={DIRECTION_ROW}
-          paddingX={SPACING.spacing6}
-          paddingTop={SPACING.spacing6}
-          marginBottom={SPACING.spacing7}
+          paddingX={SPACING.spacing32}
+          paddingTop={SPACING.spacing32}
+          marginBottom={SPACING.spacing48}
           gridGap={SPACING.spacingXXL}
         >
           <Flex
@@ -46,8 +46,8 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
         </Flex>
         <Flex
           justifyContent={JUSTIFY_END}
-          marginBottom={SPACING.spacing6}
-          marginX={SPACING.spacing6}
+          marginBottom={SPACING.spacing32}
+          marginX={SPACING.spacing32}
           alignItems={ALIGN_FLEX_END}
           flex="1"
         >
