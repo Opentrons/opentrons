@@ -23,7 +23,7 @@ export function ODDBackButton(
       gridGap={SPACING.spacing4}
       lineHeight={TYPOGRAPHY.lineHeight48}
     >
-      <Btn onClick={onClick} paddingLeft="0rem">
+      <Btn onClick={onClick}>
         <Icon
           color={COLORS.darkBlack_hundred}
           data-testid="back_icon"

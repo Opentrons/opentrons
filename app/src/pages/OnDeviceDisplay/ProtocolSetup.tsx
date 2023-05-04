@@ -102,7 +102,7 @@ function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon marginLeft="8px" name="more" size="3rem" />
+        <Icon marginLeft={SPACING.spacing3} name="more" size="3rem" />
       </Flex>
     </Btn>
   )
@@ -152,7 +152,6 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
     >
       <Icon
         color={disabled ? COLORS.darkBlack_sixty : COLORS.white}
-        marginLeft="0.25rem"
         name="play-icon"
         size="2.5rem"
       />
@@ -305,7 +304,11 @@ function PrepareToRun({
         marginBottom={SPACING.spacingXXL}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem" maxWidth="43rem">
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap="0.25rem"
+            maxWidth="43rem"
+          >
             <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
               {t('prepare_to_run')}
             </StyledText>
