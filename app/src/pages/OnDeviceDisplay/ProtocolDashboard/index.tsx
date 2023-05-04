@@ -47,37 +47,47 @@ export function ProtocolDashboard(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
+  let unpinnedProtocols: ProtocolResource[] = protocolsData
 
   // The pinned protocols are stored as an array of IDs in config
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  // If they're not in the list, they're not pinned.
-  const unpinnedProtocols = protocolsData.filter(
-    p => !pinnedProtocolIds.includes(p.id)
-  )
-  // We want an array of protocols in the same order as the
-  // array of IDs we stored. There are many ways to sort
-  // the pinned protocols. This way is mine.
   const pinnedProtocols: ProtocolResource[] = []
-  // Also, while we're here...
-  // It's possible (here in the early days while running a simulator, anyway)
-  // to lose protocols locally but still have their IDs in the pinned config.
-  // If that happens, there's no way to unpin them so let's sync the config
-  // back up with the actual protocols we have on hand.
-  const missingIds: string[] = []
-  for (const id of pinnedProtocolIds) {
-    const protocol = protocolsData.find(p => p.id === id)
-    if (protocol !== undefined) {
-      pinnedProtocols.push(protocol)
-    } else {
-      missingIds.push(id)
-    }
-  }
-  // Here's where we'll fix the config if we need to.
-  if (missingIds.length > 0) {
-    const actualPinnedIds = pinnedProtocolIds.filter(
-      id => !missingIds.includes(id)
+
+  // We only need to grab out the pinned protocol data once all the protocols load
+  // and if we have pinned ids stored in config.
+  if (protocolsData.length > 0 && pinnedProtocolIds.length > 0) {
+    // First: if they're not in the list, they're not pinned.
+    unpinnedProtocols = protocolsData.filter(
+      p => !pinnedProtocolIds.includes(p.id)
     )
-    dispatch(updateConfigValue('protocols.pinnedProtocolIds', actualPinnedIds))
+    // We want an array of protocols in the same order as the
+    // array of IDs we stored. There are many ways to sort
+    // the pinned protocols. This way is mine.
+    //
+    // Also, while we're here...
+    // It's possible (here in the early days while running a simulator, anyway)
+    // to lose protocols locally but still have their IDs in the pinned config.
+    // If that happens, there's no way to unpin them so let's sync the config
+    // back up with the actual protocols we have on hand.
+    const missingIds: string[] = []
+    for (const id of pinnedProtocolIds) {
+      const protocol = protocolsData.find(p => p.id === id)
+      if (protocol !== undefined) {
+        pinnedProtocols.push(protocol)
+      } else {
+        missingIds.push(id)
+      }
+    }
+
+    // Here's where we'll fix the config if we need to.
+    if (missingIds.length > 0) {
+      const actualPinnedIds = pinnedProtocolIds.filter(
+        id => !missingIds.includes(id)
+      )
+      dispatch(
+        updateConfigValue('protocols.pinnedProtocolIds', actualPinnedIds)
+      )
+    }
   }
 
   const runData = runs.data?.data != null ? runs.data?.data : []

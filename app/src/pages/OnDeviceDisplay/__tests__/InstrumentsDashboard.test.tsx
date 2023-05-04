@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
@@ -58,18 +58,21 @@ const mockGripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: 'ghi789',
+  data: {},
 }
 const mockRightPipetteData = {
   instrumentModel: 'p300_single_v2',
   instrumentType: 'p300',
   mount: 'right',
   serialNumber: 'abc123',
+  data: {},
 }
 const mockLeftPipetteData = {
   instrumentModel: 'p1000_single_v2',
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
+  data: {},
 }
 describe('InstrumentsDashboard', () => {
   beforeEach(() => {
@@ -101,12 +104,14 @@ describe('InstrumentsDashboard', () => {
     await getByText('left Mount').click()
     getByText('serial number')
     getByText(mockLeftPipetteData.serialNumber)
+    getByText('no calibration data')
   })
   it('should route to right mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()
     await getByText('right Mount').click()
     getByText('serial number')
     getByText(mockRightPipetteData.serialNumber)
+    getByText('no calibration data')
   })
   it('should route to extension mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()

@@ -19,6 +19,7 @@ import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { FLOWS } from '../PipetteWizardFlows/constants'
+import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { InstrumentData } from '@opentrons/api-client'
@@ -82,7 +83,13 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
         gridGap={SPACING.spacing3}
         marginTop={SPACING.spacing5}
       >
-        <InfoItem label={t('last_calibrated')} value="TODO" />
+        <InfoItem
+          label={t('last_calibrated')}
+          value={
+            formatTimestamp(instrument.data.calibratedOffset?.last_modified) ??
+            t('no_cal_data')
+          }
+        />
         <InfoItem label={t('firmware_version')} value="TODO" />
         <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
       </Flex>
