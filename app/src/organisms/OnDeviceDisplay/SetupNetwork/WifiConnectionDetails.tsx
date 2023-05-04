@@ -115,9 +115,7 @@ const DisplayConnectionStatus = ({
     <Flex
       flexDirection={DIRECTION_ROW}
       padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
-      backgroundColor={
-        connected ? COLORS.successBackgroundMed : COLORS.light_two
-      }
+      backgroundColor={connected ? COLORS.successBackgroundMed : COLORS.light2}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       borderRadius={BORDERS.size_three}
@@ -125,7 +123,7 @@ const DisplayConnectionStatus = ({
       <Icon
         name="ot-check"
         size="2.5rem"
-        color={connected ? COLORS.successEnabled : COLORS.light_two}
+        color={connected ? COLORS.successEnabled : COLORS.light2}
       />
       <StyledText
         marginLeft={SPACING.spacing5}

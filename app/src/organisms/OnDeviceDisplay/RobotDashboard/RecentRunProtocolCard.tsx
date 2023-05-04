@@ -39,8 +39,8 @@ export function RecentRunProtocolCard({
   const CARD_STYLE = css`
     &:active {
       background-color: ${isReadyToBeReRun
-        ? COLORS.green_three_pressed
-        : COLORS.yellow_three_pressed};
+        ? COLORS.green3Pressed
+        : COLORS.yellow3Pressed};
     }
     &:focus-visible {
       box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
@@ -110,9 +110,7 @@ export function RecentRunProtocolCard({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing5}
       gridGap={SPACING.spacing5}
-      backgroundColor={
-        isReadyToBeReRun ? COLORS.green_three : COLORS.yellow_three
-      }
+      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
       borderRadius={BORDERS.size_four}
       onClick={handleCardClick}
@@ -141,7 +139,7 @@ export function RecentRunProtocolCard({
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        color={COLORS.darkBlack_seventy}
+        color={COLORS.darkBlack70}
       >
         {i18n.format(t('last_run_time'), 'capitalize')}{' '}
         {lastRun != null

@@ -80,7 +80,7 @@ const ProtocolHeader = (props: {
           onClick={() => history.goBack()}
           width="2.5rem"
         >
-          <Icon name="back" width="2.5rem" color={COLORS.darkBlack_hundred} />
+          <Icon name="back" width="2.5rem" color={COLORS.darkBlack100} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -189,7 +189,7 @@ const Summary = (props: {
         {description}
       </StyledText>
       <Flex
-        backgroundColor={COLORS.darkBlack_twenty}
+        backgroundColor={COLORS.darkBlack20}
         borderRadius={BORDERS.size_one}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}

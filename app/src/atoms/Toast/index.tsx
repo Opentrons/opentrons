@@ -118,30 +118,30 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.red_two : COLORS.errorEnabled}`,
+      color: `${showODDStyle ? COLORS.red2 : COLORS.errorEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.red_four : COLORS.errorBackgroundLight
+        showODDStyle ? COLORS.red4 : COLORS.errorBackgroundLight
       }`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${showODDStyle ? COLORS.grey_two : COLORS.darkGreyEnabled}`,
+      color: `${showODDStyle ? COLORS.grey2 : COLORS.darkGreyEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.grey_four : COLORS.darkGreyDisabled
+        showODDStyle ? COLORS.grey4 : COLORS.darkGreyDisabled
       }`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
-      color: `${showODDStyle ? COLORS.green_two : COLORS.successEnabled}`,
+      color: `${showODDStyle ? COLORS.green2 : COLORS.successEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.green_four : COLORS.successBackgroundLight
+        showODDStyle ? COLORS.green4 : COLORS.successBackgroundLight
       }`,
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.yellow_two : COLORS.warningEnabled}`,
+      color: `${showODDStyle ? COLORS.yellow2 : COLORS.warningEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.yellow_four : COLORS.warningBackgroundLight
+        showODDStyle ? COLORS.yellow4 : COLORS.warningBackgroundLight
       }`,
     },
   }
@@ -249,9 +249,7 @@ export function Toast(props: ToastProps): JSX.Element {
             </StyledText>
           ) : null}
           <StyledText
-            color={
-              showODDStyle ? COLORS.darkBlack_hundred : COLORS.darkBlackEnabled
-            }
+            color={showODDStyle ? COLORS.darkBlack100 : COLORS.darkBlackEnabled}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }
@@ -272,9 +270,7 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText.length > 0 && (
         <Link role="button" height={SPACING.spacing5}>
           <StyledText
-            color={
-              showODDStyle ? COLORS.darkBlack_hundred : COLORS.darkBlackEnabled
-            }
+            color={showODDStyle ? COLORS.darkBlack100 : COLORS.darkBlackEnabled}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }
