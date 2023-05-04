@@ -1,3 +1,6 @@
+import * as React from 'react'
+import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   ALIGN_CENTER,
@@ -7,21 +10,17 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 import { BackButton } from '../../atoms/buttons'
-import { ContinueButton } from '../ProtocolSetupModules'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -32,7 +31,7 @@ export function ProtocolSetupInstruments({
   runId,
   setSetupScreen,
 }: ProtocolSetupInstrumentsProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const { data: attachedInstruments } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
@@ -49,19 +48,17 @@ export function ProtocolSetupInstruments({
         (i): i is GripperData => i.instrumentType === 'gripper'
       ) ?? null
     : null
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       gridGap={SPACING.spacing3}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+      <Flex alignItems={ALIGN_CENTER}>
         <BackButton onClick={() => setSetupScreen('prepare to run')}>
           {t('instruments')}
         </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          <ContinueButton onClick={() => setSetupScreen('modules')} />
-        </Flex>
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -69,7 +66,9 @@ export function ProtocolSetupInstruments({
         paddingX={SPACING.spacing5}
       >
         <ColumnLabel>{t('location')}</ColumnLabel>
-        <ColumnLabel>{t('calibration_status')}</ColumnLabel>
+        <ColumnLabel>
+          {i18n.format(t('calibration_status'), 'sentenceCase')}
+        </ColumnLabel>
       </Flex>
       {(mostRecentAnalysis?.pipettes ?? []).map(loadedPipette => {
         const attachedPipetteMatch =
@@ -101,7 +100,7 @@ export function ProtocolSetupInstruments({
         <ProtocolInstrumentMountItem
           key="extension"
           mount="extension"
-          speccedName={attachedGripperMatch?.instrumentModel as GripperModel}
+          speccedName={'gripperV1' as GripperModel}
           attachedInstrument={attachedGripperMatch}
           attachedCalibrationData={
             attachedGripperMatch?.data.calibratedOffset ?? null

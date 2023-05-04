@@ -1,21 +1,11 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  JUSTIFY_CENTER,
-  TYPOGRAPHY,
-  SPACING,
-  SIZE_2,
-} from '@opentrons/components'
+import { COLORS, Flex, Icon, SPACING, SIZE_2 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { ModalShell } from '../../../molecules/Modal'
+import { MenuList } from '../../../atoms/MenuList'
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../../redux/robot-controls'
 import { restartRobot } from '../../../redux/robot-admin'
 import { useLights } from '../../Devices/hooks'
@@ -34,85 +24,51 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
 
   return (
-    <ModalShell
-      borderRadius={BORDERS.size_three}
-      onOutsideClick={onClick}
-      width="18.0625rem"
-      isOnDeviceDisplay
-    >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-        padding={`0rem ${SPACING.spacingL}`}
+    <MenuList onClick={onClick} isOnDevice={true}>
+      <MenuItem
+        key="home-gantry"
+        onClick={() => dispatch(home(robotName, ROBOT))}
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          height="4.875rem"
-          onClick={() => dispatch(home(robotName, ROBOT))}
-        >
+        <Flex>
           <Icon
             name="home-gantry"
             aria-label="home-gantry_icon"
             size={SIZE_2}
-            color={COLORS.black}
           />
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize28}
-            lineHeight={TYPOGRAPHY.lineHeight36}
-            marginLeft={SPACING.spacing5}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
+          <StyledText marginLeft={SPACING.spacing5}>
             {t('home_gantry')}
           </StyledText>
         </Flex>
-        <Flex
-          alignItems={ALIGN_CENTER}
-          height="4.875rem"
-          onClick={() => dispatch(restartRobot(robotName))}
-        >
+      </MenuItem>
+      <MenuItem key="restart" onClick={() => dispatch(restartRobot(robotName))}>
+        <Flex>
           <Icon
             name="restart"
             size={SIZE_2}
             color={COLORS.black}
             aria-label="restart_icon"
           />
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize28}
-            lineHeight={TYPOGRAPHY.lineHeight36}
-            marginLeft={SPACING.spacing5}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
+          <StyledText marginLeft={SPACING.spacing5}>
             {t('robot_controls:restart_label')}
           </StyledText>
         </Flex>
-        <Flex
-          alignItems={ALIGN_CENTER}
-          height="4.875rem"
-          onClick={toggleLights}
-        >
+      </MenuItem>
+      <MenuItem key="light" onClick={toggleLights}>
+        <Flex>
           <Icon
             name="light"
             size={SIZE_2}
             color={COLORS.black}
             aria-label="light_icon"
           />
-          <StyledText
-            color={COLORS.black}
-            fontSize={TYPOGRAPHY.fontSize28}
-            marginLeft={SPACING.spacing5}
-            lineHeight={TYPOGRAPHY.lineHeight36}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-          >
+          <StyledText marginLeft={SPACING.spacing5}>
             {i18n.format(
               t(lightsOn ? 'lights_off' : 'lights_on'),
               'capitalize'
             )}
           </StyledText>
         </Flex>
-      </Flex>
-    </ModalShell>
+      </MenuItem>
+    </MenuList>
   )
 }

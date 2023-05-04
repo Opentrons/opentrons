@@ -29,6 +29,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
 from opentrons.types import DeckSlotName, MountType
+from ..errors import ModuleNotConnectedError
 
 from ..types import (
     LoadedModule,
@@ -606,9 +607,10 @@ class ModuleView(HasState[ModuleState]):
         provided by the hardware API.
         """
         module = self.get(module_id)
-        assert (
-            module.serialNumber is not None
-        ), f"Expected a connected module and got a {module.model.name}"
+        if module.serialNumber is None:
+            raise ModuleNotConnectedError(
+                f"Expected a connected module and got a {module.model.name}"
+            )
         return module.serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
@@ -629,7 +631,7 @@ class ModuleView(HasState[ModuleState]):
     ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
-        slot = self.get_location(module_id).slotName.value
+        slot = self.get_location(module_id).slotName.id
 
         pre_transform = array(
             (
@@ -653,7 +655,7 @@ class ModuleView(HasState[ModuleState]):
         module = self.get(module_id)
         if module.serialNumber is None:
             raise errors.ModuleNotConnectedError(
-                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected by a serial."
+                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected to the robot and can provide the robot with a serial number."
             )
         offset = self._state.module_offset_by_serial.get(module.serialNumber)
         if offset is not None:
@@ -827,17 +829,6 @@ class ModuleView(HasState[ModuleState]):
 
         return neighbor_slot in self._state.slot_by_module_id.values()
 
-    def ensure_module_not_present(
-        self, model: ModuleModel, location: DeckSlotLocation
-    ) -> None:
-        """Ensure a different module is not preset in the slot we are trying to load into."""
-        for module in self.get_all():
-            if module.location == location and model != module.model:
-                raise errors.ModuleAlreadyPresentError(
-                    f"A {module.model.value} is already"
-                    f" present in {location.slotName.value}"
-                )
-
     def select_hardware_module_to_load(
         self,
         model: ModuleModel,
@@ -904,7 +895,7 @@ class ModuleView(HasState[ModuleState]):
             HeaterShakerMovementRestrictors(
                 plate_shaking=substate.is_plate_shaking,
                 latch_closed=substate.is_labware_latch_closed,
-                deck_slot=int(self.get_location(substate.module_id).slotName),
+                deck_slot=self.get_location(substate.module_id).slotName.as_int(),
             )
             for substate in hs_substates
         ]

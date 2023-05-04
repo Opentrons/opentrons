@@ -907,8 +907,7 @@
         "10",
         "11",
         "12"
-      ],
-      "type": "string"
+      ]
     },
     "DeckSlotLocation": {
       "title": "DeckSlotLocation",
@@ -1113,7 +1112,7 @@
       "type": "object",
       "properties": {
         "model": {
-          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.",
+          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.\n\n For example, if you request a `temperatureModuleV1` here, Protocol Engine might load a `temperatureModuleV1` or a `temperatureModuleV2`.\n\n The model that it finds connected will be available through `result.model`.",
           "allOf": [
             {
               "$ref": "#/definitions/ModuleModel"

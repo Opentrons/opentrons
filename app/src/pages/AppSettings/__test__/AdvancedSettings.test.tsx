@@ -16,7 +16,11 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+} from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
@@ -159,7 +163,7 @@ describe('AdvancedSettings', () => {
     const btn = getByRole('button', { name: 'Add labware source folder' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'changeCustomLabwareSourceFolder',
+      name: ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
       properties: {},
     })
   })
@@ -320,7 +324,7 @@ describe('AdvancedSettings', () => {
     const button = getByRole('button', { name: 'Add override path' })
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'changePathToPythonDirectory',
+      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
       properties: {},
     })
   })

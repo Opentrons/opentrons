@@ -25,6 +25,7 @@
     "environment": { "count": 1 }
   },
   "partialTipConfigurations": { "partialTipSupported": false },
+  "backCompatNames": [],
   "channels": 1,
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904

@@ -789,6 +789,35 @@ async def test_load_module_using_virtual(
     )
 
 
+async def test_load_magnetic_block(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    hardware_api: HardwareControlAPI,
+    mag_block_v1_def: ModuleDefinition,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load a mag block, returning its ID & definition in result."""
+    decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_BLOCK_V1)
+    ).then_return(mag_block_v1_def)
+
+    result = await subject.load_magnetic_block(
+        model=ModuleModel.MAGNETIC_BLOCK_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        module_id="input-module-id",
+    )
+
+    assert result == LoadedModuleData(
+        module_id="module-id",
+        serial_number=None,
+        definition=mag_block_v1_def,
+    )
+
+
 def test_get_module_hardware_api(
     decoy: Decoy,
     state_store: StateStore,
@@ -868,32 +897,3 @@ def test_get_module_hardware_api_missing(
 
     with pytest.raises(errors.ModuleNotAttachedError):
         subject.get_module_hardware_api(cast(Any, "module-id"))
-
-
-async def test_load_magnetic_block(
-    decoy: Decoy,
-    model_utils: ModelUtils,
-    state_store: StateStore,
-    module_data_provider: ModuleDataProvider,
-    hardware_api: HardwareControlAPI,
-    mag_block_v1_def: ModuleDefinition,
-    subject: EquipmentHandler,
-) -> None:
-    """It should load a module, returning its ID, serial & definition in result."""
-    decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
-
-    decoy.when(
-        module_data_provider.get_definition(ModuleModel.MAGNETIC_BLOCK_V1)
-    ).then_return(mag_block_v1_def)
-
-    result = await subject.load_magnetic_block(
-        model=ModuleModel.MAGNETIC_BLOCK_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        module_id="input-module-id",
-    )
-
-    assert result == LoadedModuleData(
-        module_id="module-id",
-        serial_number=None,
-        definition=mag_block_v1_def,
-    )

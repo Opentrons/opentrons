@@ -55,6 +55,7 @@ async def test_calibrate_module_implementation(
     decoy.when(subject._state_view.modules.get_serial_number(module_id)).then_return(
         "TC1234abcd"
     )
+
     decoy.when(subject._state_view.modules.get_location(module_id)).then_return(
         location
     )

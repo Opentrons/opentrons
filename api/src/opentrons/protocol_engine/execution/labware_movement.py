@@ -137,6 +137,27 @@ class LabwareMovementHandler:
 
         await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
 
+        if isinstance(current_location, ModuleLocation):
+            # TODO: This is a nasty hard-coded implementation to add a wiggle
+            # to dislodge plates from *all* modules. This should be changed to
+            # check configuration values on a per-module basis for 1) whether
+            # to wiggle at all 2) how much to wiggle.
+            # See https://opentrons.atlassian.net/browse/RCORE-749
+            WIGGLE_Z_LIFT = 0.5
+            WIGGLE_MAG = 0.5
+            # Lift the gripper a tiny bit in the Z axis
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(z=WIGGLE_Z_LIFT))
+
+            # Shake in the Y axis
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(y=WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(y=-2 * WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(y=WIGGLE_MAG))
+
+            # Shake in the X axis
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(x=WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(x=-2 * WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(x=WIGGLE_MAG))
+
         new_labware_offset = (
             self._state_store.labware.get_labware_offset(new_offset_id).vector
             if new_offset_id

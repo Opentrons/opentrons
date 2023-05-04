@@ -44,7 +44,7 @@ import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
-import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
@@ -57,6 +57,7 @@ import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -175,6 +176,7 @@ function PrepareToRun({
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+
   const { data: attachedInstruments } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
@@ -183,6 +185,7 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
 
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const runStatus: string = useRunStatus(runId) ?? ''
@@ -350,16 +353,16 @@ function PrepareToRun({
           status={modulesStatus}
         />
         <ProtocolSetupStep
+          onClickSetupStep={launchLPC}
+          title={t('labware_position_check')}
+          detail={t('recommended')}
+          status="general"
+        />
+        <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('labware')}
           title={t('labware')}
           detail={labwareDetail}
           subDetail={labwareSubDetail}
-          status="general"
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('lpc')}
-          title={t('labware_position_check')}
-          detail={t('optional')}
           status="general"
         />
         <ProtocolSetupStep
@@ -375,8 +378,13 @@ function PrepareToRun({
           }
         />
       </Flex>
+      {LPCWizard}
       {showConfirmCancelModal ? (
-        <ConfirmCancelModal onClose={onConfirmCancelClose} runId={runId} />
+        <ConfirmCancelRunModal
+          runId={runId}
+          setShowConfirmCancelRunModal={setShowConfirmCancelModal}
+          isActiveRun={false}
+        />
       ) : null}
     </>
   )
@@ -387,7 +395,6 @@ export type SetupScreens =
   | 'instruments'
   | 'modules'
   | 'labware'
-  | 'lpc'
   | 'liquids'
 
 export function ProtocolSetup(): JSX.Element {

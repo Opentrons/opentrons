@@ -4,7 +4,10 @@ import { fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_IMPORT_PROTOCOL_TO_APP,
+} from '../../../redux/analytics'
 import { UploadInput } from '../UploadInput'
 
 jest.mock('../../../redux/analytics')
@@ -63,7 +66,7 @@ describe('UploadInput', () => {
     })
     expect(onUpload).toHaveBeenCalled()
     expect(trackEvent).toHaveBeenCalledWith({
-      name: 'importProtocolToApp',
+      name: ANALYTICS_IMPORT_PROTOCOL_TO_APP,
       properties: { protocolFileName: 'dummyName' },
     })
   })

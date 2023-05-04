@@ -32,7 +32,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { BackButton } from '../../atoms/buttons'
-import { ContinueButton, DeckMapButton } from '../ProtocolSetupModules' // Probably should move this to atoms/buttons as well
+import { DeckMapButton } from '../ProtocolSetupModules' // Probably should move this to atoms/buttons as well
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
@@ -250,13 +250,10 @@ export function ProtocolSetupLabware({
           </Modal>
         ) : null}
       </Portal>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex>
         <BackButton onClick={() => setSetupScreen('prepare to run')}>
           {t('labware')}
         </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          <ContinueButton onClick={() => setSetupScreen('lpc')} />
-        </Flex>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -332,7 +329,7 @@ function LabwareLatch({
       alignItems={ALIGN_FLEX_START}
       padding={SPACING.spacing4}
       gridGap="0.75rem"
-      backgroundColor={COLORS.foundationalBlue}
+      backgroundColor={COLORS.mediumBlueEnabled}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack_hundred}${COLORS.opacity60HexCode}`

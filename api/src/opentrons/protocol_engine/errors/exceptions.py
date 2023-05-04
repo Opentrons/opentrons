@@ -103,7 +103,7 @@ class ModuleNotOnDeckError(ProtocolEngineError):
 
 
 class ModuleNotConnectedError(ProtocolEngineError):
-    """Raised when trying to use a module that is not connected by a serial."""
+    """Raised when trying to use a module that is not connected to the robot electrically."""
 
 
 class SlotDoesNotExistError(ProtocolEngineError):

@@ -78,7 +78,7 @@ export function RunFailedModal({
     <Modal
       header={modalHeader}
       modalSize="large"
-      isError={true}
+      isError
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
       <Flex
@@ -89,7 +89,7 @@ export function RunFailedModal({
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('run_failed_modal_header', {
             errorName: errorName,
@@ -140,6 +140,7 @@ export function RunFailedModal({
         </StyledText>
         <Flex marginTop="1.75rem">
           <SmallButton
+            width="100%"
             buttonType="alert"
             buttonText={i18n.format(t('shared:close'), 'titleCase')}
             onClick={handleClose}

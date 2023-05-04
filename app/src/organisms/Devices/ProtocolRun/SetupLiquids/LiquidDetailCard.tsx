@@ -20,7 +20,10 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+} from '../../../../redux/analytics'
 import { getIsOnDevice } from '../../../../redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
@@ -74,7 +77,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
 
   const handleSelectedValue = (): void => {
     setSelectedValue(liquidId)
-    trackEvent({ name: 'highlightLiquidInDetailModal', properties: {} })
+    trackEvent({
+      name: ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+      properties: {},
+    })
   }
 
   return isOnDevice ? (

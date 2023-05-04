@@ -1,6 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing_extensions import Literal
-from typing import Dict, Optional, Union, List, Tuple, Type, MutableMapping
+from typing import Dict, Optional, Type, Union, List, Tuple, MutableMapping
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -10,10 +10,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    ModuleType,
-)
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
