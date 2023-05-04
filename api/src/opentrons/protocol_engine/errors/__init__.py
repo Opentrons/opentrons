@@ -21,6 +21,7 @@ from .exceptions import (
     PipetteNotLoadedError,
     ModuleNotLoadedError,
     ModuleNotOnDeckError,
+    ModuleNotConnectedError,
     SlotDoesNotExistError,
     FailedToPlanMoveError,
     MustHomeError,

@@ -24,7 +24,8 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
       color={isError ? COLORS.white : COLORS.black}
       height="6.25rem"
       width="100%"
-      padding={isError ? SPACING.spacing5 : SPACING.spacing6}
+      paddingX={SPACING.spacing6}
+      paddingY={isError ? SPACING.spacing5 : SPACING.spacing6}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}

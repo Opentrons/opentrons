@@ -355,6 +355,8 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)
     def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
+        if action == "blowout":
+            action = "dispense"
         sequence = self._config.ul_per_mm[action]
         return pipette_config.piecewise_volume_conversion(ul, sequence)
 
