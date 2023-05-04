@@ -822,6 +822,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=test_volumes,
-        channel_count=cfg.pipette_channels,
+        channel_count=len(channels_to_test),
         test_report=test_report,
     )
