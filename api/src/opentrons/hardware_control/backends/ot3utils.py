@@ -160,7 +160,7 @@ def axis_is_node(axis: OT3Axis) -> bool:
         return False
 
 
-def sub_system_to_node_id(sub_sys: SubSystem) -> "NodeId":
+def sub_system_to_nodeid(sub_sys: SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
     return SUBSYSTEM_NODEID[sub_sys]
 
@@ -189,7 +189,7 @@ def target_to_subsystem(target: FirmwareTarget) -> SubSystem:
 
 def subsystem_to_target(subsystem: SubSystem) -> FirmwareTarget:
     try:
-        return sub_system_to_node_id(subsystem)
+        return sub_system_to_nodeid(subsystem)
     except KeyError:
         return subsystem_to_usb(subsystem)
 
