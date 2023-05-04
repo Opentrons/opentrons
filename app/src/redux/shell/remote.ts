@@ -26,5 +26,13 @@ export const remote: Remote = new Proxy(emptyRemote, {
 export function appShellRequestor<Data>(
   config: AxiosRequestConfig
 ): ResponsePromise<Data> {
-  return remote.ipcRenderer.invoke('usb:request', config)
+  const { data } = config
+  // special case: protocol files and form data cannot be sent through invoke. proxy by protocolKey and handle in app-shell
+  const formDataProxy =
+    data instanceof FormData
+      ? { formDataProxy: { protocolKey: data.get('key') } }
+      : data
+  const configProxy = { ...config, data: formDataProxy }
+
+  return remote.ipcRenderer.invoke('usb:request', configProxy)
 }

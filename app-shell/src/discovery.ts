@@ -1,9 +1,12 @@
 // app shell discovery module
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron'
 import Store from 'electron-store'
+import axios, { AxiosRequestConfig } from 'axios'
+import FormData from 'form-data'
+import fs from 'fs'
 import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
-import axios, { AxiosRequestConfig } from 'axios'
+import path from 'path'
 
 import {
   createDiscoveryClient,
@@ -31,6 +34,7 @@ import {
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
+import { getProtocolSrcFilePaths } from './protocol-storage'
 
 import type { Agent } from 'http'
 
@@ -171,13 +175,42 @@ export function registerDiscovery(
     config: AxiosRequestConfig
   ): Promise<unknown> {
     try {
+      // TODO(bh, 2023-05-03): remove mutation
+      let { data } = config
+      let formHeaders = {}
+
+      // check for formDataProxy
+      if (data?.formDataProxy != null) {
+        // reconstruct FormData
+        const formData = new FormData()
+        const { protocolKey } = data.formDataProxy
+
+        const srcFilePaths: string[] = await getProtocolSrcFilePaths(
+          protocolKey
+        )
+
+        // create readable stream from file
+        srcFilePaths.forEach(srcFilePath => {
+          const readStream = fs.createReadStream(srcFilePath)
+          formData.append('files', readStream, path.basename(srcFilePath))
+        })
+
+        formData.append('key', protocolKey)
+
+        formHeaders = formData.getHeaders()
+        data = formData
+      }
+
       const response = await axios.request({
         httpAgent: usbHttpAgent,
         ...config,
+        data,
+        headers: { ...config.headers, ...formHeaders },
       })
       return { data: response.data }
     } catch (e) {
-      log.debug(`usbListener error ${JSON.stringify(e)}`)
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      log.debug(`usbListener error ${e?.message ?? 'unknown'}`)
     }
   }
 
