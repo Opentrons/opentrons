@@ -1,5 +1,5 @@
 import { css } from 'styled-components'
-import { spacing1, spacingXXS } from './spacing'
+import { spacingXXS } from './spacing'
 import {
   blueEnabled,
   medGreyEnabled,
@@ -21,7 +21,7 @@ export const size_six = '60px'
 
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};
-  border-bottom-width: ${spacing1};
+  border-bottom-width: '2px';
   border-bottom-color: ${blueEnabled};
 `
 
