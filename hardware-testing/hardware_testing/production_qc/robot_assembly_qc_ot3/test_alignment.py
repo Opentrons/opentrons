@@ -8,6 +8,7 @@ from opentrons.hardware_control.ot3_calibration import (
     find_calibration_structure_height,
     find_slot_center_binary,
 )
+from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -109,7 +110,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     _assert_deck_transform_is_default(api)
     print("homing")
-    await api.home()
+    await api.home([OT3Axis.Z_L, OT3Axis.Z_R])
     mount = OT3Mount.LEFT
     cp = types.CriticalPoint.MOUNT  # not pipette or tip, for consistency
     home_pos = await api.gantry_position(mount, critical_point=cp)

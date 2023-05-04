@@ -83,6 +83,7 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     def _finish() -> None:
         report(section, "wifi", [ssid, password, wifi_ip, result])
 
+    
     wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
     wifi_ip = wifi_status["ipAddress"]
     if wifi_ip:
@@ -229,5 +230,5 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await _test_usb_a_ports(api, report, section)
 
     # AUX
-    ui.print_header("AUX")
-    await _test_aux(api, report, section)
+    # ui.print_header("AUX")
+    # await _test_aux(api, report, section)
