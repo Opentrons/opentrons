@@ -298,4 +298,29 @@ describe('getCurrentRunModuleRenderInfo', () => {
     expect(res[0].x).toEqual(0)
     expect(res[0].y).toEqual(181.0)
   })
+
+  it('defaults module x,y coordinates to 0,0 if slot position not found in deck definition', () => {
+    const mockRunDataWithBadModuleSlot = {
+      labware: [],
+      modules: [
+        {
+          id: 'mockModuleID',
+          model: 'heaterShakerModuleV1',
+          location: {
+            slotName: '0',
+          },
+          serialNumber: 'dummySerialHS',
+        },
+      ],
+    } as any
+
+    const res = getCurrentRunModulesRenderInfo(
+      mockRunDataWithBadModuleSlot,
+      deckDefFixture as any,
+      mockLabwareDefinitions
+    )
+
+    expect(res[0].x).toEqual(0)
+    expect(res[0].y).toEqual(0)
+  })
 })
