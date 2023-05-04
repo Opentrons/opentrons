@@ -145,5 +145,5 @@ class LoadModuleCreate(BaseCommandCreate[LoadModuleParams]):
 
     _CommandCls: Type[LoadModule] = LoadModule
 
-    def canonicalize(self, robot_type: RobotType) -> LoadModuleCreate:
+    def normalize(self, robot_type: RobotType) -> LoadModuleCreate:
         return self.copy(update={"params": self.params.canonicalize(robot_type)})

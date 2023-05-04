@@ -93,7 +93,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
         ),
     )
 
-    def canonicalize(
+    def normalize(
         self: BaseCommandCreateSelfT, robot_type: RobotType
     ) -> BaseCommandCreateSelfT:
         return self

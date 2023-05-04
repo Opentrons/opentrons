@@ -148,7 +148,7 @@ class ProtocolEngine:
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
         """
-        request = request.canonicalize(robot_type=self.state_view.config.robot_type)
+        request = request.normalize(robot_type=self.state_view.config.robot_type)
 
         command_id = self._model_utils.generate_id()
         request_hash = commands.hash_command_params(
