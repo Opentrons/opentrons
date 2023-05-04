@@ -249,7 +249,7 @@ export function Toast(props: ToastProps): JSX.Element {
             </StyledText>
           ) : null}
           <StyledText
-            color={showODDStyle ? COLORS.darkBlack100 : COLORS.darkBlackEnabled}
+            color={COLORS.darkBlackEnabled}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }
@@ -270,7 +270,7 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText.length > 0 && (
         <Link role="button" height={SPACING.spacing5}>
           <StyledText
-            color={showODDStyle ? COLORS.darkBlack100 : COLORS.darkBlackEnabled}
+            color={COLORS.darkBlackEnabled}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }
