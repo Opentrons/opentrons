@@ -1,6 +1,5 @@
 export * from './ConnectingNetwork'
 export * from './DisplayWifiList'
-export * from '../RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 export * from './FailedToConnect'
 export * from './SearchNetwork'
 export * from './SelectAuthenticationType'

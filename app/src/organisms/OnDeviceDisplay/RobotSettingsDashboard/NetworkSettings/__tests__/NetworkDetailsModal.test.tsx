@@ -33,7 +33,6 @@ describe('NetworkDetailsModal', () => {
 
   it('should render text and icon - wifi', () => {
     const [{ getByText, getByLabelText }] = render(props)
-    // aria-label={`icon_${iconName}`}
     getByText('mock Wifi ssid')
     getByText('IP Address')
     getByText('192.168.1.100')
