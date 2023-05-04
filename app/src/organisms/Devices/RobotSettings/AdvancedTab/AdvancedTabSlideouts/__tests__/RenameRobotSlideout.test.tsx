@@ -3,7 +3,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
-import { useTrackEvent } from '../../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_RENAME_ROBOT,
+} from '../../../../../../redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -84,7 +87,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
       expect(renameButton).not.toBeDisabled()
       fireEvent.click(renameButton)
       expect(mockTrackEvent).toHaveBeenCalledWith({
-        name: 'renameRobot',
+        name: ANALYTICS_RENAME_ROBOT,
         properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
       })
     })

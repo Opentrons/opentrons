@@ -18,7 +18,10 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
-import { useTrackEvent } from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_RENAME_ROBOT,
+} from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
@@ -116,7 +119,7 @@ export function RenameRobotSlideout({
 
   const handleSubmitRobotRename = (): void => {
     trackEvent({
-      name: 'renameRobot',
+      name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName,
         newRobotName: formik.values.newRobotName,

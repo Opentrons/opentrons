@@ -28,7 +28,7 @@ const DESCRIPTION_STYLE = css`
   margin-bottom: ${SPACING.spacing3};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
+    font-weight: ${TYPOGRAPHY.fontWeightBold};
     font-size: ${TYPOGRAPHY.fontSize32};
     margin-top: ${SPACING.spacing6};
     margin-bottom: ${SPACING.spacing2};

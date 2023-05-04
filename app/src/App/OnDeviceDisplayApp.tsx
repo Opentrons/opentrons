@@ -26,6 +26,7 @@ import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDa
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
+import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
@@ -40,8 +41,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: Welcome,
     exact: true,
-    name: 'Get started',
-    path: '/get-started',
+    name: 'Welcome',
+    path: '/welcome',
   },
   {
     Component: TempODDMenu,
@@ -106,6 +107,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Protocol Run',
     path: '/protocols/:runId/run',
+  },
+  {
+    Component: RunSummary,
+    exact: true,
+    name: 'Protocol Run Summary',
+    path: '/protocols/:runId/summary',
   },
   {
     Component: InstrumentsDashboard,
@@ -182,7 +189,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%">
+      <Box width="100%" css="user-select: none;">
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (

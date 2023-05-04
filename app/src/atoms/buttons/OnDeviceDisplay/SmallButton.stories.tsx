@@ -13,8 +13,8 @@ const Template: Story<React.ComponentProps<typeof SmallButton>> = args => (
   <SmallButton {...args} />
 )
 
-export const Default = Template.bind({})
-Default.args = {
+export const Primary = Template.bind({})
+Primary.args = {
   buttonType: 'primary',
   buttonText: 'Button text',
 }
@@ -25,8 +25,8 @@ Alert.args = {
   buttonText: 'Button text',
 }
 
-export const Alt = Template.bind({})
-Alt.args = {
+export const Secondary = Template.bind({})
+Secondary.args = {
   buttonType: 'secondary',
   buttonText: 'Button text',
 }
@@ -43,8 +43,8 @@ TertiaryHighLight.args = {
   buttonText: 'Button text',
 }
 
-export const StartIconDefault = Template.bind({})
-StartIconDefault.args = {
+export const StartIconPrimary = Template.bind({})
+StartIconPrimary.args = {
   buttonType: 'primary',
   buttonText: 'Button text',
   iconPlacement: 'startIcon',
@@ -59,8 +59,8 @@ EndIconAlert.args = {
   iconName: 'play-round-corners',
 }
 
-export const AltRounded = Template.bind({})
-AltRounded.args = {
+export const SecondaryRounded = Template.bind({})
+SecondaryRounded.args = {
   buttonType: 'secondary',
   buttonText: 'Button text',
   buttonCategory: 'rounded',

@@ -47,7 +47,7 @@ const GO_BACK_BUTTON_STYLE = css`
 `
 const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};

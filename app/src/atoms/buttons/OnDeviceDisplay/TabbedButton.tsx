@@ -9,32 +9,32 @@ import {
 } from '@opentrons/components'
 
 const SELECTED_STYLE = css`
-  background-color: ${COLORS.highlightPurple_one};
+  background-color: ${COLORS.highlightPurple1};
   color: ${COLORS.white};
 
   &:focus,
   &:hover {
-    background-color: ${COLORS.highlightPurple_one};
+    background-color: ${COLORS.highlightPurple1};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.highlightPurple_one_pressed};
+    background-color: ${COLORS.highlightPurple1Pressed};
   }
 `
 
 const UNSELECTED_STYLE = css`
-  background-color: ${COLORS.highlightPurple_two};
-  color: ${COLORS.darkBlack_hundred};
+  background-color: ${COLORS.highlightPurple2};
+  color: ${COLORS.darkBlack100};
 
   &:focus,
   &:hover {
-    background-color: ${COLORS.highlightPurple_two};
+    background-color: ${COLORS.highlightPurple2};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.highlightPurple_two_pressed};
+    background-color: ${COLORS.highlightPurple2Pressed};
   }
 `
 
@@ -61,8 +61,8 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
         box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
       }
       &:disabled {
-        background-color: ${COLORS.darkBlack_twenty};
-        color: ${COLORS.darkBlack_sixty};
+        background-color: ${COLORS.darkBlack20};
+        color: ${COLORS.darkBlack60};
       }
     `}
 `

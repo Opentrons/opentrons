@@ -23,7 +23,11 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
+  ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+} from '../../../../redux/analytics'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
@@ -114,7 +118,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   `
   const handleSetOpenItem = (): void => {
     setOpenItem(!openItem)
-    trackEvent({ name: 'expandLiquidSetupRow', properties: {} })
+    trackEvent({ name: ANALYTICS_EXPAND_LIQUID_SETUP_ROW, properties: {} })
   }
   return (
     <Box
@@ -181,7 +185,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             const handleLiquidDetailsLabwareId = (): void => {
               setLiquidDetailsLabwareId(labware.labwareId)
               trackEvent({
-                name: 'openLiquidLabwareDetailModal',
+                name: ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
                 properties: {},
               })
             }

@@ -41,7 +41,7 @@ to {
 `
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -49,13 +49,13 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const RUN_TIMER_STYLE = css`
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
   color: ${COLORS.darkBlackEnabled};
 `

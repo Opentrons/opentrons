@@ -9,12 +9,15 @@ import {
   Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_JUPYTER_OPEN,
+} from '../../../../redux/analytics'
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 
-const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
+const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 
 const JUPYTER_NOTEBOOK_LINK =
   'https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook'
