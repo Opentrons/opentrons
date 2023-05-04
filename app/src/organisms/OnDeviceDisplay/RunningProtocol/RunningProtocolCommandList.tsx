@@ -17,17 +17,23 @@ import {
   POSITION_ABSOLUTE,
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
+import {
+  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_RESUME,
+  ANALYTICS_PROTOCOL_RUN_PAUSE,
+} from '../../../redux/analytics'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.darkBlack_seventy};
@@ -66,6 +72,7 @@ interface RunningProtocolCommandListProps {
   pauseRun: () => void
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
+  robotAnalyticsData: RobotAnalyticsData | null
   protocolName?: string
   currentRunCommandIndex?: number
 }
@@ -77,6 +84,7 @@ export function RunningProtocolCommandList({
   pauseRun,
   setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
+  robotAnalyticsData,
   protocolName,
   currentRunCommandIndex,
 }: RunningProtocolCommandListProps): JSX.Element {
@@ -92,17 +100,19 @@ export function RunningProtocolCommandList({
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pauseRun()
-      trackProtocolRunEvent({ name: 'runPause' })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
     } else {
       playRun()
-      // ToDo (kj:03/28/2023) update event information
-      // trackProtocolRunEvent({
-      //   name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
-      //   properties:
-      //     runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
-      //       ? robotAnalyticsData
-      //       : {},
-      // })
+      trackProtocolRunEvent({
+        name:
+          runStatus === RUN_STATUS_IDLE
+            ? ANALYTICS_PROTOCOL_RUN_START
+            : ANALYTICS_PROTOCOL_RUN_RESUME,
+        properties:
+          runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
+            ? robotAnalyticsData
+            : {},
+      })
     }
   }
 
