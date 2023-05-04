@@ -183,17 +183,13 @@ export function NameRobot(): JSX.Element {
                     }
                   }}
                 >
-                  <Icon
-                    name="back"
-                    size="3rem"
-                    color={COLORS.darkBlack_hundred}
-                  />
+                  <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
                 </Btn>
               </Flex>
               <Flex marginLeft={isFromRobotSettings ? '4rem' : '0'}>
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSize38}
-                  fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
                   lineHeight={TYPOGRAPHY.lineHeight48}
                 >
                   {!isFromRobotSettings
