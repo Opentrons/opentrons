@@ -179,7 +179,7 @@ class HeaterShakerMovementFlagger:
                 if dest_heater_shaker:
                     raise PipetteMovementRestrictedByHeaterShakerError(
                         f"Cannot move pipette to Heater-Shaker while labware latch"
-                        f" {'has not been closed' if hs_movement_restrictor.latch_status == HeaterShakerLatchStatus.CLOSED else 'is open'}."
+                        f" {'has not been closed' if hs_movement_restrictor.latch_status == HeaterShakerLatchStatus.UNKNOWN else 'is open'}."
                     )
                 if (
                     dest_east_west
@@ -187,7 +187,7 @@ class HeaterShakerMovementFlagger:
                 ):
                     raise PipetteMovementRestrictedByHeaterShakerError(
                         "Cannot move pipette to left or right of Heater-Shaker while labware latch "
-                        f" {'has not been closed' if hs_movement_restrictor.latch_status == HeaterShakerLatchStatus.CLOSED else 'is open'}."
+                        f" {'has not been closed' if hs_movement_restrictor.latch_status == HeaterShakerLatchStatus.UNKNOWN else 'is open'}."
                     )
 
             elif (

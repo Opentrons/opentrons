@@ -245,12 +245,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
-            labware_latch_status = HeaterShakerLatchStatus.UNKNOWN
-            if live_data is not None:
-                if live_data["labwareLatchStatus"] == "idle_closed":
-                    labware_latch_status = HeaterShakerLatchStatus.CLOSED
-                else:
-                    labware_latch_status = HeaterShakerLatchStatus.OPEN
+            if live_data is None:
+                labware_latch_status = HeaterShakerLatchStatus.UNKNOWN
+            elif live_data["labwareLatchStatus"] == "idle_closed":
+                labware_latch_status = HeaterShakerLatchStatus.CLOSED
+            else:
+                labware_latch_status = HeaterShakerLatchStatus.OPEN
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
                 labware_latch_status=labware_latch_status,
