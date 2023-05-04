@@ -115,9 +115,8 @@ export function CurrentRunningProtocolCommand({
   )
   const currentRunStatus = t(`status_${runStatus}`)
 
-  // ToDo (kj:04/09/2023 Add confirm modal)
-  // jira ticket RCORE-562 and RCORE-563
   const onStop = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
 

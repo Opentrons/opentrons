@@ -94,6 +94,7 @@ export function RunningProtocolCommandList({
   const currentRunStatus = t(`status_${runStatus}`)
 
   const onStop = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
 
