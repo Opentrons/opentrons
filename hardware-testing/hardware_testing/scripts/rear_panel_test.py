@@ -12,6 +12,88 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     set_deck_light,
     get_deck_light_state
 )
+
+##START TEST PASSING CONDITIONS
+PRE_TEST_CONDITIONS = {"ESTOP_DETECT_1": 0,
+                   "ESTOP_DETECT_2": 0,
+                   "ESTOP": 1,
+                   "AUX_ID_1": 0,
+                   "AUX_ID_2": 1,
+                   "DOOR_SW": 1,
+                   "SYNC": 0,
+                   "AUX_PRES_1": 1,
+                   "AUX_PRES_2": 1}
+
+POST_PLUG_CONDITIONS = {"ESTOP_DETECT_1": 1,
+                   "ESTOP_DETECT_2": 1,
+                   "ESTOP": 1,
+                   "AUX_ID_1": 0,
+                   "AUX_ID_2": 1,
+                   "DOOR_SW": 1,
+                   "SYNC": 0,
+                   "AUX_PRES_1": 0,
+                   "AUX_PRES_2": 0}
+
+ESTOP_CONDITIONS = {"ESTOP_DETECT_1": 1,
+                   "ESTOP_DETECT_2": 1,
+                   "ESTOP": 0,
+                   "AUX_ID_1": 0,
+                   "AUX_ID_2": 1,
+                   "DOOR_SW": 1,
+                   "SYNC": 0,
+                   "AUX_PRES_1": 0,
+                   "AUX_PRES_2": 0}
+
+AUX_ID_1_CONDITIONS = {"ESTOP_DETECT_1": 1,
+                   "ESTOP_DETECT_2": 1,
+                   "ESTOP": 0,
+                   "AUX_ID_1": 1,
+                   "AUX_ID_2": 1,
+                   "DOOR_SW": 1,
+                   "SYNC": 1,
+                   "AUX_PRES_1": 0,
+                   "AUX_PRES_2": 0}
+
+AUX_ID_2_CONDITIONS = {"ESTOP_DETECT_1": 1,
+                   "ESTOP_DETECT_2": 1,
+                   "ESTOP": 0,
+                   "AUX_ID_1": 0,
+                   "AUX_ID_2": 0,
+                   "DOOR_SW": 1,
+                   "SYNC": 1,
+                   "AUX_PRES_1": 0,
+                   "AUX_PRES_2": 0}
+
+DOOR_SW_CONDITIONS = {"ESTOP_DETECT_1": 1,
+                   "ESTOP_DETECT_2": 1,
+                   "ESTOP": 0,
+                   "AUX_ID_1": 0,
+                   "AUX_ID_2": 0,
+                   "DOOR_SW": 0,
+                   "SYNC": 1,
+                   "AUX_PRES_1": 0,
+                   "AUX_PRES_2": 0}
+
+##END TEST PASSING CONDITIONS
+
+pre_test = {"ESTOP_DETECT_1": 0,
+                   "ESTOP_DETECT_2": 0,
+                   "ESTOP": 0,
+                   "AUX_ID_1": 0,
+                   "AUX_ID_2": 0,
+                   "DOOR_SW": 0,
+                   "SYNC": 0,
+                   "AUX_PRES_1": 0,
+                   "AUX_PRES_2": 0}
+
+
+
+async def get_all_states(usb_messenger):
+    return 1
+
+async def check_all_states(usb_messenger):
+    return 1
+
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     async with usb_driver() as driver:
