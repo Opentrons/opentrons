@@ -55,7 +55,7 @@ export const SecureLabwareModal = (
                     block: (
                       <StyledText
                         as="p"
-                        marginBottom={SPACING.spacing2}
+                        marginBottom={SPACING.spacing4}
                         marginRight="3.625rem"
                       />
                     ),

@@ -113,7 +113,7 @@ export const ThermocyclerModuleSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
       >
         {t('tc_set_temperature_body', {

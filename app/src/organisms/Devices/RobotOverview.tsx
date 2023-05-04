@@ -109,13 +109,13 @@ export function RobotOverview({
                     as="h6"
                     color={COLORS.darkGreyEnabled}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    paddingBottom={SPACING.spacing2}
+                    paddingBottom={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformUppercase}
                   >
                     {t('controls')}
                   </StyledText>
                   <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-                    <Flex paddingBottom={SPACING.spacing2}>
+                    <Flex paddingBottom={SPACING.spacing4}>
                       <ToggleButton
                         label={t('lights')}
                         toggledOn={lightsOn != null ? lightsOn : false}
@@ -144,7 +144,7 @@ export function RobotOverview({
           </Box>
           <Box
             position={POSITION_ABSOLUTE}
-            top={SPACING.spacing2}
+            top={SPACING.spacing4}
             right="-.75rem"
           >
             <RobotOverviewOverflowMenu robot={robot} />

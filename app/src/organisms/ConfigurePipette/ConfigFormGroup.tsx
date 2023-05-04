@@ -72,8 +72,8 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      paddingTop={SPACING.spacing2}
-      paddingBottom={SPACING.spacing2}
+      paddingTop={SPACING.spacing4}
+      paddingBottom={SPACING.spacing4}
     >
       <StyledText
         as="label"

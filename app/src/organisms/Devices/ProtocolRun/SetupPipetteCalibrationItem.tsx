@@ -64,7 +64,7 @@ export function SetupPipetteCalibrationItem({
   if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
     pipetteMismatchInfo = (
       <Flex alignItems={ALIGN_CENTER}>
-        <Banner type="warning" padding={SPACING.spacing2}>
+        <Banner type="warning" padding={SPACING.spacing4}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             {t('pipette_mismatch')}
             <Link

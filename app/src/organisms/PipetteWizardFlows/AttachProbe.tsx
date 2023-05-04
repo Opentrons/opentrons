@@ -30,7 +30,7 @@ const IN_PROGRESS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
-    margin-top: ${SPACING.spacing2};
+    margin-top: ${SPACING.spacing4};
   }
 `
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
@@ -85,7 +85,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteProbeVid = (
-    <Flex height="10.2rem" paddingTop={SPACING.spacing2}>
+    <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
       <video
         css={css`
           max-width: 100%;

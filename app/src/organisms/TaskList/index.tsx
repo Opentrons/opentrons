@@ -232,7 +232,7 @@ function SubTask({
       <Flex
         alignItems={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
       >
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           <Flex
@@ -384,7 +384,7 @@ function Task({
           <Flex
             alignItems={ALIGN_FLEX_START}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
           >
             <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               <Flex

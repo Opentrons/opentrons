@@ -312,7 +312,7 @@ interface LabeledValueProps {
 
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText as="h6">{props.label}</StyledText>
       {typeof props.value === 'string' ? (
         <StyledText as="p">{props.value}</StyledText>
@@ -335,8 +335,8 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
         <Icon
           name="circle"
           color={COLORS.blueEnabled}
-          size={SPACING.spacing2}
-          marginRight={SPACING.spacing2}
+          size={SPACING.spacing4}
+          marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate

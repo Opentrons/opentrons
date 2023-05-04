@@ -85,7 +85,7 @@ export function CommandText(props: Props): JSX.Element | null {
       )
       return (
         <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
-          <StyledText marginBottom={SPACING.spacing2} {...styleProps}>
+          <StyledText marginBottom={SPACING.spacing4} {...styleProps}>
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,
             })}

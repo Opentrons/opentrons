@@ -86,7 +86,7 @@ export function SelectAuthenticationType({
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               name="chevron-left"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
               size="1.875rem"
             />
             <StyledText
@@ -161,7 +161,7 @@ export function SelectAuthenticationType({
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing2}
+          gridGap={SPACING.spacing4}
           marginTop="7.8125rem"
         >
           <StyledText

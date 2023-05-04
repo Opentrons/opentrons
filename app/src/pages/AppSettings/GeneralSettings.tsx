@@ -118,7 +118,7 @@ export function GeneralSettings(): JSX.Element {
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"
                 onClick={() => setShowUpdateModal(true)}
-                marginLeft={SPACING.spacing2}
+                marginLeft={SPACING.spacing4}
               >
                 {t('view_update')}
               </Link>

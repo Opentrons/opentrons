@@ -190,7 +190,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             paddingLeft={SPACING.spacing3}
           >
             {isOT3PipetteAttached && !isPipetteCalibrated ? (
-              <Banner type="error" marginBottom={SPACING.spacing2}>
+              <Banner type="error" marginBottom={SPACING.spacing4}>
                 <Trans
                   t={t}
                   i18nKey="calibration_needed"
@@ -215,7 +215,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               color={COLORS.darkGreyEnabled}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               fontSize={TYPOGRAPHY.fontSizeH6}
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
               data-testid={`PipetteCard_mount_${String(pipetteDisplayName)}`}
             >
               {is96ChannelAttached
@@ -225,7 +225,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                   })}
             </StyledText>
             <Flex
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
               data-testid={`PipetteCard_display_name_${String(
                 pipetteDisplayName
               )}`}
@@ -239,7 +239,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       </Box>
       <Box
         alignSelf={ALIGN_START}
-        padding={SPACING.spacing2}
+        padding={SPACING.spacing4}
         data-testid={`PipetteCard_overflow_btn_${String(pipetteDisplayName)}`}
       >
         <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />

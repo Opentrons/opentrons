@@ -48,7 +48,7 @@ export function UseOlderProtocol({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          paddingBottom={SPACING.spacing2}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_showLink"
         >
           {t('use_older_protocol_analysis_method')}

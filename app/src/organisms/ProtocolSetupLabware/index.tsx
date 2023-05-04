@@ -462,7 +462,7 @@ function RowLabware({
       <Flex
         alignSelf={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         width="86%"
       >
         <StyledText

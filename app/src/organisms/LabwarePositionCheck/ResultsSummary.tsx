@@ -169,7 +169,7 @@ const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
+  border-spacing: 0 ${SPACING.spacing4};
   margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
@@ -178,14 +178,14 @@ const TableHeader = styled('th')`
   color: ${COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
   background-color: ${COLORS.fundamentalsBackground};
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: wrap;
 `
@@ -238,7 +238,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                         <StyledText
                           as="p"
                           marginLeft={index > 0 ? SPACING.spacing3 : 0}
-                          marginRight={SPACING.spacing2}
+                          marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}

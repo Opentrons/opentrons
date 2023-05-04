@@ -197,14 +197,14 @@ export const HeaterShakerModuleData = (
           </StyledText>
           <Flex
             flexDirection={DIRECTION_ROW}
-            marginTop={SPACING.spacing2}
+            marginTop={SPACING.spacing4}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
           >
             {isShaking && (
               <Icon
                 paddingBottom="3px"
-                paddingRight={SPACING.spacing2}
+                paddingRight={SPACING.spacing4}
                 name="closed-locked"
                 data-testid="HeaterShakerModuleData_latch_lock"
                 size={SIZE_1}

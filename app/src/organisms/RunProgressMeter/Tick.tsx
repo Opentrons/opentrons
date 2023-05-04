@@ -86,7 +86,7 @@ export function Tick(props: TickProps): JSX.Element {
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
             padding={SPACING.spacing1}
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
             alignItems={ALIGN_CENTER}
           >
             {!isAggregatedTick && iconName != null ? (

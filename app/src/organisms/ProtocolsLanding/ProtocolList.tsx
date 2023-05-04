@@ -169,8 +169,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing3}
-                paddingRight={SPACING.spacing2}
-                paddingY={SPACING.spacing2}
+                paddingRight={SPACING.spacing4}
+                paddingY={SPACING.spacing4}
                 data-testid="sortBy-label"
               >
                 {sortByLabelType[sortBy].label}

@@ -138,7 +138,7 @@ export function LabwareListItem(
                   marginTop={SPACING.spacingXS}
                 />
                 <StyledText
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                   as="p"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 >

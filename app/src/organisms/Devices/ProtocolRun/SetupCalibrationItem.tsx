@@ -75,7 +75,7 @@ export function SetupCalibrationItem({
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />
           ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
               <StyledText
                 color={COLORS.darkGreyEnabled}

@@ -159,7 +159,7 @@ export const RobotConfigurationDetails = (
                       <ModuleIcon
                         key={index}
                         moduleType={getModuleType(module.params.model)}
-                        marginRight={SPACING.spacing2}
+                        marginRight={SPACING.spacing4}
                         alignSelf={ALIGN_CENTER}
                         color={COLORS.darkGreyEnabled}
                         height={SIZE_1}

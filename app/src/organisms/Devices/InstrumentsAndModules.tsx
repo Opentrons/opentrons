@@ -120,7 +120,7 @@ export function InstrumentsAndModules({
           <Flex
             paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            paddingX={SPACING.spacing2}
+            paddingX={SPACING.spacing4}
             width="100%"
           >
             <Banner type="warning">{t('robot_control_not_available')}</Banner>

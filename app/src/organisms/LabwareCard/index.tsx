@@ -88,7 +88,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 {t('custom_def')}
               </StyledText>
             ) : (
-              <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing2}>
+              <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
                   color={COLORS.blueEnabled}
                   name="check-decagram"
@@ -97,7 +97,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 <StyledText
                   as="label"
                   id="LabwareCard_opentronsDef"
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                 >
                   {t('opentrons_def')}
                 </StyledText>

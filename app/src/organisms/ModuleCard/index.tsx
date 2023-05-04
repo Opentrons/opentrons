@@ -212,7 +212,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={SPACING.spacing2}
+      borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
@@ -273,7 +273,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             )}
             {module.hasAvailableUpdate && showBanner && !isPending ? (
               <Flex
-                paddingBottom={SPACING.spacing2}
+                paddingBottom={SPACING.spacing4}
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
                 data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
@@ -339,7 +339,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   color={COLORS.darkGreyEnabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
-                  paddingBottom={SPACING.spacing2}
+                  paddingBottom={SPACING.spacing4}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
@@ -351,7 +351,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   })}
                 </StyledText>
                 <Flex
-                  paddingBottom={SPACING.spacing2}
+                  paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
                   fontSize={TYPOGRAPHY.fontSizeP}
                 >
@@ -379,7 +379,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
       <Box
         alignSelf={ALIGN_START}
-        padding={SPACING.spacing2}
+        padding={SPACING.spacing4}
         data-testid={`ModuleCard_overflow_btn_${module.serialNumber}`}
         opacity={isPending ? '50%' : '100%'}
       >

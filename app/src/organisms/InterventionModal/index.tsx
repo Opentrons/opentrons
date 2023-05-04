@@ -120,7 +120,7 @@ export function InterventionModal({
                   {t('protocol_info:intervention_modal_learn_more')}
                   <Icon
                     name="open-in-new"
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     size="0.5rem"
                   />
                 </Link>

@@ -48,7 +48,7 @@ export function DeviceDetails(): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING.spacing16}
           paddingX={SPACING.spacing16}
-          paddingBottom={SPACING.spacing2}
+          paddingBottom={SPACING.spacing4}
           width="100%"
         >
           <RobotOverview robotName={robotName} />

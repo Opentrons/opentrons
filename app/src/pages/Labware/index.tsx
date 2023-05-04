@@ -139,7 +139,7 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_FLEX_END}
           paddingBottom={SPACING.spacing5}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('category')}
             </StyledText>
@@ -169,8 +169,8 @@ export function Labware(): JSX.Element {
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 paddingLeft={SPACING.spacing3}
-                paddingRight={SPACING.spacing2}
-                paddingY={SPACING.spacing2}
+                paddingRight={SPACING.spacing4}
+                paddingY={SPACING.spacing4}
                 data-testid="sortBy-label"
               >
                 {sortBy === 'alphabetical'
@@ -216,7 +216,7 @@ export function Labware(): JSX.Element {
             </Flex>
           )}
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           {labware.map((labware, index) => (
             <LabwareCard
               key={`${String(labware.definition.metadata.displayName)}${index}`}
@@ -256,7 +256,7 @@ export function Labware(): JSX.Element {
             <Icon
               name="open-in-new"
               size="0.5rem"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
             />
           </Link>
         </Flex>

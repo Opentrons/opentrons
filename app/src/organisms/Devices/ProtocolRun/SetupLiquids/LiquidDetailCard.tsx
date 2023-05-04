@@ -36,7 +36,7 @@ const LIQUID_CARD_STYLE = css`
 `
 const LIQUID_CARD_ODD_STYLE = css`
   border-color: ${COLORS.medGreyEnabled};
-  border: ${SPACING.spacing2} solid ${COLORS.medGreyEnabled};
+  border: ${SPACING.spacing4} solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.size_three};
 `
 interface LiquidDetailCardProps {
@@ -67,7 +67,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
 
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.medBlue : COLORS.lightBlue};
-    border: ${isOnDevice ? SPACING.spacing2 : `1px`} solid ${COLORS.blueEnabled};
+    border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blueEnabled};
     border-radius: ${isOnDevice ? BORDERS.size_three : 0};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
@@ -216,7 +216,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           borderRadius={BORDERS.radiusSoftCorners}
           height="max-content"
           width="max-content"
-          paddingY={SPACING.spacing2}
+          paddingY={SPACING.spacing4}
           paddingX={SPACING.spacing3}
           marginTop={SPACING.spacing3}
         >
@@ -244,7 +244,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  marginRight={SPACING.spacing2}
+                  marginRight={SPACING.spacing4}
                 >
                   {well.wellName}
                 </StyledText>

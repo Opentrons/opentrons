@@ -96,7 +96,7 @@ export function ProtocolInstrumentMountItem(
           <Flex
             flex="2"
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
           >
             <MountLabel>
               {i18n.format(

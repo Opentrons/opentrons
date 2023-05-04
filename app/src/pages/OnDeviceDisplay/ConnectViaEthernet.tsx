@@ -120,7 +120,7 @@ const TitleHeader = ({ title }: TitleHeaderProps): JSX.Element => {
         >
           <Icon
             name="chevron-left"
-            marginRight={SPACING.spacing2}
+            marginRight={SPACING.spacing4}
             size="1.875rem"
           />
           <StyledText

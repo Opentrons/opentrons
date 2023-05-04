@@ -41,7 +41,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       color={isLastCrumb ? COLORS.darkGreyEnabled : COLORS.blueEnabled}
     >
       <Box
-        paddingRight={SPACING.spacing2}
+        paddingRight={SPACING.spacing4}
         textTransform={TYPOGRAPHY.textTransformNone}
         css={TYPOGRAPHY.labelRegular}
       >
@@ -123,15 +123,15 @@ function BreadcrumbsComponent(): JSX.Element | null {
       borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing2)} 0 ${String(
-        SPACING.spacing2
+      padding={`${String(SPACING.spacing4)} 0 ${String(
+        SPACING.spacing4
       )} ${String(SPACING.spacing3)}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 
         return (
-          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing2}>
+          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing4}>
             <CrumbLink
               as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
               to={crumb.linkPath}

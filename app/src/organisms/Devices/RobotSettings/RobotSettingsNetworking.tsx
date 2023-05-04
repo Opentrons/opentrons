@@ -132,7 +132,7 @@ export function RobotSettingsNetworking({
               <Flex gridGap={SPACING.spacing16}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_ip')}
@@ -143,7 +143,7 @@ export function RobotSettingsNetworking({
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_subnet_mask')}
@@ -155,7 +155,7 @@ export function RobotSettingsNetworking({
 
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_mac_address')}
@@ -201,7 +201,7 @@ export function RobotSettingsNetworking({
               <>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_ip')}
@@ -212,7 +212,7 @@ export function RobotSettingsNetworking({
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_subnet_mask')}
@@ -223,7 +223,7 @@ export function RobotSettingsNetworking({
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_mac_address')}

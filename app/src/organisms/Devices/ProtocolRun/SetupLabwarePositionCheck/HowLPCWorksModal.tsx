@@ -45,7 +45,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
             {t('learn_more_about_offset_data')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>
@@ -62,7 +62,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
             {t('learn_more_about_robot_cal_offset')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>

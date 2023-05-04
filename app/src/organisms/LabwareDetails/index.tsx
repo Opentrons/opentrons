@@ -48,7 +48,7 @@ const CLOSE_ICON_STYLE = css`
 `
 
 const COPY_ICON_STYLE = css`
-  transform: translateY(${SPACING.spacing2});
+  transform: translateY(${SPACING.spacing4});
   &:hover {
     color: ${COLORS.blueEnabled};
   }
@@ -97,7 +97,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const slideoutHeader = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
+      gridGap={SPACING.spacing4}
       paddingX={SPACING.spacing16}
       marginBottom={SPACING.spacing16}
     >
@@ -126,7 +126,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           >
             {t('opentrons_def')}
           </StyledText>

@@ -31,7 +31,7 @@ const DESCRIPTION_STYLE = css`
     font-weight: ${TYPOGRAPHY.fontWeightBold};
     font-size: ${TYPOGRAPHY.fontSize32};
     margin-top: ${SPACING.spacing6};
-    margin-bottom: ${SPACING.spacing2};
+    margin-bottom: ${SPACING.spacing4};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
     text-align: ${TYPOGRAPHY.textAlignCenter};

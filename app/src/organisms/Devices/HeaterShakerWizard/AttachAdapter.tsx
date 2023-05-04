@@ -53,7 +53,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           )}`}
         >
           <Flex
-            padding={`${String(SPACING.spacing2)} 5rem ${String(
+            padding={`${String(SPACING.spacing4)} 5rem ${String(
               SPACING.spacing16
             )} ${String(SPACING.spacing7)}`}
             data-testid="attach_adapter_screw_in_adapter_image"
@@ -91,7 +91,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
                 fontSize={TYPOGRAPHY.fontSizeP}
                 paddingBottom={SPACING.spacing16}
               >
-                <StyledText paddingBottom={SPACING.spacing2}>
+                <StyledText paddingBottom={SPACING.spacing4}>
                   {t('attach_screwdriver_and_screw')}
                 </StyledText>
                 <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>

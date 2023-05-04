@@ -84,7 +84,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       width: props.width != null ? props.width : 'auto',
       boxShadowcha: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
-      marginTop: SPACING.spacing2,
+      marginTop: SPACING.spacing4,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
     menuList: (styles: CSSObjectWithLabel) => ({
@@ -129,7 +129,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginRight: '0.75rem',
-      marginLeft: SPACING.spacing2,
+      marginLeft: SPACING.spacing4,
       marginTop: '0.2rem',
       fontSize: TYPOGRAPHY.fontSizeP,
     }),

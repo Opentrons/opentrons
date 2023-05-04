@@ -173,7 +173,7 @@ const DisplayConnectedNetworkInfo = ({
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon name="wifi" size="2.4rem" />
         <StyledText
-          marginLeft={SPACING.spacing2}
+          marginLeft={SPACING.spacing4}
           fontSize="1.5rem"
           lineHeight="1.8rem"
           fontWeight="700"
@@ -184,7 +184,7 @@ const DisplayConnectedNetworkInfo = ({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         textAlign={TYPOGRAPHY.textAlignRight}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
       >
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
           {/* ToDo: if wifi is undefined no data or empty */}

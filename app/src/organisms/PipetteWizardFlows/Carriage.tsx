@@ -68,7 +68,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       <SecondaryButton
         isDangerous
         onClick={goBack}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
       >
         {i18n.format(t('cancel_attachment'), 'capitalize')}
       </SecondaryButton>

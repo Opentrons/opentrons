@@ -107,7 +107,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         </StyledText>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         width="100%"
         justifyContent={JUSTIFY_CENTER}
       >

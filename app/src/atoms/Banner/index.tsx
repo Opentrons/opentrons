@@ -101,7 +101,7 @@ export function Banner(props: BannerProps): JSX.Element {
       ${BANNER_PROPS_BY_TYPE[type].color};
     font-size: ${TYPOGRAPHY.fontSizeP};
     font-weight: ${TYPOGRAPHY.fontWeightRegular};
-    border-radius: ${SPACING.spacing2};
+    border-radius: ${SPACING.spacing4};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: 1.25rem;

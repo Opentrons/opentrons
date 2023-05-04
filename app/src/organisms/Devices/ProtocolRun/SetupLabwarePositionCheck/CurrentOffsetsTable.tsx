@@ -42,7 +42,7 @@ const OffsetTable = styled('table')`
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
   background-color: ${COLORS.fundamentalsBackground};

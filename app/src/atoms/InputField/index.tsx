@@ -86,7 +86,7 @@ function Input(props: InputFieldProps): JSX.Element {
   const INPUT_FIELD = css`
     display: flex;
     background-color: ${COLORS.white};
-    border-radius: ${SPACING.spacing2};
+    border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing3};
     border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
@@ -151,12 +151,12 @@ function Input(props: InputFieldProps): JSX.Element {
       <Flex
         color={COLORS.darkGreyEnabled}
         fontSize={TYPOGRAPHY.fontSizeLabel}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
-        <Flex paddingBottom={SPACING.spacing2}>{props.caption}</Flex>
+        <Flex paddingBottom={SPACING.spacing4}>{props.caption}</Flex>
         {props.secondaryCaption != null ? (
-          <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
+          <Flex paddingBottom={SPACING.spacing4}>{props.secondaryCaption}</Flex>
         ) : null}
         <Flex color={COLORS.errorEnabled}>{props.error}</Flex>
       </Flex>

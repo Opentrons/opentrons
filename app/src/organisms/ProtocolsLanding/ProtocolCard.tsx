@@ -95,8 +95,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       />
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <ProtocolOverflowMenu
           handleRunProtocol={handleRunProtocol}
@@ -195,7 +195,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex={`0 0 ${String(SIZE_2)}`}
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
               >
                 <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                   {t('robot')}
@@ -207,7 +207,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
@@ -220,7 +220,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                     loading: <StyledText as="p">{t('no_data')}</StyledText>,
                     error: <StyledText as="p">{t('no_data')}</StyledText>,
                     complete: (
-                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
+                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
                         {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
                         {leftMountPipetteName != null ? (
                           <InstrumentContainer
@@ -247,7 +247,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="0 0 6rem"
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>

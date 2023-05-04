@@ -170,7 +170,7 @@ export function ChooseRobotSlideout(
         {isAnalysisError ? (
           <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
         ) : null}
-        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing2}>
+        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
           {isScanning ? (
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText
@@ -242,7 +242,7 @@ export function ChooseRobotSlideout(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing2}`}
+                    marginTop={`-${SPACING.spacing4}`}
                     marginBottom={SPACING.spacing3}
                   >
                     {runCreationErrorCode === 409 ? (

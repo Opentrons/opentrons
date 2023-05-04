@@ -130,9 +130,9 @@ export function HistoricalProtocolRun(
             <Icon
               name="circle"
               color={COLORS.blueEnabled}
-              size={SPACING.spacing2}
-              marginX={SPACING.spacing2}
-              marginBottom={SPACING.spacing2}
+              size={SPACING.spacing4}
+              marginX={SPACING.spacing4}
+              marginBottom={SPACING.spacing4}
             />
           )}
           {runStatus != null ? t(`status_${String(runStatus)}`) : ''}

@@ -61,7 +61,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
         </>
       ) : (
         <>
-          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
+          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing4}>
             {t('shared:go_back')}
           </SecondaryButton>
           <AlertPrimaryButton

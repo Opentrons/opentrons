@@ -86,7 +86,7 @@ export function SetupStep({
               <StyledText
                 color={COLORS.darkBlackEnabled}
                 css={TYPOGRAPHY.h3SemiBold}
-                marginBottom={SPACING.spacing2}
+                marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
@@ -133,7 +133,7 @@ export function SetupStep({
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}
-                margin={SPACING.spacing2}
+                margin={SPACING.spacing4}
               />
             </Flex>
           </Flex>

@@ -74,7 +74,7 @@ const Template: Story<ColorsStorybookProps> = args => {
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={color[1]}
           padding={SPACING.spacing16}
-          gridGap={SPACING.spacing2}
+          gridGap={SPACING.spacing4}
           width="20rem"
           height="6rem"
           borderRadius={BORDERS.size_two}

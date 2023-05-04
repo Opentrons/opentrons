@@ -81,7 +81,7 @@ export const TemperatureModuleSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`TemperatureSlideout_body_text_${module.serialNumber}`}
       >
         {t('tempdeck_slideout_body', {

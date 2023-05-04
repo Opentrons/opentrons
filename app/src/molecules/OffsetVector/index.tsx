@@ -17,7 +17,7 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
     <Flex {...styleProps}>
       <StyledText
         as={as}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         X
@@ -27,7 +27,7 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <StyledText
         as={as}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         Y
@@ -37,7 +37,7 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <StyledText
         as={as}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         Z

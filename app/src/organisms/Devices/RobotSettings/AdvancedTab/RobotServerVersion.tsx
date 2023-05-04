@@ -63,18 +63,18 @@ export function RobotServerVersion({
         <Box width="70%">
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
-            paddingBottom={SPACING.spacing2}
+            paddingBottom={SPACING.spacing4}
             id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_version')}
           </StyledText>
-          <StyledText as="p" paddingBottom={SPACING.spacing2}>
+          <StyledText as="p" paddingBottom={SPACING.spacing4}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')}
           </StyledText>
           {isOT3 ? (
-            <StyledText as="p" paddingBottom={SPACING.spacing2}>
+            <StyledText as="p" paddingBottom={SPACING.spacing4}>
               {t('robot_server_version_ot3_description')}
             </StyledText>
           ) : null}

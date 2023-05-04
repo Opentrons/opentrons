@@ -22,7 +22,7 @@ const Table = styled('table')`
   border-collapse: separate
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
+  border-spacing: 0 ${SPACING.spacing4};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
@@ -30,7 +30,7 @@ const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 
 const TableRow = styled('tr')`
@@ -42,7 +42,7 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   font-size: ${TYPOGRAPHY.fontSize22};
   font-weight: ${TYPOGRAPHY.lineHeight28};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {

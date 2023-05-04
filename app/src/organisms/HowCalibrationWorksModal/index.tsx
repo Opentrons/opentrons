@@ -123,7 +123,7 @@ function CalibrationSteps({
   steps,
 }: CalibrationStepsProps): JSX.Element {
   return (
-    <Box marginTop={SPACING.spacing2}>
+    <Box marginTop={SPACING.spacing4}>
       <StyledText as="p" marginBottom={SPACING.spacing3}>
         {description}
       </StyledText>

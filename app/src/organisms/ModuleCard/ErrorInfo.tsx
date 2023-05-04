@@ -59,7 +59,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
         {t('module_error')}
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <StyledText as="p" marginRight={SPACING.spacing2}>
+          <StyledText as="p" marginRight={SPACING.spacing4}>
             {t('view')}
           </StyledText>
           <Btn

@@ -17,7 +17,7 @@ const id = 'Tooltip_123'
 const tooltipRef = jest.fn()
 const tooltipStyle = {
   position: POSITION_ABSOLUTE,
-  left: SPACING.spacing2,
+  left: SPACING.spacing4,
 } as const
 const arrowRef = jest.fn()
 const arrowStyle = {

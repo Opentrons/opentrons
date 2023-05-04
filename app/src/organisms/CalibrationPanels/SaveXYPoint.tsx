@@ -253,7 +253,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           jog={jog}
           stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
         />
-        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing4}>
           {confirmLink}
         </Box>
         <Flex

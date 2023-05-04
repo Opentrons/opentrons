@@ -85,7 +85,7 @@ export function DevicesLanding(): JSX.Element {
       {!noRobots ? (
         <>
           <CollapsibleSection
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
             marginY={SPACING.spacing3}
             title={t('available', {
               count: [...healthyReachableRobots, ...unhealthyReachableRobots]
@@ -105,7 +105,7 @@ export function DevicesLanding(): JSX.Element {
           </CollapsibleSection>
           <Divider />
           <CollapsibleSection
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
             marginY={SPACING.spacing16}
             title={t('not_available', {
               count: [...recentlySeenRobots, ...unreachableRobots].length,
@@ -167,7 +167,7 @@ function DevicesLoadingState(): JSX.Element {
           <Icon
             name="open-in-new"
             size="0.5rem"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           />
         </Link>
       </Flex>

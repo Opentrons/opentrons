@@ -108,8 +108,8 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       </Flex>
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <OverflowBtn onClick={handleOverflowClick} />
         {menuOverlay}

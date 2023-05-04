@@ -153,7 +153,7 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               name="chevron-left"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
               size="1.875rem"
             />
             <StyledText

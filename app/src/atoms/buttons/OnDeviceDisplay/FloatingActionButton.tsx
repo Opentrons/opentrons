@@ -50,7 +50,7 @@ export function FloatingActionButton(
 
     &:focus-visible {
       border-color: ${COLORS.fundamentalsFocus};
-      border-width: ${SPACING.spacing2};
+      border-width: ${SPACING.spacing4};
       box-shadow: ${BORDERS.shadowBig};
     }
 

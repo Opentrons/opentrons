@@ -29,7 +29,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       marginY={SPACING.spacing3}
-      gridGap={SPACING.spacing2}
+      gridGap={SPACING.spacing4}
     >
       <StyledText
         as="label"
@@ -53,7 +53,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
             <StyledText
               as="p"
               marginLeft={SPACING.spacing3}
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {axisLabels[index]}

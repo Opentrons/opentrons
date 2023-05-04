@@ -101,7 +101,7 @@ export function AvailableRobotOption(
               <Icon
                 // local boolean corresponds to a wired usb connection
                 aria-label={local ?? false ? 'usb' : 'wifi'}
-                marginBottom={`-${SPACING.spacing2}`}
+                marginBottom={`-${SPACING.spacing4}`}
                 marginLeft={SPACING.spacing3}
                 name={local ?? false ? 'usb' : 'wifi'}
                 size={SIZE_1}

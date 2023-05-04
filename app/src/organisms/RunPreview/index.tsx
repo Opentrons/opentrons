@@ -112,7 +112,7 @@ export const RunPreviewComponent = (
               </StyledText>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
                 width="100%"
                 border={`solid 1px ${
                   index === jumpedIndex ? COLORS.electricPurple : borderColor

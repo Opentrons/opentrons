@@ -166,7 +166,7 @@ export const TestShakeSlideout = (
         marginBottom={SPACING.spacing3}
         backgroundColor={COLORS.fundamentalsBackground}
         paddingY={SPACING.spacing16}
-        paddingLeft={SPACING.spacing2}
+        paddingLeft={SPACING.spacing4}
         paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
@@ -216,7 +216,7 @@ export const TestShakeSlideout = (
             </StyledText>
           </Flex>
           <TertiaryButton
-            marginTop={SPACING.spacing2}
+            marginTop={SPACING.spacing4}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -295,7 +295,7 @@ export const TestShakeSlideout = (
       )}
       <Link
         role="button"
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
         onClick={() => setShowWizard(true)}

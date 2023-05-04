@@ -216,7 +216,7 @@ export function AdvancedSettings(): JSX.Element {
                   justifyContent={JUSTIFY_FLEX_END}
                 >
                   <Flex
-                    paddingRight={SPACING.spacing2}
+                    paddingRight={SPACING.spacing4}
                     data-testid="AdvancedSettings_ConfirmClear_Cancel"
                   >
                     <Btn
@@ -287,7 +287,7 @@ export function AdvancedSettings(): JSX.Element {
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
             >
               {t('additional_folder_location')}
             </StyledText>
@@ -589,7 +589,7 @@ export function AdvancedSettings(): JSX.Element {
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
             >
               {t('override_path')}
             </StyledText>

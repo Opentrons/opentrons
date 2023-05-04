@@ -169,11 +169,11 @@ const Summary = (props: {
   const { author, description, date } = props
   const { t } = useTranslation('protocol_details')
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         lineHeight={TYPOGRAPHY.lineHeight28}
       >
         <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>{`${t(

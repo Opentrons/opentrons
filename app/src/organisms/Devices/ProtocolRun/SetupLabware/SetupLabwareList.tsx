@@ -38,7 +38,7 @@ export function SetupLabwareList(
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
+      gridGap={SPACING.spacing4}
       marginBottom={SPACING.spacing16}
     >
       <HeaderRow>

@@ -80,7 +80,7 @@ export function DevicesEmptyState(): JSX.Element {
           <Icon
             name="open-in-new"
             size="0.5rem"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           />
         </Link>
       </Flex>

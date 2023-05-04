@@ -115,7 +115,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginTop={SPACING.spacing16}
         marginLeft={SPACING.spacingM}
-        marginBottom={SPACING.spacing2}
+        marginBottom={SPACING.spacing4}
       >
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
@@ -147,7 +147,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         width="100%"
         overflowY="auto"
         data-testid="SetupModulesList_ListView"
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
       >
         {map(
@@ -251,7 +251,7 @@ export const ModulesListItem = ({
                     color: ${COLORS.darkBlackEnabled};
                   }
                 `}
-                marginTop={SPACING.spacing2}
+                marginTop={SPACING.spacing4}
                 onClick={() => setShowHeaterShakerFlow(true)}
               >
                 <Flex flexDirection={DIRECTION_ROW}>
@@ -261,7 +261,7 @@ export const ModulesListItem = ({
                     marginTop={SPACING.spacingXS}
                   />
                   <StyledText
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     as="p"
                   >

@@ -215,7 +215,7 @@ export function ChooseProtocolSlideoutComponent(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_BLOCK}
-                    marginTop={`-${SPACING.spacing2}`}
+                    marginTop={`-${SPACING.spacing4}`}
                     marginBottom={SPACING.spacing3}
                   >
                     {runCreationErrorCode === 409 ? (

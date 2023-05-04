@@ -71,7 +71,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
               color={isAttached ? COLORS.successEnabled : COLORS.warningEnabled}
               key="icon"
               size="10px"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
             />
             <StyledText
               color={COLORS.darkGreyEnabled}

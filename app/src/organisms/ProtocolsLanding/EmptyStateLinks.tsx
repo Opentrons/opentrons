@@ -57,7 +57,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             {t('browse_protocol_library')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>
@@ -74,7 +74,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
 
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>
@@ -84,13 +84,13 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={API_DOCS_URL}
             id="EmptyStateLinks_apiDocsButton"
-            marginRight={SPACING.spacing2}
+            marginRight={SPACING.spacing4}
             external
           >
             {t('open_api_docs')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>

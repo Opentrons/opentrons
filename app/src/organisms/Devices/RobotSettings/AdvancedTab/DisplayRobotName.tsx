@@ -50,7 +50,7 @@ export function DisplayRobotName({
         <StyledText
           as="p"
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing4}
         >
           {t('robot_name')}
         </StyledText>

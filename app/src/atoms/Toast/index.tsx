@@ -195,9 +195,9 @@ export function Toast(props: ToastProps): JSX.Element {
       padding={
         showODDStyle
           ? `${String(SPACING.spacing16)} ${String(SPACING.spacing5)}`
-          : `${heading != null ? SPACING.spacing2 : SPACING.spacing3} ${
+          : `${heading != null ? SPACING.spacing4 : SPACING.spacing3} ${
               SPACING.spacing3
-            } ${heading != null ? SPACING.spacing2 : SPACING.spacing3} 0.75rem`
+            } ${heading != null ? SPACING.spacing4 : SPACING.spacing3} 0.75rem`
       }
       data-testid={`Toast_${type}`}
       height={showODDStyle ? '5.76rem' : 'auto'}
@@ -208,7 +208,7 @@ export function Toast(props: ToastProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         overflow="hidden"
         width="100%"
       >
@@ -239,7 +239,7 @@ export function Toast(props: ToastProps): JSX.Element {
               lineHeight={
                 showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
               }
-              marginRight={showODDStyle ? SPACING.spacing2 : undefined}
+              marginRight={showODDStyle ? SPACING.spacing4 : undefined}
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"

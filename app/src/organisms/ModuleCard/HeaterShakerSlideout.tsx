@@ -97,7 +97,7 @@ export const HeaterShakerSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
       >
         {t('set_target_temp_of_hs')}

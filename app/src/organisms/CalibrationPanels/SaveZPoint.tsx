@@ -132,7 +132,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
           initialPlane={VERTICAL_PLANE}
         />
-        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing4}>
           {confirmLink}
         </Box>
         <Flex

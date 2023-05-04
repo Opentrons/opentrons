@@ -285,7 +285,7 @@ const ARROW_GRID_STYLES = css`
     '.         .         ArrowDown ArrowDown .          .         '
     '.         .         .         .         .          .         ';
 
-  grid-gap: ${SPACING.spacing2};
+  grid-gap: ${SPACING.spacing4};
   align-items: ${ALIGN_CENTER};
 
   @media (max-width: 750px) {

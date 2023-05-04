@@ -23,7 +23,7 @@ describe('OffsetVector', () => {
     expect(getAllByRole('heading', { level: 6 })).toHaveLength(6)
 
     expect(getByText('X')).toHaveStyle(
-      `margin-right: ${String(SPACING.spacing2)}`
+      `margin-right: ${String(SPACING.spacing4)}`
     )
     expect(getByText('X')).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
@@ -32,7 +32,7 @@ describe('OffsetVector', () => {
     expect(x).toHaveStyle(`margin-right: ${String(SPACING.spacing3)}`)
 
     expect(getByText('Y')).toHaveStyle(
-      `margin-right: ${String(SPACING.spacing2)}`
+      `margin-right: ${String(SPACING.spacing4)}`
     )
     expect(getByText('Y')).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
@@ -41,7 +41,7 @@ describe('OffsetVector', () => {
     expect(y).toHaveStyle(`margin-right: ${String(SPACING.spacing3)}`)
 
     expect(getByText('Z')).toHaveStyle(
-      `margin-right: ${String(SPACING.spacing2)}`
+      `margin-right: ${String(SPACING.spacing4)}`
     )
     expect(getByText('Z')).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`

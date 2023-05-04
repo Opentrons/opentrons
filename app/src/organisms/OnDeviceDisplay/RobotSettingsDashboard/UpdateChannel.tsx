@@ -114,7 +114,7 @@ export function UpdateChannel({
               </StyledText>
               {radio.label === 'Alpha' ? (
                 <StyledText
-                  marginTop={SPACING.spacing2}
+                  marginTop={SPACING.spacing4}
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}

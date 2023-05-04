@@ -57,7 +57,7 @@ export function UsageSettings({
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing4}
         >
           {t('pause_protocol')}
         </StyledText>

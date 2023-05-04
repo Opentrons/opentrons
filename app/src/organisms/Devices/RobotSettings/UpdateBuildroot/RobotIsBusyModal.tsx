@@ -32,7 +32,7 @@ export function RobotIsBusyModal({
           t={t}
           i18nKey="this_robot_will_restart_with_update"
           components={{
-            block: <StyledText as="p" marginBottom={SPACING.spacing2} />,
+            block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
           }}
         />
         <Flex

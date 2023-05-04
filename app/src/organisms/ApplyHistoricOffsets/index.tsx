@@ -89,7 +89,7 @@ export function ApplyHistoricOffsets(
         disabled={noOffsetData}
         isIndeterminate={noOffsetData}
         label={
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2}>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <Icon size={SIZE_1} name="reticle" />
             <StyledText as="p">
               {t(noOffsetData ? 'no_offset_data' : 'apply_offset_data')}

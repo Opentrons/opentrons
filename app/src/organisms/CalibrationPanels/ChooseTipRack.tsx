@@ -221,7 +221,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
               strong: (
                 <strong
                   style={{
-                    marginRight: SPACING.spacing2,
+                    marginRight: SPACING.spacing4,
                     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
                   }}
                 />

@@ -51,13 +51,13 @@ export const MultipleModulesModal = (
                 {t('multiple_modules_learn_more')}
                 <Icon
                   name="open-in-new"
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                   size="0.625rem"
                 />
               </Link>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
-                marginBottom={SPACING.spacing2}
+                marginBottom={SPACING.spacing4}
               >
                 {t('example')}
               </StyledText>

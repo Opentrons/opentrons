@@ -38,7 +38,7 @@ describe('NavTab', () => {
     const tab = getByText('protocols')
     expect(tab).toHaveAttribute('href', '/protocols')
     expect(tab).toHaveStyle(
-      `padding: 0 ${String(SPACING.spacing2)} ${String(SPACING.spacing3)}`
+      `padding: 0 ${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`
     )
     expect(tab).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeLabel)}`)
     expect(tab).toHaveStyle(
@@ -62,7 +62,7 @@ describe('NavTab', () => {
     const tab = getByText('protocols')
     expect(tab.tagName.toLowerCase()).toBe('span')
     expect(tab).toHaveStyle(
-      `padding: 0 ${String(SPACING.spacing2)} ${String(SPACING.spacing3)}`
+      `padding: 0 ${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`
     )
     expect(tab).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeLabel)}`)
     expect(tab).toHaveStyle(

@@ -139,7 +139,7 @@ export const MagneticModuleSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
         {t('set_engage_height_and_enter_integer', {

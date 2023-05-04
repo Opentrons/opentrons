@@ -112,7 +112,7 @@ export function CalibrationTaskList({
       }
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
-      childrenPadding={`${SPACING.spacing16} ${SPACING.spacing5} ${SPACING.spacing5} ${SPACING.spacing2}`}
+      childrenPadding={`${SPACING.spacing16} ${SPACING.spacing5} ${SPACING.spacing5} ${SPACING.spacing4}`}
     >
       {showCompletionScreen ? (
         <Flex
