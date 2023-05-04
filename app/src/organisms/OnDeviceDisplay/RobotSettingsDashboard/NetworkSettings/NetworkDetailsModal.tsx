@@ -76,7 +76,7 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-      backgroundColor={COLORS.grey_three}
+      backgroundColor={COLORS.grey3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       borderRadius={BORDERS.size_three}
     >

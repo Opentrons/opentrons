@@ -79,7 +79,7 @@ export function WifiConnectionDetails({
               fontSize={TYPOGRAPHY.fontSize22}
               lineHeight={TYPOGRAPHY.lineHeight28}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack_seventy}
+              color={COLORS.darkBlack70}
             >
               {t('connected_network')}
             </StyledText>
@@ -87,7 +87,7 @@ export function WifiConnectionDetails({
               display={DISPLAY_FLEX}
               width="100%"
               padding={SPACING.spacing5}
-              backgroundColor={COLORS.green_three}
+              backgroundColor={COLORS.green3}
               borderRadius={BORDERS.size_three}
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
@@ -129,7 +129,7 @@ export function WifiConnectionDetails({
                     fontSize={TYPOGRAPHY.fontSize22}
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={COLORS.darkBlack_seventy}
+                    color={COLORS.darkBlack70}
                   >
                     {t('view_details')}
                   </StyledText>
@@ -143,7 +143,7 @@ export function WifiConnectionDetails({
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={COLORS.darkBlack_seventy}
+            color={COLORS.darkBlack70}
           >
             {t('other_networks')}
           </StyledText>
