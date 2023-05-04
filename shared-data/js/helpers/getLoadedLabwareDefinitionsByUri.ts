@@ -2,7 +2,7 @@ import { getLabwareDefURI } from '.'
 import type { RunTimeCommand, LabwareDefinition2 } from '..'
 
 export interface LabwareDefinitionsByUri {
-  [defURI: string]: LabwareDefinition2;
+  [defURI: string]: LabwareDefinition2
 }
 
 export function getLoadedLabwareDefinitionsByUri(

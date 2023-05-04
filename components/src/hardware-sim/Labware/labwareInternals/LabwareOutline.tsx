@@ -25,7 +25,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     isTiprack,
     stroke,
     hover,
-    highlight
+    highlight,
   } = props
   const {
     parameters = { isTiprack },
@@ -44,7 +44,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
         className={cx(styles.labware_outline, {
           [styles.tiprack_outline]: parameters && parameters.isTiprack,
           [styles.hover_outline]: hover,
-          [styles.labware_outline_highlight]: highlight
+          [styles.labware_outline_highlight]: highlight,
         })}
         style={{ stroke }}
       />

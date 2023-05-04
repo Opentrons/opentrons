@@ -109,7 +109,7 @@ export function InterventionModal({
   labwareName,
   oldDisplayLocation,
   newDisplayLocation,
-  deckDef
+  deckDef,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
 
@@ -131,7 +131,7 @@ export function InterventionModal({
         moduleRenderInfo != null &&
         oldDisplayLocation != null &&
         newDisplayLocation != null &&
-        labwareRenderInfo != null && 
+        labwareRenderInfo != null &&
         command.params?.labwareId != null &&
         deckDef != null ? (
           <MoveLabwareInterventionContent

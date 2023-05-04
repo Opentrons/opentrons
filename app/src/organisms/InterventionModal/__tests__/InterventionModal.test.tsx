@@ -68,7 +68,7 @@ describe('InterventionModal', () => {
       labwareName: LABWARE_NAME,
       oldDisplayLocation: 'Slot 1',
       newDisplayLocation: 'Slot 2',
-      deckDef: ot2StandardDeckDef as any
+      deckDef: ot2StandardDeckDef as any,
     }
     const { getByText } = render(props)
     getByText('Move Labware')
