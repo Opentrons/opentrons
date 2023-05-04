@@ -301,7 +301,7 @@ const ProtocolName = styled.h4`
   color: ${COLORS.darkBlack_seventy};
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   overflow: hidden;
   overflow-wrap: break-word;
   height: max-content;
