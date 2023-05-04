@@ -86,13 +86,13 @@ class HeaterShakerMovementFlagger:
             )
         except self._HardwareHeaterShakerMissingError as e:
             raise HeaterShakerLabwareLatchNotOpenError(
-                "H/S labware latch must be open when moving a labware on it,"
-                " but can't confirm its current status."
+                "Heater-Shaker labware latch must be open when moving labware to/from it,"
+                " but the latch status is unknown."
             ) from e
 
         if hs_latch_status != HeaterShakerHardwareLatchStatus.IDLE_OPEN:
             raise HeaterShakerLabwareLatchNotOpenError(
-                f"H/S latch must be open when moving a labware on it,"
+                f"Heater-Shaker labware latch must be open when moving labware to/from it,"
                 f" but the latch is currently {hs_latch_status}"
             )
 
