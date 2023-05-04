@@ -155,7 +155,7 @@ export function RunSummary(): JSX.Element {
                 />
                 <SplashHeader> {runStatusText} </SplashHeader>
               </Flex>
-              <Flex width="49rem">
+              <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
                 <SplashBody>{protocolName}</SplashBody>
               </Flex>
             </SplashFrame>
