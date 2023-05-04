@@ -41,7 +41,7 @@ export function CompleteUpdateSoftware({
           {t('update_complete')}
         </StyledText>
         <StyledText
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           fontSize="1.5rem"
           lineHeight="2.0625rem"
           fontWeight="400"

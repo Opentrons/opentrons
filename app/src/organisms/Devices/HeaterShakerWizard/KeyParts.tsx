@@ -64,7 +64,7 @@ export function KeyParts(): JSX.Element {
               block: (
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  marginBottom={SPACING.spacing4}
+                  marginBottom={SPACING.spacing16}
                 />
               ),
             }}
@@ -77,7 +77,7 @@ export function KeyParts(): JSX.Element {
               block: (
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  marginBottom={SPACING.spacing4}
+                  marginBottom={SPACING.spacing16}
                 />
               ),
             }}

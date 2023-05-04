@@ -30,7 +30,7 @@ export function ManufacturerDetails(
   return (
     <Box
       backgroundColor={COLORS.fundamentalsBackground}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_ROW}

@@ -32,8 +32,8 @@ function LevelingVideo(props: {
       css={css`
         width: 275px;
         max-height: 270px;
-        margin-top: ${SPACING.spacing4};
-        margin-left: ${SPACING.spacing4};
+        margin-top: ${SPACING.spacing16};
+        margin-left: ${SPACING.spacing16};
       `}
       autoPlay={true}
       loop={true}
@@ -82,7 +82,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
                 h1: (
                   <StyledText
                     css={TYPOGRAPHY.h1Default}
-                    marginBottom={SPACING.spacing4}
+                    marginBottom={SPACING.spacing16}
                   />
                 ),
                 block: (

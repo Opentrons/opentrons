@@ -66,12 +66,12 @@ const ProtocolHeader = (props: {
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      margin={SPACING.spacing4}
+      margin={SPACING.spacing16}
       marginBottom={SPACING.spacingXXL}
     >
       <Flex
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing3}
       >
         <Btn
@@ -112,7 +112,7 @@ const ProtocolHeader = (props: {
           borderRadius={BORDERS.size_six}
           boxShadow="none"
           onClick={handleRunProtocol}
-          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+          padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
         >
           <StyledText
             fontSize="2.333125rem"
@@ -145,7 +145,7 @@ interface ProtocolSectionTabsProps {
 const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   const { currentOption, setCurrentOption } = props
   return (
-    <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing4}>
+    <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing16}>
       {protocolSectionTabOptions.map(option => {
         return (
           <TabbedButton
@@ -241,7 +241,7 @@ const ProtocolSectionContent = (
       protocolSection = <Deck protocolId={protocolId} />
       break
   }
-  return <Flex margin={SPACING.spacing4}>{protocolSection}</Flex>
+  return <Flex margin={SPACING.spacing16}>{protocolSection}</Flex>
 }
 
 export function ProtocolDetails(): JSX.Element | null {
@@ -345,7 +345,7 @@ export function ProtocolDetails(): JSX.Element | null {
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing3}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        margin={SPACING.spacing4}
+        margin={SPACING.spacing16}
       >
         <MediumButton
           buttonText={

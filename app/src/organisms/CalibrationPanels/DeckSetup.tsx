@@ -53,7 +53,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
     >
       <Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+          <StyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('prepare_the_space')}
           </StyledText>
           {isHealthCheck ? (

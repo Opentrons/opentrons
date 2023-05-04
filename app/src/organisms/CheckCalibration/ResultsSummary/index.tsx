@@ -133,11 +133,11 @@ export function ResultsSummary(
           isCalibrationCompleted={isCalibrationCompleted()}
         />
       </Box>
-      <Box marginBottom={SPACING.spacing4}>
+      <Box marginBottom={SPACING.spacing16}>
         <CalibrationResult calType="deck" isBadCal={isDeckResultBad} />
       </Box>
       <RenderMountInformation mount={LEFT} pipette={leftPipette} />
-      <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing16}>
         {leftPipette != null && (
           <>
             <CalibrationResult

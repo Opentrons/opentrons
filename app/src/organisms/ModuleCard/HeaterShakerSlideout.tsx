@@ -103,7 +103,7 @@ export const HeaterShakerSlideout = (
         {t('set_target_temp_of_hs')}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
       >

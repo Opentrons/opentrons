@@ -174,7 +174,7 @@ export function ChooseProtocolSlideoutComponent(
                     <Box
                       marginY={SPACING.spacingAuto}
                       backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                      marginRight={SPACING.spacing4}
+                      marginRight={SPACING.spacing16}
                       height="4.25rem"
                       width="4.75rem"
                     >
@@ -250,7 +250,7 @@ export function ChooseProtocolSlideoutComponent(
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           minHeight="11rem"
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           css={BORDERS.cardOutlineBorder}
         >
           <Icon

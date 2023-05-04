@@ -123,7 +123,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   return (
     <Box
       css={LIQUID_CARD_STYLE}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
       backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
@@ -148,14 +148,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_FLEX_START}
-            gridGap={SPACING.spacing4}
-            marginTop={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
+            marginTop={SPACING.spacing16}
             marginBottom={SPACING.spacing3}
           >
             <StyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              marginLeft={SPACING.spacing4}
+              marginLeft={SPACING.spacing16}
               width="8.125rem"
             >
               {t('location')}
@@ -172,7 +172,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               width="4.25rem"
               marginLeft="auto"
-              marginRight={SPACING.spacing4}
+              marginRight={SPACING.spacing16}
             >
               {t('volume')}
             </StyledText>
@@ -195,7 +195,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 key={index}
                 borderRadius="4px"
                 marginBottom={SPACING.spacing3}
-                padding={SPACING.spacing4}
+                padding={SPACING.spacing16}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${String(index)}`}
                 onClick={handleLiquidDetailsLabwareId}
@@ -203,7 +203,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_FLEX_START}
-                  gridGap={SPACING.spacing4}
+                  gridGap={SPACING.spacing16}
                 >
                   <StyledText
                     as="p"
@@ -272,7 +272,7 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginX={SPACING.spacing4}
+          marginX={SPACING.spacing16}
         >
           {displayName}
         </StyledText>
@@ -280,7 +280,7 @@ export const LiquidsListItemDetails = (
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.darkGreyEnabled}
-          marginX={SPACING.spacing4}
+          marginX={SPACING.spacing16}
         >
           {description != null ? description : null}
         </StyledText>

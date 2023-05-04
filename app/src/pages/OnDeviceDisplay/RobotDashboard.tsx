@@ -39,7 +39,7 @@ export function RobotDashboard(): JSX.Element {
   return (
     <Flex paddingX={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         {sortedProtocols.length === 0 ? (
           <EmptyRecentRun />
         ) : (

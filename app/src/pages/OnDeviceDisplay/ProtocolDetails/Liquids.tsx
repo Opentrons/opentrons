@@ -27,7 +27,7 @@ const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
   border-spacing: 0 ${BORDERS.size_two};
-  margin: ${SPACING.spacing4} 0;
+  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
@@ -42,7 +42,7 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing5};
   background-color: ${COLORS.light_one};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
@@ -98,11 +98,11 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                 >
                   <Flex
                     borderRadius={BORDERS.size_two}
-                    padding={SPACING.spacing4}
+                    padding={SPACING.spacing16}
                     backgroundColor={COLORS.white}
                     height="3.75rem"
                     width="3.75rem"
-                    marginRight={SPACING.spacing4}
+                    marginRight={SPACING.spacing16}
                   >
                     <Icon
                       name="circle"

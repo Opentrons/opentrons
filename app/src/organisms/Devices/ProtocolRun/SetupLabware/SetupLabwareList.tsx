@@ -39,7 +39,7 @@ export function SetupLabwareList(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing2}
-      marginBottom={SPACING.spacing4}
+      marginBottom={SPACING.spacing16}
     >
       <HeaderRow>
         <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

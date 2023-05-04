@@ -57,14 +57,14 @@ export function TipConfirmation(props: CalibrationPanelProps): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="25rem"
     >
-      <StyledText as="h1" marginBottom={SPACING.spacing4}>
+      <StyledText as="h1" marginBottom={SPACING.spacing16}>
         {t('did_pipette_pick_up_tip')}
       </StyledText>
 
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
       >
         <NeedHelpLink />
         <Flex gridGap={SPACING.spacing3}>

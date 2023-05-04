@@ -82,7 +82,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       {hasADuplicateModule ? (
         <Box marginTop={SPACING.spacing3}>
           <Banner
-            iconMarginRight={SPACING.spacing4}
+            iconMarginRight={SPACING.spacing16}
             iconMarginLeft={SPACING.spacing3}
             size={SPACING.spacingM}
             type="informing"
@@ -113,7 +113,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         marginLeft={SPACING.spacingM}
         marginBottom={SPACING.spacing2}
       >
@@ -128,7 +128,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_location"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
           width="15%"
         >
           {t('location')}
@@ -136,7 +136,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_connection_status"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
           width="15%"
         >
           {t('connection_status')}
@@ -216,7 +216,7 @@ export const ModulesListItem = ({
       borderColor={COLORS.medGreyEnabled}
       borderWidth={SPACING.spacingXXS}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
       data-testid="ModulesListItem_Row"
     >

@@ -28,7 +28,7 @@ export function FeatureFlags(): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       minHeight="calc(100vh - 8.5rem)"
-      paddingX={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
       paddingY={SPACING.spacing5}
     >
       {Config.DEV_INTERNAL_FLAGS.map((flag, index) => (

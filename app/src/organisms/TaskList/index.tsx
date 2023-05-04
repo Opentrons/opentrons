@@ -76,7 +76,7 @@ function ProgressTrackerItem({
       {isComplete || isTaskListComplete || isPastTask ? (
         <Icon
           size="1.25rem"
-          margin={SPACING.spacing4}
+          margin={SPACING.spacing16}
           name="ot-check"
           color={
             isTaskListComplete || isPastTask
@@ -93,7 +93,7 @@ function ProgressTrackerItem({
             isFutureTask ? COLORS.medGreyHover : COLORS.blueEnabled
           }
           color={COLORS.white}
-          margin={SPACING.spacing4}
+          margin={SPACING.spacing16}
           height="1.25rem"
           width="1.25rem"
           borderRadius="0.625rem"
@@ -157,7 +157,7 @@ function ProgressTrackerItem({
                   }
                   borderWidth={SPACING.spacing1}
                   color={COLORS.white}
-                  margin={SPACING.spacing4}
+                  margin={SPACING.spacing16}
                   height="0.75rem"
                   width="0.75rem"
                   borderRadius="0.375rem"
@@ -223,7 +223,7 @@ function SubTask({
       alignItems={ALIGN_CENTER}
       backgroundColor={isActiveSubTask ? COLORS.lightBlue : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       gridGap={SPACING.spacing5}
@@ -361,7 +361,7 @@ function Task({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
         backgroundColor={
           isActiveTask && !isTaskOpen ? COLORS.lightBlue : COLORS.white
         }
@@ -476,7 +476,7 @@ function Task({
         {isTaskOpen ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             gridGap={SPACING.spacing3}
           >
             {subTasks.map(

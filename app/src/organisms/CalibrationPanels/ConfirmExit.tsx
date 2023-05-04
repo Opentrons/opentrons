@@ -56,7 +56,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
       <Flex
         flex="0"
         width="100%"
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <NeedHelpLink />

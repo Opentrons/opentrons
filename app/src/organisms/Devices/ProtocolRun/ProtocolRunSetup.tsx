@@ -183,8 +183,8 @@ export function ProtocolRunSetup({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      margin={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
+      margin={SPACING.spacing16}
     >
       {protocolData != null ? (
         <>

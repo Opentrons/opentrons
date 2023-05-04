@@ -71,7 +71,7 @@ export function RobotOverview({
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           width="100%"
         >
           <Flex>
@@ -94,7 +94,7 @@ export function RobotOverview({
                 marginBottom={SPACING.spacing3}
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
                 name={robot.name}
                 local={robot.local}
@@ -103,7 +103,7 @@ export function RobotOverview({
               <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText
                     as="h6"
@@ -156,7 +156,7 @@ export function RobotOverview({
       ) : null}
       <Flex
         borderBottom={BORDERS.lineBorder}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         position={POSITION_RELATIVE}
         width="100%"
       />

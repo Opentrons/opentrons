@@ -38,7 +38,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
             color={isError ? COLORS.white : iconColor}
             size={SIZE_2}
             alignSelf={ALIGN_CENTER}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           />
         ) : null}
         <StyledText

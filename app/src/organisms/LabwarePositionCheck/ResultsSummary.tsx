@@ -137,7 +137,7 @@ export const ResultsSummary = (
           TableComponent={TableComponent}
           JupyterComponent={JupyterSnippet}
           CommandLineComponent={CommandLineSnippet}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         />
       ) : (
         <OffsetTable
@@ -170,7 +170,7 @@ const Table = styled('table')`
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const TableHeader = styled('th')`

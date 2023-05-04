@@ -54,7 +54,7 @@ export function SmallModalChildren(
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing6}
           onClick={handleCloseMaxPinsAlert}
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
         >
           <StyledText
             color={COLORS.white}

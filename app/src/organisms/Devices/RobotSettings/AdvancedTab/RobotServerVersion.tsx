@@ -55,7 +55,7 @@ export function RobotServerVersion({
         </Portal>
       ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
-        <Box marginBottom={SPACING.spacing4} width="100%">
+        <Box marginBottom={SPACING.spacing16} width="100%">
           <UpdateRobotBanner robot={robot} />
         </Box>
       ) : null}
@@ -93,7 +93,7 @@ export function RobotServerVersion({
             <StyledText
               as="label"
               color={COLORS.darkGreyEnabled}
-              paddingRight={SPACING.spacing4}
+              paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}
             </StyledText>

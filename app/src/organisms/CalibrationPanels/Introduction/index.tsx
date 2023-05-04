@@ -137,7 +137,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing3}
         >
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+          <StyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('before_you_begin')}
           </StyledText>
 

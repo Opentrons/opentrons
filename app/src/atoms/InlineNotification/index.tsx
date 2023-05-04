@@ -77,7 +77,7 @@ export function InlineNotification(
       flexDirection={DIRECTION_ROW}
       gridGap="0.75rem"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`0.75rem ${SPACING.spacing4}`}
+      padding={`0.75rem ${SPACING.spacing16}`}
       width={hug ? 'max-content' : '100%'}
     >
       <Icon {...iconProps} aria-label={`icon_${type}`} />

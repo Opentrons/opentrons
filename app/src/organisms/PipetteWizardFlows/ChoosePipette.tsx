@@ -157,7 +157,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               <StyledText
                 fontSize="1.75rem"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                marginBottom={SPACING.spacing4}
+                marginBottom={SPACING.spacing16}
               >
                 {t('choose_pipette')}
               </StyledText>

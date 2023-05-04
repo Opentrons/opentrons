@@ -116,7 +116,7 @@ export function SetWifiCred({
                 width="2.75rem"
                 height="1.875rem"
               />
-              <StyledText marginLeft={SPACING.spacing4}>
+              <StyledText marginLeft={SPACING.spacing16}>
                 {showPassword ? t('hide') : t('show')}
               </StyledText>
             </Flex>

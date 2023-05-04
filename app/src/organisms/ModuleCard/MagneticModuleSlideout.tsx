@@ -154,7 +154,7 @@ export const MagneticModuleSlideout = (
         fontSize={TYPOGRAPHY.fontSizeH6}
         color={COLORS.darkGreyEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        paddingTop={SPACING.spacing4}
+        paddingTop={SPACING.spacing16}
         textTransform={TYPOGRAPHY.textTransformUppercase}
         paddingBottom={SPACING.spacing3}
         data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
@@ -167,7 +167,7 @@ export const MagneticModuleSlideout = (
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -193,7 +193,7 @@ export const MagneticModuleSlideout = (
             {max}
           </StyledText>
           <StyledText
-            paddingLeft={SPACING.spacing4}
+            paddingLeft={SPACING.spacing16}
             paddingBottom={SPACING.spacing3}
           >
             {labwareBottom}
@@ -202,7 +202,7 @@ export const MagneticModuleSlideout = (
         </Flex>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`MagneticModuleSlideout_input_field_${module.serialNumber}`}
       >

@@ -86,12 +86,12 @@ export function DisplayWifiList({
           >
             <Flex
               flexDirection={DIRECTION_ROW}
-              padding={SPACING.spacing4}
+              padding={SPACING.spacing16}
               alignItems={ALIGN_CENTER}
             >
               <Icon name="wifi" size="2.25rem" />
               <StyledText
-                marginLeft={SPACING.spacing4}
+                marginLeft={SPACING.spacing16}
                 fontSize="1.5rem"
                 lineHeight="2.0625rem"
                 fontWeight="400"
@@ -114,7 +114,7 @@ export function DisplayWifiList({
         css={NETWORK_ROW_STYLE}
       >
         <Flex
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
         >

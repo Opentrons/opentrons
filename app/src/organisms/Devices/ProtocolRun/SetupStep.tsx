@@ -118,7 +118,7 @@ export function SetupStep({
                   <StyledText
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
-                    marginRight={SPACING.spacing4}
+                    marginRight={SPACING.spacing16}
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                     id="RunSetupCard_calibrationText"
                   >

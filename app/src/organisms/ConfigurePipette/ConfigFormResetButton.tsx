@@ -35,7 +35,7 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
       />
       <SecondaryButton
         marginTop={SPACING.spacingSM}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         onClick={onClick}
         disabled={disabled}
       >

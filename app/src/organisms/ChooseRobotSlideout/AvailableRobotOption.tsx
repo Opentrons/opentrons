@@ -84,9 +84,9 @@ export function AvailableRobotOption(
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          marginLeft={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
           marginTop={SPACING.spacing3}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
         >
           <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {robotModel}

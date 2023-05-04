@@ -45,7 +45,7 @@ export function ProtocolAnalysisErrorModal({
           })}
         </StyledText>
         {errors?.map((error, index) => (
-          <StyledText as="p" key={index} marginTop={SPACING.spacing4}>
+          <StyledText as="p" key={index} marginTop={SPACING.spacing16}>
             {error?.detail}
           </StyledText>
         ))}
@@ -53,7 +53,7 @@ export function ProtocolAnalysisErrorModal({
           <PrimaryButton
             role="button"
             aria-label="close_analysis_error_modal"
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing7)}`}
             onClick={onClose}
           >

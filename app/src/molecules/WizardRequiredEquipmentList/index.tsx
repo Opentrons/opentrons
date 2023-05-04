@@ -129,7 +129,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
           flex="0 1 30%"
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
         >
           <img
             css={css`

@@ -47,5 +47,5 @@ const Template: Story<React.ComponentProps<typeof Divider>> = args => (
 
 export const Primary = Template.bind({})
 Primary.args = {
-  marginY: SPACING.spacing4,
+  marginY: SPACING.spacing16,
 }

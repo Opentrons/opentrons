@@ -71,7 +71,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
         >
           <Flex gridGap={SPACING.spacing3}>
             <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h1" marginBottom={SPACING.spacing4}>
+              <StyledText as="h1" marginBottom={SPACING.spacing16}>
                 {t('do_you_have_a_cal_block')}
               </StyledText>
 

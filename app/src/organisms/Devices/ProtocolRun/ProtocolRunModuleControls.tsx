@@ -41,7 +41,7 @@ export const ProtocolRunModuleControls = ({
       <StyledText
         as="p"
         color={COLORS.darkGreyEnabled}
-        marginY={SPACING.spacing4}
+        marginY={SPACING.spacing16}
       >
         {t('connect_modules_to_see_controls')}
       </StyledText>
@@ -49,9 +49,9 @@ export const ProtocolRunModuleControls = ({
   ) : (
     <Flex
       gridGap={SPACING.spacing3}
-      paddingTop={SPACING.spacing4}
+      paddingTop={SPACING.spacing16}
       paddingBottom={SPACING.spacing3}
-      paddingX={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

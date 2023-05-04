@@ -228,7 +228,7 @@ export function ProtocolSetupLabware({
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing4}
+                gridGap={SPACING.spacing16}
               >
                 <StyledText>
                   {mostRecentAnalysis != null
@@ -447,7 +447,7 @@ function RowLabware({
       backgroundColor={COLORS.light_one}
       borderRadius={BORDERS.size_three}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
       gridGap={SPACING.spacing5}
     >
       <Flex width="7.6875rem">

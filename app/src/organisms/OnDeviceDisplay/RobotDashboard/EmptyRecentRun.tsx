@@ -27,7 +27,7 @@ export function EmptyRecentRun(): JSX.Element {
       alignItems={ALIGN_CENTER}
       padding="5.25rem 3.75rem"
     >
-      <Flex marginBottom={SPACING.spacing4}>
+      <Flex marginBottom={SPACING.spacing16}>
         <img
           src={abstractImage}
           alt="There is no recent run protocol"

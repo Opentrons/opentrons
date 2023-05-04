@@ -94,7 +94,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         data-testid={`cardButton_icon_${String(iconName)}`}
         color={disabled ? COLORS.darkBlack_sixty : COLORS.blueEnabled}
       />
-      <Flex marginTop={SPACING.spacing4}>
+      <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
           fontSize="1.75rem"

@@ -43,7 +43,7 @@ export function UpdateSoftware({
     <Flex
       backgroundColor={COLORS.darkGreyDisabled}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"

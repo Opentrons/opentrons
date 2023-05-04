@@ -123,7 +123,7 @@ export const ThermocyclerModuleSlideout = (
         })}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >

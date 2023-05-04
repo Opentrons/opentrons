@@ -194,7 +194,7 @@ export function Toast(props: ToastProps): JSX.Element {
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
-          ? `${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
+          ? `${String(SPACING.spacing16)} ${String(SPACING.spacing5)}`
           : `${heading != null ? SPACING.spacing2 : SPACING.spacing3} ${
               SPACING.spacing3
             } ${heading != null ? SPACING.spacing2 : SPACING.spacing3} 0.75rem`
@@ -215,7 +215,7 @@ export function Toast(props: ToastProps): JSX.Element {
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
-          width={showODDStyle ? SPACING.spacing6 : SPACING.spacing4}
+          width={showODDStyle ? SPACING.spacing6 : SPACING.spacing16}
           marginRight={SPACING.spacing3}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}

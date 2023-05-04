@@ -112,7 +112,7 @@ export function CalibrationTaskList({
       }
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
-      childrenPadding={`${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5} ${SPACING.spacing2}`}
+      childrenPadding={`${SPACING.spacing16} ${SPACING.spacing5} ${SPACING.spacing5} ${SPACING.spacing2}`}
     >
       {showCompletionScreen ? (
         <Flex
@@ -144,7 +144,7 @@ export function CalibrationTaskList({
           <Flex
             alignItems={ALIGN_CENTER}
             gridGap={SPACING.spacing3}
-            padding={SPACING.spacing4}
+            padding={SPACING.spacing16}
             paddingBottom={SPACING.spacing6}
           >
             <StyledText css={TYPOGRAPHY.h2SemiBold}>

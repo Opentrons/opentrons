@@ -165,9 +165,9 @@ export const TestShakeSlideout = (
         borderRadius={SPACING.spacingS}
         marginBottom={SPACING.spacing3}
         backgroundColor={COLORS.fundamentalsBackground}
-        paddingY={SPACING.spacing4}
+        paddingY={SPACING.spacing16}
         paddingLeft={SPACING.spacing2}
-        paddingRight={SPACING.spacing4}
+        paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
@@ -175,7 +175,7 @@ export const TestShakeSlideout = (
           <Icon
             name="information"
             size={SPACING.spacing6}
-            paddingBottom={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
             aria-label="information"
           />
         </Flex>
@@ -188,9 +188,9 @@ export const TestShakeSlideout = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${String(SPACING.spacing4)} ${String(
+        padding={`${String(SPACING.spacing16)} ${String(
           SPACING.spacingM
-        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
+        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing16)}`}
         width="100%"
       >
         <Flex
@@ -237,7 +237,7 @@ export const TestShakeSlideout = (
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >
           {t('shake_speed')}
         </StyledText>
@@ -245,7 +245,7 @@ export const TestShakeSlideout = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing3}
-            paddingRight={SPACING.spacing4}
+            paddingRight={SPACING.spacing16}
           >
             <InputField
               data-testid="TestShakeSlideout_shake_input"

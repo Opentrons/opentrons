@@ -70,7 +70,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="8.5rem"
-          left={SPACING.spacing4}
+          left={SPACING.spacing16}
           flexDirection={DIRECTION_COLUMN}
         >
           {filterOptions.map((option, index) => (

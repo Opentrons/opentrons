@@ -23,7 +23,7 @@ const Table = styled('table')`
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
+  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`

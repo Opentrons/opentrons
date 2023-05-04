@@ -103,7 +103,7 @@ export function NetworkSettings({
         return (
           <Flex
             paddingX={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing3}
           >

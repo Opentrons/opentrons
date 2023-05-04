@@ -138,7 +138,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing3}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            <StyledText as="h1" marginBottom={SPACING.spacing16}>
               {titleText}
             </StyledText>
             <StyledText as="p">
@@ -171,7 +171,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
         </Box>
         <Flex
           width="100%"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <NeedHelpLink />

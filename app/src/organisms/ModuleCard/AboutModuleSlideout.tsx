@@ -30,7 +30,7 @@ interface AboutModuleSlideoutProps {
 
 const ALERT_ITEM_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
-  margin-bottom: ${SPACING.spacing4};
+  margin-bottom: ${SPACING.spacing16};
 `
 
 export const AboutModuleSlideout = (
@@ -70,7 +70,7 @@ export const AboutModuleSlideout = (
       }
     >
       {module.hasAvailableUpdate && !isDisabled && showBanner ? (
-        <Flex paddingBottom={SPACING.spacing4}>
+        <Flex paddingBottom={SPACING.spacing16}>
           <Banner
             data-testid={`alert_item_firmware_update_${String(
               module.moduleModel
@@ -106,7 +106,7 @@ export const AboutModuleSlideout = (
           </Flex>
         </Flex>
         <StyledText
-          paddingTop={SPACING.spacing4}
+          paddingTop={SPACING.spacing16}
           as="h6"
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel

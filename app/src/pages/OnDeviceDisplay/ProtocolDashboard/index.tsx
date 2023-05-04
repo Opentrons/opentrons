@@ -132,7 +132,7 @@ export function ProtocolDashboard(): JSX.Element {
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
-        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing16}>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             fontWeight={TYPOGRAPHY.fontWeightBold}
@@ -150,8 +150,8 @@ export function ProtocolDashboard(): JSX.Element {
             alignItems="center"
             backgroundColor={COLORS.white}
             flexDirection={DIRECTION_ROW}
-            paddingBottom={SPACING.spacing4}
-            paddingTop={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
+            paddingTop={SPACING.spacing16}
             position="sticky"
             top="0px"
             width="100%"
@@ -245,7 +245,7 @@ export function ProtocolDashboard(): JSX.Element {
                 fontSize={TYPOGRAPHY.fontSize32}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
                 lineHeight={TYPOGRAPHY.lineHeight42}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
                 marginBottom={SPACING.spacing3}
               >
                 {t('nothing_here_yet')}

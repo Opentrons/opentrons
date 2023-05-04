@@ -39,7 +39,7 @@ const OptionButton = styled.input`
 `
 
 const OptionLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing5};
   border: 2px solid
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light_two};
@@ -115,7 +115,7 @@ export function DeviceReset({
           backgroundColor={COLORS.warningBackgroundMed}
           alignItems={ALIGN_CENTER}
           gridGap="0.75rem"
-          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+          padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
           borderRadius={BORDERS.size_three}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />

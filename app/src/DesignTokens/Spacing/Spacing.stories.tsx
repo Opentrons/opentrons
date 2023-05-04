@@ -35,7 +35,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
           key={`spacing_${index}`}
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_FLEX_START}
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           gridGap={SPACING.spacing3}
           width="100%"
           height="6rem"

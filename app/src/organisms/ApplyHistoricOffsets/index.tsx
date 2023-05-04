@@ -122,7 +122,7 @@ export function ApplyHistoricOffsets(
               flexDirection={DIRECTION_COLUMN}
               padding={
                 noOffsetData
-                  ? `${SPACING.spacing4} ${SPACING.spacing6} ${SPACING.spacing6}`
+                  ? `${SPACING.spacing16} ${SPACING.spacing6} ${SPACING.spacing6}`
                   : SPACING.spacing6
               }
             >

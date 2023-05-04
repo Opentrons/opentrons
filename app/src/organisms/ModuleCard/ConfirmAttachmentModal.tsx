@@ -73,7 +73,7 @@ export const ConfirmAttachmentModal = (
       <Flex
         flexDirection={DIRECTION_ROW}
         textAlign={TEXT_ALIGN_CENTER}
-        paddingTop={SPACING.spacing4}
+        paddingTop={SPACING.spacing16}
         data-testid={`ConfirmAttachmentModal_checkbox_field_${
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}

@@ -43,7 +43,7 @@ export function UseOlderProtocol({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom={SPACING.spacing4}
+      marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
         <StyledText

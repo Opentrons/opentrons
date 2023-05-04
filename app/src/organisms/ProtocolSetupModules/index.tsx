@@ -81,7 +81,7 @@ function RowModule({
       borderRadius={BORDERS.size_three}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
       gridGap={SPACING.spacing5}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
       onClick={() =>
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }

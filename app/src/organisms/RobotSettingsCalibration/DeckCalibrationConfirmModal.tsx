@@ -32,7 +32,7 @@ export function DeckCalibrationConfirmModal({
       onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('deck_calibration_modal_description')}
         </StyledText>
         <StyledText

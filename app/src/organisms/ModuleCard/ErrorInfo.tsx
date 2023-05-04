@@ -51,8 +51,8 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   return (
     <Banner
       type="error"
-      marginBottom={SPACING.spacing4}
-      paddingRight={SPACING.spacing4}
+      marginBottom={SPACING.spacing16}
+      paddingRight={SPACING.spacing16}
       marginRight={SPACING.spacing5}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -90,7 +90,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
               {errorDetails != null ? (
                 <StyledText as="p">{errorDetails}</StyledText>
               ) : null}
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <StyledText as="p" marginBottom={SPACING.spacing16}>
                 {t('module_error_contact_support')}
               </StyledText>
             </Flex>
@@ -98,7 +98,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
               <PrimaryButton
                 onClick={() => setShowErrorDetails(false)}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>

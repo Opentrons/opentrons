@@ -199,9 +199,9 @@ export function ProtocolRunHeader({
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      marginBottom={SPACING.spacing4}
-      padding={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
+      marginBottom={SPACING.spacing16}
+      padding={SPACING.spacing16}
     >
       {showAnalysisErrorModal &&
         analysisErrors != null &&
@@ -534,7 +534,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+        padding={`${SPACING.spacingSM} ${SPACING.spacing16}`}
         disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"

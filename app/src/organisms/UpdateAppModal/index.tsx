@@ -68,10 +68,10 @@ const NOTIFICATIONS_DISABLED_DESCRIPTION = (
 
 const FINISH_UPDATE_INSTRUCTIONS = (
   <>
-    <Text marginBottom={SPACING.spacing4}>
+    <Text marginBottom={SPACING.spacing16}>
       Restart your app to complete the update. Please note the following:
     </Text>
-    <Box as="ol" paddingLeft={SPACING.spacing4}>
+    <Box as="ol" paddingLeft={SPACING.spacing16}>
       <li>
         <Text marginBottom={SPACING.spacing3}>
           After updating the Opentrons App, <strong>update your OT-2</strong> to
@@ -181,7 +181,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
                 as={InternalLink}
                 to="/more/app"
                 onClick={handleCloseClick}
-                marginRight={SPACING.spacing4}
+                marginRight={SPACING.spacing16}
               >
                 {VIEW_APP_SOFTWARE_SETTINGS}
               </SecondaryBtn>
@@ -200,7 +200,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
                 </Btn>
               ) : null}
               <SecondaryBtn
-                marginRight={SPACING.spacing4}
+                marginRight={SPACING.spacing16}
                 onClick={handleCloseClick}
               >
                 {NOT_NOW}

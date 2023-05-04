@@ -82,7 +82,7 @@ export const SecureLabwareModal = (
                 src={secureTCLatchImage}
                 width="288px"
                 height="100%"
-                style={{ marginBottom: SPACING.spacing4 }}
+                style={{ marginBottom: SPACING.spacing16 }}
               />
             </Flex>
           )}

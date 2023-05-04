@@ -36,7 +36,7 @@ const OffsetTable = styled('table')`
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing1};
-  margin: ${SPACING.spacing4} 0;
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`
@@ -132,7 +132,7 @@ export function CurrentOffsetsTable(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <StyledText as="h6">{t('applied_offset_data')}</StyledText>
       {isLabwareOffsetCodeSnippetsOn ? (

@@ -33,7 +33,7 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="1"
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
           >
             <Skeleton height="1.5rem" width="100px" backgroundSize="47rem" />
             <Skeleton {...args} />

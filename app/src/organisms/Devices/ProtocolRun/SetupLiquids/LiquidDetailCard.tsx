@@ -93,7 +93,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       minHeight="max-content"
       aria-label="liquidBox_odd"
     >
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <Flex
           css={BORDERS.cardOutlineBorder}
           padding={SPACING.spacing3}
@@ -126,7 +126,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           height="2.75rem"
           padding={`${SPACING.spacing3} 0.75rem`}
           alignItems={TYPOGRAPHY.textAlignCenter}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           width="max-content"
         >
           <>
@@ -139,7 +139,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <>
           <Box borderBottom={`3px solid ${COLORS.darkBlack_twenty}`} />
           <Flex
-            padding={SPACING.spacing4}
+            padding={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
@@ -180,7 +180,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
       onClick={handleSelectedValue}
       width="10.3rem"
@@ -228,7 +228,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Divider marginX="-1rem" marginY={SPACING.spacing4} />
+          <Divider marginX="-1rem" marginY={SPACING.spacing16} />
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex

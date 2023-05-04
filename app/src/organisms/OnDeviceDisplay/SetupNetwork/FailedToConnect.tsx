@@ -93,7 +93,7 @@ export function FailedToConnect({
             requestState.error != null &&
             'message' in requestState.error &&
             requestState.error.message != null && (
-              <StyledText marginTop={SPACING.spacing4}>
+              <StyledText marginTop={SPACING.spacing16}>
                 {requestState.error.message}
               </StyledText>
             )}

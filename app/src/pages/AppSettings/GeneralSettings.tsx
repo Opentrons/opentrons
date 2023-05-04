@@ -101,12 +101,12 @@ export function GeneralSettings(): JSX.Element {
     <>
       <Box
         height="calc(100vh - 8.5rem)"
-        paddingX={SPACING.spacing4}
+        paddingX={SPACING.spacing16}
         paddingY={SPACING.spacing5}
       >
         {showUpdateBanner && (
           <Box
-            marginBottom={SPACING.spacing4}
+            marginBottom={SPACING.spacing16}
             id="GeneralSettings_updatebanner"
           >
             <Banner
@@ -130,7 +130,7 @@ export function GeneralSettings(): JSX.Element {
             flexDirection={DIRECTION_ROW}
             alignItems={updateAvailable ? ALIGN_CENTER : ALIGN_START}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
           >
             {showConnectRobotSlideout && (
               <ConnectRobotSlideout
@@ -221,7 +221,7 @@ export function GeneralSettings(): JSX.Element {
           <StyledText as="p">{t('receive_alert')}</StyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
             disabled={updateAlertEnabled === null}
             toggledOn={updateAlertEnabled === true}
             onClick={handleToggle}

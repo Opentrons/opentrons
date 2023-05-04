@@ -118,7 +118,7 @@ export function RecentRunProtocolCard({
       onClick={handleCardClick}
     >
       {/* marginLeft is needed to cancel chip's padding */}
-      {/* <Flex marginLeft={`-${SPACING.spacing4}`}> */}
+      {/* <Flex marginLeft={`-${SPACING.spacing16}`}> */}
       <Flex>
         <Chip
           paddingLeft="0"

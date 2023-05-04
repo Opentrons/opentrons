@@ -104,7 +104,7 @@ export function SetupPipetteCalibrationItem({
       <>
         <Flex
           alignItems={ALIGN_CENTER}
-          marginLeft={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
           flexWrap={WRAP}
           justifyContent={JUSTIFY_FLEX_END}
           gridGap={SPACING.spacing3}

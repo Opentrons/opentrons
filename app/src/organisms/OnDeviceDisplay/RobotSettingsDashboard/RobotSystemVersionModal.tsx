@@ -55,7 +55,7 @@ export function RobotSystemVersionModal({
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.light_two}
-            paddingX={SPACING.spacing4}
+            paddingX={SPACING.spacing16}
             paddingY={SPACING.spacing5}
             borderRadius={BORDERS.size_three}
             marginY={SPACING.spacing5}

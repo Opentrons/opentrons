@@ -31,7 +31,7 @@ export function ModuleIcon(props: ModuleIconProps): JSX.Element {
       <Flex {...targetProps}>
         <SharedModuleIcon
           moduleType={module.moduleType}
-          size={SPACING.spacing4}
+          size={SPACING.spacing16}
           marginX={SPACING.spacing1}
           color={COLORS.darkGreyEnabled}
           css={MODULE_ICON_STYLE}

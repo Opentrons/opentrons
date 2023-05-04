@@ -82,7 +82,7 @@ function ProtocolSetupStep({
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
         borderRadius={BORDERS.size_four}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
         padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
       >
         {status !== 'general' ? (
@@ -321,7 +321,7 @@ function PrepareToRun({
               {truncateString(protocolName as string, 100)}
             </StyledText>
           </Flex>
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
             <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>

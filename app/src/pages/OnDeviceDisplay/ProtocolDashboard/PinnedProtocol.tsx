@@ -91,7 +91,7 @@ export function PinnedProtocol(props: {
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       overflowWrap="anywhere"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       ref={longpress.ref}
     >
       <StyledText

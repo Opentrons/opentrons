@@ -100,7 +100,7 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   width: 100%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
 `
 
 const ModalArea = styled.div<

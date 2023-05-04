@@ -122,7 +122,7 @@ const DIRECTION_CONTROL_LAYOUT = css`
   flex: 1;
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  grid-gap: ${SPACING.spacing4};
+  grid-gap: ${SPACING.spacing16};
   min-width: 313px;
 
   @media (max-width: 750px) {
@@ -397,7 +397,7 @@ export function TouchDirectionControl(
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.darkBlack_forty}`}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       gridGap={SPACING.spacing3}
     >
       <TouchControlLabel>{t('jog_controls')}</TouchControlLabel>

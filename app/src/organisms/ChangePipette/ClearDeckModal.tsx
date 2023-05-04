@@ -33,7 +33,7 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
             h1: (
               <StyledText
                 css={TYPOGRAPHY.h1Default}
-                marginBottom={SPACING.spacing4}
+                marginBottom={SPACING.spacing16}
               />
             ),
             block: <StyledText as="p" />,

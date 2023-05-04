@@ -43,8 +43,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       backgroundColor={COLORS.white}
       color={COLORS.black}
       css={BORDERS.cardOutlineBorder}
-      paddingLeft={SPACING.spacing4}
-      paddingY={SPACING.spacing4}
+      paddingLeft={SPACING.spacing16}
+      paddingY={SPACING.spacing16}
       height="auto"
       onClick={props.onClick}
       cursor="pointer"
@@ -64,7 +64,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </RobotWorkSpace>
       </Box>
       {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}
-      <Box marginRight={SPACING.spacing4}>
+      <Box marginRight={SPACING.spacing16}>
         <StyledText css={TYPOGRAPHY.pSemiBold} id="displayCategory">
           {displayCategory}
         </StyledText>
@@ -104,7 +104,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               </Flex>
             )}
           </Box>
-          <Box paddingTop={SPACING.spacing4}>
+          <Box paddingTop={SPACING.spacing16}>
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}

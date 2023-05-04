@@ -37,7 +37,7 @@ export const MultipleModulesModal = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex flexDirection={DIRECTION_ROW}>
             <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <StyledText as="p" marginBottom={SPACING.spacing16}>
                 {t('multiple_modules_explanation')}
               </StyledText>
               <Link
@@ -46,7 +46,7 @@ export const MultipleModulesModal = (
                 href={HOW_TO_MULTIPLE_MODULES_HREF}
                 target="_blank"
                 rel="noopener noreferrer"
-                marginBottom={SPACING.spacing4}
+                marginBottom={SPACING.spacing16}
               >
                 {t('multiple_modules_learn_more')}
                 <Icon
@@ -68,7 +68,7 @@ export const MultipleModulesModal = (
               height="100%"
               width="288px"
               src={multipleModuleHelp}
-              style={{ marginBottom: SPACING.spacing4 }}
+              style={{ marginBottom: SPACING.spacing16 }}
             />
           </Flex>
           <PrimaryButton

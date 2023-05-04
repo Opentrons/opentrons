@@ -103,7 +103,7 @@ function Input(props: InputFieldProps): JSX.Element {
       border: none;
       flex: 1 1 auto;
       width: 100%;
-      height: ${SPACING.spacing4};
+      height: ${SPACING.spacing16};
     }
     & input:focus {
       outline: none;

@@ -65,7 +65,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
 
           <Flex
             marginLeft={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
             <Trans
@@ -99,7 +99,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
         </Flex>
       </AttachedModuleItem>
       <AttachedModuleItem step={t('1b')}>
-        <Flex flexDirection={DIRECTION_ROW} marginX={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_ROW} marginX={SPACING.spacing16}>
           <Box
             width="60%"
             padding={SPACING.spacing3}
@@ -146,7 +146,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           </Box>
           <Flex
             marginLeft={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
             <Trans
@@ -217,7 +217,7 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
     <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
       <StyledText
         color={COLORS.darkGrey}
-        paddingRight={SPACING.spacing4}
+        paddingRight={SPACING.spacing16}
         data-testid={`attach_module_${step}`}
       >
         {step}
@@ -228,11 +228,11 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
         )}`}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${String(SPACING.spacing4)} ${String(
+        padding={`${String(SPACING.spacing16)} ${String(
           SPACING.spacingM
-        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
+        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing16)}`}
         width="100%"
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
       >
         {props.children}
       </Flex>

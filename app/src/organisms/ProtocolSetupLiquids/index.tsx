@@ -87,17 +87,17 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         width="100%"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
         onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
           borderRadius={BORDERS.size_two}
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
         >
           <Icon
             name="circle"

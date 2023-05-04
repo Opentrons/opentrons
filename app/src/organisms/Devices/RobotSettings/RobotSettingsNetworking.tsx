@@ -89,7 +89,7 @@ export function RobotSettingsNetworking({
           />
         ) : null}
       </Portal>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex alignItems={ALIGN_CENTER}>
           {wifi?.ipAddress != null ? (
             <Icon
@@ -100,7 +100,7 @@ export function RobotSettingsNetworking({
               data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
-            <Box height={SPACING.spacing4} width="1.75rem"></Box>
+            <Box height={SPACING.spacing16} width="1.75rem"></Box>
           )}
           <Icon
             size="1.25rem"
@@ -129,7 +129,7 @@ export function RobotSettingsNetworking({
                   </SecondaryButton>
                 ) : null}
               </Flex>
-              <Flex gridGap={SPACING.spacing4}>
+              <Flex gridGap={SPACING.spacing16}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing2}
@@ -183,7 +183,7 @@ export function RobotSettingsNetworking({
               data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
-            <Box height={SPACING.spacing4} width="1.75rem"></Box>
+            <Box height={SPACING.spacing16} width="1.75rem"></Box>
           )}
           <Icon
             size="1.25rem"
@@ -196,7 +196,7 @@ export function RobotSettingsNetworking({
           </StyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             {ethernet?.ipAddress != null ? (
               <>
                 <Flex
@@ -242,13 +242,13 @@ export function RobotSettingsNetworking({
             )}
           </Flex>
           {isOT3 ? null : (
-            <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing16}>
               <ExternalLink href={HELP_CENTER_URL} id="WiredUSB_description">
                 {t('wired_usb_description')}
               </ExternalLink>
               <StyledText
                 as="p"
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
                 marginBottom={SPACING.spacing3}
               >
                 {t('usb_to_ethernet_description')}
@@ -272,7 +272,7 @@ export function RobotSettingsNetworking({
                   data-testid="RobotSettings_Networking_check_circle"
                 />
               ) : (
-                <Box height={SPACING.spacing4} width="1.75rem"></Box>
+                <Box height={SPACING.spacing16} width="1.75rem"></Box>
               )}
               <Icon
                 size="1.25rem"

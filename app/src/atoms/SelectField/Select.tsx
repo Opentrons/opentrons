@@ -42,7 +42,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       borderRadius: BORDERS.radiusRoundEdge,
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
-      height: SPACING.spacing4,
+      height: SPACING.spacing16,
       borderColor: COLORS.medGreyEnabled,
       boxShadow: 'none',
       padding: '0.375rem',

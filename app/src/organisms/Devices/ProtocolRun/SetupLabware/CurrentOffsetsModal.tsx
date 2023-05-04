@@ -37,7 +37,7 @@ const OffsetTable = styled('table')`
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing1};
-  margin: ${SPACING.spacing4} 0;
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`

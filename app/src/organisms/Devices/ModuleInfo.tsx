@@ -57,7 +57,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
-      flexProps={{ padding: SPACING.spacing4 }}
+      flexProps={{ padding: SPACING.spacing16 }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

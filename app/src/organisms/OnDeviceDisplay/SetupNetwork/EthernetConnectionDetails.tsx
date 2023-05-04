@@ -22,7 +22,7 @@ import type { State, Dispatch } from '../../../redux/types'
 
 const STRETCH_LIST_STYLE = css`
   width: 100%;
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
   background-color: ${COLORS.light_one};
   border-radius: ${BORDERS.size_three};
 `

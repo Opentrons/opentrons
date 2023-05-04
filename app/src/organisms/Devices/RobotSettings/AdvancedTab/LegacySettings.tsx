@@ -50,7 +50,7 @@ export function LegacySettings({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           id="AdvancedSettings_showLink"
         >
           {t('legacy_settings')}

@@ -122,7 +122,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   }
 
   return (
-    <Box padding={SPACING.spacing4}>
+    <Box padding={SPACING.spacing16}>
       {selectedProtocol != null ? (
         <>
           <ChooseRobotToRunProtocolSlideout
@@ -147,7 +147,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             <StyledText
               as="p"
@@ -238,7 +238,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         isExpanded={showImportProtocolSlideout}
         onCloseClick={() => setShowImportProtocolSlideout(false)}
       >
-        <Box marginTop={SPACING.spacing4}>
+        <Box marginTop={SPACING.spacing16}>
           <UploadInput onUpload={() => setShowImportProtocolSlideout(false)} />
         </Box>
       </Slideout>

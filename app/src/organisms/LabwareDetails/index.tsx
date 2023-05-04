@@ -98,8 +98,8 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing2}
-      paddingX={SPACING.spacing4}
-      marginBottom={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
+      marginBottom={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -160,7 +160,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       <Gallery definition={definition} />
       <Box
         backgroundColor={COLORS.fundamentalsBackground}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
         marginBottom={SPACING.spacing5}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
@@ -181,7 +181,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         </Link>
       </Box>
       <Box border={BORDERS.lineBorder}>
-        <Box padding={SPACING.spacing4}>
+        <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}
             count={Object.keys(wells).length}

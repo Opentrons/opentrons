@@ -86,7 +86,7 @@ export function ConnectRobotSlideout({
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
           id="ConnectIPAddressSupportPage"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >
           {t('connect_ip_link')}
         </ExternalLink>
@@ -98,7 +98,7 @@ export function ConnectRobotSlideout({
 
         <Flex
           marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           justifyContent={ALIGN_FLEX_END}
         >
           {Boolean(isScanning) ? (

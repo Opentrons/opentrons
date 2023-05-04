@@ -107,7 +107,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       <StyledText
         as="p"
         textAlign={TYPOGRAPHY.textAlignCenter}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
       >
         {props.uploadText}
       </StyledText>

@@ -67,7 +67,7 @@ export function DevicesLanding(): JSX.Element {
   return (
     <Box
       minWidth={SIZE_6}
-      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing16)}`}
     >
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -106,7 +106,7 @@ export function DevicesLanding(): JSX.Element {
           <Divider />
           <CollapsibleSection
             gridGap={SPACING.spacing2}
-            marginY={SPACING.spacing4}
+            marginY={SPACING.spacing16}
             title={t('not_available', {
               count: [...recentlySeenRobots, ...unreachableRobots].length,
             })}
@@ -140,8 +140,8 @@ function DevicesLoadingState(): JSX.Element {
         aria-label="ot-spinner"
         spin
         size="3.25rem"
-        marginTop={SPACING.spacing4}
-        marginBottom={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
+        marginBottom={SPACING.spacing16}
         color={COLORS.darkGreyEnabled}
       />
       <Flex

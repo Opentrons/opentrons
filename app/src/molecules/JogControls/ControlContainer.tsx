@@ -19,7 +19,7 @@ interface ControlContainerProps extends StyleProps {
 const CONTROL_CHILDREN_STYLES = css`
   background-color: ${COLORS.fundamentalsBackground};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
   width: 100%;
   height: 9.75rem;
 

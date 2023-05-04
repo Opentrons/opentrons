@@ -139,7 +139,7 @@ export const LiquidsLabwareDetailsModal = (
         css={HIDE_SCROLLBAR}
         minWidth="10.313rem"
         overflowY="scroll"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         {liquidCard}
       </Flex>
@@ -165,8 +165,8 @@ export const LiquidsLabwareDetailsModal = (
       width="45rem"
     >
       <Box
-        paddingX={SPACING.spacing4}
-        paddingTop={SPACING.spacing4}
+        paddingX={SPACING.spacing16}
+        paddingTop={SPACING.spacing16}
         backgroundColor={COLORS.fundamentalsBackground}
         height="28.125rem"
       >
@@ -185,7 +185,7 @@ export const LiquidsLabwareDetailsModal = (
             flexDirection={DIRECTION_COLUMN}
             width="100%"
             maxHeight="25rem"
-            marginLeft={SPACING.spacing4}
+            marginLeft={SPACING.spacing16}
             marginTop={SPACING.spacing3}
           >
             <Flex flexDirection={DIRECTION_ROW}>

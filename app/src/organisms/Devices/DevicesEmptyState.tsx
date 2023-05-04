@@ -41,13 +41,13 @@ export function DevicesEmptyState(): JSX.Element {
         <StyledText
           as="h1"
           fontWeight={FONT_WEIGHT_REGULAR}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing16}
           id="DevicesEmptyState_noRobotsFound"
           marginTop="20vh"
         >
           {t('no_robots_found')}
         </StyledText>
-        <Box paddingBottom={SPACING.spacing4}>
+        <Box paddingBottom={SPACING.spacing16}>
           <PrimaryButton
             onClick={handleRefresh}
             id="DevicesEmptyState_refreshButton"

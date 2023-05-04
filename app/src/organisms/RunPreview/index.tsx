@@ -56,7 +56,7 @@ export const RunPreviewComponent = (
       width="100%"
       overflowY="scroll"
       gridGap={SPACING.spacing3}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -69,7 +69,7 @@ export const RunPreviewComponent = (
       <StyledText as="p" marginBottom={SPACING.spacing3}>
         {t('preview_of_protocol_steps')}
       </StyledText>
-      <Divider marginX={`calc(-1 * ${SPACING.spacing4})`} />
+      <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
       <ViewportList
         viewportRef={viewPortRef}
         ref={ref}
@@ -105,7 +105,7 @@ export const RunPreviewComponent = (
               gridGap={SPACING.spacing3}
             >
               <StyledText
-                minWidth={SPACING.spacing4}
+                minWidth={SPACING.spacing16}
                 fontSize={TYPOGRAPHY.fontSizeCaption}
               >
                 {index + 1}

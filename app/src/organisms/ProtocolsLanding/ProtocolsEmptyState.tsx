@@ -18,7 +18,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       width="100%"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       paddingTop={SPACING.spacing6}
       transform="translateY(25%)"
     >

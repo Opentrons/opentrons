@@ -130,7 +130,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
     <Flex
       borderRadius={BORDERS.size_three}
       backgroundColor={COLORS.lightGreyPressed}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing5}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight36}
       {...props}

@@ -53,14 +53,14 @@ export function SetupLabwarePositionCheck(
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      marginTop={SPACING.spacing4}
-      gridGap={SPACING.spacing4}
+      marginTop={SPACING.spacing16}
+      gridGap={SPACING.spacing16}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         flex="1 0 auto"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         <Link
           css={TYPOGRAPHY.linkPSemiBold}
@@ -106,7 +106,7 @@ export function SetupLabwarePositionCheck(
         <PrimaryButton
           onClick={expandLabwareStep}
           id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing16)}`}
           {...targetProps}
         >
           {t('proceed_to_labware_setup_step')}

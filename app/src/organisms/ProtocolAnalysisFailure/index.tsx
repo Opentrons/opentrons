@@ -101,7 +101,7 @@ export function ProtocolAnalysisFailure(
               <PrimaryButton
                 onClick={handleClickHideDetails}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>

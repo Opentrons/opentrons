@@ -20,12 +20,12 @@ export function TipLengthCalibrationInfoBox(
   return (
     <Box
       border={BORDER_SOLID_LIGHT}
-      margin={SPACING.spacing4}
-      paddingY={SPACING.spacing4}
+      margin={SPACING.spacing16}
+      paddingY={SPACING.spacing16}
     >
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        paddingLeft={SPACING.spacing4}
+        paddingLeft={SPACING.spacing16}
         paddingBottom={SPACING.spacing3}
       >
         {title}

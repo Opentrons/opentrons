@@ -60,7 +60,7 @@ export function CalibrationStatusCard({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

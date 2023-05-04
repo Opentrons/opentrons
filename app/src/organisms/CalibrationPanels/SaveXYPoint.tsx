@@ -222,7 +222,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           gridGap={SPACING.spacing3}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            <StyledText as="h1" marginBottom={SPACING.spacing16}>
               {t(isHealthCheck ? 'check_xy_axes' : 'calibrate_xy_axes', {
                 slotName: slotNumber,
               })}
@@ -258,7 +258,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
         </Box>
         <Flex
           width="100%"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <NeedHelpLink />

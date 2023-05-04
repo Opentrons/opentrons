@@ -58,9 +58,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       backgroundColor={COLORS.white}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
       minWidth="36rem"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
       css={BORDERS.cardOutlineBorder}
@@ -78,7 +78,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       >
         <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing5} />
         <ReachableBanner robot={robot} />
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <RobotStatusHeader
             local={local}
             name={robotName}
@@ -90,7 +90,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             <Flex
               flexDirection={DIRECTION_ROW}
               flexWrap={WRAP}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing16}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <AttachedInstruments robotName={robotName} />

@@ -33,9 +33,9 @@ export const HeaterShakerModuleCard = (
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
-      padding={`${String(SPACING.spacing4)} ${String(
+      padding={`${String(SPACING.spacing16)} ${String(
         SPACING.spacing3
-      )} ${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
+      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing3)}`}
       width="20rem"
     >
       <Flex

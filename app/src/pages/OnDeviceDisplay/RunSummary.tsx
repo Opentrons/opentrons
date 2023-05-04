@@ -129,7 +129,7 @@ export function RunSummary(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing16}
             >
               <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
                 <Icon
@@ -166,7 +166,7 @@ export function RunSummary(): JSX.Element {
                 )}: ${completedAtTimestamp}`}</SummaryDatum>
               </Flex>
             </Flex>
-            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing4}>
+            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
               <LargeButton
                 flex="1"
                 iconName="arrow-left"

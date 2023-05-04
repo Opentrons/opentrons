@@ -193,7 +193,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         >
           <StyledText
             css={TYPOGRAPHY.h1Default}
-            marginBottom={SPACING.spacing4}
+            marginBottom={SPACING.spacing16}
           >
             {t('choose_a_tip_rack')}
           </StyledText>
@@ -232,7 +232,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         </Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <Banner type="warning">
-            <StyledText as="p" marginRight={SPACING.spacing4}>
+            <StyledText as="p" marginRight={SPACING.spacing16}>
               {t('opentrons_tip_racks_recommended')}
             </StyledText>
           </Banner>
@@ -257,7 +257,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
             css={TYPOGRAPHY.darkLinkH4SemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={() => closeModal()}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {t('shared:cancel')}
           </Link>

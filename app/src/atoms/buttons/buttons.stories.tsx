@@ -25,7 +25,7 @@ const TertiaryButtonTemplate: Story<
 > = args => {
   const { children } = args
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
       <TertiaryButton>{children}</TertiaryButton>
     </Flex>
   )
@@ -41,7 +41,7 @@ const QuaternaryButtonTemplate: Story<
 > = args => {
   const { children } = args
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
       <QuaternaryButton>{children}</QuaternaryButton>
     </Flex>
   )
@@ -115,13 +115,13 @@ const LongPressButtonTemplate: Story<
   }, [longPress, longPress.isLongPressed])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
       <PrimaryButton ref={longPress.ref} width="16rem" onClick={handlePress}>
         {children}
       </PrimaryButton>
       {
         <StyledText
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >{`You tapped ${tapCount} times`}</StyledText>
       }
     </Flex>

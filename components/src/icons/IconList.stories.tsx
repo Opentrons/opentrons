@@ -77,7 +77,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           borderRadius={BORDERS.size_three}
           marginRight={SPACING.spacing3}
           marginBottom={SPACING.spacing3}
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           onClick={() => handleCopy(name, index)}
           border={
             selectedIcon === name

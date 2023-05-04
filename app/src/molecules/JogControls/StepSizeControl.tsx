@@ -37,7 +37,7 @@ const BUTTON_WRAPPER_STYLE = css`
   display: grid;
   grid-auto-flow: column;
   grid-gap: ${SPACING.spacing3};
-  margin-top: ${SPACING.spacing4};
+  margin-top: ${SPACING.spacing16};
 
   @media (max-width: 750px) {
     grid-template-columns: none;
@@ -174,7 +174,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.darkBlack_forty}`}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       gridGap={SPACING.spacing3}
     >
       <TouchControlLabel>{t('jump_size')}</TouchControlLabel>

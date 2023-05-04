@@ -68,7 +68,7 @@ export function SoftwareUpdateModal({
   ) : (
     <Modal title={t('robot_update_available')} onClose={closeModal}>
       <Banner type="informing">{t('requires_restarting_the_robot')}</Banner>
-      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing16}>
         {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
         <StyledText css={TYPOGRAPHY.pSemiBold}>
           {t('app_change_in', { version })}
@@ -85,7 +85,7 @@ export function SoftwareUpdateModal({
         <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
           {t('bug_fixes')}
         </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {'None in the Opentrons (Here will be fixes info)'}
         </StyledText>
         <Divider />
@@ -93,7 +93,7 @@ export function SoftwareUpdateModal({
           href={TECHNICAL_CHANGE_LOG_URL}
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateTechnicalChangeLogLink"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           marginBottom={SPACING.spacing3}
         >
           {t('view_opentrons_technical_change_log')}

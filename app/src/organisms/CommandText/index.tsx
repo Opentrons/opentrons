@@ -90,7 +90,7 @@ export function CommandText(props: Props): JSX.Element | null {
               repetitions: Object.keys(steps).length,
             })}
           </StyledText>
-          <Flex marginLeft={SPACING.spacing4}>
+          <Flex marginLeft={SPACING.spacing16}>
             <ul>
               {steps.map((step: string, index: number) => (
                 <li key={index}> {step}</li>

@@ -196,7 +196,7 @@ export function AdvancedSettings(): JSX.Element {
 
   return (
     <>
-      <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
+      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing5}>
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -440,7 +440,7 @@ export function AdvancedSettings(): JSX.Element {
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
             {driverOutdated && (
-              <Banner type="warning" marginTop={SPACING.spacing4}>
+              <Banner type="warning" marginTop={SPACING.spacing16}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                   <StyledText as="p" color={COLORS.darkBlackEnabled}>
                     {t('usb_to_ethernet_adapter_toast_message')}
@@ -459,17 +459,17 @@ export function AdvancedSettings(): JSX.Element {
               </Banner>
             )}
             {device === null ? (
-              <StyledText as="p" marginTop={SPACING.spacing4}>
+              <StyledText as="p" marginTop={SPACING.spacing16}>
                 {t('usb_to_ethernet_not_connected')}
               </StyledText>
             ) : (
               <Flex
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_description')}
@@ -478,7 +478,7 @@ export function AdvancedSettings(): JSX.Element {
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_manufacturer')}
@@ -487,7 +487,7 @@ export function AdvancedSettings(): JSX.Element {
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_driver_version')}

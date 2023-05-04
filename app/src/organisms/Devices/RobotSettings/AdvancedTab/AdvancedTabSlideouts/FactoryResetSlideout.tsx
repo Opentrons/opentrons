@@ -149,7 +149,7 @@ export function FactoryResetSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('factory_reset_slideout_description')}
         </StyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -163,7 +163,7 @@ export function FactoryResetSlideout({
             {t('factory_resets_cannot_be_undone')}
           </StyledText>
         </Flex>
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <Box>
           <Flex
             flexDirection={DIRECTION_ROW}

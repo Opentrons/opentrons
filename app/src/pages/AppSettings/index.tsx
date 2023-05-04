@@ -45,7 +45,7 @@ export function AppSettings(): JSX.Element {
   )
 
   return (
-    <Flex paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
+    <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box
         backgroundColor={COLORS.white}
         height="100%"
@@ -56,7 +56,7 @@ export function AppSettings(): JSX.Element {
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >
-        <Box padding={SPACING.spacing4} paddingBottom="0">
+        <Box padding={SPACING.spacing16} paddingBottom="0">
           <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
             {t('app_settings')}
           </Text>

@@ -284,7 +284,7 @@ const RobotSettingButton = ({
             gridGap="0.75rem"
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.warningBackgroundMed}
-            padding={`0.75rem ${SPACING.spacing4}`}
+            padding={`0.75rem ${SPACING.spacing16}`}
             borderRadius={BORDERS.size_four}
           >
             <Icon
@@ -308,7 +308,7 @@ const RobotSettingButton = ({
             gridGap="0.75rem"
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.transparent}
-            padding={`0.75rem ${SPACING.spacing4}`}
+            padding={`0.75rem ${SPACING.spacing16}`}
             borderRadius={BORDERS.size_four}
           >
             <StyledText

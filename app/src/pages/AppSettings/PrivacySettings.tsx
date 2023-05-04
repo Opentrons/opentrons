@@ -29,9 +29,9 @@ export function PrivacySettings(): JSX.Element {
     <Flex
       height="calc(100vh - 8.5rem)"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      paddingX={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
       paddingY={SPACING.spacing5}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
     >
       <Box width="70%">
         <StyledText

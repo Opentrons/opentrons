@@ -53,7 +53,7 @@ const LabwareRow = styled.div`
   border-width: ${SPACING.spacingXXS};
   border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
@@ -155,7 +155,7 @@ export function LabwareListItem(
           <StyledText
             as="p"
             color={COLORS.darkGreyEnabled}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {t('heater_shaker_labware_list_view')}
           </StyledText>
@@ -224,7 +224,7 @@ export function LabwareListItem(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
-          marginLeft={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
           marginRight={SPACING.spacing5}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

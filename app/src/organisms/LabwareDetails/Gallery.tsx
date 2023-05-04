@@ -52,7 +52,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
       {images.length > 1 && (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_EVENLY}
         >
           {images.map((img, index) => {

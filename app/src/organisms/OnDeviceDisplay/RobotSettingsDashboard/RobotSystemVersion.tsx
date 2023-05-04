@@ -74,8 +74,8 @@ export function RobotSystemVersion({
           {isUpdateAvailable ? (
             <Flex
               flexDirection={DIRECTION_ROW}
-              padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
-              gridGap={SPACING.spacing4}
+              padding={`${SPACING.spacing5} ${SPACING.spacing16}`}
+              gridGap={SPACING.spacing16}
               borderRadius={BORDERS.size_three}
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.warningBackgroundMed}

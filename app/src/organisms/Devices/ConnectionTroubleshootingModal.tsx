@@ -44,7 +44,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           label={t('if_still_having_issues')}
           steps={[t('restart_the_robot'), t('restart_the_app')]}
         />
-        <StyledText as="p" marginTop={SPACING.spacing4}>
+        <StyledText as="p" marginTop={SPACING.spacing16}>
           {t('contact_support_for_connection_help', {
             support_email: SUPPORT_EMAIL,
           })}
@@ -53,7 +53,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
           external
           css={TYPOGRAPHY.linkPSemiBold}
           href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           marginBottom={SPACING.spacing5}
         >
           {t('learn_more_about_troubleshooting_connection')}
@@ -77,7 +77,7 @@ interface TroubleshootingStepsProps {
 function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
   const { label, steps } = props
   return (
-    <Box marginTop={SPACING.spacing4}>
+    <Box marginTop={SPACING.spacing16}>
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {label}:
       </StyledText>

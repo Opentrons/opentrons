@@ -18,7 +18,7 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
   return (
     <Box marginTop={SPACING.spacing3}>
       <Banner
-        iconMarginRight={SPACING.spacing4}
+        iconMarginRight={SPACING.spacing16}
         iconMarginLeft={SPACING.spacing3}
         type="warning"
         size={SPACING.spacingM}

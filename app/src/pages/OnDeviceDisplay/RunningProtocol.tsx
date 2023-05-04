@@ -173,7 +173,7 @@ export function RunningProtocol(): JSX.Element {
           <Flex
             marginTop="2rem"
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >

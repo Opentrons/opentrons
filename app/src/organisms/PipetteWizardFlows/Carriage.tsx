@@ -103,7 +103,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
             ),
           }}
         />

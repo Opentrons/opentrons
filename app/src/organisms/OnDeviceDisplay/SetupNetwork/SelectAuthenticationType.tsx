@@ -131,7 +131,7 @@ export function SelectAuthenticationType({
             backgroundColor={
               selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
             }
-            padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
+            padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing6)}`}
             borderRadius="3.5625rem"
             onClick={() => {
               setSelectedAuthType('wpa-psk')
@@ -149,7 +149,7 @@ export function SelectAuthenticationType({
           <Btn
             backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
-            padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
+            padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing6)}`}
             onClick={() => {
               setSelectedAuthType('none')
             }}

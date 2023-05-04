@@ -88,7 +88,7 @@ export function RunningProtocolSkeleton({
                 backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
               />
             </Flex>
-            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
               <StopButton buttonSize="6.25rem" iconSize="5rem" />
               <PlayPauseButton buttonSize="6.25rem" iconSize="2.5rem" />
             </Flex>

@@ -246,7 +246,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         />
       )}
       <Box
-        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
+        padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing3)}`}
         width="100%"
       >
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>

@@ -29,7 +29,7 @@ describe('Unselected TabbedButton', () => {
       `background-color: ${String(COLORS.highlightPurple_two)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
+      `padding: ${String(SPACING.spacing16)} ${String(SPACING.spacing5)}`
     )
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSize22)}`)
     expect(button).toHaveStyle(
@@ -105,7 +105,7 @@ describe('Selected TabbedButton', () => {
       `background-color: ${String(COLORS.highlightPurple_one)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
+      `padding: ${String(SPACING.spacing16)} ${String(SPACING.spacing5)}`
     )
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSize22)}`)
     expect(button).toHaveStyle(

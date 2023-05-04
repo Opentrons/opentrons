@@ -52,7 +52,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
         padding={
           isOnDevice
             ? `1.75rem ${SPACING.spacing6}`
-            : `${SPACING.spacing4} ${SPACING.spacing6}`
+            : `${SPACING.spacing16} ${SPACING.spacing6}`
         }
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -80,7 +80,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
                   ? css`
                       font-size: 1.375rem;
                       font-weight: 700;
-                      margin-left: ${SPACING.spacing4};
+                      margin-left: ${SPACING.spacing16};
                     `
                   : TYPOGRAPHY.pSemiBold
               }

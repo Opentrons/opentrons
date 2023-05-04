@@ -81,7 +81,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       borderRadius={BORDERS.radiusSoftCorners}
       cursor="pointer"
       minWidth="36rem"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       position="relative"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
       css={BORDERS.cardOutlineBorder}
@@ -142,7 +142,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     <Flex
       alignItems={ALIGN_FLEX_START}
       flex="1 0 100%"
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
     >
       <Box
         size="6rem"
@@ -166,7 +166,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       <Flex
         flex="1 0"
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         {/* error and protocol name section */}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
@@ -191,7 +191,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           </StyledText>
         ) : (
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-            <Flex gridGap={SPACING.spacing4}>
+            <Flex gridGap={SPACING.spacing16}>
               <Flex
                 flex={`0 0 ${String(SIZE_2)}`}
                 flexDirection={DIRECTION_COLUMN}

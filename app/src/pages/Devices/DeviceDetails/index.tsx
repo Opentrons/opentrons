@@ -36,8 +36,8 @@ export function DeviceDetails(): JSX.Element | null {
         minWidth="36rem"
         height="100%"
         overflow={OVERFLOW_SCROLL}
-        paddingX={SPACING.spacing4}
-        paddingTop={SPACING.spacing4}
+        paddingX={SPACING.spacing16}
+        paddingTop={SPACING.spacing16}
         paddingBottom={SPACING.spacing7}
       >
         <Flex
@@ -46,8 +46,8 @@ export function DeviceDetails(): JSX.Element | null {
           border={`1px solid ${String(COLORS.medGreyEnabled)}`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing4}
-          paddingX={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
+          paddingX={SPACING.spacing16}
           paddingBottom={SPACING.spacing2}
           width="100%"
         >

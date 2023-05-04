@@ -103,7 +103,7 @@ export function InstrumentsAndModules({
       <StyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
@@ -118,7 +118,7 @@ export function InstrumentsAndModules({
       >
         {currentRunId != null && !isRunTerminal && (
           <Flex
-            paddingBottom={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
             paddingX={SPACING.spacing2}
             width="100%"

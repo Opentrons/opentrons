@@ -42,7 +42,7 @@ export function DisplayRobotName({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           id="AdvancedSettings_About"
         >
           {t('about_advanced')}

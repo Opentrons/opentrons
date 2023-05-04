@@ -105,7 +105,7 @@ export function HistoricalProtocolRun(
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {protocolName}
           </StyledText>
@@ -115,7 +115,7 @@ export function HistoricalProtocolRun(
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             overflowWrap="anywhere"
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {protocolName}
           </StyledText>

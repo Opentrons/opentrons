@@ -49,7 +49,7 @@ export function UsageSettings({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.h2SemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}
