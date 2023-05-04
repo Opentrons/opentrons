@@ -44,6 +44,7 @@ class Axis(enum.Enum):
         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
+    # TODO (spp, 2023-5-4): deprecate this method & create a replacement called 'pipette_mount_axes'
     @classmethod
     def mount_axes(cls) -> Tuple["Axis", "Axis"]:
         """The axes which are used for moving pipettes up and down."""
@@ -68,11 +69,18 @@ class Axis(enum.Enum):
             cls.A: top_types.Mount.RIGHT,
             cls.B: top_types.Mount.LEFT,
             cls.C: top_types.Mount.RIGHT,
+            cls.Z_G: top_types.Mount.EXTENSION,
+            cls.G: top_types.Mount.EXTENSION,
         }[inst]
 
     @classmethod
     def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
         return cls.B, cls.C
+
+    @classmethod
+    def ot2_axes(cls) -> List["Axis"]:
+        """Returns only OT2 axes."""
+        return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.G]]
 
     def __str__(self) -> str:
         return self.name

@@ -284,7 +284,7 @@ class Simulator:
         """
         return {
             mount: self._attached_to_mount(mount, expected.get(mount))
-            for mount in types.Mount
+            for mount in types.Mount.ot2_mounts()
         }
 
     def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:

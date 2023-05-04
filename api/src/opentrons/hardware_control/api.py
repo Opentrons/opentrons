@@ -571,9 +571,10 @@ class API(
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home the entire robot and initialize current position."""
+
         self._reset_last_mount()
         # Initialize/update current_position
-        checked_axes = axes or [ax for ax in Axis]
+        checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}
