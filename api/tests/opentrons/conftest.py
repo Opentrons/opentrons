@@ -53,6 +53,8 @@ from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
 
+from .protocol_engine_in_thread import protocol_engine_in_thread
+
 
 if TYPE_CHECKING:
     from opentrons.drivers.smoothie_drivers import SmoothieDriver as SmoothieDriverType
@@ -255,9 +257,40 @@ async def hardware(
         yield hw
 
 
-@pytest.fixture()
-def ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+def _make_ot2_non_pe_ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+    """Return a ProtocolContext configured for an OT-2 and not backed by Protocol Engine."""
     return create_protocol_context(api_version=APIVersion(2, 13), hardware_api=hardware)
+
+
+@contextlib.contextmanager
+def _make_ot3_pe_ctx(
+    hardware: ThreadManagedHardware,
+) -> Generator[ProtocolContext, None, None]:
+    """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
+    with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
+        yield create_protocol_context(
+            api_version=APIVersion(2, 14),
+            hardware_api=hardware,
+            protocol_engine=engine,
+            # TODO will this deadlock?
+            protocol_engine_loop=loop,
+        )
+
+
+@pytest.fixture()
+def ctx(
+    request: pytest.FixtureRequest,
+    robot_model: RobotModel,
+    hardware: ThreadManagedHardware,
+) -> Generator[ProtocolContext, None, None]:
+    if robot_model == "OT-2 Standard":
+        yield _make_ot2_non_pe_ctx(hardware=hardware)
+    elif robot_model == "OT-3 Standard":
+        if request.node.get_closest_marker("apiv2_non_pe_only"):
+            pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
+        else:
+            with _make_ot3_pe_ctx(hardware=hardware) as ctx:
+                yield ctx
 
 
 @pytest.fixture()

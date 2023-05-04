@@ -717,6 +717,30 @@ exports[`icons comment renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons connection-status renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 24 24"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M 6, 12 a 6,6 0 1,1 12,0 a 6,6 0 1,1 -12,0"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons content-copy renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
@@ -808,6 +832,30 @@ exports[`icons cursor-move renders correctly 1`] = `
 >
   <path
     d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons deck-map renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 60 48"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M20.5713 8.57141H8.57129V15.4286H20.5713V8.57141Z M36.0856 8.57141H24.0856V15.4286H36.0856V8.57141Z M39.5999 8.57141H51.5999V15.4286H39.5999V8.57141Z M20.5713 20.5714H8.57129V27.4286H20.5713V20.5714Z M24.0856 20.5714H36.0856V27.4286H24.0856V20.5714Z M51.5999 20.5714H39.5999V27.4286H51.5999V20.5714Z M8.57129 32.5886H20.5713V39.4457H8.57129V32.5886Z M36.0856 32.5886H24.0856V39.4457H36.0856V32.5886Z M39.5999 32.5886H51.5999V39.4457H39.5999V32.5886Z"
     fillRule="evenodd"
   />
 </svg>

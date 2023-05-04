@@ -14,7 +14,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { BackButton } from '../../atoms/buttons'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
@@ -55,11 +55,10 @@ export function ProtocolSetupInstruments({
       width="100%"
       gridGap={SPACING.spacing3}
     >
-      <Flex alignItems={ALIGN_CENTER}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('instruments')}
-        </BackButton>
-      </Flex>
+      <ODDBackButton
+        label={t('instruments')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
