@@ -30,6 +30,7 @@ class BinaryMessageId(int, Enum):
     aux_present_request = 0x10
     aux_id_request = 0x11
     aux_id_response = 0x12
+    estop_button_present_request = 0x13
 
     # Light messages prefixed by 0x400
     # 0x40x = light strip
