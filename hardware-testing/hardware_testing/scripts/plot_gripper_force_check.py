@@ -110,9 +110,20 @@ class Plot:
         x_end = df[x_axis].iloc[-1]
         y_start = df[y_axis].iloc[0]
         y_end = df[y_axis].iloc[-1]
+        y_avg = df[y_axis].mean()
+        y_min = df[y_axis].min()
+        y_max = df[y_axis].max()
+        y_range = y_max - y_min
+
+        y_range = round(y_range, 3)
+        y_avg = round(y_avg, 3)
+        y_avg_xpos = 1
+        y_avg_text = f"Avg Force = {y_avg}N ± {y_range}N"
+
+        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=200, ay_pos=100)
+
         fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True)
-        # fig2 = px.line(x=[-self.LIMIT, self.LIMIT], y=[[y_axis2, y_axis2]], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
-        fig2 = px.line(df, x=x_axis, y=[y_axis2], line_dash_sequence=["dash"], color_discrete_sequence=["black"])
+        fig2 = px.line(df, x=x_axis, y=[y_axis2], line_dash_sequence=["dash"], color_discrete_sequence=["red"])
         subfig = make_subplots()
         subfig.add_traces(fig1.data + fig2.data)
         self.plot_param["figure"] = subfig
@@ -123,7 +134,7 @@ class Plot:
         self.plot_param["x_range"] = [1, 10]
         self.plot_param["y_range"] = [0, 25]
         self.plot_param["legend"] = "Data"
-        self.plot_param["annotation"] = None
+        self.plot_param["annotation"] = [annotation_yavg]
         self.write_plot(self.plot_param)
 
 if __name__ == '__main__':
