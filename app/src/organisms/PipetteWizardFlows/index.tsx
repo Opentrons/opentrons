@@ -76,8 +76,8 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset.last_modified != null
+  const hasCalData = false
+  // attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
@@ -128,7 +128,12 @@ export const PipetteWizardFlows = (
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      deleteMaintenanceRun(maintenanceRunId)
+      chainRunCommands(
+        [{ commandType: 'home' as const, params: {} }],
+        true
+      ).then(() => {
+        deleteMaintenanceRun(maintenanceRunId)
+      })
     }
   }
   const {
@@ -161,6 +166,7 @@ export const PipetteWizardFlows = (
   }
   const exitModal = (
     <ExitModal
+      isRobotMoving={isRobotMoving}
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}
