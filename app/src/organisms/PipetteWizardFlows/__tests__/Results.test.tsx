@@ -231,7 +231,7 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully recalibrated')
-    getByRole('button', { name: 'SmallButton_default' }).click()
+    getByRole('button', { name: 'SmallButton_primary' }).click()
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a fail for attach flow on ODD', async () => {
@@ -246,7 +246,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'SmallButton_default' }).click()
+    getByRole('button', { name: 'SmallButton_primary' }).click()
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })

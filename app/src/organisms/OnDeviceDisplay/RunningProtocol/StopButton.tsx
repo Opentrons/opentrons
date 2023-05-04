@@ -12,7 +12,7 @@ import {
 
 const STOP_BUTTON_STYLE = css`
   display: flex;
-  background-color: ${COLORS.red_two};
+  background-color: ${COLORS.red2};
   border-radius: 50%;
 
   &:focus {
@@ -22,19 +22,19 @@ const STOP_BUTTON_STYLE = css`
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.red_two};
+    background-color: ${COLORS.red2};
     color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
-    background-color: ${COLORS.red_two};
+    background-color: ${COLORS.red2};
   }
   &:active {
-    background-color: ${COLORS.red_two};
+    background-color: ${COLORS.red2};
   }
   &:disabled {
-    background-color: ${COLORS.darkBlack_twenty};
-    color: ${COLORS.darkBlack_sixty};
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
   }
 `
 

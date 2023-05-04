@@ -17,9 +17,9 @@ import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 type SmallButtonTypes =
-  | 'alt'
   | 'alert'
-  | 'default'
+  | 'primary'
+  | 'secondary'
   | 'tertiaryLowLight'
   | 'tertiaryHighLight'
 
@@ -57,40 +57,40 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       defaultColor: string
     }
   > = {
-    alt: {
+    secondary: {
       defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.mediumBlueEnabled,
       activeBackgroundColor: COLORS.mediumBluePressed,
-      disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
-      disabledColor: `${COLORS.darkBlack_sixty}`,
+      disabledBackgroundColor: `${COLORS.darkBlack20}`,
+      disabledColor: `${COLORS.darkBlack60}`,
     },
     alert: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.red_two,
-      activeBackgroundColor: COLORS.red_two_pressed,
-      disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
-      disabledColor: `${COLORS.darkBlack_sixty}`,
+      defaultBackgroundColor: COLORS.red2,
+      activeBackgroundColor: COLORS.red2Pressed,
+      disabledBackgroundColor: `${COLORS.darkBlack20}`,
+      disabledColor: `${COLORS.darkBlack60}`,
     },
-    default: {
+    primary: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: COLORS.blueEnabled,
       activeBackgroundColor: COLORS.bluePressed,
-      disabledBackgroundColor: `${COLORS.darkBlack_twenty}`,
-      disabledColor: `${COLORS.darkBlack_sixty}`,
+      disabledBackgroundColor: `${COLORS.darkBlack20}`,
+      disabledColor: `${COLORS.darkBlack60}`,
     },
     tertiaryHighLight: {
-      defaultColor: `${COLORS.darkBlack_seventy}`,
+      defaultColor: COLORS.darkBlackEnabled,
       defaultBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
+      activeBackgroundColor: `${COLORS.darkBlack20}`,
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      disabledColor: `${COLORS.darkBlack_sixty}`,
+      disabledColor: `${COLORS.darkBlack60}`,
     },
     tertiaryLowLight: {
-      defaultColor: COLORS.darkBlackEnabled,
+      defaultColor: `${COLORS.darkBlack70}`,
       defaultBackgroundColor: ` ${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      activeBackgroundColor: `${COLORS.darkBlack_twenty}`,
+      activeBackgroundColor: `${COLORS.darkBlack20}`,
       disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
-      disabledColor: `${COLORS.darkBlack_sixty}`,
+      disabledColor: `${COLORS.darkBlack60}`,
     },
   }
 

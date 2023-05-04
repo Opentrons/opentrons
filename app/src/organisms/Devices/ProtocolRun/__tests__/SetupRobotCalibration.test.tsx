@@ -5,7 +5,10 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+} from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
@@ -119,7 +122,7 @@ describe('SetupRobotCalibration', () => {
     fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceed_to_module_setup_step',
+      name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
       properties: {},
     })
   })

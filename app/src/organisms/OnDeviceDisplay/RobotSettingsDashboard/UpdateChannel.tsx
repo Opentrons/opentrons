@@ -119,9 +119,7 @@ export function UpdateChannel({
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={
-                    radio.value === channel
-                      ? COLORS.white
-                      : COLORS.darkBlack_seventy
+                    radio.value === channel ? COLORS.white : COLORS.darkBlack70
                   }
                 >
                   {t('alpha_description')}

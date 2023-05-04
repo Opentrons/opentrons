@@ -77,13 +77,15 @@ class MeasurementData(EnvironmentData):
         )
 
 
-def create_measurement_tag(t: str, volume: Optional[float], trial: int) -> str:
+def create_measurement_tag(
+    t: str, volume: Optional[float], channel: int, trial: int
+) -> str:
     """Create measurement tag."""
     if volume is None:
         vol_in_tag = "blank"
     else:
         vol_in_tag = str(round(volume, 2))
-    return f"{t}-{vol_in_tag}-ul-{trial + 1}"
+    return f"{t}-{vol_in_tag}-ul-channel_{channel + 1}-trial-{trial + 1}"
 
 
 class UnstableMeasurementError(Exception):
@@ -103,6 +105,8 @@ def _build_measurement_data(
     segment = GravimetricRecording(
         [sample for sample in recorder.recording if sample.tag and sample.tag == tag]
     )
+    if simulating and len(segment) == 1:
+        segment.append(segment[0])
     if stable and not simulating:
         # try to isolate only "stable" scale readings if sample length >= 2
         stable_only = GravimetricRecording(
@@ -136,6 +140,7 @@ def record_measurement_data(
     mount: str,
     stable: bool,
     shorten: bool = False,
+    delay_seconds: int = DELAY_FOR_MEASUREMENT,
 ) -> MeasurementData:
     """Record measurement data."""
     env_data = read_environment_data(mount, ctx.is_simulating())
@@ -147,10 +152,8 @@ def record_measurement_data(
         elif shorten:
             ctx.delay(1)
         else:
-            print(
-                f"delaying {DELAY_FOR_MEASUREMENT} seconds for measurement, please wait..."
-            )
-            ctx.delay(DELAY_FOR_MEASUREMENT)
+            print(f"delaying {delay_seconds} seconds for measurement, please wait...")
+            ctx.delay(delay_seconds)
     return _build_measurement_data(
         recorder, tag, env_data, stable=stable, simulating=ctx.is_simulating()
     )

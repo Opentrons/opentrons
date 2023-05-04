@@ -172,7 +172,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack_forty}`}
+      border={`1px solid ${COLORS.darkBlack40}`}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing4}
       gridGap={SPACING.spacing3}
@@ -182,7 +182,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
         return (
           <SmallButton
             key={index}
-            buttonType={currentStepSize === stepSize ? 'default' : 'alt'}
+            buttonType={currentStepSize === stepSize ? 'primary' : 'secondary'}
             onClick={() => {
               setCurrentStepSize(stepSize)
             }}
