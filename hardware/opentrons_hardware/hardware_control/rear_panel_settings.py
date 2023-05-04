@@ -8,7 +8,7 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     AuxPresentDetectionChange,
     AuxPresentRequest,
     AuxIDRequest,
-    AuxIDResposne,
+    AuxIDResponse,
     SetDeckLightRequest,
     GetDeckLightRequest,
     GetDeckLightResponse,
@@ -105,14 +105,14 @@ async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinStat
     # Aux id pins
     response = await messenger.send_and_receive(
         message=AuxIDRequest(),
-        response_type=AuxIDResposne,
+        response_type=AuxIDResponse,
     )
     if response is not None:
         current_state.aux1_id_active = bool(
-            cast(AuxIDResposne, response).aux1_id_state.value
+            cast(AuxIDResponse, response).aux1_id_state.value
         )
         current_state.aux2_id_active = bool(
-            cast(AuxIDResposne, response).aux2_id_state.value
+            cast(AuxIDResponse, response).aux2_id_state.value
         )
     # TODO add estop port detection request
     """

@@ -225,7 +225,7 @@ class AuxPresentRequest(utils.BinarySerializable):
 
 
 @dataclass
-class AuxIDResposne(utils.BinarySerializable):
+class AuxIDResponse(utils.BinarySerializable):
     """Sent from the rear panel when requested, only used for board testing."""
 
     # each value should return false if they are in their default state
@@ -362,7 +362,7 @@ BinaryMessageDefinition = Union[
     AuxPresentDetectionChange,
     AuxPresentRequest,
     AuxIDRequest,
-    AuxIDResposne,
+    AuxIDResponse,
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,
