@@ -29,7 +29,6 @@ from .exceptions import (
     SetupCommandNotAllowedError,
     ModuleNotAttachedError,
     ModuleAlreadyPresentError,
-    ModuleNotConnectedError,
     WrongModuleTypeError,
     ThermocyclerNotOpenError,
     RobotDoorOpenError,
