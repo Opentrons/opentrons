@@ -28,7 +28,7 @@ async def _get_system_server_client() -> ClientSession:
         # class.
         return ClientSession()  # type: ignore
     except Exception as e:
-        raise AuthenticationFailed(detail=str(e)).as_error(status.HTTP_403_FORBIDDEN)
+        raise AuthenticationFailed(detail=str(e)).as_error(status.HTTP_502_BAD_GATEWAY)
 
 
 @call_once
