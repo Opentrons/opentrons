@@ -20,13 +20,13 @@ describe('UnMatchedModuleWarning', () => {
   it('should render the correct body, clicking on exit button closes banner', () => {
     const { getByText, getByTestId } = render()
     getByText(
-      'Make sure the modules connected to this robot are of the right type and generation.'
+      'Make sure the modules connected to this robot are of the right type and generation'
     )
     const exit = getByTestId('Banner_close-button')
     fireEvent.click(exit)
     expect(
       screen.queryByText(
-        'Make sure the modules connected to this robot are of the right type and generation.'
+        'Make sure the modules connected to this robot are of the right type and generation'
       )
     ).not.toBeInTheDocument()
   })
