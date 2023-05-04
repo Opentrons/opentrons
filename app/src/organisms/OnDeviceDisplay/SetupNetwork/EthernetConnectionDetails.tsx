@@ -23,7 +23,7 @@ import type { State, Dispatch } from '../../../redux/types'
 const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing4};
-  background-color: ${COLORS.light_one};
+  background-color: ${COLORS.light1};
   border-radius: ${BORDERS.size_three};
 `
 
@@ -72,7 +72,7 @@ export function EthernetConnectionDetails(): JSX.Element {
       {ethernet?.ipAddress === null || ethernet?.macAddress === null ? (
         <Flex marginTop="9rem">
           <StyledText
-            color={COLORS.darkBlack_seventy}
+            color={COLORS.darkBlack70}
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -109,7 +109,7 @@ const EthernetDetailsRow = ({
         {title}
       </StyledText>
       <StyledText
-        color={COLORS.darkBlack_seventy}
+        color={COLORS.darkBlack70}
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}

@@ -50,7 +50,7 @@ export function ConfirmCancelRunModal({
     title: t('cancel_run_modal_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow_two,
+    iconColor: COLORS.yellow2,
   }
 
   const handleCancelRun = (): void => {

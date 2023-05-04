@@ -77,7 +77,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.light_one}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_four}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
@@ -120,7 +120,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={COLORS.darkBlack_twenty}
+            backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
             padding={`${SPACING.spacing3} 0.75rem`}

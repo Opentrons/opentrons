@@ -108,7 +108,7 @@ export function RunFailedModal({
         </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.light_one}
+          backgroundColor={COLORS.light1}
           borderRadius={BORDERS.size_three}
           gridGap={SPACING.spacing3}
           padding={SPACING.spacing4}

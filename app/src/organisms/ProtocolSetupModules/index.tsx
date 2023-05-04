@@ -263,7 +263,7 @@ export function ProtocolSetupModules({
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
           <Flex
-            color={COLORS.darkBlack_seventy}
+            color={COLORS.darkBlack70}
             fontSize={TYPOGRAPHY.fontSize22}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             gridGap={SPACING.spacing5}

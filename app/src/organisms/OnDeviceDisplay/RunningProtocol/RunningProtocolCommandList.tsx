@@ -36,7 +36,7 @@ import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -159,7 +159,7 @@ export function RunningProtocolCommandList({
               const backgroundColor =
                 index === currentRunCommandIndex
                   ? COLORS.mediumBlueEnabled
-                  : COLORS.light_one
+                  : COLORS.light1
               return (
                 <Flex
                   key={command.id}

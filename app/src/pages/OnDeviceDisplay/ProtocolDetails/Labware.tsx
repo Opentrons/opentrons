@@ -34,7 +34,7 @@ const TableHeader = styled('th')`
 `
 
 const TableRow = styled('tr')`
-  background-color: ${COLORS.light_one};
+  background-color: ${COLORS.light1};
   border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `
@@ -79,7 +79,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              color={COLORS.darkBlack_seventy}
+              color={COLORS.darkBlack70}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               lineHeight={TYPOGRAPHY.lineHeight24}
@@ -90,7 +90,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
           </TableHeader>
           <TableHeader>
             <StyledText
-              color={COLORS.darkBlack_seventy}
+              color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               fontSize={TYPOGRAPHY.fontSize20}
               lineHeight={TYPOGRAPHY.lineHeight24}
@@ -127,7 +127,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   )}
                   <StyledText
                     alignItems={ALIGN_CENTER}
-                    color={COLORS.darkBlack_hundred}
+                    color={COLORS.darkBlack100}
                     lineHeight={TYPOGRAPHY.lineHeight28}
                   >
                     {name}
@@ -137,7 +137,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               <TableDatum>
                 <StyledText
                   alignItems={ALIGN_CENTER}
-                  color={COLORS.darkBlack_hundred}
+                  color={COLORS.darkBlack100}
                   lineHeight={TYPOGRAPHY.lineHeight28}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >

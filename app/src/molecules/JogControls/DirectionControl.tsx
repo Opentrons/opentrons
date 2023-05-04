@@ -395,7 +395,7 @@ export function TouchDirectionControl(
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack_forty}`}
+      border={`1px solid ${COLORS.darkBlack40}`}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing4}
       gridGap={SPACING.spacing3}
