@@ -2616,6 +2616,7 @@ class OT3API(
         mount: OT3Mount,
         moving_axis: Axis,
         target_pos: float,
+        direction: float,
         pass_settings: CapacitivePassSettings,
         retract_after: bool = True,
         probe: Optional[InstrumentProbeType] = None,
@@ -2631,16 +2632,19 @@ class OT3API(
 
         here = await self.gantry_position(mount, refresh=True)
         origin_pos = moving_axis.of_point(here)
-        if origin_pos < target_pos:
-            pass_start = target_pos - pass_settings.prep_distance_mm
-            pass_distance = (
+        # print(f"origin_pos: {origin_pos}")
+        # if origin_pos < target_pos:
+        #     pass_start = target_pos - pass_settings.prep_distance_mm
+        #     # print(f"pass_start: {pass_start}")
+        pass_distance = -direction * (
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
-        else:
-            pass_start = target_pos + pass_settings.prep_distance_mm
-            pass_distance = -1.0 * (
-                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
-            )
+        # else:
+        #     pass_start = target_pos + pass_settings.prep_distance_mm
+        #     # print(f"pass_start: {pass_start}")
+        #     pass_distance = 1.0 * (
+        #         pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
+        #     )
         machine_pass_distance = moving_axis.of_point(
             machine_vector_from_deck_vector(
                 moving_axis.set_in_point(top_types.Point(0, 0, 0), pass_distance),

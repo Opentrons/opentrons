@@ -1,60 +1,29 @@
-"""Demo OT3 Gantry Functionality."""
-import argparse
-import ast
+import logging
 import asyncio
-import csv
-import time
-from typing import Tuple, Dict, Optional
-from threading import Thread
-import datetime
-import os
-import sys
+import argparse
+from numpy import float64
 import termios
-import tty
-import json
+import sys, tty, os, time
 
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from hardware_testing.opentrons_api.types import (
+    GantryLoad,
     OT3Mount,
     OT3Axis,
     Point,
-    CriticalPoint,
+    Axis,
 )
 from hardware_testing.opentrons_api.helpers_ot3 import (
+    OT3API,
     build_async_ot3_hardware_api,
+    GantryLoadSettings,
+    set_gantry_load_per_axis_settings_ot3,
     home_ot3,
+    get_endstop_position_ot3,
     move_plunger_absolute_ot3,
-    move_plunger_relative_ot3,
-    get_plunger_positions_ot3,
     update_pick_up_current,
     update_pick_up_distance,
-    update_drop_tip_current,
-    _get_pipette_from_mount,
 )
-
-from hardware_testing import data
-from hardware_testing.drivers.mark10 import Mark10
-
-
-def dict_keys_to_line(dict):
-    return str.join(",", list(dict.keys())) + "\n"
-
-
-def file_setup(test_data, details):
-    today = datetime.date.today()
-    test_name = "{}-drop_tip-force-test-{}Amps".format(
-        details[0],  # Pipette model
-        details[1],  # Motor Current
-    )
-    test_header = dict_keys_to_line(test_data)
-    test_tag = "-{}".format(today.strftime("%b-%d-%Y"))
-    test_id = data.create_run_id()
-    test_path = data.create_folder_for_test_data(test_name)
-    test_file = data.create_file_name(test_name, test_id, test_tag)
-    data.append_data_to_file(test_name, test_file, test_header)
-    print("FILE PATH = ", test_path)
-    print("FILE NAME = ", test_file)
-    return test_name, test_file
 
 
 def getch():
@@ -76,11 +45,11 @@ def getch():
     return _getch()
 
 
-async def jog(api, position, cp) -> Dict[OT3Axis, float]:
-    step_size = [0.01, 0.05, 0.1, 0.5, 1, 10, 20, 50]
+async def _jog_axis(api, position) -> None:
+    step_size = [0.05, 0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
-    xy_speed = 60
+    xy_speed = 150
     za_speed = 65
     information_str = """
         Click  >>   i   << to move up
@@ -145,8 +114,8 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
         elif input == "+":
             sys.stdout.flush()
             step_length_index = step_length_index + 1
-            if step_length_index >= 7:
-                step_length_index = 7
+            if step_length_index >= 6:
+                step_length_index = 6
             step = step_size[step_length_index]
 
         elif input == "-":
@@ -158,14 +127,8 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
 
         elif input == "\r":
             sys.stdout.flush()
-            position = await api.current_position_ot3(
-                mount, refresh=True, critical_point=cp
-            )
-            print("\r\n")
             return position
-        position = await api.current_position_ot3(
-            mount, refresh=True, critical_point=cp
-        )
+        position = await api.current_position_ot3(mount)
 
         print(
             "Coordinates: ",
@@ -181,18 +144,11 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
         print("\r", end="")
 
 
-async def update_drop_tip_distance(api, mount, position) -> None:
-    pipette = _get_pipette_from_mount(api, mount)
-    pipette.plunger_positions.drop_tip = position
-
-
 async def _main() -> None:
-    today = datetime.date.today()
-    tips_to_use = 96
     slot_loc = {
         "A1": (13.42, 394.92, 110),
         "A2": (177.32, 394.92, 110),
-        "A3": (341.03, 394.92, 110),
+        "A3": (341.03, 394.0, 110),
         "B1": (13.42, 288.42, 110),
         "B2": (177.32, 288.92, 110),
         "B3": (341.03, 288.92, 110),
@@ -206,35 +162,94 @@ async def _main() -> None:
     hw_api = await build_async_ot3_hardware_api(
         is_simulating=args.simulate, use_defaults=True
     )
-    tip_length = {"T1K": 85.7, "T50": 57.9}
-    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.RIGHT]["pipette_id"]
-    pipette = _get_pipette_from_mount(hw_api, mount)
-    dial_data = {"Tip": None, "Tip Height": None, "Motor Current": None}
-    m_current = 0.2
-    await home_ot3(hw_api, [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.X, OT3Axis.Y])
+    # await set_default_current_settings(hw_api, load=None)
+    await hw_api.cache_instruments()
+    await home_ot3(hw_api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     await hw_api.home_plunger(mount)
-    plunger_pos = get_plunger_positions_ot3(hw_api, mount)
-    home_position = await hw_api.current_position_ot3(mount)
-    tip_length = {"T1K": 85.7, "T50": 57.9}
-    if args.tip_size == "T1K":
-        home_with_tip_position = 164.3  # T1K
-    elif args.tip_size == "T50":
-        home_with_tip_position = 192.1  # T50
-    start_time = time.perf_counter()
-
+    home_pos = await hw_api.current_position_ot3(mount)
+    tip_length = {"T1K": 85.7, "T200": 48.35, "T50": 47.9}
+    print(hw_api.get_all_attached_instr()[mount])
+    pipette_model = hw_api.get_all_attached_instr()[mount]["pipette_id"]
+    tip_column = 0
+    columns_to_use = 12
     try:
+
         await hw_api.move_to(
             mount,
             Point(
-                slot_loc[args.slot][0],
-                slot_loc[args.slot][1],
-                home_position[OT3Axis.by_mount(mount)],
+                slot_loc["C2"][0],
+                slot_loc["C2"][1],
+                home_pos[OT3Axis.by_mount(mount)],
             ),
         )
-        cp = CriticalPoint.NOZZLE
-        current_position = await hw_api.current_position_ot3(mount)
-        jog_loc = await jog(hw_api, current_position, cp)
+        await hw_api.move_to(
+            mount,
+            Point(
+                slot_loc["C2"][0],
+                slot_loc["C2"][1],
+                home_pos[OT3Axis.by_mount(mount)] - 50,
+            ),
+        )
 
+        for cycle in range(1, columns_to_use + 1):
+            if cycle <= 1:
+                print("Move to Tiprack")
+                home_position = await hw_api.current_position_ot3(mount)
+                tiprack_loc = await _jog_axis(hw_api, home_position)
+
+            await hw_api.move_to(
+                mount,
+                Point(
+                    tiprack_loc[OT3Axis.X] + tip_column,
+                    tiprack_loc[OT3Axis.Y],
+                    tiprack_loc[OT3Axis.by_mount(mount)],
+                ),
+            )
+            # await hw_api.pick_up_tip(mount, tip_length = 58.5, presses = 2, increment = 1)
+            current_val = float(input("Enter Current Val: "))
+            print(f"Current Val: {current_val}")
+            await update_pick_up_current(hw_api, mount, current_val)
+            await hw_api.pick_up_tip(mount, tip_length=58.5)
+            await hw_api.home_z(mount)
+            current_pos = await hw_api.current_position_ot3(mount)
+
+            # Move to gage plate
+            await hw_api.move_to(
+                mount,
+                Point(
+                    slot_loc["D2"][0],
+                    slot_loc["D2"][1],
+                    current_pos[OT3Axis.by_mount(mount)],
+                ),
+            )
+            current_pos = await hw_api.current_position_ot3(mount)
+            gage_plate = await _jog_axis(hw_api, current_pos)
+
+            await hw_api.home_z(mount, allow_home_other=False)
+            current_pos = await hw_api.current_position_ot3(mount)
+            await hw_api.move_to(
+                mount,
+                Point(
+                    slot_loc["A3"][0],
+                    slot_loc["A3"][1],
+                    current_pos[OT3Axis.by_mount(mount)],
+                ),
+            )
+            await hw_api.move_to(
+                mount, Point(slot_loc["A3"][0], slot_loc["A3"][1], 100)
+            )
+            await hw_api.drop_tip(mount)
+            await hw_api.home_z(mount, allow_home_other=False)
+            current_pos = await hw_api.current_position_ot3(mount)
+            tip_column += 9
+            await hw_api.move_to(
+                mount,
+                Point(
+                    tiprack_loc[OT3Axis.X] + tip_column,
+                    tiprack_loc[OT3Axis.Y],
+                    current_pos[OT3Axis.by_mount(mount)],
+                ),
+            )
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     except KeyboardInterrupt:
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -260,19 +275,13 @@ if __name__ == "__main__":
     ]
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--tiprack", action="store_true", default=True)
-    parser.add_argument("--slot", default="D2")
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
-    parser.add_argument("--fg", action="store_true", default=True)
-    parser.add_argument("--fg_jog", action="store_true", default=True)
-    parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
-    parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
-    parser.add_argument(
-        "--port", type=str, default="/dev/ttyUSB0", help="Force Gauge Port"
-    )
+    parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="C2")
     args = parser.parse_args()
     if args.mount == "left":
         mount = OT3Mount.LEFT
     else:
         mount = OT3Mount.RIGHT
+    xy_speed = 250
+    speed_z = 60
     asyncio.run(_main())

@@ -29,7 +29,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     update_pick_up_current,
     update_pick_up_distance,
     update_drop_tip_current,
-    _get_pipette_from_mount
+    _get_pipette_from_mount,
 )
 
 from hardware_testing import data
@@ -279,7 +279,7 @@ async def _main() -> None:
             location,
             init_tip_loc,
             final_tip_loc,
-            None
+            None,
         ]
         enc_record(file_name, details, True)
         tiprack_loc = [
@@ -303,7 +303,7 @@ async def _main() -> None:
         init_drop_tip_position = await hw_api.encoder_current_position_ot3(mount)
         # obtain the encoder position
         final_drop_tip_position = await hw_api.drop_tip(mount)
-        location = 'Trash'
+        location = "Trash"
         details = [
             start_time,
             pipette_model,
@@ -311,7 +311,7 @@ async def _main() -> None:
             location,
             init_tip_loc,
             final_tip_loc,
-            None
+            None,
         ]
         enc_record(file_name, details, False)
         print(f"drop tip current: {pipette._drop_configurations.current}")
@@ -382,7 +382,7 @@ async def _main() -> None:
                 location,
                 init_tip_loc,
                 final_tip_loc,
-                d_current
+                d_current,
             ]
             enc_record(file_name, details, False)
             # Home Z
@@ -406,8 +406,8 @@ async def _main() -> None:
             # obtain the encoder position
             init_drop_tip_position = await hw_api.encoder_current_position_ot3(mount)
             # obtain the encoder position
-            final_drop_tip_position = await hw_api.drop_tip(mount, home_after = False)
-            location = 'Trash'
+            final_drop_tip_position = await hw_api.drop_tip(mount, home_after=False)
+            location = "Trash"
             details = [
                 start_time,
                 pipette_model,
@@ -415,14 +415,16 @@ async def _main() -> None:
                 location,
                 init_drop_tip_position[OT3Axis.of_main_tool_actuator(mount)],
                 final_drop_tip_position[OT3Axis.of_main_tool_actuator(mount)],
-                d_current
+                d_current,
             ]
             enc_record(file_name, details, False)
             await hw_api.home_plunger(mount)
             safety_margin = 1
             drop_tip_distance_target = 19 - safety_margin
-            delta = final_drop_tip_position[OT3Axis.of_main_tool_actuator(mount)] \
-                        - init_drop_tip_position[OT3Axis.of_main_tool_actuator(mount)]
+            delta = (
+                final_drop_tip_position[OT3Axis.of_main_tool_actuator(mount)]
+                - init_drop_tip_position[OT3Axis.of_main_tool_actuator(mount)]
+            )
             if delta < drop_tip_distance_target:
                 print("Test Fail")
                 break
@@ -443,12 +445,12 @@ def enc_record(file_name, t_data, header):
             "Time(s)": None,
             "Pipette Model": None,
             "Location": None,
-            "Motor Current(Amps)":+ None,
+            "Motor Current(Amps)": +None,
             "Initial Enc Pos(mm)": None,
             "Final Enc Pos(mm)": None,
             "Dropt Current(Amps)": None,
             "Remaining Distance(mm)": None,
-            "Pass/Fail": None
+            "Pass/Fail": None,
         }
         log_file = csv.DictWriter(f, test_data)
         if header == True:
@@ -461,15 +463,15 @@ def enc_record(file_name, t_data, header):
             test_data["Initial Enc Pos(mm)"] = t_data[4]
             test_data["Final Enc Pos(mm)"] = t_data[5]
             test_data["Dropt Current(Amps)"] = t_data[6]
-            test_data["Remaining Distance(mm)"] = t_data[5]-t_data[4]
+            test_data["Remaining Distance(mm)"] = t_data[5] - t_data[4]
 
-            if t_data[3] == 'Trash':
+            if t_data[3] == "Trash":
                 print(f"initial P: {t_data[4]}, final P: {t_data[5]}")
                 delta = t_data[5] - t_data[4]
                 if delta < 0.1:
-                    test_data["Pass/Fail"] = 'PASS'
+                    test_data["Pass/Fail"] = "PASS"
                 else:
-                    test_data["Pass/Fail"] = 'FAIL'
+                    test_data["Pass/Fail"] = "FAIL"
             else:
                 print(f"initial Z: {t_data[4]}, final Z: {t_data[5]}")
                 test_data["Pass/Fail"] = None
