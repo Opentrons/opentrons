@@ -69,4 +69,4 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         result = await get_tip_status(api)
     else:
         result = 1
-    input(f"got {result} as tip-status")
+    print(f"got {result} as tip-status")

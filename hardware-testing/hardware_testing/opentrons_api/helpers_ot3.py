@@ -131,13 +131,9 @@ async def build_async_ot3_hardware_api(
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
-    kwargs = {"config": config, "use_usb_bus": True}
+    kwargs = {"config": config}
     if is_simulating:
         builder = OT3API.build_hardware_simulator
-        # TODO (andy s): add ability to simulate:
-        #                - gripper
-        #                - 96-channel
-        #                - modules
         sim_pips = _create_attached_instruments_dict(
             pipette_left, pipette_right, gripper
         )
@@ -146,9 +142,12 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
+        kwargs["use_usb_bus"] = True
     try:
         return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     except Exception as e:
+        if is_simulating:
+            raise e
         print(e)
         kwargs["use_usb_bus"] = False
         return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
