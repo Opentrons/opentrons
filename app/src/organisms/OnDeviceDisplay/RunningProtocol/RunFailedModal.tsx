@@ -34,6 +34,7 @@ interface RunFailedModalProps {
   errors?: RunError[]
 }
 
+// ToDo (kj:05/03/2023) This component is needed to refactor to handle error messages
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
