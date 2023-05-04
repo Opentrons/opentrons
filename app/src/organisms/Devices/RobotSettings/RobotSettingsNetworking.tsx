@@ -16,6 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { useWifiList } from '../../../resources/networking/hooks'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
@@ -25,7 +26,6 @@ import {
   fetchWifiList,
   getCanDisconnect,
   getNetworkInterfaces,
-  getWifiList,
 } from '../../../redux/networking'
 
 import { useIsOT3, useIsRobotBusy } from '../hooks'
@@ -49,7 +49,7 @@ export function RobotSettingsNetworking({
   updateRobotStatus,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const wifiList = useSelector((state: State) => getWifiList(state, robotName))
+  const wifiList = useWifiList(robotName)
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isOT3 = useIsOT3(robotName)

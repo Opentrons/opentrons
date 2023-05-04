@@ -2,12 +2,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { useInterval } from '@opentrons/components'
-
+import { useWifiList } from '../../../resources/networking/hooks'
 import {
   fetchStatus,
   fetchWifiList,
   getNetworkInterfaces,
-  getWifiList,
 } from '../../../redux/networking'
 
 import type { Dispatch, State } from '../../../redux/types'
@@ -26,7 +25,7 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   let connectionStatus: string = ''
-  const list = useSelector((state: State) => getWifiList(state, robotName))
+  const list = useWifiList(robotName)
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )

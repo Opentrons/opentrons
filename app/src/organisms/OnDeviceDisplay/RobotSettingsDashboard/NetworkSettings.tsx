@@ -19,7 +19,6 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { WifiConnectionDetails } from '../SetupNetwork'
-import { getWifiList } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
 import { EthernetConnectionDetails } from '../SetupNetwork/EthernetConnectionDetails'
 
@@ -28,6 +27,7 @@ import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
 import type { ChipType } from '../../../atoms/Chip'
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { State } from '../../../redux/types'
+import { useWifiList } from '../../../resources/networking/hooks'
 
 export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
 
@@ -53,7 +53,7 @@ export function NetworkSettings({
   } = networkConnection
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const list = useSelector((state: State) => getWifiList(state, robotName))
+  const list = useWifiList(robotName)
   const connectedWifiAuthType = list.find(wifi => wifi.ssid === activeSsid)
     ?.securityType
 
