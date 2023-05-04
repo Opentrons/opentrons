@@ -18,8 +18,8 @@ class Plot:
         self.PLOT_PATH = "plot_pipette_calibration/"
         self.PLOT_FORMAT = ".png"
         # self.axes = ["X", "Y", "Z"]
-        # self.axes = ["X", "Y"]
-        self.axes = ["Z"]
+        self.axes = ["X", "Y"]
+        # self.axes = ["Z"]
         self.jog_offset = 0 # mm
         self.gauge_time =  0.33 # min
         self.plot_param = {
