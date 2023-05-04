@@ -232,6 +232,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
+    MAGNETIC_BLOCK_V1 = "magneticBlockV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -243,6 +244,8 @@ class ModuleModel(str, Enum):
             return ModuleType.THERMOCYCLER
         elif ModuleModel.is_heater_shaker_module_model(self):
             return ModuleType.HEATER_SHAKER
+        elif ModuleModel.is_magnetic_block(self):
+            return ModuleType.MAGNETIC_BLOCK
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -274,6 +277,11 @@ class ModuleModel(str, Enum):
         """Whether a given model is a Heater-Shaker Module."""
         return model == cls.HEATER_SHAKER_MODULE_V1
 
+    @classmethod
+    def is_magnetic_block(cls, model: ModuleModel) -> TypeGuard[MagneticBlockModel]:
+        """Whether a given model is a Magnetic block."""
+        return model == cls.MAGNETIC_BLOCK_V1
+
 
 TemperatureModuleModel = Literal[
     ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
@@ -285,6 +293,7 @@ ThermocyclerModuleModel = Literal[
     ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2
 ]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
+MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
 
 
 class ModuleDimensions(BaseModel):
@@ -405,7 +414,7 @@ class LoadedModule(BaseModel):
     id: str
     model: ModuleModel
     location: Optional[DeckSlotLocation]
-    serialNumber: str
+    serialNumber: Optional[str]
 
 
 class LabwareOffsetLocation(BaseModel):

@@ -191,16 +191,19 @@ def test_get_all_modules(
 def test_get_properties_by_id(
     tempdeck_v2_def: ModuleDefinition,
     magdeck_v1_def: ModuleDefinition,
+    mag_block_v1_def: ModuleDefinition,
 ) -> None:
     """It should return a loaded module's properties by ID."""
     subject = make_module_view(
         slot_by_module_id={
             "module-1": DeckSlotName.SLOT_1,
             "module-2": DeckSlotName.SLOT_2,
+            "module-3": DeckSlotName.SLOT_3,
         },
         requested_model_by_module_id={
             "module-1": ModuleModel.TEMPERATURE_MODULE_V1,
             "module-2": ModuleModel.MAGNETIC_MODULE_V1,
+            "module-3": ModuleModel.MAGNETIC_BLOCK_V1,
         },
         hardware_by_module_id={
             "module-1": HardwareModule(
@@ -212,6 +215,7 @@ def test_get_properties_by_id(
                 serial_number="serial-2",
                 definition=magdeck_v1_def,
             ),
+            "module-3": HardwareModule(serial_number=None, definition=mag_block_v1_def),
         },
     )
 
@@ -232,6 +236,17 @@ def test_get_properties_by_id(
     assert subject.get_location("module-2") == DeckSlotLocation(
         slotName=DeckSlotName.SLOT_2
     )
+
+    assert subject.get_definition("module-3") == mag_block_v1_def
+    assert subject.get_dimensions("module-3") == mag_block_v1_def.dimensions
+    assert subject.get_requested_model("module-3") == ModuleModel.MAGNETIC_BLOCK_V1
+    assert subject.get_connected_model("module-3") == ModuleModel.MAGNETIC_BLOCK_V1
+    assert subject.get_location("module-3") == DeckSlotLocation(
+        slotName=DeckSlotName.SLOT_3
+    )
+
+    with pytest.raises(errors.ModuleNotConnectedError):
+        subject.get_serial_number("module-3")
 
     with pytest.raises(errors.ModuleNotLoadedError):
         subject.get_definition("Not a module ID oh no")
