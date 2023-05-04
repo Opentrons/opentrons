@@ -1,18 +1,3 @@
-export const spacingL = '1.625rem' //   26px
-export const spacingXL = '1.875rem' // 30px
-export const spacingSS = '0.438rem' //  7px
-export const spacingXS = '0.313rem' //  5px
-export const spacingXXS = '1px' // 1px
-export const spacingSM = '0.625rem' //  10px
-export const spacingXXL = '2.5rem' // 40px
-export const spacingAuto = 'auto' // auto
-
-
-
-
-
-
-
 export const spacing2 = '0.125rem' // 2px
 export const spacing4 = '0.25rem' // 4px
 export const spacing8 = '0.5rem' // 8px
@@ -26,3 +11,5 @@ export const spacing48 = '3rem' // 48px
 export const spacing68 = '4.25rem' // 68px
 export const spacing80 = '5rem' // 80px
 export const spacing120 = '7.5rem' // 120px
+
+export const spacingAuto = 'auto' // auto

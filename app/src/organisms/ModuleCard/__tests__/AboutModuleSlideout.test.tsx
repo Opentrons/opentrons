@@ -1,13 +1,4 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_FINISHING,
-} from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
@@ -15,7 +6,16 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
 } from '../../../redux/modules/__fixtures__'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_FINISHING,
+} from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../RunTimeControl/hooks')
 

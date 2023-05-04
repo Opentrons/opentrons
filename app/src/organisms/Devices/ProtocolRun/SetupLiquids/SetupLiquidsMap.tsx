@@ -1,6 +1,13 @@
-import * as React from 'react'
-import map from 'lodash/map'
-import isEmpty from 'lodash/isEmpty'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import {
+  useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../hooks'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
+import { getWellFillFromLabwareId } from './utils'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
@@ -19,17 +26,10 @@ import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import {
-  useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-import { getWellFillFromLabwareId } from './utils'
 import type { RobotType } from '@opentrons/shared-data'
+import isEmpty from 'lodash/isEmpty'
+import map from 'lodash/map'
+import * as React from 'react'
 
 const OT2_VIEWBOX = '-80 -40 550 500'
 const OT3_VIEWBOX = '-144.31 -76.59 750 681.74'

@@ -1,13 +1,11 @@
-import * as React from 'react'
-
-import { usePrevious } from '@opentrons/components'
-import { ProgressSpinner, ProgressBar } from './progress'
-import styles from './styles.css'
-
 import type {
   BuildrootUpdateSession,
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
+import { ProgressSpinner, ProgressBar } from './progress'
+import styles from './styles.css'
+import { usePrevious } from '@opentrons/components'
+import * as React from 'react'
 
 export interface InstallModalContentsProps {
   robotSystemType: RobotSystemType | null

@@ -1,21 +1,21 @@
-import { connect } from 'react-redux'
-import { Props, Alerts } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import { getSelectedStepId } from '../../ui/steps'
+import { ProfileItem, StepIdType } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import { BaseState } from '../../types'
+import { getSelectedStepId } from '../../ui/steps'
+import { Props, Alerts } from '../alerts/Alerts'
 import {
   getVisibleFormErrors,
   getVisibleFormWarnings,
   getVisibleProfileFormLevelErrors,
 } from './utils'
+import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { ProfileItem, StepIdType } from '../../form-types'
-import { StepFieldName } from '../../steplist/fieldLevel'
-import { BaseState } from '../../types'
-import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference

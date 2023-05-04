@@ -1,7 +1,11 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { Slideout } from '../../atoms/Slideout'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { getScanning, startDiscovery } from '../../redux/discovery'
+import type { Dispatch, State } from '../../redux/types'
+import { ManualIpHostnameForm } from './ManualIpHostnameForm'
+import { ManualIpHostnameList } from './ManualIpHostnameList'
 import {
   Flex,
   ALIGN_FLEX_END,
@@ -14,16 +18,9 @@ import {
   Link,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { ManualIpHostnameForm } from './ManualIpHostnameForm'
-import { ManualIpHostnameList } from './ManualIpHostnameList'
-import { Slideout } from '../../atoms/Slideout'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
-import { getScanning, startDiscovery } from '../../redux/discovery'
-
-import type { Dispatch, State } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'

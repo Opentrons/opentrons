@@ -1,9 +1,7 @@
-import styled, { css } from 'styled-components'
-
 import * as Styles from '../styles'
 import { styleProps, isntStyleProp } from './style-props'
-
 import type { PrimitiveComponent } from './types'
+import styled, { css } from 'styled-components'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'

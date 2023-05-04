@@ -1,3 +1,6 @@
+import { FormData, StepIdType } from '../../../../form-types'
+import { ModuleOnDeck } from '../../../../step-forms'
+import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -7,9 +10,6 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
-import { FormData, StepIdType } from '../../../../form-types'
-import { ModuleOnDeck } from '../../../../step-forms'
-import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
 
 const getThermocycler = () => ({
   id: 'tcId',

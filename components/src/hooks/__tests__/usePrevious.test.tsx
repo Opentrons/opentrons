@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
 import { usePrevious } from '..'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 describe('usePrevious hook', () => {
   const TestUsePrevious = (props: { value: string }): JSX.Element => {

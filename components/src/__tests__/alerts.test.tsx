@@ -1,8 +1,7 @@
 // button component tests
+import { AlertItem } from '..'
 import * as React from 'react'
 import Renderer from 'react-test-renderer'
-
-import { AlertItem } from '..'
 
 describe('alerts', () => {
   const onCloseClick = jest.fn()

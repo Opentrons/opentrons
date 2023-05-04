@@ -1,9 +1,12 @@
-import assert from 'assert'
-import zip from 'lodash/zip'
-import { getWellDepth } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import type {
+  TransferArgs,
+  CurriedCommandCreator,
+  CommandCreator,
+  CommandCreatorError,
+} from '../../types'
 import {
   blowoutUtil,
   curryCommandCreator,
@@ -20,12 +23,10 @@ import {
   moveToWell,
 } from '../atomic'
 import { mixUtil } from './mix'
-import type {
-  TransferArgs,
-  CurriedCommandCreator,
-  CommandCreator,
-  CommandCreatorError,
-} from '../../types'
+import { getWellDepth } from '@opentrons/shared-data'
+import assert from 'assert'
+import zip from 'lodash/zip'
+
 export const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,

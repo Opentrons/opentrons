@@ -1,6 +1,3 @@
-import * as React from 'react'
-import { FormikTouched } from 'formik'
-import { AlertItem } from '@opentrons/components'
 import {
   SUGGESTED_X,
   SUGGESTED_Y,
@@ -9,6 +6,9 @@ import {
   LabwareFields,
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
+import { AlertItem } from '@opentrons/components'
+import { FormikTouched } from 'formik'
+import * as React from 'react'
 
 const xyMessage = (
   <div>

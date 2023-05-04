@@ -1,16 +1,17 @@
-import values from 'lodash/values'
 import { i18n } from '../../localization'
-import {
-  MAGNETIC_MODULE_V1,
-  getLabwareDefaultEngageHeight,
-  ModuleType,
-} from '@opentrons/shared-data'
-import { Options } from '@opentrons/components'
 import {
   ModuleOnDeck,
   LabwareOnDeck,
   InitialDeckSetup,
 } from '../../step-forms/types'
+import { Options } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_V1,
+  getLabwareDefaultEngageHeight,
+  ModuleType,
+} from '@opentrons/shared-data'
+import values from 'lodash/values'
+
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,
   type: ModuleType

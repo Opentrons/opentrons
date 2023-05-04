@@ -1,5 +1,5 @@
-import * as React from 'react'
-
+import { Portal } from '../../App/portal'
+import styles from './styles.css'
 import {
   AlertModal,
   Box,
@@ -10,10 +10,7 @@ import {
   SPACING_3,
   Text,
 } from '@opentrons/components'
-
-import { Portal } from '../../App/portal'
-
-import styles from './styles.css'
+import * as React from 'react'
 
 const TITLE = 'Are you sure you want to continue?'
 

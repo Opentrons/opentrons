@@ -1,7 +1,22 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { UseMutateFunction } from 'react-query'
+import { Portal } from '../../App/portal'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice } from '../../redux/config'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import { BeforeBeginning } from './BeforeBeginning'
+import { ExitConfirmation } from './ExitConfirmation'
+import { MountGripper } from './MountGripper'
+import { MovePin } from './MovePin'
+import { Success } from './Success'
+import { UnmountGripper } from './UnmountGripper'
+import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
+import { getGripperWizardSteps } from './getGripperWizardSteps'
+import type { GripperWizardFlowType } from './types'
+import type {
+  CreateMaintenanceRunData,
+  InstrumentData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import {
   useConditionalConfirm,
   Flex,
@@ -13,28 +28,12 @@ import {
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { ModalShell } from '../../molecules/Modal'
-import { Portal } from '../../App/portal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice } from '../../redux/config'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
-import { getGripperWizardSteps } from './getGripperWizardSteps'
-import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { MovePin } from './MovePin'
-import { MountGripper } from './MountGripper'
-import { UnmountGripper } from './UnmountGripper'
-import { Success } from './Success'
-import { ExitConfirmation } from './ExitConfirmation'
-
-import type { GripperWizardFlowType } from './types'
-import type { AxiosError } from 'axios'
-import type {
-  CreateMaintenanceRunData,
-  InstrumentData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
 import type { Coordinates } from '@opentrons/shared-data'
+import type { AxiosError } from 'axios'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { UseMutateFunction } from 'react-query'
+import { useSelector } from 'react-redux'
 
 interface MaintenanceRunManagerProps {
   flowType: GripperWizardFlowType

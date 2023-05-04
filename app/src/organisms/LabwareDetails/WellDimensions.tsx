@@ -1,15 +1,14 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import round from 'lodash/round'
-import { Box, SPACING } from '@opentrons/components'
-import { LabeledValue } from './StyledComponents/LabeledValue'
-import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import { getMeasurementDiagram } from './measurementGuide'
-
 import type {
   LabwareWellGroupProperties,
   LabwareParameters,
 } from '../../pages/Labware/types'
+import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
+import { LabeledValue } from './StyledComponents/LabeledValue'
+import { getMeasurementDiagram } from './measurementGuide'
+import { Box, SPACING } from '@opentrons/components'
+import round from 'lodash/round'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

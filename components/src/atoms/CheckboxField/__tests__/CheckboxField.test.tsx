@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { CheckboxField } from '..'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
 import { COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-
-import { CheckboxField } from '..'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof CheckboxField>) => {
   return renderWithProviders(<CheckboxField {...props} />)[0]
@@ -41,9 +40,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacing20)}`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(
-      `border-radius: ${String(SPACING.spacingXXS)}`
-    )
+    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -92,8 +89,8 @@ describe('CheckboxField', () => {
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
     expect(checkBoxInput).toHaveStyle(`overflow: hidden`)
     expect(checkBoxInput).toHaveStyle(`clip: rect(0 0 0 0)`)
-    expect(checkBoxInput).toHaveStyle(`height: ${String(SPACING.spacingXXS)}`)
-    expect(checkBoxInput).toHaveStyle(`width: ${String(SPACING.spacingXXS)}`)
+    expect(checkBoxInput).toHaveStyle(`height: 1px`)
+    expect(checkBoxInput).toHaveStyle(`width: 1px`)
     expect(checkBoxInput).toHaveStyle(`margin: -1px`)
     expect(checkBoxInput).toHaveStyle(`padding: 0`)
     expect(checkBoxInput).toHaveStyle(`border: 0`)
@@ -127,9 +124,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacing20)}`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(
-      `border-radius: ${String(SPACING.spacingXXS)}`
-    )
+    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -144,9 +139,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacing20)}`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(
-      `border-radius: ${String(SPACING.spacingXXS)}`
-    )
+    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )

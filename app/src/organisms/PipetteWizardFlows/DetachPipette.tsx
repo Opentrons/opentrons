@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
+import { Skeleton } from '../../atoms/Skeleton'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { Skeleton } from '../../atoms/Skeleton'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
+import { getPipetteAnimations } from './utils'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean

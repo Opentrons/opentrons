@@ -1,5 +1,5 @@
-import { dependentFieldsUpdateHeaterShaker } from '../dependentFieldsUpdateHeaterShaker'
 import type { FormData } from '../../../../form-types'
+import { dependentFieldsUpdateHeaterShaker } from '../dependentFieldsUpdateHeaterShaker'
 
 describe('dependentFieldsUpdateHeaterShaker', () => {
   let formData: FormData

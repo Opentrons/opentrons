@@ -1,3 +1,4 @@
+import { useHost } from '../api'
 import {
   HostConfig,
   RunAction,
@@ -5,8 +6,6 @@ import {
   createRunAction,
 } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
-import { useHost } from '../api'
-
 import type {
   UseMutationResult,
   UseMutateFunction,

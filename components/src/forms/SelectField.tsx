@@ -1,13 +1,11 @@
-import * as React from 'react'
+import type { SelectOption } from '.'
+import { Select } from './Select'
+import type { SelectProps } from './Select'
+import styles from './SelectField.css'
 import cx from 'classnames'
 import find from 'lodash/find'
-
-import { Select } from './Select'
-import styles from './SelectField.css'
-
-import type { SelectProps } from './Select'
+import * as React from 'react'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
-import type { SelectOption } from '.'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */

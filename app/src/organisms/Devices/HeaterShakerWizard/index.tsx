@@ -1,14 +1,13 @@
-import * as React from 'react'
-import { useParams } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { getAdapterName } from '@opentrons/shared-data'
 import { Portal } from '../../../App/portal'
+import type { DesktopRouteParams } from '../../../App/types'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { Tooltip } from '../../../atoms/Tooltip'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { AttachAdapter } from './AttachAdapter'
+import { AttachModule } from './AttachModule'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
-import { AttachModule } from './AttachModule'
-import { AttachAdapter } from './AttachAdapter'
 import { PowerOn } from './PowerOn'
 import { TestShake } from './TestShake'
 import {
@@ -20,11 +19,11 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-
+import { getAdapterName } from '@opentrons/shared-data'
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { DesktopRouteParams } from '../../../App/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useParams } from 'react-router-dom'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown

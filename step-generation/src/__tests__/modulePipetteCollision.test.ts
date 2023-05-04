@@ -1,11 +1,12 @@
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import type { RobotState, InvariantContext } from '../types'
+import { modulePipetteCollision } from '../utils/modulePipetteCollision'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-import { modulePipetteCollision } from '../utils/modulePipetteCollision'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
-import type { RobotState, InvariantContext } from '../types'
+
 let invariantContext: InvariantContext
 let robotState: RobotState
 let collisionArgs: {

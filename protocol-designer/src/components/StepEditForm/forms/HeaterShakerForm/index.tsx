@@ -1,6 +1,13 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
+import { i18n } from '../../../../localization'
+import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
+import styles from '../../StepEditForm.css'
+import {
+  ToggleRowField,
+  TextField,
+  CheckboxRowField,
+  StepFormDropdown,
+} from '../../fields'
+import type { StepFormProps } from '../../types'
 import {
   FormGroup,
   Flex,
@@ -9,17 +16,9 @@ import {
   Tooltip,
   TOOLTIP_BOTTOM,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
-import {
-  ToggleRowField,
-  TextField,
-  CheckboxRowField,
-  StepFormDropdown,
-} from '../../fields'
-import styles from '../../StepEditForm.css'
-
-import type { StepFormProps } from '../../types'
+import cx from 'classnames'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)

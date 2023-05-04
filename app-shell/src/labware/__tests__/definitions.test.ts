@@ -1,16 +1,14 @@
 // tests for labware directory utilities
-
-import path from 'path'
-import fs from 'fs-extra'
-import tempy from 'tempy'
-import Electron from 'electron'
-
 import {
   readLabwareDirectory,
   parseLabwareFiles,
   addLabwareFile,
   removeLabwareFile,
 } from '../definitions'
+import Electron from 'electron'
+import fs from 'fs-extra'
+import path from 'path'
+import tempy from 'tempy'
 
 jest.mock('electron')
 

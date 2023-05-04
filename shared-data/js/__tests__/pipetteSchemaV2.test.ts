@@ -1,10 +1,9 @@
+import geometrySpecsSchema from '../../pipette/schemas/2/pipetteGeometrySchema.json'
+import liquidSpecsSchema from '../../pipette/schemas/2/pipetteLiquidPropertiesSchema.json'
+import generalSpecsSchema from '../../pipette/schemas/2/pipettePropertiesSchema.json'
 import Ajv from 'ajv'
 import glob from 'glob'
 import path from 'path'
-
-import liquidSpecsSchema from '../../pipette/schemas/2/pipetteLiquidPropertiesSchema.json'
-import geometrySpecsSchema from '../../pipette/schemas/2/pipetteGeometrySchema.json'
-import generalSpecsSchema from '../../pipette/schemas/2/pipettePropertiesSchema.json'
 
 const allGeometryDefinitions = path.join(
   __dirname,

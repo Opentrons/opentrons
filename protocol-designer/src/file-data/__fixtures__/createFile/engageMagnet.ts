@@ -1,7 +1,8 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
-import { RobotState, Timeline } from '@opentrons/step-generation'
-import { SavedStepFormState, ModuleEntities } from '../../../step-forms'
 import { StepIdType } from '../../../form-types'
+import { SavedStepFormState, ModuleEntities } from '../../../step-forms'
+import { RobotState, Timeline } from '@opentrons/step-generation'
+
 export const initialRobotState: RobotState = {
   labware: {
     fixedTrash: {

@@ -1,8 +1,10 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
-
+import { NAV_BAR_WIDTH } from '../../App/constants'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { CommandText } from '../CommandText'
+import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { CommandIcon } from './CommandIcon'
 import {
   Flex,
   ALIGN_CENTER,
@@ -16,14 +18,10 @@ import {
   COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { CommandText } from '../CommandText'
-import { Divider } from '../../atoms/structure'
-import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
-import { CommandIcon } from './CommandIcon'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { css } from 'styled-components'
 
 const COLOR_FADE_MS = 500
 interface RunPreviewProps {
@@ -144,7 +142,7 @@ export const RunPreviewComponent = (
       {currentRunCommandIndex >= 0 ? (
         <PrimaryButton
           position={POSITION_FIXED}
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
           transform="translate(-50%)"
           borderRadius={SPACING.spacing32}

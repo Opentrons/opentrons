@@ -1,5 +1,6 @@
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import type { RobotState } from '../'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+
 export const thermocyclerPipetteCollision = (
   modules: RobotState['modules'],
   labware: RobotState['labware'],

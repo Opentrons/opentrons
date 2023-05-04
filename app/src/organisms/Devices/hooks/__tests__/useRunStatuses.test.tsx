@@ -1,3 +1,6 @@
+import { useRunStatuses } from '..'
+import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { useRunStatus } from '../../../RunTimeControl/hooks'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
@@ -6,10 +9,6 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useRunStatuses } from '..'
 
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../RunTimeControl/hooks')

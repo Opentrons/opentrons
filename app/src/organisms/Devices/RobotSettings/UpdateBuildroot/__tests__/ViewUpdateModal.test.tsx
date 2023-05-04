@@ -1,14 +1,12 @@
+import * as Buildroot from '../../../../../redux/buildroot'
+import type { State } from '../../../../../redux/types'
+import { DownloadUpdateModal } from '../DownloadUpdateModal'
+import { MigrationWarningModal } from '../MigrationWarningModal'
+import { ReleaseNotesModal } from '../ReleaseNotesModal'
+import { ViewUpdateModal } from '../ViewUpdateModal'
+import { mountWithStore } from '@opentrons/components'
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { mountWithStore } from '@opentrons/components'
-import * as Buildroot from '../../../../../redux/buildroot'
-
-import { DownloadUpdateModal } from '../DownloadUpdateModal'
-import { ReleaseNotesModal } from '../ReleaseNotesModal'
-import { MigrationWarningModal } from '../MigrationWarningModal'
-import { ViewUpdateModal } from '../ViewUpdateModal'
-
-import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/buildroot')
 

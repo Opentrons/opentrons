@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { LabwareDetails } from '..'
 import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockOpentronsLabwareDetailsDefinition } from '../../../redux/custom-labware/__fixtures__'
@@ -10,11 +7,12 @@ import { Dimensions } from '../Dimensions'
 import { Gallery } from '../Gallery'
 import { ManufacturerDetails } from '../ManufacturerDetails'
 import { WellCount } from '../WellCount'
-import { WellProperties } from '../WellProperties'
 import { WellDimensions } from '../WellDimensions'
+import { WellProperties } from '../WellProperties'
 import { WellSpacing } from '../WellSpacing'
-
-import { LabwareDetails } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../pages/Labware/hooks')
 jest.mock('../../LabwareCard/CustomLabwareOverflowMenu')

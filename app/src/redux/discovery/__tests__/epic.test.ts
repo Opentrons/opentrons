@@ -1,10 +1,8 @@
-import { TestScheduler } from 'rxjs/testing'
-
 import * as Shell from '../../shell'
+import type { Action, State } from '../../types'
 import * as Actions from '../actions'
 import { discoveryEpic } from '../epic'
-
-import type { Action, State } from '../../types'
+import { TestScheduler } from 'rxjs/testing'
 
 describe('discovery actions', () => {
   let testScheduler: TestScheduler

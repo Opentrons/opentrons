@@ -1,21 +1,19 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
-
-import * as RobotApi from '../../../redux/robot-api'
-import * as Networking from '../../../redux/networking'
 import { Portal } from '../../../App/portal'
-import { SelectSsid } from './ConnectNetwork/SelectSsid'
+import * as Networking from '../../../redux/networking'
+import type { WifiNetwork } from '../../../redux/networking/types'
+import * as RobotApi from '../../../redux/robot-api'
+import type { State, Dispatch } from '../../../redux/types'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
+import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
-
-import type { State, Dispatch } from '../../../redux/types'
-import type { WifiNetwork } from '../../../redux/networking/types'
 import type {
   WifiConfigureRequest,
   NetworkChangeState,
 } from './ConnectNetwork/types'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 interface TempSelectNetworkProps {
   robotName: string

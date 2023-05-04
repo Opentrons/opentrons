@@ -1,4 +1,3 @@
-import * as React from 'react'
 import styles from './styles.css'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -15,6 +14,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import * as React from 'react'
 
 interface Props {
   type: ModuleType

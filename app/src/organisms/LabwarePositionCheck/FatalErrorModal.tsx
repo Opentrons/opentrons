@@ -1,6 +1,7 @@
-import * as React from 'react'
-import styled, { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import {
   Icon,
   COLORS,
@@ -16,10 +17,9 @@ import {
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 

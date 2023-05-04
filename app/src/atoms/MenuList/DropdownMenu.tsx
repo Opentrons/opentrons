@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../text'
+import { MenuItem } from './MenuItem'
 import {
   Flex,
   SPACING,
@@ -14,8 +14,8 @@ import {
   Icon,
   useOnClickOutside,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { MenuItem } from './MenuItem'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 export interface DropdownOption {
   name: string

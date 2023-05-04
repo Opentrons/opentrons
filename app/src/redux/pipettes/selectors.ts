@@ -1,6 +1,3 @@
-import { createSelector } from 'reselect'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
 import {
   getPipetteOffsetCalibrations,
   filterCalibrationForPipette,
@@ -9,12 +6,12 @@ import {
   getTipLengthCalibrations,
   filterTipLengthForPipetteAndTiprack,
 } from '../calibration/tip-length'
-
+import type { State } from '../types'
 import * as Constants from './constants'
 import * as Types from './types'
-
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteModel } from '@opentrons/shared-data'
-import type { State } from '../types'
+import { createSelector } from 'reselect'
 
 export const getAttachedPipettes: (
   state: State,

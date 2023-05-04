@@ -1,7 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-
+import { StyledText } from '../../atoms/text'
+import { startDiscovery } from '../../redux/discovery'
 import {
   Box,
   Flex,
@@ -17,9 +15,9 @@ import {
   PrimaryButton,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-
-import { startDiscovery } from '../../redux/discovery'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
@@ -61,7 +59,7 @@ export function DevicesEmptyState(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom={SPACING.spacingXXL}
+        bottom={SPACING.spacing40}
         left="0"
         right="0"
         marginLeft={SPACING.spacingAuto}

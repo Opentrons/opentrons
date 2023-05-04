@@ -1,7 +1,6 @@
+import { useHost } from '../api'
 import { HostConfig, Runs, getRuns } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
-import { useHost } from '../api'
-
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useAllRunsQuery(

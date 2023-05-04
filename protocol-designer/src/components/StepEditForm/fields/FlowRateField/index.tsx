@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { FlowRateInput, FlowRateInputProps } from './FlowRateInput'
-import { connect } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { FieldProps } from '../../types'
 import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
+import { FlowRateInput, FlowRateInputProps } from './FlowRateInput'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface OP extends FieldProps {
   pipetteId?: string | null

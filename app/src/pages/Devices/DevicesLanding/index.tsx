@@ -1,8 +1,16 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import partition from 'lodash/partition'
-
+import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
+import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
+import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
+import { RobotCard } from '../../../organisms/Devices/RobotCard'
+import {
+  getScanning,
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../../redux/discovery'
+import type { State } from '../../../redux/types'
+import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 import {
   Box,
   Flex,
@@ -18,21 +26,10 @@ import {
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import {
-  getScanning,
-  getConnectableRobots,
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../redux/discovery'
-import { RobotCard } from '../../../organisms/Devices/RobotCard'
-import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
-import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
-
-import { Divider } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
-import { NewRobotSetupHelp } from './NewRobotSetupHelp'
-
-import type { State } from '../../../redux/types'
+import partition from 'lodash/partition'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
@@ -148,7 +145,7 @@ function DevicesLoadingState(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom={SPACING.spacingXXL}
+        bottom={SPACING.spacing40}
         left="0"
         right="0"
         marginLeft={SPACING.spacingAuto}

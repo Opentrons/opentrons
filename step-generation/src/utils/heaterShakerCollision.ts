@@ -1,4 +1,9 @@
-import some from 'lodash/some'
+import type {
+  LabwareEntities,
+  RobotState,
+  DeckSlot,
+  LabwareEntity,
+} from '../types'
 import {
   getAreSlotsAdjacent,
   getAreSlotsHorizontallyAdjacent,
@@ -8,12 +13,7 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type {
-  LabwareEntities,
-  RobotState,
-  DeckSlot,
-  LabwareEntity,
-} from '../types'
+import some from 'lodash/some'
 
 export const getIsHeaterShakerEastWestWithLatchOpen = (
   hwModules: RobotState['modules'],

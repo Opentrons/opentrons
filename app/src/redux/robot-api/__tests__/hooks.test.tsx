@@ -1,8 +1,8 @@
-import * as React from 'react'
-import uniqueId from 'lodash/uniqueId'
-import { mountWithStore } from '@opentrons/components'
 import { PENDING, SUCCESS } from '../constants'
 import { useDispatchApiRequest, useDispatchApiRequests } from '../hooks'
+import { mountWithStore } from '@opentrons/components'
+import uniqueId from 'lodash/uniqueId'
+import * as React from 'react'
 
 jest.mock('lodash/uniqueId')
 

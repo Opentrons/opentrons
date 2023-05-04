@@ -1,10 +1,9 @@
+import { Portal } from '../../App/portal'
+import styles from './styles.css'
+import { AlertModal } from '@opentrons/components'
+import type { ButtonProps } from '@opentrons/components'
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-
-import styles from './styles.css'
-import type { ButtonProps } from '@opentrons/components'
 
 interface Props {
   heading?: string | null

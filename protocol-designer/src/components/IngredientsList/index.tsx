@@ -1,17 +1,17 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
-import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { selectors } from '../../labware-ingred/selectors'
+import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
+import { i18n } from '../../localization'
+import { TitledListNotes } from '../TitledListNotes'
+import { PDTitledList, PDListItem } from '../lists'
+import { swatchColors } from '../swatchColors'
+import styles from './IngredientsList.css'
+import { LabwareDetailsCard } from './LabwareDetailsCard'
 import { IconButton, SidePanel } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
-import { PDTitledList, PDListItem } from '../lists'
-import { TitledListNotes } from '../TitledListNotes'
-import { swatchColors } from '../swatchColors'
-import { LabwareDetailsCard } from './LabwareDetailsCard'
-import styles from './IngredientsList.css'
-import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
 import { SingleLabwareLiquidState } from '@opentrons/step-generation'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 type RemoveWellsContents = (args: {
   liquidGroupId: string

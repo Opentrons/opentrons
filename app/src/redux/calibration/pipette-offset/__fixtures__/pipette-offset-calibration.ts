@@ -3,13 +3,12 @@ import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../../robot-api/__fixtures__'
-import { PIPETTE_OFFSET_CALIBRATIONS_PATH } from '../constants'
-
 import type { ResponseFixtures } from '../../../robot-api/__fixtures__'
 import type {
   PipetteOffsetCalibration,
   AllPipetteOffsetCalibrations,
 } from '../../api-types'
+import { PIPETTE_OFFSET_CALIBRATIONS_PATH } from '../constants'
 
 export const mockPipetteOffsetCalibration1: PipetteOffsetCalibration = {
   pipette: 'P3HSV2008052020A02',

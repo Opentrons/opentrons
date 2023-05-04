@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks'
 import { useLongPress } from '../useLongPress'
+import { renderHook } from '@testing-library/react-hooks'
 
 describe('useLongPress', () => {
   it('useLongPress returns typeof UseLongPressResult', () => {

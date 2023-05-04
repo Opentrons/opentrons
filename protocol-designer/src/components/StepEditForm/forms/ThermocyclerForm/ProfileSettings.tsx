@@ -1,12 +1,9 @@
-import * as React from 'react'
-
-import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
-import { TextField } from '../../fields'
-
 import styles from '../../StepEditForm.css'
-
+import { TextField } from '../../fields'
 import { FieldPropsByName } from '../../types'
+import { FormGroup } from '@opentrons/components'
+import * as React from 'react'
 
 interface Props {
   propsForFields: FieldPropsByName

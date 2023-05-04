@@ -1,5 +1,7 @@
-import * as React from 'react'
-import { Field } from 'formik'
+import { InputField } from '../../atoms/InputField'
+import { StyledText } from '../../atoms/text'
+import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
+import styles from './styles.css'
 import {
   FormGroup,
   Flex,
@@ -8,12 +10,9 @@ import {
   TYPOGRAPHY,
   CheckboxField,
 } from '@opentrons/components'
-import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
-import styles from './styles.css'
-
+import { Field } from 'formik'
 import type { FieldProps } from 'formik'
-import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
+import * as React from 'react'
 
 export interface FormColumnProps {
   children: React.ReactNode
@@ -138,10 +137,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
           />
         )}
       </Field>
-      <StyledText
-        paddingLeft={SPACING.spacing8}
-        paddingTop={SPACING.spacingXXS}
-      >
+      <StyledText paddingLeft={SPACING.spacing8} paddingTop="1px">
         {displayName}
       </StyledText>
     </Flex>

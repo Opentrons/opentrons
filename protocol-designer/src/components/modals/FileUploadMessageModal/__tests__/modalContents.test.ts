@@ -1,4 +1,5 @@
 import { getMigrationMessage } from '../modalContents'
+
 describe('modalContents', () => {
   describe('getMigrationMessage', () => {
     it('should return the v3 migration message when migrating to v3', () => {

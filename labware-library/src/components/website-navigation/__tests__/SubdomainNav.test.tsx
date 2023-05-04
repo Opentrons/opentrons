@@ -1,8 +1,7 @@
 // tests for top navbar
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { SubdomainNav, SUBDOMAIN_NAV_LINKS } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('SecondaryNav', () => {
   it('component renders', () => {

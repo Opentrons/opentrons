@@ -1,7 +1,20 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT3_PNG from '../../assets/images/OT3.png'
+import { ToggleButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
+import type { State } from '../../redux/types'
+import { UpdateRobotBanner } from '../UpdateRobotBanner'
+import { CalibrationStatusBanner } from './CalibrationStatusBanner'
+import { ReachableBanner } from './ReachableBanner'
+import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
+import { RobotStatusHeader } from './RobotStatusHeader'
+import {
+  useIsRobotBusy,
+  useIsRobotViewable,
+  useLights,
+  useRobot,
+} from './hooks'
 import {
   Box,
   Flex,
@@ -17,25 +30,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
-import { ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
-import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { RobotStatusHeader } from './RobotStatusHeader'
-import { ReachableBanner } from './ReachableBanner'
-import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import {
-  useIsRobotBusy,
-  useIsRobotViewable,
-  useLights,
-  useRobot,
-} from './hooks'
-import { CalibrationStatusBanner } from './CalibrationStatusBanner'
-
-import type { State } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 interface RobotOverviewProps {
   robotName: string

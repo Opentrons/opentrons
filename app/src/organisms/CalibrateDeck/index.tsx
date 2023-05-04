@@ -1,11 +1,7 @@
 // Deck Calibration Orchestration Component
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm } from '@opentrons/components'
-
-import * as Sessions from '../../redux/sessions'
+import { Portal } from '../../App/portal'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import {
   Introduction,
   DeckSetup,
@@ -17,18 +13,19 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
-
-import type { Mount } from '@opentrons/components'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import * as Sessions from '../../redux/sessions'
 import type {
   CalibrationLabware,
   CalibrationSessionStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
+import { useConditionalConfirm } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>

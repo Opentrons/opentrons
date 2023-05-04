@@ -1,11 +1,9 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
-
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import { SECURITY_NONE } from '../../constants'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
-
 import type { NetworkOptionLabelProps } from '../NetworkOptionLabel'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 describe('NetworkOptionLabel presentational component', () => {
   let props: NetworkOptionLabelProps

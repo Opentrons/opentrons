@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../../styles'
 import { EmanatingNozzle } from '../EmanatingNozzle'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from '../constants'
+import { render } from '@testing-library/react'
+import * as React from 'react'
 
 describe('EmanatingNozzle', () => {
   it('should render an small origin circle', () => {

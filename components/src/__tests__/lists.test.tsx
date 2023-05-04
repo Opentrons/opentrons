@@ -1,9 +1,8 @@
 // list and list item components tests
+import { SidePanelGroup, TitledList, ListItem } from '..'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import Renderer from 'react-test-renderer'
-
-import { SidePanelGroup, TitledList, ListItem } from '..'
 
 describe('TitledList', () => {
   it('adds an h3 with the title', () => {

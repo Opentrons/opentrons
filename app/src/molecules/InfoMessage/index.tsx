@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   Icon,
@@ -12,8 +12,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
 
 export interface InfoMessageProps {
   title: string

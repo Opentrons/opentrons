@@ -1,6 +1,11 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { StaticRouter } from 'react-router-dom'
+import { i18n } from '../../../../../i18n'
+import {
+  useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../../hooks'
+import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
+import { SetupLabwareMap } from '../SetupLabwareMap'
 import {
   renderWithProviders,
   componentPropsMatcher,
@@ -15,17 +20,11 @@ import {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-
-import { i18n } from '../../../../../i18n'
-import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
-import {
-  useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../../hooks'
-import { SetupLabwareMap } from '../SetupLabwareMap'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

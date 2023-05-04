@@ -1,6 +1,6 @@
-import assert from 'assert'
-import { HeaterShakerArgs } from '@opentrons/step-generation'
 import type { HydratedHeaterShakerFormData } from '../../../form-types'
+import { HeaterShakerArgs } from '@opentrons/step-generation'
+import assert from 'assert'
 
 export const heaterShakerFormToArgs = (
   formData: HydratedHeaterShakerFormData

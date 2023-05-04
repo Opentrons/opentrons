@@ -1,16 +1,14 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { COLORS, Flex, Icon, SPACING, SIZE_2 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { home, ROBOT } from '../../../redux/robot-controls'
+import { StyledText } from '../../../atoms/text'
 import { restartRobot } from '../../../redux/robot-admin'
-import { useLights } from '../../Devices/hooks'
-
+import { home, ROBOT } from '../../../redux/robot-controls'
 import type { Dispatch } from '../../../redux/types'
+import { useLights } from '../../Devices/hooks'
+import { COLORS, Flex, Icon, SPACING, SIZE_2 } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler

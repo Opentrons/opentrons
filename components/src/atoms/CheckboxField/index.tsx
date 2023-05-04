@@ -1,9 +1,9 @@
+import { Icon } from '../../icons'
+import { Flex, Box } from '../../primitives'
+import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import * as React from 'react'
 import { css } from 'styled-components'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { Flex, Box } from '../../primitives'
-import { Icon } from '../../icons'
-import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -28,8 +28,8 @@ const INPUT_STYLE = css`
   position: absolute;
   overflow: hidden;
   clip: rect(0 0 0 0);
-  height: ${SPACING.spacingXXS};
-  width: ${SPACING.spacingXXS};
+  height: 1px;
+  width: 1px;
   margin: -1px;
   padding: 0;
   border: 0;
@@ -47,7 +47,7 @@ const INNER_STYLE_VALUE = css`
   min-width: ${SPACING.spacing20};
   color: ${COLORS.blueEnabled};
   display: flex;
-  border-radius: ${SPACING.spacingXXS};
+  border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 
@@ -73,7 +73,7 @@ const INNER_STYLE_NO_VALUE = css`
   min-width: ${SPACING.spacing20};
   color: ${COLORS.darkGreyEnabled};
   display: flex;
-  border-radius: ${SPACING.spacingXXS};
+  border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 

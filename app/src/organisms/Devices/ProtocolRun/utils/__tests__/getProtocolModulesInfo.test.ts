@@ -1,6 +1,3 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
-import _protocolWithMultipleTemps from '@opentrons/shared-data/protocol/fixtures/6/multipleTempModules.json'
-import _standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
 import {
   getModuleDef2,
@@ -8,6 +5,9 @@ import {
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
+import _standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import _protocolWithMultipleTemps from '@opentrons/shared-data/protocol/fixtures/6/multipleTempModules.json'
+import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 
 const protocolWithMagTempTC = ({
   ..._protocolWithMagTempTC,

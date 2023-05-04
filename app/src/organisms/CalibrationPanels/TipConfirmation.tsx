@@ -1,5 +1,11 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../../atoms/text'
+import * as Sessions from '../../redux/sessions'
+import type {
+  SessionType,
+  SessionCommandString,
+} from '../../redux/sessions/types'
+import { NeedHelpLink } from './NeedHelpLink'
+import type { CalibrationPanelProps } from './types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,17 +14,9 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
-import * as Sessions from '../../redux/sessions'
-import { NeedHelpLink } from './NeedHelpLink'
-import { StyledText } from '../../atoms/text'
-
-import type { CalibrationPanelProps } from './types'
-import type {
-  SessionType,
-  SessionCommandString,
-} from '../../redux/sessions/types'
+import { css } from 'styled-components'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

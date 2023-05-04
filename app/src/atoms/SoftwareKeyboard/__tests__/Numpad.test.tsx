@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { Numpad } from '../'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
-import { renderWithProviders } from '@opentrons/components'
-import { Numpad } from '../'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Numpad>) => {
   return renderWithProviders(<Numpad {...props} />)[0]

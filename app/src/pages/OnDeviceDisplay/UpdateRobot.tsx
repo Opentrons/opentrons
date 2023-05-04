@@ -1,22 +1,19 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { Flex, SPACING } from '@opentrons/components'
-
-import { getLocalRobot } from '../../redux/discovery'
-import {
-  getBuildrootUpdateAvailable,
-  getBuildrootSession,
-  startBuildrootUpdate,
-} from '../../redux/buildroot'
-import { UNREACHABLE } from '../../redux/discovery/constants'
 import { CheckUpdates } from '../../organisms/UpdateRobotSoftware/CheckUpdates'
 import { CompleteUpdateSoftware } from '../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { ErrorUpdateSoftware } from '../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware'
 import { NoUpdateFound } from '../../organisms/UpdateRobotSoftware/NoUpdateFound'
 import { UpdateSoftware } from '../../organisms/UpdateRobotSoftware/UpdateSoftware'
-
+import {
+  getBuildrootUpdateAvailable,
+  getBuildrootSession,
+  startBuildrootUpdate,
+} from '../../redux/buildroot'
+import { getLocalRobot } from '../../redux/discovery'
+import { UNREACHABLE } from '../../redux/discovery/constants'
 import type { Dispatch, State } from '../../redux/types'
+import { Flex, SPACING } from '@opentrons/components'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const CHECK_UPDATES_DURATION = 10000 // Note: kj 1/10/2023 Currently set 10 sec later we may use a status from state
 
@@ -100,8 +97,8 @@ export function UpdateRobot(): JSX.Element {
   return (
     <Flex
       padding={`${String(SPACING.spacing24)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+        SPACING.spacing40
+      )} ${String(SPACING.spacing40)}`}
     >
       {isShowCheckingUpdates ? (
         <CheckUpdates />

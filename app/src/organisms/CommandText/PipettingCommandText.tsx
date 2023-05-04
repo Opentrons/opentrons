@@ -1,6 +1,5 @@
-import { useTranslation } from 'react-i18next'
-import { getLoadedLabware } from './utils/accessors'
 import { getLabwareName, getLabwareDisplayLocation } from './utils'
+import { getLoadedLabware } from './utils/accessors'
 import type {
   CompletedProtocolAnalysis,
   AspirateRunTimeCommand,
@@ -10,6 +9,7 @@ import type {
   DropTipRunTimeCommand,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 type PipettingRunTimeCommmand =
   | AspirateRunTimeCommand

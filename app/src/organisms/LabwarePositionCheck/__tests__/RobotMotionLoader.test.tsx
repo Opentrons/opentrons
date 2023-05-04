@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { RobotMotionLoader } from '../RobotMotionLoader'
 import { i18n } from '../../../i18n'
+import { RobotMotionLoader } from '../RobotMotionLoader'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const mockHeader = 'Stand back, robot needs some space right now'
 

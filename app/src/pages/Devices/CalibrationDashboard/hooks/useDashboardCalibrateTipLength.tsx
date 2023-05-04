@@ -1,26 +1,24 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import { Portal } from '../../../../App/portal'
-import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { ModalShell } from '../../../../molecules/Modal'
+import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { LoadingState } from '../../../../organisms/CalibrationPanels'
-import * as RobotApi from '../../../../redux/robot-api'
-import * as Sessions from '../../../../redux/sessions'
 import { tipLengthCalibrationStarted } from '../../../../redux/analytics'
 import { getHasCalibrationBlock } from '../../../../redux/config'
-import { getTipLengthCalibrationSession } from '../../../../redux/sessions/tip-length-calibration/selectors'
-
+import * as RobotApi from '../../../../redux/robot-api'
 import type { RequestState } from '../../../../redux/robot-api/types'
+import * as Sessions from '../../../../redux/sessions'
+import { getTipLengthCalibrationSession } from '../../../../redux/sessions/tip-length-calibration/selectors'
 import type {
   SessionCommandString,
   TipLengthCalibrationSession,
   TipLengthCalibrationSessionParams,
 } from '../../../../redux/sessions/types'
 import type { State } from '../../../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
 // tip length calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [

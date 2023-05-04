@@ -1,16 +1,13 @@
-import * as React from 'react'
-
-import { when, resetAllWhenMocks } from 'jest-when'
-import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { I18nextProvider } from 'react-i18next'
-
+import { useNetworkConnection } from '..'
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
-
-import { useNetworkConnection } from '..'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
 jest.mock('../../../../redux/networking/selectors')
 

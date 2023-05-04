@@ -1,9 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-  useAllRunsQuery,
-  useAllProtocolsQuery,
-} from '@opentrons/react-api-client'
+import { StyledText } from '../../atoms/text'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { HistoricalProtocolRun } from './HistoricalProtocolRun'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   Flex,
   ALIGN_CENTER,
@@ -16,11 +14,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { HistoricalProtocolRun } from './HistoricalProtocolRun'
-import { useIsRobotViewable, useRunStatuses } from './hooks'
+import {
+  useAllRunsQuery,
+  useAllProtocolsQuery,
+} from '@opentrons/react-api-client'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface RecentProtocolRunsProps {
   robotName: string

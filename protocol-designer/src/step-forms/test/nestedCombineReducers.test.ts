@@ -1,5 +1,5 @@
-import { Action } from 'redux'
 import { nestedCombineReducers } from '../reducers/nestedCombineReducers'
+import { Action } from 'redux'
 
 // typical reducer, only gets its own substate
 const fruits = (

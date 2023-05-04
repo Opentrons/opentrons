@@ -1,12 +1,10 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
-
 import { i18n } from '../../../../i18n'
 import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
 import { RunningProtocolCommandList } from '../RunningProtocolCommandList'
+import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const mockPlayRun = jest.fn()
 const mockPauseRun = jest.fn()

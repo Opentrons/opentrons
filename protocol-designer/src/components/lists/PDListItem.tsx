@@ -1,6 +1,6 @@
-import * as React from 'react'
-import cx from 'classnames'
 import styles from './styles.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface Props {
   className?: string | null

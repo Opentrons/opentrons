@@ -1,22 +1,19 @@
 // full-width labware details
-import * as React from 'react'
 import { getUniqueWellProperties } from '../../labwareInference'
+import type { LabwareDefinition } from '../../types'
 import {
   getWellLabel,
   WellCount,
   WellProperties,
   ManufacturerStats,
 } from '../labware-ui'
-
 import { DetailsBox } from '../ui'
-import { InsertDetails } from './InsertDetails'
 import { Dimensions } from './Dimensions'
+import { InsertDetails } from './InsertDetails'
 import { WellDimensions } from './WellDimensions'
 import { WellSpacing } from './WellSpacing'
-
 import styles from './styles.css'
-
-import type { LabwareDefinition } from '../../types'
+import * as React from 'react'
 
 export interface LabwareDetailsBoxProps {
   definition: LabwareDefinition

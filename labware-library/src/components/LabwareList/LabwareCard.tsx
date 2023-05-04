@@ -1,10 +1,11 @@
 // labware display card
-import * as React from 'react'
-import uniq from 'lodash/uniq'
-import { Icon } from '@opentrons/components'
-import { getPublicPath } from '../../public-path'
 import { isNewLabware } from '../../definitions'
-import { Link } from '../ui'
+import {
+  CATEGORY_LABELS_BY_CATEGORY,
+  MANUFACTURER_VALUES,
+} from '../../localization'
+import { getPublicPath } from '../../public-path'
+import type { LabwareDefinition } from '../../types'
 import {
   getWellLabel,
   Gallery,
@@ -14,13 +15,12 @@ import {
   AllWellProperties,
   NewLabwareAlert,
 } from '../labware-ui'
-import {
-  CATEGORY_LABELS_BY_CATEGORY,
-  MANUFACTURER_VALUES,
-} from '../../localization'
-import type { LabwareDefinition } from '../../types'
-
+import { Link } from '../ui'
 import styles from './styles.css'
+import { Icon } from '@opentrons/components'
+import uniq from 'lodash/uniq'
+import * as React from 'react'
+
 export interface LabwareCardProps {
   definition: LabwareDefinition
 }

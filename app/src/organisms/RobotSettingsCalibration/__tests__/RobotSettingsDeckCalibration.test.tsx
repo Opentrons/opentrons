@@ -1,24 +1,20 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
-import * as RobotApi from '../../../redux/robot-api'
+import {
+  useDeckCalibrationData,
+  useRobot,
+  useAttachedPipettes,
+} from '../../../organisms/Devices/hooks'
 import {
   mockDeckCalData,
   mockWarningDeckCalData,
 } from '../../../redux/calibration/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
-import {
-  useDeckCalibrationData,
-  useRobot,
-  useAttachedPipettes,
-} from '../../../organisms/Devices/hooks'
-
-import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
-
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import * as RobotApi from '../../../redux/robot-api'
+import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../../organisms/CalibrationStatusCard')
 jest.mock('../../../redux/robot-api/selectors')

@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
+import { getPipetteAnimations } from './utils'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface DetachProbeProps extends PipetteWizardStepProps {
   proceed: () => void

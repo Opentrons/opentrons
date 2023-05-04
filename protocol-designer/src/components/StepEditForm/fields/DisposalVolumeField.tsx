@@ -1,25 +1,22 @@
-import * as React from 'react'
+import { PathOption, StepType } from '../../../form-types'
+import { i18n } from '../../../localization'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
+import { BaseState } from '../../../types'
+import { selectors as uiLabwareSelectors } from '../../../ui/labware'
+import styles from '../StepEditForm.css'
+import { FieldProps, FieldPropsByName } from '../types'
+import { getBlowoutLocationOptionsForForm } from '../utils'
+import { TextField } from './TextField'
 import {
   FormGroup,
   DeprecatedCheckboxField,
   DropdownField,
   Options,
 } from '@opentrons/components'
-import { connect } from 'react-redux'
 import cx from 'classnames'
-
-import { i18n } from '../../../localization'
-import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { getBlowoutLocationOptionsForForm } from '../utils'
-import { TextField } from './TextField'
-
-import { FieldProps, FieldPropsByName } from '../types'
-import { PathOption, StepType } from '../../../form-types'
-import { BaseState } from '../../../types'
-
-import styles from '../StepEditForm.css'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface DropdownFormFieldProps extends FieldProps {
   className?: string

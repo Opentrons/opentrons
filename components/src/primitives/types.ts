@@ -1,5 +1,4 @@
 // known style types
-
 import type { StyledComponent, CSSProperties } from 'styled-components'
 
 export interface ColorProps {

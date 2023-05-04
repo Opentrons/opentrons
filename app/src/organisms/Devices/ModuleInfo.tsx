@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import { useRunHasStarted } from './hooks'
 import {
   Flex,
   Icon,
@@ -17,9 +17,8 @@ import {
   getModuleDisplayName,
   getModuleDef2,
 } from '@opentrons/shared-data'
-
-import { StyledText } from '../../atoms/text'
-import { useRunHasStarted } from './hooks'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface ModuleInfoProps {
   moduleModel: ModuleModel

@@ -1,13 +1,11 @@
-import * as React from 'react'
+import { useIsOT3 } from '..'
+import { getRobotModelByName } from '../../../../redux/discovery'
+import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
-import { getRobotModelByName } from '../../../../redux/discovery'
-
-import { useIsOT3 } from '..'
 
 jest.mock('../../../../redux/discovery/selectors')
 

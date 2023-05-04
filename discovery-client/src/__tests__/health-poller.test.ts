@@ -1,11 +1,9 @@
-import nodeFetch from 'node-fetch'
-import isError from 'lodash/isError'
-
 import * as Fixtures from '../__fixtures__'
 import { createHealthPoller } from '../health-poller'
-
-import type { RequestInit, Response } from 'node-fetch'
 import type { HealthPoller } from '../types'
+import isError from 'lodash/isError'
+import nodeFetch from 'node-fetch'
+import type { RequestInit, Response } from 'node-fetch'
 
 // TODO(mc, 2020-07-13): remove __mocks__/node-fetch
 jest.mock('node-fetch', () => ({ __esModule: true, default: jest.fn() }))

@@ -1,6 +1,21 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { ProgressBar } from '../../atoms/ProgressBar'
+import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
+import { CommandText } from '../CommandText'
+import { useDownloadRunLog } from '../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import { InterventionTicks } from './InterventionTicks'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_SUCCEEDED,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+} from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   COLORS,
   BORDERS,
@@ -17,28 +32,12 @@ import {
   TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_FAILED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_SUCCEEDED,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-} from '@opentrons/api-client'
-import {
   useAllCommandsQuery,
   useCommandQuery,
 } from '@opentrons/react-api-client'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { StyledText } from '../../atoms/text'
-import { Tooltip } from '../../atoms/Tooltip'
-import { CommandText } from '../CommandText'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { ProgressBar } from '../../atoms/ProgressBar'
-import { useDownloadRunLog } from '../Devices/hooks'
-import { InterventionTicks } from './InterventionTicks'
-
-import type { RunStatus } from '@opentrons/api-client'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,

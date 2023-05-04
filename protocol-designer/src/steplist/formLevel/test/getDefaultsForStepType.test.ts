@@ -1,3 +1,4 @@
+import { getDefaultsForStepType } from '..'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -6,7 +7,6 @@ import {
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   FIXED_TRASH_ID,
 } from '../../../constants'
-import { getDefaultsForStepType } from '..'
 
 describe('getDefaultsForStepType', () => {
   afterEach(() => {

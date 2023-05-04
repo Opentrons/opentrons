@@ -1,10 +1,18 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Portal } from '../../App/portal'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
 } from '../../redux/analytics'
+import {
+  deleteCustomLabwareFile,
+  openCustomLabwareDirectory,
+} from '../../redux/custom-labware'
+import type { Dispatch } from '../../redux/types'
 import {
   Flex,
   Icon,
@@ -22,19 +30,9 @@ import {
   Btn,
   useOnClickOutside,
 } from '@opentrons/components'
-
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
-import { Modal } from '../../molecules/Modal'
-import { Portal } from '../../App/portal'
-import {
-  deleteCustomLabwareFile,
-  openCustomLabwareDirectory,
-} from '../../redux/custom-labware'
-
-import type { Dispatch } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
@@ -127,7 +125,7 @@ export function CustomLabwareOverflowMenu(
               {t('open_labware_creator')}
               <Icon
                 name="open-in-new"
-                height={SPACING.spacingSM}
+                height={SPACING.spacing12}
                 marginLeft="0.375rem"
               ></Icon>
             </StyledText>

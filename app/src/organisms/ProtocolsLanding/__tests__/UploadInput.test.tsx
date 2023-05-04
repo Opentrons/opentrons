@@ -1,14 +1,14 @@
-import * as React from 'react'
-import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
 } from '../../../redux/analytics'
 import { UploadInput } from '../UploadInput'
+import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { BrowserRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/analytics')
 

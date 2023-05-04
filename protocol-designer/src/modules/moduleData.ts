@@ -1,4 +1,5 @@
 import { SPAN7_8_10_11_SLOT } from '../constants'
+import { DropdownOption } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -6,7 +7,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
 } from '@opentrons/shared-data'
-import { DropdownOption } from '@opentrons/components'
+
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,

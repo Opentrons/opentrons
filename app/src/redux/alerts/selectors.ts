@@ -1,11 +1,9 @@
-import { createSelector } from 'reselect'
-import without from 'lodash/without'
-
 import { getConfig } from '../config'
-
-import type { State } from '../types'
 import type { Config } from '../config/types'
+import type { State } from '../types'
 import type { AlertId, AlertsState } from './types'
+import without from 'lodash/without'
+import { createSelector } from 'reselect'
 
 const getIgnoredAlertsFromConfig: (
   state: State

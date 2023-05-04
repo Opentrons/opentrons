@@ -1,7 +1,6 @@
 import { resetConfigValue } from '../config'
-import * as Types from './types'
-
 import type { ResetConfigValueAction } from '../config/types'
+import * as Types from './types'
 
 // action type literals
 

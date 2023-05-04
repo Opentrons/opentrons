@@ -1,5 +1,13 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
+import { useTrackProtocolRunEvent } from '../Devices/hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
+import {
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_STOP_REQUESTED,
+} from '@opentrons/api-client'
 import {
   Icon,
   SPACING,
@@ -12,18 +20,9 @@ import {
   COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import {
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_STOP_REQUESTED,
-} from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
-
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
-import { useTrackProtocolRunEvent } from '../Devices/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown

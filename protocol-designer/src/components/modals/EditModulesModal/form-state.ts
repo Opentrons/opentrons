@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
-import { useFormikContext } from 'formik'
-import { usePrevious } from '@opentrons/components'
-import { isModuleWithCollisionIssue } from '../../modules/utils'
 import { EditModulesFormValues } from '.'
+import { isModuleWithCollisionIssue } from '../../modules/utils'
+import { usePrevious } from '@opentrons/components'
+import { useFormikContext } from 'formik'
+import { useEffect } from 'react'
+
 export const useResetSlotOnModelChange = (
   supportedModuleSlot: string
 ): void => {

@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useConditionalConfirm } from '@opentrons/components'
+import { StepIdType } from '../../form-types'
+import { i18n } from '../../localization'
+import { actions as steplistActions } from '../../steplist'
+import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { i18n } from '../../localization'
-import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
-import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
-import { StepIdType } from '../../form-types'
+import { useConditionalConfirm } from '@opentrons/components'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const MENU_OFFSET_PX = 5
 

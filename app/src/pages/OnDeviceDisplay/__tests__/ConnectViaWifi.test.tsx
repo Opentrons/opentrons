@@ -1,13 +1,12 @@
+import { i18n } from '../../../i18n'
+import * as Networking from '../../../redux/networking'
+import * as Fixtures from '../../../redux/networking/__fixtures__'
+import * as RobotApi from '../../../redux/robot-api'
+import { ConnectViaWifi } from '../ConnectViaWifi'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import * as RobotApi from '../../../redux/robot-api'
-import * as Fixtures from '../../../redux/networking/__fixtures__'
-import * as Networking from '../../../redux/networking'
-import { ConnectViaWifi } from '../ConnectViaWifi'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking/selectors')

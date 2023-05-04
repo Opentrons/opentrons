@@ -1,7 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import {
   Btn,
   Icon,
@@ -12,9 +10,9 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-
-import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 const IpItem = styled.div`
   flex: 1 1 auto;

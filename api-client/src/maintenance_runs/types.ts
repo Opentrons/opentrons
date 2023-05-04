@@ -1,10 +1,10 @@
+import type { RunCommandSummary, LabwareOffsetCreateData } from '../runs'
 import type {
   Liquid,
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { RunCommandSummary, LabwareOffsetCreateData } from '../runs'
 
 export const ENGINE_STATUS_IDLE = 'idle' as const
 export const ENGINE_STATUS_RUNNING = 'running' as const

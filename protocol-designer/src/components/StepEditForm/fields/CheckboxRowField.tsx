@@ -1,14 +1,14 @@
-import * as React from 'react'
+import styles from '../StepEditForm.css'
+import { FieldProps } from '../types'
 import {
   DeprecatedCheckboxField,
   useHoverTooltip,
   Tooltip,
   TOOLTIP_TOP,
 } from '@opentrons/components'
-import cx from 'classnames'
-import styles from '../StepEditForm.css'
-import { FieldProps } from '../types'
 import type { Placement } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
 type CheckboxRowProps = FieldProps & {
   children?: React.ReactNode

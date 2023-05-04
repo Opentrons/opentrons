@@ -1,8 +1,7 @@
-import * as React from 'react'
-import parseHtml from 'html-react-parser'
-import { stringify } from 'svgson'
-
 import type { DeckDefinition } from '@opentrons/shared-data'
+import parseHtml from 'html-react-parser'
+import * as React from 'react'
+import { stringify } from 'svgson'
 
 export interface DeckFromDataProps {
   def: DeckDefinition

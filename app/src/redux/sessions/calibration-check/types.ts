@@ -1,9 +1,6 @@
-import type { CalibrationLabware } from '../types'
 import type { Mount } from '../../pipettes/types'
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
-
+import type { CalibrationLabware } from '../types'
 // calibration check session types
-
 import {
   CHECK_STEP_SESSION_STARTED,
   CHECK_STEP_LABWARE_LOADED,
@@ -24,6 +21,7 @@ import {
   CHECK_STATUS_IN_THRESHOLD,
   CHECK_STATUS_OUTSIDE_THRESHOLD,
 } from './constants'
+import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 /* Robot Calibration Check Types */
 

@@ -1,3 +1,9 @@
+import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
+import { StyledText } from '../../atoms/text'
+import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import type { GripperWizardStepProps } from './types'
 import {
   Flex,
   TYPOGRAPHY,
@@ -8,17 +14,10 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
-import { css } from 'styled-components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
-
-import type { GripperWizardStepProps } from './types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { css } from 'styled-components'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

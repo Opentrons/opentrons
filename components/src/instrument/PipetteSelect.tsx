@@ -1,17 +1,16 @@
-import * as React from 'react'
-import groupBy from 'lodash/groupBy'
+import { Select, CONTEXT_VALUE } from '../forms'
+import type { SelectOption } from '../forms'
 import { Flex } from '../primitives'
+import styles from './PipetteSelect.css'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
   GEN1,
   GEN2,
 } from '@opentrons/shared-data'
-import { Select, CONTEXT_VALUE } from '../forms'
-import styles from './PipetteSelect.css'
-
-import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import groupBy from 'lodash/groupBy'
+import * as React from 'react'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
 
 export interface PipetteSelectProps {

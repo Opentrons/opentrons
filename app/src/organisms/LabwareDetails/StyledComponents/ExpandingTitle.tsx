@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
 import {
   Flex,
   Icon,
@@ -10,8 +11,7 @@ import {
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import { Divider } from '../../../atoms/structure'
+import * as React from 'react'
 
 interface ExpandingTitleProps {
   label: React.ReactNode

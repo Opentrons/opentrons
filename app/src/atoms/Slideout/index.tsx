@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { Divider } from '../structure'
+import { StyledText } from '../text'
 import {
   Box,
   Flex,
@@ -15,9 +15,8 @@ import {
   POSITION_FIXED,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { Divider } from '../structure'
-import { StyledText } from '../text'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 export interface SlideoutProps {
   title: string | React.ReactElement

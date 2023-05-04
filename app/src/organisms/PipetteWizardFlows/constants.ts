@@ -1,5 +1,5 @@
-import { css } from 'styled-components'
 import { TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
+import { css } from 'styled-components'
 
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',

@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,7 +7,8 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 export interface ClearDeckModalProps {
   onContinueClick: () => void

@@ -1,5 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import type {
+  LabwareDefinition,
+  LabwareWellGroupProperties,
+  LabwareVolumeUnits,
+} from '../../pages/Labware/types'
 import {
   Box,
   Flex,
@@ -11,13 +15,8 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
-
-import type {
-  LabwareDefinition,
-  LabwareWellGroupProperties,
-  LabwareVolumeUnits,
-} from '../../pages/Labware/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface AllWellPropertiesProps {
   definition: LabwareDefinition

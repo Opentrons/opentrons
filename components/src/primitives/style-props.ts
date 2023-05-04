@@ -1,10 +1,7 @@
 // common styling props you can apply to any primitive component
 // props are string type for flexibility, but try to use constants for safety
-
-import pick from 'lodash/pick'
-
 import * as Types from './types'
-
+import pick from 'lodash/pick'
 import type { CSSObject } from 'styled-components'
 
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity'] as const

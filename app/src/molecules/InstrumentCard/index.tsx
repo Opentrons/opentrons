@@ -1,5 +1,9 @@
-import * as React from 'react'
-
+import flexGripper from '../../assets/images/flex_gripper.svg'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { StyledText } from '../../atoms/text'
+import { MenuOverlay } from './MenuOverlay'
+import type { MenuOverlayItemProps } from './MenuOverlay'
 import {
   Box,
   Flex,
@@ -14,15 +18,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import flexGripper from '../../assets/images/flex_gripper.svg'
-
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../atoms/text'
-import { MenuOverlay } from './MenuOverlay'
-
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'
-import type { MenuOverlayItemProps } from './MenuOverlay'
+import * as React from 'react'
 
 interface InstrumentCardProps extends StyleProps {
   description: string

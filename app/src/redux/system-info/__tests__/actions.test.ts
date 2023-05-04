@@ -1,7 +1,6 @@
 // system-info actions tests
-
-import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
+import * as Actions from '../actions'
 import type { SystemInfoAction } from '../types'
 
 interface ActionSpec {

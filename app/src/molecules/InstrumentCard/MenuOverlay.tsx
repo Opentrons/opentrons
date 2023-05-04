@@ -1,5 +1,5 @@
-import * as React from 'react'
-
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Divider } from '../../atoms/structure'
 import {
   Flex,
   BORDERS,
@@ -7,11 +7,8 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Divider } from '../../atoms/structure'
-
 import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
 
 export interface MenuOverlayItemProps {
   label: React.ReactNode

@@ -1,6 +1,4 @@
-import * as React from 'react'
-import capitalize from 'lodash/capitalize'
-
+import { StyledText } from '../text'
 import {
   Flex,
   Icon,
@@ -10,8 +8,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
 
-import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string

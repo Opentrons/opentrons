@@ -1,7 +1,28 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import compact from 'lodash/compact'
-import values from 'lodash/values'
+import { PSEUDO_DECK_SLOTS } from '../../constants'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
+import { i18n } from '../../localization'
+import {
+  getSlotsBlockedBySpanning,
+  getSlotIsEmpty,
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+  ModuleOnDeck,
+} from '../../step-forms'
+import { TerminalItemId } from '../../steplist'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../utils/labwareModuleCompatibility'
+import { BrowseLabwareModal } from '../labware'
+import styles from './DeckSetup.css'
+import { LabwareOnDeck } from './LabwareOnDeck'
+import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
+import { ModuleTag } from './ModuleTag'
+import { SlotWarning } from './SlotWarning'
 import {
   ModuleViz,
   RobotCoordsText,
@@ -12,7 +33,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
 } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import {
   getLabwareHasQuirk,
   getModuleVizDims,
@@ -21,35 +42,11 @@ import {
   DeckSlot as DeckDefSlot,
   ModuleType,
 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { PSEUDO_DECK_SLOTS } from '../../constants'
-import { i18n } from '../../localization'
-import {
-  getLabwareIsCompatible,
-  getLabwareIsCustom,
-} from '../../utils/labwareModuleCompatibility'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
-
-import { selectors as featureFlagSelectors } from '../../feature-flags'
-import {
-  getSlotsBlockedBySpanning,
-  getSlotIsEmpty,
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../step-forms'
-import { BrowseLabwareModal } from '../labware'
-import { ModuleTag } from './ModuleTag'
-import { SlotWarning } from './SlotWarning'
-import { LabwareOnDeck } from './LabwareOnDeck'
-import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
-
-import { TerminalItemId } from '../../steplist'
-
-import styles from './DeckSetup.css'
+import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import compact from 'lodash/compact'
+import values from 'lodash/values'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',

@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { Banner } from '../../atoms/Banner'
+import { Slideout } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
+import type { AttachedModule } from '../../redux/modules/types'
+import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
   Flex,
@@ -14,12 +16,9 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
-import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
-
-import type { AttachedModule } from '../../redux/modules/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface AboutModuleSlideoutProps {
   module: AttachedModule

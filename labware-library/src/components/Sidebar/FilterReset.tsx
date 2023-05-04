@@ -1,11 +1,11 @@
 // reset all filters button
-import * as React from 'react'
-import { Link } from 'react-router-dom'
-import { Icon } from '@opentrons/components'
 import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 import { CLEAR_FILTERS } from '../../localization'
-import styles from './styles.css'
 import type { FilterParams } from '../../types'
+import styles from './styles.css'
+import { Icon } from '@opentrons/components'
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 
 export interface FilterResetProps {
   filters: FilterParams

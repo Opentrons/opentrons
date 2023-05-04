@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../../atoms/text'
 import {
   Icon,
   Flex,
@@ -11,7 +10,8 @@ import {
   IconName,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 interface CollapsibleProps {
   expanded: boolean

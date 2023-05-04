@@ -1,10 +1,10 @@
-import React from 'react'
-import { shallow } from 'enzyme'
+import { ModuleDiagram } from '../ModuleDiagram'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
-import { ModuleDiagram } from '../ModuleDiagram'
+import { shallow } from 'enzyme'
+import React from 'react'
 
 describe('ModuleDiagram', () => {
   it('displays a module diagram based on module type and model', () => {

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { TabbedButton } from '..'
 import {
   renderWithProviders,
   BORDERS,
@@ -6,8 +6,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { TabbedButton } from '..'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof TabbedButton>) => {
   return renderWithProviders(<TabbedButton {...props} />)[0]

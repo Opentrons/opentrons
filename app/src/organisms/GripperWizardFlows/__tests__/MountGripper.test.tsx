@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
 import { MountGripper } from '../MountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 describe('MountGripper', () => {
   let render: (

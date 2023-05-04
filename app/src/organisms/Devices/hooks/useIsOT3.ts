@@ -1,11 +1,9 @@
-import { useSelector } from 'react-redux'
-
 import {
   getRobotModelByName,
   RE_ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
-
 import type { State } from '../../../redux/types'
+import { useSelector } from 'react-redux'
 
 export function useIsOT3(robotName: string): boolean {
   const robotModel = useSelector((state: State) =>

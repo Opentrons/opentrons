@@ -1,16 +1,14 @@
-import { ofType } from 'redux-observable'
-
 import { GET } from '../../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../../robot-api/operators'
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../../robot-api/operators'
 import type { Action, Epic } from '../../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import type { FetchPipetteOffsetCalibrationsAction } from '../types'
+import { ofType } from 'redux-observable'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipetteOffsetCalibrationsAction> = action => ({
   method: GET,

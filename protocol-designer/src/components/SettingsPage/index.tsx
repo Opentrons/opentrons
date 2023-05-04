@@ -1,9 +1,8 @@
+import { selectors, Page } from '../../navigation'
+import { BaseState } from '../../types'
+import { SettingsApp } from './SettingsApp'
 import * as React from 'react'
 import { connect } from 'react-redux'
-
-import { BaseState } from '../../types'
-import { selectors, Page } from '../../navigation'
-import { SettingsApp } from './SettingsApp'
 
 export { SettingsSidebar } from './SettingsSidebar'
 

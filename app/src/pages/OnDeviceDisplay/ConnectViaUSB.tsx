@@ -1,6 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+// import { PrimaryButton } from '../../atoms/buttons'
+import usbImage from '../../assets/images/on-device-display/usb@x2.png'
+import { StepMeter } from '../../atoms/StepMeter'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   SPACING,
@@ -15,10 +16,9 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { StepMeter } from '../../atoms/StepMeter'
-// import { PrimaryButton } from '../../atoms/buttons'
-import usbImage from '../../assets/images/on-device-display/usb@x2.png'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 // Note: kj 12/06/2022 The commented-out lines will be activated when the check function is ready
 export function ConnectViaUSB(): JSX.Element {
@@ -33,8 +33,8 @@ export function ConnectViaUSB(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
@@ -42,7 +42,7 @@ export function ConnectViaUSB(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_RELATIVE}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           {/* this path is temporary and it will be update soon */}
           <Btn
@@ -88,7 +88,7 @@ export function ConnectViaUSB(): JSX.Element {
           />
           <StyledText
             marginTop={SPACING.spacing32}
-            marginX={SPACING.spacingXXL}
+            marginX={SPACING.spacing40}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('connect_via_usb_description')}
@@ -122,7 +122,7 @@ const ConnectedViaDesktopApp = ({
     >
       <Icon name="ot-check" size="4.375rem" color={COLORS.successEnabled} />
       <StyledText
-        marginTop={SPACING.spacingXXL}
+        marginTop={SPACING.spacing40}
         textAlign={TYPOGRAPHY.textAlignCenter}
         color={COLORS.black}
         fontSize="1.625rem"

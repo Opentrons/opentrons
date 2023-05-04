@@ -1,3 +1,4 @@
+import type { Mount } from '../../redux/pipettes/types'
 import type {
   SessionCommandParams,
   SessionType,
@@ -7,9 +8,7 @@ import type {
   CalibrationCheckInstrument,
   CalibrationCheckComparisonByPipette,
 } from '../../redux/sessions/types'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
 
 // TODO (lc 10-20-2020) Given there are lots of optional
 // keys here now we should split these panel props out

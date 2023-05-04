@@ -1,9 +1,7 @@
-import * as React from 'react'
-
 import { InstrumentInfo } from './InstrumentInfo'
-import styles from './instrument.css'
-
 import type { InstrumentInfoProps } from './InstrumentInfo'
+import styles from './instrument.css'
+import * as React from 'react'
 
 export interface InstrumentGroupProps {
   showMountLabel?: boolean | null | undefined

@@ -1,16 +1,15 @@
+import { i18n } from '../../../localization'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { maskField } from '../../../steplist/fieldLevel'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import styles from '../StepEditForm.css'
+import { TextField, RadioGroupField } from '../fields'
+import { StepFormProps } from '../types'
+import { FormGroup } from '@opentrons/components'
+import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import cx from 'classnames'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { FormGroup } from '@opentrons/components'
-import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { i18n } from '../../../localization'
-import { maskField } from '../../../steplist/fieldLevel'
-import { TextField, RadioGroupField } from '../fields'
-import styles from '../StepEditForm.css'
-
-import { StepFormProps } from '../types'
 
 export const MagnetForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(

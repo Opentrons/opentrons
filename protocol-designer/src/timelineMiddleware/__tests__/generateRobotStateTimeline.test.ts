@@ -1,3 +1,5 @@
+import { StepArgsAndErrorsById } from '../../steplist'
+import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -6,8 +8,7 @@ import {
   SOURCE_LABWARE,
   DEST_LABWARE,
 } from '@opentrons/step-generation'
-import { StepArgsAndErrorsById } from '../../steplist'
-import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
+
 jest.mock('../../labware-defs/utils')
 describe('generateRobotStateTimeline', () => {
   it('performs eager tip dropping', () => {

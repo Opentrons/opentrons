@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ModalHeader } from '../ModalHeader'
+import { renderWithProviders, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof ModalHeader>) => {
   return renderWithProviders(<ModalHeader {...props} />)[0]

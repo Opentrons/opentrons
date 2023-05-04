@@ -1,6 +1,7 @@
+import { getLabwareIsCustom } from '../labwareModuleCompatibility'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_96_plate_def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import { getLabwareIsCustom } from '../labwareModuleCompatibility'
+
 describe('labwareModuleCompatibility', () => {
   describe('getLabwareIsCustom', () => {
     const labwareOnDeck = {

@@ -1,16 +1,14 @@
+import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+import { ScrollableAlertModal } from '../../../../molecules/modals'
+import { buildrootChangelogSeen } from '../../../../redux/buildroot'
+import type { RobotSystemType } from '../../../../redux/buildroot/types'
+import type { Dispatch } from '../../../../redux/types'
+import { useIsRobotBusy } from '../../hooks'
+import { RobotIsBusyModal } from './RobotIsBusyModal'
+import styles from './styles.css'
+import { ButtonProps, useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-
-import { buildrootChangelogSeen } from '../../../../redux/buildroot'
-import { ScrollableAlertModal } from '../../../../molecules/modals'
-import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
-import { useIsRobotBusy } from '../../hooks'
-import styles from './styles.css'
-import { RobotIsBusyModal } from './RobotIsBusyModal'
-
-import { ButtonProps, useConditionalConfirm } from '@opentrons/components'
-import type { Dispatch } from '../../../../redux/types'
-import type { RobotSystemType } from '../../../../redux/buildroot/types'
 
 export interface ReleaseNotesModalProps {
   robotName: string

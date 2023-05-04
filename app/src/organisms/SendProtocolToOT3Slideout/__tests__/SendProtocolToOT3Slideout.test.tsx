@@ -1,20 +1,8 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import {
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
-import {
-  useAllRunsQuery,
-  useCreateProtocolMutation,
-} from '@opentrons/react-api-client'
-
+import { SendProtocolToOT3Slideout } from '..'
 import { mockSuccessQueryResults } from '../../../__fixtures__'
 import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -24,15 +12,25 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { SendProtocolToOT3Slideout } from '..'
+import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
+import { renderWithProviders } from '@opentrons/components'
+import {
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+} from '@opentrons/discovery-client/src/__fixtures__'
+import {
+  useAllRunsQuery,
+  useCreateProtocolMutation,
+} from '@opentrons/react-api-client'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ToasterOven')

@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
 import { Modal } from './Modal'
+import { COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'ODD/Molecules/Modals/Modal',

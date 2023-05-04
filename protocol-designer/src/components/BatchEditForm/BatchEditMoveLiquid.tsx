@@ -1,14 +1,7 @@
-import * as React from 'react'
-import {
-  Box,
-  DeprecatedPrimaryButton,
-  OutlineButton,
-  Tooltip,
-  useHoverTooltip,
-  TOOLTIP_TOP,
-  TOOLTIP_FIXED,
-} from '@opentrons/components'
+import { WellOrderOption } from '../../form-types'
 import { i18n } from '../../localization'
+import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
+import styles from '../StepEditForm/StepEditForm.css'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -18,17 +11,24 @@ import {
   WellOrderField,
 } from '../StepEditForm/fields'
 import { MixFields } from '../StepEditForm/fields/MixFields'
+import { FieldPropsByName } from '../StepEditForm/types'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
-import { FormColumn } from './FormColumn'
-import { FieldPropsByName } from '../StepEditForm/types'
-import { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
 import formStyles from '../forms/forms.css'
-import styles from '../StepEditForm/StepEditForm.css'
-import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
+import { FormColumn } from './FormColumn'
+import {
+  Box,
+  DeprecatedPrimaryButton,
+  OutlineButton,
+  Tooltip,
+  useHoverTooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
+import * as React from 'react'
 
 const SourceDestBatchEditMoveLiquidFields = (props: {
   prefix: 'aspirate' | 'dispense'

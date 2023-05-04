@@ -1,8 +1,18 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { format, formatDistance } from 'date-fns'
+import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
+import imgSrc from '../../../assets/images/on-device-display/abstract@x2.png'
+import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../../atoms/text'
+import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import {
+  getPinnedProtocolIds,
+  getProtocolsOnDeviceSortKey,
+  updateConfigValue,
+} from '../../../redux/config'
+import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
+import type { Dispatch } from '../../../redux/types'
+import { LongPressModal } from './LongPressModal'
+import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
+import { sortProtocols } from './utils'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,29 +26,17 @@ import {
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
+import type { UseLongPressResult } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
-import { StyledText } from '../../../atoms/text'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
-import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
-import {
-  getPinnedProtocolIds,
-  getProtocolsOnDeviceSortKey,
-  updateConfigValue,
-} from '../../../redux/config'
-import { LongPressModal } from './LongPressModal'
-import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
-import { sortProtocols } from './utils'
-
-import imgSrc from '../../../assets/images/on-device-display/abstract@x2.png'
-
-import type { Dispatch } from '../../../redux/types'
-import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
-import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
+import { format, formatDistance } from 'date-fns'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
@@ -128,7 +126,7 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
-      paddingX={SPACING.spacingXXL}
+      paddingX={SPACING.spacing40}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (

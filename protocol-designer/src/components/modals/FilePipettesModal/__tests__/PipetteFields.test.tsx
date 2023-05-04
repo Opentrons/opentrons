@@ -1,22 +1,21 @@
-import React, { ChangeEvent } from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { LabwareDefinition2 } from '../../../../../../shared-data/lib/js/types.d'
+import { actions as labwareDefActions } from '../../../../labware-defs'
+import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
+import { FormPipette } from '../../../../step-forms'
+import { PipetteDiagram } from '../PipetteDiagram'
+import { PipetteFields, Props } from '../PipetteFields'
 import {
   PipetteSelect,
   DropdownField,
   OutlineButton,
 } from '@opentrons/components'
+import type { SelectOption } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import { actions as labwareDefActions } from '../../../../labware-defs'
-import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
-import { PipetteFields, Props } from '../PipetteFields'
-import { PipetteDiagram } from '../PipetteDiagram'
-import { FormPipette } from '../../../../step-forms'
-import { LabwareDefinition2 } from '../../../../../../shared-data/lib/js/types.d'
-
+import { mount } from 'enzyme'
+import React, { ChangeEvent } from 'react'
+import { Provider } from 'react-redux'
 import type { ActionMeta } from 'react-select'
-import type { SelectOption } from '@opentrons/components'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')

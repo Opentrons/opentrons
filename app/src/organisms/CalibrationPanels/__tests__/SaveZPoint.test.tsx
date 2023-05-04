@@ -1,13 +1,12 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
+import * as Sessions from '../../../redux/sessions'
 import {
   mockDeckCalTipRack,
   mockTipLengthCalBlock,
 } from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
 import { SaveZPoint } from '../SaveZPoint'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 describe('SaveZPoint', () => {
   let render: (

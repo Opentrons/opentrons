@@ -1,9 +1,8 @@
-import * as React from 'react'
-import { useFormikContext } from 'formik'
-import { SectionBody } from './SectionBody'
-import styles from '../../styles.css'
-
 import type { LabwareFields } from '../../fields'
+import styles from '../../styles.css'
+import { SectionBody } from './SectionBody'
+import { useFormikContext } from 'formik'
+import * as React from 'react'
 
 export const CustomTiprackWarning = (): JSX.Element | null => {
   const { values } = useFormikContext<LabwareFields>()

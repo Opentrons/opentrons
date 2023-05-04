@@ -1,6 +1,6 @@
-import noop from 'lodash/noop'
-import { makeBatchEditFieldProps } from '../makeBatchEditFieldProps'
 import * as stepEditFormUtils from '../../StepEditForm/utils'
+import { makeBatchEditFieldProps } from '../makeBatchEditFieldProps'
+import noop from 'lodash/noop'
 
 const getFieldDefaultTooltipSpy = jest.spyOn(
   stepEditFormUtils,

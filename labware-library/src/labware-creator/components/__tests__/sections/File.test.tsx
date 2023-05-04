@@ -1,8 +1,3 @@
-import React from 'react'
-import { when } from 'jest-when'
-import { FormikConfig } from 'formik'
-import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -11,6 +6,11 @@ import {
 import { isEveryFieldHidden } from '../../../utils'
 import { File } from '../../sections/File'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import { when } from 'jest-when'
+import React from 'react'
 
 jest.mock('../../../utils')
 

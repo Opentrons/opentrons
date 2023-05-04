@@ -1,8 +1,7 @@
-import * as React from 'react'
-import cx from 'classnames'
 import styles from './styles.css'
-
 import type { Link } from './types'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface Props extends Link {
   className?: string

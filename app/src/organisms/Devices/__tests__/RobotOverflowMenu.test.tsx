@@ -1,19 +1,18 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
-import { ConnectionTroubleshootingModal } from '../ConnectionTroubleshootingModal'
-import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
-
 import {
   mockUnreachableRobot,
   mockConnectedRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { ConnectionTroubleshootingModal } from '../ConnectionTroubleshootingModal'
+import { RobotOverflowMenu } from '../RobotOverflowMenu'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../ProtocolUpload/hooks')

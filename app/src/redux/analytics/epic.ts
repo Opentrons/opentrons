@@ -1,6 +1,14 @@
 // analytics epics
+import * as Cfg from '../config'
+import type { ConfigInitializedAction } from '../config/types'
+import type { State, Action, Epic } from '../types'
+import { makeEvent } from './make-event'
+import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
+import { getAnalyticsConfig } from './selectors'
+import type { TrackEventArgs, AnalyticsEvent, AnalyticsConfig } from './types'
 import { combineEpics, ofType } from 'redux-observable'
 import { of, from, zip } from 'rxjs'
+import type { Observable } from 'rxjs'
 import {
   map,
   mergeMap,
@@ -10,16 +18,6 @@ import {
   ignoreElements,
   pairwise,
 } from 'rxjs/operators'
-
-import * as Cfg from '../config'
-import { getAnalyticsConfig } from './selectors'
-import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
-import { makeEvent } from './make-event'
-
-import type { Observable } from 'rxjs'
-import type { State, Action, Epic } from '../types'
-import type { ConfigInitializedAction } from '../config/types'
-import type { TrackEventArgs, AnalyticsEvent, AnalyticsConfig } from './types'
 
 const initializeAnalyticsEpic: Epic = (action$, state$) => {
   return action$.pipe(

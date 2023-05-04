@@ -1,7 +1,4 @@
-import assert from 'assert'
-import range from 'lodash/range'
-import isEmpty from 'lodash/isEmpty'
-import uniq from 'lodash/uniq'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import {
   AIR,
   mergeLiquid,
@@ -11,7 +8,11 @@ import {
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import assert from 'assert'
+import isEmpty from 'lodash/isEmpty'
+import range from 'lodash/range'
+import uniq from 'lodash/uniq'
+
 export function forAspirate(
   params: AspDispAirgapParams,
   invariantContext: InvariantContext,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { FloatingActionButton } from '..'
 import {
   renderWithProviders,
   BORDERS,
@@ -6,8 +6,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { FloatingActionButton } from '..'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof FloatingActionButton>) => {
   return renderWithProviders(<FloatingActionButton {...props} />)[0]

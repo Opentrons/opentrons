@@ -1,5 +1,4 @@
 import { getLoadedModule } from './accessors'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export function getModuleDisplayLocation(

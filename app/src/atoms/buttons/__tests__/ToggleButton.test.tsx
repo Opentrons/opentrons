@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders, COLORS, SIZE_2 } from '@opentrons/components'
-
 import { ToggleButton } from '..'
+import { renderWithProviders, COLORS, SIZE_2 } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const mockOnClick = jest.fn()
 

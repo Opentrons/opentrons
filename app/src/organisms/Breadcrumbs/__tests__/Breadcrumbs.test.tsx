@@ -1,9 +1,4 @@
-import * as React from 'react'
-import { MemoryRouter, Route, Switch } from 'react-router-dom'
-import { when } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { Breadcrumbs } from '..'
 import { i18n } from '../../../i18n'
 import {
   useRobot,
@@ -14,9 +9,11 @@ import { getIsOnDevice } from '../../../redux/config'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { Breadcrumbs } from '..'
-
 import type { State } from '../../../redux/types'
+import { renderWithProviders } from '@opentrons/components'
+import { when } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter, Route, Switch } from 'react-router-dom'
 
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../organisms/ProtocolsLanding/utils')

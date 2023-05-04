@@ -1,6 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import type { FormattedPipetteOffsetCalibration } from '.'
+import { StyledText } from '../../atoms/text'
+import { useAttachedPipettes } from '../../organisms/Devices/hooks'
+import { TipLengthCalibration } from '../../redux/calibration/api-types'
+import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
+import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,15 +11,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-
-import { StyledText } from '../../atoms/text'
-import { useAttachedPipettes } from '../../organisms/Devices/hooks'
-import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
-
-import type { FormattedPipetteOffsetCalibration } from '.'
-import { TipLengthCalibration } from '../../redux/calibration/api-types'
-import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
 import { getLabwareDefURI, PipetteName } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface RobotSettingsTipLengthCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]

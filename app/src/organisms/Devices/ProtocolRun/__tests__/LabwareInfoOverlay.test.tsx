@@ -1,5 +1,10 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { i18n } from '../../../../i18n'
+import { useCurrentRun } from '../../../ProtocolUpload/hooks'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
+import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
+import { getLabwareLocation } from '../utils/getLabwareLocation'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   LabwareDefinition2,
@@ -7,13 +12,8 @@ import {
   LoadedLabware,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../i18n'
-import { useCurrentRun } from '../../../ProtocolUpload/hooks'
-import { getLabwareLocation } from '../utils/getLabwareLocation'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
-import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../utils/getLabwareLocation')

@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { Svg } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('Svg primitive component', () => {
   it('should be an <svg> with the base SVG props', () => {

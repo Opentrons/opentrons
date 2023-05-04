@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
-
+import { DevicesLanding } from '..'
 import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
 import { RobotCard } from '../../../../organisms/Devices/RobotCard'
@@ -16,7 +13,9 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
-import { DevicesLanding } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../../organisms/Devices/DevicesEmptyState')
 jest.mock('../../../../organisms/Devices/RobotCard')

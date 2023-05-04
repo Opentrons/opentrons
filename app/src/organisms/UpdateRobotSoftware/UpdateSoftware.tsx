@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { ProgressBar } from '../../atoms/ProgressBar'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   COLORS,
@@ -10,9 +9,8 @@ import {
   JUSTIFY_CENTER,
   Box,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
@@ -61,7 +59,7 @@ export function UpdateSoftware({
         fontSize="1.5rem"
         lineHeight="2.0625rem"
         fontWeight="400"
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         {renderText()}
       </StyledText>

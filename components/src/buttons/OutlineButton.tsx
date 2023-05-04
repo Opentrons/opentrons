@@ -1,10 +1,8 @@
-import * as React from 'react'
-import cx from 'classnames'
-
 import { Button } from './Button'
-import styles from './buttons.css'
-
 import type { ButtonProps } from './Button'
+import styles from './buttons.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 /**
  * Button with no background fill and a dark border.

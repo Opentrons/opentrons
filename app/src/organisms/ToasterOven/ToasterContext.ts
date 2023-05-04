@@ -1,7 +1,6 @@
-import * as React from 'react'
-
-import type { ToastProps, ToastType } from '../../atoms/Toast'
 import type { SnackbarProps } from '../../atoms/Snackbar'
+import type { ToastProps, ToastType } from '../../atoms/Toast'
+import * as React from 'react'
 
 export type MakeToastOptions = Omit<ToastProps, 'id' | 'message' | 'type'>
 

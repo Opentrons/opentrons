@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
+import { usePipetteOffsetCalibrations } from '..'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
-import { usePipetteOffsetCalibrations } from '..'
+import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 jest.mock('@opentrons/react-api-client')
 

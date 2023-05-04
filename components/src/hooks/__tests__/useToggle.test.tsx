@@ -1,8 +1,7 @@
+import { useToggle } from '../useToggle'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-
-import { useToggle } from '../useToggle'
 
 describe('useToggle hook', () => {
   let result: ReturnType<typeof useToggle>

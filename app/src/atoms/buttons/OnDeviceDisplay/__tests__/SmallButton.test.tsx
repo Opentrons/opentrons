@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
-
 import { SmallButton } from '../SmallButton'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof SmallButton>) => {
   return renderWithProviders(<SmallButton {...props} />)[0]

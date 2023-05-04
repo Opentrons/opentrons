@@ -1,8 +1,3 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   mockConnectableRobot,
@@ -10,8 +5,12 @@ import {
 } from '../../../../../redux/discovery/__fixtures__'
 import { downloadLogs } from '../../../../../redux/shell/robot-logs/actions'
 import { useRobot } from '../../../hooks'
-
 import { Troubleshooting } from '../Troubleshooting'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../../redux/shell/robot-logs/actions')
 jest.mock('../../../../../redux/shell/robot-logs/selectors')

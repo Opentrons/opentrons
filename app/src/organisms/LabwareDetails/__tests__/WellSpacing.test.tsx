@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { mockCircularLabwareWellGroupProperties } from '../../../redux/custom-labware/__fixtures__'
 import { WellSpacing } from '../WellSpacing'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof WellSpacing>) => {
   return renderWithProviders(<WellSpacing {...props} />, {

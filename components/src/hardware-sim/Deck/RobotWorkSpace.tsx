@@ -1,10 +1,9 @@
-import * as React from 'react'
-import cx from 'classnames'
 import { StyleProps, Svg } from '../../primitives'
 import { DeckFromData } from './DeckFromData'
 import styles from './RobotWorkSpace.css'
-
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }

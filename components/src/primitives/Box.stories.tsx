@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { Box as BoxComponent } from './Box'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Atoms/Box',

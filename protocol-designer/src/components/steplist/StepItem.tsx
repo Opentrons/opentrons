@@ -1,14 +1,3 @@
-import * as React from 'react'
-import cx from 'classnames'
-import sum from 'lodash/sum'
-import { Icon } from '@opentrons/components'
-import {
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
-import { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import {
   stepIconsByType,
@@ -20,26 +9,36 @@ import {
 } from '../../form-types'
 import { i18n } from '../../localization'
 import {
+  SubstepIdentifier,
+  SubstepItemData,
+  ThermocyclerProfileSubstepItem,
+  WellIngredientNames,
+} from '../../steplist/types'
+import {
   makeLidLabelText,
   makeSpeedText,
   makeTemperatureText,
   makeTimerText,
 } from '../../utils'
-import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
+import { PDListItem, TitledStepList } from '../lists'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
 import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
 import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
-
+import { Icon } from '@opentrons/components'
 import {
-  SubstepIdentifier,
-  SubstepItemData,
-  ThermocyclerProfileSubstepItem,
-  WellIngredientNames,
-} from '../../steplist/types'
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
+import cx from 'classnames'
+import sum from 'lodash/sum'
+import * as React from 'react'
 
 export interface StepItemProps {
   description?: string | null

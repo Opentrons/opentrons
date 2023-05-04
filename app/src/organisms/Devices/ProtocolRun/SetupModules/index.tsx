@@ -1,5 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Tooltip } from '../../../../atoms/Tooltip'
+import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
+import { SetupModulesList } from './SetupModulesList'
+import { SetupModulesMap } from './SetupModulesMap'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,11 +11,8 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
-import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { Tooltip } from '../../../../atoms/Tooltip'
-import { SetupModulesMap } from './SetupModulesMap'
-import { SetupModulesList } from './SetupModulesList'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SetupModulesProps {
   expandLabwarePositionCheckStep: () => void

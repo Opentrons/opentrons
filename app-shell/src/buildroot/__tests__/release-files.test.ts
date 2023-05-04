@@ -1,10 +1,9 @@
 // TODO(mc, 2020-06-11): test all release-files functions
-import path from 'path'
+import { cleanupReleaseFiles } from '../release-files'
 import { promises as fs } from 'fs'
 import fse from 'fs-extra'
+import path from 'path'
 import tempy from 'tempy'
-
-import { cleanupReleaseFiles } from '../release-files'
 
 describe('buildroot release files utilities', () => {
   const tempDirs: string[] = []

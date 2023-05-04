@@ -1,6 +1,6 @@
-import { RunTimeCommand } from '@opentrons/shared-data'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { getSlotLabwareDefinition } from '../getSlotLabwareDefinition'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 const LABWARE_ID =
   '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'

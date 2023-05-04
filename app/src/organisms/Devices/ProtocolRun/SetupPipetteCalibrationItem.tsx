@@ -1,6 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link as RRDLink } from 'react-router-dom'
+import { Banner } from '../../../atoms/Banner'
+import { TertiaryButton } from '../../../atoms/buttons'
+import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { useDeckCalibrationData, useIsOT3 } from '../hooks'
+import type { PipetteInfo } from '../hooks'
+import { SetupCalibrationItem } from './SetupCalibrationItem'
 import {
   Box,
   Flex,
@@ -18,14 +21,9 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Banner } from '../../../atoms/Banner'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useDeckCalibrationData, useIsOT3 } from '../hooks'
-import { SetupCalibrationItem } from './SetupCalibrationItem'
-
-import type { PipetteInfo } from '../hooks'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link as RRDLink } from 'react-router-dom'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'

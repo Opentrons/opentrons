@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { LabeledValue as LabeledValueComponent } from './LabeledValue'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Molecules/Labeled Value',

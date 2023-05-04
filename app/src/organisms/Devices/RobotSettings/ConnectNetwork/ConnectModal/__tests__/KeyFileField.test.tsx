@@ -1,17 +1,14 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
-import { SelectField } from '@opentrons/components'
-import { UploadKeyInput } from '../UploadKeyInput'
-import { KeyFileField } from '../KeyFileField'
-import * as FormState from '../form-state'
-
 import { LABEL_ADD_NEW_KEY } from '../../i18n'
-
-import type { ShallowWrapper } from 'enzyme'
-import type { ActionMeta } from 'react-select'
+import { KeyFileField } from '../KeyFileField'
+import { UploadKeyInput } from '../UploadKeyInput'
+import * as FormState from '../form-state'
+import { SelectField } from '@opentrons/components'
 import type { SelectOption } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import type { ShallowWrapper } from 'enzyme'
+import * as React from 'react'
+import type { ActionMeta } from 'react-select'
 
 jest.mock('../form-state')
 

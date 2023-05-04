@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { ChooseProtocolSlideout } from '../'
 import { i18n } from '../../../i18n'
-import { getStoredProtocols } from '../../../redux/protocol-storage'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { getStoredProtocols } from '../../../redux/protocol-storage'
+import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import { ChooseProtocolSlideout } from '../'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 jest.mock('../../../redux/protocol-storage')

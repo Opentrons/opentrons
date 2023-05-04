@@ -1,5 +1,4 @@
-import * as React from 'react'
-
+import styles from './styles.css'
 import {
   LabwareRender,
   LabwareNameOverlay,
@@ -12,9 +11,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
-import styles from './styles.css'
-
 import type { LabwareDefinition2, DeckSlot } from '@opentrons/shared-data'
+import * as React from 'react'
 
 const SHORT = 'SHORT'
 const TALL = 'TALL'

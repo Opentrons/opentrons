@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
 import {
   COLORS,
@@ -6,8 +5,8 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '../../../ui-style-constants'
-
 import { AlertPrimaryButton } from '../AlertPrimaryButton'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof AlertPrimaryButton>) => {
   return renderWithProviders(<AlertPrimaryButton {...props} />)[0]

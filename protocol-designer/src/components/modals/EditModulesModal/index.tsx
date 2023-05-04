@@ -1,8 +1,30 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Form, Formik, useFormikContext } from 'formik'
-import some from 'lodash/some'
-import cx from 'classnames'
+import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { i18n } from '../../../localization'
+import {
+  SUPPORTED_MODULE_SLOTS,
+  getAllModuleSlotsByType,
+} from '../../../modules/moduleData'
+import {
+  selectors as stepFormSelectors,
+  actions as stepFormActions,
+} from '../../../step-forms'
+import { ModuleOnDeck } from '../../../step-forms/types'
+import {
+  getSlotsBlockedBySpanning,
+  getSlotIsEmpty,
+  getLabwareOnSlot,
+} from '../../../step-forms/utils'
+import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
+import { ModelModuleInfo } from '../../EditModules'
+import { PDAlert } from '../../alerts/PDAlert'
+import { isModuleWithCollisionIssue } from '../../modules'
+import modalStyles from '../modal.css'
+import { ConnectedSlotMap } from './ConnectedSlotMap'
+import styles from './EditModules.css'
+import { ModelDropdown } from './ModelDropdown'
+import { SlotDropdown } from './SlotDropdown'
+import { useResetSlotOnModelChange } from './form-state'
 import {
   Modal,
   FormGroup,
@@ -19,34 +41,11 @@ import {
   ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
-import {
-  getSlotsBlockedBySpanning,
-  getSlotIsEmpty,
-  getLabwareOnSlot,
-} from '../../../step-forms/utils'
-import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
-import {
-  selectors as stepFormSelectors,
-  actions as stepFormActions,
-} from '../../../step-forms'
-import {
-  SUPPORTED_MODULE_SLOTS,
-  getAllModuleSlotsByType,
-} from '../../../modules/moduleData'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
-import { PDAlert } from '../../alerts/PDAlert'
-import { isModuleWithCollisionIssue } from '../../modules'
-import modalStyles from '../modal.css'
-import styles from './EditModules.css'
-import { ModelDropdown } from './ModelDropdown'
-import { SlotDropdown } from './SlotDropdown'
-import { ConnectedSlotMap } from './ConnectedSlotMap'
-import { useResetSlotOnModelChange } from './form-state'
-
-import { ModuleOnDeck } from '../../../step-forms/types'
-import { ModelModuleInfo } from '../../EditModules'
+import cx from 'classnames'
+import { Form, Formik, useFormikContext } from 'formik'
+import some from 'lodash/some'
+import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType

@@ -1,14 +1,12 @@
-import * as React from 'react'
-
-import { mountWithStore, WrapperWithStore } from '@opentrons/components'
-import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
+import { UpdateBuildroot } from '..'
 import * as Buildroot from '../../../../../redux/buildroot'
+import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
+import type { State } from '../../../../../redux/types'
+import { InstallModal } from '../InstallModal'
 import { VersionInfoModal } from '../VersionInfoModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
-import { InstallModal } from '../InstallModal'
-import { UpdateBuildroot } from '..'
-
-import type { State } from '../../../../../redux/types'
+import { mountWithStore, WrapperWithStore } from '@opentrons/components'
+import * as React from 'react'
 
 // shallow render connected children
 jest.mock('../VersionInfoModal', () => ({

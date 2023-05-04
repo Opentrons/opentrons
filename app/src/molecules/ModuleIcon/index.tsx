@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { Tooltip } from '../../atoms/Tooltip'
+import type { AttachedModule } from '../../redux/modules/types'
 import {
   COLORS,
   Flex,
@@ -8,9 +8,8 @@ import {
   SPACING,
   useHoverTooltip,
 } from '@opentrons/components'
-import { Tooltip } from '../../atoms/Tooltip'
-
-import type { AttachedModule } from '../../redux/modules/types'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 const MODULE_ICON_STYLE = css`
   &:hover {

@@ -1,7 +1,8 @@
-import takeWhile from 'lodash/takeWhile'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
-import * as StepGeneration from '@opentrons/step-generation'
 import { StepArgsAndErrorsById } from '../steplist/types'
+import * as StepGeneration from '@opentrons/step-generation'
+import takeWhile from 'lodash/takeWhile'
+
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   orderedStepIds: string[]

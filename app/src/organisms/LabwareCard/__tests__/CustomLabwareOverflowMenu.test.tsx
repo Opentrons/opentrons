@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { i18n } from '../../../i18n'
 import { useTrackEvent } from '../../../redux/analytics'
+import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 import {
   renderWithProviders,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../redux/analytics')
 jest.mock('@opentrons/components/src/hooks')

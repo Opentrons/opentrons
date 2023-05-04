@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { trackEventMiddleware } from './analytics/middleware'
+import { fileUploadMessage } from './load-file/actions'
+import { makePersistSubscriber, rehydratePersistedAction } from './persist'
+import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
+import { BaseState, Action } from './types'
 import {
   createStore,
   combineReducers,
@@ -8,11 +13,7 @@ import {
   Reducer,
 } from 'redux'
 import thunk from 'redux-thunk'
-import { trackEventMiddleware } from './analytics/middleware'
-import { makePersistSubscriber, rehydratePersistedAction } from './persist'
-import { fileUploadMessage } from './load-file/actions'
-import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
-import { BaseState, Action } from './types'
+
 const timelineMiddleware = makeTimelineMiddleware()
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined

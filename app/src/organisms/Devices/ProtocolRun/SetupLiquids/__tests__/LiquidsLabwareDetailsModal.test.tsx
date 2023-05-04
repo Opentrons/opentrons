@@ -1,24 +1,23 @@
-import * as React from 'react'
-import { when } from 'jest-when'
 import { i18n } from '../../../../../i18n'
+import { getIsOnDevice } from '../../../../../redux/config'
+import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
+import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
+import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { LiquidDetailCard } from '../LiquidDetailCard'
+import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
+import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
+import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 import {
   nestedTextMatcher,
   renderWithProviders,
   partialComponentPropsMatcher,
   LabwareRender,
 } from '@opentrons/components'
-import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
-import { getIsOnDevice } from '../../../../../redux/config'
-import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
-import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
-import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
-import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
-import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
-import { LiquidDetailCard } from '../LiquidDetailCard'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

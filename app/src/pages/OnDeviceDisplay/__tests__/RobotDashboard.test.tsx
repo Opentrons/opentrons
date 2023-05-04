@@ -1,20 +1,17 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-
+import { i18n } from '../../../i18n'
+import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { EmptyRecentRun } from '../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
+import { useMissingProtocolHardware } from '../../Protocols/hooks'
+import { RobotDashboard } from '../RobotDashboard'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
-
-import { i18n } from '../../../i18n'
-import { EmptyRecentRun } from '../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
-import { useMissingProtocolHardware } from '../../Protocols/hooks'
-import { RobotDashboard } from '../RobotDashboard'
-
 import type { ProtocolResource } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 const mockPush = jest.fn()
 

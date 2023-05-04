@@ -1,10 +1,8 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-import * as Sessions from '../../../../redux/sessions'
-
 import { i18n } from '../../../../i18n'
+import * as Sessions from '../../../../redux/sessions'
 import { Body } from '../Body'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Body>) => {
   return renderWithProviders(<Body {...props} />, {

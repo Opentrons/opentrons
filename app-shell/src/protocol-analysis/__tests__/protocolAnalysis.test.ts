@@ -1,21 +1,19 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-import electron from 'electron'
-import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
-import * as Cfg from '@opentrons/app/src/redux/config'
-
-import * as Dialogs from '../../dialogs'
-import { Config, getConfig, handleConfigChange } from '../../config'
-import { getValidLabwareFilePaths } from '../../labware'
-import { selectPythonPath, getPythonPath } from '../getPythonPath'
-import { executeAnalyzeCli } from '../executeAnalyzeCli'
-import { writeFailedAnalysis } from '../writeFailedAnalysis'
-
 import {
   registerProtocolAnalysis,
   analyzeProtocolSource,
   CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
 } from '..'
+import { Config, getConfig, handleConfigChange } from '../../config'
+import * as Dialogs from '../../dialogs'
+import { getValidLabwareFilePaths } from '../../labware'
 import { Dispatch } from '../../types'
+import { executeAnalyzeCli } from '../executeAnalyzeCli'
+import { selectPythonPath, getPythonPath } from '../getPythonPath'
+import { writeFailedAnalysis } from '../writeFailedAnalysis'
+import * as Cfg from '@opentrons/app/src/redux/config'
+import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
+import electron from 'electron'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 jest.mock('../../labware')
 jest.mock('../../dialogs')

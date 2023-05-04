@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
+import { renderWithProviders, COLORS, TYPOGRAPHY } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (
   props: React.ComponentProps<typeof CalibrationHealthCheckResults>

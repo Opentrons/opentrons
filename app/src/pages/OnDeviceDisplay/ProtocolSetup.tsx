@@ -1,8 +1,24 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory, useParams } from 'react-router-dom'
-import first from 'lodash/first'
-
+import type { OnDeviceRouteParams } from '../../App/types'
+import { Skeleton } from '../../atoms/Skeleton'
+import { StyledText } from '../../atoms/text'
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useAttachedModules } from '../../organisms/Devices/hooks'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
+import {
+  getAreInstrumentsReady,
+  getProtocolUsesGripper,
+} from '../../organisms/ProtocolSetupInstruments/utils'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
+import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
+import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
+import { useRunControls } from '../../organisms/RunTimeControl/hooks'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 import {
   Btn,
   Flex,
@@ -30,29 +46,10 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-
-import { StyledText } from '../../atoms/text'
-import { Skeleton } from '../../atoms/Skeleton'
-import { useAttachedModules } from '../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
-import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
-import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
-import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
-import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
-import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import {
-  getAreInstrumentsReady,
-  getProtocolUsesGripper,
-} from '../../organisms/ProtocolSetupInstruments/utils'
-import { useRunControls } from '../../organisms/RunTimeControl/hooks'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
-
-import type { OnDeviceRouteParams } from '../../App/types'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import first from 'lodash/first'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory, useParams } from 'react-router-dom'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -301,7 +298,7 @@ function PrepareToRun({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -434,7 +431,7 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />

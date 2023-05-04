@@ -1,5 +1,5 @@
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { volumeTooHigh } from '../errors'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 
 describe('volumeTooHigh', () => {
   let fieldsWithPipette: any // this is any typed because HydratedFormData in formLevel/errors is any typed :(

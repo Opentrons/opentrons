@@ -1,14 +1,15 @@
-import { connect } from 'react-redux'
-import {
-  FeatureFlagCard as FeatureFlagCardComponent,
-  Props as FeatureFlagCardProps,
-} from './FeatureFlagCard'
 import {
   actions as featureFlagActions,
   selectors as featureFlagSelectors,
 } from '../../../feature-flags'
-import { Dispatch } from 'redux'
 import { BaseState } from '../../../types'
+import {
+  FeatureFlagCard as FeatureFlagCardComponent,
+  Props as FeatureFlagCardProps,
+} from './FeatureFlagCard'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
+
 interface SP {
   flags: FeatureFlagCardProps['flags']
 }

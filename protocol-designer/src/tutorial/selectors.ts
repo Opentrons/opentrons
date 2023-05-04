@@ -1,10 +1,10 @@
-import { createSelector } from 'reselect'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
-import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
-import { getUnsavedForm, getOrderedStepIds } from '../step-forms/selectors'
-import isEmpty from 'lodash/isEmpty'
-import { BaseState, Selector } from '../types'
 import { HintKey } from '.'
+import { getUnsavedForm, getOrderedStepIds } from '../step-forms/selectors'
+import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
+import { BaseState, Selector } from '../types'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import isEmpty from 'lodash/isEmpty'
+import { createSelector } from 'reselect'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 

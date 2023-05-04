@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { DeprecatedPrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
+import { DeprecatedPrimaryButton, Icon } from '@opentrons/components'
+import * as React from 'react'
 
 interface Props {
   onUpload: React.DragEventHandler<HTMLLabelElement> &

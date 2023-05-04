@@ -1,6 +1,10 @@
-import * as React from 'react'
-import snakeCase from 'lodash/snakeCase'
-import { Trans, useTranslation } from 'react-i18next'
+import { Portal } from '../../../../App/portal'
+import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
+import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
+import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
+import { getModuleName } from '../utils/getModuleName'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -11,14 +15,9 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { Portal } from '../../../../App/portal'
-import { StyledText } from '../../../../atoms/text'
-import { Modal } from '../../../../molecules/Modal'
-import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
-import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
-import { getModuleName } from '../utils/getModuleName'
-
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import snakeCase from 'lodash/snakeCase'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 interface SecureLabwareModalProps {
   onCloseClick: () => unknown

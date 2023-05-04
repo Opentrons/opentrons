@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
-
-import { TOOLTIP_TOP } from '../constants'
 import { Tooltip, Arrow } from '../Tooltip'
+import { TOOLTIP_TOP } from '../constants'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 const placement = TOOLTIP_TOP
 const tooltipId = 'tooltip-id'

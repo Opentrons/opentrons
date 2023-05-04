@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { TertiaryButton } from '../buttons'
+import { Tooltip } from './index'
 import {
   Flex,
   JUSTIFY_CENTER,
@@ -11,9 +12,8 @@ import {
   Link,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { TertiaryButton } from '../buttons'
-import { Tooltip } from './index'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/Tooltip',

@@ -1,3 +1,4 @@
+import { distribute } from '../commandCreators/compound/distribute'
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -21,13 +22,12 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { distribute } from '../commandCreators/compound/distribute'
-import type { CreateCommand } from '@opentrons/shared-data'
 import type { DistributeArgs, InvariantContext, RobotState } from '../types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 // well depth for 96 plate is 10.54, so need to add 1mm to top of well
 const airGapHelper = makeAirGapHelper({

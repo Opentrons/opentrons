@@ -1,8 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { Redirect, useParams } from 'react-router-dom'
-
+import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
+import { Line } from '../../atoms/structure'
+import { NavTab } from '../../molecules/NavTab'
+import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
+import * as Config from '../../redux/config'
+import { AdvancedSettings } from './AdvancedSettings'
+import { GeneralSettings } from './GeneralSettings'
+import { PrivacySettings } from './PrivacySettings'
 import {
   Text,
   Box,
@@ -14,16 +17,10 @@ import {
   BORDERS,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import * as Config from '../../redux/config'
-import { GeneralSettings } from './GeneralSettings'
-import { PrivacySettings } from './PrivacySettings'
-import { AdvancedSettings } from './AdvancedSettings'
-import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
-import { NavTab } from '../../molecules/NavTab'
-import { Line } from '../../atoms/structure'
-
-import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { Redirect, useParams } from 'react-router-dom'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
@@ -50,9 +47,7 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        border={`${String(SPACING.spacingXXS)} ${String(
-          BORDERS.styleSolid
-        )} ${String(COLORS.medGreyEnabled)}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >

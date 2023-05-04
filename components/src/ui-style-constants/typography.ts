@@ -1,5 +1,5 @@
-import { css } from 'styled-components'
 import { COLORS } from './'
+import { css } from 'styled-components'
 
 // Font Sizes
 export const fontSize80 = '5rem' // 80px

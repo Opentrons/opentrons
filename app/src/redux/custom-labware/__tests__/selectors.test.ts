@@ -1,7 +1,6 @@
+import type { State } from '../../types'
 import * as Fixtures from '../__fixtures__'
 import * as selectors from '../selectors'
-
-import type { State } from '../../types'
 import type { ValidLabwareFile } from '../types'
 
 interface SelectorSpec {

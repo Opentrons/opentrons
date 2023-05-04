@@ -1,7 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import { Divider } from '../../../../atoms/structure'
+import { StyledText } from '../../../../atoms/text'
+import {
+  useTrackEvent,
+  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+} from '../../../../redux/analytics'
+import { getIsOnDevice } from '../../../../redux/config'
+import { getWellRangeForLiquidLabwarePair } from './utils'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,14 +22,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { Divider } from '../../../../atoms/structure'
-import { StyledText } from '../../../../atoms/text'
-import {
-  useTrackEvent,
-  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
-} from '../../../../redux/analytics'
-import { getIsOnDevice } from '../../../../redux/config'
-import { getWellRangeForLiquidLabwarePair } from './utils'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 const LIQUID_CARD_STYLE = css`
   ${BORDERS.cardOutlineBorder}

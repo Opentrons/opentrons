@@ -1,22 +1,20 @@
-import semver from 'semver'
-import { createSelector } from 'reselect'
-
 import {
   HEALTH_STATUS_OK,
   getViewableRobots,
   getRobotApiVersion,
   getRobotByName,
 } from '../discovery'
-import * as Constants from './constants'
-
-import type { State } from '../types'
 import type { ViewableRobot } from '../discovery/types'
+import type { State } from '../types'
+import * as Constants from './constants'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,
   BuildrootUpdateType,
   RobotSystemType,
 } from './types'
+import { createSelector } from 'reselect'
+import semver from 'semver'
 
 // TODO(mc, 2020-08-02): i18n
 const UPDATE_SERVER_UNAVAILABLE =

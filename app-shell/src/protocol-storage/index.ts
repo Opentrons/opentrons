@@ -1,16 +1,13 @@
+import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
+import type { Action, Dispatch } from '../types'
+import * as FileSystem from './file-system'
+import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
+import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { shell } from 'electron'
 import fse from 'fs-extra'
 import path from 'path'
-import { shell } from 'electron'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
-
-import * as FileSystem from './file-system'
-import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
-
-import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
-import type { Action, Dispatch } from '../types'
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 

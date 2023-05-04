@@ -1,10 +1,4 @@
-import Ajv from 'ajv'
-import flatten from 'lodash/flatten'
-import range from 'lodash/range'
-import round from 'lodash/round'
-
 import labwareSchema from '../../labware/schemas/2.json'
-
 import {
   toWellName,
   sortWells,
@@ -13,7 +7,6 @@ import {
   getAsciiVolumeUnits,
   ensureVolumeUnits,
 } from '../helpers/index'
-
 import type {
   LabwareDefinition2 as Definition,
   LabwareMetadata as Metadata,
@@ -27,6 +20,10 @@ import type {
   LabwareOffset as Offset,
   LabwareVolumeUnits as VolumeUnits,
 } from '../types'
+import Ajv from 'ajv'
+import flatten from 'lodash/flatten'
+import range from 'lodash/range'
+import round from 'lodash/round'
 
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
 export const DEFAULT_CUSTOM_NAMESPACE = 'custom_beta'

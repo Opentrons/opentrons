@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { FormikTouched } from 'formik'
 import { LabwareFields } from '../../fields'
 import { AlertItem } from '@opentrons/components'
+import { FormikTouched } from 'formik'
+import * as React from 'react'
 
 export interface Props {
   values: LabwareFields

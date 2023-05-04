@@ -1,7 +1,11 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Link as InternalLink } from 'react-router-dom'
-
+import { ReleaseNotes } from '../../molecules/ReleaseNotes'
+import { ErrorModal } from '../../molecules/modals'
+import {
+  getShellUpdateState,
+  downloadShellUpdate,
+  applyShellUpdate,
+} from '../../redux/shell'
+import type { Dispatch } from '../../redux/types'
 import {
   ALIGN_CENTER,
   C_BLUE,
@@ -27,17 +31,9 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import {
-  getShellUpdateState,
-  downloadShellUpdate,
-  applyShellUpdate,
-} from '../../redux/shell'
-
-import { ErrorModal } from '../../molecules/modals'
-import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-
-import type { Dispatch } from '../../redux/types'
+import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { Link as InternalLink } from 'react-router-dom'
 
 export interface UpdateAppModalProps {
   dismissAlert?: (remember: boolean) => unknown

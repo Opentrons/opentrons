@@ -1,6 +1,12 @@
-import * as React from 'react'
-import map from 'lodash/map'
-
+import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
+import {
+  useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../hooks'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
 import {
   Flex,
   Box,
@@ -16,15 +22,8 @@ import {
   RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import {
-  useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
-import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
-import { OffDeckLabwareList } from './OffDeckLabwareList'
+import map from 'lodash/map'
+import * as React from 'react'
 
 interface SetupLabwareMapProps {
   robotName: string

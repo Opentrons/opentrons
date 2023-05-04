@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { Portal } from '../../../App/portal'
+import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal'
 import {
   Flex,
   JUSTIFY_FLEX_END,
@@ -8,12 +8,9 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { Portal } from '../../../App/portal'
-import { StyledText } from '../../../atoms/text'
-import { Modal } from '../../../molecules/Modal'
-
 import type { AnalysisError } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ProtocolAnalysisErrorModalProps {
   displayName: string | null

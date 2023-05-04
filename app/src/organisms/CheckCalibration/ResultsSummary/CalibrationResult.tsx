@@ -1,7 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { StyledText } from '../../../atoms/text'
+import { RenderResult } from './RenderResult'
 import {
   Flex,
   DIRECTION_ROW,
@@ -10,9 +8,9 @@ import {
   COLORS,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { RenderResult } from './RenderResult'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 export const RESULT_SUMMARY_STYLE = css`
   border: 1px solid ${COLORS.medGreyEnabled};

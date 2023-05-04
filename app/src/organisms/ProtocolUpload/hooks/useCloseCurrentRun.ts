@@ -1,9 +1,7 @@
-import * as React from 'react'
-
-import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
-
+import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
+import * as React from 'react'
 
 type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
 

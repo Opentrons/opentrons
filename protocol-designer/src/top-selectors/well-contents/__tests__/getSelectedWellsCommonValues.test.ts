@@ -1,6 +1,5 @@
-import { LabwareLiquidState } from '@opentrons/step-generation'
-
 import { getSelectedWellsCommonValues } from '../'
+import { LabwareLiquidState } from '@opentrons/step-generation'
 
 jest.mock('../../../labware-defs/utils')
 

@@ -1,24 +1,14 @@
-import { combineReducers } from 'redux'
-import isEqual from 'lodash/isEqual'
-import keyBy from 'lodash/keyBy'
-import omit from 'lodash/omit'
-
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_UNREACHABLE,
 } from '../constants'
-
-import * as Actions from './actions'
-
-import type { Reducer } from 'redux'
-
 import type {
   HealthResponse,
   ServerHealthResponse,
   HealthErrorResponse,
 } from '../types'
-
+import * as Actions from './actions'
 import type {
   State,
   Action,
@@ -29,6 +19,11 @@ import type {
   Address,
   HealthStatus,
 } from './types'
+import isEqual from 'lodash/isEqual'
+import keyBy from 'lodash/keyBy'
+import omit from 'lodash/omit'
+import { combineReducers } from 'redux'
+import type { Reducer } from 'redux'
 
 const INITIAL_STATE: State = {
   robotsByName: {},

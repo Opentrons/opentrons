@@ -1,8 +1,19 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useFormik } from 'formik'
+import { Banner } from '../../../../../atoms/Banner'
+import { InputField } from '../../../../../atoms/InputField'
+import { Slideout } from '../../../../../atoms/Slideout'
+import { StyledText } from '../../../../../atoms/text'
+import {
+  useTrackEvent,
+  ANALYTICS_RENAME_ROBOT,
+} from '../../../../../redux/analytics'
+import {
+  removeRobot,
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../../../../redux/discovery'
+import type { State, Dispatch } from '../../../../../redux/types'
+import type { UpdatedRobotName } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,23 +23,12 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
-import {
-  removeRobot,
-  getConnectableRobots,
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../../../redux/discovery'
-import {
-  useTrackEvent,
-  ANALYTICS_RENAME_ROBOT,
-} from '../../../../../redux/analytics'
-import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
-import { InputField } from '../../../../../atoms/InputField'
-import { Banner } from '../../../../../atoms/Banner'
+import { useFormik } from 'formik'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
-import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '../../../../../redux/types'
 interface RenameRobotSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import styles from './ConditionalLabwareRender.css'
 import {
   LabwareRender,
   LabwareOutline,
@@ -10,7 +10,7 @@ import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import styles from './ConditionalLabwareRender.css'
+import * as React from 'react'
 
 interface Props {
   definition: LabwareDefinition2 | null

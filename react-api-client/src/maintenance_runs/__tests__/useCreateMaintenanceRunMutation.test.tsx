@@ -1,17 +1,16 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { createMaintenanceRun } from '@opentrons/api-client'
+import { useCreateMaintenanceRunMutation } from '..'
 import { useHost } from '../../api'
 import { mockMaintenanceRunResponse } from '../__fixtures__'
-import { useCreateMaintenanceRunMutation } from '..'
-
+import { createMaintenanceRun } from '@opentrons/api-client'
 import type {
   HostConfig,
   Response,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import { act, renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

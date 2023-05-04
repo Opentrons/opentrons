@@ -1,5 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Tooltip } from '../../../../atoms/Tooltip'
+import { StyledText } from '../../../../atoms/text'
+import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
+import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
+import { CurrentOffsetsTable } from './CurrentOffsetsTable'
+import { HowLPCWorksModal } from './HowLPCWorksModal'
 import {
   Flex,
   SPACING,
@@ -14,14 +20,8 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { useRunQuery } from '@opentrons/react-api-client'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
-import { Tooltip } from '../../../../atoms/Tooltip'
-import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
-import { CurrentOffsetsTable } from './CurrentOffsetsTable'
-import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
-import { HowLPCWorksModal } from './HowLPCWorksModal'
-import { StyledText } from '../../../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void

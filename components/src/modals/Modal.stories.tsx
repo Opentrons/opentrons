@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   AlertModal,
   BaseModal,
@@ -20,8 +19,8 @@ import {
   FONT_WEIGHT_REGULAR,
   SPACING_2,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Molecules/Modal',

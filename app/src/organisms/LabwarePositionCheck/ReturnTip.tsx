@@ -1,9 +1,13 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
+import { UnorderedList } from '../../molecules/UnorderedList'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import type { ReturnTipStep } from './types'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+import type { VectorOffset } from '@opentrons/api-client'
+import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -11,13 +15,8 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
-import { UnorderedList } from '../../molecules/UnorderedList'
-import { useChainRunCommands } from '../../resources/runs/hooks'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-
-import type { VectorOffset } from '@opentrons/api-client'
-import type { ReturnTipStep } from './types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis

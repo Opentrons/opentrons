@@ -1,11 +1,10 @@
+import type { DeckCalibrationStatus } from '../calibration/types'
 import type { Config } from '../config/types'
+import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
-
-import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
-import type { DeckCalibrationStatus } from '../calibration/types'
 import type { Mount } from '@opentrons/components'
 
 export type AnalyticsConfig = Config['analytics']

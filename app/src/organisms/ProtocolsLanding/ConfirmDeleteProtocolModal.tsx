@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 import {
   Flex,
   COLORS,
@@ -11,8 +11,8 @@ import {
   Link,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: React.MouseEventHandler<HTMLAnchorElement> | undefined

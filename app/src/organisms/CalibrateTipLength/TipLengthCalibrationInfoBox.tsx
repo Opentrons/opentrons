@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   Box,
   Text,
@@ -6,6 +5,7 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   SPACING,
 } from '@opentrons/components'
+import * as React from 'react'
 
 export interface TipLengthCalibrationInfoBoxProps {
   title: string

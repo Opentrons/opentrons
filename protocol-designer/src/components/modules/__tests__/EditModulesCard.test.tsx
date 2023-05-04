@@ -1,6 +1,13 @@
-import React from 'react'
-import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { SUPPORTED_MODULE_TYPES } from '../../../modules'
+import {
+  ModuleOnDeck,
+  selectors as stepFormSelectors,
+} from '../../../step-forms'
+import { FormPipette } from '../../../step-forms/types'
+import { CrashInfoBox } from '../CrashInfoBox'
+import { EditModulesCard } from '../EditModulesCard'
+import { ModuleRow } from '../ModuleRow'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
@@ -9,16 +16,9 @@ import {
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import {
-  ModuleOnDeck,
-  selectors as stepFormSelectors,
-} from '../../../step-forms'
-import { FormPipette } from '../../../step-forms/types'
-import { SUPPORTED_MODULE_TYPES } from '../../../modules'
-import { EditModulesCard } from '../EditModulesCard'
-import { CrashInfoBox } from '../CrashInfoBox'
-import { ModuleRow } from '../ModuleRow'
+import { mount } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')

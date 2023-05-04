@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../atoms/text'
 import {
   Box,
   Flex,
@@ -23,8 +21,8 @@ import {
   Icon,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,

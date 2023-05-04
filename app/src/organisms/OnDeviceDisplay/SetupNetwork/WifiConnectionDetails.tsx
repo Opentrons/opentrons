@@ -1,8 +1,17 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { useHistory, Link } from 'react-router-dom'
-
+import { TertiaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import { getLocalRobot } from '../../../redux/discovery'
+import {
+  getNetworkInterfaces,
+  fetchStatus,
+  fetchWifiList,
+} from '../../../redux/networking'
+import type {
+  SimpleInterfaceStatus,
+  WifiNetwork,
+  WifiSecurityType,
+} from '../../../redux/networking/types'
+import type { State, Dispatch } from '../../../redux/types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -18,22 +27,10 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { TertiaryButton } from '../../../atoms/buttons'
-import {
-  getNetworkInterfaces,
-  fetchStatus,
-  fetchWifiList,
-} from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
-
-import type { State, Dispatch } from '../../../redux/types'
-import type {
-  SimpleInterfaceStatus,
-  WifiNetwork,
-  WifiSecurityType,
-} from '../../../redux/networking/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory, Link } from 'react-router-dom'
 
 interface WifiConnectionDetailsProps {
   ssid?: string
@@ -114,7 +111,7 @@ const DisplayConnectionStatus = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing24)} ${String(SPACING.spacingXXL)}`}
+      padding={`${String(SPACING.spacing24)} ${String(SPACING.spacing40)}`}
       backgroundColor={
         connected ? COLORS.successBackgroundMed : COLORS.light_two
       }

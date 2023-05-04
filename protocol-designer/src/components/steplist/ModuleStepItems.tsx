@@ -1,16 +1,16 @@
-import * as React from 'react'
-import cx from 'classnames'
+import { i18n } from '../../localization'
+import { PDListItem } from '../lists'
+import { LabwareTooltipContents } from './LabwareTooltipContents'
+import styles from './StepItem.css'
 import {
   Tooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { PDListItem } from '../lists'
-import { LabwareTooltipContents } from './LabwareTooltipContents'
-import styles from './StepItem.css'
 import { ModuleType } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
 export interface ModuleStepItemRowProps {
   label?: string | null

@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { MenuList } from './index'
 import { MenuItem } from './MenuItem'
-
+import { MenuList } from './index'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/MenuList',

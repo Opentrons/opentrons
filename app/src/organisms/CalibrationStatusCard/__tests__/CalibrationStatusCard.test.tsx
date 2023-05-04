@@ -1,11 +1,5 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
-import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '..'
+import { i18n } from '../../../i18n'
 import { useCalibrationTaskList } from '../../Devices/hooks'
 import {
   expectedBadDeckTaskList,
@@ -17,6 +11,10 @@ import {
   expectedIncompleteDeckCalTaskList,
   expectedTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
+import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../Devices/hooks')
 

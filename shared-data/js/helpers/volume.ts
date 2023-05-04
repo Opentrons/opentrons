@@ -1,7 +1,6 @@
 // utilities for working with volumes in µL
-import round from 'lodash/round'
-
 import type { LabwareVolumeUnits } from '../types'
+import round from 'lodash/round'
 
 const SCALE_BY_UNITS = {
   µL: 1,

@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { MenuList } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof MenuList>) => {
   return renderWithProviders(<MenuList {...props} />)[0]

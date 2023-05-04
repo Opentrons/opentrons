@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ModalShell } from '../../molecules/Modal'
 import {
   COLORS,
   POSITION_ABSOLUTE,
@@ -8,7 +8,7 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { ModalShell } from '../../molecules/Modal'
+import * as React from 'react'
 
 interface MenuListProps {
   children: React.ReactNode

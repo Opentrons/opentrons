@@ -1,7 +1,7 @@
-import * as React from 'react'
-import styles from './styles.css'
 import { NavLink } from './NavLink'
 import { protocolLinkProps } from './nav-data'
+import styles from './styles.css'
+import * as React from 'react'
 
 interface Props {
   active: boolean

@@ -1,10 +1,8 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
 import { SetupStep } from '../SetupStep'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 describe('SetupStep', () => {
   const render = ({

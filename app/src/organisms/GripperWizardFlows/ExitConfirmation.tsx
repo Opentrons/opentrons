@@ -1,5 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { GRIPPER_FLOW_TYPES } from './constants'
+import type { GripperWizardFlowType } from './types'
 import {
   COLORS,
   SPACING,
@@ -7,9 +8,8 @@ import {
   AlertPrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { GRIPPER_FLOW_TYPES } from './constants'
-import type { GripperWizardFlowType } from './types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ExitConfirmationProps {
   handleExit: () => void

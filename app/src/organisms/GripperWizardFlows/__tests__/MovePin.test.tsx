@@ -1,8 +1,4 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
-
 import { MovePin } from '../MovePin'
 import {
   GRIPPER_FLOW_TYPES,
@@ -11,7 +7,10 @@ import {
   REMOVE_PIN_FROM_REAR_JAW,
   SECTIONS,
 } from '../constants'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 import type { CommandData } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 describe('MovePin', () => {
   let render: (

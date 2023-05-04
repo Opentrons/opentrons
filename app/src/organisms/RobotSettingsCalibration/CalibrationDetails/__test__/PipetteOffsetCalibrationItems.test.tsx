@@ -1,23 +1,20 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders, Mount } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
-import {
-  mockAttachedPipette,
-  mockAttachedPipetteInformation,
-} from '../../../../redux/pipettes/__fixtures__'
 import {
   useAttachedPipettes,
   useIsOT3,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../../organisms/Devices/hooks'
-import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
-import { OverflowMenu } from '../OverflowMenu'
-import { formatLastCalibrated } from '../utils'
-
+import {
+  mockAttachedPipette,
+  mockAttachedPipetteInformation,
+} from '../../../../redux/pipettes/__fixtures__'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import { OverflowMenu } from '../OverflowMenu'
+import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
+import { formatLastCalibrated } from '../utils'
+import { renderWithProviders, Mount } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>

@@ -1,14 +1,5 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { SECTIONS } from '../constants'
-import { getLabwareDefinitionsFromCommands } from './labware'
-import {
-  getLabwareDefURI,
-  getIsTiprack,
-  getSlotHasMatingSurfaceUnitVector,
-  FIXED_TRASH_ID,
-} from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
-
+import { SECTIONS } from '../constants'
 import type {
   LabwarePositionCheckStep,
   CheckTipRacksStep,
@@ -16,10 +7,18 @@ import type {
   CheckLabwareStep,
   ReturnTipStep,
 } from '../types'
+import { getLabwareDefinitionsFromCommands } from './labware'
+import {
+  getLabwareDefURI,
+  getIsTiprack,
+  getSlotHasMatingSurfaceUnitVector,
+  FIXED_TRASH_ID,
+} from '@opentrons/shared-data'
 import type {
   RunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
 interface LPCArgs {

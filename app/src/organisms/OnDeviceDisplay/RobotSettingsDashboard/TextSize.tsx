@@ -1,7 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
+import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import {
   Flex,
   Btn,
@@ -16,10 +14,9 @@ import {
   COLORS,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 interface RectProps {
   isActive: boolean

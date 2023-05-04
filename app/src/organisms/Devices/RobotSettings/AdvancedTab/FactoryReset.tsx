@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { TertiaryButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
 import {
   Flex,
   ALIGN_CENTER,
@@ -10,9 +9,8 @@ import {
   Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../../atoms/text'
-import { TertiaryButton } from '../../../../atoms/buttons'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface FactoryResetProps {
   updateIsExpanded: (

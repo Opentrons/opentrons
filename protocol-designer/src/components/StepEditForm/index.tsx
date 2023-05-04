@@ -1,24 +1,24 @@
-import { useConditionalConfirm } from '@opentrons/components'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import { FormData, StepFieldName, StepIdType } from '../../form-types'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions } from '../../steplist'
+import { maskField } from '../../steplist/fieldLevel'
+import { BaseState, ThunkDispatch } from '../../types'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { maskField } from '../../steplist/fieldLevel'
-import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
+import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
+import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { getDirtyFields } from './utils'
-import { BaseState, ThunkDispatch } from '../../types'
-import { FormData, StepFieldName, StepIdType } from '../../form-types'
+import { useConditionalConfirm } from '@opentrons/components'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface SP {
   canSave: boolean

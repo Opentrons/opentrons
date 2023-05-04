@@ -1,9 +1,11 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-import clamp from 'lodash/clamp'
-
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import {
+  getOnDeviceDisplaySettings,
+  updateConfigValue,
+} from '../../../redux/config'
+import type { Dispatch } from '../../../redux/types'
 import {
   Flex,
   Btn,
@@ -18,16 +20,11 @@ import {
   SPACING,
   COLORS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
-import {
-  getOnDeviceDisplaySettings,
-  updateConfigValue,
-} from '../../../redux/config'
-
-import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import clamp from 'lodash/clamp'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
 
 const BUTTON_STYLE = css`
   &:focus-visible {

@@ -1,4 +1,9 @@
-import * as React from 'react'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { i18n } from '../../i18n'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { getIsOnDevice } from '../../redux/config'
+import { NeedHelpLink } from '../CalibrationPanels'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -9,15 +14,9 @@ import {
   ALIGN_CENTER,
   COLORS,
 } from '@opentrons/components'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { NeedHelpLink } from '../CalibrationPanels'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { i18n } from '../../i18n'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

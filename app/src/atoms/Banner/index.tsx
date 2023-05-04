@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -16,6 +14,8 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 export type BannerType =
   | 'success'
@@ -97,7 +97,7 @@ export function Banner(props: BannerProps): JSX.Element {
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
   const BANNER_STYLE = css`
-    border: ${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)}
+    border: 1px ${String(BORDERS.styleSolid)}
       ${BANNER_PROPS_BY_TYPE[type].color};
     font-size: ${TYPOGRAPHY.fontSizeP};
     font-weight: ${TYPOGRAPHY.fontWeightRegular};

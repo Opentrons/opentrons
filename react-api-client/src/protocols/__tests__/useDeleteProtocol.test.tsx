@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { deleteProtocol } from '@opentrons/api-client'
-import { useHost } from '../../api'
 import { useDeleteProtocolMutation } from '..'
+import { useHost } from '../../api'
+import { deleteProtocol } from '@opentrons/api-client'
 import type { HostConfig, Response, EmptyResponse } from '@opentrons/api-client'
+import { act, renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

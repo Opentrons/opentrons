@@ -1,5 +1,6 @@
-import i18next from 'i18next'
 import { en } from './en'
+import i18next from 'i18next'
+
 // TODO(IL, 2020-06-08): use a proper type def for i18next module -- but flow-types seems wrong
 interface I18n {
   t: (

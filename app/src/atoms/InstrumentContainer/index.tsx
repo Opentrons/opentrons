@@ -1,8 +1,6 @@
-import * as React from 'react'
-
-import { Flex, BORDERS, COLORS, SPACING } from '@opentrons/components'
-
 import { StyledText } from '../text'
+import { Flex, BORDERS, COLORS, SPACING } from '@opentrons/components'
+import * as React from 'react'
 
 interface InstrumentContainerProps {
   displayName: string

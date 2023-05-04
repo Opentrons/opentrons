@@ -1,6 +1,6 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
-import { INITIAL_STATE, buildrootReducer } from '../reducer'
 import type { Action } from '../../types'
+import { INITIAL_STATE, buildrootReducer } from '../reducer'
 import type { BuildrootState } from '../types'
 
 const BASE_SESSION = {

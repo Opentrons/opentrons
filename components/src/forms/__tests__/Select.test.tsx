@@ -1,8 +1,7 @@
+import { Select } from '../Select'
+import { shallow } from 'enzyme'
 import * as React from 'react'
 import ReactSelect from 'react-select'
-import { shallow } from 'enzyme'
-
-import { Select } from '../Select'
 
 describe('Select', () => {
   it('component renders a ReactSelect', () => {

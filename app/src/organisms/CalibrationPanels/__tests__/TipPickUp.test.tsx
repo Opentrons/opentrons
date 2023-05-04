@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
-
+import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
 import { TipPickUp } from '../TipPickUp'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 describe('TipPickUp', () => {
   let render: (

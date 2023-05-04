@@ -1,12 +1,12 @@
-import * as React from 'react'
+import { i18n } from '../../localization'
+import styles from './AutoAddPauseUntilTempStepModal.css'
+import modalStyles from './modal.css'
 import {
   AlertModal,
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import modalStyles from './modal.css'
-import styles from './AutoAddPauseUntilTempStepModal.css'
+import * as React from 'react'
 
 interface Props {
   displayTemperature: string

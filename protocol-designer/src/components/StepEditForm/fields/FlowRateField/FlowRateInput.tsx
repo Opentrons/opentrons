@@ -1,17 +1,17 @@
-import * as React from 'react'
-import round from 'lodash/round'
+import { i18n } from '../../../../localization'
+import modalStyles from '../../../modals/modal.css'
+import { Portal } from '../../../portals/MainPageModalPortal'
+import stepFormStyles from '../../StepEditForm.css'
+import { FieldProps } from '../../types'
+import styles from './FlowRateInput.css'
 import {
   AlertModal,
   FormGroup,
   RadioGroup,
   InputField,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './FlowRateInput.css'
-import { FieldProps } from '../../types'
+import round from 'lodash/round'
+import * as React from 'react'
 
 const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1

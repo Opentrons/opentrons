@@ -1,9 +1,6 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import {
-  getModuleDef2,
-  inferModuleOrientationFromXCoordinate,
-} from '@opentrons/shared-data'
+import { StyledText } from '../../../atoms/text'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { ModuleInfo } from '../ModuleInfo'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -12,10 +9,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import { ModuleInfo } from '../ModuleInfo'
-
-import type { HeaterShakerModule } from '../../../redux/modules/types'
+import {
+  getModuleDef2,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 const VIEW_BOX = '-150 -38 440 128'
 interface PowerOnProps {
@@ -40,7 +39,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
             strong: (
               <StyledText
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                paddingBottom={SPACING.spacingSM}
+                paddingBottom={SPACING.spacing12}
               />
             ),
             block: <span />,

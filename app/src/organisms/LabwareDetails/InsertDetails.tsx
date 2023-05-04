@@ -1,13 +1,12 @@
-import * as React from 'react'
-import { Box, SPACING, BORDERS, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { getUniqueWellProperties } from './helpers/labwareInference'
-import { getWellLabel } from './helpers/labels'
-import { WellProperties } from './WellProperties'
-import { WellDimensions } from './WellDimensions'
-import { ManufacturerDetails } from './ManufacturerDetails'
-
 import type { LabwareDefinition } from '../../pages/Labware/types'
+import { ManufacturerDetails } from './ManufacturerDetails'
+import { WellDimensions } from './WellDimensions'
+import { WellProperties } from './WellProperties'
+import { getWellLabel } from './helpers/labels'
+import { getUniqueWellProperties } from './helpers/labwareInference'
+import { Box, SPACING, BORDERS, TYPOGRAPHY } from '@opentrons/components'
+import * as React from 'react'
 
 export interface InsertDetailsProps {
   definition: LabwareDefinition

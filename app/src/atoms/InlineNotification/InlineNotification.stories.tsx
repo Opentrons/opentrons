@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { InlineNotification } from '.'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'ODD/Atoms/InlineNotification',

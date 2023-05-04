@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { Icon, SPACING_3 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import collisionImage from '../../images/modules/module_pipette_collision_warning.png'
+import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
+import { Icon, SPACING_3 } from '@opentrons/components'
+import * as React from 'react'
 
 interface Props {
   showDiagram?: boolean

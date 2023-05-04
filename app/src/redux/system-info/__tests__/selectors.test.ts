@@ -1,9 +1,8 @@
+import type { State } from '../../types'
 import * as Fixtures from '../__fixtures__'
+import * as Constants from '../constants'
 import * as Selectors from '../selectors'
 import * as Utils from '../utils'
-import * as Constants from '../constants'
-
-import type { State } from '../../types'
 
 describe('robot controls selectors', () => {
   afterEach(() => {

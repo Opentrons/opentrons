@@ -1,7 +1,3 @@
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
-import each from 'lodash/each'
-import oldProtocol from '../../../../fixtures/protocol/1/doItAll.json'
 import {
   renameOrderedSteps,
   addInitialDeckSetupStep,
@@ -11,6 +7,11 @@ import {
   MIX_DEPRECATED_FIELD_NAMES,
   replaceTCDStepsWithMoveLiquidStep,
 } from '../1_1_0'
+import oldProtocol from '../../../../fixtures/protocol/1/doItAll.json'
+import each from 'lodash/each'
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+
 describe('renameOrderedSteps', () => {
   // @ts-expect-error incorrect paramater type, should be PDProtocolFile type
   const migratedFile = renameOrderedSteps(oldProtocol)

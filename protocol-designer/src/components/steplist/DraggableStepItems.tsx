@@ -1,5 +1,13 @@
+import { DND_TYPES } from '../../constants'
+import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
+import { stepIconsByType, StepIdType, StepType } from '../../form-types'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { BaseState } from '../../types'
+import { PDTitledList } from '../lists'
+import { ContextMenu } from './ContextMenu'
+import styles from './StepItem.css'
+import isEqual from 'lodash/isEqual'
 import * as React from 'react'
-import { connect } from 'react-redux'
 import {
   DragSource,
   DropTarget,
@@ -13,16 +21,7 @@ import {
   DragSourceOptions,
   ConnectDropTarget,
 } from 'react-dnd'
-import isEqual from 'lodash/isEqual'
-
-import { DND_TYPES } from '../../constants'
-import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
-import { PDTitledList } from '../lists'
-import { stepIconsByType, StepIdType, StepType } from '../../form-types'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { BaseState } from '../../types'
-import { ContextMenu } from './ContextMenu'
-import styles from './StepItem.css'
+import { connect } from 'react-redux'
 
 type DragDropStepItemProps = React.ComponentProps<typeof ConnectedStepItem> & {
   connectDragSource: (val: unknown) => React.ReactElement<any>

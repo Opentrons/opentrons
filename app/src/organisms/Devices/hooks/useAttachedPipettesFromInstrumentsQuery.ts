@@ -1,7 +1,7 @@
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs, PipetteModel } from '@opentrons/shared-data'
 import type { PipetteData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs, PipetteModel } from '@opentrons/shared-data'
 
 export interface PipetteInformation extends PipetteData {
   displayName: string

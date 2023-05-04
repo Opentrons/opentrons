@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
-
 import { InstrumentCard } from '..'
+import { render } from '@testing-library/react'
+import * as React from 'react'
 
 const mockOnClick = jest.fn()
 const mockDisabledOnClick = jest.fn()

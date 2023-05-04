@@ -1,26 +1,24 @@
-import React from 'react'
-import { Provider } from 'react-redux'
-import thunk from 'redux-thunk'
-import { mount } from 'enzyme'
-import configureMockStore from 'redux-mock-store'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { act } from 'react-dom/test-utils'
-
-import { actions as stepActions } from '../../../ui/steps'
 import * as stepFormSelectors from '../../../step-forms/selectors'
-import * as stepSelectors from '../../../ui/steps/selectors'
 import * as stepListActions from '../../../steplist/actions/actions'
-
-import {
-  MultiSelectToolbar,
-  ClickableIcon,
-  Accordion,
-} from '../MultiSelectToolbar'
+import { actions as stepActions } from '../../../ui/steps'
+import * as stepSelectors from '../../../ui/steps/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_BATCH_EDIT_FORM,
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
+import {
+  MultiSelectToolbar,
+  ClickableIcon,
+  Accordion,
+} from '../MultiSelectToolbar'
+import { mount } from 'enzyme'
+import { when, resetAllWhenMocks } from 'jest-when'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 
 jest.mock('../../../step-forms/selectors')
 jest.mock('../../../ui/steps/selectors')

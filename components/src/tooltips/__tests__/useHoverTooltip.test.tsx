@@ -1,14 +1,12 @@
+import { Tooltip } from '../Tooltip'
+import { TOOLTIP_TOP, TOOLTIP_FIXED } from '../constants'
+import * as Types from '../types'
+import { useHoverTooltip } from '../useHoverTooltip'
+import * as UseTooltip from '../useTooltip'
+import { mount } from 'enzyme'
+import type { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-
-import { TOOLTIP_TOP, TOOLTIP_FIXED } from '../constants'
-import * as UseTooltip from '../useTooltip'
-import { Tooltip } from '../Tooltip'
-import { useHoverTooltip } from '../useHoverTooltip'
-
-import type { ReactWrapper } from 'enzyme'
-import * as Types from '../types'
 
 jest.mock('../useTooltip', () => ({
   useTooltip: jest.fn(jest.requireActual('../useTooltip').useTooltip),

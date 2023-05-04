@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { Box } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('Box primitive component', () => {
   it('should be a div with min-width: 0', () => {

@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
 import {
   Icon,
   Flex,
@@ -14,7 +12,9 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const DROP_ZONE_STYLES = css`
   display: flex;

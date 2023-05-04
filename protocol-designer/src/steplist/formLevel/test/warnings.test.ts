@@ -1,10 +1,10 @@
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import {
   _minAirGapVolume,
   belowPipetteMinimumVolume,
   minDisposalVolume,
   maxDispenseWellVolume,
 } from '../warnings'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 
 type CheckboxFields = 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox'
 type VolumeFields = 'aspirate_airGap_volume' | 'dispense_airGap_volume'

@@ -1,6 +1,6 @@
-import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
 import type { LogLevel } from '../../logger'
 import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
+import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
 
 export type UrlProtocol = 'file:' | 'http:'
 

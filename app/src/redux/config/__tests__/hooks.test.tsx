@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
+import { useFeatureFlag } from '../hooks'
+import * as Selectors from '../selectors'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
-
-import * as Selectors from '../selectors'
-import { useFeatureFlag } from '../hooks'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
 jest.mock('../selectors')
 

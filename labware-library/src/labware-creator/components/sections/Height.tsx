@@ -1,16 +1,15 @@
-import * as React from 'react'
-import { useFormikContext } from 'formik'
-import { isEveryFieldHidden } from '../../utils'
 import { makeMaskToDecimal } from '../../fieldMasks'
 import { LabwareFields } from '../../fields'
-import { HeightAlerts } from '../alerts/HeightAlerts'
-import { FormAlerts } from '../alerts/FormAlerts'
-import { TextField } from '../TextField'
-import { HeightImg } from '../diagrams'
-import { HeightGuidingText } from '../HeightGuidingText'
-import { SectionBody } from './SectionBody'
-
 import styles from '../../styles.css'
+import { isEveryFieldHidden } from '../../utils'
+import { HeightGuidingText } from '../HeightGuidingText'
+import { TextField } from '../TextField'
+import { FormAlerts } from '../alerts/FormAlerts'
+import { HeightAlerts } from '../alerts/HeightAlerts'
+import { HeightImg } from '../diagrams'
+import { SectionBody } from './SectionBody'
+import { useFormikContext } from 'formik'
+import * as React from 'react'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

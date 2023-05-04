@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
-import { getIsHidden } from '../../formSelectors'
 import {
   IRREGULAR_LABWARE_ERROR,
   LOOSE_TIP_FIT_ERROR,
   LABWARE_TOO_SMALL_ERROR,
   LABWARE_TOO_LARGE_ERROR,
 } from '../../fields'
+import { getIsHidden } from '../../formSelectors'
 import { FormAlerts, Props as FormAlertProps } from '../alerts/FormAlerts'
+import { render } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../formSelectors')
 

@@ -1,7 +1,6 @@
-import os from 'os'
-import isEqual from 'lodash/isEqual'
-
 import type { NetworkInterface } from '@opentrons/app/src/redux/system-info/types'
+import isEqual from 'lodash/isEqual'
+import os from 'os'
 
 export type { NetworkInterface }
 

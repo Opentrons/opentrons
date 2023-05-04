@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { COLORS, AlertPrimaryButton } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { COLORS, AlertPrimaryButton } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface UnskippableModalProps {
   goBack: () => void

@@ -1,8 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-import { css } from 'styled-components'
-
+import { StyledText } from '../../../atoms/text'
+import type { WifiNetwork } from '../../../redux/networking/types'
+import {
+  CONNECT,
+  JOIN_OTHER,
+} from '../../Devices/RobotSettings/ConnectNetwork/constants'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
+import { SearchNetwork } from './SearchNetwork'
 import {
   Flex,
   SPACING,
@@ -17,16 +20,10 @@ import {
   COLORS,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { SearchNetwork } from './SearchNetwork'
-import {
-  CONNECT,
-  JOIN_OTHER,
-} from '../../Devices/RobotSettings/ConnectNetwork/constants'
-
-import type { WifiNetwork } from '../../../redux/networking/types'
-import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
 const NETWORK_ROW_STYLE = css`
   &:active {
@@ -120,7 +117,7 @@ export function DisplayWifiList({
         >
           <Icon name="plus" size="2.25rem" color={COLORS.darkGreyEnabled} />
           <StyledText
-            marginLeft={SPACING.spacingSM}
+            marginLeft={SPACING.spacing12}
             fontSize="1.5rem"
             lineHeight="1.8125rem"
             fontWeight="400"

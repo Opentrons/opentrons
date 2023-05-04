@@ -1,7 +1,9 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-
+import type { DesktopRouteParams } from '../../../App/types'
+import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
+import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
+import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
+import { getScanning } from '../../../redux/discovery'
 import {
   Box,
   Flex,
@@ -12,14 +14,9 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-
-import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
-import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
-import { getScanning } from '../../../redux/discovery'
-
-import type { DesktopRouteParams } from '../../../App/types'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<DesktopRouteParams>()

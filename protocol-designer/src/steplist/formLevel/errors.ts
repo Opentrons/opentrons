@@ -1,8 +1,3 @@
-import * as React from 'react'
-import { getWellRatio } from '../utils'
-import { canPipetteUseLabware } from '../../utils'
-import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
-import { getPipetteCapacity } from '../../pipettes/pipetteData'
 import {
   MIN_ENGAGE_HEIGHT_V1,
   MAX_ENGAGE_HEIGHT_V1,
@@ -14,6 +9,11 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { StepFieldName } from '../../form-types'
+import { getPipetteCapacity } from '../../pipettes/pipetteData'
+import { canPipetteUseLabware } from '../../utils'
+import { getWellRatio } from '../utils'
+import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+import * as React from 'react'
 
 /*******************
  ** Error Messages **

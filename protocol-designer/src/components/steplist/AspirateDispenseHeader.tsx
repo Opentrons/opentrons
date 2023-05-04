@@ -1,14 +1,14 @@
-import * as React from 'react'
-import cx from 'classnames'
+import { PDListItem } from '../lists'
+import { LabwareTooltipContents } from './LabwareTooltipContents'
+import styles from './StepItem.css'
 import {
   Icon,
   Tooltip,
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { PDListItem } from '../lists'
-import styles from './StepItem.css'
-import { LabwareTooltipContents } from './LabwareTooltipContents'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface AspirateDispenseHeaderProps {
   sourceLabwareNickname?: string | null

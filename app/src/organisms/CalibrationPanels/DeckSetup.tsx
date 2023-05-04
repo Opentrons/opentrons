@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import map from 'lodash/map'
+import { StyledText } from '../../atoms/text'
+import * as Sessions from '../../redux/sessions'
+import { CalibrationLabwareRender } from './CalibrationLabwareRender'
+import { NeedHelpLink } from './NeedHelpLink'
+import type { CalibrationPanelProps } from './types'
 import {
   RobotWorkSpace,
   Flex,
@@ -13,13 +15,9 @@ import {
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-
-import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from './NeedHelpLink'
-import { CalibrationLabwareRender } from './CalibrationLabwareRender'
-
-import type { CalibrationPanelProps } from './types'
+import map from 'lodash/map'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const TIPRACK = 'tip rack'
 

@@ -1,14 +1,14 @@
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { uuid } from '../../utils'
 import { renameLabware, createContainer } from '../actions'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 
 jest.mock('../../labware-defs/selectors')
 jest.mock('../../step-forms/selectors')

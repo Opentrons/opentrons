@@ -1,7 +1,4 @@
-import {
-  timelineFrameBeforeActiveItem,
-  timelineFrameAfterActiveItem,
-} from '../timelineFrames'
+import { StepIdType } from '../../form-types'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -12,8 +9,12 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
   HoverableItem,
 } from '../../ui/steps/reducers'
+import {
+  timelineFrameBeforeActiveItem,
+  timelineFrameAfterActiveItem,
+} from '../timelineFrames'
 import { CommandsAndRobotState } from '@opentrons/step-generation'
-import { StepIdType } from '../../form-types'
+
 const initialRobotState: any = 'fake initial robot state'
 const initialFrame: any = {
   robotState: initialRobotState,

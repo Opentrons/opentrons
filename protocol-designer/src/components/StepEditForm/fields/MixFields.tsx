@@ -1,8 +1,8 @@
-import * as React from 'react'
 import { i18n } from '../../../localization'
-import { CheckboxRowField, TextField } from './'
-import { FieldPropsByName } from '../types'
 import styles from '../StepEditForm.css'
+import { FieldPropsByName } from '../types'
+import { CheckboxRowField, TextField } from './'
+import * as React from 'react'
 
 export const MixFields = (props: {
   propsForFields: FieldPropsByName

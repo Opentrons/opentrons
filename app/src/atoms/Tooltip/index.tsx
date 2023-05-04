@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   COLORS,
   TYPOGRAPHY,
@@ -8,6 +7,7 @@ import type {
   UseTooltipResultTooltipProps,
   StyleProps,
 } from '@opentrons/components'
+import * as React from 'react'
 
 export interface TooltipProps extends StyleProps {
   children: React.ReactNode

@@ -1,13 +1,35 @@
-import * as React from 'react'
-import map from 'lodash/map'
-import omit from 'lodash/omit'
-import isEmpty from 'lodash/isEmpty'
-import startCase from 'lodash/startCase'
-import { format } from 'date-fns'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
+import { Portal } from '../../App/portal'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
+import { Modal } from '../../molecules/Modal'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../redux/analytics'
+import {
+  getIsProtocolAnalysisInProgress,
+  analyzeProtocol,
+} from '../../redux/protocol-storage'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { State, Dispatch } from '../../redux/types'
+import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+} from '../ProtocolsLanding/utils'
+import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
+import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
+import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import {
+  parseInitialPipetteNamesByMount,
+  parseInitialLoadedModulesBySlot,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedLabwareByModuleId,
+} from '@opentrons/api-client'
 import {
   Box,
   Btn,
@@ -30,42 +52,17 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import {
-  parseInitialPipetteNamesByMount,
-  parseInitialLoadedModulesBySlot,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-} from '@opentrons/api-client'
 import { protocolHasLiquids } from '@opentrons/shared-data'
-
-import { Portal } from '../../App/portal'
-import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { Modal } from '../../molecules/Modal'
-import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '../../redux/analytics'
-import {
-  getIsProtocolAnalysisInProgress,
-  analyzeProtocol,
-} from '../../redux/protocol-storage'
-import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import {
-  getAnalysisStatus,
-  getProtocolDisplayName,
-} from '../ProtocolsLanding/utils'
-import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
-import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
-import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
-import { RobotConfigurationDetails } from './RobotConfigurationDetails'
-
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State, Dispatch } from '../../redux/types'
+import { format } from 'date-fns'
+import isEmpty from 'lodash/isEmpty'
+import map from 'lodash/map'
+import omit from 'lodash/omit'
+import startCase from 'lodash/startCase'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 const GRID_STYLE = css`
   display: grid;

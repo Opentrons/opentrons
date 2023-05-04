@@ -1,17 +1,15 @@
-import assert from 'assert'
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import reduce from 'lodash/reduce'
-
 import { selectors } from '../../labware-ingred/selectors'
-import { SingleLabware } from './SingleLabware'
-import { wellFillFromWellContents } from './utils'
 import { ContentsByWell } from '../../labware-ingred/types'
 import { WellIngredientNames } from '../../steplist/types'
+import { SingleLabware } from './SingleLabware'
+import { WellTooltip } from './WellTooltip'
+import { wellFillFromWellContents } from './utils'
 import { WellGroup, WELL_LABEL_OPTIONS } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
-
-import { WellTooltip } from './WellTooltip'
+import assert from 'assert'
+import reduce from 'lodash/reduce'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 interface Props {
   definition?: LabwareDefinition2 | null

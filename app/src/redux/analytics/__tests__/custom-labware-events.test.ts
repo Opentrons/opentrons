@@ -1,10 +1,8 @@
-import { makeEvent } from '../make-event'
-
 import * as CustomLabware from '../../custom-labware'
 import * as LabwareFixtures from '../../custom-labware/__fixtures__'
-import { ANALYTICS_ADD_CUSTOM_LABWARE } from '../constants'
-
 import type { State, Action } from '../../types'
+import { ANALYTICS_ADD_CUSTOM_LABWARE } from '../constants'
+import { makeEvent } from '../make-event'
 import type { AnalyticsEvent } from '../types'
 
 interface EventSpec {

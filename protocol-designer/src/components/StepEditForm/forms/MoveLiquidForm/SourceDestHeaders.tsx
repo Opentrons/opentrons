@@ -1,13 +1,12 @@
-import * as React from 'react'
-import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { LabwareField, WellSelectionField } from '../../fields'
-import { AspDispSection } from '../AspDispSection'
-import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { FormData } from '../../../../form-types'
-import { FieldPropsByName } from '../../types'
-
+import { i18n } from '../../../../localization'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
 import styles from '../../StepEditForm.css'
+import { LabwareField, WellSelectionField } from '../../fields'
+import { FieldPropsByName } from '../../types'
+import { AspDispSection } from '../AspDispSection'
+import { FormGroup } from '@opentrons/components'
+import * as React from 'react'
 
 interface Props {
   className?: string | null

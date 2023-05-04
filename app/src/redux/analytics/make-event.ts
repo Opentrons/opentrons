@@ -3,15 +3,16 @@
 // out because RPC-based analytics events were not replaced with
 // the switch to the HTTP APIs. Commented out code left to aid with
 // analytics replacement.
-import * as CustomLabware from '../custom-labware'
-import * as SystemInfo from '../system-info'
-import * as brActions from '../buildroot/constants'
-import * as Sessions from '../sessions'
 import * as Alerts from '../alerts'
-import * as Constants from './constants'
-import { sharedCalCommands } from '../sessions/common-calibration/constants'
+import * as brActions from '../buildroot/constants'
+import * as CustomLabware from '../custom-labware'
+import type { Mount } from '../pipettes/types'
 import * as RobotAdmin from '../robot-admin'
-
+import * as Sessions from '../sessions'
+import { sharedCalCommands } from '../sessions/common-calibration/constants'
+import * as SystemInfo from '../system-info'
+import type { State, Action } from '../types'
+import * as Constants from './constants'
 import {
   getBuildrootAnalyticsData,
   getAnalyticsPipetteCalibrationData,
@@ -21,10 +22,7 @@ import {
   getAnalyticsSessionExitDetails,
   getSessionInstrumentAnalyticsData,
 } from './selectors'
-
-import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
-import type { Mount } from '../pipettes/types'
 
 const EVENT_APP_UPDATE_DISMISSED = 'appUpdateDismissed'
 

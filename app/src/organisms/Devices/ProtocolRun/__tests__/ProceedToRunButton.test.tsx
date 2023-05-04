@@ -1,9 +1,3 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { StaticRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
 import {
   useTrackEvent,
@@ -15,6 +9,10 @@ import {
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { ProceedToRunButton } from '../ProceedToRunButton'
+import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

@@ -1,16 +1,13 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
-import { useInterval } from '@opentrons/components'
-
 import {
   fetchStatus,
   fetchWifiList,
   getNetworkInterfaces,
   getWifiList,
 } from '../../../redux/networking'
-
 import type { Dispatch, State } from '../../../redux/types'
+import { useInterval } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface NetworkConnection {
   isWifiConnected: boolean

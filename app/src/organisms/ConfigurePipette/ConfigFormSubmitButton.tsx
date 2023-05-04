@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,6 +5,9 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   PrimaryButton,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean
   formId: string

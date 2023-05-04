@@ -1,5 +1,5 @@
-import { getIsHidden } from '../formSelectors'
 import { LabwareFields } from '../fields'
+import { getIsHidden } from '../formSelectors'
 
 export const isEveryFieldHidden = (
   fieldList: Array<keyof LabwareFields>,

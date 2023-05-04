@@ -1,16 +1,14 @@
-import * as React from 'react'
-import { Form } from 'formik'
-import styled, { css } from 'styled-components'
-
-import { FONT_SIZE_BODY_1, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
 import { ScrollableAlertModal } from '../../../../../molecules/modals'
-import { TextField } from './TextField'
-import { KeyFileField } from './KeyFileField'
-import { SecurityField } from './SecurityField'
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
 import * as Copy from '../i18n'
-
 import type { ConnectFormField, WifiNetwork } from '../types'
+import { KeyFileField } from './KeyFileField'
+import { SecurityField } from './SecurityField'
+import { TextField } from './TextField'
+import { FONT_SIZE_BODY_1, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
+import { Form } from 'formik'
+import * as React from 'react'
+import styled, { css } from 'styled-components'
 
 const fieldStyle = css`
   min-width: 12rem;

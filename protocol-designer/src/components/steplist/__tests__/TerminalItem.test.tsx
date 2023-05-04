@@ -1,20 +1,19 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-import { when, resetAllWhenMocks } from 'jest-when'
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
-
-import * as stepFormSelectors from '../../../step-forms/selectors'
-import * as uiStepSelectors from '../../../ui/steps/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
 } from '../../../components/modals/ConfirmDeleteModal'
+import * as stepFormSelectors from '../../../step-forms/selectors'
+import * as uiStepSelectors from '../../../ui/steps/selectors'
 import { PDTitledList } from '../../lists'
 import { TerminalItem, TerminalItemProps } from '../TerminalItem'
+import { mount } from 'enzyme'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 
 jest.mock('../../../step-forms/selectors')
 jest.mock('../../../ui/steps/selectors')

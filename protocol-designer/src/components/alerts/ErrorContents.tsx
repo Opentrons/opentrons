@@ -1,9 +1,9 @@
-import * as React from 'react'
 import { i18n } from '../../localization'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
+import { AlertLevel } from './types'
+import * as React from 'react'
 
 interface ErrorContentsProps {
   errorType: string

@@ -1,8 +1,20 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
-import { format } from 'date-fns'
+import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import type { OnDeviceRouteParams } from '../../../App/types'
+import { Chip } from '../../../atoms/Chip'
+import {
+  MediumButton,
+  TabbedButton,
+} from '../../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../../atoms/text'
+import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../../organisms/ToasterOven'
+import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+import type { Dispatch } from '../../../redux/types'
+import { Deck } from './Deck'
+import { Hardware } from './Hardware'
+import { Labware } from './Labware'
+import { Liquids } from './Liquids'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -24,24 +36,11 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import {
-  MediumButton,
-  TabbedButton,
-} from '../../../atoms/buttons/OnDeviceDisplay'
-import { Chip } from '../../../atoms/Chip'
-import { StyledText } from '../../../atoms/text'
-import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
-import { useToaster } from '../../../organisms/ToasterOven'
-import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
-import { Deck } from './Deck'
-import { Hardware } from './Hardware'
-import { Labware } from './Labware'
-import { Liquids } from './Liquids'
-
-import type { Dispatch } from '../../../redux/types'
-import type { OnDeviceRouteParams } from '../../../App/types'
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { format } from 'date-fns'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory, useParams } from 'react-router-dom'
 
 const ProtocolHeader = (props: {
   title: string
@@ -67,7 +66,7 @@ const ProtocolHeader = (props: {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       margin={SPACING.spacing16}
-      marginBottom={SPACING.spacingXXL}
+      marginBottom={SPACING.spacing40}
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -103,7 +102,7 @@ const ProtocolHeader = (props: {
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
-        marginLeft={SPACING.spacingXXL}
+        marginLeft={SPACING.spacing40}
         maxHeight="3.75rem"
         minWidth="15.6875rem"
       >

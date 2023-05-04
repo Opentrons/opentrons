@@ -1,8 +1,8 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
-import path from 'path'
 import { getConfig } from './config'
 import { createLogger } from './log'
+import { app, shell, BrowserWindow } from 'electron'
+import path from 'path'
 
 const config = getConfig('ui')
 const log = createLogger('ui')

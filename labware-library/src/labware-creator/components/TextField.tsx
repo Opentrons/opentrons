@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { Field } from 'formik'
-import { InputField } from '@opentrons/components'
 import { reportFieldEdit } from '../analyticsUtils'
-import { getIsHidden } from '../formSelectors'
 import { getLabel } from '../fields'
-import type { InputFieldProps } from '@opentrons/components'
 import type { LabwareFields } from '../fields'
-import type { FieldProps } from 'formik'
+import { getIsHidden } from '../formSelectors'
 import fieldStyles from './fieldStyles.css'
+import { InputField } from '@opentrons/components'
+import type { InputFieldProps } from '@opentrons/components'
+import { Field } from 'formik'
+import type { FieldProps } from 'formik'
+import * as React from 'react'
 
 interface Props {
   name: keyof LabwareFields

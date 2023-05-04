@@ -1,6 +1,7 @@
-import { uuid } from '../../utils'
 // TODO(mc, 2022-06-21): replace with `waitForResume` and `waitForDuration`
 import type { PauseArgs, CommandCreator } from '../../types'
+import { uuid } from '../../utils'
+
 export const delay: CommandCreator<PauseArgs> = (
   args,
   invariantContext,

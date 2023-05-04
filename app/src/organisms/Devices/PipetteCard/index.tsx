@@ -1,6 +1,21 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { Banner } from '../../../atoms/Banner'
+import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
+import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
+import { StyledText } from '../../../atoms/text'
+import { LEFT } from '../../../redux/pipettes'
+import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
+import { ChangePipette } from '../../ChangePipette'
+import { PipetteWizardFlows } from '../../PipetteWizardFlows'
+import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
+import { FLOWS } from '../../PipetteWizardFlows/constants'
+import type {
+  PipetteWizardFlow,
+  SelectablePipettes,
+} from '../../PipetteWizardFlows/types'
+import { useIsOT3 } from '../hooks'
+import { AboutPipetteSlideout } from './AboutPipetteSlideout'
+import { PipetteOverflowMenu } from './PipetteOverflowMenu'
+import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import {
   Box,
   Flex,
@@ -19,29 +34,14 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { LEFT } from '../../../redux/pipettes'
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../../atoms/text'
-import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
-import { ChangePipette } from '../../ChangePipette'
-import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
-import { useIsOT3 } from '../hooks'
-import { PipetteOverflowMenu } from './PipetteOverflowMenu'
-import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
-import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 import type {
   PipetteModelSpecs,
   PipetteMount,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
-import type {
-  PipetteWizardFlow,
-  SelectablePipettes,
-} from '../../PipetteWizardFlows/types'
-import { Banner } from '../../../atoms/Banner'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null

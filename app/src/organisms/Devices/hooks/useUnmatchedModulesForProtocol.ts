@@ -1,12 +1,10 @@
-import reduce from 'lodash/reduce'
-
-import type { AttachedModule } from '../../../redux/modules/types'
-
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
   useRobot,
 } from '.'
+import type { AttachedModule } from '../../../redux/modules/types'
+import reduce from 'lodash/reduce'
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]

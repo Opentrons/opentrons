@@ -1,19 +1,18 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { MemoryRouter } from 'react-router-dom'
+import { HeaterShakerWizard } from '..'
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { HeaterShakerWizard } from '..'
+import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { AttachAdapter } from '../AttachAdapter'
+import { AttachModule } from '../AttachModule'
 import { Introduction } from '../Introduction'
 import { KeyParts } from '../KeyParts'
-import { AttachModule } from '../AttachModule'
-import { AttachAdapter } from '../AttachAdapter'
 import { PowerOn } from '../PowerOn'
 import { TestShake } from '../TestShake'
-
-import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { renderWithProviders } from '@opentrons/components'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../Introduction')
 jest.mock('../KeyParts')

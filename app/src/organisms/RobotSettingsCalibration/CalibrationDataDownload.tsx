@@ -1,18 +1,3 @@
-import * as React from 'react'
-import { saveAs } from 'file-saver'
-import { useTranslation, Trans } from 'react-i18next'
-
-import {
-  Flex,
-  Icon,
-  Link,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-} from '@opentrons/components'
-
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
@@ -26,6 +11,19 @@ import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '../../redux/analytics'
+import {
+  Flex,
+  Icon,
+  Link,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+} from '@opentrons/components'
+import { saveAs } from 'file-saver'
+import * as React from 'react'
+import { useTranslation, Trans } from 'react-i18next'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'

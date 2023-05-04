@@ -1,6 +1,6 @@
-import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { ProtocolState } from './types'
+import type { Reducer } from 'redux'
 
 const INITIAL_STATE: ProtocolState = { file: null, contents: null, data: null }
 

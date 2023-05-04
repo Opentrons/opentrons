@@ -9,8 +9,9 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { RobotState, InvariantContext } from '../types'
+import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+
 describe('blowout', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState

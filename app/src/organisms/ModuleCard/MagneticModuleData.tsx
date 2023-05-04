@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
+import type { MagneticStatus } from '../../redux/modules/api-types'
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data/js/constants'
-import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
-import type { MagneticStatus } from '../../redux/modules/api-types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface MagModuleProps {
   moduleStatus: MagneticStatus

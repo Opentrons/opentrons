@@ -1,10 +1,12 @@
-import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import { FormData } from '../../../form-types'
 import { i18n } from '../../../localization'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
 } from '../../../steplist/types'
+import * as utils from '../../modules/utils'
+import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
@@ -21,10 +23,7 @@ import {
   getCountPerStepType,
   getBatchEditSelectedStepTypes,
 } from '../selectors'
-import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
-
-import * as utils from '../../modules/utils'
-import { FormData } from '../../../form-types'
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 function createArgsForStepId(
   stepId: string,

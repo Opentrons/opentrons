@@ -1,42 +1,40 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
+import { Portal } from '../../App/portal'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice } from '../../redux/config'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import { AttachProbe } from './AttachProbe'
+import { BeforeBeginning } from './BeforeBeginning'
+import { Carriage } from './Carriage'
+import { DetachPipette } from './DetachPipette'
+import { DetachProbe } from './DetachProbe'
+import { ExitModal } from './ExitModal'
+import { MountPipette } from './MountPipette'
+import { MountingPlate } from './MountingPlate'
+import { Results } from './Results'
+import { UnskippableModal } from './UnskippableModal'
+import { FLOWS, SECTIONS } from './constants'
+import { getPipetteWizardSteps } from './getPipetteWizardSteps'
+import type { PipetteWizardFlow, SelectablePipettes } from './types'
 import { useConditionalConfirm } from '@opentrons/components'
+import {
+  useHost,
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
+} from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
   RIGHT,
 } from '@opentrons/shared-data'
-import {
-  useHost,
-  useCreateMaintenanceRunMutation,
-  useDeleteMaintenanceRunMutation,
-} from '@opentrons/react-api-client'
-
-import { ModalShell } from '../../molecules/Modal'
-import { Portal } from '../../App/portal'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
-import { getIsOnDevice } from '../../redux/config'
-import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
-import { getPipetteWizardSteps } from './getPipetteWizardSteps'
-import { FLOWS, SECTIONS } from './constants'
-import { BeforeBeginning } from './BeforeBeginning'
-import { AttachProbe } from './AttachProbe'
-import { DetachProbe } from './DetachProbe'
-import { Results } from './Results'
-import { ExitModal } from './ExitModal'
-import { MountPipette } from './MountPipette'
-import { DetachPipette } from './DetachPipette'
-import { Carriage } from './Carriage'
-import { MountingPlate } from './MountingPlate'
-import { UnskippableModal } from './UnskippableModal'
-
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import startCase from 'lodash/startCase'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow

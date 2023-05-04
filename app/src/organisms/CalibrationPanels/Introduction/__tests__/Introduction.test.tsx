@@ -1,11 +1,10 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-
-import { mockCalibrationCheckLabware } from '../../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../../redux/sessions'
-import { i18n } from '../../../../i18n'
 import { Introduction } from '../'
+import { i18n } from '../../../../i18n'
+import * as Sessions from '../../../../redux/sessions'
+import { mockCalibrationCheckLabware } from '../../../../redux/sessions/__fixtures__'
 import { ChooseTipRack } from '../../ChooseTipRack'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../ChooseTipRack')
 

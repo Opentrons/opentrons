@@ -1,28 +1,27 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import {
-  mockMagneticModule as mockMagneticModuleFixture,
-  mockHeaterShaker,
-} from '../../../../../redux/modules/__fixtures__/index'
 import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { MultipleModulesModal } from '../MultipleModulesModal'
-import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
+import {
+  mockMagneticModule as mockMagneticModuleFixture,
+  mockHeaterShaker,
+} from '../../../../../redux/modules/__fixtures__/index'
+import { HeaterShakerWizard } from '../../../HeaterShakerWizard'
 import {
   useIsOT3,
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
-import { HeaterShakerWizard } from '../../../HeaterShakerWizard'
+import { MultipleModulesModal } from '../MultipleModulesModal'
 import { SetupModulesList } from '../SetupModulesList'
-
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../hooks')
 jest.mock('../UnMatchedModuleWarning')

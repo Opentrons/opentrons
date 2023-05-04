@@ -1,8 +1,7 @@
-import * as React from 'react'
+import { CreateLabwareSandbox } from '..'
 import '@testing-library/jest-dom'
 import { render, fireEvent } from '@testing-library/react'
-
-import { CreateLabwareSandbox } from '..'
+import * as React from 'react'
 
 describe('CreateLabwareSandbox', () => {
   it('renders irregular form by default', () => {

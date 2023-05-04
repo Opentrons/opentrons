@@ -1,7 +1,8 @@
-import * as React from 'react'
-import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
-
+import logoSvg from '../assets/images/logo_nav.svg'
+import logoSvgThree from '../assets/images/logo_nav_three.svg'
+import { StyledText } from '../atoms/text'
+import { NAV_BAR_WIDTH } from './constants'
+import type { RouteProps } from './types'
 import {
   Flex,
   COLORS,
@@ -18,14 +19,9 @@ import {
   JUSTIFY_SPACE_EVENLY,
   SIZE_2,
 } from '@opentrons/components'
-
-import logoSvg from '../assets/images/logo_nav.svg'
-import logoSvgThree from '../assets/images/logo_nav_three.svg'
-
-import { NAV_BAR_WIDTH } from './constants'
-import { StyledText } from '../atoms/text'
-
-import type { RouteProps } from './types'
+import * as React from 'react'
+import { NavLink } from 'react-router-dom'
+import styled from 'styled-components'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 

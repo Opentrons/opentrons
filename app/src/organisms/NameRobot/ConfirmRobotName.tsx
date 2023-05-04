@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-
+import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
+import { StepMeter } from '../../atoms/StepMeter'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,10 +11,9 @@ import {
   COLORS,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { StepMeter } from '../../atoms/StepMeter'
-import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
@@ -33,8 +31,8 @@ export function ConfirmRobotName({
       <StepMeter totalSteps={5} currentStep={5} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
@@ -60,7 +58,7 @@ export function ConfirmRobotName({
               height="236px"
             />
             <StyledText
-              marginTop={SPACING.spacingXXL}
+              marginTop={SPACING.spacing40}
               fontSize="1.625rem"
               lineHeight="2.1875rem"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -68,7 +66,7 @@ export function ConfirmRobotName({
               {t('your_robot_is_ready_to_go')}
             </StyledText>
             <PrimaryButton
-              marginTop={SPACING.spacingXXL}
+              marginTop={SPACING.spacing40}
               onClick={() => history.push('/dashboard')}
               width="100%"
               height="4.375rem"

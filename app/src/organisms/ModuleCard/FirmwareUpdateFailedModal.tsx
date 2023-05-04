@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import type { AttachedModule } from '../../redux/modules/types'
 import {
   DIRECTION_ROW,
   Flex,
@@ -12,10 +12,9 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
-
-import type { AttachedModule } from '../../redux/modules/types'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface FirmwareUpdateFailedModalProps {
   onCloseClick: () => void
@@ -57,7 +56,7 @@ export const FirmwareUpdateFailedModal = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacingXL}
+        paddingTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
         data-testid={`FirmwareUpdateFailedModal_cancel_btn_${module.serialNumber}`}
       >

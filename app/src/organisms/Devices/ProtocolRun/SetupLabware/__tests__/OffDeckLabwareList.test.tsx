@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../LabwareListItem')
 

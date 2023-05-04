@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useConditionalConfirm } from '@opentrons/components'
+import {
+  getCurrentFormIsPresaved,
+  getCurrentFormHasUnsavedChanges,
+} from '../../../step-forms/selectors'
+import { TerminalItemId } from '../../../steplist'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
@@ -9,17 +11,15 @@ import {
   SelectTerminalItemAction,
   HoverOnTerminalItemAction,
 } from '../../../ui/steps'
-import {
-  getCurrentFormIsPresaved,
-  getCurrentFormHasUnsavedChanges,
-} from '../../../step-forms/selectors'
+import { PDTitledList } from '../../lists'
 import {
   ConfirmDeleteModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
 } from '../../modals/ConfirmDeleteModal'
-import { PDTitledList } from '../../lists'
-import { TerminalItemId } from '../../../steplist'
+import { useConditionalConfirm } from '@opentrons/components'
+import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 export { TerminalItemLink } from './TerminalItemLink'
 

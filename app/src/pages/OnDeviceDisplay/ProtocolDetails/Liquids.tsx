@@ -1,8 +1,9 @@
-import * as React from 'react'
-import last from 'lodash/last'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import { MICRO_LITERS } from '@opentrons/shared-data'
+import { StyledText } from '../../../atoms/text'
+import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import {
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
 import {
   BORDERS,
   COLORS,
@@ -14,14 +15,13 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import {
-  parseLabwareInfoByLiquidId,
-  parseLiquidsInLoadOrder,
-} from '@opentrons/api-client'
-import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import { StyledText } from '../../../atoms/text'
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import { MICRO_LITERS } from '@opentrons/shared-data'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};

@@ -1,7 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { Portal } from '../../App/portal'
+import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 import {
   Box,
   Flex,
@@ -13,13 +15,9 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { Portal } from '../../App/portal'
-import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
@@ -98,7 +96,7 @@ export function HowCalibrationWorksModal({
             ]}
           />
           <Divider
-            marginTop={SPACING.spacingXXL}
+            marginTop={SPACING.spacing40}
             marginBottom={SPACING.spacing16}
           />
           <PrimaryButton

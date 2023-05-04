@@ -1,5 +1,7 @@
-import * as React from 'react'
-
+import { Tooltip } from '../../atoms/Tooltip'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 import {
   Flex,
   Icon,
@@ -17,12 +19,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-
-import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Tooltip } from '../../atoms/Tooltip'
-
-import type { SubTaskProps, TaskListProps, TaskProps } from './types'
+import * as React from 'react'
 
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null

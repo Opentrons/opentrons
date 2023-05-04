@@ -1,16 +1,15 @@
-import * as React from 'react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useLatchControls } from '../../../ModuleCard/hooks'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useRunStatuses } from '../../hooks'
-import { TestShake } from '../TestShake'
-import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
-
 import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useLatchControls } from '../../../ModuleCard/hooks'
+import { useRunStatuses } from '../../hooks'
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
+import { TestShake } from '../TestShake'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import { fireEvent, waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')

@@ -1,25 +1,24 @@
 // system update files
-import path from 'path'
-import { ensureDir } from 'fs-extra'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import type { DownloadProgress } from '../http'
 import { createLogger } from '../log'
+import type { Action, Dispatch } from '../types'
 import {
   getLatestSystemUpdateUrls,
   getLatestVersion,
   isUpdateAvailable,
   updateLatestVersion,
 } from '../update'
+import { getSystemUpdateDir } from './directories'
 import {
   getReleaseFiles,
   readUserFileInfo,
   cleanupReleaseFiles,
 } from './release-files'
-import { uploadSystemFile } from './update'
-import { getSystemUpdateDir } from './directories'
-
-import type { DownloadProgress } from '../http'
-import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
+import { uploadSystemFile } from './update'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { ensureDir } from 'fs-extra'
+import path from 'path'
 
 const log = createLogger('systemUpdate/index')
 

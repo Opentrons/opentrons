@@ -4,7 +4,6 @@ import {
   SECURITY_WPA_EAP,
   SECURITY_NONE,
 } from '../../../../redux/networking'
-
 import type { WifiNetwork } from './types'
 
 const SECURITY_DESC = {

@@ -1,10 +1,53 @@
 import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-} from '@opentrons/shared-data'
+  INITIAL_DECK_SETUP_STEP_ID,
+  SPAN7_8_10_11_SLOT,
+  PAUSE_UNTIL_TEMP,
+} from '../../constants'
+import {
+  FormData,
+  PROFILE_CYCLE,
+  PROFILE_STEP,
+  StepType,
+} from '../../form-types'
+import { moveDeckItem } from '../../labware-ingred/actions'
+import { DeleteContainerAction } from '../../labware-ingred/actions/actions'
+import {
+  AddProfileCycleAction,
+  AddProfileStepAction,
+  ChangeFormInputAction,
+  DeleteMultipleStepsAction,
+  DeleteProfileCycleAction,
+  DeleteProfileStepAction,
+  EditProfileCycleAction,
+  EditProfileStepAction,
+} from '../../steplist/actions'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import { DeckSlot } from '../../types'
+import {
+  AddStepAction,
+  DuplicateMultipleStepsAction,
+  DuplicateStepAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps'
+import { uuid } from '../../utils'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  ChangeBatchEditFieldAction,
+  SaveStepFormsMultiAction,
+  ResetBatchEditFieldChangesAction,
+} from '../actions'
+import {
+  CreateModuleAction,
+  DeleteModuleAction,
+  EditModuleAction,
+} from '../actions/modules'
+import {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
 import {
   orderedStepIds,
   labwareInvariantProperties,
@@ -24,59 +67,16 @@ import {
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
 } from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import {
-  FormData,
-  PROFILE_CYCLE,
-  PROFILE_STEP,
-  StepType,
-} from '../../form-types'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
-import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { uuid } from '../../utils'
-import { DeckSlot } from '../../types'
-import { DeleteContainerAction } from '../../labware-ingred/actions/actions'
+import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+} from '@opentrons/shared-data'
 import { ModuleEntity } from '@opentrons/step-generation'
-import {
-  AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
-  SelectMultipleStepsAction,
-  SelectStepAction,
-  SelectTerminalItemAction,
-} from '../../ui/steps'
-import {
-  ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
-  ResetBatchEditFieldChangesAction,
-} from '../actions'
-import {
-  AddProfileCycleAction,
-  AddProfileStepAction,
-  ChangeFormInputAction,
-  DeleteMultipleStepsAction,
-  DeleteProfileCycleAction,
-  DeleteProfileStepAction,
-  EditProfileCycleAction,
-  EditProfileStepAction,
-} from '../../steplist/actions'
 
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')

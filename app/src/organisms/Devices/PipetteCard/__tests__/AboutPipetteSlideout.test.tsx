@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { i18n } from '../../../../i18n'
+import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
+import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
-import { i18n } from '../../../../i18n'
-import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof AboutPipetteSlideout>) => {
   return renderWithProviders(<AboutPipetteSlideout {...props} />, {

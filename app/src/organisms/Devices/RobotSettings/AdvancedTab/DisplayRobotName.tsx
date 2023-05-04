@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { TertiaryButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,9 +10,9 @@ import {
   SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../../../atoms/text'
-import { TertiaryButton } from '../../../../atoms/buttons'
 interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (

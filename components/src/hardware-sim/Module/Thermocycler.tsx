@@ -1,14 +1,10 @@
 // TODO: BC 2021-08-03 we should migrate to only using the ModuleFromData
 // component; once legacy Module viz is removed, we should rename it Module
-
-import * as React from 'react'
-
-import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
-
+import { C_MED_LIGHT_GRAY } from '../../styles'
 import { RobotCoordsForeignDiv } from '../Deck'
 import { ModuleFromDef } from './ModuleFromDef'
-
-import { C_MED_LIGHT_GRAY } from '../../styles'
+import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
+import * as React from 'react'
 
 export interface ThermocyclerVizProps {
   lidMotorState: 'open' | 'closed' | 'unknown'

@@ -1,7 +1,7 @@
-import * as React from 'react'
+import { CheckPipetteButton } from '../CheckPipetteButton'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { CheckPipetteButton } from '../CheckPipetteButton'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]

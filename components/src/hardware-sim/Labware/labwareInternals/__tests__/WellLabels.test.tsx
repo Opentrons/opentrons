@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
+import { WELL_LABEL_OPTIONS } from '../../LabwareRender'
+import { WellLabels } from '../WellLabels'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import _uncasted_troughFixture12 from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough_v2.json'
-import { WellLabels } from '../WellLabels'
-import { WELL_LABEL_OPTIONS } from '../../LabwareRender'
+import { render } from '@testing-library/react'
+import * as React from 'react'
 
 const troughFixture12 = _uncasted_troughFixture12 as LabwareDefinition2
 

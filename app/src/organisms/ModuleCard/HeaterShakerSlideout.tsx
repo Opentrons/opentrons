@@ -1,12 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import {
-  getModuleDisplayName,
-  CELSIUS,
-  HS_TEMP_MIN,
-  HS_TEMP_MAX,
-} from '@opentrons/shared-data'
+import { InputField } from '../../atoms/InputField'
+import { Slideout } from '../../atoms/Slideout'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import type { HeaterShakerModule } from '../../redux/modules/types'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -14,13 +10,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-
-import type { HeaterShakerModule } from '../../redux/modules/types'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  getModuleDisplayName,
+  CELSIUS,
+  HS_TEMP_MIN,
+  HS_TEMP_MAX,
+} from '@opentrons/shared-data'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule

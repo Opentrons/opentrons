@@ -1,9 +1,9 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+import styles from './StepItem.css'
+import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface Props {
   volume?: string | null

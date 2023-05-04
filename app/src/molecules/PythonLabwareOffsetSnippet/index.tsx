@@ -1,13 +1,13 @@
-import * as React from 'react'
-import styled from 'styled-components'
-import { TYPOGRAPHY, SPACING, BORDERS } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
+import { TYPOGRAPHY, SPACING, BORDERS } from '@opentrons/components'
 import type {
   LoadedLabware,
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import * as React from 'react'
+import styled from 'styled-components'
 
 const JsonTextArea = styled.textarea`
   min-height: 28vh;

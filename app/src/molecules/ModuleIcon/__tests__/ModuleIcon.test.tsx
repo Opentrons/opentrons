@@ -1,9 +1,7 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
-
 import { ModuleIcon } from '../'
-
 import type { AttachedModule } from '../../../redux/modules/types'
+import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

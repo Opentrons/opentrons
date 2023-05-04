@@ -1,3 +1,7 @@
+import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -7,11 +11,6 @@ import {
 } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
-
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 export interface ProtocolSetupLabwarePositionCheckProps {
   runId: string

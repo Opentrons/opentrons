@@ -1,24 +1,24 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import isEmpty from 'lodash/isEmpty'
-import last from 'lodash/last'
-import filter from 'lodash/filter'
-import mapValues from 'lodash/mapValues'
-import { PipetteName } from '@opentrons/shared-data'
-import { uuid } from '../../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { actions as steplistActions } from '../../../steplist'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { StepIdType } from '../../../form-types'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
   PipetteOnDeck,
   FormPipettesByMount,
 } from '../../../step-forms'
-import { FilePipettesModal, PipetteFieldsData } from '../FilePipettesModal'
-import { NormalizedPipette } from '@opentrons/step-generation'
+import { actions as steplistActions } from '../../../steplist'
 import { BaseState, ThunkDispatch } from '../../../types'
-import { StepIdType } from '../../../form-types'
+import { uuid } from '../../../utils'
+import { FilePipettesModal, PipetteFieldsData } from '../FilePipettesModal'
+import { PipetteName } from '@opentrons/shared-data'
+import { NormalizedPipette } from '@opentrons/step-generation'
+import filter from 'lodash/filter'
+import isEmpty from 'lodash/isEmpty'
+import last from 'lodash/last'
+import mapValues from 'lodash/mapValues'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 type Props = React.ComponentProps<typeof FilePipettesModal>
 

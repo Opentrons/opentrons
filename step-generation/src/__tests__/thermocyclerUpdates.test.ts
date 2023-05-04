@@ -1,8 +1,6 @@
-import merge from 'lodash/merge'
-import {
-  THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
-} from '@opentrons/shared-data'
+import type { ImmutableStateUpdater } from '../__utils__'
+import { makeImmutableStateUpdater } from '../__utils__'
+import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import {
   forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
@@ -14,15 +12,18 @@ import {
   forThermocyclerCloseLid as _forThermocyclerCloseLid,
   forThermocyclerOpenLid as _forThermocyclerOpenLid,
 } from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
-import type { ImmutableStateUpdater } from '../__utils__'
-import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
+import { InvariantContext, RobotState, ThermocyclerModuleState } from '../types'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
 import type {
   ModuleOnlyParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import { InvariantContext, RobotState, ThermocyclerModuleState } from '../types'
+import merge from 'lodash/merge'
+
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
 )

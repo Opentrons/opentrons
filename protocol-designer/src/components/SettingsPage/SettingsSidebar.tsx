@@ -1,12 +1,11 @@
-import * as React from 'react'
-import { SidePanel } from '@opentrons/components'
-import { connect } from 'react-redux'
-
-import { BaseState, ThunkDispatch } from '../../types'
-import { actions, selectors, Page } from '../../navigation'
 import { i18n } from '../../localization'
+import { actions, selectors, Page } from '../../navigation'
+import { BaseState, ThunkDispatch } from '../../types'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
+import { SidePanel } from '@opentrons/components'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface SP {
   currentPage: Page

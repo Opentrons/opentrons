@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,8 +10,8 @@ import {
   Btn,
   PrimaryButton,
 } from '@opentrons/components'
-import { Modal } from '../../../../molecules/Modal'
-import { StyledText } from '../../../../atoms/text'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 interface RobotIsBusyModalProps {
   closeModal: () => void

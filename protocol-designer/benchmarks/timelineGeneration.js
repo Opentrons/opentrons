@@ -1,11 +1,12 @@
-import assert from 'assert'
-import bench from 'nanobench'
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
   mix,
   getStateAndContextTempTCModules,
 } from '@opentrons/step-generation'
+import assert from 'assert'
+import bench from 'nanobench'
+
 // TODO IMMEDIATELY: figure out a better way to import fixtures from step generation
 const times = 200
 

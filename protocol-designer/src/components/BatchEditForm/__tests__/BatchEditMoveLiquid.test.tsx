@@ -1,15 +1,15 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import {
-  DeprecatedPrimaryButton,
-  OutlineButton,
-  Tooltip,
-} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   BatchEditMoveLiquid,
   BatchEditMoveLiquidProps,
 } from '../BatchEditMoveLiquid'
+import {
+  DeprecatedPrimaryButton,
+  OutlineButton,
+  Tooltip,
+} from '@opentrons/components'
+import { shallow } from 'enzyme'
+import React from 'react'
 
 const localizationSpy = jest.spyOn(i18n, 't')
 

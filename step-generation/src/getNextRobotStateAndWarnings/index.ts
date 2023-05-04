@@ -1,12 +1,28 @@
-import assert from 'assert'
-import produce from 'immer'
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../types'
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
 import { forAspirate } from './forAspirate'
-import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
+import { forDispense } from './forDispense'
 import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
+import {
+  forHeaterShakerCloseLatch,
+  forHeaterShakerDeactivateHeater,
+  forHeaterShakerOpenLatch,
+  forHeaterShakerSetTargetShakeSpeed,
+  forHeaterShakerSetTargetTemperature,
+  forHeaterShakerStopShake,
+} from './heaterShakerUpdates'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import {
+  forAwaitTemperature,
+  forSetTemperature,
+  forDeactivateTemperature,
+} from './temperatureUpdates'
 import {
   forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature,
@@ -19,25 +35,9 @@ import {
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
 } from './thermocyclerUpdates'
-import {
-  forAwaitTemperature,
-  forSetTemperature,
-  forDeactivateTemperature,
-} from './temperatureUpdates'
-import {
-  forHeaterShakerCloseLatch,
-  forHeaterShakerDeactivateHeater,
-  forHeaterShakerOpenLatch,
-  forHeaterShakerSetTargetShakeSpeed,
-  forHeaterShakerSetTargetTemperature,
-  forHeaterShakerStopShake,
-} from './heaterShakerUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
+import assert from 'assert'
+import produce from 'immer'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(

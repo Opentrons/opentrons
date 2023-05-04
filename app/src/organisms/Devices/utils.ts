@@ -1,10 +1,10 @@
-import { format, parseISO } from 'date-fns'
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
   Mount,
 } from '../../redux/pipettes/types'
 import type { PipetteOffsetCalibration } from '@opentrons/api-client'
+import { format, parseISO } from 'date-fns'
 
 /**
  * formats a string if it is in ISO 8601 date format

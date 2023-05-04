@@ -1,16 +1,14 @@
 // analytics epics tests
-import { TestScheduler } from 'rxjs/testing'
-
 import * as Cfg from '../../config'
+import type { Action, State } from '../../types'
+import { analyticsEpic } from '../epic'
+import { makeEvent } from '../make-event'
 import {
   initializeMixpanel,
   trackEvent,
   setMixpanelTracking,
 } from '../mixpanel'
-import { makeEvent } from '../make-event'
-import { analyticsEpic } from '../epic'
-
-import type { Action, State } from '../../types'
+import { TestScheduler } from 'rxjs/testing'
 
 jest.mock('../make-event')
 jest.mock('../mixpanel')

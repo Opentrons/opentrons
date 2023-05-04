@@ -1,22 +1,9 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
-
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  // useInterval,
-  SPACING,
-} from '@opentrons/components'
-
 import { StepMeter } from '../../atoms/StepMeter'
-import * as Networking from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
-import * as RobotApi from '../../redux/robot-api'
 import {
   CONNECT,
   JOIN_OTHER,
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
+import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 import {
   ConnectingNetwork,
   DisplayWifiList,
@@ -26,11 +13,20 @@ import {
   SetWifiCred,
   WifiConnectionDetails,
 } from '../../organisms/OnDeviceDisplay/SetupNetwork'
-
-import type { State, Dispatch } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
+import { getLocalRobot } from '../../redux/discovery'
+import * as Networking from '../../redux/networking'
 import type { WifiNetwork } from '../../redux/networking/types'
-import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
+import * as RobotApi from '../../redux/robot-api'
+import type { RequestState } from '../../redux/robot-api/types'
+import type { State, Dispatch } from '../../redux/types'
+import {
+  Flex,
+  DIRECTION_COLUMN, // useInterval,
+  SPACING,
+} from '@opentrons/components'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 export type AuthType = 'wpa-psk' | 'none'
 
@@ -192,8 +188,8 @@ export function ConnectViaWifi(): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
       >
         {renderScreen()}
       </Flex>

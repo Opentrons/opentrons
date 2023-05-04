@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { PinnedProtocol } from './PinnedProtocol'
+import type { CardSizeType } from './PinnedProtocol'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
@@ -8,10 +9,8 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { PinnedProtocol } from './PinnedProtocol'
-
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { CardSizeType } from './PinnedProtocol'
+import * as React from 'react'
 
 export function PinnedProtocolCarousel(props: {
   pinnedProtocols: ProtocolResource[]

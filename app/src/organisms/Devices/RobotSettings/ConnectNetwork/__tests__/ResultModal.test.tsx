@@ -1,13 +1,11 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
-import { AlertModal, SpinnerModal } from '@opentrons/components'
 import { ErrorModal } from '../../../../../molecules/modals'
 import { ResultModal } from '../ResultModal'
-import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
-
-import type { ShallowWrapper } from 'enzyme'
 import type { ResultModalProps } from '../ResultModal'
+import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
+import { AlertModal, SpinnerModal } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import type { ShallowWrapper } from 'enzyme'
+import * as React from 'react'
 
 describe("SelectNetwork's ResultModal", () => {
   const mockSsid = 'foobar'

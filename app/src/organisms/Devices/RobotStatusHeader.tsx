@@ -1,8 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link, useHistory } from 'react-router-dom'
-
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { Tooltip } from '../../atoms/Tooltip'
+import { QuaternaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import type { DiscoveredRobot } from '../../redux/discovery/types'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
@@ -17,15 +18,11 @@ import {
   TYPOGRAPHY,
   truncateString,
 } from '@opentrons/components'
-
-import { QuaternaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
-
 import type { StyleProps } from '@opentrons/components'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link, useHistory } from 'react-router-dom'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {

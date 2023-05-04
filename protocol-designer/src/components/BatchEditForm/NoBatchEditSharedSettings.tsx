@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { i18n } from '../../localization'
 import {
   Flex,
   Text,
@@ -7,7 +7,7 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
+import * as React from 'react'
 
 export const NoBatchEditSharedSettings = (): JSX.Element => {
   return (

@@ -1,7 +1,43 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
+import { Banner } from '../../atoms/Banner'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { SUCCESS_TOAST } from '../../atoms/Toast'
+import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
+import { updateModule } from '../../redux/modules'
+import type {
+  AttachedModule,
+  HeaterShakerModule,
+} from '../../redux/modules/types'
+import {
+  useDispatchApiRequest,
+  getRequestById,
+  PENDING,
+  FAILURE,
+  getErrorResponseMessage,
+  dismissRequest,
+  SUCCESS,
+} from '../../redux/robot-api'
+import type { RequestState } from '../../redux/robot-api/types'
+import type { State, Dispatch } from '../../redux/types'
+import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useToaster } from '../ToasterOven'
+import { AboutModuleSlideout } from './AboutModuleSlideout'
+import { ErrorInfo } from './ErrorInfo'
+import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
+import { HeaterShakerModuleData } from './HeaterShakerModuleData'
+import { HeaterShakerSlideout } from './HeaterShakerSlideout'
+import { MagneticModuleData } from './MagneticModuleData'
+import { MagneticModuleSlideout } from './MagneticModuleSlideout'
+import { ModuleOverflowMenu } from './ModuleOverflowMenu'
+import { TemperatureModuleData } from './TemperatureModuleData'
+import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
+import { TestShakeSlideout } from './TestShakeSlideout'
+import { ThermocyclerModuleData } from './ThermocyclerModuleData'
+import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { getModuleCardImage } from './utils'
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   Box,
   Flex,
@@ -26,48 +62,11 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import last from 'lodash/last'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { updateModule } from '../../redux/modules'
-import {
-  useDispatchApiRequest,
-  getRequestById,
-  PENDING,
-  FAILURE,
-  getErrorResponseMessage,
-  dismissRequest,
-  SUCCESS,
-} from '../../redux/robot-api'
-import { Banner } from '../../atoms/Banner'
-import { SUCCESS_TOAST } from '../../atoms/Toast'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
-import { useCurrentRunStatus } from '../RunTimeControl/hooks'
-import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useToaster } from '../ToasterOven'
-import { MagneticModuleData } from './MagneticModuleData'
-import { TemperatureModuleData } from './TemperatureModuleData'
-import { ThermocyclerModuleData } from './ThermocyclerModuleData'
-import { ModuleOverflowMenu } from './ModuleOverflowMenu'
-import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
-import { MagneticModuleSlideout } from './MagneticModuleSlideout'
-import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
-import { AboutModuleSlideout } from './AboutModuleSlideout'
-import { HeaterShakerModuleData } from './HeaterShakerModuleData'
-import { HeaterShakerSlideout } from './HeaterShakerSlideout'
-import { TestShakeSlideout } from './TestShakeSlideout'
-import { getModuleCardImage } from './utils'
-import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-import { ErrorInfo } from './ErrorInfo'
-
-import type {
-  AttachedModule,
-  HeaterShakerModule,
-} from '../../redux/modules/types'
-import type { State, Dispatch } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -323,7 +322,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 data-testid={`ModuleCard_update_pending_${module.serialNumber}`}
               >
                 <Icon
-                  width={SPACING.spacingSM}
+                  width={SPACING.spacing12}
                   name="ot-spinner"
                   spin
                   aria-label="ot-spinner"

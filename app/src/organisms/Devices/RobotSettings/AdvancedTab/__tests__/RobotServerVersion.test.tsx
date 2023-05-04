@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
+import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../../../hooks'
 import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../hooks')
 jest.mock('../../../../../redux/buildroot/selectors')

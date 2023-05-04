@@ -1,13 +1,11 @@
-import * as React from 'react'
-import { useFormikContext } from 'formik'
 import { FormStatus, LabwareFields } from '../../fields'
+import styles from '../../styles.css'
 import { getLabwareName } from '../../utils'
 import { ConditionalLabwareRender } from '../ConditionalLabwareRender'
 import { FormLevelErrorAlerts } from '../FormLevelErrorAlerts'
-
 import { SectionBody } from './SectionBody'
-
-import styles from '../../styles.css'
+import { useFormikContext } from 'formik'
+import * as React from 'react'
 
 export const PreviewInstructions = (props: {
   values: LabwareFields

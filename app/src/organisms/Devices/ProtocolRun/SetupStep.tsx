@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { StyledText } from '../../../atoms/text'
 import {
   Box,
   Btn,
@@ -16,8 +13,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface SetupStepProps {
   expanded: boolean

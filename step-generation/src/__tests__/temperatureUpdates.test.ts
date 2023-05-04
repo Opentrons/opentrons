@@ -1,18 +1,18 @@
+import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdater'
 import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import {
+  getStateAndContextTempTCModules,
+  robotWithStatusAndTemp,
+} from '../fixtures/robotStateFixtures'
+import {
   forSetTemperature as _forSetTemperature,
   forDeactivateTemperature as _forDeactivateTemperature,
   forAwaitTemperature as _forAwaitTemperature,
 } from '../getNextRobotStateAndWarnings/temperatureUpdates'
-import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdater'
-import {
-  getStateAndContextTempTCModules,
-  robotWithStatusAndTemp,
-} from '../fixtures/robotStateFixtures'
 import { InvariantContext, RobotState } from '../types'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)

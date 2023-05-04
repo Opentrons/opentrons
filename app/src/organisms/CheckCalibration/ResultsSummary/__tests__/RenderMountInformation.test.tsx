@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { LEFT, RIGHT } from '../../../../redux/pipettes'
 import * as Fixtures from '../../../../redux/sessions/__fixtures__'
 import { RenderMountInformation } from '../RenderMountInformation'
+import { renderWithProviders } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import * as React from 'react'
 
 jest.mock('@opentrons/shared-data', () => ({
   getAllPipetteNames: jest.fn(

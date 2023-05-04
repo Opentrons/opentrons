@@ -1,9 +1,8 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
 import { LabwareOffsetTable } from '../LabwareOffsetTable'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',

@@ -1,25 +1,21 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import type { FormattedPipetteOffsetCalibration } from '..'
 import { i18n } from '../../../i18n'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-  mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   useIsOT3,
   usePipetteOffsetCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+  mockPipetteOffsetCalibration3,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-
-import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
-
-import type { FormattedPipetteOffsetCalibration } from '..'
+import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
+import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')

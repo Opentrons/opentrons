@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { UseQueryResult } from 'react-query'
-import { when } from 'jest-when'
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import { i18n } from '../../../../i18n'
+import { Liquids } from '../Liquids'
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
   ProtocolAnalyses,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../i18n'
-import { Liquids } from '../Liquids'
+import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import { when } from 'jest-when'
+import * as React from 'react'
+import { UseQueryResult } from 'react-query'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')

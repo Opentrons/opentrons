@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { Splash as SplashComponent } from './Splash'
 import { Box } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Molecules/Splash',

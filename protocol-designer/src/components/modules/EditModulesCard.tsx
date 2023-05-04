@@ -1,5 +1,14 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
+import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import {
+  selectors as stepFormSelectors,
+  getIsCrashablePipetteSelected,
+  ModulesForEditModulesCard,
+} from '../../step-forms'
+import { CrashInfoBox } from './CrashInfoBox'
+import { ModuleRow } from './ModuleRow'
+import styles from './styles.css'
+import { isModuleWithCollisionIssue } from './utils'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -9,17 +18,8 @@ import {
   PipetteName,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
-import {
-  selectors as stepFormSelectors,
-  getIsCrashablePipetteSelected,
-  ModulesForEditModulesCard,
-} from '../../step-forms'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { SUPPORTED_MODULE_TYPES } from '../../modules'
-import { CrashInfoBox } from './CrashInfoBox'
-import { ModuleRow } from './ModuleRow'
-import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.css'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 export interface Props {
   modules: ModulesForEditModulesCard

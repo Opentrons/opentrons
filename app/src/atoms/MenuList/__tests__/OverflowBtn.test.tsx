@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { OverflowBtn } from '../OverflowBtn'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import 'jest-styled-components'
-import { COLORS, renderWithProviders } from '@opentrons/components'
-import { OverflowBtn } from '../OverflowBtn'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof OverflowBtn>) => {
   return renderWithProviders(<OverflowBtn {...props} />)[0]

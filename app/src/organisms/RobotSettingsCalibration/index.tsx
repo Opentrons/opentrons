@@ -1,13 +1,3 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { SpinnerModalPage, AlertModal } from '@opentrons/components'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useCalibrationStatusQuery,
-} from '@opentrons/react-api-client'
-
 import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
@@ -24,22 +14,30 @@ import {
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
-import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
+import type { RequestState } from '../../redux/robot-api/types'
 import * as Sessions from '../../redux/sessions'
+import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
+import type {
+  SessionCommandString,
+  DeckCalibrationSession,
+} from '../../redux/sessions/types'
+import type { State, Dispatch } from '../../redux/types'
 import { CalibrationDataDownload } from './CalibrationDataDownload'
 import { CalibrationHealthCheck } from './CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
-
+import { SpinnerModalPage, AlertModal } from '@opentrons/components'
 import type { Mount } from '@opentrons/components'
-import type { RequestState } from '../../redux/robot-api/types'
-import type {
-  SessionCommandString,
-  DeckCalibrationSession,
-} from '../../redux/sessions/types'
-import type { State, Dispatch } from '../../redux/types'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+} from '@opentrons/react-api-client'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
 const CALS_FETCH_MS = 5000
 

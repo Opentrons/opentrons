@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Box } from './Box'
 import {
   PrimaryBtn,
   SecondaryBtn,
@@ -9,9 +9,8 @@ import {
   LightSecondaryBtn,
   TertiaryBtn,
 } from './Btn'
-import { Box } from './Box'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Atoms/Btn',

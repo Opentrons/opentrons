@@ -1,8 +1,7 @@
+import { syncSystemTime } from '../../../redux/robot-admin'
+import type { Dispatch } from '../../../redux/types'
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { syncSystemTime } from '../../../redux/robot-admin'
-
-import type { Dispatch } from '../../../redux/types'
 
 /**
  * syncs robot system time once on mount

@@ -1,22 +1,21 @@
 // system info module
-import { app } from 'electron'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as SystemInfo from '@opentrons/app/src/redux/system-info'
 import { createLogger } from '../log'
 import { isWindows } from '../os'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
+import type { Action, Dispatch } from '../types'
 import {
   createNetworkInterfaceMonitor,
   getActiveInterfaces,
 } from './network-interfaces'
-
-import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
-import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor, Device } from './usb-devices'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
 } from './network-interfaces'
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
+import type { UsbDeviceMonitor, Device } from './usb-devices'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import * as SystemInfo from '@opentrons/app/src/redux/system-info'
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
+import { app } from 'electron'
 
 export { createNetworkInterfaceMonitor }
 export type { NetworkInterface, NetworkInterfaceMonitor }

@@ -1,8 +1,9 @@
 // jog controls component
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { ControlContainer } from './ControlContainer'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
+import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
 import {
   Box,
   Flex,
@@ -25,14 +26,11 @@ import {
   ALIGN_STRETCH,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { StyledText } from '../../atoms/text'
-import { ControlContainer } from './ControlContainer'
-import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
-
 import type { IconName } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 import type { CSSProperties } from 'styled-components'
-import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
 
 interface Control {
   bearing: Bearing

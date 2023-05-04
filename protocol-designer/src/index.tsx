@@ -1,12 +1,11 @@
+import { initializeMixpanel } from './analytics/mixpanel'
+import { App } from './components/App'
+import { configureStore } from './configureStore'
+import { initialize } from './initialize'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
 import { AppContainer } from 'react-hot-loader'
-
-import { configureStore } from './configureStore'
-import { App } from './components/App'
-import { initialize } from './initialize'
-import { initializeMixpanel } from './analytics/mixpanel'
+import { Provider } from 'react-redux'
 
 // initialize Redux
 const store = configureStore()

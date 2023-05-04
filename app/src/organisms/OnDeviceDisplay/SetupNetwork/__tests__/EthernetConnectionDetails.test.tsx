@@ -1,15 +1,12 @@
-import * as React from 'react'
-import { when } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
-import * as Networking from '../../../../redux/networking'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
-
+import * as Networking from '../../../../redux/networking'
 import type { State } from '../../../../redux/types'
+import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
+import { renderWithProviders } from '@opentrons/components'
+import { when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../../redux/networking')
 jest.mock('../../../../redux/discovery')

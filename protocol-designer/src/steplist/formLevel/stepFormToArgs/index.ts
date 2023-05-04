@@ -1,14 +1,15 @@
-import mapValues from 'lodash/mapValues'
+import { FormData } from '../../../form-types'
 import { castField } from '../../../steplist/fieldLevel'
-import { mixFormToArgs } from './mixFormToArgs'
-import { pauseFormToArgs } from './pauseFormToArgs'
+import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
+import { mixFormToArgs } from './mixFormToArgs'
+import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
+import { pauseFormToArgs } from './pauseFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
-import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
-import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
-import { FormData } from '../../../form-types'
 import { CommandCreatorArgs } from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
+
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators

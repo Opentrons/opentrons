@@ -1,10 +1,9 @@
+import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-
-import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
 import { LabwareEntities, LabwareLiquidState } from '@opentrons/step-generation'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('../../../labware-defs/utils')
 

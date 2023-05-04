@@ -1,7 +1,5 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
+import styles from '../StepEditForm.css'
 import {
   BlowoutLocationField,
   ChangeTipField,
@@ -16,15 +14,15 @@ import {
   WellOrderField,
   WellSelectionField,
 } from '../fields'
+import { StepFormProps } from '../types'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../utils'
 import { AspDispSection } from './AspDispSection'
-
-import { StepFormProps } from '../types'
-
-import styles from '../StepEditForm.css'
+import { FormGroup } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)

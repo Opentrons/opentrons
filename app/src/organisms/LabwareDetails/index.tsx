@@ -1,8 +1,18 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { format } from 'date-fns'
-import { css } from 'styled-components'
-
+import { Slideout } from '../../atoms/Slideout'
+import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
+import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
+import { Dimensions } from './Dimensions'
+import { Gallery } from './Gallery'
+import { InsertDetails } from './InsertDetails'
+import { ManufacturerDetails } from './ManufacturerDetails'
+import { WellCount } from './WellCount'
+import { WellDimensions } from './WellDimensions'
+import { WellProperties } from './WellProperties'
+import { WellSpacing } from './WellSpacing'
+import { getWellLabel } from './helpers/labels'
+import { getUniqueWellProperties } from './helpers/labwareInference'
 import {
   Box,
   Link,
@@ -20,21 +30,10 @@ import {
   useHoverTooltip,
   TOOLTIP_TOP_START,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Slideout } from '../../atoms/Slideout'
-import { Tooltip } from '../../atoms/Tooltip'
-import { getWellLabel } from './helpers/labels'
-import { getUniqueWellProperties } from './helpers/labwareInference'
-import { WellCount } from './WellCount'
-import { WellProperties } from './WellProperties'
-import { Dimensions } from './Dimensions'
-import { WellDimensions } from './WellDimensions'
-import { WellSpacing } from './WellSpacing'
-import { ManufacturerDetails } from './ManufacturerDetails'
-import { InsertDetails } from './InsertDetails'
-import { Gallery } from './Gallery'
-import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { format } from 'date-fns'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
@@ -113,7 +112,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           data-testid="labwareDetails_slideout_close_button"
         >
-          <Icon name="close" height={SPACING.spacing24} css={CLOSE_ICON_STYLE} />
+          <Icon
+            name="close"
+            height={SPACING.spacing24}
+            css={CLOSE_ICON_STYLE}
+          />
         </Link>
       </Flex>
       {!isCustomDefinition && (

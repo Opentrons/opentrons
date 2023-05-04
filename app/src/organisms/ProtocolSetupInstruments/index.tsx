@@ -1,6 +1,8 @@
-import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 import {
   COLORS,
   ALIGN_CENTER,
@@ -14,13 +16,10 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
-
-import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string

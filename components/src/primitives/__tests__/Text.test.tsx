@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { Text } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('Text primitive component', () => {
   it('should be a p with no margins', () => {

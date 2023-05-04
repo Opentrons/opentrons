@@ -1,18 +1,15 @@
-import omit from 'lodash/omit'
-import range from 'lodash/range'
-
-import { splitWellsOnColumn, sortWells } from '../../helpers/index'
-import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
-
 import {
   createIrregularLabware,
   _irregularWellName,
   _generateIrregularLoadName,
   _calculateWellCoord,
 } from '..'
-
-import type { LabwareDefinition2, LabwareWellProperties } from '../../types'
 import type { IrregularLabwareProps } from '..'
+import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
+import { splitWellsOnColumn, sortWells } from '../../helpers/index'
+import type { LabwareDefinition2, LabwareWellProperties } from '../../types'
+import omit from 'lodash/omit'
+import range from 'lodash/range'
 
 // NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName
 const exampleLabware1 = {

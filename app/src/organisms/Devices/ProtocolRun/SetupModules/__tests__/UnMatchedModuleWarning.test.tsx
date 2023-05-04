@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import * as React from 'react'
 
 const render = () => {
   return renderWithProviders(<UnMatchedModuleWarning />, {

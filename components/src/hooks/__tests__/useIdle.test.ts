@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks'
 import { useIdle } from '../useIdle'
+import { renderHook } from '@testing-library/react-hooks'
 
 const MOCK_EVENTS: Array<keyof DocumentEventMap> = [
   'mousedown',

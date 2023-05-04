@@ -1,14 +1,14 @@
 import type {
+  PipetteOffsetCalibration,
+  TipLengthCalibration,
+} from '../calibration/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
+import type {
   LabwareDefinition2,
   PipetteChannels,
   PipetteModel,
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
-import type { RobotApiRequestMeta } from '../robot-api/types'
-import type {
-  PipetteOffsetCalibration,
-  TipLengthCalibration,
-} from '../calibration/types'
 
 // common types
 

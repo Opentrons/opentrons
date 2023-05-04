@@ -1,8 +1,7 @@
+import { ALIGN_CENTER, Box, Btn, Flex, Icon } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-
-import { ALIGN_CENTER, Box, Btn, Flex, Icon } from '@opentrons/components'
 
 // TODO(bh, 2022-12-7): finish styling when designs finalized
 export function BackButton({

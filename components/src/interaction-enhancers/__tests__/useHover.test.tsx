@@ -1,9 +1,8 @@
-import * as React from 'react'
-import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-
 import { useHover } from '../useHover'
 import type { UseHoverOptions, UseHoverResult } from '../useHover'
+import { mount } from 'enzyme'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 const TARGET_SELECTOR = '[title="target"]'
 

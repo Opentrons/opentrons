@@ -1,7 +1,7 @@
-import React from 'react'
-import { shallow } from 'enzyme'
 import { StepList, StepListProps } from '..'
 import { MultiSelectToolbar } from '../MultiSelectToolbar'
+import { shallow } from 'enzyme'
+import React from 'react'
 
 describe('StepList', () => {
   let props: StepListProps

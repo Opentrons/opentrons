@@ -1,11 +1,12 @@
+import { LoadFileAction, NewProtocolFields } from '../../load-file'
+import { Substeps } from '../../steplist/types'
+import { Action } from '../../types'
+import { ComputeRobotStateTimelineSuccessAction } from '../actions'
+import { FileMetadataFields, SaveFileMetadataAction } from '../types'
+import { Timeline } from '@opentrons/step-generation'
 import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Timeline } from '@opentrons/step-generation'
-import { Action } from '../../types'
-import { FileMetadataFields, SaveFileMetadataAction } from '../types'
-import { LoadFileAction, NewProtocolFields } from '../../load-file'
-import { ComputeRobotStateTimelineSuccessAction } from '../actions'
-import { Substeps } from '../../steplist/types'
+
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,

@@ -1,18 +1,15 @@
-import * as React from 'react'
-import uniqueId from 'lodash/uniqueId'
-import { mountWithStore, renderWithProviders } from '@opentrons/components'
-import { act } from 'react-dom/test-utils'
-
+import { i18n } from '../../../../../i18n'
 import { LoadingState } from '../../../../../organisms/CalibrationPanels'
+import { pipetteOffsetCalibrationStarted } from '../../../../../redux/analytics'
 import * as RobotApi from '../../../../../redux/robot-api'
 import * as Sessions from '../../../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../../../redux/sessions/__fixtures__'
-
 import { useDashboardCalibratePipOffset } from '../useDashboardCalibratePipOffset'
-import { pipetteOffsetCalibrationStarted } from '../../../../../redux/analytics'
-
 import type { DashboardCalOffsetInvoker } from '../useDashboardCalibratePipOffset'
-import { i18n } from '../../../../../i18n'
+import { mountWithStore, renderWithProviders } from '@opentrons/components'
+import uniqueId from 'lodash/uniqueId'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/robot-api/selectors')

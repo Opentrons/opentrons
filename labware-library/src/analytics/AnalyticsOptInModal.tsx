@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { AlertModal } from '@opentrons/components'
 import { useAnalyticsOptInOrOut } from './useAnalyticsOptInOrOut'
+import { AlertModal } from '@opentrons/components'
+import * as React from 'react'
 
 interface Props {
   className?: string

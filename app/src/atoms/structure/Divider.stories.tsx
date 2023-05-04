@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { StyledText } from '../text'
+import { Divider } from './index'
 import {
   Box,
   Flex,
@@ -6,9 +7,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { Divider } from './index'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/Divider',

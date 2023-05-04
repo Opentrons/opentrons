@@ -1,12 +1,10 @@
 // test concrete implementations of primitive components to ensure that they:
 // - Apply the style props to CSS
 // - Don't pass the style props down to the DOM
-
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
-import * as Styles from '../../styles'
 import { Box, Flex, Text, Link, Svg } from '..'
+import * as Styles from '../../styles'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 const COMPONENTS = [
   { Component: Box, name: 'Box' },

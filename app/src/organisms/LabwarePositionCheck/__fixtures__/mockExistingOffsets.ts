@@ -1,5 +1,5 @@
-import { getLabwareDefURI } from '@opentrons/shared-data'
 import { mockTipRackDef } from './mockTipRackDef'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 
 export const mockExistingOffset = {
   id: 'offset1',

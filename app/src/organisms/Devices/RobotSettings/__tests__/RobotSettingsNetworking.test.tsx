@@ -1,17 +1,14 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
+import type { State } from '../../../../redux/types'
 import { useIsOT3, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
-
-import type { State } from '../../../../redux/types'
+import { renderWithProviders } from '@opentrons/components'
+import { when } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../redux/networking')
 jest.mock('../../../../redux/robot-api/selectors')

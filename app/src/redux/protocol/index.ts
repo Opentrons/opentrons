@@ -1,13 +1,12 @@
 // TODO(bc, 2023-02-06): This entire branch of the redux store is dead code and can be removed
 // protocol state and loading actions
+import type { ThunkAction } from '../types'
 import {
   fileToProtocolFile,
   parseProtocolData,
   fileIsBinary,
   fileIsBundle,
 } from './protocol-data'
-
-import type { ThunkAction } from '../types'
 import type {
   OpenProtocolAction,
   UploadProtocolAction,

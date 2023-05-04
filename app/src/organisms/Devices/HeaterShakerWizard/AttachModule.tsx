@@ -1,5 +1,7 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.png'
+import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.png'
+import { StyledText } from '../../../atoms/text'
+import { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import {
   COLORS,
   Flex,
@@ -16,11 +18,10 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../../atoms/text'
-import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.png'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.png'
-import { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+
 interface AttachModuleProps {
   moduleFromProtocol?: ProtocolModuleInfo
 }
@@ -46,13 +47,13 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
-        paddingBottom={SPACING.spacingL}
+        paddingBottom={SPACING.spacing24}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {t('step_1_of_4_attach_module')}
       </StyledText>
       <AttachedModuleItem step={t('1a')}>
-        <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacingXL}>
+        <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacing32}>
           <img src={attachHeaterShakerModule} alt="Attach Module to Deck" />
           <Box marginTop="1.375rem" marginRight="1.375rem">
             <img
@@ -64,7 +65,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           </Box>
 
           <Flex
-            marginLeft={SPACING.spacingXXL}
+            marginLeft={SPACING.spacing40}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
@@ -145,7 +146,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             />
           </Box>
           <Flex
-            marginLeft={SPACING.spacingXXL}
+            marginLeft={SPACING.spacing40}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
@@ -214,7 +215,7 @@ interface AttachedModuleItemProps {
 function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
   const { step } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
       <StyledText
         color={COLORS.darkGrey}
         paddingRight={SPACING.spacing16}
@@ -223,9 +224,7 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
         {step}
       </StyledText>
       <Flex
-        border={`${String(SPACING.spacingXXS)} solid ${String(
-          COLORS.medGreyEnabled
-        )}`}
+        border={`1px solid ${COLORS.medGreyEnabled}`}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         padding={`${String(SPACING.spacing16)} ${String(

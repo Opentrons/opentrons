@@ -1,7 +1,7 @@
 import type { State } from '../../types'
 import { SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION } from '../constants'
-import type { Session, PipetteOffsetCalibrationSession } from '../types'
 import { getRobotSessionOfType } from '../selectors'
+import type { Session, PipetteOffsetCalibrationSession } from '../types'
 
 export const getPipetteOffsetCalibrationSession: (
   state: State,

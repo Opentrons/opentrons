@@ -1,7 +1,6 @@
-import head from 'lodash/head'
-
 import type { State } from '../../types'
 import type { TipLengthCalibration } from '../api-types'
+import head from 'lodash/head'
 
 export const getTipLengthCalibrations: (
   state: State,

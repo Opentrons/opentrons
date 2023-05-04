@@ -1,7 +1,19 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-import map from 'lodash/map'
+import { Portal } from '../../App/portal'
+import { FloatingActionButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import type { LabwareSetupItem } from '../../pages/Protocols/utils'
+import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
+import type { LatchStatus } from '../../redux/modules/api-types'
+import { getLabwareDisplayLocation } from '../CommandText/utils'
+import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
+import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -19,31 +31,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  useCreateLiveCommandMutation,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
+import {
   getDeckDefFromRobotType,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import {
-  useCreateLiveCommandMutation,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
-
-import { FloatingActionButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
-
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getLabwareDisplayLocation } from '../CommandText/utils'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
-import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
-import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
-
 import type {
   CompletedProtocolAnalysis,
   HeaterShakerCloseLatchCreateCommand,
@@ -51,10 +48,10 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
 } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
-import type { LatchStatus } from '../../redux/modules/api-types'
+import map from 'lodash/map'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',

@@ -1,7 +1,17 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
+import { Modal as OddModal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { getIsOnDevice } from '../../../../redux/config'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
+import { LiquidDetailCard } from './LiquidDetailCard'
+import {
+  getLiquidsByIdForLabware,
+  getWellFillFromLabwareId,
+  getWellGroupForLiquidId,
+  getDisabledWellGroupForLiquidId,
+} from './utils'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
@@ -16,20 +26,10 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
-import { Modal as OddModal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
-import { getIsOnDevice } from '../../../../redux/config'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { Modal } from '../../../../molecules/Modal'
-import { StyledText } from '../../../../atoms/text'
-import { getSlotLabwareName } from '../utils/getSlotLabwareName'
-import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
-import { LiquidDetailCard } from './LiquidDetailCard'
-import {
-  getLiquidsByIdForLabware,
-  getWellFillFromLabwareId,
-  getWellGroupForLiquidId,
-  getDisabledWellGroupForLiquidId,
-} from './utils'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 interface LiquidsLabwareDetailsModalProps {
   liquidId?: string

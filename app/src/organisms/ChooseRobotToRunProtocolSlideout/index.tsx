@@ -1,10 +1,12 @@
-import * as React from 'react'
-import path from 'path'
-import first from 'lodash/first'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
-
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import type { Robot } from '../../redux/discovery/types'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { State } from '../../redux/types'
+import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
+import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import {
   Icon,
   Flex,
@@ -12,18 +14,13 @@ import {
   SIZE_1,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
-import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
-import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
-
 import type { StyleProps } from '@opentrons/components'
-import type { State } from '../../redux/types'
-import type { Robot } from '../../redux/discovery/types'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
+import first from 'lodash/first'
+import path from 'path'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData

@@ -1,6 +1,10 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import deepwell from '../../../assets/images/deepwell_thermal_adapter.png'
+import flatBottom from '../../../assets/images/flatbottom_thermal_adapter.png'
+import heaterShaker from '../../../assets/images/heater_shaker_empty.png'
+import pcr from '../../../assets/images/pcr_thermal_adapter.png'
+import screwdriver from '../../../assets/images/t10_torx_screwdriver.png'
+import universal from '../../../assets/images/universal_thermal_adapter.png'
+import { StyledText } from '../../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,20 +19,14 @@ import {
   RobotWorkSpace,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-
-import heaterShaker from '../../../assets/images/heater_shaker_empty.png'
-import flatBottom from '../../../assets/images/flatbottom_thermal_adapter.png'
-import deepwell from '../../../assets/images/deepwell_thermal_adapter.png'
-import pcr from '../../../assets/images/pcr_thermal_adapter.png'
-import universal from '../../../assets/images/universal_thermal_adapter.png'
-import screwdriver from '../../../assets/images/t10_torx_screwdriver.png'
-import { StyledText } from '../../../atoms/text'
-
 import type {
   LabwareDefinition2,
   ModuleModel,
   ThermalAdapterName,
 } from '@opentrons/shared-data'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const VIEW_BOX = '-20 -10 160 100'
 
@@ -40,7 +38,7 @@ interface IntroContainerProps {
 
 const IntroItem = (props: IntroContainerProps): JSX.Element => {
   let multiText: JSX.Element = <div></div>
-  const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing8
+  const leftPadding = props.image != null ? SPACING.spacing24 : SPACING.spacing8
 
   if (props.subtext != null) {
     multiText = (
@@ -78,16 +76,14 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   return (
     <Flex
       marginTop={SPACING.spacing8}
-      border={`${String(SPACING.spacingXXS)} ${String(
-        BORDERS.styleSolid
-      )} ${String(COLORS.medGreyEnabled)}`}
+      border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
       flexDirection={DIRECTION_ROW}
       width="21.5rem"
       paddingBottom={SPACING.spacing8}
     >
       {props.image != null ? (
         <>
-          <Flex paddingLeft={SPACING.spacingXS} paddingTop={SPACING.spacing8}>
+          <Flex paddingLeft={SPACING.spacing4} paddingTop={SPACING.spacing8}>
             {props.image}
           </Flex>
           {multiText}

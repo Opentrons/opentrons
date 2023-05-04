@@ -1,19 +1,17 @@
-import * as React from 'react'
-import { createStore, Store } from 'redux'
-import { Provider } from 'react-redux'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { waitFor } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
-
+import { useTrackEvent } from '../../../../redux/analytics'
+import type { ProtocolAnalyticsData } from '../../../../redux/analytics/types'
+import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import { STORED_PROTOCOL_ANALYSIS } from '../__fixtures__/storedProtocolAnalysis'
-import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
 import { parseProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import { parseProtocolAnalysisOutput } from '../useStoredProtocolAnalysis'
-import { useTrackEvent } from '../../../../redux/analytics'
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-
-import type { ProtocolAnalyticsData } from '../../../../redux/analytics/types'
+import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
+import { waitFor } from '@testing-library/react'
+import { renderHook } from '@testing-library/react-hooks'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
 jest.mock('../../hooks')
 jest.mock('../useProtocolRunAnalyticsData')

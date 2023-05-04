@@ -1,8 +1,7 @@
+import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 import * as React from 'react'
 import { css } from 'styled-components'
-import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
 
 interface MiniCardProps extends StyleProps {
   onClick: () => void

@@ -1,5 +1,4 @@
 // generic, robot HTTP API fixtures
-
 import type {
   Method,
   RobotHost,

@@ -1,11 +1,10 @@
-import { formatTimestamp } from '../../utils'
-
 import type {
   TipLengthCalibration,
   PipetteOffsetCalibration,
 } from '../../../../redux/calibration/api-types'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 import type { TaskListProps } from '../../../TaskList/types'
+import { formatTimestamp } from '../../utils'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 export const TASK_COUNT = 3

@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components'
+import { useField } from 'formik'
+import * as React from 'react'
 
 export interface ModelDropdownProps {
   fieldName: string

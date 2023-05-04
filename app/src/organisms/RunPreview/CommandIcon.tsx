@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { SPACING, Icon, IconName } from '@opentrons/components'
-import { RunTimeCommand } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
+import { RunTimeCommand } from '@opentrons/shared-data'
+import * as React from 'react'
 
 const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
   delay: 'pause-circle',

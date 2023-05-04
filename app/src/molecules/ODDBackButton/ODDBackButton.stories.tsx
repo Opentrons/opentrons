@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { ODDBackButton } from '.'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'ODD/Molecules/ODDBackButton',

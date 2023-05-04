@@ -1,7 +1,7 @@
+import { useConditionalConfirm } from '../useConditionalConfirm'
+import { mount } from 'enzyme'
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-import { useConditionalConfirm } from '../useConditionalConfirm'
 
 describe('useConditionalConfirm', () => {
   let confirm: () => unknown

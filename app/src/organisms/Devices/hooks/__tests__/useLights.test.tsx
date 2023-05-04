@@ -1,15 +1,14 @@
-import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { useLights } from '..'
 import {
   useLightsQuery,
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
-
-import { useLights } from '..'
+import { renderHook } from '@testing-library/react-hooks'
+import { resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
 jest.mock('@opentrons/react-api-client')
 

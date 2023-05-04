@@ -1,11 +1,9 @@
-import { combineEpics } from 'redux-observable'
-
+import type { Epic } from '../../types'
 import { fetchLightsEpic } from './fetchLightsEpic'
-import { updateLightsEpic } from './updateLightsEpic'
 import { homeEpic } from './homeEpic'
 import { moveEpic } from './moveEpic'
-
-import type { Epic } from '../../types'
+import { updateLightsEpic } from './updateLightsEpic'
+import { combineEpics } from 'redux-observable'
 
 export const robotControlsEpic: Epic = combineEpics<Epic>(
   fetchLightsEpic,

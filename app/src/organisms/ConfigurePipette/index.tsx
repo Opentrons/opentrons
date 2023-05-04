@@ -1,17 +1,17 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { Box } from '@opentrons/components'
-import { SUCCESS, FAILURE, PENDING } from '../../redux/robot-api'
-import { ConfigForm } from './ConfigForm'
-import { ConfigErrorBanner } from './ConfigErrorBanner'
+import { getAttachedPipetteSettingsFieldsById } from '../../redux/pipettes'
 import type {
   AttachedPipette,
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
-import { getAttachedPipetteSettingsFieldsById } from '../../redux/pipettes'
+import { SUCCESS, FAILURE, PENDING } from '../../redux/robot-api'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { State } from '../../redux/types'
+import { ConfigErrorBanner } from './ConfigErrorBanner'
+import { ConfigForm } from './ConfigForm'
+import { Box } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 interface Props {
   closeModal: () => void

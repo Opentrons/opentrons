@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react'
 import assert from 'assert'
-
+import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
 export interface UseOnClickOutsideOptions {

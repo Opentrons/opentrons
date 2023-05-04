@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { SPACING } from '@opentrons/components'
+import attachMountingPlate from '../../assets/images/change-pip/attach-mounting-plate.png'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import attachMountingPlate from '../../assets/images/change-pip/attach-mounting-plate.png'
 import { BODY_STYLE, FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
+import { SPACING } from '@opentrons/components'
+import { RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 export const MountingPlate = (
   props: PipetteWizardStepProps

@@ -1,9 +1,8 @@
 // structure components tests
+import { PageTabs, TitleBar, Card, LabeledValue, Splash, Pill } from '..'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import Renderer from 'react-test-renderer'
-
-import { PageTabs, TitleBar, Card, LabeledValue, Splash, Pill } from '..'
 
 describe('TitleBar', () => {
   it('adds an h1 with the title', () => {

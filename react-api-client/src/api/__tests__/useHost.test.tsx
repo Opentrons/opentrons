@@ -1,8 +1,7 @@
 // tests for the HostConfig context and hook
-import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
-
 import { ApiHostProvider, useHost } from '..'
+import { renderHook } from '@testing-library/react-hooks'
+import * as React from 'react'
 
 describe('ApiHostProvider and useHost', () => {
   it('should default to null if no host provided', () => {

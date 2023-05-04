@@ -1,5 +1,15 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import {
+  getIsTouchTipField,
+  getIsDelayPositionField,
+} from '../../../../form-types'
+import { i18n } from '../../../../localization'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { BaseState } from '../../../../types'
+import stepFormStyles from '../../StepEditForm.css'
+import { FieldProps } from '../../types'
+import styles from './TipPositionInput.css'
+import { TipPositionModal } from './TipPositionModal'
+import { getDefaultMmFromBottom } from './utils'
 import {
   FormGroup,
   InputField,
@@ -8,19 +18,8 @@ import {
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
-import {
-  getIsTouchTipField,
-  getIsDelayPositionField,
-} from '../../../../form-types'
-import { i18n } from '../../../../localization'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './TipPositionInput.css'
-import { TipPositionModal } from './TipPositionModal'
-
-import { getDefaultMmFromBottom } from './utils'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface OP extends FieldProps {
   labwareId?: string | null

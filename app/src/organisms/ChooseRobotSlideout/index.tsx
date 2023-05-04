@@ -1,9 +1,21 @@
-import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { NavLink } from 'react-router-dom'
-import { css } from 'styled-components'
-
+import { Banner } from '../../atoms/Banner'
+import { Slideout } from '../../atoms/Slideout'
+import type { SlideoutProps } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
+import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import {
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+  getScanning,
+  startDiscovery,
+  RE_ROBOT_MODEL_OT3,
+  ROBOT_MODEL_OT3,
+} from '../../redux/discovery'
+import type { Robot } from '../../redux/discovery/types'
+import type { State, Dispatch } from '../../redux/types'
+import { AvailableRobotOption } from './AvailableRobotOption'
 import {
   SPACING,
   Icon,
@@ -21,26 +33,11 @@ import {
   SIZE_4,
   DIRECTION_ROW,
 } from '@opentrons/components'
-
-import {
-  getConnectableRobots,
-  getReachableRobots,
-  getUnreachableRobots,
-  getScanning,
-  startDiscovery,
-  RE_ROBOT_MODEL_OT3,
-  ROBOT_MODEL_OT3,
-} from '../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { Banner } from '../../atoms/Banner'
-import { Slideout } from '../../atoms/Slideout'
-import { StyledText } from '../../atoms/text'
-import { AvailableRobotOption } from './AvailableRobotOption'
-
-import type { SlideoutProps } from '../../atoms/Slideout'
-import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import type { State, Dispatch } from '../../redux/types'
-import type { Robot } from '../../redux/discovery/types'
+import * as React from 'react'
+import { useTranslation, Trans } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { NavLink } from 'react-router-dom'
+import { css } from 'styled-components'
 
 interface RobotIsBusyAction {
   type: 'robotIsBusy'
@@ -176,7 +173,7 @@ export function ChooseRobotSlideout(
               <StyledText
                 as="p"
                 color={COLORS.darkGreyEnabled}
-                marginRight={SPACING.spacingSM}
+                marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
               </StyledText>

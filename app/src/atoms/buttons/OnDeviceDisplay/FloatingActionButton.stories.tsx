@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { FloatingActionButton } from '.'
-import type { Story, Meta } from '@storybook/react'
 import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
+import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'ODD/Atoms/Buttons/FloatingActionButton',

@@ -1,12 +1,10 @@
-import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
+import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
+import type { LabwareDefinition2 } from '../types'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
-
-import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
-
-import type { LabwareDefinition2 } from '../types'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 
 const fixtureTrash = fixture_trash as LabwareDefinition2
 const fixture96Plate = fixture_96_plate as LabwareDefinition2

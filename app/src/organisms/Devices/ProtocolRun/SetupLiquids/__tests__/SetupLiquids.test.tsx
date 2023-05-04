@@ -1,11 +1,11 @@
-import * as React from 'react'
 import { i18n } from '../../../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
-import { SetupLiquids } from '../index'
+import { ProceedToRunButton } from '../../ProceedToRunButton'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
-import { ProceedToRunButton } from '../../ProceedToRunButton'
+import { SetupLiquids } from '../index'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../SetupLiquidsList')
 jest.mock('../SetupLiquidsMap')

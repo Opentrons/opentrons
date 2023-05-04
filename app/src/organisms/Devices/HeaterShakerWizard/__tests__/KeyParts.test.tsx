@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { KeyParts } from '../KeyParts'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = () => {
   return renderWithProviders(<KeyParts />, {

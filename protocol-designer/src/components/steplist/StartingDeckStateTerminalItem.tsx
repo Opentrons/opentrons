@@ -1,11 +1,11 @@
-import { connect } from 'react-redux'
-import * as React from 'react'
-import { TerminalItem } from './TerminalItem'
-import { PDListItem } from '../lists'
 import { START_TERMINAL_TITLE } from '../../constants'
-import { BaseState } from '../../types'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
+import { BaseState } from '../../types'
+import { PDListItem } from '../lists'
+import { TerminalItem } from './TerminalItem'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface Props {
   showHint: boolean

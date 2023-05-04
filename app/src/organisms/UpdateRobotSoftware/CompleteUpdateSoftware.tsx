@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { ProgressBar } from '../../atoms/ProgressBar'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -10,9 +9,8 @@ import {
   JUSTIFY_CENTER,
   Box,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { ProgressBar } from '../../atoms/ProgressBar'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface CompleteUpdateSoftwareProps {
   robotName: string
@@ -28,7 +26,7 @@ export function CompleteUpdateSoftware({
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.darkGreyDisabled}
         height="33rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >

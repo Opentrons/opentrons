@@ -1,7 +1,16 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
+import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import type { DashboardCalDeckInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
+import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import {
+  useAttachedPipettes,
+  useCalibrationTaskList,
+  useRunHasStarted,
+} from '../Devices/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { TaskList } from '../TaskList'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,22 +22,9 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
-import { TaskList } from '../TaskList'
-
-import {
-  useAttachedPipettes,
-  useCalibrationTaskList,
-  useRunHasStarted,
-} from '../Devices/hooks'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
-
-import type { DashboardCalOffsetInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibratePipOffset'
-import type { DashboardCalTipLengthInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
-import type { DashboardCalDeckInvoker } from '../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateDeck'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 interface CalibrationTaskListProps {
   robotName: string

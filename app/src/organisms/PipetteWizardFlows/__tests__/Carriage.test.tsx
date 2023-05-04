@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { i18n } from '../../../i18n'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { Carriage } from '../Carriage'
+import { FLOWS } from '../constants'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
-import { Carriage } from '../Carriage'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Carriage>) => {
   return renderWithProviders(<Carriage {...props} />, {

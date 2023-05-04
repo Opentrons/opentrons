@@ -1,13 +1,12 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
-import { Icon } from '@opentrons/components'
-import { getHoveredStepLabware, getHoveredStepId } from '../../../ui/steps'
-import { getSavedStepForms } from '../../../step-forms/selectors'
 import { THERMOCYCLER_PROFILE } from '../../../constants'
-
-import styles from './LabwareOverlays.css'
 import { LabwareOnDeck } from '../../../step-forms'
+import { getSavedStepForms } from '../../../step-forms/selectors'
+import { getHoveredStepLabware, getHoveredStepId } from '../../../ui/steps'
+import styles from './LabwareOverlays.css'
+import { Icon } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 interface LabwareHighlightProps {
   labwareOnDeck: LabwareOnDeck

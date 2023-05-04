@@ -1,19 +1,6 @@
-import * as React from 'react'
-import { Route } from 'react-router'
-import { UseQueryResult } from 'react-query'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
-import {
-  useProtocolAnalysesQuery,
-  useProtocolQuery,
-  useRunQuery,
-  useRunActionMutations,
-} from '@opentrons/react-api-client'
-
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
@@ -23,11 +10,21 @@ import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
-import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { RunningProtocol } from '../RunningProtocol'
-
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import type { ProtocolAnalyses } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import {
+  useProtocolAnalysesQuery,
+  useProtocolQuery,
+  useRunQuery,
+  useRunActionMutations,
+} from '@opentrons/react-api-client'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { UseQueryResult } from 'react-query'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/Devices/hooks')

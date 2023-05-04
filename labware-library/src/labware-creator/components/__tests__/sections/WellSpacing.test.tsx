@@ -1,8 +1,3 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { render, screen } from '@testing-library/react'
-import { nestedTextMatcher } from '@opentrons/components'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -11,6 +6,11 @@ import {
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { WellSpacing } from '../../sections/WellSpacing'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import { nestedTextMatcher } from '@opentrons/components'
+import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
+import React from 'react'
 
 jest.mock('../../../utils')
 

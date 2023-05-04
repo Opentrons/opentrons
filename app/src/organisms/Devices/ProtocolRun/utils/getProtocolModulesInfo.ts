@@ -1,10 +1,9 @@
+import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import {
   SPAN7_8_10_11_SLOT,
   getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -12,6 +11,7 @@ import type {
   ProtocolAnalysisOutput,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
+import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export interface ProtocolModuleInfo {
   moduleId: string

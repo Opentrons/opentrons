@@ -1,19 +1,17 @@
-import assert from 'assert'
-import mapValues from 'lodash/mapValues'
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
-
 import {
   FIXED_TRASH_RENDER_HEIGHT,
   OPENTRONS_LABWARE_NAMESPACE,
   SLOT_RENDER_HEIGHT,
 } from './constants'
-
 import type {
   LabwareDefinition1,
   LabwareDefinition2,
   WellDefinition,
 } from './types'
+import assert from 'assert'
+import mapValues from 'lodash/mapValues'
 
 assert(
   definitions && Object.keys(definitions).length > 0,

@@ -1,4 +1,5 @@
-import mapValues from 'lodash/mapValues'
+import { i18n } from './localization'
+import type { DeckSlot, WellVolumes } from './types'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -14,9 +15,8 @@ import {
   DeckSlot as DeckDefSlot,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { i18n } from './localization'
-import type { DeckSlot, WellVolumes } from './types'
 import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
+import mapValues from 'lodash/mapValues'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)

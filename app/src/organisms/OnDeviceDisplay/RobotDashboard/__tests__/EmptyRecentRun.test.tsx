@@ -1,8 +1,7 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { EmptyRecentRun } from '../EmptyRecentRun'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const PNG_FILE_NAME = 'empty_recent_protocol_run.png'
 

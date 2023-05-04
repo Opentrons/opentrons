@@ -1,9 +1,8 @@
 import assert from 'assert'
+import { mount } from 'enzyme'
+import type { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-
-import type { ReactWrapper } from 'enzyme'
 
 export interface MockStore<State, Action> {
   getState: jest.MockedFunction<() => State>

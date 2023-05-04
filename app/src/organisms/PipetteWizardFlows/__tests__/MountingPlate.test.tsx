@@ -1,5 +1,8 @@
-import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { i18n } from '../../../i18n'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { MountingPlate } from '../MountingPlate'
+import { FLOWS } from '../constants'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -7,11 +10,8 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
-import { MountingPlate } from '../MountingPlate'
+import { fireEvent, waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof MountingPlate>) => {
   return renderWithProviders(<MountingPlate {...props} />, {

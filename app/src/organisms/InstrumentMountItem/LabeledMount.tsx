@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import { StyledText } from '../../atoms/text'
+import type { Mount } from '../../redux/pipettes/types'
 import {
   ALIGN_CENTER,
   Flex,
@@ -14,8 +13,9 @@ import {
   ALIGN_FLEX_START,
   BORDERS,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import type { Mount } from '../../redux/pipettes/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
   display: flex;

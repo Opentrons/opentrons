@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   C_BLUE,
   FONT_SIZE_INHERIT,
@@ -7,6 +5,7 @@ import {
   Btn,
   Text,
 } from '@opentrons/components'
+import * as React from 'react'
 
 interface SkipAppUpdateMessageProps {
   onClick: React.MouseEventHandler

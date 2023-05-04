@@ -1,17 +1,14 @@
-import * as React from 'react'
-import uniqueId from 'lodash/uniqueId'
 import { i18n } from '../../../i18n'
-import { mountWithProviders, AlertPrimaryButton } from '@opentrons/components'
-import { act } from 'react-dom/test-utils'
-
+import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Sessions from '../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
-
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
-import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
-
 import type { Invoker } from '../useCalibratePipetteOffset'
+import { mountWithProviders, AlertPrimaryButton } from '@opentrons/components'
+import uniqueId from 'lodash/uniqueId'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')

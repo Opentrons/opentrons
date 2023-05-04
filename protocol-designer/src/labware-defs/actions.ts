@@ -1,20 +1,21 @@
-import assert from 'assert'
-import Ajv from 'ajv'
-import isEqual from 'lodash/isEqual'
-import flatten from 'lodash/flatten'
-import values from 'lodash/values'
-import uniqBy from 'lodash/uniqBy'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import { ThunkAction } from '../types'
+import { getAllWellSetsForLabware } from '../utils'
+import * as labwareDefSelectors from './selectors'
+import { LabwareUploadMessage } from './types'
 import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import * as labwareDefSelectors from './selectors'
-import { getAllWellSetsForLabware } from '../utils'
-import { ThunkAction } from '../types'
-import { LabwareUploadMessage } from './types'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import Ajv from 'ajv'
+import assert from 'assert'
+import flatten from 'lodash/flatten'
+import isEqual from 'lodash/isEqual'
+import uniqBy from 'lodash/uniqBy'
+import values from 'lodash/values'
+
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage

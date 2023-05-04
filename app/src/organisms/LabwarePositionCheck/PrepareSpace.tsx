@@ -1,7 +1,8 @@
-import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { getIsOnDevice } from '../../redux/config'
+import { NeedHelpLink } from '../CalibrationPanels'
+import type { CheckLabwareStep } from './types'
 import {
   LabwareRender,
   Module,
@@ -26,13 +27,10 @@ import {
 } from '@opentrons/shared-data'
 import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
-
-import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from '../CalibrationPanels'
-
-import type { CheckLabwareStep } from './types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -187,7 +185,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
 
 const ResponsiveTwoUpPanel = styled.div`
   display: flex;
-  grid-gap: ${SPACING.spacingL};
+  grid-gap: ${SPACING.spacing24};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: 0;

@@ -8,15 +8,15 @@ The following should be present in the application entry point:
 
 ```js
 import { analyticsMiddleware } from './path/to/analytics'
-
-// add the middleware to the store
+ add the middleware to the store
+c
 const middleware = applyMiddleware(
-  // ...
-  analyticsMiddleware
-  // ...
+   ...
+  analyticsMiddleware  ...
 )
-
-// create store
+)
+ create store
+c
 const store = createStore(reducer, middleware)
 ```
 

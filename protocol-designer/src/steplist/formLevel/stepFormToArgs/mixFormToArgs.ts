@@ -1,5 +1,3 @@
-import assert from 'assert'
-import { getWellsDepth } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -7,10 +5,13 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
+import { HydratedMixFormDataLegacy } from '../../../form-types'
 import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
-import { HydratedMixFormDataLegacy } from '../../../form-types'
+import { getWellsDepth } from '@opentrons/shared-data'
 import { MixArgs } from '@opentrons/step-generation'
+import assert from 'assert'
+
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy

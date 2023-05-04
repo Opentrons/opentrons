@@ -1,15 +1,14 @@
-import * as React from 'react'
-import cx from 'classnames'
 import { Box } from '..'
-import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
-import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
-import singleGEN2Src from '@opentrons/components/src/instrument/single-channel_GEN2_800px.png'
-import multiGEN2Src from '@opentrons/components/src/instrument/multi-channel_GEN2_800px.png'
-import styles from './instrument.css'
-
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { Mount } from '../robot-types'
 import type { StyleProps } from '..'
+import type { Mount } from '../robot-types'
+import styles from './instrument.css'
+import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
+import multiGEN2Src from '@opentrons/components/src/instrument/multi-channel_GEN2_800px.png'
+import singleGEN2Src from '@opentrons/components/src/instrument/single-channel_GEN2_800px.png'
+import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
 export interface InstrumentDiagramProps extends StyleProps {
   pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null

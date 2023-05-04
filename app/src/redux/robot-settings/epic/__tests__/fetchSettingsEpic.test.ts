@@ -1,16 +1,14 @@
-import { TestScheduler } from 'rxjs/testing'
-
+import { robotSettingsEpic } from '..'
+import * as DiscoverySelectors from '../../../discovery/selectors'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
-import * as Fixtures from '../../__fixtures__'
-import * as Selectors from '../../selectors'
-import * as Actions from '../../actions'
-import * as Types from '../../types'
-import { robotSettingsEpic } from '..'
-
-import type { Action, State } from '../../../types'
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
+import type { Action, State } from '../../../types'
+import * as Fixtures from '../../__fixtures__'
+import * as Actions from '../../actions'
+import * as Selectors from '../../selectors'
+import * as Types from '../../types'
+import { TestScheduler } from 'rxjs/testing'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')

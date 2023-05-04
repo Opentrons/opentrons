@@ -1,21 +1,19 @@
-import * as React from 'react'
-
+import { Portal } from '../../../../../App/portal'
+import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../../redux/buildroot'
+import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
+import * as Shell from '../../../../../redux/shell'
+import type { State, Action } from '../../../../../redux/types'
+import { UpdateAppModal } from '../../../../UpdateAppModal'
+import { SkipAppUpdateMessage } from '../SkipAppUpdateMessage'
+import { SyncRobotMessage } from '../SyncRobotMessage'
+import { VersionInfoModal } from '../VersionInfoModal'
+import { VersionList } from '../VersionList'
 import {
   mountWithStore,
   AlertModal,
   OutlineButton,
 } from '@opentrons/components'
-import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
-import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../../redux/buildroot'
-import * as Shell from '../../../../../redux/shell'
-import { Portal } from '../../../../../App/portal'
-import { UpdateAppModal } from '../../../../UpdateAppModal'
-import { VersionList } from '../VersionList'
-import { SyncRobotMessage } from '../SyncRobotMessage'
-import { SkipAppUpdateMessage } from '../SkipAppUpdateMessage'
-import { VersionInfoModal } from '../VersionInfoModal'
-
-import type { State, Action } from '../../../../../redux/types'
+import * as React from 'react'
 
 jest.mock('../../../../../redux/shell/update')
 jest.mock('../../../../UpdateAppModal', () => ({

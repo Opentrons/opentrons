@@ -1,14 +1,10 @@
-import { renderHook } from '@testing-library/react-hooks'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import {
-  getPipetteNameSpecs,
-  getLoadedLabwareDefinitionsByUri,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
-
+  useAttachedPipetteCalibrations,
+  useAttachedPipettes,
+  useRunPipetteInfoByMount,
+  useStoredProtocolAnalysis,
+} from '..'
+import type { PipetteInfo } from '..'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -22,20 +18,21 @@ import {
   mockRightProtoPipette,
 } from '../../../../redux/pipettes/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import {
-  useAttachedPipetteCalibrations,
-  useAttachedPipettes,
-  useRunPipetteInfoByMount,
-  useStoredProtocolAnalysis,
-} from '..'
 import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
-
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import {
+  getPipetteNameSpecs,
+  getLoadedLabwareDefinitionsByUri,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { PipetteInfo } from '..'
+import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')

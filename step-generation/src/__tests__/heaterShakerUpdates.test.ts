@@ -1,8 +1,6 @@
-import merge from 'lodash/merge'
-import {
-  HEATERSHAKER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_V1,
-} from '@opentrons/shared-data'
+import { makeImmutableStateUpdater } from '../__utils__'
+import type { ImmutableStateUpdater } from '../__utils__'
+import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import {
   forHeaterShakerSetTargetTemperature as _forHeaterShakerSetTargetTemperature,
   forHeaterShakerAwaitTemperature as _forHeaterShakerAwaitTemperature,
@@ -12,19 +10,21 @@ import {
   forHeaterShakerOpenLatch as _forHeaterShakerOpenLatch,
   forHeaterShakerCloseLatch as _forHeaterShakerCloseLatch,
 } from '../getNextRobotStateAndWarnings/heaterShakerUpdates'
-import { makeImmutableStateUpdater } from '../__utils__'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import type {
   HeaterShakerModuleState,
   InvariantContext,
   RobotState,
 } from '../types'
-import type { ImmutableStateUpdater } from '../__utils__'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+} from '@opentrons/shared-data'
 import type {
   TemperatureParams,
   ModuleOnlyParams,
   ShakeSpeedParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import merge from 'lodash/merge'
 
 const forHeaterShakerSetTargetTemperature = makeImmutableStateUpdater(
   _forHeaterShakerSetTargetTemperature

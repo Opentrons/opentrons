@@ -1,5 +1,10 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../../../atoms/text'
+import { useRobot } from '../../../../organisms/Devices/hooks'
+import {
+  getRobotSerialNumber,
+  getRobotFirmwareVersion,
+  getRobotProtocolApiVersion,
+} from '../../../../redux/discovery'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,13 +13,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
-import { useRobot } from '../../../../organisms/Devices/hooks'
-import {
-  getRobotSerialNumber,
-  getRobotFirmwareVersion,
-  getRobotProtocolApiVersion,
-} from '../../../../redux/discovery'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface RobotInformationProps {
   robotName: string

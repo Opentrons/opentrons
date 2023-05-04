@@ -1,7 +1,7 @@
-import React from 'react'
-import { I18nextProvider } from 'react-i18next'
 import { GlobalStyle } from '../app/src/atoms/GlobalStyle'
 import { i18n } from '../app/src/i18n'
+import React from 'react'
+import { I18nextProvider } from 'react-i18next'
 
 export const customViewports = {
   onDeviceDisplay: {

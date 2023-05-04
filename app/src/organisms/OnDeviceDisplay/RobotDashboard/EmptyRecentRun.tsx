@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import abstractImage from '../../../assets/images/on-device-display/empty_recent_protocol_run.png'
+import { StyledText } from '../../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -10,10 +9,8 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-
-import abstractImage from '../../../assets/images/on-device-display/empty_recent_protocol_run.png'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function EmptyRecentRun(): JSX.Element {
   const { t } = useTranslation('device_details')

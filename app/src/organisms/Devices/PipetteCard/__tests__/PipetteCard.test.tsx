@@ -1,25 +1,23 @@
-import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { i18n } from '../../../../i18n'
-import { getHasCalibrationBlock } from '../../../../redux/config'
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
-import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
-import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData, useIsOT3 } from '../../hooks'
-import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
-import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
-
+import { i18n } from '../../../../i18n'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { getHasCalibrationBlock } from '../../../../redux/config'
 import {
   mockLeftSpecs,
   mockRightSpecs,
 } from '../../../../redux/pipettes/__fixtures__'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-
+import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
+import { useDeckCalibrationData, useIsOT3 } from '../../hooks'
+import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
+import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
+import { renderWithProviders } from '@opentrons/components'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')

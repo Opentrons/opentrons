@@ -1,7 +1,8 @@
 import { generateRobotStateTimeline } from './generateRobotStateTimeline'
 import { generateSubsteps } from './generateSubsteps'
-import { Timeline } from '@opentrons/step-generation'
 import { WorkerContext } from './types'
+import { Timeline } from '@opentrons/step-generation'
+
 // Since we can't type the worker.js itself (flow would not understand `new Worker()`),
 // this typed wrapper is a trick to give us static type safety.
 export const makeWorker = (context: WorkerContext): void => {

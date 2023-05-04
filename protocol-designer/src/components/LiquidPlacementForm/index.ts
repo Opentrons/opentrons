@@ -1,21 +1,22 @@
-import { connect } from 'react-redux'
-import assert from 'assert'
-import isEmpty from 'lodash/isEmpty'
 import {
   removeWellsContents,
   setWellContents,
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import { getSelectedWells } from '../../well-selection/selectors'
+import { BaseState } from '../../types'
 import { deselectAllWells } from '../../well-selection/actions'
+import { getSelectedWells } from '../../well-selection/selectors'
 import {
   LiquidPlacementForm as LiquidPlacementFormComponent,
   Props as LiquidPlacementFormProps,
   LiquidPlacementFormValues,
 } from './LiquidPlacementForm'
+import assert from 'assert'
+import isEmpty from 'lodash/isEmpty'
+import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { BaseState } from '../../types'
+
 type SP = Omit<
   LiquidPlacementFormProps & {
     _labwareId?: string | null

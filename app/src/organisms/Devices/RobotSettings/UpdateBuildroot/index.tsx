@@ -1,9 +1,3 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
-import { VersionInfoModal } from './VersionInfoModal'
-import { ViewUpdateModal } from './ViewUpdateModal'
-import { InstallModal } from './InstallModal'
 import {
   startBuildrootUpdate,
   setBuildrootUpdateSeen,
@@ -13,9 +7,13 @@ import {
   getRobotSystemType,
   getBuildrootUpdateAvailable,
 } from '../../../../redux/buildroot'
-
-import type { State, Dispatch } from '../../../../redux/types'
 import type { ViewableRobot } from '../../../../redux/discovery/types'
+import type { State, Dispatch } from '../../../../redux/types'
+import { InstallModal } from './InstallModal'
+import { VersionInfoModal } from './VersionInfoModal'
+import { ViewUpdateModal } from './ViewUpdateModal'
+import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 export interface UpdateBuildrootProps {
   robot: ViewableRobot

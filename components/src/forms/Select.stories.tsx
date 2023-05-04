@@ -1,9 +1,7 @@
-import * as React from 'react'
-
 import { Select } from './Select'
 import styles from './Select.css'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Molecules/Forms/Select',

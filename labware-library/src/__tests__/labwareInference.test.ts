@@ -1,11 +1,11 @@
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixtureIrregular from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1.json'
 import {
   getIfConsistent,
   getSpacingIfUniform,
   getUniqueWellProperties,
 } from '../labwareInference'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixtureIrregular from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1.json'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixtureIrregular = _fixtureIrregular as LabwareDefinition2

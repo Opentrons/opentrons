@@ -1,14 +1,13 @@
-import * as React from 'react'
+import { InputField } from '../InputField'
+import { Numpad } from './'
 import {
   Flex,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
-import { InputField } from '../InputField'
-import { Numpad } from './'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Odd/Atoms/SoftwareKeyboard/Numpad',

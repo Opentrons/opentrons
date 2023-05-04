@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
 import { useInterval } from '..'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 describe('useInterval hook', () => {
   const callback = jest.fn()

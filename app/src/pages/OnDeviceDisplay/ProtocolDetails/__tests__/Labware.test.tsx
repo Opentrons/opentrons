@@ -1,15 +1,13 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useRequiredProtocolLabware } from '../../../Protocols/hooks'
 import { Labware } from '../Labware'
-
+import { renderWithProviders } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../Protocols/hooks')
 

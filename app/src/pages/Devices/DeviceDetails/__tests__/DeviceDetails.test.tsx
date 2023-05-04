@@ -1,25 +1,22 @@
-import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { MemoryRouter, Route } from 'react-router-dom'
-
-import {
-  componentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
-
+import { DeviceDetails } from '..'
 import { i18n } from '../../../../i18n'
+import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
+import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
+import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
 import {
   useRobot,
   useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
-import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
-import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
-import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
-import { DeviceDetails } from '..'
-
 import type { State } from '../../../../redux/types'
+import {
+  componentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter, Route } from 'react-router-dom'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/InstrumentsAndModules')

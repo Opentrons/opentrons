@@ -1,31 +1,28 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
-import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-
-import {
-  parseRequiredModulesEntity,
-  parseInitialLoadedLabwareEntity,
-  parsePipetteEntity,
-} from '@opentrons/api-client'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import {
   getStoredProtocol,
   StoredProtocolData,
 } from '../../../../redux/protocol-storage'
-import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
+import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import {
   LABWARE_ENTITY,
   MODULE_ENTITY,
   PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
-
+import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
+import {
+  parseRequiredModulesEntity,
+  parseInitialLoadedLabwareEntity,
+  parsePipetteEntity,
+} from '@opentrons/api-client'
 import type { Protocol, Run } from '@opentrons/api-client'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('@opentrons/api-client')

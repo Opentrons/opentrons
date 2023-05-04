@@ -1,8 +1,3 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { StaticRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   mockHeaterShaker,
@@ -10,12 +5,17 @@ import {
   mockTemperatureModule,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
-import { SecureLabwareModal } from '../SecureLabwareModal'
-import { LabwareListItem } from '../LabwareListItem'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../../redux/modules/types'
+import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
+import { LabwareListItem } from '../LabwareListItem'
+import { SecureLabwareModal } from '../SecureLabwareModal'
+import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../SecureLabwareModal')
 jest.mock('@opentrons/react-api-client')

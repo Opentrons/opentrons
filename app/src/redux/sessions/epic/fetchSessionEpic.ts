@@ -1,17 +1,12 @@
-import { ofType } from 'redux-observable'
-
 import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
-
 import type { ResponseToActionMapper } from '../../robot-api/operators'
 import type { RobotApiRequestOptions } from '../../robot-api/types'
-
+import type { Action, Epic } from '../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import type { FetchSessionAction, CreateSessionCommandAction } from '../types'
+import { ofType } from 'redux-observable'
 
 export const mapActionToRequest = (
   action: FetchSessionAction | CreateSessionCommandAction

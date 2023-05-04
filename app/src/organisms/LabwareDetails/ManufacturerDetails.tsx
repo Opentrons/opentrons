@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import type { LabwareBrand } from '../../pages/Labware/types'
 import {
   Flex,
   Box,
@@ -11,8 +11,8 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import type { LabwareBrand } from '../../pages/Labware/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface ManufacturerDetailsProps {
   brand: LabwareBrand
@@ -44,7 +44,7 @@ export function ManufacturerDetails(
             links.map((href, index) => (
               <StyledText as="p" key={index}>
                 <Link href={href} external>
-                  website <Icon height={SPACING.spacingSM} name="open-in-new" />
+                  website <Icon height={SPACING.spacing12} name="open-in-new" />
                 </Link>
               </StyledText>
             ))}

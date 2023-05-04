@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { StyledText } from '../../text'
 import {
   Btn,
   Flex,
@@ -14,9 +11,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
-
 import type { IconName, StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface FloatingActionButtonProps extends StyleProps {
   buttonText?: React.ReactNode

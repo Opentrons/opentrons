@@ -1,9 +1,9 @@
+import { getBlowoutLocationOptionsForForm } from '../utils'
+import { DropdownOption } from '@opentrons/components'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { DropdownOption } from '@opentrons/components'
-import { getBlowoutLocationOptionsForForm } from '../utils'
 
 describe('getBlowoutLocationOptionsForForm', () => {
   let destOption: DropdownOption

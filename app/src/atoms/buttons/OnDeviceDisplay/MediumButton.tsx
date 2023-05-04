@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -10,10 +10,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
-import { ODD_FOCUS_VISIBLE } from './constants'
-
 import type { IconName, StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 type MediumButtonTypes =
   | 'primary'
@@ -140,11 +139,11 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       display="flex"
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacingSM}
+      gridGap={SPACING.spacing12}
       padding={
         iconName !== undefined
           ? `${SPACING.spacing20} ${SPACING.spacing24}`
-          : `${SPACING.spacing20} ${SPACING.spacingXXL}`
+          : `${SPACING.spacing20} ${SPACING.spacing40}`
       }
       {...buttonProps}
     >
@@ -157,7 +156,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
               ? COLORS.darkBlack_sixty
               : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
-          size={SPACING.spacingXXL}
+          size={SPACING.spacing40}
         />
       )}
       <StyledText

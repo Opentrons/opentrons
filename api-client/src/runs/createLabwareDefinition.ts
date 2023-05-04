@@ -1,8 +1,7 @@
 import { POST, request } from '../request'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export interface CreateLabwareDefinitionResponsePayload {
   definitionUri: string

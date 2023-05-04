@@ -1,24 +1,22 @@
-import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { waitFor } from '@testing-library/dom'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import * as RobotApi from '../../../../redux/robot-api'
+import { getConfig } from '../../../../redux/config'
 import {
   getAttachedPipetteSettingsFieldsById,
   updatePipetteSettings,
 } from '../../../../redux/pipettes'
-import { getConfig } from '../../../../redux/config'
-import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
-
 import {
   mockLeftSpecs,
   mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
-
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 import type { UpdatePipetteSettingsAction } from '../../../../redux/pipettes/types'
+import * as RobotApi from '../../../../redux/robot-api'
+import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
+import { renderWithProviders } from '@opentrons/components'
+import { waitFor } from '@testing-library/dom'
+import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../redux/config')

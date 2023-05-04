@@ -1,7 +1,10 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
-
+import { StyledText } from '../../../atoms/text'
+import type { RequestState } from '../../../redux/robot-api/types'
+import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
+import type {
+  NetworkChangeType,
+  NetworkChangeState,
+} from '../../Devices/RobotSettings/ConnectNetwork/types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -14,15 +17,9 @@ import {
   TYPOGRAPHY,
   Icon,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
-
-import type { RequestState } from '../../../redux/robot-api/types'
-import type {
-  NetworkChangeType,
-  NetworkChangeState,
-} from '../../Devices/RobotSettings/ConnectNetwork/types'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface FailedToConnectProps {
   ssid: string
@@ -81,7 +78,7 @@ export function FailedToConnect({
             fontSize="2rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="2.72375rem"
-            marginTop={SPACING.spacingXXL}
+            marginTop={SPACING.spacing40}
           >
             {isInvalidPassword
               ? `Oops! Incorrect password for ${ssid}.`

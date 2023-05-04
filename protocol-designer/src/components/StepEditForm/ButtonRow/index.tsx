@@ -1,10 +1,9 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
-
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
+import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface ButtonRowProps {
   handleClickMoreOptions: () => unknown

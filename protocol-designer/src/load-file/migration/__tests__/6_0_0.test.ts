@@ -1,7 +1,7 @@
 import { migrateFile } from '../6_0_0'
-import { getLoadLiquidCommands } from '../utils/getLoadLiquidCommands'
 import _oldDoItAllProtocol from '../../../../fixtures/protocol/5/doItAllV5.json'
 import _oldMultipleLiquidsProtocol from '../../../../fixtures/protocol/5/multipleLiquids.json'
+import { getLoadLiquidCommands } from '../utils/getLoadLiquidCommands'
 import type { ProtocolFileV5 } from '@opentrons/shared-data'
 
 const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV5<any>

@@ -1,13 +1,11 @@
 // titled modal page component
-import * as React from 'react'
-import cx from 'classnames'
-
 import { Box } from '../primitives'
 import { TitleBar } from '../structure'
+import type { TitleBarProps } from '../structure'
 import { Overlay } from './Overlay'
 import styles from './modals.css'
-
-import type { TitleBarProps } from '../structure'
+import cx from 'classnames'
+import * as React from 'react'
 
 export interface ModalPageProps {
   /** Props for title bar at top of modal page */

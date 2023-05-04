@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   Icon,
@@ -14,8 +13,8 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface CompleteConfirmationProps {
   proceed: React.MouseEventHandler

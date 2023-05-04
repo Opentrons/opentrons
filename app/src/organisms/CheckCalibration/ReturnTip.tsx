@@ -1,4 +1,8 @@
-import * as React from 'react'
+import { StyledText } from '../../atoms/text'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import * as Sessions from '../../redux/sessions'
+import type { SessionCommandString } from '../../redux/sessions/types'
+import { NeedHelpLink } from '../CalibrationPanels'
 import {
   Flex,
   PrimaryButton,
@@ -8,13 +12,8 @@ import {
   ALIGN_STRETCH,
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
-
-import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
-import type { SessionCommandString } from '../../redux/sessions/types'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { NeedHelpLink } from '../CalibrationPanels'
 
 export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')

@@ -1,9 +1,9 @@
 // Table Title with expandable measurement diagrams
-import * as React from 'react'
-import cx from 'classnames'
-import { LabelText, LABEL_LEFT } from './LabelText'
 import { ClickableIcon } from './ClickableIcon'
+import { LabelText, LABEL_LEFT } from './LabelText'
 import styles from './styles.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface TableTitleProps {
   label: React.ReactNode

@@ -4,7 +4,6 @@
  * was punted. Now that schema V6 does exist, this intermediate type that SG and PD support
  * can be phased out as the two are updated to the V6 schema support.
  */
-
 import type { ProtocolFile as V3ProtocolFile, AirGapParams } from './schemaV3'
 import type { FileModule } from './schemaV4'
 import type { Command as V5Command } from './schemaV5'

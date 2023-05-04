@@ -1,5 +1,5 @@
-import * as React from 'react'
-
+import type { LabwareDefinition } from '../../pages/Labware/types'
+import { labwareImages } from './labware-images'
 import {
   Box,
   DIRECTION_ROW,
@@ -11,9 +11,7 @@ import {
   SPACING,
   SPACING_AUTO,
 } from '@opentrons/components'
-import { labwareImages } from './labware-images'
-
-import type { LabwareDefinition } from '../../pages/Labware/types'
+import * as React from 'react'
 
 export interface GalleryProps {
   definition: LabwareDefinition

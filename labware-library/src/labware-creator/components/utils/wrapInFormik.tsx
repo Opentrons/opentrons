@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { Formik, FormikConfig } from 'formik'
+import * as React from 'react'
 
 /**
  * Wraps a component in <Formik /> so it can be unit tested in isolation

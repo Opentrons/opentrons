@@ -1,11 +1,11 @@
-import * as React from 'react'
+import { StepFieldName } from '../../../form-types'
 import { i18n } from '../../../localization'
-import { TextField } from './TextField'
-import { CheckboxRowField } from './CheckboxRowField'
-import { TipPositionField } from './TipPositionField'
 import styles from '../StepEditForm.css'
 import { FieldPropsByName } from '../types'
-import { StepFieldName } from '../../../form-types'
+import { CheckboxRowField } from './CheckboxRowField'
+import { TextField } from './TextField'
+import { TipPositionField } from './TipPositionField'
+import * as React from 'react'
 
 export interface DelayFieldProps {
   checkboxFieldName: StepFieldName // TODO(IL, 2021-03-03): strictly, could be DelayCheckboxFields!

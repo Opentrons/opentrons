@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
-
 import { RadioButton } from '..'
+import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof RadioButton>) => {
   return renderWithProviders(<RadioButton {...props} />)[0]

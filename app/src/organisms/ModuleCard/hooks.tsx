@@ -1,7 +1,11 @@
-import * as React from 'react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { useTranslation } from 'react-i18next'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Tooltip } from '../../atoms/Tooltip'
+import type { AttachedModule } from '../../redux/modules/types'
+import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useHoverTooltip } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
@@ -10,12 +14,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
-
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -28,8 +26,8 @@ import type {
   TCOpenLidCreateCommand,
   TCCloseLidCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-
-import type { AttachedModule } from '../../redux/modules/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()

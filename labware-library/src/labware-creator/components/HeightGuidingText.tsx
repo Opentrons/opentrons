@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { LabwareType } from '../fields'
+import * as React from 'react'
 
 export const HeightGuidingText = (props: {
   labwareType: LabwareType | null | undefined

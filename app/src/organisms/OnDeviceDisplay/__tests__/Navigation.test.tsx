@@ -1,12 +1,10 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { NavigationMenu } from '../Navigation/NavigationMenu'
 import { Navigation } from '../Navigation'
+import { NavigationMenu } from '../Navigation/NavigationMenu'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../Navigation/NavigationMenu')

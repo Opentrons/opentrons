@@ -1,5 +1,5 @@
-import * as React from 'react'
 import styles from './styles.css'
+import * as React from 'react'
 
 export interface ValueProps {
   /** contents of the value */

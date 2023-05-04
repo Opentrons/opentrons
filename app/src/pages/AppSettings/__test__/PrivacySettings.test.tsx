@@ -1,10 +1,8 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
 import { PrivacySettings } from '../PrivacySettings'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/config')

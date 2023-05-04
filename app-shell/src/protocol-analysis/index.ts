@@ -1,19 +1,17 @@
-import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
-import * as Cfg from '@opentrons/app/src/redux/config'
-
-import { createLogger } from '../log'
 import { getConfig, handleConfigChange } from '../config'
-import { getValidLabwareFilePaths } from '../labware'
 import {
   showOpenDirectoryDialog,
   openDirectoryInFileExplorer,
 } from '../dialogs'
-import { selectPythonPath, getPythonPath } from './getPythonPath'
-import { executeAnalyzeCli } from './executeAnalyzeCli'
-import { writeFailedAnalysis } from './writeFailedAnalysis'
-
-import type { BrowserWindow } from 'electron'
+import { getValidLabwareFilePaths } from '../labware'
+import { createLogger } from '../log'
 import type { Action, Dispatch } from '../types'
+import { executeAnalyzeCli } from './executeAnalyzeCli'
+import { selectPythonPath, getPythonPath } from './getPythonPath'
+import { writeFailedAnalysis } from './writeFailedAnalysis'
+import * as Cfg from '@opentrons/app/src/redux/config'
+import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
+import type { BrowserWindow } from 'electron'
 
 const log = createLogger('protocol-analysis')
 

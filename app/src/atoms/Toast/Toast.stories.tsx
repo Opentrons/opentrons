@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { StyledText } from '../text'
+import { Toast } from './index'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -6,9 +7,8 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { Toast } from './index'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/Toast',

@@ -1,11 +1,9 @@
+import { sessionsEpic } from '..'
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as RobotApiHttp from '../../../robot-api/http'
-
+import type { Action } from '../../../types'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { sessionsEpic } from '..'
-
-import type { Action } from '../../../types'
 
 jest.mock('../../../robot-api/http')
 

@@ -1,15 +1,16 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import cx from 'classnames'
-import { AlertModal } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
+import { i18n } from '../../../localization'
 import { BaseState, ThunkDispatch } from '../../../types'
 import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
+import { AlertModal } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
 interface Props {
   hasOptedIn: boolean | null
   optIn: () => unknown

@@ -1,22 +1,3 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
-
-import {
-  Flex,
-  Link,
-  Icon,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  TYPOGRAPHY,
-  PrimaryButton,
-  AlertPrimaryButton,
-  JUSTIFY_CENTER,
-} from '@opentrons/components'
-
 import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
@@ -30,8 +11,24 @@ import {
   FAILURE,
   SUCCESS,
 } from '../../../../redux/robot-api'
-
 import type { Dispatch, State } from '../../../../redux/types'
+import {
+  Flex,
+  Link,
+  Icon,
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  JUSTIFY_FLEX_END,
+  SPACING,
+  TYPOGRAPHY,
+  PrimaryButton,
+  AlertPrimaryButton,
+  JUSTIFY_CENTER,
+} from '@opentrons/components'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface DisconnectModalProps {
   onCancel: () => unknown

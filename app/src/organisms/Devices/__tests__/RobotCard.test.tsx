@@ -1,7 +1,23 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
+import { i18n } from '../../../i18n'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotModelByName } from '../../../redux/discovery'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import {
+  HEALTH_STATUS_OK,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+} from '../../../redux/discovery/constants'
+import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
+import {
+  mockLeftProtoPipette,
+  mockRightProtoPipette,
+} from '../../../redux/pipettes/__fixtures__'
+import type { State } from '../../../redux/types'
+import { UpdateRobotBanner } from '../../UpdateRobotBanner'
+import { RobotCard } from '../RobotCard'
+import { RobotOverflowMenu } from '../RobotOverflowMenu'
+import { RobotStatusHeader } from '../RobotStatusHeader'
+import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { renderWithProviders } from '@opentrons/components'
 import {
   mockOT2HealthResponse,
@@ -9,28 +25,9 @@ import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
-
-import { i18n } from '../../../i18n'
-import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
-import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
-} from '../../../redux/pipettes/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
-import { getRobotModelByName } from '../../../redux/discovery'
-import {
-  HEALTH_STATUS_OK,
-  ROBOT_MODEL_OT2,
-  ROBOT_MODEL_OT3,
-} from '../../../redux/discovery/constants'
-import { useAttachedModules, useAttachedPipettes } from '../hooks'
-import { UpdateRobotBanner } from '../../UpdateRobotBanner'
-import { RobotOverflowMenu } from '../RobotOverflowMenu'
-import { RobotStatusHeader } from '../RobotStatusHeader'
-import { RobotCard } from '../RobotCard'
-
-import type { State } from '../../../redux/types'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../../redux/discovery/selectors')

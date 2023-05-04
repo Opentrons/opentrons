@@ -1,13 +1,11 @@
-import * as React from 'react'
-import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
-import { LabeledToggle } from '@opentrons/components'
-
 import {
   toggleAnalyticsOptedIn,
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
-
 import type { State } from '../../redux/types'
+import { LabeledToggle } from '@opentrons/components'
+import * as React from 'react'
+import { connect, MapStateToProps, MapDispatchToProps } from 'react-redux'
 
 interface SP {
   optedIn: boolean

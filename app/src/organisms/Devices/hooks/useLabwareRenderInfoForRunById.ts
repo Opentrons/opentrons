@@ -1,9 +1,8 @@
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import { getLabwareRenderInfo } from '../ProtocolRun/utils/getLabwareRenderInfo'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useProtocolDetailsForRun, useStoredProtocolAnalysis } from '.'
-
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getLabwareRenderInfo } from '../ProtocolRun/utils/getLabwareRenderInfo'
 import type { LabwareRenderInfoById } from '../ProtocolRun/utils/getLabwareRenderInfo'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 export function useLabwareRenderInfoForRunById(
   runId: string

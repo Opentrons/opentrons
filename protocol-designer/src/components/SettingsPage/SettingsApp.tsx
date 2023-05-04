@@ -1,24 +1,24 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import {
+  actions as analyticsActions,
+  selectors as analyticsSelectors,
+} from '../../analytics'
+import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
 import { i18n } from '../../localization'
+import {
+  actions as tutorialActions,
+  selectors as tutorialSelectors,
+} from '../../tutorial'
+import { BaseState, ThunkDispatch } from '../../types'
+import { FeatureFlagCard } from './FeatureFlagCard'
+import styles from './SettingsPage.css'
 import {
   Card,
   OutlineButton,
   ToggleButton,
   LabeledValue,
 } from '@opentrons/components'
-import {
-  actions as analyticsActions,
-  selectors as analyticsSelectors,
-} from '../../analytics'
-import {
-  actions as tutorialActions,
-  selectors as tutorialSelectors,
-} from '../../tutorial'
-import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
-import { FeatureFlagCard } from './FeatureFlagCard'
-import styles from './SettingsPage.css'
-import { BaseState, ThunkDispatch } from '../../types'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface Props {
   canClearHintDismissals: boolean

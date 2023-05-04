@@ -1,6 +1,10 @@
-import * as React from 'react'
-import map from 'lodash/map'
-
+import { ModuleInfo } from '../../ModuleInfo'
+import {
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../hooks'
+import { getStandardDeckViewBox } from '../utils/getStandardDeckViewBox'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import {
   Flex,
   Box,
@@ -13,13 +17,8 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { ModuleInfo } from '../../ModuleInfo'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
-import { getStandardDeckViewBox } from '../utils/getStandardDeckViewBox'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import map from 'lodash/map'
+import * as React from 'react'
 
 interface SetupModulesMapProps {
   robotName: string

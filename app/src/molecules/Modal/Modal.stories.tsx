@@ -1,10 +1,8 @@
-import * as React from 'react'
-
-import { Modal } from './index'
 import { StyledText } from '../../atoms/text'
-
-import type { Story, Meta } from '@storybook/react'
+import { Modal } from './index'
 import { COLORS, PrimaryBtn, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Molecules/Modal',

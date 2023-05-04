@@ -1,11 +1,10 @@
 import { addUniqueConfigValue, subtractConfigValue } from '../config'
-import * as Constants from './constants'
-import * as Types from './types'
-
 import type {
   AddUniqueConfigValueAction,
   SubtractConfigValueAction,
 } from '../config/types'
+import * as Constants from './constants'
+import * as Types from './types'
 
 export const alertTriggered = (
   alertId: Types.AlertId

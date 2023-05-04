@@ -1,7 +1,10 @@
-import * as React from 'react'
-import cx from 'classnames'
+import { WellOrderOption } from '../../../../form-types'
 import { i18n } from '../../../../localization'
+import modalStyles from '../../../modals/modal.css'
 import { Portal } from '../../../portals/MainPageModalPortal'
+import stepEditStyles from '../../StepEditForm.css'
+import styles from './WellOrderInput.css'
+import { WellOrderViz } from './WellOrderViz'
 import {
   Modal,
   OutlineButton,
@@ -9,12 +12,8 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../../modals/modal.css'
-import { WellOrderOption } from '../../../../form-types'
-
-import { WellOrderViz } from './WellOrderViz'
-import styles from './WellOrderInput.css'
-import stepEditStyles from '../../StepEditForm.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'

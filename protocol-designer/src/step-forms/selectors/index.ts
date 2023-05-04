@@ -1,57 +1,30 @@
-import assert from 'assert'
-import isEqual from 'lodash/isEqual'
-import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
-import isEmpty from 'lodash/isEmpty'
-import { createSelector, Selector } from 'reselect'
-import {
-  getPipetteNameSpecs,
-  getLabwareDisplayName,
-  getLabwareDefURI,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  PipetteName,
-} from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import {
-  getFormWarnings,
-  getFormErrors,
-  stepFormToArgs,
-} from '../../steplist/formLevel'
-import {
-  ProfileFormError,
-  getProfileFormErrors,
-} from '../../steplist/formLevel/profileErrors'
-import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
-import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
-import { denormalizePipetteEntities } from '../utils'
+import { FormData, StepIdType } from '../../form-types'
 import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
 } from '../../labware-defs'
 import { i18n } from '../../localization'
-import { InstrumentGroup } from '@opentrons/components'
-import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import type {
-  InvariantContext,
-  LabwareEntity,
-  LabwareEntities,
-  ModuleEntities,
-  ModuleEntity,
-  PipetteEntities,
-} from '@opentrons/step-generation'
+import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import {
+  getFormWarnings,
+  getFormErrors,
+  stepFormToArgs,
+} from '../../steplist/formLevel'
 import type { FormWarning } from '../../steplist/formLevel'
-import { BaseState, DeckSlot } from '../../types'
-import { FormData, StepIdType } from '../../form-types'
+import {
+  ProfileFormError,
+  getProfileFormErrors,
+} from '../../steplist/formLevel/profileErrors'
 import { StepArgsAndErrorsById, StepFormErrors } from '../../steplist/types'
+import { BaseState, DeckSlot } from '../../types'
+import {
+  PresavedStepFormState,
+  RootState,
+  SavedStepFormState,
+  BatchEditFormChangesState,
+} from '../reducers'
 import {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -66,12 +39,39 @@ import {
   ThermocyclerModuleState,
   HeaterShakerModuleState,
 } from '../types'
+import { denormalizePipetteEntities } from '../utils'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+import { InstrumentGroup } from '@opentrons/components'
+import type {
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
 import {
-  PresavedStepFormState,
-  RootState,
-  SavedStepFormState,
-  BatchEditFormChangesState,
-} from '../reducers'
+  getPipetteNameSpecs,
+  getLabwareDisplayName,
+  getLabwareDefURI,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  PipetteName,
+} from '@opentrons/shared-data'
+import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import type {
+  InvariantContext,
+  LabwareEntity,
+  LabwareEntities,
+  ModuleEntities,
+  ModuleEntity,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import assert from 'assert'
+import isEmpty from 'lodash/isEmpty'
+import isEqual from 'lodash/isEqual'
+import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
+import { createSelector, Selector } from 'reselect'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 

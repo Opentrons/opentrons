@@ -1,12 +1,12 @@
+import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { FLOWS, SECTIONS } from './constants'
-import { SINGLE_MOUNT_PIPETTES, LEFT, RIGHT } from '@opentrons/shared-data'
 import type {
   PipetteWizardStep,
   PipetteWizardFlow,
   SelectablePipettes,
 } from './types'
+import { SINGLE_MOUNT_PIPETTES, LEFT, RIGHT } from '@opentrons/shared-data'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,

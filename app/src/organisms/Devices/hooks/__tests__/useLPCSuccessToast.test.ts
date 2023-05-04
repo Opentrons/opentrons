@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
 import { useLPCSuccessToast } from '..'
+import { renderHook } from '@testing-library/react-hooks'
+import * as React from 'react'
 
 jest.mock('react', () => {
   const actualReact = jest.requireActual('react')

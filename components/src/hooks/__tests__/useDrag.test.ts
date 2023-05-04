@@ -1,6 +1,6 @@
-import { renderHook } from '@testing-library/react-hooks'
 import { useDrag } from '../useDrag'
 import type { ElementPosition } from '../useDrag'
+import { renderHook } from '@testing-library/react-hooks'
 
 const mockPosition: ElementPosition = {
   width: 100,

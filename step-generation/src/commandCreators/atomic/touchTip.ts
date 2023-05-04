@@ -1,6 +1,6 @@
-import { uuid } from '../../utils'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CommandCreator, CommandCreatorError } from '../../types'
+import { uuid } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { TouchTipParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 

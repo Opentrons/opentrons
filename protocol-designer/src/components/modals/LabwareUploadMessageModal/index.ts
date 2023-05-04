@@ -1,15 +1,15 @@
-import assert from 'assert'
-import { connect } from 'react-redux'
 import {
   selectors as labwareDefSelectors,
   actions as labwareDefActions,
 } from '../../../labware-defs'
+import { BaseState } from '../../../types'
 import {
   LabwareUploadMessageModal as LabwareUploadMessageModalComponent,
   LabwareUploadMessageModalProps,
 } from './LabwareUploadMessageModal'
+import assert from 'assert'
+import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { BaseState } from '../../../types'
 
 type Props = LabwareUploadMessageModalProps
 interface SP {

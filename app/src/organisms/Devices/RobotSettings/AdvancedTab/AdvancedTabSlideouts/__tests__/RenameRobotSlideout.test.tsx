@@ -1,7 +1,3 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import {
   useTrackEvent,
@@ -15,8 +11,11 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '../../../../../../redux/discovery/__fixtures__'
-
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, waitFor } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../../../redux/discovery/selectors')
 jest.mock('../../../../../../redux/analytics')

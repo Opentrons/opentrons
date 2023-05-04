@@ -1,12 +1,10 @@
-import * as React from 'react'
-
-import { SelectField } from '@opentrons/components'
+import { LABEL_ADD_NEW_KEY } from '../i18n'
+import type { WifiKey } from '../types'
 import { FormRow } from './FormRow'
 import { UploadKeyInput } from './UploadKeyInput'
-import { LABEL_ADD_NEW_KEY } from '../i18n'
 import { useConnectFormField } from './form-state'
-
-import type { WifiKey } from '../types'
+import { SelectField } from '@opentrons/components'
+import * as React from 'react'
 
 export interface KeyFileFieldProps {
   id: string

@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof ConfirmAttachmentModal>) => {
   return renderWithProviders(<ConfirmAttachmentModal {...props} />, {

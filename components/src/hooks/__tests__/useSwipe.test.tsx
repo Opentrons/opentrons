@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks'
 import { useSwipe } from '..'
+import { renderHook } from '@testing-library/react-hooks'
 
 describe('useSwipe hook', () => {
   it('useSwipe returns UseSwipeResult object', () => {

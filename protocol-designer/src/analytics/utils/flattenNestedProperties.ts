@@ -1,4 +1,5 @@
 import isPlainObject from 'lodash/isPlainObject'
+
 const SEPARATOR = '__'
 
 const _innerFnFlattenNested = (innerProperties: any, prefix: string): any => {

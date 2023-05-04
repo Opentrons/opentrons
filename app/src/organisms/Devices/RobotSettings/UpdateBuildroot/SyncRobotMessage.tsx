@@ -1,7 +1,7 @@
-import * as React from 'react'
-import styles from './styles.css'
 import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../../redux/buildroot'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
+import styles from './styles.css'
+import * as React from 'react'
 
 export interface SyncRobotMessageProps {
   updateType: BuildrootUpdateType

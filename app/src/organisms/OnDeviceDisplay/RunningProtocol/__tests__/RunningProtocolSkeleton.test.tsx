@@ -1,8 +1,6 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (
   props: React.ComponentProps<typeof RunningProtocolSkeleton>

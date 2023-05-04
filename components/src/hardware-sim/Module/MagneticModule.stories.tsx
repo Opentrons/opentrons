@@ -1,12 +1,10 @@
-import * as React from 'react'
+import type { RobotWorkSpaceRenderProps } from '../Deck'
 import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
 import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
-
 import { Module } from './'
-
-import type { RobotWorkSpaceRenderProps } from '../Deck'
-import type { Story, Meta } from '@storybook/react'
 import { MAGNETIC_MODULE_V2, getModuleDef2 } from '@opentrons/shared-data'
+import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 const slots = ['1', '3', '4', '6', '7', '9', '10']
 

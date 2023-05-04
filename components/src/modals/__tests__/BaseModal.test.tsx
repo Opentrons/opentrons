@@ -1,11 +1,9 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
-import { OVERLAY_BLACK_90, C_WHITE, C_LIGHT_GRAY } from '../../styles'
-
 import { Box, Flex, Text, Btn } from '../../primitives'
+import { OVERLAY_BLACK_90, C_WHITE, C_LIGHT_GRAY } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import { BaseModal } from '../BaseModal'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('BaseModal', () => {
   it('should take up the whole parent', () => {

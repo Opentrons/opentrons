@@ -1,13 +1,13 @@
-import isEqual from 'lodash/isEqual'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../../organisms/Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import { LabwareOffset } from '@opentrons/api-client'
 import { getLabwareOffsetLocation } from '../../organisms/Devices/ProtocolRun/utils/getLabwareOffsetLocation'
+import { LabwareOffset } from '@opentrons/api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import type {
   LoadedLabware,
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import isEqual from 'lodash/isEqual'
 
 const PYTHON_INDENT = '    '
 const JUPYTER_PREFIX =

@@ -1,16 +1,15 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
 import { CommandText } from '../'
+import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../__fixtures__'
-
+import { renderWithProviders } from '@opentrons/components'
+import { RunTimeCommand } from '@opentrons/shared-data'
 import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { RunTimeCommand } from '@opentrons/shared-data'
+import * as React from 'react'
 
 describe('CommandText', () => {
   it('renders correct text for aspirate', () => {

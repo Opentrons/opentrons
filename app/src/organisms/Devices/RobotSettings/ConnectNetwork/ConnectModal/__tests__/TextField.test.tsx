@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
 import { TextField } from '../TextField'
 import * as FormState from '../form-state'
+import { mount } from 'enzyme'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 jest.mock('../form-state')
 

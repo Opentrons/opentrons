@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import type { Direction } from './types'
 import {
   COLORS,
   SPACING,
@@ -7,9 +7,8 @@ import {
   AlertPrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-
-import type { Direction } from './types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   back: () => void

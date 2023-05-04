@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Tooltip } from '..'
 import {
   renderWithProviders,
   TOOLTIP_TOP,
@@ -6,7 +6,7 @@ import {
   COLORS,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-import { Tooltip } from '..'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Tooltip>) => {
   return renderWithProviders(<Tooltip {...props} />)[0]

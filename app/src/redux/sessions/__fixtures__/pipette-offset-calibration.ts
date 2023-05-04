@@ -1,9 +1,9 @@
-import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import type { PipetteOffsetCalibrationSessionParams } from '../pipette-offset-calibration/types'
 import type {
   PipetteOffsetCalibrationSessionDetails,
   CalibrationLabware,
 } from '../types'
-import type { PipetteOffsetCalibrationSessionParams } from '../pipette-offset-calibration/types'
+import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 export const mockPipetteOffsetTipRack: CalibrationLabware = {
   slot: '8',

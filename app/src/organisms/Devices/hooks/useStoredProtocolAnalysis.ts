@@ -1,15 +1,13 @@
-import { useSelector } from 'react-redux'
+import { getStoredProtocol } from '../../../redux/protocol-storage'
+import type { State } from '../../../redux/types'
 import {
   parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-
-import { getStoredProtocol } from '../../../redux/protocol-storage'
-
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { State } from '../../../redux/types'
+import { useSelector } from 'react-redux'
 
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null

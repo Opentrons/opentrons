@@ -1,6 +1,12 @@
-import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import type { Mount } from '../../redux/pipettes/types'
+import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
+import type { SelectablePipettes } from '../PipetteWizardFlows/types'
+import type {
+  InstrumentData,
+  PipetteOffsetCalibration,
+  GripperData,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   Flex,
@@ -19,18 +25,10 @@ import {
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
-
-import type {
-  InstrumentData,
-  PipetteOffsetCalibration,
-  GripperData,
-} from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
-import type { SelectablePipettes } from '../PipetteWizardFlows/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;

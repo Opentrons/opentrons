@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   getRobotSerialNumber,
   getRobotFirmwareVersion,
   getRobotProtocolApiVersion,
 } from '../../../../../redux/discovery'
-import { useRobot } from '../../../hooks'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
+import { useRobot } from '../../../hooks'
 import { RobotInformation } from '../RobotInformation'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../hooks')
 jest.mock('../../../../../redux/discovery/selectors')

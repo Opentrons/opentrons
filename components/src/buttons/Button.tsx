@@ -1,18 +1,15 @@
-import * as React from 'react'
-import cx from 'classnames'
-import omit from 'lodash/omit'
-
 import { Icon } from '../icons'
-import styles from './buttons.css'
-
+import type { IconName } from '../icons'
 import {
   BUTTON_TYPE_SUBMIT,
   BUTTON_TYPE_RESET,
   BUTTON_TYPE_BUTTON,
 } from '../primitives'
-
-import type { IconName } from '../icons'
 import type { UseHoverTooltipTargetProps } from '../tooltips'
+import styles from './buttons.css'
+import cx from 'classnames'
+import omit from 'lodash/omit'
+import * as React from 'react'
 
 export interface ButtonProps {
   /** id attribute */

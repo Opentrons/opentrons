@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { Box, COLORS, SPACING } from '@opentrons/components'
+import * as React from 'react'
 
 type Props = React.ComponentProps<typeof Box>
 

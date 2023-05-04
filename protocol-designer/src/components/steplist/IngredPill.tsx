@@ -1,11 +1,11 @@
+import { selectors } from '../../labware-ingred/selectors'
+import { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
+import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
+import styles from './StepItem.css'
+import { Pill, UseHoverTooltipTargetProps } from '@opentrons/components'
+import { AIR } from '@opentrons/step-generation'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Pill, UseHoverTooltipTargetProps } from '@opentrons/components'
-import { selectors } from '../../labware-ingred/selectors'
-import { AIR } from '@opentrons/step-generation'
-import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
-import { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
-import styles from './StepItem.css'
 
 interface Props {
   ingreds: WellIngredientVolumeData

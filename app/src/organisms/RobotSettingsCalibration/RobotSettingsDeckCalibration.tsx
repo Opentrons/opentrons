@@ -1,7 +1,8 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../atoms/text'
+import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
+import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
+import * as RobotApi from '../../redux/robot-api'
+import type { State } from '../../redux/types'
 import {
   Flex,
   COLORS,
@@ -9,13 +10,9 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
-import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
-import * as RobotApi from '../../redux/robot-api'
-
-import type { State } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 interface RobotSettingsDeckCalibrationProps {
   robotName: string

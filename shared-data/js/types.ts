@@ -1,3 +1,5 @@
+import type { RunTimeCommand } from '../protocol'
+import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
 import {
   MAGDECK,
   TEMPDECK,
@@ -21,10 +23,8 @@ import {
   GRIPPER_V1,
   GRIPPER_V1_1,
 } from './constants'
-import type { INode } from 'svgson'
-import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
-import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
+import type { INode } from 'svgson'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 

@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { Tooltip } from './Tooltip'
-import { useTooltip } from './useTooltip'
 import { useHoverTooltip } from './useHoverTooltip'
+import { useTooltip } from './useTooltip'
 import {
   Box,
   Flex,
@@ -12,8 +11,8 @@ import {
   C_LIGHT_GRAY,
   C_MED_GRAY,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Atoms/Tooltip',

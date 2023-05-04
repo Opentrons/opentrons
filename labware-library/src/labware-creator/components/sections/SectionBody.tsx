@@ -1,5 +1,5 @@
-import * as React from 'react'
 import styles from './SectionBody.css'
+import * as React from 'react'
 
 interface Props {
   children: React.ReactNode

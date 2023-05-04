@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
 import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
 import { getLatestCurrentOffsets } from '../utils'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
+import * as React from 'react'
 
 jest.mock('../../../hooks')
 jest.mock('../../../../LabwarePositionCheck')

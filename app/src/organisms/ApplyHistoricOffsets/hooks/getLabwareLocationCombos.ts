@@ -1,10 +1,10 @@
-import isEqual from 'lodash/isEqual'
+import { LabwareOffsetLocation } from '@opentrons/api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { LabwareOffsetLocation } from '@opentrons/api-client'
+import isEqual from 'lodash/isEqual'
 
 interface LabwareLocationCombo {
   location: LabwareOffsetLocation

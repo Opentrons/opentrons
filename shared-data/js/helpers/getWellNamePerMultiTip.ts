@@ -1,6 +1,6 @@
-import range from 'lodash/range'
 import { getLabwareHasQuirk, sortWells } from '.'
 import type { LabwareDefinition2 } from '../types'
+import range from 'lodash/range'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips

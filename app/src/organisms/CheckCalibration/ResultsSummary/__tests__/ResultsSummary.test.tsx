@@ -1,18 +1,15 @@
-import * as React from 'react'
-import { saveAs } from 'file-saver'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-
-import { i18n } from '../../../../i18n'
-import * as Fixtures from '../../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../../redux/sessions'
-import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
-import { RenderMountInformation } from '../RenderMountInformation'
-import { CalibrationResult } from '../CalibrationResult'
-
 import { ResultsSummary } from '../'
-
+import { i18n } from '../../../../i18n'
 import type { CalibrationPanelProps } from '../../../../organisms/CalibrationPanels/types'
+import * as Sessions from '../../../../redux/sessions'
+import * as Fixtures from '../../../../redux/sessions/__fixtures__'
+import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
+import { CalibrationResult } from '../CalibrationResult'
+import { RenderMountInformation } from '../RenderMountInformation'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { saveAs } from 'file-saver'
+import * as React from 'react'
 
 jest.mock('file-saver')
 jest.mock('../../../../redux/sessions')

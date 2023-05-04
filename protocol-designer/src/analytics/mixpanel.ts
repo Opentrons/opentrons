@@ -1,8 +1,8 @@
 // TODO(IL, 2020-09-09): reconcile with app/src/analytics/mixpanel.js, which this is derived from
-import mixpanel from 'mixpanel-browser'
 import { getIsProduction } from '../networking/opentronsWebApi'
-import { getHasOptedIn } from './selectors'
 import { BaseState } from '../types'
+import { getHasOptedIn } from './selectors'
+import mixpanel from 'mixpanel-browser'
 
 // TODO(IL, 2020-09-09): AnalyticsEvent type copied from app/src/analytics/types.js, consider merging
 export type AnalyticsEvent =

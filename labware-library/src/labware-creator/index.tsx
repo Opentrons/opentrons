@@ -1,41 +1,10 @@
-import assert from 'assert'
-import Ajv from 'ajv'
-import * as React from 'react'
-import { Formik } from 'formik'
-import { saveAs } from 'file-saver'
-import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
-import { AlertModal } from '@opentrons/components'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import {
-  aluminumBlockAutofills,
-  aluminumBlockChildTypeOptions,
-  aluminumBlockTypeOptions,
-  FormStatus,
-  getDefaultFormState,
-  getInitialStatus,
-  tubeRackAutofills,
-  tubeRackInsertOptions,
-} from './fields'
-import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
-import { labwareDefToFields } from './labwareDefToFields'
-import { labwareFormSchema } from './labwareFormSchema'
-import {
-  formLevelValidation,
-  LabwareCreatorErrors,
-} from './formLevelValidation'
-import { labwareTestProtocol } from './testProtocols/labwareTestProtocol'
-import { tipRackTestProtocol } from './testProtocols/tipRackTestProtocol'
-import { fieldsToLabware } from './fieldsToLabware'
-import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { Dropdown } from './components/Dropdown'
-import { IntroCopy } from './components/IntroCopy'
-
 import { ImportErrorModal } from './components/ImportErrorModal'
+import { IntroCopy } from './components/IntroCopy'
+import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { CreateNewDefinition } from './components/sections/CreateNewDefinition'
-import { UploadExisting } from './components/sections/UploadExisting'
-
 import { CustomTiprackWarning } from './components/sections/CustomTiprackWarning'
 import { Description } from './components/sections/Description'
 import { Export } from './components/sections/Export'
@@ -47,21 +16,48 @@ import { HandPlacedTipFit } from './components/sections/HandPlacedTipFit'
 import { Height } from './components/sections/Height'
 import { Preview } from './components/sections/Preview'
 import { Regularity } from './components/sections/Regularity'
+import { UploadExisting } from './components/sections/UploadExisting'
 import { Volume } from './components/sections/Volume'
 import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
 import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellSpacing } from './components/sections/WellSpacing'
-
-import styles from './styles.css'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  aluminumBlockAutofills,
+  aluminumBlockChildTypeOptions,
+  aluminumBlockTypeOptions,
+  FormStatus,
+  getDefaultFormState,
+  getInitialStatus,
+  tubeRackAutofills,
+  tubeRackInsertOptions,
+} from './fields'
 import type {
   ImportError,
   LabwareFields,
   ProcessedLabwareFields,
 } from './fields'
+import { fieldsToLabware } from './fieldsToLabware'
+import {
+  formLevelValidation,
+  LabwareCreatorErrors,
+} from './formLevelValidation'
 import { getDefaultedDef } from './getDefaultedDef'
+import { labwareDefToFields } from './labwareDefToFields'
+import { labwareFormSchema } from './labwareFormSchema'
+import styles from './styles.css'
+import { labwareTestProtocol } from './testProtocols/labwareTestProtocol'
+import { tipRackTestProtocol } from './testProtocols/tipRackTestProtocol'
 import { getIsXYGeometryChanged } from './utils/getIsXYGeometryChanged'
+import { makeAutofillOnChange } from './utils/makeAutofillOnChange'
+import { AlertModal } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import Ajv from 'ajv'
+import assert from 'assert'
+import { saveAs } from 'file-saver'
+import { Formik } from 'formik'
+import JSZip from 'jszip'
+import * as React from 'react'
 
 const ajv = new Ajv()
 const validateLabwareSchema = ajv.compile(labwareSchema)

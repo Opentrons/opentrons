@@ -1,4 +1,4 @@
-import * as React from 'react'
+import styles from './LabwareRender.css'
 import {
   WellLabels,
   StyledWells,
@@ -6,9 +6,6 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import styles from './LabwareRender.css'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
   WellMouseEvent,
@@ -16,6 +13,8 @@ import type {
   WellStroke,
   WellGroup,
 } from './labwareInternals/types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import * as React from 'react'
 import type { CSSProperties } from 'styled-components'
 
 export const WELL_LABEL_OPTIONS = {

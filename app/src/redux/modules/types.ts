@@ -1,11 +1,11 @@
 import type { RobotApiRequestMeta } from '../robot-api/types'
+import * as ApiTypes from './api-types'
 import type {
   TemperatureModuleModel,
   ThermocyclerModuleModel,
   MagneticModuleModel,
   HeaterShakerModuleModel,
 } from '@opentrons/shared-data'
-
 import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -13,7 +13,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import * as ApiTypes from './api-types'
 export * from './api-types'
 
 // common types

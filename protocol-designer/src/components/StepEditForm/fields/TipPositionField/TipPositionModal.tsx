@@ -1,6 +1,10 @@
-import * as React from 'react'
-import cx from 'classnames'
-import round from 'lodash/round'
+import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
+import { i18n } from '../../../../localization'
+import modalStyles from '../../../modals/modal.css'
+import { Portal } from '../../../portals/MainPageModalPortal'
+import styles from './TipPositionInput.css'
+import { TipPositionZAxisViz } from './TipPositionZAxisViz'
+import * as utils from './utils'
 import {
   AlertModal,
   Flex,
@@ -10,14 +14,9 @@ import {
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import { TipPositionZAxisViz } from './TipPositionZAxisViz'
-
-import styles from './TipPositionInput.css'
-import * as utils from './utils'
-import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
+import cx from 'classnames'
+import round from 'lodash/round'
+import * as React from 'react'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10

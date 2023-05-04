@@ -1,8 +1,9 @@
-import * as React from 'react'
-import { Formik, FormikProps } from 'formik'
-import * as Yup from 'yup'
+import { i18n } from '../../localization'
 // TODO: Ian 2018-10-19 move the processors out of steplist (chore)
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
+import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
+import formStyles from '../forms/forms.css'
+import styles from './LiquidPlacementForm.css'
 import {
   DropdownField,
   InputField,
@@ -11,10 +12,9 @@ import {
   DeprecatedPrimaryButton,
   Options,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import styles from './LiquidPlacementForm.css'
-import formStyles from '../forms/forms.css'
-import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
+import { Formik, FormikProps } from 'formik'
+import * as React from 'react'
+import * as Yup from 'yup'
 
 interface ValidFormValues {
   selectedLiquidId: string

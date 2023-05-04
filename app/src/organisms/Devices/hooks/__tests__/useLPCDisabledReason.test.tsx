@@ -1,23 +1,23 @@
-import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
-import { Provider } from 'react-redux'
-import { I18nextProvider } from 'react-i18next'
-import { createStore } from 'redux'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
-import { i18n } from '../../../../i18n'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
-import { useLPCDisabledReason } from '../useLPCDisabledReason'
 import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '..'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { Store } from 'redux'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { i18n } from '../../../../i18n'
 import type { State } from '../../../../redux/types'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
+import { useLPCDisabledReason } from '../useLPCDisabledReason'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import { renderHook } from '@testing-library/react-hooks'
+import * as React from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
 
 jest.mock('..')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

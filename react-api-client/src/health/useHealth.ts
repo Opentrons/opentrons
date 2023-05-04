@@ -1,6 +1,6 @@
+import { useHost } from '../api'
 import { HostConfig, Health, getHealth } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
-import { useHost } from '../api'
 
 export function useHealthQuery(): UseQueryResult<Health> {
   const host = useHost()

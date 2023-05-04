@@ -1,7 +1,12 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { SLEEP_NEVER_MS } from '../../../App/constants'
+import { RadioButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import {
+  getOnDeviceDisplaySettings,
+  updateConfigValue,
+} from '../../../redux/config'
+import type { Dispatch } from '../../../redux/types'
 import {
   Flex,
   Btn,
@@ -10,17 +15,9 @@ import {
   ALIGN_CENTER,
   SPACING,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { RadioButton } from '../../../atoms/buttons/OnDeviceDisplay'
-import {
-  getOnDeviceDisplaySettings,
-  updateConfigValue,
-} from '../../../redux/config'
-import { SLEEP_NEVER_MS } from '../../../App/constants'
-
-import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 
@@ -66,7 +63,7 @@ export function TouchScreenSleep({
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText>{t('sleep_settings_description')}</StyledText>
       </Flex>
       <Flex

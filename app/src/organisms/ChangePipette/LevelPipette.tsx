@@ -1,7 +1,5 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { StyledText } from '../../atoms/text'
+import type { Mount } from '../../redux/pipettes/types'
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -12,9 +10,9 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-
-import type { Mount } from '../../redux/pipettes/types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface LevelPipetteProps {
   mount: Mount
@@ -62,7 +60,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans

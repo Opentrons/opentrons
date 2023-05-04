@@ -1,6 +1,5 @@
-import Electron from 'electron'
-
 import * as Dialogs from '..'
+import Electron from 'electron'
 
 jest.mock('electron')
 

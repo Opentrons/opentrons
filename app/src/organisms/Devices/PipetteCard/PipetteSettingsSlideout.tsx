@@ -1,27 +1,26 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import last from 'lodash/last'
-import { useDispatch, useSelector } from 'react-redux'
-import { Flex, useInterval } from '@opentrons/components'
-import { PipetteModelSpecs } from '@opentrons/shared-data'
+import { Slideout } from '../../../atoms/Slideout'
 import {
   fetchPipetteSettings,
   updatePipetteSettings,
 } from '../../../redux/pipettes'
-import { Slideout } from '../../../atoms/Slideout'
+import type {
+  AttachedPipette,
+  PipetteSettingsFieldsUpdate,
+} from '../../../redux/pipettes/types'
 import {
   getRequestById,
   PENDING,
   useDispatchApiRequest,
 } from '../../../redux/robot-api'
-import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
-import { ConfigurePipette } from '../../ConfigurePipette'
-
-import type {
-  AttachedPipette,
-  PipetteSettingsFieldsUpdate,
-} from '../../../redux/pipettes/types'
 import type { Dispatch, State } from '../../../redux/types'
+import { ConfigurePipette } from '../../ConfigurePipette'
+import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
+import { Flex, useInterval } from '@opentrons/components'
+import { PipetteModelSpecs } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 

@@ -1,6 +1,6 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
 import { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 const protocolWithMagTempTC = (_protocolWithMagTempTC as unknown) as ProtocolAnalysisFile

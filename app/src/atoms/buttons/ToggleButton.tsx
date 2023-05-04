@@ -1,9 +1,7 @@
+import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 import * as React from 'react'
 import { css } from 'styled-components'
-
-import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
-
-import type { StyleProps } from '@opentrons/components'
 
 const TOGGLE_DISABLED_STYLES = css`
   color: ${COLORS.darkGreyEnabled};

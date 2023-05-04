@@ -1,13 +1,13 @@
-import React from 'react'
-import '@testing-library/jest-dom'
-import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { nestedTextMatcher } from '@opentrons/components'
-import { render, screen } from '@testing-library/react'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
+import { isEveryFieldHidden } from '../../../utils'
 import { Footprint } from '../../sections/Footprint'
 import { wrapInFormik } from '../../utils/wrapInFormik'
-import { isEveryFieldHidden } from '../../../utils'
+import { nestedTextMatcher } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
+import React from 'react'
 
 jest.mock('../../../utils')
 

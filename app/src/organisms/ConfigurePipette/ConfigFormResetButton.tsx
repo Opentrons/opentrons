@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,8 +7,8 @@ import {
   TYPOGRAPHY,
   SecondaryButton,
 } from '@opentrons/components'
-import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 export interface ButtonProps {
   onClick?: () => unknown
@@ -28,13 +28,13 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
           block: (
             <StyledText
               fontSize={TYPOGRAPHY.fontSizeP}
-              paddingBottom={SPACING.spacingXS}
+              paddingBottom={SPACING.spacing4}
             />
           ),
         }}
       />
       <SecondaryButton
-        marginTop={SPACING.spacingSM}
+        marginTop={SPACING.spacing12}
         marginBottom={SPACING.spacing16}
         onClick={onClick}
         disabled={disabled}

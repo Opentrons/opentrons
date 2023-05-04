@@ -1,9 +1,11 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
-
+import { RobotBusyStatusAction } from '.'
+import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT3_PNG from '../../assets/images/OT3.png'
+import { StyledText } from '../../atoms/text'
+import { MiniCard } from '../../molecules/MiniCard'
+import { getRobotModelByName } from '../../redux/discovery'
+import type { Robot } from '../../redux/discovery/types'
+import type { State } from '../../redux/types'
 import {
   SPACING,
   Icon,
@@ -15,16 +17,11 @@ import {
   SIZE_1,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-
-import { StyledText } from '../../atoms/text'
-import { MiniCard } from '../../molecules/MiniCard'
-import { getRobotModelByName } from '../../redux/discovery'
-import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
-import { RobotBusyStatusAction } from '.'
-
-import type { Robot } from '../../redux/discovery/types'
-import type { State } from '../../redux/types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { NavLink } from 'react-router-dom'
+import { css } from 'styled-components'
 
 interface AvailableRobotOptionProps {
   robot: Robot

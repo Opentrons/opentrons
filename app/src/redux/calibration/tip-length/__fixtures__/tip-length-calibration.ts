@@ -3,13 +3,12 @@ import {
   makeResponseFixtures,
   mockFailureBody,
 } from '../../../robot-api/__fixtures__'
-import { TIP_LENGTH_CALIBRATIONS_PATH } from '../constants'
-
 import type { ResponseFixtures } from '../../../robot-api/__fixtures__'
 import type {
   TipLengthCalibration,
   AllTipLengthCalibrations,
 } from '../../api-types'
+import { TIP_LENGTH_CALIBRATIONS_PATH } from '../constants'
 
 export const mockTipLengthCalibration1: TipLengthCalibration = {
   pipette: 'P3HSV2008052020A02',

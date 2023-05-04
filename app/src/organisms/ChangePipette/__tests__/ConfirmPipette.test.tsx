@@ -1,17 +1,16 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import { LEFT } from '@opentrons/shared-data'
+import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { ConfirmPipette } from '../ConfirmPipette'
-
+import { renderWithProviders } from '@opentrons/components'
+import { LEFT } from '@opentrons/shared-data'
 import type {
   PipetteModelSpecs,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
+import { fireEvent, screen } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../CheckPipettesButton')
 

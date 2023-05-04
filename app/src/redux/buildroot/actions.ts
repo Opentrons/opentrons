@@ -1,7 +1,6 @@
-import * as Constants from './constants'
-
-import type { RobotHost } from '../robot-api/types'
 import type { ViewableRobot } from '../discovery/types'
+import type { RobotHost } from '../robot-api/types'
+import * as Constants from './constants'
 import type {
   BuildrootAction,
   UpdateSessionStep,

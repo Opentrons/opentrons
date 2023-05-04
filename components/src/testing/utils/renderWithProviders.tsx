@@ -1,14 +1,13 @@
 // render using targetted component using @testing-library/react
 // with wrapping providers for i18next and redux
-import * as React from 'react'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { I18nextProvider } from 'react-i18next'
-import { Provider } from 'react-redux'
 import { render, RenderResult } from '@testing-library/react'
-import { createStore } from 'redux'
-
-import type { Store } from 'redux'
 import type { RenderOptions } from '@testing-library/react'
+import * as React from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
   initialState?: State

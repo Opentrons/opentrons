@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link as RouterLink } from 'react-router-dom'
-
+import { StatusLabel } from '../../atoms/StatusLabel'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { useCalibrationTaskList } from '../Devices/hooks'
 import {
   Flex,
   Link,
@@ -15,12 +15,9 @@ import {
   JUSTIFY_CENTER,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
-
-import { TertiaryButton } from '../../atoms/buttons'
-import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
-
-import { useCalibrationTaskList } from '../Devices/hooks'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link as RouterLink } from 'react-router-dom'
 
 export interface CalibrationStatusCardProps {
   robotName: string
@@ -67,7 +64,7 @@ export function CalibrationStatusCard({
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing8}
-        marginRight={SPACING.spacingXXL}
+        marginRight={SPACING.spacing40}
       >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <StyledText css={TYPOGRAPHY.h2SemiBold}>

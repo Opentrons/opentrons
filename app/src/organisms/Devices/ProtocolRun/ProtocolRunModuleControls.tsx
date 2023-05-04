@@ -1,5 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../../atoms/text'
+import { ModuleCard } from '../../ModuleCard'
+import { useModuleRenderInfoForProtocolById } from '../hooks'
 import {
   COLORS,
   Flex,
@@ -7,9 +8,8 @@ import {
   JUSTIFY_CENTER,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import { ModuleCard } from '../../ModuleCard'
-import { useModuleRenderInfoForProtocolById } from '../hooks'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string

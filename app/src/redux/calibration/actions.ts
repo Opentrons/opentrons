@@ -3,13 +3,12 @@ import type {
   ResetConfigValueAction,
   UpdateConfigValueAction,
 } from '../config/types'
-import * as Constants from './constants'
-import * as Types from './types'
-
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../robot-api/types'
+import * as Constants from './constants'
+import * as Types from './types'
 
 export const fetchCalibrationStatus = (
   robotName: string

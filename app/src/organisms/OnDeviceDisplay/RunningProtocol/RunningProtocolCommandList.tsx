@@ -1,8 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
-
+import { StyledText } from '../../../atoms/text'
+import { CommandText } from '../../CommandText'
+import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import { CommandIcon } from '../../RunPreview/CommandIcon'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_ROW,
@@ -17,17 +20,11 @@ import {
   POSITION_ABSOLUTE,
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-
-import { StyledText } from '../../../atoms/text'
-import { CommandText } from '../../CommandText'
-import { CommandIcon } from '../../RunPreview/CommandIcon'
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { css } from 'styled-components'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.darkBlack_seventy};
@@ -107,11 +104,11 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">

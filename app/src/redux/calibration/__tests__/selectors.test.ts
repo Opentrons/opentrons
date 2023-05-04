@@ -1,7 +1,6 @@
+import type { State } from '../../types'
 import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
-
-import type { State } from '../../types'
 
 describe('calibration selectors', () => {
   describe('getCalibrationStatus', () => {

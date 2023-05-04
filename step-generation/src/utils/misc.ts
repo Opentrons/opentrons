@@ -1,18 +1,4 @@
-import assert from 'assert'
-import flatMap from 'lodash/flatMap'
-import mapValues from 'lodash/mapValues'
-import range from 'lodash/range'
-import reduce from 'lodash/reduce'
-import {
-  getIsTiprack,
-  getLabwareDefURI,
-  getWellsDepth,
-  getWellNamePerMultiTip,
-} from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
-import { curryCommandCreator } from './curryCommandCreator'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   CurriedCommandCreator,
   InvariantContext,
@@ -22,6 +8,21 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
+import { curryCommandCreator } from './curryCommandCreator'
+import {
+  getIsTiprack,
+  getLabwareDefURI,
+  getWellsDepth,
+  getWellNamePerMultiTip,
+} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
+import assert from 'assert'
+import flatMap from 'lodash/flatMap'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
+import reduce from 'lodash/reduce'
+
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'

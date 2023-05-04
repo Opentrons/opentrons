@@ -1,11 +1,12 @@
-import { createSelector } from 'reselect'
-import mapValues from 'lodash/mapValues'
 import { selectors as stepFormSelectors } from '../step-forms'
-import { getSelectedStepId } from '../ui/steps/selectors'
-import { PRESAVED_STEP_ID } from '../steplist/types'
 import { FormWarning } from '../steplist'
+import { PRESAVED_STEP_ID } from '../steplist/types'
 import { BaseState, Selector } from '../types'
+import { getSelectedStepId } from '../ui/steps/selectors'
 import { RootState, DismissedWarningsAllSteps, WarningType } from './reducers'
+import mapValues from 'lodash/mapValues'
+import { createSelector } from 'reselect'
+
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 export const getAllDismissedWarnings: Selector<any> = createSelector(
   rootSelector,

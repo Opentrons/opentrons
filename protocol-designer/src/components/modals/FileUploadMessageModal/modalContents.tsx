@@ -1,9 +1,9 @@
-import * as React from 'react'
-import assert from 'assert'
-import semver from 'semver'
+import { FileUploadMessage } from '../../../load-file'
 import styles from './modalContents.css'
 import { ModalContents } from './types'
-import { FileUploadMessage } from '../../../load-file'
+import assert from 'assert'
+import * as React from 'react'
+import semver from 'semver'
 
 const INVALID_FILE_TYPE: ModalContents = {
   title: 'Incorrect file type',

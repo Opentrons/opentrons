@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
+import { FLOWS } from '../constants'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {

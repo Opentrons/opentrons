@@ -1,9 +1,3 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
-import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
-
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useTrackEvent,
@@ -14,6 +8,10 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
 } from '../hooks'
+import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 interface ProceedToRunButtonProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null

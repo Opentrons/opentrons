@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { BackgroundOverlay } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof BackgroundOverlay>) => {
   return renderWithProviders(<BackgroundOverlay {...props} />)[0]

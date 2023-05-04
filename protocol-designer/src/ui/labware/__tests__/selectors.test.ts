@@ -1,3 +1,11 @@
+import { LabwareDefinition2 } from '../../../../../shared-data/lib/js/types.d'
+import { LabwareEntities } from '../../../../../step-generation/src/types'
+import { SPAN7_8_10_11_SLOT, FIXED_TRASH_ID } from '../../../constants'
+import {
+  getDisposalLabwareOptions,
+  getLabwareOptions,
+  _sortLabwareDropdownOptions,
+} from '../selectors'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
@@ -6,17 +14,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT, FIXED_TRASH_ID } from '../../../constants'
-import {
-  getDisposalLabwareOptions,
-  getLabwareOptions,
-  _sortLabwareDropdownOptions,
-} from '../selectors'
-import { LabwareEntities } from '../../../../../step-generation/src/types'
-import { LabwareDefinition2 } from '../../../../../shared-data/lib/js/types.d'
-import _fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 
 const fixtureTiprack1000ul = _fixture_tiprack_1000_ul as LabwareDefinition2

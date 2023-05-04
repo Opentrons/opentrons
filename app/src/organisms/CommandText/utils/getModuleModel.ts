@@ -1,5 +1,4 @@
 import { getLoadedModule } from './accessors'
-
 import type {
   ModuleModel,
   CompletedProtocolAnalysis,

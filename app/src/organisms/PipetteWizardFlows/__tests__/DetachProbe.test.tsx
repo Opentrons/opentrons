@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { i18n } from '../../../i18n'
+import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { DetachProbe } from '../DetachProbe'
+import { FLOWS } from '../constants'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { FLOWS } from '../constants'
-import { DetachProbe } from '../DetachProbe'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 

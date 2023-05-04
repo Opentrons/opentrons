@@ -1,8 +1,20 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import cx from 'classnames'
+import { DND_TYPES } from '../../../constants'
+import {
+  deleteContainer,
+  duplicateLabware,
+  moveDeckItem,
+  openIngredientSelector,
+} from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { i18n } from '../../../localization'
+import { LabwareOnDeck } from '../../../step-forms'
+import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
+import styles from './LabwareOverlays.css'
+import { NameThisLabware } from './NameThisLabware'
 import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 import {
   DragSource,
   DragSourceConnector,
@@ -12,19 +24,7 @@ import {
   DropTargetMonitor,
   DropTargetSpec,
 } from 'react-dnd'
-import { i18n } from '../../../localization'
-import { NameThisLabware } from './NameThisLabware'
-import { DND_TYPES } from '../../../constants'
-import {
-  deleteContainer,
-  duplicateLabware,
-  moveDeckItem,
-  openIngredientSelector,
-} from '../../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
-import styles from './LabwareOverlays.css'
+import { connect } from 'react-redux'
 
 interface OP {
   labwareOnDeck: LabwareOnDeck

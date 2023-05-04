@@ -1,9 +1,3 @@
-import type {
-  DiscoveryClientRobot,
-  HealthResponse,
-  HealthStatus,
-} from '@opentrons/discovery-client'
-
 import {
   HEALTH_STATUS_OK,
   CONNECTABLE,
@@ -12,6 +6,11 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from './constants'
+import type {
+  DiscoveryClientRobot,
+  HealthResponse,
+  HealthStatus,
+} from '@opentrons/discovery-client'
 
 export type { DiscoveryClientRobot, HealthStatus }
 

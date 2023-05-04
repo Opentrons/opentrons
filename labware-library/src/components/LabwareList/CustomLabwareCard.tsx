@@ -1,14 +1,14 @@
 // labware creator display card
-import * as React from 'react'
-import { Link } from 'react-router-dom'
-import { getPublicPath } from '../../public-path'
 import {
   CUSTOM_LABWARE_PROMPT_NO_RESULTS,
   CUSTOM_LABWARE_PROMPT_W_RESULTS,
   CUSTOM_LABWARE_SUPPORT_BTN,
   LABWARE_CREATOR_BTN,
 } from '../../localization'
+import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 
 interface Props {
   isResultsEmpty?: boolean

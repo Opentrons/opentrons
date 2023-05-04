@@ -1,8 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
-import { format } from 'date-fns'
-
+import { StyledText } from '../../atoms/text'
+import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import {
   Box,
   Flex,
@@ -18,11 +16,10 @@ import {
   ALIGN_FLEX_END,
   ALIGN_CENTER,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
-
-import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { format } from 'date-fns'
+import startCase from 'lodash/startCase'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate
@@ -124,7 +121,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       {/* Note kj 06/30/2022 currently this section would not be ideal implementation
         Once the team have an agreement for grid system, we could refactor */}
       <Box
-        marginTop={`-${String(SPACING.spacingSM)}`}
+        marginTop={`-${String(SPACING.spacing12)}`}
         paddingRight={SPACING.spacing8}
       >
         {modified != null && filename != null && (

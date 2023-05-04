@@ -1,8 +1,9 @@
-import uuidv1 from 'uuid/v4'
-import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import { BoundingRect, GenericRect } from '../collision-types'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
-import { BoundingRect, GenericRect } from '../collision-types'
+import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import uuidv1 from 'uuid/v4'
+
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? // eslint-disable-next-line @typescript-eslint/no-var-requires

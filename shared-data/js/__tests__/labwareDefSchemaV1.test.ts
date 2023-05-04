@@ -1,9 +1,8 @@
-import path from 'path'
-import glob from 'glob'
-import Ajv from 'ajv'
-
 import { labwareSchemaV1 } from '../schema'
 import type { LabwareDefinition1 } from '../types'
+import Ajv from 'ajv'
+import glob from 'glob'
+import path from 'path'
 
 const DEFINITIONS_GLOB_PATTERN = '../../labware/definitions/1/*.json'
 const GLOB_OPTIONS = { absolute: true, cwd: __dirname }

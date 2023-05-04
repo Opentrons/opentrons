@@ -1,13 +1,13 @@
-import { labwareDefToFields } from '../labwareDefToFields'
+import type { ProcessedLabwareFields } from '../fields'
 import { fieldsToLabware } from '../fieldsToLabware'
+import { labwareDefToFields } from '../labwareDefToFields'
 import { labwareFormSchema } from '../labwareFormSchema'
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import _fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ProcessedLabwareFields } from '../fields'
+import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2

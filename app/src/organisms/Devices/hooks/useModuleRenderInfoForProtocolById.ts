@@ -1,17 +1,16 @@
 import {
-  checkModuleCompatibility,
-  getDeckDefFromRobotType,
-} from '@opentrons/shared-data'
-
-import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
-import {
   useAttachedModules,
   useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '.'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../../redux/modules/types'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
+import {
+  checkModuleCompatibility,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null

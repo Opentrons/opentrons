@@ -1,10 +1,11 @@
-import { createSelector } from 'reselect'
+import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { getSelectedStepId } from '../../ui/steps'
-import { selectors as dismissSelectors } from '../../dismiss'
-import { CommandCreatorWarning } from '@opentrons/step-generation'
 import { Selector } from '../../types'
+import { getSelectedStepId } from '../../ui/steps'
+import { CommandCreatorWarning } from '@opentrons/step-generation'
+import { createSelector } from 'reselect'
+
 export const getTimelineWarningsForSelectedStep: Selector<
   CommandCreatorWarning[]
 > = createSelector(

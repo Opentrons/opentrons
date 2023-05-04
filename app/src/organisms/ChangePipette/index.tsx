@@ -1,17 +1,14 @@
-import * as React from 'react'
-import capitalize from 'lodash/capitalize'
-import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
-
+import { StyledText } from '../../atoms/text'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { getCalibrationForPipette } from '../../redux/calibration'
+import type { Mount } from '../../redux/pipettes/types'
 import {
   useDispatchApiRequests,
   getRequestById,
   SUCCESS,
 } from '../../redux/robot-api'
-import { getCalibrationForPipette } from '../../redux/calibration'
 import {
   home,
   move,
@@ -23,17 +20,12 @@ import {
   CHANGE_PIPETTE,
   HOME,
 } from '../../redux/robot-controls'
-
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { StyledText } from '../../atoms/text'
+import type { State, Dispatch } from '../../redux/types'
 import { useAttachedPipettes } from '../Devices/hooks'
+import { ClearDeckModal } from './ClearDeckModal'
+import { ConfirmPipette } from './ConfirmPipette'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
-import { ConfirmPipette } from './ConfirmPipette'
-import { ClearDeckModal } from './ClearDeckModal'
-
 import {
   ATTACH,
   DETACH,
@@ -43,10 +35,14 @@ import {
   SINGLE_CHANNEL_STEPS,
   EIGHT_CHANNEL_STEPS,
 } from './constants'
-
-import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'
+import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 interface Props {
   robotName: string

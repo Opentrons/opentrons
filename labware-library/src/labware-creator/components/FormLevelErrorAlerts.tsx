@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { AlertItem } from '@opentrons/components'
 import { LabwareCreatorErrors, FORM_LEVEL_ERRORS } from '../formLevelValidation'
+import { AlertItem } from '@opentrons/components'
+import * as React from 'react'
 
 export const FormLevelErrorAlerts = (props: {
   errors: LabwareCreatorErrors

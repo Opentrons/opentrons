@@ -1,6 +1,20 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
+import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
+import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
+import slot5RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
+import slot5RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
+import { StyledText } from '../../atoms/text'
+import {
+  JogControls,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+  VERTICAL_PLANE,
+} from '../../molecules/JogControls'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import * as Sessions from '../../redux/sessions'
+import { NeedHelpLink } from './NeedHelpLink'
+import type { CalibrationPanelProps } from './types'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { formatJogVector } from './utils'
 import {
   Box,
   Flex,
@@ -11,26 +25,9 @@ import {
   PrimaryButton,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-
-import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
-import {
-  JogControls,
-  MEDIUM_STEP_SIZE_MM,
-  SMALL_STEP_SIZE_MM,
-  VERTICAL_PLANE,
-} from '../../molecules/JogControls'
-import { formatJogVector } from './utils'
-import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
-import { NeedHelpLink } from './NeedHelpLink'
-
-import slot5LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_MULTI_Z.webm'
-import slot5LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_LEFT_SINGLE_Z.webm'
-import slot5RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_5_RIGHT_MULTI_Z.webm'
-import slot5RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_5_RIGHT_SINGLE_Z.webm'
-
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type { CalibrationPanelProps } from './types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const assetMap = {
   left: {

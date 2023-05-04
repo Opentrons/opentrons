@@ -1,5 +1,4 @@
-import React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../../atoms/text'
 import {
   BORDERS,
   COLORS,
@@ -8,8 +7,9 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { StyleProps } from '@opentrons/components'
+import React from 'react'
+import { css } from 'styled-components'
 
 interface ControlContainerProps extends StyleProps {
   title: string

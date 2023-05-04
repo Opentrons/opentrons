@@ -1,9 +1,14 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import last from 'lodash/last'
-import { useHistory } from 'react-router-dom'
-
+import { StyledText } from '../../../../../atoms/text'
+import { Modal } from '../../../../../molecules/Modal'
+import { resetConfig } from '../../../../../redux/robot-admin'
+import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import {
+  useDispatchApiRequest,
+  getRequestById,
+  SUCCESS,
+  PENDING,
+} from '../../../../../redux/robot-api'
+import type { State } from '../../../../../redux/types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,18 +20,11 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../../../../atoms/text'
-import { Modal } from '../../../../../molecules/Modal'
-import {
-  useDispatchApiRequest,
-  getRequestById,
-  SUCCESS,
-  PENDING,
-} from '../../../../../redux/robot-api'
-import { resetConfig } from '../../../../../redux/robot-admin'
-
-import type { State } from '../../../../../redux/types'
-import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import last from 'lodash/last'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 interface FactoryResetModalProps {
   closeModal: () => void

@@ -1,7 +1,8 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { getIsOnDevice } from '../../redux/config'
+import { equipmentImages } from './equipmentImages'
 import {
   Flex,
   ALIGN_CENTER,
@@ -15,14 +16,12 @@ import {
   Box,
   BORDERS,
 } from '@opentrons/components'
-
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { equipmentImages } from './equipmentImages'
-
 import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 interface WizardRequiredEquipmentListProps extends StyleProps {
   equipmentList: Array<React.ComponentProps<typeof RequiredEquipmentCard>>
   footer?: string
@@ -67,7 +66,7 @@ export function WizardRequiredEquipmentList(
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`${SPACING.spacingXXS} solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>

@@ -1,6 +1,7 @@
-import * as React from 'react'
-import capitalize from 'lodash/capitalize'
-import { useTranslation } from 'react-i18next'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { FLOWS } from './constants'
+import type { PipetteWizardFlow } from './types'
 import {
   COLORS,
   SPACING,
@@ -9,10 +10,9 @@ import {
   SecondaryButton,
   AlertPrimaryButton,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { FLOWS } from './constants'
-import type { PipetteWizardFlow } from './types'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ExitModalProps {
   proceed: () => void

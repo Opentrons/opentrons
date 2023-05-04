@@ -1,7 +1,14 @@
-import * as React from 'react'
-import { Formik, FormikProps } from 'formik'
-import { format } from 'date-fns'
-
+import formStyles from '../components/forms/forms.css'
+import modalStyles from '../components/modals/modal.css'
+import { FileMetadataFields } from '../file-data'
+import { i18n } from '../localization'
+import { ModulesForEditModulesCard } from '../step-forms'
+import { resetScrollElements } from '../ui/steps/utils'
+import { EditModules } from './EditModules'
+import styles from './FilePage.css'
+import { EditPipettesModal } from './modals/EditPipettesModal'
+import { EditModulesCard } from './modules'
+import { Portal } from './portals/MainPageModalPortal'
 import {
   Card,
   FormGroup,
@@ -10,19 +17,11 @@ import {
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import cx from 'classnames'
-import { i18n } from '../localization'
-import { resetScrollElements } from '../ui/steps/utils'
-import { Portal } from './portals/MainPageModalPortal'
-import { EditPipettesModal } from './modals/EditPipettesModal'
-import { EditModulesCard } from './modules'
-import { EditModules } from './EditModules'
-import styles from './FilePage.css'
-import modalStyles from '../components/modals/modal.css'
-import formStyles from '../components/forms/forms.css'
 import { ModuleType } from '@opentrons/shared-data'
-import { FileMetadataFields } from '../file-data'
-import { ModulesForEditModulesCard } from '../step-forms'
+import cx from 'classnames'
+import { format } from 'date-fns'
+import { Formik, FormikProps } from 'formik'
+import * as React from 'react'
 
 export interface Props {
   formValues: FileMetadataFields

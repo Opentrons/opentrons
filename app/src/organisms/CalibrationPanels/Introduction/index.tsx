@@ -1,6 +1,12 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { StyledText } from '../../../atoms/text'
+import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import * as Sessions from '../../../redux/sessions'
+import { ChooseTipRack } from '../ChooseTipRack'
+import { NeedHelpLink } from '../NeedHelpLink'
+import { TRASH_BIN_LOAD_NAME } from '../constants'
+import type { CalibrationPanelProps } from '../types'
+import { Body } from './Body'
+import { InvalidationWarning } from './InvalidationWarning'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -10,19 +16,10 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-
-import * as Sessions from '../../../redux/sessions'
-import { StyledText } from '../../../atoms/text'
-import { NeedHelpLink } from '../NeedHelpLink'
-import { ChooseTipRack } from '../ChooseTipRack'
-
-import { TRASH_BIN_LOAD_NAME } from '../constants'
-import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
-import { Body } from './Body'
-import { InvalidationWarning } from './InvalidationWarning'
-
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { CalibrationPanelProps } from '../types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const TRASH_BIN = 'Removable black plastic trash bin'
 
@@ -131,7 +128,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <Flex gridGap={SPACING.spacingXXL}>
+      <Flex gridGap={SPACING.spacing40}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}

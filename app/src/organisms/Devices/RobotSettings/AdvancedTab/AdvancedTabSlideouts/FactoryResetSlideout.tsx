@@ -1,8 +1,24 @@
-import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import snakeCase from 'lodash/snakeCase'
-
+import { Slideout } from '../../../../../atoms/Slideout'
+import { Divider } from '../../../../../atoms/structure'
+import { StyledText } from '../../../../../atoms/text'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+} from '../../../../../redux/analytics'
+import { UNREACHABLE } from '../../../../../redux/discovery'
+import {
+  getResetConfigOptions,
+  fetchResetConfigOptions,
+} from '../../../../../redux/robot-admin'
+import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import type { State, Dispatch } from '../../../../../redux/types'
+import {
+  useDeckCalibrationData,
+  useIsOT3,
+  usePipetteOffsetCalibrations,
+  useTipLengthCalibrations,
+  useRobot,
+} from '../../../hooks'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -20,29 +36,10 @@ import {
   CheckboxField,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-
-import { UNREACHABLE } from '../../../../../redux/discovery'
-import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
-import { Divider } from '../../../../../atoms/structure'
-import {
-  getResetConfigOptions,
-  fetchResetConfigOptions,
-} from '../../../../../redux/robot-admin'
-import {
-  useTrackEvent,
-  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
-} from '../../../../../redux/analytics'
-import {
-  useDeckCalibrationData,
-  useIsOT3,
-  usePipetteOffsetCalibrations,
-  useTipLengthCalibrations,
-  useRobot,
-} from '../../../hooks'
-
-import type { State, Dispatch } from '../../../../../redux/types'
-import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import snakeCase from 'lodash/snakeCase'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
 interface FactoryResetSlideoutProps {
   isExpanded: boolean

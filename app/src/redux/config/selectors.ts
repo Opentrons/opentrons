@@ -1,5 +1,6 @@
-import { createSelector } from 'reselect'
 import { SLEEP_NEVER_MS } from '../../App/constants'
+import type { SelectOption } from '../../atoms/SelectField/Select'
+import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 import type { State } from '../types'
 import type {
   Config,
@@ -8,8 +9,7 @@ import type {
   ProtocolsOnDeviceSortKey,
   OnDeviceDisplaySettings,
 } from './types'
-import type { SelectOption } from '../../atoms/SelectField/Select'
-import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
+import { createSelector } from 'reselect'
 
 export const getConfig = (state: State): Config | null => state.config
 

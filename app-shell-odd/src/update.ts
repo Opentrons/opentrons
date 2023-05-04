@@ -1,15 +1,14 @@
-import semver from 'semver'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import { createLogger } from './log'
 import { getConfig } from './config'
+import { createLogger } from './log'
 import {
   downloadAndCacheReleaseManifest,
   getCachedReleaseManifest,
   getReleaseSet,
 } from './system-update/release-manifest'
-
-import type { Action, Dispatch } from './types'
 import type { ReleaseSetUrls } from './system-update/types'
+import type { Action, Dispatch } from './types'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import semver from 'semver'
 
 const log = createLogger('update')
 

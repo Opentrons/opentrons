@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
-
 import { MediumButton } from '../MediumButton'
+import { renderWithProviders, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof MediumButton>) => {
   return renderWithProviders(<MediumButton {...props} />)[0]

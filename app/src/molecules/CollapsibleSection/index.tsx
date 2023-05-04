@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-
+import { StyledText } from '../../atoms/text'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -11,7 +9,8 @@ import {
   COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;

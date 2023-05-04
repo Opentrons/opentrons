@@ -1,7 +1,4 @@
 // form component tests
-import React from 'react'
-import Renderer from 'react-test-renderer'
-
 import {
   DeprecatedCheckboxField,
   DropdownField,
@@ -9,6 +6,8 @@ import {
   InputField,
   RadioGroup,
 } from '..'
+import React from 'react'
+import Renderer from 'react-test-renderer'
 
 describe('DeprecatedCheckboxField', () => {
   it('renders correctly when unchecked', () => {

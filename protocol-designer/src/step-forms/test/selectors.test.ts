@@ -1,3 +1,5 @@
+import { FormData } from '../../form-types'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import {
   _hasFieldLevelErrors,
   getEquippedPipetteOptions,
@@ -5,9 +7,8 @@ import {
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
 } from '../selectors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import { FormData } from '../../form-types'
+
 jest.mock('../../steplist/fieldLevel')
 jest.mock('../utils/getProfileItemsHaveErrors')
 const mockGetFieldErrors = getFieldErrors as jest.MockedFunction<

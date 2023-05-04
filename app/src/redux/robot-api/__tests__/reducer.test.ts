@@ -1,7 +1,6 @@
-import { robotApiReducer } from '../reducer'
-
-import type { RobotApiState } from '../types'
 import { mockFailedRequestState } from '../__fixtures__'
+import { robotApiReducer } from '../reducer'
+import type { RobotApiState } from '../types'
 
 interface ReducerSpec {
   name: string

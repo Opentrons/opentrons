@@ -1,14 +1,13 @@
+import type { State } from '../../../../redux/types'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
+import { useHeaterShakerModuleIdsFromRun } from '../hooks'
+import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+import { renderHook } from '@testing-library/react-hooks'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useHeaterShakerModuleIdsFromRun } from '../hooks'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
-
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
 
 jest.mock('../../hooks')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

@@ -1,10 +1,9 @@
-import { useState, useCallback, useRef } from 'react'
-import uniqueId from 'lodash/uniqueId'
-import { usePopper } from './usePopper'
 import * as Styles from './styles'
-
-import type { CSSProperties } from 'react'
 import type { UseTooltipOptions, UseTooltipResult, Placement } from './types'
+import { usePopper } from './usePopper'
+import uniqueId from 'lodash/uniqueId'
+import { useState, useCallback, useRef } from 'react'
+import type { CSSProperties } from 'react'
 
 interface TooltipState {
   placement: Placement | null

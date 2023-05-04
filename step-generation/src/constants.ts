@@ -2,6 +2,7 @@ import {
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
   'TEMPERATURE_DEACTIVATED'

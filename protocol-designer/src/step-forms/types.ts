@@ -1,3 +1,4 @@
+import { DeckSlot } from '../types'
 import { Mount } from '@opentrons/components'
 import {
   ModuleType,
@@ -7,14 +8,13 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { DeckSlot } from '../types'
-
 import {
   TemperatureStatus,
   ModuleEntity,
   PipetteEntity,
   LabwareEntity,
 } from '@opentrons/step-generation'
+
 export interface FormPipette {
   pipetteName: string | null | undefined
   tiprackDefURI: string | null | undefined

@@ -1,9 +1,3 @@
-import * as React from 'react'
-import {
-  getModuleType,
-  ModuleDefinition,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
   C_MED_LIGHT_GRAY,
@@ -15,9 +9,14 @@ import {
   ALIGN_CENTER,
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
-
-import { Thermocycler } from './Thermocycler'
 import { ModuleFromDef } from './ModuleFromDef'
+import { Thermocycler } from './Thermocycler'
+import {
+  getModuleType,
+  ModuleDefinition,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import * as React from 'react'
 
 export * from './Thermocycler'
 export * from './ModuleFromDef'

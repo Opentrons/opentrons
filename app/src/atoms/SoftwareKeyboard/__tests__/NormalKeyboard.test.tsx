@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { NormalKeyboard } from '..'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
-import { renderWithProviders } from '@opentrons/components'
-import { NormalKeyboard } from '..'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
   return renderWithProviders(<NormalKeyboard {...props} />)[0]

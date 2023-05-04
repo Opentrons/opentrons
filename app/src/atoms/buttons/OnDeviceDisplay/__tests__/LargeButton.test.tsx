@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
-
 import { LargeButton } from '../LargeButton'
+import { renderWithProviders, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof LargeButton>) => {
   return renderWithProviders(<LargeButton {...props} />)[0]

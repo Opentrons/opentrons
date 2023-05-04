@@ -1,7 +1,6 @@
+import type { Action } from '../../types'
 import * as Fixtures from '../__fixtures__'
 import { pipettesReducer } from '../reducer'
-
-import type { Action } from '../../types'
 import type { PipettesState } from '../types'
 
 interface ReducerSpec {

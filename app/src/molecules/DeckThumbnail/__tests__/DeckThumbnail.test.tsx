@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { DeckThumbnail } from '../'
+import { i18n } from '../../../i18n'
+import { simpleAnalysisFileFixture } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
 import {
   getRobotTypeFromLoadedLabware,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { renderWithProviders } from '@opentrons/components'
-import { simpleAnalysisFileFixture } from '@opentrons/api-client'
-import { i18n } from '../../../i18n'
-import { DeckThumbnail } from '../'
 import type { LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
+import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')

@@ -1,9 +1,9 @@
+import type { ResourceLinks } from '../types'
 import type {
   ProtocolResource,
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import type { ResourceLinks } from '../types'
 
 export interface ProtocolMetadata {
   protocolName?: string

@@ -1,7 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
+import { ToggleButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
+import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { SecureLabwareModal } from './SecureLabwareModal'
 import {
   Flex,
   SPACING,
@@ -33,24 +35,19 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-
-import { ToggleButton } from '../../../../atoms/buttons'
-import { StyledText } from '../../../../atoms/text'
-import { SecureLabwareModal } from './SecureLabwareModal'
-
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   border-style: ${BORDERS.styleSolid};
-  border-width: ${SPACING.spacingXXS};
+  border-width: 1px;
   border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing16};
@@ -135,7 +132,7 @@ export function LabwareListItem(
                 <Icon
                   name="information"
                   size="0.75rem"
-                  marginTop={SPACING.spacingXS}
+                  marginTop={SPACING.spacing4}
                 />
                 <StyledText
                   marginLeft={SPACING.spacing4}

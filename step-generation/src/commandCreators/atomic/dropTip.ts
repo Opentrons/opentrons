@@ -1,6 +1,7 @@
-import { uuid } from '../../utils'
 import { FIXED_TRASH_ID } from '../../constants'
 import type { CommandCreator } from '../../types'
+import { uuid } from '../../utils'
+
 interface DropTipArgs {
   pipette: string
 }

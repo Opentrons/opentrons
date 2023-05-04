@@ -1,4 +1,5 @@
 import * as errorCreators from '../../errorCreators'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
@@ -13,7 +14,6 @@ import {
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Dispense with given args. Requires tip. */
 export const dispense: CommandCreator<DispenseParams> = (

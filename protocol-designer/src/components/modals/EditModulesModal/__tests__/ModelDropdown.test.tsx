@@ -1,11 +1,11 @@
-import React from 'react'
-import * as Formik from 'formik'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
+import { ModelDropdown, ModelDropdownProps } from '../ModelDropdown'
 import { DropdownField } from '@opentrons/components'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import { ModelDropdown, ModelDropdownProps } from '../ModelDropdown'
-import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
+import { mount } from 'enzyme'
+import * as Formik from 'formik'
+import React from 'react'
+import { Provider } from 'react-redux'
 
 jest.mock('formik')
 

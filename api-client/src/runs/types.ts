@@ -1,10 +1,11 @@
+import type { ResourceLink } from '../types'
+import type { RunCommandSummary } from './commands/types'
 import type {
   LoadedLabware,
   LoadedPipette,
   ModuleModel,
 } from '@opentrons/shared-data'
-import type { ResourceLink } from '../types'
-import type { RunCommandSummary } from './commands/types'
+
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const

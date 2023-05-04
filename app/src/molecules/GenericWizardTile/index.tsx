@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { NeedHelpLink } from '../../organisms/CalibrationPanels'
+import { getIsOnDevice } from '../../redux/config'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -18,10 +18,10 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -109,7 +109,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       height={isOnDevice ? '30rem' : '24.625rem'}
       padding={SPACING.spacing32}
     >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"

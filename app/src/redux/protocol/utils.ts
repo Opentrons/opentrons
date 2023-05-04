@@ -1,3 +1,5 @@
+import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
+import type { ProtocolType } from './types'
 import {
   fileExtensionIsPython,
   fileExtensionIsJson,
@@ -5,9 +7,6 @@ import {
   fileIsBinary,
   parseProtocolData,
 } from '@opentrons/shared-data/js/helpers'
-import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
-
-import type { ProtocolType } from './types'
 import type {
   ProtocolData,
   ProtocolParseErrorHandler,

@@ -1,6 +1,5 @@
 import { mockBaseBrowser } from '../__fixtures__'
 import { getBrowserInterfaces, compareInterfaces } from '../interfaces'
-
 import type { Socket } from 'dgram'
 import type { Browser as BaseBrowser } from 'mdns-js'
 

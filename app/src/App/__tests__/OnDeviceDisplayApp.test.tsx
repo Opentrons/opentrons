@@ -1,23 +1,21 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../i18n'
 import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
-import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
-import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
-import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
-import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
+import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
+import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
+import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
 import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
+import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
+import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../pages/OnDeviceDisplay/Welcome')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')

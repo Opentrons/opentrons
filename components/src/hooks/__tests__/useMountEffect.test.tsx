@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
-
 import { useMountEffect } from '../useMountEffect'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 describe('useMountEffect hook', () => {
   const TestUseMountEffect = (props: {

@@ -1,5 +1,4 @@
 import { getLoadedPipette } from './accessors'
-
 import type {
   CompletedProtocolAnalysis,
   PipetteName,

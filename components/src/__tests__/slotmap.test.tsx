@@ -1,7 +1,7 @@
 // slot map  component tests
+import { SlotMap } from '..'
 import React from 'react'
 import Renderer from 'react-test-renderer'
-import { SlotMap } from '..'
 
 describe('SlotMap', () => {
   it('renders correctly without collision warnings or errors', () => {

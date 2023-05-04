@@ -1,7 +1,12 @@
-import * as React from 'react'
-import { useParams, useHistory, Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import type { OnDeviceRouteParams } from '../../App/types'
+import { TertiaryButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
+import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
+import { useRunCreatedAtTimestamp } from '../../organisms/Devices/hooks'
+import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
+import { useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -23,18 +28,11 @@ import {
   DISPLAY_FLEX,
   SIZE_2,
 } from '@opentrons/components'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
-
-import { TertiaryButton } from '../../atoms/buttons'
-import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
-import { useRunCreatedAtTimestamp } from '../../organisms/Devices/hooks'
-import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
-import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
-import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
-
-import type { OnDeviceRouteParams } from '../../App/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useParams, useHistory, Link } from 'react-router-dom'
+import styled, { css } from 'styled-components'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -100,8 +98,8 @@ export function RunSummary(): JSX.Element {
             alignItems={ALIGN_CENTER}
             position={POSITION_ABSOLUTE}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingXXL}
-            padding={SPACING.spacingXXL}
+            gridGap={SPACING.spacing40}
+            padding={SPACING.spacing40}
             backgroundColor={isRunSucceeded ? COLORS.green_two : COLORS.red_two}
           >
             <SplashFrame>
@@ -124,7 +122,7 @@ export function RunSummary(): JSX.Element {
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING.spacingXXL}
+            padding={SPACING.spacing40}
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -247,7 +245,7 @@ const SplashFrame = styled(Flex)`
   align-items: ${ALIGN_CENTER};
   border: ${BORDERS.size_two} solid ${COLORS.white}${COLORS.opacity20HexCode};
   border-radius: ${BORDERS.size_three};
-  grid-gap: ${SPACING.spacingXXL};
+  grid-gap: ${SPACING.spacing40};
 `
 
 const ProtocolName = styled.h4`

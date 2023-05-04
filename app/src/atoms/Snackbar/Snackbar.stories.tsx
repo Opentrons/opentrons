@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { StyledText } from '../text'
+import { Snackbar } from './index'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -8,9 +9,8 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'ODD/Atoms/Snackbar',
@@ -43,7 +43,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           position="absolute"
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
           <Snackbar {...args} onClose={() => setIsShowSnackbar(false)} />

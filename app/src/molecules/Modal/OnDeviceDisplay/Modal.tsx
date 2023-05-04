@@ -1,4 +1,6 @@
-import * as React from 'react'
+import { BackgroundOverlay } from '../../BackgroundOverlay'
+import { ModalHeader } from './ModalHeader'
+import type { ModalHeaderBaseProps, ModalSize } from './types'
 import {
   BORDERS,
   COLORS,
@@ -7,10 +9,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { BackgroundOverlay } from '../../BackgroundOverlay'
-import { ModalHeader } from './ModalHeader'
-
-import type { ModalHeaderBaseProps, ModalSize } from './types'
+import * as React from 'react'
 
 interface ModalProps {
   /** clicking anywhere outside of the modal closes it  */

@@ -1,17 +1,14 @@
-import { when } from 'jest-when'
-
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import * as Actions from '../../actions'
-import * as robotAdminSelectors from '../../selectors'
 import * as discoverySelectors from '../../../discovery/selectors'
-
-import { trackRestartsEpic } from '../trackRestartsEpic'
-
 import type {
   ConnectivityStatus,
   DiscoveredRobot,
 } from '../../../discovery/types'
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import type { Action } from '../../../types'
+import * as Actions from '../../actions'
+import * as robotAdminSelectors from '../../selectors'
+import { trackRestartsEpic } from '../trackRestartsEpic'
+import { when } from 'jest-when'
 
 jest.mock('../../../discovery/selectors')
 jest.mock('../../selectors')

@@ -1,5 +1,5 @@
-import * as React from 'react'
-
+import { StyledText } from '../text'
+import { ProgressBar } from './index'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -7,11 +7,8 @@ import {
   COLORS,
   SecondaryButton,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
-import { ProgressBar } from './index'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/ProgressBar',
@@ -32,7 +29,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       backgroundColor={COLORS.darkGreyDisabled}
       padding={SPACING.spacing16}
     >

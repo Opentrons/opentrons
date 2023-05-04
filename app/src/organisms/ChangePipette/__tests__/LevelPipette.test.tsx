@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { LEFT, PipetteNameSpecs } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { LevelPipette } from '../LevelPipette'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { LEFT, PipetteNameSpecs } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof LevelPipette>) => {
   return renderWithProviders(<LevelPipette {...props} />, {

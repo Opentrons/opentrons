@@ -1,9 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-import capitalize from 'lodash/capitalize'
-import { useDispatch } from 'react-redux'
-
+import { StyledText } from '../../atoms/text'
+import { startBuildrootUpdate } from '../../redux/buildroot'
+import type { Dispatch } from '../../redux/types'
 import {
   Flex,
   SPACING,
@@ -16,11 +13,11 @@ import {
   JUSTIFY_CENTER,
   DIRECTION_ROW,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { startBuildrootUpdate } from '../../redux/buildroot'
-
-import type { Dispatch } from '../../redux/types'
+import capitalize from 'lodash/capitalize'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 interface ErrorUpdateSoftwareProps {
   errorMessage: string
@@ -44,7 +41,7 @@ export function ErrorUpdateSoftware({
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.errorBackgroundMed}
         height="26.625rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >

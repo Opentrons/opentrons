@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../../atoms/text'
+import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { useRunPipetteInfoByMount } from '../hooks'
+import { SetupCalibrationItem } from './SetupCalibrationItem'
+import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,12 +10,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../../atoms/text'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useRunPipetteInfoByMount } from '../hooks'
-import { SetupCalibrationItem } from './SetupCalibrationItem'
-import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string

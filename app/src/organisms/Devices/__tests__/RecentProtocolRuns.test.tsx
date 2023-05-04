@@ -1,13 +1,12 @@
-import * as React from 'react'
-import { UseQueryResult } from 'react-query'
+import { i18n } from '../../../i18n'
+import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
+import { RecentProtocolRuns } from '../RecentProtocolRuns'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
+import type { Runs } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
-import { useIsRobotViewable, useRunStatuses } from '../hooks'
-import { RecentProtocolRuns } from '../RecentProtocolRuns'
-import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
-
-import type { Runs } from '@opentrons/api-client'
+import * as React from 'react'
+import { UseQueryResult } from 'react-query'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')

@@ -1,15 +1,14 @@
-import * as React from 'react'
-import { useFormikContext } from 'formik'
 import { maskToInteger } from '../../fieldMasks'
-import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { LabwareFields, yesNoOptions } from '../../fields'
-import { FormAlerts } from '../alerts/FormAlerts'
-import { TextField } from '../TextField'
+import styles from '../../styles.css'
+import { isEveryFieldHidden, getLabwareName } from '../../utils'
 import { RadioField } from '../RadioField'
+import { TextField } from '../TextField'
+import { FormAlerts } from '../alerts/FormAlerts'
 import { GridImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
-
-import styles from '../../styles.css'
+import { useFormikContext } from 'formik'
+import * as React from 'react'
 
 interface Props {
   values: LabwareFields

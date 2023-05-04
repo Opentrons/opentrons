@@ -1,7 +1,8 @@
-import { i18n } from './localization'
-import { selectors as loadFileSelectors } from './load-file'
 import { selectors as analyticsSelectors } from './analytics'
 import { initializeFullstory } from './analytics/fullstory'
+import { selectors as loadFileSelectors } from './load-file'
+import { i18n } from './localization'
+
 export const initialize = (store: Record<string, any>): void => {
   if (process.env.NODE_ENV === 'production') {
     window.onbeforeunload = (_e: unknown) => {

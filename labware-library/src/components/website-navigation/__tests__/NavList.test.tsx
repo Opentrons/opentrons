@@ -1,8 +1,7 @@
 // tests for main navbar link list
-import * as React from 'react'
-import { shallow, mount } from 'enzyme'
-
 import { NavList } from '..'
+import { shallow, mount } from 'enzyme'
+import * as React from 'react'
 
 describe('NavList', () => {
   it('component renders', () => {

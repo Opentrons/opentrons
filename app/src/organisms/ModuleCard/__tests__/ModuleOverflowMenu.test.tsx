@@ -1,6 +1,3 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import {
   mockMagneticModule,
@@ -16,6 +13,9 @@ import {
 } from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')

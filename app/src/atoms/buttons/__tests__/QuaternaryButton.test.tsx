@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { QuaternaryButton } from '..'
 import {
   renderWithProviders,
   COLORS,
@@ -6,8 +6,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
-import { QuaternaryButton } from '..'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof QuaternaryButton>) => {
   return renderWithProviders(<QuaternaryButton {...props} />)[0]

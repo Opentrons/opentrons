@@ -1,9 +1,8 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
 import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
 import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 describe('AskForCalibrationBlockModal', () => {
   let onResponse: jest.MockedFunction<() => {}>

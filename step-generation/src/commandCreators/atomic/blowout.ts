@@ -1,8 +1,8 @@
-import { uuid } from '../../utils'
 import * as errorCreators from '../../errorCreators'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreatorError, CommandCreator } from '../../types'
+import { uuid } from '../../utils'
 import { CreateCommand } from '@opentrons/shared-data'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 
 export const blowout: CommandCreator<BlowoutParams> = (
   args,

@@ -1,6 +1,13 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
+import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
+import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
+import { StyledText } from '../../atoms/text'
+import { JogControls } from '../../molecules/JogControls'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import * as Sessions from '../../redux/sessions'
+import { NeedHelpLink } from './NeedHelpLink'
+import type { CalibrationPanelProps } from './types'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { formatJogVector } from './utils'
 import {
   Box,
   Flex,
@@ -11,19 +18,9 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
 } from '@opentrons/components'
-
-import * as Sessions from '../../redux/sessions'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import { StyledText } from '../../atoms/text'
-import { JogControls } from '../../molecules/JogControls'
-import type { CalibrationPanelProps } from './types'
-import { formatJogVector } from './utils'
-
-import { NeedHelpLink } from './NeedHelpLink'
-import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
-
-import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
-import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const ASSET_MAP = {
   multi: multiDemoAsset,

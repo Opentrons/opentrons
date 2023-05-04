@@ -1,11 +1,8 @@
-import type { FormikErrors } from 'formik'
-
 import type {
   WifiNetwork,
   EapOption,
   WifiKey,
 } from '../../../../redux/networking/types'
-
 import {
   CONNECT,
   DISCONNECT,
@@ -14,6 +11,7 @@ import {
   FIELD_TYPE_KEY_FILE,
   FIELD_TYPE_SECURITY,
 } from './constants'
+import type { FormikErrors } from 'formik'
 
 export type {
   WifiNetwork,

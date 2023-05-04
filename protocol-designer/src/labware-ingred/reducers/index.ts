@@ -1,18 +1,7 @@
-import { Reducer, combineReducers } from 'redux'
-import { handleActions } from 'redux-actions'
-import omit from 'lodash/omit'
-import mapValues from 'lodash/mapValues'
-import pickBy from 'lodash/pickBy'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-import {
-  SingleLabwareLiquidState,
-  LocationLiquidState,
-  LabwareLiquidState,
-} from '@opentrons/step-generation'
-import { Action, DeckSlot } from '../../types'
-import { LiquidGroupsById, DisplayLabware } from '../types'
 import { LoadFileAction } from '../../load-file'
+import { Action, DeckSlot } from '../../types'
 import {
   RemoveWellsContentsAction,
   CreateContainerAction,
@@ -29,6 +18,18 @@ import {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
+import { LiquidGroupsById, DisplayLabware } from '../types'
+import {
+  SingleLabwareLiquidState,
+  LocationLiquidState,
+  LabwareLiquidState,
+} from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import pickBy from 'lodash/pickBy'
+import { Reducer, combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)

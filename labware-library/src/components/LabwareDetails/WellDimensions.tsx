@@ -1,7 +1,4 @@
 // well dimensions and spacing for details page
-import * as React from 'react'
-import round from 'lodash/round'
-
 import {
   MEASUREMENTS,
   WELL_X_DIM,
@@ -11,10 +8,11 @@ import {
   TOTAL_LENGTH,
   MM,
 } from '../../localization'
-import { LabeledValueTable, LowercaseText } from '../ui'
-import { getMeasurementDiagram } from '../measurement-guide'
-
 import type { LabwareWellGroupProperties, LabwareParameters } from '../../types'
+import { getMeasurementDiagram } from '../measurement-guide'
+import { LabeledValueTable, LowercaseText } from '../ui'
+import round from 'lodash/round'
+import * as React from 'react'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

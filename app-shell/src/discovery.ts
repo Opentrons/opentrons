@@ -1,34 +1,29 @@
 // app shell discovery module
-import { app } from 'electron'
-import Store from 'electron-store'
-import groupBy from 'lodash/groupBy'
-import throttle from 'lodash/throttle'
-
-import {
-  createDiscoveryClient,
-  DEFAULT_PORT,
-} from '@opentrons/discovery-client'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { getFullConfig, handleConfigChange } from './config'
+import type { Config } from './config'
+import { createLogger } from './log'
+import type { Action, Dispatch } from './types'
 import {
   DISCOVERY_START,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
   CLEAR_CACHE,
 } from '@opentrons/app/src/redux/discovery/actions'
-
-import { getFullConfig, handleConfigChange } from './config'
-import { createLogger } from './log'
-
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import {
+  createDiscoveryClient,
+  DEFAULT_PORT,
+} from '@opentrons/discovery-client'
 import type {
   Address,
   DiscoveryClientRobot,
   LegacyService,
   DiscoveryClient,
 } from '@opentrons/discovery-client'
-
-import type { Action, Dispatch } from './types'
-import type { Config } from './config'
+import { app } from 'electron'
+import Store from 'electron-store'
+import groupBy from 'lodash/groupBy'
+import throttle from 'lodash/throttle'
 
 const log = createLogger('discovery')
 

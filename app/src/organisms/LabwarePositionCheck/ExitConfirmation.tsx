@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import { NeedHelpLink } from '../CalibrationPanels'
 import {
   Flex,
   Icon,
@@ -14,8 +14,8 @@ import {
   TYPOGRAPHY,
   SecondaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from '../CalibrationPanels'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

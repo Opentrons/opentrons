@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { COLORS, PrimaryButton } from '@opentrons/components'
 import { ModalShell } from '../Modal'
 import { WizardHeader } from '../WizardHeader'
 import { SimpleWizardBody } from './index'
-
+import { COLORS, PrimaryButton } from '@opentrons/components'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Molecules/SimpleWizardBody',

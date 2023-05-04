@@ -1,17 +1,16 @@
 // tests for the app-shell's discovery module
-import { app } from 'electron'
-import Store from 'electron-store'
-import noop from 'lodash/noop'
-import { when } from 'jest-when'
-
-import * as DiscoveryClient from '@opentrons/discovery-client'
+import * as Cfg from '../config'
+import { registerDiscovery } from '../discovery'
+import * as SysInfo from '../system-info'
 import {
   startDiscovery,
   finishDiscovery,
 } from '@opentrons/app/src/redux/discovery'
-import { registerDiscovery } from '../discovery'
-import * as Cfg from '../config'
-import * as SysInfo from '../system-info'
+import * as DiscoveryClient from '@opentrons/discovery-client'
+import { app } from 'electron'
+import Store from 'electron-store'
+import { when } from 'jest-when'
+import noop from 'lodash/noop'
 
 jest.mock('electron')
 jest.mock('electron-store')

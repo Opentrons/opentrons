@@ -1,7 +1,6 @@
-import { createSelector } from 'reselect'
-
 import type { State } from '../types'
 import type { StoredProtocolData } from './types'
+import { createSelector } from 'reselect'
 
 export const getStoredProtocols: (
   state: State

@@ -1,5 +1,3 @@
-import * as React from 'react'
-import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import {
   Icon,
   BORDERS,
@@ -11,7 +9,8 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-
+import * as React from 'react'
+import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import type {
   Props as ReactSelectProps,
   StylesConfig,
@@ -72,7 +71,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       zIndex: 5,
       position: POSITION_ABSOLUTE,
-      top: SPACING.spacingXS,
+      top: SPACING.spacing4,
       paddingLeft: '0.375rem',
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -121,7 +120,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      marginLeft: SPACING.spacingSS,
+      marginLeft: SPACING.spacing8,
       color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',

@@ -2,6 +2,7 @@ import { createFile } from '../../file-data/selectors/fileCreator'
 import { getFileMetadata } from '../../file-data/selectors/fileFields'
 import { saveProtocolFile } from '../actions'
 import { saveFile as saveFileUtil } from '../utils'
+
 jest.mock('../../file-data/selectors/fileCreator')
 jest.mock('../../file-data/selectors/fileFields')
 jest.mock('../utils')

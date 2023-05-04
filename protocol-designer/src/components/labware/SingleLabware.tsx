@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
+import * as React from 'react'
 
 type Props = React.ComponentProps<typeof LabwareRender>
 

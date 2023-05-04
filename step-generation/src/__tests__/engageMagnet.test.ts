@@ -1,10 +1,10 @@
+import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
+import { makeContext, getInitialRobotStateStandard } from '../fixtures'
+import type { InvariantContext, RobotState } from '../types'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
-import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
-import type { InvariantContext, RobotState } from '../types'
 
 const moduleId = 'magneticModuleId'
 const commandCreatorFnName = 'engageMagnet'

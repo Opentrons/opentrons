@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
+import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('@opentrons/react-api-client')
 

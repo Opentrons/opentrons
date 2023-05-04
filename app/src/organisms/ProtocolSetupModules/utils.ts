@@ -1,7 +1,6 @@
-import { checkModuleCompatibility } from '@opentrons/shared-data'
-
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../redux/modules/types'
+import { checkModuleCompatibility } from '@opentrons/shared-data'
 
 export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {
   attachedModuleMatch: AttachedModule | null

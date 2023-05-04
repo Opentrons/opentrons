@@ -1,23 +1,18 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-
-import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-
-import * as Networking from '../../../../redux/networking'
-import * as RobotApi from '../../../../redux/robot-api'
-import * as Fixtures from '../../../../redux/networking/__fixtures__'
-import * as Constants from '../ConnectNetwork/constants'
-
 import { Portal } from '../../../../App/portal'
-import { SelectSsid } from '../ConnectNetwork/SelectSsid'
+import * as Networking from '../../../../redux/networking'
+import * as Fixtures from '../../../../redux/networking/__fixtures__'
+import * as RobotApi from '../../../../redux/robot-api'
+import { RequestState } from '../../../../redux/robot-api/types'
 import { ConnectModal } from '../ConnectNetwork/ConnectModal'
 import { ResultModal } from '../ConnectNetwork/ResultModal'
-
+import { SelectSsid } from '../ConnectNetwork/SelectSsid'
+import * as Constants from '../ConnectNetwork/constants'
 import { SelectNetwork } from '../SelectNetwork'
-
+import { mount } from 'enzyme'
 import type { ReactWrapper } from 'enzyme'
-import { RequestState } from '../../../../redux/robot-api/types'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')

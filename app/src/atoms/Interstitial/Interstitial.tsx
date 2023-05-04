@@ -1,4 +1,7 @@
-import * as React from 'react'
+import {
+  InterstitialTitleBar,
+  InterstitialTitleBarProps,
+} from './InterstitiallTitleBar'
 import {
   Box,
   Flex,
@@ -11,10 +14,8 @@ import {
   SPACING,
   Overlay,
 } from '@opentrons/components'
-import {
-  InterstitialTitleBar,
-  InterstitialTitleBarProps,
-} from './InterstitiallTitleBar'
+import * as React from 'react'
+
 export interface InterstitialProps {
   titleBar: InterstitialTitleBarProps
   contentsClassName?: string
@@ -36,7 +37,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       top="0"
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
-      padding={`${String(SPACING.spacingXXL)} ${String(
+      padding={`${String(SPACING.spacing40)} ${String(
         SPACING.spacing48
       )} ${String(SPACING.spacing16)} ${String(SPACING.spacing48)}`}
       data-testid="interstitial"

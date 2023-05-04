@@ -1,10 +1,11 @@
-import { addAndSelectStepWithHints } from '../thunks'
+import * as fileDataSelectors from '../../../../file-data/selectors'
+import { StepType } from '../../../../form-types'
+import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType } from '../../../../form-types'
+import { addAndSelectStepWithHints } from '../thunks'
+
 jest.mock('../../../../tutorial/actions')
 jest.mock('../../../../ui/modules/selectors')
 jest.mock('../../../../labware-ingred/selectors')

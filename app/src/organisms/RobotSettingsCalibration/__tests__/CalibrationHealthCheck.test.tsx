@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
+import {
+  useAttachedPipettes,
+  useAttachedPipetteCalibrations,
+  useRunStatuses,
+} from '../../../organisms/Devices/hooks'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
@@ -17,18 +17,14 @@ import {
   mockTipLengthCalibration2,
 } from '../../../redux/calibration/tip-length/__fixtures__'
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
-import {
-  useAttachedPipettes,
-  useAttachedPipetteCalibrations,
-  useRunStatuses,
-} from '../../../organisms/Devices/hooks'
-
-import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
-
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
+import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/config')

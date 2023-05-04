@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import {
   mockDefinition,
@@ -7,6 +5,8 @@ import {
   mockRectangularLabwareWellGroupProperties,
 } from '../../../redux/custom-labware/__fixtures__'
 import { WellDimensions } from '../WellDimensions'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof WellDimensions>) => {
   return renderWithProviders(<WellDimensions {...props} />, {

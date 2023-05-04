@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import { useTipLengthCalibrations } from '..'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '../../../../redux/calibration/tip-length/__fixtures__'
-import { useTipLengthCalibrations } from '..'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 jest.mock('@opentrons/react-api-client')
 

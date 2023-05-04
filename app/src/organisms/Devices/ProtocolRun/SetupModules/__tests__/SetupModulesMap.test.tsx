@@ -1,8 +1,14 @@
-import * as React from 'react'
-import '@testing-library/jest-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { StaticRouter } from 'react-router-dom'
-
+import { i18n } from '../../../../../i18n'
+import {
+  mockThermocycler as mockThermocyclerFixture,
+  mockMagneticModule as mockMagneticModuleFixture,
+} from '../../../../../redux/modules/__fixtures__/index'
+import { ModuleInfo } from '../../../ModuleInfo'
+import {
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../../hooks'
+import { SetupModulesMap } from '../SetupModulesMap'
 import {
   renderWithProviders,
   partialComponentPropsMatcher,
@@ -15,18 +21,10 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-
-import { i18n } from '../../../../../i18n'
-import {
-  mockThermocycler as mockThermocyclerFixture,
-  mockMagneticModule as mockMagneticModuleFixture,
-} from '../../../../../redux/modules/__fixtures__/index'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../../hooks'
-import { ModuleInfo } from '../../../ModuleInfo'
-import { SetupModulesMap } from '../SetupModulesMap'
+import '@testing-library/jest-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

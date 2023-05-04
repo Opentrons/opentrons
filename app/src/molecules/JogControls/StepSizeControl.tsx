@@ -1,6 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { ControlContainer } from './ControlContainer'
+import type { StepSize } from './types'
 import {
   HandleKeypress,
   TYPOGRAPHY,
@@ -15,12 +16,9 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
-
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { StyledText } from '../../atoms/text'
-import { ControlContainer } from './ControlContainer'
-
-import type { StepSize } from './types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
 const JUMP_SIZE_ICON_STYLE = css`

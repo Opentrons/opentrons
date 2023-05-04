@@ -1,5 +1,3 @@
-import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
-
 import {
   CONFIGURE_FIELD_SSID,
   CONFIGURE_FIELD_PSK,
@@ -8,13 +6,12 @@ import {
   SECURITY_WPA_PSK,
   SECURITY_NONE,
 } from '../../../../../../redux/networking'
-
+import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import {
   FIELD_TYPE_TEXT,
   FIELD_TYPE_KEY_FILE,
   FIELD_TYPE_SECURITY,
 } from '../../constants'
-
 import {
   LABEL_SECURITY,
   LABEL_SSID,
@@ -22,7 +19,6 @@ import {
   SELECT_AUTHENTICATION_METHOD,
   SELECT_FILE,
 } from '../../i18n'
-
 import {
   getConnectFormFields,
   validateConnectFormFields,

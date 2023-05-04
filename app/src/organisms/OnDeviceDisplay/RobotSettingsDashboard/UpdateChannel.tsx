@@ -1,8 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import styled from 'styled-components'
-
+import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import {
+  getUpdateChannel,
+  getUpdateChannelOptions,
+  updateConfigValue,
+} from '../../../redux/config'
+import type { Dispatch } from '../../../redux/types'
 import {
   Flex,
   SPACING,
@@ -14,16 +17,10 @@ import {
   COLORS,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import {
-  getUpdateChannel,
-  getUpdateChannelOptions,
-  updateConfigValue,
-} from '../../../redux/config'
-
-import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 interface LabelProps {
   isSelected?: boolean
@@ -78,7 +75,7 @@ export function UpdateChannel({
           {t('app_settings:update_channel')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}

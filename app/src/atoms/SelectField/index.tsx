@@ -1,11 +1,10 @@
-import * as React from 'react'
-import find from 'lodash/find'
 import { Select } from './Select'
-import { COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { css } from 'styled-components'
-
 import type { SelectProps, SelectOption } from './Select'
+import { COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
+import find from 'lodash/find'
+import * as React from 'react'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+import { css } from 'styled-components'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */

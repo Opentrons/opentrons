@@ -1,12 +1,5 @@
-import path from 'path'
-import uniq from 'lodash/uniq'
-import { createSelector } from 'reselect'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
-
 import { createLogger } from '../../logger'
 import * as PipetteConstants from '../pipettes/constants'
-
 import type { State } from '../types'
 import type {
   ProtocolData,
@@ -14,6 +7,11 @@ import type {
   ProtocolFile,
   ProtocolPipetteTipRackByMount,
 } from './types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import uniq from 'lodash/uniq'
+import path from 'path'
+import { createSelector } from 'reselect'
 
 type ProtocolInfoSelector = (
   state: State

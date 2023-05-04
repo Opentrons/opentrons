@@ -1,9 +1,8 @@
+import heaterShakerModule from '../../../../assets/images/heater_shaker_module_transparent.png'
 import magneticModule from '../../../../assets/images/magnetic_module_gen_2_transparent.png'
 import temperatureModule from '../../../../assets/images/temp_deck_gen_2_transparent.png'
 import thermoModuleGen1 from '../../../../assets/images/thermocycler_closed.png'
-import heaterShakerModule from '../../../../assets/images/heater_shaker_module_transparent.png'
 import thermoModuleGen2 from '../../../../assets/images/thermocycler_gen_2_closed.png'
-
 import type { ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleImage(model: ModuleModel): string {

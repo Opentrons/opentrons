@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   SPACING,
@@ -12,8 +9,9 @@ import {
   PrimaryButton,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 export function NoUpdateFound(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
@@ -24,7 +22,7 @@ export function NoUpdateFound(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.successBackgroundMed}
         height="26.625rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >

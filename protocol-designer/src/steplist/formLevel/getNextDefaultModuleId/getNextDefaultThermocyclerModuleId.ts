@@ -1,6 +1,7 @@
-import findKey from 'lodash/findKey'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { ModuleOnDeck } from '../../../step-forms'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import findKey from 'lodash/findKey'
+
 export function getNextDefaultThermocyclerModuleId(
   equippedModulesById: Record<string, ModuleOnDeck>
 ): string | null {

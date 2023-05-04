@@ -1,8 +1,7 @@
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
-
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 interface NavTabProps {
   to: string

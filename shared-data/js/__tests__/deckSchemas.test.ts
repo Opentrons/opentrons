@@ -1,10 +1,9 @@
 /** Ensure that the deck schema itself functions as intended,
  *  and that all v4 protocol fixtures will validate */
-import Ajv from 'ajv'
-import path from 'path'
-import glob from 'glob'
-
 import deckSchema from '../../deck/schemas/3.json'
+import Ajv from 'ajv'
+import glob from 'glob'
+import path from 'path'
 
 const fixtureGlob = path.join(__dirname, '../../deck/fixtures/3/*.json')
 const defGlob = path.join(__dirname, '../../deck/definitions/3/*.json')

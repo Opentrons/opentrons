@@ -1,11 +1,8 @@
-import * as React from 'react'
-import cx from 'classnames'
-
-import { ToggleField } from '@opentrons/components'
-
 import styles from '../StepEditForm.css'
-
 import { FieldProps } from '../types'
+import { ToggleField } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
 
 type ToggleRowProps = FieldProps & {
   offLabel?: string

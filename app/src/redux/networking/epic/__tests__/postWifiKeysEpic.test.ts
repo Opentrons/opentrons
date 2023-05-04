@@ -1,9 +1,8 @@
+import { networkingEpic } from '..'
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import type { Action } from '../../../types'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { networkingEpic } from '..'
-
-import type { Action } from '../../../types'
 
 const keyFile = new File([Buffer.from('contents')], 'key.crt')
 const makeTriggerAction = (robotName: string) =>

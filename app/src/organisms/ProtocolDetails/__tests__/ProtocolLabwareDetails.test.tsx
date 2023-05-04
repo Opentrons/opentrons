@@ -1,9 +1,8 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
-
+import { renderWithProviders } from '@opentrons/components'
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import * as React from 'react'
 
 const mockRequiredLabwareDetails = [
   {

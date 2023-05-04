@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { StyledText } from '../text'
 import {
   Flex,
   Icon,
@@ -16,10 +13,10 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
-
 import type { IconName, IconProps, StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'
@@ -186,7 +183,7 @@ export function Toast(props: ToastProps): JSX.Element {
         showODDStyle ? BORDERS.size_three : BORDERS.radiusSoftCorners
       }
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.size_one : SPACING.spacingXXS}
+      borderWidth={showODDStyle ? BORDERS.size_one : '1px'}
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}

@@ -1,5 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
+import type {
+  LatchStatus,
+  SpeedStatus,
+  TemperatureStatus,
+} from '../../redux/modules/api-types'
+import type { HeaterShakerModule } from '../../redux/modules/types'
 import {
   Flex,
   COLORS,
@@ -11,14 +17,8 @@ import {
   SIZE_1,
   WRAP,
 } from '@opentrons/components'
-import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
-import type {
-  LatchStatus,
-  SpeedStatus,
-  TemperatureStatus,
-} from '../../redux/modules/api-types'
-import type { HeaterShakerModule } from '../../redux/modules/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']

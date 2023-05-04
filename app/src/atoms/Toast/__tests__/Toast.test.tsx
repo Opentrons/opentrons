@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { act, fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { Toast } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import { act, fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
   return renderWithProviders(<Toast {...props} displayType="desktop" />)[0]

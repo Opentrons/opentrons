@@ -12,10 +12,9 @@
 //
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
 import { getLabwareDefURI } from '.'
-import uniq from 'lodash/uniq'
-
-import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
+import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+import uniq from 'lodash/uniq'
 
 type WellSetByPrimaryWell = string[][]
 

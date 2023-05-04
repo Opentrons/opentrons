@@ -1,7 +1,20 @@
-import * as React from 'react'
-import { useParams, Link, useHistory } from 'react-router-dom'
-import styled from 'styled-components'
-
+import type { OnDeviceRouteParams } from '../../App/types'
+import { StepMeter } from '../../atoms/StepMeter'
+import { TertiaryButton } from '../../atoms/buttons'
+import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
+import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import {
+  CurrentRunningProtocolCommand,
+  RunningProtocolCommandList,
+  RunningProtocolSkeleton,
+} from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
+import {
+  useRunStatus,
+  useRunTimestamps,
+} from '../../organisms/RunTimeControl/hooks'
+import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,30 +28,14 @@ import {
   OVERFLOW_HIDDEN,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   useProtocolQuery,
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-
-import { TertiaryButton } from '../../atoms/buttons'
-import { StepMeter } from '../../atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
-import {
-  useRunStatus,
-  useRunTimestamps,
-} from '../../organisms/RunTimeControl/hooks'
-import {
-  CurrentRunningProtocolCommand,
-  RunningProtocolCommandList,
-  RunningProtocolSkeleton,
-} from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
-import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
-
-import type { OnDeviceRouteParams } from '../../App/types'
+import * as React from 'react'
+import { useParams, Link, useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
 interface BulletProps {
   isActive: boolean
@@ -139,7 +136,7 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         <Flex
           ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (

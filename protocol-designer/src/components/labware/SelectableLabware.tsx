@@ -1,24 +1,22 @@
-import * as React from 'react'
-import reduce from 'lodash/reduce'
-
+import { GenericRect } from '../../collision-types'
+import { ContentsByWell } from '../../labware-ingred/types'
+import { WellIngredientNames } from '../../steplist/types'
+import {
+  arrayToWellGroup,
+  getCollidingWells,
+  getWellSetForMultichannel,
+} from '../../utils'
+import { SelectionRect } from '../SelectionRect'
+import { SingleLabware } from './SingleLabware'
+import { WellTooltip } from './WellTooltip'
 import {
   SELECTABLE_WELL_CLASS,
   Channels,
   WellMouseEvent,
   WellGroup,
 } from '@opentrons/components'
-import {
-  arrayToWellGroup,
-  getCollidingWells,
-  getWellSetForMultichannel,
-} from '../../utils'
-import { SingleLabware } from './SingleLabware'
-import { SelectionRect } from '../SelectionRect'
-import { WellTooltip } from './WellTooltip'
-
-import { ContentsByWell } from '../../labware-ingred/types'
-import { WellIngredientNames } from '../../steplist/types'
-import { GenericRect } from '../../collision-types'
+import reduce from 'lodash/reduce'
+import * as React from 'react'
 
 export interface Props {
   labwareProps: Omit<

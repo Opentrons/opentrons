@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { StyledText } from '../text'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -12,9 +12,8 @@ import {
   BORDERS,
   Btn,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-
 import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

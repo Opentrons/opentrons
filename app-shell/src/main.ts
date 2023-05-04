@@ -1,22 +1,20 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
-import contextMenu from 'electron-context-menu'
-
-import { createUi } from './ui'
-import { initializeMenu } from './menu'
-import { createLogger } from './log'
-import { registerProtocolAnalysis } from './protocol-analysis'
+import { registerBuildrootUpdate } from './buildroot'
+import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
-import { registerRobotLogs } from './robot-logs'
-import { registerUpdate } from './update'
-import { registerBuildrootUpdate } from './buildroot'
-import { registerSystemInfo } from './system-info'
+import { createLogger } from './log'
+import { initializeMenu } from './menu'
+import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
-import { getConfig, getStore, getOverrides, registerConfig } from './config'
-
-import type { BrowserWindow } from 'electron'
+import { registerRobotLogs } from './robot-logs'
+import { registerSystemInfo } from './system-info'
 import type { Dispatch, Logger } from './types'
+import { createUi } from './ui'
+import { registerUpdate } from './update'
+import { app, ipcMain } from 'electron'
+import type { BrowserWindow } from 'electron'
+import contextMenu from 'electron-context-menu'
 
 const config = getConfig()
 const log = createLogger('main')

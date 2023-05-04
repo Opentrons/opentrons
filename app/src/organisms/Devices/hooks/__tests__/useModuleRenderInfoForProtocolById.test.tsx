@@ -1,30 +1,26 @@
-import { renderHook } from '@testing-library/react-hooks'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-
-import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
-
-import {
-  mockMagneticModuleGen2,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-} from '../../../../redux/modules/__fixtures__'
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '..'
-
+import type { ProtocolDetails } from '..'
+import {
+  mockMagneticModuleGen2,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+} from '../../../../redux/modules/__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 import type {
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { ProtocolDetails } from '..'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')

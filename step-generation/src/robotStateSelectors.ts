@@ -1,18 +1,19 @@
-import assert from 'assert'
-// TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
-import { orderWells } from './utils/orderWells'
-import min from 'lodash/min'
-import sortBy from 'lodash/sortBy'
-import {
-  getTiprackVolume,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
   ThermocyclerModuleState,
 } from './'
+// TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
+import { orderWells } from './utils/orderWells'
+import {
+  getTiprackVolume,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import assert from 'assert'
+import min from 'lodash/min'
+import sortBy from 'lodash/sortBy'
+
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']
 ): string[] {

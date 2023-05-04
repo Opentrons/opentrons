@@ -1,6 +1,5 @@
-import * as React from 'react'
-import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
+import { CountPerStepType, StepType } from '../../form-types'
+import { i18n } from '../../localization'
 import {
   Box,
   Flex,
@@ -24,8 +23,9 @@ import {
   SPACING_3,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { CountPerStepType, StepType } from '../../form-types'
+import startCase from 'lodash/startCase'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 interface StepPillProps {
   stepType: StepType

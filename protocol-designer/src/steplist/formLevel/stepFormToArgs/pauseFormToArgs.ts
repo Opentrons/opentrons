@@ -8,6 +8,7 @@ import type {
   WaitForTemperatureArgs,
   PauseArgs,
 } from '@opentrons/step-generation'
+
 export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | WaitForTemperatureArgs | null => {

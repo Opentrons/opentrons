@@ -1,8 +1,6 @@
-import * as React from 'react'
-
-import { COLORS, renderWithProviders } from '@opentrons/components'
-
 import { Chip } from '..'
+import { COLORS, renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Chip>) => {
   return renderWithProviders(<Chip {...props} />)

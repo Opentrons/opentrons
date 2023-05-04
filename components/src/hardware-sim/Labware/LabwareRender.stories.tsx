@@ -1,17 +1,14 @@
-import * as React from 'react'
-
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import { RobotWorkSpace } from '../Deck'
+import { LabwareRender } from './LabwareRender'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-
-import { RobotWorkSpace } from '../Deck'
-import { LabwareRender } from './LabwareRender'
-
 import type { Story, Meta } from '@storybook/react'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import * as React from 'react'
 
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition2

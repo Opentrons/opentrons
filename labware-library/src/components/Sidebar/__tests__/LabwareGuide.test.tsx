@@ -1,8 +1,7 @@
 // LabwareGuide component tests
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { LabwareGuide } from '../LabwareGuide'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('LabwareGuide', () => {
   it('component renders', () => {

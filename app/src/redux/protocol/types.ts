@@ -1,14 +1,12 @@
 // protocol type defs
+import type { Mount } from '../pipettes/types'
+import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 import type {
   JsonProtocolFile,
   ProtocolFileV1,
   LabwareDefinition2,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-
-import type { Mount } from '../pipettes/types'
-
-import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
 export type PythonProtocolMetadata = ProtocolFileV1<{
   [key: string]: unknown

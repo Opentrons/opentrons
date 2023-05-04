@@ -1,8 +1,5 @@
-import get from 'lodash/get'
-
 import * as Constants from '../constants'
 import * as Copy from '../i18n'
-
 import type {
   WifiNetwork,
   WifiKey,
@@ -17,6 +14,7 @@ import type {
   ConnectFormTextField,
   ConnectFormSecurityField,
 } from '../types'
+import get from 'lodash/get'
 
 export const renderLabel = (label: string, required: boolean): string =>
   `${required ? '* ' : ''}${label}`

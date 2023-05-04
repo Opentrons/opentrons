@@ -1,5 +1,5 @@
-import * as React from 'react'
 import logo from '../../assets/images/on-device-display/opentrons_logo.png'
+import * as React from 'react'
 
 export function SleepScreen(): JSX.Element {
   const speed = 50

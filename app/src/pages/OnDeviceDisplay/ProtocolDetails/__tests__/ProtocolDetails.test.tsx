@@ -1,26 +1,26 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { format } from 'date-fns'
-import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { ProtocolDetails } from '..'
+import { i18n } from '../../../../i18n'
+import { Deck } from '../Deck'
+import { Hardware } from '../Hardware'
+import { Labware } from '../Labware'
 import {
   deleteProtocol,
   deleteRun,
   getProtocol,
   HostConfig,
 } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
 import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../../i18n'
-import { ProtocolDetails } from '..'
-import { Deck } from '../Deck'
-import { Hardware } from '../Hardware'
-import { Labware } from '../Labware'
+import '@testing-library/jest-dom'
+import { format } from 'date-fns'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')

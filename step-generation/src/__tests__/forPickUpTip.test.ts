@@ -1,4 +1,3 @@
-import merge from 'lodash/merge'
 import { makeImmutableStateUpdater } from '../__utils__'
 import {
   getInitialRobotStateStandard,
@@ -6,9 +5,10 @@ import {
   getTipColumn,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 import type { InvariantContext, RobotState } from '../types'
+import merge from 'lodash/merge'
 
 const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)
 jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')

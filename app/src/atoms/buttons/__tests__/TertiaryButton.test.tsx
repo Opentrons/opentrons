@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { TertiaryButton } from '..'
 import {
   renderWithProviders,
   COLORS,
@@ -6,8 +6,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
-import { TertiaryButton } from '..'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof TertiaryButton>) => {
   return renderWithProviders(<TertiaryButton {...props} />)[0]

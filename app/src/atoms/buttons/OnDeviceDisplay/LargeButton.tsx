@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../../text'
+import { ODD_FOCUS_VISIBLE } from './constants'
 import {
   TYPOGRAPHY,
   COLORS,
@@ -11,9 +11,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DISPLAY_FLEX,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
-import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 type LargeButtonTypes = 'primary' | 'secondary' | 'alert'
 interface LargeButtonProps extends StyleProps {

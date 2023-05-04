@@ -1,13 +1,13 @@
+import { FormData } from '../../../../form-types'
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
-import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import { PipetteEntities } from '@opentrons/step-generation'
-import { FormData } from '../../../../form-types'
 
 const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
 

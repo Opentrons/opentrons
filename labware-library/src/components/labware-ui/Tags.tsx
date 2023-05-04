@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { LabelText, Value, LABEL_LEFT } from '../ui'
 import { TAGS } from '../../localization'
 import type { LabwareDefinition } from '../../types'
+import { LabelText, Value, LABEL_LEFT } from '../ui'
 import styles from './styles.css'
+import * as React from 'react'
 
 export interface TagsProps {
   definition: LabwareDefinition

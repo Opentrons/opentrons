@@ -1,19 +1,18 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import { FormData } from '../../form-types'
+import { i18n } from '../../localization'
+import { actions as steplistActions } from '../../steplist'
+import { StepFieldName } from '../../steplist/fieldLevel'
+import { ThunkDispatch } from '../../types'
+import styles from './MoreOptionsModal.css'
+import modalStyles from './modal.css'
 import {
   FormGroup,
   InputField,
   Modal,
   OutlineButton,
 } from '@opentrons/components'
-
-import { i18n } from '../../localization'
-import { actions as steplistActions } from '../../steplist'
-import { StepFieldName } from '../../steplist/fieldLevel'
-import { FormData } from '../../form-types'
-import { ThunkDispatch } from '../../types'
-import modalStyles from './modal.css'
-import styles from './MoreOptionsModal.css'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface OP {
   close: (event?: React.MouseEvent) => unknown

@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { FormGroup, DropdownField, Options } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
+import { FormGroup, DropdownField, Options } from '@opentrons/components'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 type OP = FieldProps
 

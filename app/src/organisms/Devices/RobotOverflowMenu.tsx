@@ -1,8 +1,16 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-
+import { Portal } from '../../App/portal'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { Tooltip } from '../../atoms/Tooltip'
+import { Divider } from '../../atoms/structure'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { CONNECTABLE, removeRobot } from '../../redux/discovery'
+import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { Dispatch, State } from '../../redux/types'
+import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import {
   Flex,
   COLORS,
@@ -13,22 +21,11 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-
-import { CONNECTABLE, removeRobot } from '../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { Tooltip } from '../../atoms/Tooltip'
-import { Divider } from '../../atoms/structure'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Portal } from '../../App/portal'
-import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-
 import type { StyleProps } from '@opentrons/components'
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch, State } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot

@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { DeckThumbnail } from '../../../../molecules/DeckThumbnail'
 import { Deck } from '../Deck'
+import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../../molecules/DeckThumbnail')
 

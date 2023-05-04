@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
 import { Line } from '../index'
+import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Line>) => {
   return renderWithProviders(<Line {...props} />)[0]

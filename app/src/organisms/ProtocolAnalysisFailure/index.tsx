@@ -1,7 +1,9 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation, Trans } from 'react-i18next'
-
+import { Portal } from '../../App/portal'
+import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { analyzeProtocol } from '../../redux/protocol-storage'
+import type { Dispatch } from '../../redux/types'
 import {
   Flex,
   SPACING,
@@ -13,14 +15,10 @@ import {
   PrimaryButton,
   WRAP_REVERSE,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation, Trans } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
-
-import type { Dispatch } from '../../redux/types'
-import { analyzeProtocol } from '../../redux/protocol-storage'
 interface ProtocolAnalysisFailureProps {
   errors: string[]
   protocolKey: string

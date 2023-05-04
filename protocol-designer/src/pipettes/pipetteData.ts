@@ -1,12 +1,13 @@
-import assert from 'assert'
 import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
+import { Options } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
   getTiprackVolume,
   PipetteName,
 } from '@opentrons/shared-data'
-import { Options } from '@opentrons/components'
 import { PipetteEntity } from '@opentrons/step-generation'
+import assert from 'assert'
+
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',

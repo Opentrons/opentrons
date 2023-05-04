@@ -1,8 +1,8 @@
+import { getOrderedStepIds } from '../../step-forms/selectors'
+import { deleteMultipleSteps } from '../actions/actions'
+import { when, resetAllWhenMocks } from 'jest-when'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { deleteMultipleSteps } from '../actions/actions'
-import { getOrderedStepIds } from '../../step-forms/selectors'
 
 jest.mock('../../step-forms/selectors')
 

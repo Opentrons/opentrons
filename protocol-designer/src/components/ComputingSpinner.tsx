@@ -1,8 +1,8 @@
+import * as fileDataSelectors from '../file-data/selectors'
+import { Box, POSITION_FIXED } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
-import { Box, POSITION_FIXED } from '@opentrons/components'
-import * as fileDataSelectors from '../file-data/selectors'
 
 const waitCursorStyle = css`
   cursor: wait;

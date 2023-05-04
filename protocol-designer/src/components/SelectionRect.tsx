@@ -1,7 +1,6 @@
-import * as React from 'react'
-
-import styles from './SelectionRect.css'
 import { DragRect, GenericRect } from '../collision-types'
+import styles from './SelectionRect.css'
+import * as React from 'react'
 
 interface Props {
   onSelectionMove?: (e: MouseEvent, arg: GenericRect) => unknown

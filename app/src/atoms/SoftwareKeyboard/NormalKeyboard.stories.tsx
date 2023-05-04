@@ -1,15 +1,14 @@
-import * as React from 'react'
+import '../../styles.global.css'
+import { InputField } from '../InputField'
+import { NormalKeyboard } from './'
 import {
   Flex,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
-import { InputField } from '../InputField'
-import { NormalKeyboard } from './'
-import '../../styles.global.css'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Odd/Atoms/SoftwareKeyboard/NormalKeyboard',

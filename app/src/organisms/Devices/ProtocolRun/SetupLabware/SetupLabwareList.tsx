@@ -1,6 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import { StyledText } from '../../../../atoms/text'
+import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
+import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { LabwareListItem } from './LabwareListItem'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
 import {
   Flex,
   SPACING,
@@ -8,13 +11,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RunTimeCommand } from '@opentrons/shared-data'
-import { StyledText } from '../../../../atoms/text'
-import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
-import { LabwareListItem } from './LabwareListItem'
-import { OffDeckLabwareList } from './OffDeckLabwareList'
-
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const HeaderRow = styled.div`
   display: grid;

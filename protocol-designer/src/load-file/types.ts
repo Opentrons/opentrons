@@ -1,4 +1,5 @@
 import { PDProtocolFile } from '../file-types'
+
 export type FileUploadErrorType = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 export type FileUploadMessageKey = 'DID_MIGRATE'
 export type FileUploadMessage =

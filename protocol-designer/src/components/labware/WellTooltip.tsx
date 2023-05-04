@@ -1,12 +1,11 @@
-import * as React from 'react'
-
-import { Popper, Reference, Manager } from 'react-popper'
-import cx from 'classnames'
+import { WellIngredientNames } from '../../steplist/types'
 import { Portal } from '../portals/TopPortal'
 import { PillTooltipContents } from '../steplist/SubstepRow'
 import styles from './labware.css'
 import { LocationLiquidState } from '@opentrons/step-generation'
-import { WellIngredientNames } from '../../steplist/types'
+import cx from 'classnames'
+import * as React from 'react'
+import { Popper, Reference, Manager } from 'react-popper'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4

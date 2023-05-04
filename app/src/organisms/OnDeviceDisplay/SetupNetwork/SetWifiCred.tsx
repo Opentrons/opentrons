@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { InputField } from '../../../atoms/InputField'
+import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
 import {
   Box,
   Flex,
@@ -14,11 +14,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { InputField } from '../../../atoms/InputField'
-import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../../atoms/buttons'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing24};

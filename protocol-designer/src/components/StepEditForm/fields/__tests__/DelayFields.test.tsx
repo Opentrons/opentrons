@@ -1,12 +1,12 @@
-import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
 import ApplicationText from '../../../../localization/en/application.json'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { CheckboxRowField, TextField, TipPositionField } from '../../fields'
 import { DelayFields, DelayFieldProps } from '../DelayFields'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { mount } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
 
 jest.mock('../../../../step-forms/selectors')
 

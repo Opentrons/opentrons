@@ -1,7 +1,10 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { v4 as uuidv4 } from 'uuid'
-
+import { Snackbar } from '../../atoms/Snackbar'
+import type { SnackbarProps } from '../../atoms/Snackbar'
+import { Toast } from '../../atoms/Toast'
+import type { ToastProps, ToastType } from '../../atoms/Toast'
+import { getIsOnDevice } from '../../redux/config'
+import { ToasterContext } from './ToasterContext'
+import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,15 +14,9 @@ import {
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
-
-import { Snackbar } from '../../atoms/Snackbar'
-import { Toast } from '../../atoms/Toast'
-import { getIsOnDevice } from '../../redux/config'
-import { ToasterContext } from './ToasterContext'
-
-import type { SnackbarProps } from '../../atoms/Snackbar'
-import type { ToastProps, ToastType } from '../../atoms/Toast'
-import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid'
 
 interface ToasterOvenProps {
   children: React.ReactNode
@@ -111,7 +108,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           position="absolute"
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
           <Snackbar

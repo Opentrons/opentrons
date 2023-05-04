@@ -1,5 +1,4 @@
 // deck calibration types
-
 import {
   DECK_STEP_SESSION_STARTED,
   DECK_STEP_LABWARE_LOADED,

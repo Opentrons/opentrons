@@ -1,18 +1,16 @@
 // main application wrapper component
-import * as React from 'react'
-import { hot } from 'react-hot-loader/root'
-import cx from 'classnames'
-
 import { DefinitionRoute } from '../../definitions'
+import type { DefinitionRouteRenderProps } from '../../definitions'
 import { useFilters } from '../../filters'
+import { LabwareDetails } from '../LabwareDetails'
+import { LabwareList } from '../LabwareList'
 import { Nav, Breadcrumbs } from '../Nav'
 import { Sidebar } from '../Sidebar'
 import { Page } from './Page'
-import { LabwareList } from '../LabwareList'
-import { LabwareDetails } from '../LabwareDetails'
 import styles from './styles.css'
-
-import type { DefinitionRouteRenderProps } from '../../definitions'
+import cx from 'classnames'
+import * as React from 'react'
+import { hot } from 'react-hot-loader/root'
 
 export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
   const { definition, location } = props

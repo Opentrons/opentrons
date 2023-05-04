@@ -1,7 +1,13 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { Chip } from '../../../atoms/Chip'
+import type { ChipType } from '../../../atoms/Chip'
+import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
+import { getLocalRobot } from '../../../redux/discovery'
+import { getWifiList } from '../../../redux/networking'
+import type { State } from '../../../redux/types'
+import { WifiConnectionDetails } from '../SetupNetwork'
+import { EthernetConnectionDetails } from '../SetupNetwork/EthernetConnectionDetails'
 import {
   Flex,
   SPACING,
@@ -15,19 +21,10 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { Chip } from '../../../atoms/Chip'
-import { WifiConnectionDetails } from '../SetupNetwork'
-import { getWifiList } from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
-import { EthernetConnectionDetails } from '../SetupNetwork/EthernetConnectionDetails'
-
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
-import type { ChipType } from '../../../atoms/Chip'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import type { State } from '../../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
 
@@ -102,7 +99,7 @@ export function NetworkSettings({
       default:
         return (
           <Flex
-            paddingX={SPACING.spacingXXL}
+            paddingX={SPACING.spacing40}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
@@ -152,7 +149,7 @@ export function NetworkSettings({
   return (
     <>
       <Flex
-        padding={`${SPACING.spacing32} ${SPACING.spacingXXL}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_START}
       >

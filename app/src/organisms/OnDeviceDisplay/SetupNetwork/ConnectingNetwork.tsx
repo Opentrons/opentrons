@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,8 +9,8 @@ import {
   TYPOGRAPHY,
   Icon,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function ConnectingNetwork(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -39,7 +37,7 @@ export function ConnectingNetwork(): JSX.Element {
             fontSize="2rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="2.72375rem"
-            marginTop={SPACING.spacingXXL}
+            marginTop={SPACING.spacing40}
           >
             {t('connecting')}
           </StyledText>

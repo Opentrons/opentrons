@@ -1,5 +1,7 @@
-import * as React from 'react'
-
+import { Skeleton } from '../../../atoms/Skeleton'
+import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtocol'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -9,12 +11,7 @@ import {
   ALIGN_CENTER,
   SPACING,
 } from '@opentrons/components'
-
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
-import { Skeleton } from '../../../atoms/Skeleton'
-
-import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtocol'
+import * as React from 'react'
 
 const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
 const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen
@@ -58,7 +55,7 @@ export function RunningProtocolSkeleton({
             gridGap={SPACING.spacing32}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
-            marginBottom={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing40}
           >
             <StopButton />
             <PlayPauseButton />
@@ -74,7 +71,7 @@ export function RunningProtocolSkeleton({
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Skeleton

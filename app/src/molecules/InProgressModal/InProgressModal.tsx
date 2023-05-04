@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
+import { StyledText } from '../../atoms/text'
+import { getIsOnDevice } from '../../redux/config'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,8 +11,9 @@ import {
   RESPONSIVENESS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { getIsOnDevice } from '../../redux/config'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 interface Props {
   //  optional override of the spinner

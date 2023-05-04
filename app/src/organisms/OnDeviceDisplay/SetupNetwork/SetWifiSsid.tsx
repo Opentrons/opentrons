@@ -1,7 +1,9 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { InputField } from '../../../atoms/InputField'
+import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,14 +18,9 @@ import {
   Btn,
   Icon,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { InputField } from '../../../atoms/InputField'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants'
-
-import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing24};
@@ -105,7 +102,7 @@ export function SetWifiSsid({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingX="6.34375rem"
-        gridGap={SPACING.spacingSM}
+        gridGap={SPACING.spacing12}
       >
         <StyledText fontSize="1.375rem" lineHeight="1.875rem" fontWeight="500">
           {t('enter_ssid')}

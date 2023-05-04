@@ -1,12 +1,9 @@
-import assert from 'assert'
-import clamp from 'lodash/clamp'
-import pick from 'lodash/pick'
-import round from 'lodash/round'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { FormData, StepFieldName } from '../../../form-types'
 import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '@opentrons/step-generation'
+  getMinPipetteVolume,
+  getPipetteCapacity,
+} from '../../../pipettes/pipetteData'
+import { FormPatch } from '../../actions/types'
 import { getWellRatio } from '../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
@@ -20,16 +17,19 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import { FormData, StepFieldName } from '../../../form-types'
-import { FormPatch } from '../../actions/types'
-import {
-  getMinPipetteVolume,
-  getPipetteCapacity,
-} from '../../../pipettes/pipetteData'
+import assert from 'assert'
+import clamp from 'lodash/clamp'
+import pick from 'lodash/pick'
+import round from 'lodash/round'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>

@@ -1,10 +1,8 @@
+import { BackButton } from '..'
+import { i18n } from '../../../i18n'
+import { renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
 import { MemoryRouter, Route, Switch } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
-import { i18n } from '../../../i18n'
-import { BackButton } from '..'
 
 const render = (props?: React.HTMLProps<HTMLButtonElement>) => {
   return renderWithProviders(

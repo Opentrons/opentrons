@@ -1,6 +1,25 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { Portal } from '../../App/portal'
+import { Chip } from '../../atoms/Chip'
+import { InlineNotification } from '../../atoms/InlineNotification'
+import {
+  FloatingActionButton,
+  SmallButton,
+} from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
+import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useAttachedModules } from '../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
+import {
+  getAttachedProtocolModuleMatches,
+  getUnmatchedModulesForProtocol,
+} from './utils'
+import type { AttachedProtocolModuleMatch } from './utils'
 import {
   Flex,
   Icon,
@@ -24,30 +43,8 @@ import {
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
-import { Portal } from '../../App/portal'
-import {
-  FloatingActionButton,
-  SmallButton,
-} from '../../atoms/buttons/OnDeviceDisplay'
-import { Chip } from '../../atoms/Chip'
-import { InlineNotification } from '../../atoms/InlineNotification'
-import { Modal } from '../../molecules/Modal'
-import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { useAttachedModules } from '../../organisms/Devices/hooks'
-import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
-import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
-import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
-import {
-  getAttachedProtocolModuleMatches,
-  getUnmatchedModulesForProtocol,
-} from './utils'
-
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { AttachedProtocolModuleMatch } from './utils'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',

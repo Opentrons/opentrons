@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   Icon,
@@ -10,9 +10,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-
 import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface OffsetVectorProps extends StyleProps {
@@ -40,9 +39,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
-        border={`${String(BORDERS.styleSolid)} ${String(
-          SPACING.spacingXXS
-        )} ${String(COLORS.lightGreyHover)}`}
+        border={`${BORDERS.styleSolid} 1px ${COLORS.lightGreyHover}`}
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing8}
         {...styleProps}

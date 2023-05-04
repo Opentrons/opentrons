@@ -1,10 +1,9 @@
-import * as React from 'react'
-import { act } from 'react-dom/test-utils'
-import { mount } from 'enzyme'
-
-import { AlertModal } from '@opentrons/components'
 import * as Analytics from '../../../redux/analytics'
 import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
+import { AlertModal } from '@opentrons/components'
+import { mount } from 'enzyme'
+import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 
 jest.mock('../../../redux/analytics')
 

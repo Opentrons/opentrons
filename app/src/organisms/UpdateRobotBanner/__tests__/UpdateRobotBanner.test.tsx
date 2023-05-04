@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent, screen } from '@testing-library/react'
+import { UpdateRobotBanner } from '..'
 import { i18n } from '../../../i18n'
 import * as Buildroot from '../../../redux/buildroot'
 import {
@@ -8,7 +6,9 @@ import {
   mockReachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { UpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
-import { UpdateRobotBanner } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../redux/buildroot')
 jest.mock('../../Devices/RobotSettings/UpdateBuildroot')

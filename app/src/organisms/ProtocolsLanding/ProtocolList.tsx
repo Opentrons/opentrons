@@ -1,8 +1,19 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { Slideout } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
+import {
+  getProtocolsDesktopSortKey,
+  updateConfigValue,
+} from '../../redux/config'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { Dispatch } from '../../redux/types'
+import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
+import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { EmptyStateLinks } from './EmptyStateLinks'
+import { ProtocolCard } from './ProtocolCard'
+import { UploadInput } from './UploadInput'
+import { useSortedProtocols } from './hooks'
+import type { ProtocolSort } from './hooks'
 import {
   Box,
   Flex,
@@ -19,24 +30,10 @@ import {
   DIRECTION_COLUMN,
   Overlay,
 } from '@opentrons/components'
-
-import {
-  getProtocolsDesktopSortKey,
-  updateConfigValue,
-} from '../../redux/config'
-import { useSortedProtocols } from './hooks'
-import { StyledText } from '../../atoms/text'
-import { Slideout } from '../../atoms/Slideout'
-import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
-import { UploadInput } from './UploadInput'
-import { ProtocolCard } from './ProtocolCard'
-import { EmptyStateLinks } from './EmptyStateLinks'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { ProtocolSort } from './hooks'
-import type { Dispatch } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
@@ -221,7 +218,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       <Flex
         flexDirection="column"
         gridGap={SPACING.spacing8}
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         {sortedStoredProtocols.map(storedProtocol => (
           <ProtocolCard

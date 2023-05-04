@@ -1,8 +1,19 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { Trans, useTranslation } from 'react-i18next'
-import head from 'lodash/head'
-import isEqual from 'lodash/isEqual'
+import { Banner } from '../../atoms/Banner'
+import { Select } from '../../atoms/SelectField/Select'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import {
+  getCalibrationForPipette,
+  getTipLengthCalibrations,
+  getTipLengthForPipetteAndTiprack,
+} from '../../redux/calibration/'
+import type { TipLengthCalibration } from '../../redux/calibration/api-types'
+import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
+import type { Mount } from '../../redux/pipettes/types'
+import type { CalibrationLabware } from '../../redux/sessions/types'
+import type { State } from '../../redux/types'
+import { ChosenTipRackRender } from './ChosenTipRackRender'
+import { NeedHelpLink } from './NeedHelpLink'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -15,28 +26,16 @@ import {
   Link,
   PrimaryButton,
 } from '@opentrons/components'
+import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
-import {
-  getCalibrationForPipette,
-  getTipLengthCalibrations,
-  getTipLengthForPipetteAndTiprack,
-} from '../../redux/calibration/'
-import { Select } from '../../atoms/SelectField/Select'
-import { Banner } from '../../atoms/Banner'
-import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from './NeedHelpLink'
-import { ChosenTipRackRender } from './ChosenTipRackRender'
-
-import type { MultiValue, SingleValue } from 'react-select'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
-import type { CalibrationLabware } from '../../redux/sessions/types'
-import type { State } from '../../redux/types'
-import type { Mount } from '../../redux/pipettes/types'
-import type { TipLengthCalibration } from '../../redux/calibration/api-types'
+import head from 'lodash/head'
+import isEqual from 'lodash/isEqual'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import type { MultiValue, SingleValue } from 'react-select'
 
 interface TipRackInfo {
   definition: LabwareDefinition2
@@ -185,7 +184,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <Flex gridGap={SPACING.spacingXXL}>
+      <Flex gridGap={SPACING.spacing40}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
@@ -203,7 +202,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           >
             {t('select_tip_rack')}
           </StyledText>
-          <Box marginBottom={SPACING.spacingSM}>
+          <Box marginBottom={SPACING.spacing12}>
             <Select
               isSearchable={false}
               options={groupOptions}

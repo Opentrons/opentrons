@@ -1,10 +1,3 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
-  PrimaryButton,
-} from '@opentrons/components'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import {
   SUCCESSFULLY_ATTACHED,
@@ -13,6 +6,13 @@ import {
   SUCCESSFULLY_DETACHED,
 } from './constants'
 import type { GripperWizardStepProps, SuccessStep } from './types'
+import {
+  COLORS,
+  TEXT_TRANSFORM_CAPITALIZE,
+  PrimaryButton,
+} from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const Success = (
   props: Pick<GripperWizardStepProps, 'proceed'> & SuccessStep

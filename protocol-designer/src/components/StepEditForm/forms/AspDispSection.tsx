@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import styles from '../StepEditForm.css'
+import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
+import * as React from 'react'
 
 interface Props {
   className?: string | null

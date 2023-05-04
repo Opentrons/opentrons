@@ -1,8 +1,14 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_TEMP,
+} from '../../../constants'
+import { i18n } from '../../../localization'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
-
+import styles from '../StepEditForm.css'
+import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
+import { StepFormProps } from '../types'
+import { getSingleSelectDisabledTooltip } from '../utils'
 import {
   FormGroup,
   useHoverTooltip,
@@ -10,17 +16,9 @@ import {
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
-import {
-  PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
-  PAUSE_UNTIL_TEMP,
-} from '../../../constants'
-import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
-import { getSingleSelectDisabledTooltip } from '../utils'
-import styles from '../StepEditForm.css'
-
-import { StepFormProps } from '../types'
+import cx from 'classnames'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 export const PauseForm = (props: StepFormProps): JSX.Element => {
   const tempModuleLabwareOptions = useSelector(

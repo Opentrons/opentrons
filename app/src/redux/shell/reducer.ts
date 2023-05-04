@@ -1,9 +1,7 @@
-import { combineReducers } from 'redux'
-
-import { robotLogsReducer } from './robot-logs/reducer'
-
 import type { Action } from '../types'
+import { robotLogsReducer } from './robot-logs/reducer'
 import type { ShellUpdateState } from './types'
+import { combineReducers } from 'redux'
 
 const INITIAL_STATE: ShellUpdateState = {
   checking: false,

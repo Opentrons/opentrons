@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Box,
   COLORS,
@@ -7,6 +5,8 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 interface StepMeterProps {
   totalSteps: number

@@ -1,11 +1,11 @@
-import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import { formatTimestamp } from '../Devices/utils'
 import type { OffsetCandidate } from './hooks/useOffsetCandidatesForAnalysis'
+import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

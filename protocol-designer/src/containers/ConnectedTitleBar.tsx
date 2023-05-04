@@ -1,28 +1,26 @@
-import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-
-import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import styles from './TitleBar.css'
-import { i18n } from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
+import { selectors as fileDataSelectors } from '../file-data'
+import { stepIconsByType } from '../form-types'
+import { closeIngredientSelector } from '../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors as uiLabwareSelectors } from '../ui/labware'
+import { i18n } from '../localization'
+import { selectors, Page } from '../navigation'
 import { selectors as stepFormSelectors } from '../step-forms'
+import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
+import { BaseState } from '../types'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import {
   getSelectedStepTitleInfo,
   getSelectedTerminalItemId,
   getWellSelectionLabwareKey,
   actions as stepsActions,
 } from '../ui/steps'
-import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
-import { selectors as fileDataSelectors } from '../file-data'
-import { closeIngredientSelector } from '../labware-ingred/actions'
-import { stepIconsByType } from '../form-types'
-import { selectors, Page } from '../navigation'
-
-import { BaseState } from '../types'
+import styles from './TitleBar.css'
+import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 type Props = React.ComponentProps<typeof TitleBar>
 

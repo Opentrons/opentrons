@@ -1,6 +1,22 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import cx from 'classnames'
+import {
+  PROFILE_CYCLE,
+  ProfileStepItem,
+  ProfileItem,
+  ProfileCycleItem,
+} from '../../../form-types'
+import { i18n } from '../../../localization'
+import * as steplistActions from '../../../steplist/actions'
+import {
+  getProfileFieldErrors,
+  maskProfileField,
+} from '../../../steplist/fieldLevel'
+import {
+  ConfirmDeleteModal,
+  DELETE_PROFILE_CYCLE,
+} from '../../modals/ConfirmDeleteModal'
+import styles from '../StepEditForm.css'
+import { FocusHandlers } from '../types'
+import { getDynamicFieldFocusHandlerId } from '../utils'
 import {
   Icon,
   InputField,
@@ -11,26 +27,9 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_TOP_END,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
-import * as steplistActions from '../../../steplist/actions'
-import {
-  PROFILE_CYCLE,
-  ProfileStepItem,
-  ProfileItem,
-  ProfileCycleItem,
-} from '../../../form-types'
-import {
-  getProfileFieldErrors,
-  maskProfileField,
-} from '../../../steplist/fieldLevel'
-import {
-  ConfirmDeleteModal,
-  DELETE_PROFILE_CYCLE,
-} from '../../modals/ConfirmDeleteModal'
-import { getDynamicFieldFocusHandlerId } from '../utils'
-import styles from '../StepEditForm.css'
-
-import { FocusHandlers } from '../types'
+import cx from 'classnames'
+import * as React from 'react'
+import { useDispatch } from 'react-redux'
 
 export const showProfileFieldErrors = ({
   fieldId,

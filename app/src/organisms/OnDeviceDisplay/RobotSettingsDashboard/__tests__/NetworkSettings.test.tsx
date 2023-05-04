@@ -1,15 +1,12 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
 import { getLocalRobot } from '../../../../redux/discovery'
-import { getWifiList } from '../../../../redux/networking'
-import { NetworkSettings } from '../NetworkSettings'
-import { WifiConnectionDetails } from '../../SetupNetwork'
-
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
+import { getWifiList } from '../../../../redux/networking'
 import type { WifiNetwork } from '../../../../redux/networking/types'
+import { WifiConnectionDetails } from '../../SetupNetwork'
+import { NetworkSettings } from '../NetworkSettings'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/networking')

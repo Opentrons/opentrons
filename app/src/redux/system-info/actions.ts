@@ -1,5 +1,4 @@
 // system-info actions
-
 import * as Constants from './constants'
 import * as Types from './types'
 

@@ -1,7 +1,6 @@
+import { writeFailedAnalysis } from '../writeFailedAnalysis'
 import { readFile, rm } from 'fs/promises'
 import tempy from 'tempy'
-
-import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
 const ISO_8061_DATETIME_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/
 

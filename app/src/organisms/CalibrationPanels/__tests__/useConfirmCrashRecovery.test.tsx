@@ -1,18 +1,16 @@
-import * as React from 'react'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { I18nextProvider } from 'react-i18next'
-import { LEFT, renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
-import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
-import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'
 import {
   DECK_STEP_JOGGING_TO_DECK,
   SESSION_TYPE_DECK_CALIBRATION,
   sharedCalCommands,
 } from '../../../redux/sessions'
-
+import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'
 import type { CalibrationPanelProps } from '../types'
+import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
+import { LEFT, renderWithProviders } from '@opentrons/components'
+import { act, renderHook } from '@testing-library/react-hooks'
+import * as React from 'react'
+import { I18nextProvider } from 'react-i18next'
 
 describe('useConfirmCrashRecovery', () => {
   let wrapper: React.FunctionComponent<{}>

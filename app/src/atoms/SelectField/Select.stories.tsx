@@ -1,8 +1,6 @@
-import * as React from 'react'
-
 import { Select } from './Select'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/Select',

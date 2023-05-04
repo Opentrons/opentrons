@@ -1,26 +1,23 @@
-import { ofType } from 'redux-observable'
-import { of } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
-
 import { POST, fetchRobotApi } from '../../robot-api'
 import { withRobotHost } from '../../robot-api/operators'
-
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
-
-import type { Observable } from 'rxjs'
-import type { State, Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotHost,
   RobotApiResponse,
 } from '../../robot-api/types'
+import type { State, Action, Epic } from '../../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import type {
   CreateSessionCommandAction,
   CreateSessionCommandFailureAction,
   CreateSessionCommandSuccessAction,
 } from '../types'
+import { mapActionToRequest as mapActionToFetchSessionRequest } from './fetchSessionEpic'
+import { ofType } from 'redux-observable'
+import { of } from 'rxjs'
+import type { Observable } from 'rxjs'
+import { map, switchMap } from 'rxjs/operators'
 
 const mapActionToRequest = (
   action: CreateSessionCommandAction

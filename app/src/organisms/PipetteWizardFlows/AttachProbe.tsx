@@ -1,6 +1,12 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
+import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import { StyledText } from '../../atoms/text'
+import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
+import type { PipetteWizardStepProps } from './types'
+import { getPipetteAnimations } from './utils'
 import {
   Flex,
   TYPOGRAPHY,
@@ -9,15 +15,9 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
-import { getPipetteAnimations } from './utils'
-import type { PipetteWizardStepProps } from './types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean

@@ -1,10 +1,8 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
-import { StaticRouter } from 'react-router-dom'
-
-import { Navbar } from '../Navbar'
-
 import type { RouteProps } from '..//types'
+import { Navbar } from '../Navbar'
+import { render } from '@testing-library/react'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 const ROUTE_PROPS: RouteProps[] = [
   { name: 'foo', navLinkTo: '/foo', path: '/foo', Component: () => null },

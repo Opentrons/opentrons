@@ -1,5 +1,8 @@
-import cx from 'classnames'
-import * as React from 'react'
+import { reportFieldEdit } from '../analyticsUtils'
+import { getLabel, LabwareFields } from '../fields'
+import type { RichOption, RichOptions } from '../fields'
+import styles from './Dropdown.css'
+import fieldStyles from './fieldStyles.css'
 import {
   Box,
   SelectField,
@@ -8,12 +11,9 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
+import cx from 'classnames'
 import { Field } from 'formik'
-import { reportFieldEdit } from '../analyticsUtils'
-import { getLabel, LabwareFields } from '../fields'
-import type { RichOption, RichOptions } from '../fields'
-import fieldStyles from './fieldStyles.css'
-import styles from './Dropdown.css'
+import * as React from 'react'
 
 export interface DropdownProps extends StyleProps {
   name: keyof LabwareFields

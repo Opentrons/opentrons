@@ -1,9 +1,9 @@
 // HACK: IL 2019-11-25 this file is copied from Run App
-import groupBy from 'lodash/groupBy'
 import type {
   LabwareDefinition1,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import groupBy from 'lodash/groupBy'
 
 // require all definitions in the labware/definitions/1 directory
 const labwareSchemaV1DefsContext = require.context(

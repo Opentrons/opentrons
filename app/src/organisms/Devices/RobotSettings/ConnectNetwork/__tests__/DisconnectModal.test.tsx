@@ -1,8 +1,3 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../../i18n'
 import { useRobot } from '../../../../../organisms/Devices/hooks'
 import {
@@ -22,11 +17,13 @@ import {
   FAILURE,
   SUCCESS,
 } from '../../../../../redux/robot-api'
-import { DisconnectModal } from '../DisconnectModal'
-
 import type { DispatchApiRequestType } from '../../../../../redux/robot-api'
 import type { RequestState } from '../../../../../redux/robot-api/types'
 import type { State } from '../../../../../redux/types'
+import { DisconnectModal } from '../DisconnectModal'
+import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../../../organisms/Devices/hooks')
 jest.mock('../../../../../redux/networking')

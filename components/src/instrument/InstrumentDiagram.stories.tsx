@@ -1,10 +1,8 @@
-import * as React from 'react'
-import keyBy from 'lodash/keyBy'
-import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
-
 import { InstrumentDiagram as InstrumentDiagramComponent } from './InstrumentDiagram'
-
+import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 import type { Story, Meta } from '@storybook/react'
+import keyBy from 'lodash/keyBy'
+import * as React from 'react'
 
 const allPipetteSpecsByDisplayNames = keyBy(
   getAllPipetteNames().map(getPipetteNameSpecs),

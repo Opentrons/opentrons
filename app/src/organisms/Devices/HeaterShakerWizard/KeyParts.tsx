@@ -1,6 +1,6 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import HeaterShakerKeyParts from '../../../assets/images/heater_shaker-key-parts.png'
+import HeaterShakerDeckLock from '../../../assets/videos/heater-shaker-setup/HS_Deck_Lock_Anim.webm'
+import { StyledText } from '../../../atoms/text'
 import {
   ALIGN_FLEX_START,
   DIRECTION_COLUMN,
@@ -10,9 +10,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import HeaterShakerKeyParts from '../../../assets/images/heater_shaker-key-parts.png'
-import HeaterShakerDeckLock from '../../../assets/videos/heater-shaker-setup/HS_Deck_Lock_Anim.webm'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 export function KeyParts(): JSX.Element {
   const { t } = useTranslation('heater_shaker')

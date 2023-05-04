@@ -1,14 +1,12 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import { resetConfig } from '../../../../../../redux/robot-admin'
 import { useDispatchApiRequest } from '../../../../../../redux/robot-api'
-
-import { FactoryResetModal } from '../FactoryResetModal'
-
 import type { DispatchApiRequestType } from '../../../../../../redux/robot-api'
+import { FactoryResetModal } from '../FactoryResetModal'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../../../redux/robot-admin')
 jest.mock('../../../../../../redux/robot-api')

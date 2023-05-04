@@ -1,5 +1,14 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { LiquidDetails } from './LiquidDetails'
+import {
+  parseLiquidsInLoadOrder,
+  parseLabwareInfoByLiquidId,
+} from '@opentrons/api-client'
+import type { ParsedLiquid } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -11,18 +20,9 @@ import {
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import {
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
 import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
-import { LiquidDetails } from './LiquidDetails'
-import type { ParsedLiquid } from '@opentrons/api-client'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface ProtocolSetupLiquidsProps {
   runId: string

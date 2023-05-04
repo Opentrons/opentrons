@@ -1,17 +1,16 @@
-import * as React from 'react'
+import { Skeleton } from '../../atoms/Skeleton'
+import { StyledText } from '../../atoms/text'
+import { ModalShell } from '../Modal'
+import { WizardHeader } from '../WizardHeader'
+import { GenericWizardTile } from './index'
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Skeleton } from '../../atoms/Skeleton'
-import { ModalShell } from '../Modal'
-import { WizardHeader } from '../WizardHeader'
-import { GenericWizardTile } from './index'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Molecules/GenericWizardTile',

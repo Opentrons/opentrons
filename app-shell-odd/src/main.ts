@@ -1,16 +1,15 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
-import { createUi } from './ui'
-import { createLogger } from './log'
-import { registerDiscovery } from './discovery'
-import { registerRobotLogs } from './robot-logs'
-import { registerUpdate, updateLatestVersion } from './update'
-import { registerRobotSystemUpdate } from './system-update'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { registerDiscovery } from './discovery'
+import { createLogger } from './log'
+import { registerRobotLogs } from './robot-logs'
+import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
-
-import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
+import { createUi } from './ui'
+import { registerUpdate, updateLatestVersion } from './update'
+import { app, ipcMain } from 'electron'
+import type { BrowserWindow } from 'electron'
 
 systemd.sendStatus('starting app')
 const config = getConfig()

@@ -11,7 +11,6 @@ import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
-
 import type { RunData, CommandDetail } from '@opentrons/api-client'
 
 export const PROTOCOL_ID = '1'

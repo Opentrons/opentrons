@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   Btn,
   Flex,
@@ -9,6 +7,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import * as React from 'react'
 
 export function ODDBackButton(
   props: React.HTMLProps<HTMLButtonElement>

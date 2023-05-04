@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
-import { selectors as uiModuleSelectors } from '../../../../ui/modules'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { FormData } from '../../../../form-types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { selectors as uiModuleSelectors } from '../../../../ui/modules'
 import * as _fields from '../../fields'
 import { MagnetForm } from '../MagnetForm'
+import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+import { mount } from 'enzyme'
+import * as React from 'react'
+import { Provider } from 'react-redux'
 
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../ui/modules')

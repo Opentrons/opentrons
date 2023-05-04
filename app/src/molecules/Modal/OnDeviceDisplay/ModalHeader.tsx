@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { StyledText } from '../../../atoms/text'
+import type { ModalHeaderBaseProps } from './types'
 import {
   Flex,
   TYPOGRAPHY,
@@ -10,8 +11,7 @@ import {
   COLORS,
   SIZE_2,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import type { ModalHeaderBaseProps } from './types'
+import * as React from 'react'
 
 interface ModalHeaderProps extends ModalHeaderBaseProps {
   isError?: boolean

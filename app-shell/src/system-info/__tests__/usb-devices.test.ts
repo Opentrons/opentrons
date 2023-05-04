@@ -1,8 +1,7 @@
+import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
+import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import execa from 'execa'
 import usbDetection from 'usb-detection'
-
-import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
-import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 
 jest.mock('execa')
 jest.mock('usb-detection')

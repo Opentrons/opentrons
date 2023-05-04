@@ -1,7 +1,27 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { Portal } from '../../App/portal'
+import { Tooltip } from '../../atoms/Tooltip'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import {
+  useDeckCalibrationStatus,
+  useAttachedPipettes,
+  useAttachedPipetteCalibrations,
+  useRunStatuses,
+} from '../../organisms/Devices/hooks'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../redux/analytics'
+import * as Calibration from '../../redux/calibration'
+import * as Config from '../../redux/config'
+import * as Pipettes from '../../redux/pipettes'
+import type {
+  AttachedPipettesByMount,
+  PipetteCalibrationsByMount,
+} from '../../redux/pipettes/types'
+import type { DispatchRequestsType } from '../../redux/robot-api'
+import * as Sessions from '../../redux/sessions'
 import {
   Flex,
   ALIGN_CENTER,
@@ -12,32 +32,9 @@ import {
   TOOLTIP_LEFT,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-
-import { Portal } from '../../App/portal'
-import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Tooltip } from '../../atoms/Tooltip'
-import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import {
-  useTrackEvent,
-  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
-} from '../../redux/analytics'
-import * as Calibration from '../../redux/calibration'
-import * as Config from '../../redux/config'
-import * as Pipettes from '../../redux/pipettes'
-import * as Sessions from '../../redux/sessions'
-import {
-  useDeckCalibrationStatus,
-  useAttachedPipettes,
-  useAttachedPipetteCalibrations,
-  useRunStatuses,
-} from '../../organisms/Devices/hooks'
-
-import type {
-  AttachedPipettesByMount,
-  PipetteCalibrationsByMount,
-} from '../../redux/pipettes/types'
-import type { DispatchRequestsType } from '../../redux/robot-api'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 interface CalibrationHealthCheckProps {
   buttonDisabledReason: string | null

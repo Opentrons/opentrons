@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../../atoms/text'
+import { useRunHasStarted } from '../hooks'
+import { formatTimestamp } from '../utils'
 import {
   Flex,
   Icon,
@@ -14,10 +14,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { useRunHasStarted } from '../hooks'
-import { formatTimestamp } from '../utils'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SetupCalibrationItemProps {
   calibratedDate: string | null

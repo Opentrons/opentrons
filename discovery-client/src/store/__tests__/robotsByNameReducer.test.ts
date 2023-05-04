@@ -4,10 +4,9 @@ import {
   mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
 } from '../../__fixtures__/health'
-
+import type { HealthResponse, ServerHealthResponse } from '../../types'
 import * as Actions from '../actions'
 import { reducer, robotsByNameReducer } from '../reducer'
-import type { HealthResponse, ServerHealthResponse } from '../../types'
 import type { Action, RobotsByNameMap } from '../types'
 
 describe('robotsByName reducer', () => {

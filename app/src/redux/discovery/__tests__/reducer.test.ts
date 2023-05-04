@@ -1,7 +1,6 @@
 // discovery reducer test
-import { discoveryReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { discoveryReducer } from '../reducer'
 import type { DiscoveryState } from '../types'
 
 describe('discoveryReducer', () => {

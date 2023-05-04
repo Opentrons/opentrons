@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
+import { LOG_DIR } from './log'
 import { Menu } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
-
-import { LOG_DIR } from './log'
 
 // file or application menu
 const firstMenu: MenuItemConstructorOptions = {

@@ -1,9 +1,25 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { Link } from 'react-router-dom'
-
+import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import {
+  DeviceReset,
+  DisplayLEDLights,
+  TouchscreenBrightness,
+  TouchScreenSleep,
+  TextSize,
+  NetworkSettings,
+  RobotName,
+  RobotSystemVersion,
+  UpdateChannel,
+} from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
+import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
+import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
+import { UNREACHABLE } from '../../redux/discovery/constants'
+import type { Dispatch, State } from '../../redux/types'
+import { useNetworkConnection } from './hooks'
+import type { NetworkConnection } from './hooks'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -20,31 +36,12 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
-import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
-import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
-import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
-import { UNREACHABLE } from '../../redux/discovery/constants'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
-import { useNetworkConnection } from './hooks'
-import {
-  DeviceReset,
-  DisplayLEDLights,
-  TouchscreenBrightness,
-  TouchScreenSleep,
-  TextSize,
-  NetworkSettings,
-  RobotName,
-  RobotSystemVersion,
-  UpdateChannel,
-} from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
-
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from './hooks'
-import type { Dispatch, State } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { css } from 'styled-components'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -103,7 +100,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         </Flex>
       ) : (
         <Flex
-          padding={`0 ${SPACING.spacingXXL}`}
+          padding={`0 ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           <Navigation routes={onDeviceDisplayRoutes} />
@@ -199,7 +196,7 @@ export function RobotSettingsDashboard(): JSX.Element {
 
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        padding={SPACING.spacingXXL}
+        padding={SPACING.spacing40}
         width="fit-content"
       >
         <Link to="menu">

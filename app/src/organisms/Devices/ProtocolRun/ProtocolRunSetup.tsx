@@ -1,18 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
-import { parseAllRequiredModuleModels } from '@opentrons/api-client'
-import {
-  Flex,
-  ALIGN_CENTER,
-  COLORS,
-  DIRECTION_COLUMN,
-  SPACING,
-} from '@opentrons/components'
-
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsOT3,
   useRobot,
@@ -21,13 +10,23 @@ import {
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
-import { SetupRobotCalibration } from './SetupRobotCalibration'
-import { SetupModules } from './SetupModules'
-import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
+import { SetupModules } from './SetupModules'
+import { SetupRobotCalibration } from './SetupRobotCalibration'
+import { SetupStep } from './SetupStep'
+import { parseAllRequiredModuleModels } from '@opentrons/api-client'
+import {
+  Flex,
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  SPACING,
+} from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
 const LPC_KEY = 'labware_position_check_step' as const

@@ -1,6 +1,17 @@
-import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
 import { i18n } from '../../../../i18n'
+import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
+import {
+  mockMagneticModuleGen2,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+  mockHeaterShaker,
+} from '../../../../redux/modules/__fixtures__'
+import { ModuleCard } from '../../../ModuleCard'
+import {
+  useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
+} from '../../hooks'
+import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import {
   componentPropsMatcher,
   renderWithProviders,
@@ -10,19 +21,8 @@ import {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
-import { ModuleCard } from '../../../ModuleCard'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
-import {
-  mockMagneticModuleGen2,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-  mockHeaterShaker,
-} from '../../../../redux/modules/__fixtures__'
-import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../ModuleCard')
 jest.mock('../../hooks')

@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { Well } from './Well'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import * as React from 'react'
 
 export interface StyledWellProps {
   className: string

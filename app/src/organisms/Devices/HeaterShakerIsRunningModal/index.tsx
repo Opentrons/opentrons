@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal'
+import { HeaterShakerModule } from '../../../redux/modules/types'
+import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
+import { useAttachedModules } from '../hooks'
 import {
   Icon,
   COLORS,
@@ -13,14 +15,11 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { useAttachedModules } from '../hooks'
-import { Modal } from '../../../molecules/Modal'
-import { StyledText } from '../../../atoms/text'
-import { HeaterShakerModule } from '../../../redux/modules/types'
-import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
@@ -95,7 +94,7 @@ export const HeaterShakerIsRunningModal = (
         <SecondaryButton
           marginTop={SPACING.spacing24}
           marginRight={SPACING.spacing8}
-          padding={SPACING.spacingSM}
+          padding={SPACING.spacing12}
           onClick={handleStopShake}
           id="HeaterShakerIsRunningModal_stop_shaking"
         >
@@ -103,7 +102,7 @@ export const HeaterShakerIsRunningModal = (
         </SecondaryButton>
         <PrimaryButton
           marginTop={SPACING.spacing24}
-          padding={SPACING.spacingSM}
+          padding={SPACING.spacing12}
           onClick={handleContinueShaking}
           id="HeaterShakerIsRunningModal_keep_shaking"
         >

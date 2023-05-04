@@ -1,20 +1,20 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
+import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
+import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
+import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
+import { i18n } from '../../localization'
+import { TerminalItemId } from '../../steplist'
+import { actions, selectors, HintKey } from '../../tutorial'
+import { BaseState, ThunkDispatch } from '../../types'
+import { actions as stepsActions } from '../../ui/steps'
+import { Portal } from '../portals/MainPageModalPortal'
+import styles from './hints.css'
 import {
   AlertModal,
   DeprecatedCheckboxField,
   OutlineButton,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { actions as stepsActions } from '../../ui/steps'
-import { TerminalItemId } from '../../steplist'
-import { actions, selectors, HintKey } from '../../tutorial'
-import { Portal } from '../portals/MainPageModalPortal'
-import styles from './hints.css'
-import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
-import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
-import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
-import { BaseState, ThunkDispatch } from '../../types'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface SP {
   hintKey?: HintKey | null

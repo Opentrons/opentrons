@@ -1,4 +1,10 @@
-import * as React from 'react'
+import { i18n } from '../../../../localization'
+import styles from '../../StepEditForm.css'
+import { FieldProps } from '../../types'
+import {
+  getDisabledChangeTipOptions,
+  DisabledChangeTipArgs,
+} from './getDisabledChangeTipOptions'
 import {
   FormGroup,
   SelectField,
@@ -6,14 +12,8 @@ import {
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import {
-  getDisabledChangeTipOptions,
-  DisabledChangeTipArgs,
-} from './getDisabledChangeTipOptions'
 import { ChangeTipOptions } from '@opentrons/step-generation'
-import { FieldProps } from '../../types'
-import styles from '../../StepEditForm.css'
+import * as React from 'react'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',

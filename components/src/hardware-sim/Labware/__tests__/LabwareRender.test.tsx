@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import _uncasted_troughFixture12 from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough_v2.json'
 import { componentPropsMatcher } from '../../../testing/utils'
+import { LabwareRender, WELL_LABEL_OPTIONS } from '../LabwareRender'
 import {
   StaticLabwareComponent as StaticLabware,
   WellLabelsComponent as WellLabels,
   StrokedWellsComponent as StrokedWells,
 } from '../labwareInternals'
-import { LabwareRender, WELL_LABEL_OPTIONS } from '../LabwareRender'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import _uncasted_troughFixture12 from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough_v2.json'
+import { render } from '@testing-library/react'
+import { resetAllWhenMocks, when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../labwareInternals')
 

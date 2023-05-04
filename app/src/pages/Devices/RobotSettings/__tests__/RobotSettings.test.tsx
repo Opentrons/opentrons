@@ -1,22 +1,21 @@
-import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
-
+import { RobotSettings } from '..'
 import { i18n } from '../../../../i18n'
-import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
-import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsPrivacy } from '../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { useRobot } from '../../../../organisms/Devices/hooks'
-import { RobotSettings } from '..'
-import { when } from 'jest-when'
+import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
+import { getBuildrootSession } from '../../../../redux/buildroot'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
-import { getBuildrootSession } from '../../../../redux/buildroot'
+import { renderWithProviders } from '@opentrons/components'
+import { when } from 'jest-when'
+import * as React from 'react'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../organisms/RobotSettingsCalibration')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')

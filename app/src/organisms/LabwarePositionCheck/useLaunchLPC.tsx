@@ -1,11 +1,11 @@
-import * as React from 'react'
+import { LabwarePositionCheck } from '.'
+import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import {
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { LabwarePositionCheck } from '.'
-import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
+import * as React from 'react'
 
 export function useLaunchLPC(
   runId: string

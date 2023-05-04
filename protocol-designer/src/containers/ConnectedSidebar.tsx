@@ -1,15 +1,13 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { selectors, Page } from '../navigation'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-
-import { ConnectedStepList } from './ConnectedStepList'
-import { IngredientsList } from './IngredientsList'
 import { FileSidebar } from '../components/FileSidebar'
 import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
-
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
+import { ConnectedStepList } from './ConnectedStepList'
+import { IngredientsList } from './IngredientsList'
+import * as React from 'react'
+import { connect } from 'react-redux'
 
 interface Props {
   page: Page

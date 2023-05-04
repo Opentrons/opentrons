@@ -1,12 +1,11 @@
+import { i18n } from '../../../localization'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import styles from '../StepEditForm.css'
+import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
+import { StepFormProps } from '../types'
+import { FormGroup } from '@opentrons/components'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
-import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../localization'
-
-import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
-import styles from '../StepEditForm.css'
-import { StepFormProps } from '../types'
 
 export const TemperatureForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(

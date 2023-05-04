@@ -1,16 +1,14 @@
+import { AppSettings } from '..'
+import { i18n } from '../../../i18n'
+import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
+import * as Config from '../../../redux/config'
+import { AdvancedSettings } from '../AdvancedSettings'
+import { GeneralSettings } from '../GeneralSettings'
+import { PrivacySettings } from '../PrivacySettings'
+import { renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
-import { i18n } from '../../../i18n'
-import * as Config from '../../../redux/config'
-import { GeneralSettings } from '../GeneralSettings'
-import { PrivacySettings } from '../PrivacySettings'
-import { AdvancedSettings } from '../AdvancedSettings'
-import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
-import { AppSettings } from '..'
 
 jest.mock('../../../redux/config')
 jest.mock('../GeneralSettings')

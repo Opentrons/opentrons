@@ -1,4 +1,5 @@
 import type { HintKey } from './index'
+
 export interface AddHintAction {
   type: 'ADD_HINT'
   payload: {

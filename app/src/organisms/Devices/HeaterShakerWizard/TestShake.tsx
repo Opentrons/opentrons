@@ -1,6 +1,13 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { InputField } from '../../../atoms/InputField'
+import { Tooltip } from '../../../atoms/Tooltip'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { Collapsible } from '../../ModuleCard/Collapsible'
+import { useLatchControls } from '../../ModuleCard/hooks'
+import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -14,28 +21,20 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   RPM,
   HS_RPM_MAX,
   HS_RPM_MIN,
   CreateCommand,
 } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Tooltip } from '../../../atoms/Tooltip'
-import { StyledText } from '../../../atoms/text'
-import { Divider } from '../../../atoms/structure'
-import { InputField } from '../../../atoms/InputField'
-import { Collapsible } from '../../ModuleCard/Collapsible'
-import { useLatchControls } from '../../ModuleCard/hooks'
-import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
-
-import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 interface TestShakeProps {
   module: HeaterShakerModule
@@ -169,7 +168,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
 
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginY={SPACING.spacingL}
+          marginY={SPACING.spacing24}
           alignItems={ALIGN_FLEX_START}
         >
           <Flex flexDirection={DIRECTION_COLUMN} maxWidth="6.25rem">
@@ -243,7 +242,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Collapsible>
-      <Divider marginTop={SPACING.spacing16} marginBottom={SPACING.spacingXL} />
+      <Divider marginTop={SPACING.spacing16} marginBottom={SPACING.spacing32} />
     </Flex>
   )
 }

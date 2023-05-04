@@ -1,12 +1,9 @@
 // Tip Length Calibration Orchestration Component
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { useConditionalConfirm } from '@opentrons/components'
-
-import * as Sessions from '../../redux/sessions'
+import { Portal } from '../../App/portal'
+import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
+import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import {
   Introduction,
   DeckSetup,
@@ -18,21 +15,20 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
-
-import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
-import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
-
-import type { Mount } from '@opentrons/components'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import * as Sessions from '../../redux/sessions'
 import type {
   SessionCommandParams,
   CalibrationLabware,
   CalibrationSessionStep,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
+import { useConditionalConfirm } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'

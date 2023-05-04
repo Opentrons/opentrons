@@ -1,9 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
+import { ChooseRobotSlideout } from '..'
 import { i18n } from '../../../i18n'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -11,13 +8,15 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { ChooseRobotSlideout } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')

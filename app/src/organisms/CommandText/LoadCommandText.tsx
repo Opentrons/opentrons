@@ -1,18 +1,3 @@
-import { useTranslation } from 'react-i18next'
-import {
-  getModuleDisplayName,
-  getModuleType,
-  getOccludedSlotCountForModule,
-} from '@opentrons/shared-data'
-import {
-  getPipetteNameSpecs,
-  OT2_STANDARD_MODEL,
-} from '@opentrons/shared-data/js'
-
-import type {
-  RunTimeCommand,
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
 import {
   getLabwareName,
   getPipetteNameOnMount,
@@ -20,6 +5,20 @@ import {
   getModuleDisplayLocation,
   getLiquidDisplayName,
 } from './utils'
+import {
+  getModuleDisplayName,
+  getModuleType,
+  getOccludedSlotCountForModule,
+} from '@opentrons/shared-data'
+import type {
+  RunTimeCommand,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  OT2_STANDARD_MODEL,
+} from '@opentrons/shared-data/js'
+import { useTranslation } from 'react-i18next'
 
 interface LoadCommandTextProps {
   command: RunTimeCommand

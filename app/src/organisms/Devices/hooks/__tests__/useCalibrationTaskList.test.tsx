@@ -1,17 +1,6 @@
-import * as React from 'react'
-import { createStore } from 'redux'
-import { I18nextProvider } from 'react-i18next'
-import { Provider } from 'react-redux'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import {
-  useDeleteCalibrationMutation,
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useCalibrationStatusQuery,
-} from '@opentrons/react-api-client'
-import { useCalibrationTaskList } from '../useCalibrationTaskList'
 import { useAttachedPipettes } from '..'
+import { i18n } from '../../../../i18n'
+import type { State } from '../../../../redux/types'
 import {
   TASK_COUNT,
   mockAttachedPipettesResponse,
@@ -27,10 +16,20 @@ import {
   mockIncompleteTipLengthCalibrations,
   expectedTaskList,
 } from '../__fixtures__/taskListFixtures'
-import { i18n } from '../../../../i18n'
-
+import { useCalibrationTaskList } from '../useCalibrationTaskList'
+import {
+  useDeleteCalibrationMutation,
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+} from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
 
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')

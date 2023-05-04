@@ -1,6 +1,6 @@
 // mock logger for tests
-import path from 'path'
 import type { Logger } from '../logger'
+import path from 'path'
 
 export function createLogger(filename: string): Logger {
   const label = path.relative(path.join(__dirname, '../../..'), filename)

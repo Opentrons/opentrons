@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { MenuButton } from './MenuButton'
 import { MobileList } from './MobileList'
+import * as React from 'react'
 
 interface State {
   isOpen: boolean

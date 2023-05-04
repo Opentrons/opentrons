@@ -1,17 +1,16 @@
-import * as React from 'react'
-import last from 'lodash/last'
-import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 import {
   useProtocolQuery,
   useProtocolAnalysesQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-
+import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 import type {
   RobotType,
   CompletedProtocolAnalysis,
   PendingProtocolAnalysis,
 } from '@opentrons/shared-data'
+import last from 'lodash/last'
+import * as React from 'react'
 
 export interface ProtocolDetails {
   displayName: string | null

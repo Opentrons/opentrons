@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { COLORS, Overlay } from '@opentrons/components'
+import * as React from 'react'
 
 interface MenuHandleClickOutside {
   menuOverlay: JSX.Element

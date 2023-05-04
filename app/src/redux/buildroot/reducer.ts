@@ -1,8 +1,7 @@
-import * as Constants from './constants'
-
-import type { Reducer } from 'redux'
 import type { Action } from '../types'
+import * as Constants from './constants'
 import type { BuildrootState, BuildrootUpdateSession } from './types'
+import type { Reducer } from 'redux'
 
 export const INITIAL_STATE: BuildrootState = {
   seen: false,

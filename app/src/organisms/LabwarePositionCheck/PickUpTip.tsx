@@ -1,11 +1,21 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import isEqual from 'lodash/isEqual'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
+import type { Jog } from '../../molecules/JogControls/types'
+import { UnorderedList } from '../../molecules/UnorderedList'
+import { useChainRunCommands } from '../../resources/runs/hooks'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { TipConfirmation } from './TipConfirmation'
+import type {
+  PickUpTipStep,
+  RegisterPositionAction,
+  WorkingOffset,
+} from './types'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
+import type { LabwareOffset } from '@opentrons/api-client'
+import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -17,20 +27,9 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
-import { useChainRunCommands } from '../../resources/runs/hooks'
-import { UnorderedList } from '../../molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { TipConfirmation } from './TipConfirmation'
-import { getLabwareDef } from './utils/labware'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-
-import type { Jog } from '../../molecules/JogControls/types'
-import type {
-  PickUpTipStep,
-  RegisterPositionAction,
-  WorkingOffset,
-} from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
+import isEqual from 'lodash/isEqual'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis

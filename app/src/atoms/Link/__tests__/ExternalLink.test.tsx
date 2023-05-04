@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ExternalLink } from '../ExternalLink'
+import { renderWithProviders, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const TEST_URL = 'https://opentrons.com'
 

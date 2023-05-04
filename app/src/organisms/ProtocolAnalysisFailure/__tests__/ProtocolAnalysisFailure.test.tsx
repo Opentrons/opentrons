@@ -1,12 +1,11 @@
-import * as React from 'react'
-import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { i18n } from '../../../i18n'
-
 import { ProtocolAnalysisFailure } from '..'
+import { i18n } from '../../../i18n'
 import { analyzeProtocol } from '../../../redux/protocol-storage'
+import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolAnalysisFailure>> = {}

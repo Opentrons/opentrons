@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { Modal } from '.'
+import { StyledText } from '../../../atoms/text'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -7,9 +8,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { Modal } from '.'
+import * as React from 'react'
 
 interface SmallModalChildrenProps {
   handleCloseMaxPinsAlert: () => void

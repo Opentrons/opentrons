@@ -1,20 +1,18 @@
-import last from 'lodash/last'
 import {
   analyticsEvent,
   AnalyticsEventAction,
 } from '../../../analytics/actions'
+import { AnalyticsEvent } from '../../../analytics/mixpanel'
+import { StepIdType, StepType } from '../../../form-types'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
   PRESAVED_STEP_ID,
   TerminalItemId,
   SubstepIdentifier,
 } from '../../../steplist/types'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import { getMultiSelectLastSelected } from '../selectors'
 import { resetScrollElements } from '../utils'
-import { Timeline } from '@opentrons/step-generation'
-import { StepIdType, StepType } from '../../../form-types'
-import { GetState, ThunkAction, ThunkDispatch } from '../../../types'
-import { AnalyticsEvent } from '../../../analytics/mixpanel'
 import {
   AddStepAction,
   ExpandAddStepButtonAction,
@@ -30,6 +28,9 @@ import {
   SelectStepAction,
   SelectMultipleStepsAction,
 } from './types'
+import { Timeline } from '@opentrons/step-generation'
+import last from 'lodash/last'
+
 // adds an incremental integer ID for Step reducers.
 // NOTE: if this is an "add step" directly performed by the user,
 // addAndSelectStepWithHints is probably what you want

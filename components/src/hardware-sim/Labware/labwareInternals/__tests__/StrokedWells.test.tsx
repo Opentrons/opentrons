@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
-import _uncasted_troughFixture12 from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough_v2.json'
 import { StrokedWells } from '../StrokedWells'
 import { WellComponent as Well } from '../Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import _uncasted_troughFixture12 from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough_v2.json'
+import { render } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../Well')
 

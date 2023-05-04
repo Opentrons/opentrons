@@ -1,20 +1,18 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import { Portal } from '../../../../App/portal'
 import { ModalShell } from '../../../../molecules/Modal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibrateDeck } from '../../../../organisms/CalibrateDeck'
 import { LoadingState } from '../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../redux/robot-api'
-import * as Sessions from '../../../../redux/sessions'
-import { getDeckCalibrationSession } from '../../../../redux/sessions/deck-calibration/selectors'
-
-import type { State } from '../../../../redux/types'
-import type { DeckCalibrationSession } from '../../../../redux/sessions'
-import type { SessionCommandString } from '../../../../redux/sessions/types'
 import type { RequestState } from '../../../../redux/robot-api/types'
+import * as Sessions from '../../../../redux/sessions'
+import type { DeckCalibrationSession } from '../../../../redux/sessions'
+import { getDeckCalibrationSession } from '../../../../redux/sessions/deck-calibration/selectors'
+import type { SessionCommandString } from '../../../../redux/sessions/types'
+import type { State } from '../../../../redux/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 // deck calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [

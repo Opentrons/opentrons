@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UnskippableModal } from '../UnskippableModal'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof UnskippableModal>) => {
   return renderWithProviders(<UnskippableModal {...props} />, {

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   RobotCoordsForeignDiv,
   C_MED_LIGHT_GRAY,
@@ -6,6 +5,7 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
 } from '../../'
+import * as React from 'react'
 
 export interface ModuleTagProps {
   x: number

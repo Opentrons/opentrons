@@ -1,10 +1,11 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { LabwareNameOverlay } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { LabwareOnDeck } from '../../../step-forms'
 import { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { LabwareOnDeck } from '../../../step-forms'
+import { LabwareNameOverlay } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import * as React from 'react'
+import { connect } from 'react-redux'
+
 interface OP {
   labwareOnDeck: LabwareOnDeck
 }

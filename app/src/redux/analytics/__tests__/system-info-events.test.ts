@@ -1,9 +1,7 @@
-import { makeEvent } from '../make-event'
-
 import * as SystemInfo from '../../system-info'
 import * as Fixtures from '../../system-info/__fixtures__'
-
 import type { State } from '../../types'
+import { makeEvent } from '../make-event'
 
 jest.mock('../../system-info/selectors')
 

@@ -1,12 +1,11 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
 import { startDiscovery } from '../../../redux/discovery'
 import {
   DevicesEmptyState,
   TROUBLESHOOTING_CONNECTION_PROBLEMS_URL,
 } from '../DevicesEmptyState'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../../redux/discovery')
 

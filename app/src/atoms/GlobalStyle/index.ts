@@ -1,9 +1,9 @@
-import { createGlobalStyle } from 'styled-components'
-import { COLORS } from '@opentrons/components'
-import 'typeface-open-sans'
 import '@fontsource/public-sans'
 import '@fontsource/public-sans/600.css'
 import '@fontsource/public-sans/700.css'
+import { COLORS } from '@opentrons/components'
+import { createGlobalStyle } from 'styled-components'
+import 'typeface-open-sans'
 
 export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
   * {

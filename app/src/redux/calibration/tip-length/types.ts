@@ -2,9 +2,7 @@ import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../../robot-api/types'
-
 import type { AllTipLengthCalibrations } from '../api-types'
-
 import {
   FETCH_TIP_LENGTH_CALIBRATIONS,
   FETCH_TIP_LENGTH_CALIBRATIONS_SUCCESS,

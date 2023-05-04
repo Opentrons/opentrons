@@ -1,11 +1,10 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-
+import { ProtocolsLanding } from '..'
+import { ProtocolList } from '../../../../organisms/ProtocolsLanding/ProtocolList'
 import { ProtocolsEmptyState } from '../../../../organisms/ProtocolsLanding/ProtocolsEmptyState'
 import { getStoredProtocols } from '../../../../redux/protocol-storage'
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import { ProtocolList } from '../../../../organisms/ProtocolsLanding/ProtocolList'
-import { ProtocolsLanding } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../../../redux/protocol-storage')
 jest.mock('../../../../organisms/ProtocolsLanding/ProtocolsEmptyState')

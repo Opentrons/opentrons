@@ -1,11 +1,10 @@
-import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
+import { getDeckDefinitions } from './getDeckDefinitions'
 import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
 import { getModuleDef2 } from '@opentrons/shared-data'
-import { getDeckDefinitions } from './getDeckDefinitions'
-import type { INode } from 'svgson'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
+import type { INode } from 'svgson'
 
 const allDeckDefs = getDeckDefinitions()
 

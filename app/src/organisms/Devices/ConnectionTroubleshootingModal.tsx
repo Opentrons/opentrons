@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -11,9 +10,9 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

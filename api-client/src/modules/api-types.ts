@@ -1,5 +1,4 @@
 import { ModuleType } from '@opentrons/shared-data'
-
 import type { ModuleModel } from '@opentrons/shared-data'
 
 interface PhysicalPort {

@@ -1,5 +1,5 @@
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { pipettes } from '../components/getPipetteOptions'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface LabwareTestProtocolArgs {
   pipetteName: string

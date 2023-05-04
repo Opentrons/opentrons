@@ -1,4 +1,23 @@
-import * as React from 'react'
+import { WellOrderOption } from '../../form-types'
+import { i18n } from '../../localization'
+import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
+import styles from '../StepEditForm/StepEditForm.css'
+import {
+  BlowoutLocationField,
+  CheckboxRowField,
+  DelayFields,
+  FlowRateField,
+  TipPositionField,
+  WellOrderField,
+} from '../StepEditForm/fields'
+import { FieldPropsByName } from '../StepEditForm/types'
+import {
+  getBlowoutLocationOptionsForForm,
+  getLabwareFieldForPositioningField,
+} from '../StepEditForm/utils'
+// TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
+import formStyles from '../forms/forms.css'
+import { FormColumn } from './FormColumn'
 import {
   Box,
   DeprecatedPrimaryButton,
@@ -8,26 +27,7 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import {
-  BlowoutLocationField,
-  CheckboxRowField,
-  DelayFields,
-  FlowRateField,
-  TipPositionField,
-  WellOrderField,
-} from '../StepEditForm/fields'
-import {
-  getBlowoutLocationOptionsForForm,
-  getLabwareFieldForPositioningField,
-} from '../StepEditForm/utils'
-import { FormColumn } from './FormColumn'
-import { FieldPropsByName } from '../StepEditForm/types'
-import { WellOrderOption } from '../../form-types'
-// TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
-import formStyles from '../forms/forms.css'
-import styles from '../StepEditForm/StepEditForm.css'
-import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
+import * as React from 'react'
 
 interface BatchEditMixProps {
   batchEditFormHasChanges: boolean

@@ -1,23 +1,18 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-import {
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
-
 import { i18n } from '../../../i18n'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { useFeatureFlag } from '../../../redux/config'
 import { getRobotModelByName } from '../../../redux/discovery'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
+import type { State } from '../../../redux/types'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { UpdateRobotBanner } from '../../UpdateRobotBanner'
+import { RobotOverview } from '../RobotOverview'
+import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
+import { RobotStatusHeader } from '../RobotStatusHeader'
 import {
   useCalibrationTaskList,
   useIsRobotBusy,
@@ -35,12 +30,14 @@ import {
   expectedIncompleteDeckCalTaskList,
   expectedTaskList,
 } from '../hooks/__fixtures__/taskListFixtures'
-import { UpdateRobotBanner } from '../../UpdateRobotBanner'
-import { RobotStatusHeader } from '../RobotStatusHeader'
-import { RobotOverview } from '../RobotOverview'
-import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
-
-import type { State } from '../../../redux/types'
+import { renderWithProviders } from '@opentrons/components'
+import {
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+} from '@opentrons/discovery-client/src/__fixtures__'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/buildroot/selectors')

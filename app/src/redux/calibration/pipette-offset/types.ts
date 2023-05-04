@@ -2,9 +2,7 @@ import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../../robot-api/types'
-
 import type { AllPipetteOffsetCalibrations } from '../api-types'
-
 import {
   FETCH_PIPETTE_OFFSET_CALIBRATIONS,
   FETCH_PIPETTE_OFFSET_CALIBRATIONS_SUCCESS,

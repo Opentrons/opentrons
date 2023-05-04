@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import { AttachModule } from '../AttachModule'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { AttachModule } from '../AttachModule'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import * as React from 'react'
 
 const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
   moduleId: 'heater_shaker_id',

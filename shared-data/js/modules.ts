@@ -1,11 +1,10 @@
+import heaterShakerModuleV1 from '../module/definitions/3/heaterShakerModuleV1.json'
 import magneticModuleV1 from '../module/definitions/3/magneticModuleV1.json'
 import magneticModuleV2 from '../module/definitions/3/magneticModuleV2.json'
 import temperatureModuleV1 from '../module/definitions/3/temperatureModuleV1.json'
 import temperatureModuleV2 from '../module/definitions/3/temperatureModuleV2.json'
 import thermocyclerModuleV1 from '../module/definitions/3/thermocyclerModuleV1.json'
 import thermocyclerModuleV2 from '../module/definitions/3/thermocyclerModuleV2.json'
-import heaterShakerModuleV1 from '../module/definitions/3/heaterShakerModuleV1.json'
-
 import {
   MAGDECK,
   MAGNETIC_MODULE_V1,
@@ -18,7 +17,6 @@ import {
   THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
 } from './constants'
-
 import type {
   ModuleModel,
   ModuleModelWithLegacy,

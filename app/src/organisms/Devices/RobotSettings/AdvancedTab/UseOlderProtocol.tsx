@@ -1,7 +1,8 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { ToggleButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
+import { updateSetting } from '../../../../redux/robot-settings'
+import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+import type { Dispatch } from '../../../../redux/types'
 import {
   Flex,
   ALIGN_CENTER,
@@ -10,13 +11,10 @@ import {
   Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
-import { StyledText } from '../../../../atoms/text'
-import { ToggleButton } from '../../../../atoms/buttons'
-import { updateSetting } from '../../../../redux/robot-settings'
-
-import type { Dispatch } from '../../../../redux/types'
-import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
 interface UseOlderProtocolProps {
   settings: RobotSettingsField | undefined
   robotName: string

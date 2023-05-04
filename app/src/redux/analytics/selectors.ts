@@ -1,6 +1,10 @@
 // import { createSelector } from 'reselect'
-import * as Sessions from '../sessions'
-
+import {
+  getBuildrootUpdateVersion,
+  getBuildrootRobot,
+  getBuildrootSession,
+  getRobotSystemType,
+} from '../buildroot'
 // import {
 //   getProtocolType,
 //   getProtocolCreatorApp,
@@ -10,24 +14,13 @@ import * as Sessions from '../sessions'
 //   getProtocolAuthor,
 //   getProtocolContents,
 // } from '../protocol'
-
 import { getViewableRobots, getRobotApiVersion } from '../discovery'
-
-import {
-  getBuildrootUpdateVersion,
-  getBuildrootRobot,
-  getBuildrootSession,
-  getRobotSystemType,
-} from '../buildroot'
-
+import type { Mount } from '../pipettes/types'
+import * as Sessions from '../sessions'
 import { getRobotSessionById } from '../sessions/selectors'
-
 // import { hash } from './hash'
-
 // import type { Selector } from 'reselect'
 import type { State } from '../types'
-import type { Mount } from '../pipettes/types'
-
 import type {
   AnalyticsConfig,
   BuildrootAnalyticsData,

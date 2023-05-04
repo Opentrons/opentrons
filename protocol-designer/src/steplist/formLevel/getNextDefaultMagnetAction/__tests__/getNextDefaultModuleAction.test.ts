@@ -1,5 +1,6 @@
 import { getNextDefaultMagnetAction } from '../'
 import { StepType } from '../../../../form-types'
+
 describe('getNextDefaultMagnetAction', () => {
   describe('no previous forms defaults to engage', () => {
     const testCases = [

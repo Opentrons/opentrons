@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
-
 import { InputField } from '../InputField'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 describe('InputField', () => {
   it('clears out value when isIndeterminate === true', () => {

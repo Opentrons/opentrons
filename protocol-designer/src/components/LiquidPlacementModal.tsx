@@ -1,29 +1,26 @@
-import assert from 'assert'
-import * as React from 'react'
-import { connect } from 'react-redux'
-import cx from 'classnames'
-import isEmpty from 'lodash/isEmpty'
-import { WellGroup, WELL_LABEL_OPTIONS } from '@opentrons/components'
+import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
 import {
   wellFillFromWellContents,
   SelectableLabware,
 } from '../components/labware'
-import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
-import { WellSelectionInstructions } from './WellSelectionInstructions'
-
 import { selectors } from '../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../step-forms'
-import * as wellContentsSelectors from '../top-selectors/well-contents'
-import { getSelectedWells } from '../well-selection/selectors'
-import { selectWells, deselectWells } from '../well-selection/actions'
-
-import styles from './LiquidPlacementModal.css'
-
-import { Dispatch } from 'redux'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import { BaseState } from '../types'
 import { ContentsByWell } from '../labware-ingred/types'
+import { selectors as stepFormSelectors } from '../step-forms'
 import { WellIngredientNames } from '../steplist'
+import * as wellContentsSelectors from '../top-selectors/well-contents'
+import { BaseState } from '../types'
+import { selectWells, deselectWells } from '../well-selection/actions'
+import { getSelectedWells } from '../well-selection/selectors'
+import styles from './LiquidPlacementModal.css'
+import { WellSelectionInstructions } from './WellSelectionInstructions'
+import { WellGroup, WELL_LABEL_OPTIONS } from '@opentrons/components'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import assert from 'assert'
+import cx from 'classnames'
+import isEmpty from 'lodash/isEmpty'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 interface SP {
   selectedWells: WellGroup

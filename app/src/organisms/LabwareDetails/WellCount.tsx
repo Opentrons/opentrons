@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
@@ -8,7 +7,8 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface WellCountProps {
   count: number

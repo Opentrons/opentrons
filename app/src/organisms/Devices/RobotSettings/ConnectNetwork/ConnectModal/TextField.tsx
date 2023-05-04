@@ -1,15 +1,13 @@
-import * as React from 'react'
-
+import { LABEL_SHOW_PASSWORD } from '../i18n'
+import { FormRow } from './FormRow'
+import { useConnectFormField } from './form-state'
 import {
   InputField,
   DeprecatedCheckboxField,
   INPUT_TYPE_TEXT,
   INPUT_TYPE_PASSWORD,
 } from '@opentrons/components'
-
-import { FormRow } from './FormRow'
-import { useConnectFormField } from './form-state'
-import { LABEL_SHOW_PASSWORD } from '../i18n'
+import * as React from 'react'
 
 export interface TextFieldProps {
   id: string

@@ -1,6 +1,15 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation, Trans } from 'react-i18next'
+import { Slideout } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
+import { UploadInput } from '../../molecules/UploadInput'
+import {
+  useTrackEvent,
+  ANALYTICS_ADD_CUSTOM_LABWARE,
+} from '../../redux/analytics'
+import {
+  addCustomLabwareFile,
+  addCustomLabware,
+} from '../../redux/custom-labware'
+import type { Dispatch } from '../../redux/types'
 import {
   Flex,
   Link,
@@ -9,18 +18,9 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import {
-  addCustomLabwareFile,
-  addCustomLabware,
-} from '../../redux/custom-labware'
-import { Slideout } from '../../atoms/Slideout'
-import { StyledText } from '../../atoms/text'
-import {
-  useTrackEvent,
-  ANALYTICS_ADD_CUSTOM_LABWARE,
-} from '../../redux/analytics'
-import { UploadInput } from '../../molecules/UploadInput'
-import type { Dispatch } from '../../redux/types'
+import * as React from 'react'
+import { useTranslation, Trans } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 export interface AddCustomLabwareSlideoutProps {
   isExpanded: boolean

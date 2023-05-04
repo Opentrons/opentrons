@@ -1,21 +1,17 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
-import * as Buildroot from '../../../redux/buildroot'
-import { getLocalRobot } from '../../../redux/discovery'
 import { CheckUpdates } from '../../../organisms/UpdateRobotSoftware/CheckUpdates'
 import { CompleteUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { ErrorUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware'
 import { NoUpdateFound } from '../../../organisms/UpdateRobotSoftware/NoUpdateFound'
 import { UpdateSoftware } from '../../../organisms/UpdateRobotSoftware/UpdateSoftware'
-
-import { UpdateRobot } from '../UpdateRobot'
-
+import * as Buildroot from '../../../redux/buildroot'
+import { getLocalRobot } from '../../../redux/discovery'
 import type { State } from '../../../redux/types'
+import { UpdateRobot } from '../UpdateRobot'
+import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')

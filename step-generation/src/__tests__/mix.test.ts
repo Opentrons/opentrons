@@ -1,4 +1,3 @@
-import flatMap from 'lodash/flatMap'
 import { mix } from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,
@@ -22,6 +21,7 @@ import type {
   MixArgs,
   RobotState,
 } from '../types'
+import flatMap from 'lodash/flatMap'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper({ labwareId: SOURCE_LABWARE })

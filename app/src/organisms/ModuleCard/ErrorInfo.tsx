@@ -1,10 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-  getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
+import { Portal } from '../../App/portal'
+import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import type { AttachedModule } from '../../redux/modules/types'
 import {
   Flex,
   SPACING,
@@ -16,12 +14,13 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
-
-import type { AttachedModule } from '../../redux/modules/types'
+import {
+  getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ErrorInfoProps {
   attachedModule: AttachedModule

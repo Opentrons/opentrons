@@ -1,11 +1,9 @@
 // titled modal page component
-import * as React from 'react'
-
 import { TitleBar } from '../structure'
+import type { TitleBarProps } from '../structure'
 import { SpinnerModal } from './SpinnerModal'
 import styles from './modals.css'
-
-import type { TitleBarProps } from '../structure'
+import * as React from 'react'
 
 // TODO(mc, 2018-06-20): s/titleBar/titleBarProps
 export interface SpinnerModalPageProps

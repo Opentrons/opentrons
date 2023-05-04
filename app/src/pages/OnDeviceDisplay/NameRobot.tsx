@@ -1,9 +1,19 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { useFormik } from 'formik'
-import { css } from 'styled-components'
-
+import { InputField } from '../../atoms/InputField'
+import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
+import { StepMeter } from '../../atoms/StepMeter'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
+import {
+  removeRobot,
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+  getLocalRobot,
+} from '../../redux/discovery'
+import type { State, Dispatch } from '../../redux/types'
+import type { UpdatedRobotName } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -19,31 +29,18 @@ import {
   Icon,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
-
-import {
-  removeRobot,
-  getConnectableRobots,
-  getReachableRobots,
-  getUnreachableRobots,
-  getLocalRobot,
-} from '../../redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { StyledText } from '../../atoms/text'
-import { InputField } from '../../atoms/InputField'
-import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../atoms/buttons'
-import { StepMeter } from '../../atoms/StepMeter'
-import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
-
-import type { UpdatedRobotName } from '@opentrons/api-client'
-import type { State, Dispatch } from '../../redux/types'
+import { useFormik } from 'formik'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
 // Note: kj 12/15/2022 the current input field is optimized for the desktop
 // Need to update the InputField for the ODD app
 // That will be done in another PR
 const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacingXXL};
-  padding-bottom: ${SPACING.spacingXXL};
+  padding-top: ${SPACING.spacing40};
+  padding-bottom: ${SPACING.spacing40};
   font-size: 2.5rem;
   line-height: 3.25rem;
   text-align: center;
@@ -148,7 +145,7 @@ export function NameRobot(): JSX.Element {
       ) : (
         <>
           <StepMeter totalSteps={5} currentStep={4} OnDevice />
-          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
+          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacing40}>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}

@@ -1,3 +1,9 @@
+import { createLogger } from '../../logger'
+import { alertTriggered, ALERT_APP_UPDATE_AVAILABLE } from '../alerts'
+import { getUpdateChannel } from '../config'
+import type { Epic, Action } from '../types'
+import { remote } from './remote'
+import { getAvailableShellUpdate, checkShellUpdate } from './update'
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import {
@@ -8,14 +14,6 @@ import {
   tap,
   ignoreElements,
 } from 'rxjs/operators'
-
-import { alertTriggered, ALERT_APP_UPDATE_AVAILABLE } from '../alerts'
-import { createLogger } from '../../logger'
-import { getUpdateChannel } from '../config'
-import { getAvailableShellUpdate, checkShellUpdate } from './update'
-import { remote } from './remote'
-
-import type { Epic, Action } from '../types'
 
 const { ipcRenderer } = remote
 

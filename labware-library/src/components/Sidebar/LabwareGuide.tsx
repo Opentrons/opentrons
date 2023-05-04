@@ -1,7 +1,4 @@
 // labware filters
-import * as React from 'react'
-import { Link } from 'react-router-dom'
-import { Icon } from '@opentrons/components'
 import {
   LABWARE_GUIDE,
   WHAT_IS_A_LABWARE_DEFINITION,
@@ -11,6 +8,9 @@ import {
 } from '../../localization'
 import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
+import { Icon } from '@opentrons/components'
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 
 const LINKS = [
   {

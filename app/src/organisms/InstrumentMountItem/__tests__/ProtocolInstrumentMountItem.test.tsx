@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { LEFT, renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
 import { ProtocolInstrumentMountItem } from '..'
+import { i18n } from '../../../i18n'
+import { LEFT, renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const mockGripperData = {
   instrumentModel: 'gripper_v1',

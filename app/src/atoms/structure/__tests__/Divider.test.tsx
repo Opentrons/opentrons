@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
 import { Divider } from '../index'
+import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Divider>) => {
   return renderWithProviders(<Divider {...props} />)[0]

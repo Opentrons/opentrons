@@ -1,8 +1,33 @@
-import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
-
+import { Portal } from '../../App/portal'
+import { Banner } from '../../atoms/Banner'
+import { SelectField } from '../../atoms/SelectField'
+import { SelectOption } from '../../atoms/SelectField/Select'
+import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { useToaster } from '../../organisms/ToasterOven'
+import {
+  useTrackEvent,
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+} from '../../redux/analytics'
+import * as Calibration from '../../redux/calibration'
+import * as Config from '../../redux/config'
+import * as CustomLabware from '../../redux/custom-labware'
+import {
+  clearDiscoveryCache,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../redux/discovery'
+import * as ProtocolAnalysis from '../../redux/protocol-analysis'
+import {
+  getU2EAdapterDevice,
+  getU2EWindowsDriverStatus,
+  OUTDATED,
+} from '../../redux/system-info'
+import type { Dispatch, State } from '../../redux/types'
 import {
   Flex,
   Box,
@@ -22,38 +47,10 @@ import {
   AlertPrimaryButton,
   DIRECTION_ROW,
 } from '@opentrons/components'
-
-import * as Config from '../../redux/config'
-import * as ProtocolAnalysis from '../../redux/protocol-analysis'
-import * as Calibration from '../../redux/calibration'
-import * as CustomLabware from '../../redux/custom-labware'
-import {
-  clearDiscoveryCache,
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../redux/discovery'
-import { Modal } from '../../molecules/Modal'
-import { Portal } from '../../App/portal'
-import { SelectOption } from '../../atoms/SelectField/Select'
-import { SelectField } from '../../atoms/SelectField'
-import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import {
-  useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
-} from '../../redux/analytics'
-import {
-  getU2EAdapterDevice,
-  getU2EWindowsDriverStatus,
-  OUTDATED,
-} from '../../redux/system-info'
-import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { useToaster } from '../../organisms/ToasterOven'
-
-import type { Dispatch, State } from '../../redux/types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'
@@ -200,7 +197,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           {showConfirmDeleteUnavailRobots ? (
             <Portal level="top">
@@ -212,7 +209,7 @@ export function AdvancedSettings(): JSX.Element {
                 <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
                 <Flex
                   flexDirection={DIRECTION_ROW}
-                  paddingTop={SPACING.spacingXL}
+                  paddingTop={SPACING.spacing32}
                   justifyContent={JUSTIFY_FLEX_END}
                 >
                   <Flex
@@ -270,7 +267,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
@@ -406,7 +403,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Box>
             <StyledText

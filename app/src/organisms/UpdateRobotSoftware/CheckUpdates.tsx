@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   COLORS,
@@ -10,8 +8,8 @@ import {
   JUSTIFY_CENTER,
   Icon,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -19,7 +17,7 @@ export function CheckUpdates(): JSX.Element {
     <Flex
       backgroundColor={COLORS.darkGreyDisabled}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"

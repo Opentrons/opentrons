@@ -1,12 +1,9 @@
-import * as React from 'react'
-import cx from 'classnames'
-
-import WELLS_IMAGE from '../../../../images/well_order_wells.svg'
-import PATH_IMAGE from '../../../../images/well_order_path.svg'
-
 import { WellOrderOption } from '../../../../form-types'
-
+import PATH_IMAGE from '../../../../images/well_order_path.svg'
+import WELLS_IMAGE from '../../../../images/well_order_wells.svg'
 import styles from './WellOrderInput.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface Props {
   firstValue: WellOrderOption

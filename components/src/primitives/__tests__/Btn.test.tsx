@@ -1,6 +1,3 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import {
   Btn,
   PrimaryBtn,
@@ -14,6 +11,8 @@ import {
   BUTTON_TYPE_SUBMIT,
   BUTTON_TYPE_RESET,
 } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('Btn primitive component', () => {
   it('should be an <button> with css reset and type: button', () => {

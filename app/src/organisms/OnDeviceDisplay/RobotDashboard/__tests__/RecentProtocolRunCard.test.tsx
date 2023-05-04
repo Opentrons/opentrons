@@ -1,14 +1,11 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { formatDistance } from 'date-fns'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { RecentRunProtocolCard } from '../'
 import { i18n } from '../../../../i18n'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
-import { RecentRunProtocolCard } from '../'
-
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { formatDistance } from 'date-fns'
+import * as React from 'react'
 
 jest.mock('../../../../pages/Protocols/hooks')
 jest.mock('../../../../organisms/Devices/hooks')

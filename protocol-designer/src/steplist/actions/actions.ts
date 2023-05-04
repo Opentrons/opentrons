@@ -1,12 +1,13 @@
-import { getOrderedStepIds } from '../../step-forms/selectors'
-import { getNextNonTerminalItemId } from '../utils'
-import { ThunkAction } from '../../types'
 import { StepIdType, FormData } from '../../form-types'
-import { ChangeFormPayload } from './types'
+import { getOrderedStepIds } from '../../step-forms/selectors'
+import { ThunkAction } from '../../types'
 import {
   ClearSelectedItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps'
+import { getNextNonTerminalItemId } from '../utils'
+import { ChangeFormPayload } from './types'
+
 export interface ChangeSavedStepFormAction {
   type: 'CHANGE_SAVED_STEP_FORM'
   payload: ChangeFormPayload

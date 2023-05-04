@@ -1,6 +1,6 @@
-import * as React from 'react'
 import styles from './ModuleViz.css'
 import { getModuleVizDims, ModuleType } from '@opentrons/shared-data'
+import * as React from 'react'
 
 interface Props {
   x: number

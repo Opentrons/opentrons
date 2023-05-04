@@ -35,9 +35,8 @@ The relative order of `ApiClientProvider` and `ApiHostProvider` does not matter.
 
 ```typescript
 // App.tsx
-import * as React from 'react'
 import { ApiClientProvider, ApiHostProvider } from '@opentrons/react-api-client'
-
+import * as React from 'react'
 export function App(): JSX.Element {
   return (
     <ApiClientProvider>
@@ -55,15 +54,12 @@ The client exposes hooks for getting the data from the API. The hook will handle
 
 ```typescript
 import { useHealth } from '@opentrons/react-api-client'
-
 export function RobotName(): JSX.Element | null {
   const healthData = useHealth()
-
-  // data may not be available yet
+   data may not be available yet
   if (healthData == null) {
     return null
   }
-
   return <h1>{healthData.name}</h1>
 }
 ```
@@ -72,19 +68,15 @@ If you need access to information about the query itself - for example, to indic
 
 ```typescript
 import { useHealthQuery } from '@opentrons/react-api-client'
-
 export function RobotName(): JSX.Element | null {
   const healthQuery = useHealthQuery()
   const { status, data } = healthQuery.data
-
   if (status === 'loading') {
     return <h1>Robot information loading...</h1>
   }
-
   if (data != null) {
     return <h1>{data.name}</h1>
   }
-
   return null
 }
 ```
@@ -106,10 +98,9 @@ Because `@opentrons/react-api-client` uses [react-query][], you can drop in the 
 
 ```typescript
 // App.tsx
-import * as React from 'react'
 import { ApiClientProvider, ApiHostProvider } from '@opentrons/react-api-client'
+import * as React from 'react'
 import { ReactQueryDevtools } from 'react-query/devtools'
-
 export function App(): JSX.Element {
   return (
     <ApiClientProvider>

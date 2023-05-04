@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
+import { updateConfigValue } from '../../redux/config'
+import { UpdateConfigValueAction } from '../../redux/config/types'
+import { Dispatch } from '../../redux/types'
 import {
   DIRECTION_ROW,
   Flex,
@@ -14,11 +16,9 @@ import {
   CheckboxField,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { StyledText } from '../../atoms/text'
-import { Dispatch } from '../../redux/types'
-import { UpdateConfigValueAction } from '../../redux/config/types'
-import { updateConfigValue } from '../../redux/config'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -85,7 +85,7 @@ export const ConfirmAttachmentModal = (
           value={isDismissed}
         />
         <StyledText
-          paddingTop={SPACING.spacingXXS}
+          paddingTop="1px"
           paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
@@ -94,7 +94,7 @@ export const ConfirmAttachmentModal = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacingXL}
+        paddingTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
         alignItems={ALIGN_CENTER}
       >

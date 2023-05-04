@@ -1,14 +1,14 @@
 import { getModuleState } from '../robotStateSelectors'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import type {
-  EngageMagnetParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotStateAndWarnings,
 } from '../types'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import type {
+  EngageMagnetParams,
+  ModuleOnlyParams,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 function _setMagnet(
   moduleState: ModuleTemporalProperties['moduleState'],

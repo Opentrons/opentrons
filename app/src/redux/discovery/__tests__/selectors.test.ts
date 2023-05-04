@@ -1,15 +1,5 @@
 // discovery selectors tests
-import {
-  mockLegacyHealthResponse,
-  mockLegacyServerHealthResponse,
-  mockOT2HealthResponse,
-  mockOT2ServerHealthResponse,
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
-  mockHealthErrorStringResponse,
-  mockHealthFetchErrorResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
-
+import type { State } from '../../types'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
@@ -20,10 +10,17 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../constants'
-
 import * as discovery from '../selectors'
-
-import type { State } from '../../types'
+import {
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
+  mockOT2HealthResponse,
+  mockOT2ServerHealthResponse,
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+  mockHealthErrorStringResponse,
+  mockHealthFetchErrorResponse,
+} from '@opentrons/discovery-client/src/__fixtures__'
 
 const MOCK_STATE: State = {
   discovery: {

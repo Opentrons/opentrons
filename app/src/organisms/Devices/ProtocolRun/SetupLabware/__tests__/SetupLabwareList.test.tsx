@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { StaticRouter } from 'react-router-dom'
-import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
-import { SetupLabwareList } from '../SetupLabwareList'
 import { LabwareListItem } from '../LabwareListItem'
+import { SetupLabwareList } from '../SetupLabwareList'
+import { renderWithProviders } from '@opentrons/components'
 import type {
   ProtocolAnalysisFile,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
+import * as React from 'react'
+import { StaticRouter } from 'react-router-dom'
 
 jest.mock('../LabwareListItem')
 

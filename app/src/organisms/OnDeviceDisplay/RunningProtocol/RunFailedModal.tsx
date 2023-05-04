@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
+import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 import {
   Flex,
   SPACING,
@@ -12,12 +12,9 @@ import {
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 import { RunTimeCommand } from '@opentrons/shared-data'
-
-import { StyledText } from '../../../atoms/text'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
-
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 interface RunError {
   id: string

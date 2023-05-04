@@ -1,6 +1,9 @@
-import * as React from 'react'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import type { Mount } from '../../redux/pipettes/types'
+import { CheckPipettesButton } from './CheckPipettesButton'
+import { InstructionStep } from './InstructionStep'
+import { PipetteSelection } from './PipetteSelection'
+import type { Direction } from './types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -13,18 +16,14 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { CheckPipettesButton } from './CheckPipettesButton'
-import { InstructionStep } from './InstructionStep'
-import { PipetteSelection } from './PipetteSelection'
-
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
-import type { Direction } from './types'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface Props {
   robotName: string
@@ -151,7 +150,10 @@ export function Instructions(props: Props): JSX.Element {
                               />
                             ),
                             block: (
-                              <StyledText as="p" marginTop={SPACING.spacing16} />
+                              <StyledText
+                                as="p"
+                                marginTop={SPACING.spacing16}
+                              />
                             ),
                           }}
                         />

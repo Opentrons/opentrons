@@ -1,19 +1,18 @@
-import * as React from 'react'
-import { BrowserRouter } from 'react-router-dom'
-import { when } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
 import { getProtocolsDesktopSortKey } from '../../../redux/config'
 import {
   storedProtocolData,
   storedProtocolDataTwo,
 } from '../../../redux/protocol-storage/__fixtures__'
-import { ProtocolList } from '../ProtocolList'
-import { useSortedProtocols } from '../hooks'
 import { EmptyStateLinks } from '../EmptyStateLinks'
 import { ProtocolCard } from '../ProtocolCard'
+import { ProtocolList } from '../ProtocolList'
+import { useSortedProtocols } from '../hooks'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { when } from 'jest-when'
+import * as React from 'react'
+import { BrowserRouter } from 'react-router-dom'
 
 jest.mock('../hooks')
 jest.mock('../../../redux/protocol-storage')

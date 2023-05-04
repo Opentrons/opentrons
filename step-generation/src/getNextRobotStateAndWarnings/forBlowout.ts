@@ -1,6 +1,7 @@
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+
 export function forBlowout(
   params: BlowoutParams,
   invariantContext: InvariantContext,

@@ -1,7 +1,15 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getBatchEditFormHasUnsavedChanges } from '../../../step-forms/selectors'
+import { deleteMultipleSteps } from '../../../steplist/actions'
+import {
+  getMultiSelectItemIds,
+  actions as stepActions,
+} from '../../../ui/steps'
+import {
+  CLOSE_BATCH_EDIT_FORM,
+  ConfirmDeleteModal,
+  DELETE_MULTIPLE_STEP_FORMS,
+} from '../../modals/ConfirmDeleteModal'
 import {
   useConditionalConfirm,
   Flex,
@@ -20,18 +28,9 @@ import {
   POSITION_STICKY,
   IconName,
 } from '@opentrons/components'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import {
-  getMultiSelectItemIds,
-  actions as stepActions,
-} from '../../../ui/steps'
-import { getBatchEditFormHasUnsavedChanges } from '../../../step-forms/selectors'
-import { deleteMultipleSteps } from '../../../steplist/actions'
-import {
-  CLOSE_BATCH_EDIT_FORM,
-  ConfirmDeleteModal,
-  DELETE_MULTIPLE_STEP_FORMS,
-} from '../../modals/ConfirmDeleteModal'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 export interface ClickableIconProps {
   id?: string

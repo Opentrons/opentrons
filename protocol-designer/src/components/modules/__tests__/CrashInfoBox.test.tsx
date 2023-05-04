@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { render } from '@testing-library/react'
 import { CrashInfoBox } from '../CrashInfoBox'
+import { render } from '@testing-library/react'
+import * as React from 'react'
 
 describe('CrashInfoBox', () => {
   let props: React.ComponentProps<typeof CrashInfoBox>

@@ -1,6 +1,6 @@
-import * as React from 'react'
-import cx from 'classnames'
 import styles from './LabwareNameOverlay.css'
+import cx from 'classnames'
+import * as React from 'react'
 
 export interface LabwareNameOverlayProps {
   title: string

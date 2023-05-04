@@ -1,7 +1,7 @@
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import React from 'react'
-import { render, shallow, mount } from 'enzyme'
 import { ModuleStepItems } from '../ModuleStepItems'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import { render, shallow, mount } from 'enzyme'
+import React from 'react'
 
 let props: any
 beforeEach(() => {

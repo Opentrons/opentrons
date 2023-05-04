@@ -1,16 +1,13 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
-import { CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
-
+import { SelectSsid } from '..'
 import { SelectField } from '../../../../../../atoms/SelectField'
+import type { SelectOption } from '../../../../../../atoms/SelectField/Select'
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import { LABEL_JOIN_OTHER_NETWORK } from '../../i18n'
-
-import { SelectSsid } from '..'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
-
+import { CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
+import { mount } from 'enzyme'
+import * as React from 'react'
 import type { ActionMeta } from 'react-select'
-import type { SelectOption } from '../../../../../../atoms/SelectField/Select'
 
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },

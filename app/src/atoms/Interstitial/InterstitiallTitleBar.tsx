@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { StyledText } from '../text'
 import {
   Btn,
   ButtonProps,
@@ -12,7 +11,8 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { StyledText } from '../text'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 export interface InterstitialTitleBarProps {
   title: React.ReactNode
@@ -43,7 +43,7 @@ export function InterstitialTitleBar(
       css={TITLE_BAR}
       data-testid="titlebar"
     >
-      <Flex padding={SPACING.spacingXS} data-testid={`titlebar_${title}`}>
+      <Flex padding={SPACING.spacing4} data-testid={`titlebar_${title}`}>
         <Icon
           name="ot-logo"
           width={TYPOGRAPHY.lineHeight18}
@@ -52,7 +52,7 @@ export function InterstitialTitleBar(
           aria-label="ot-logo"
         />
         <Flex
-          paddingLeft={SPACING.spacingXS}
+          paddingLeft={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH3}
         >
@@ -65,8 +65,8 @@ export function InterstitialTitleBar(
           data-testid={`titlebar_${exit.title}`}
         >
           <StyledText
-            paddingRight={SPACING.spacingSS}
-            paddingTop={SPACING.spacingXS}
+            paddingRight={SPACING.spacing8}
+            paddingTop={SPACING.spacing4}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH3}
             textTransform={TYPOGRAPHY.textTransformCapitalize}

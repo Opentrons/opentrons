@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import {
   Btn,
   Icon,
@@ -11,10 +11,9 @@ import {
   JUSTIFY_CENTER,
   COLORS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
 import type { IconProps } from '@opentrons/components'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 export interface ModalHeaderProps {
   onClose?: React.MouseEventHandler
@@ -28,8 +27,8 @@ const closeIconStyles = css`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   border-radius: 0.875rem;
-  width: ${SPACING.spacingL};
-  height: ${SPACING.spacingL};
+  width: ${SPACING.spacing24};
+  height: ${SPACING.spacing24};
   &:hover {
     background-color: ${COLORS.lightGreyHover};
   }

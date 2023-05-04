@@ -1,13 +1,4 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
-import { getLocalRobot } from '../../../redux/discovery'
-import { toggleDevtools } from '../../../redux/config'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import {
   DeviceReset,
@@ -18,8 +9,14 @@ import {
   TextSize,
   UpdateChannel,
 } from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
-
+import { toggleDevtools } from '../../../redux/config'
+import { getLocalRobot } from '../../../redux/discovery'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/dom'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')

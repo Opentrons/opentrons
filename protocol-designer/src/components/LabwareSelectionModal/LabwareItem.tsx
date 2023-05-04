@@ -1,15 +1,15 @@
-import * as React from 'react'
-import cx from 'classnames'
 import { i18n } from '../../localization'
-import { Icon, IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
+import { Icon, IconName } from '@opentrons/components'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import * as React from 'react'
 
 interface Props {
   disabled?: boolean | null

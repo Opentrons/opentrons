@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../atoms/text'
 import {
   Box,
   Flex,
@@ -9,8 +7,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function RobotSettingsGripperCalibration(): JSX.Element {
   const { t } = useTranslation('device_settings')

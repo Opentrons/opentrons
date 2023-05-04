@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { startBuildrootUpdate } from '../../../redux/buildroot'
 import { ErrorUpdateSoftware } from '../ErrorUpdateSoftware'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const mockPush = jest.fn()
 jest.mock('../../../redux/buildroot')

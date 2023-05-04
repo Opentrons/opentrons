@@ -1,8 +1,6 @@
-import gripperV1 from '../gripper/definitions/1/gripperV1.json'
 import gripperV1_1 from '../gripper/definitions/1/gripperV1.1.json'
-
+import gripperV1 from '../gripper/definitions/1/gripperV1.json'
 import { GRIPPER_V1, GRIPPER_V1_1 } from './constants'
-
 import type { GripperModel, GripperDefinition } from './types'
 
 export const getGripperDef = (

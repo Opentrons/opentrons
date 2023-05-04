@@ -1,5 +1,10 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Tooltip } from '../../../atoms/Tooltip'
+import { TertiaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { useLatchControls } from '../../ModuleCard/hooks'
+import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
+import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapter_screwdriver.png'
 import {
   COLORS,
   Flex,
@@ -11,15 +16,8 @@ import {
   SIZE_AUTO,
   useHoverTooltip,
 } from '@opentrons/components'
-
-import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapter_screwdriver.png'
-import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Tooltip } from '../../../atoms/Tooltip'
-import { StyledText } from '../../../atoms/text'
-import { useLatchControls } from '../../ModuleCard/hooks'
-
-import type { HeaterShakerModule } from '../../../redux/modules/types'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface AttachAdapterProps {
   module: HeaterShakerModule
@@ -36,7 +34,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
-      <Flex paddingBottom={SPACING.spacingL}>
+      <Flex paddingBottom={SPACING.spacing24}>
         {t('step_3_of_4_attach_adapter')}
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
@@ -47,11 +45,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         >
           {t('3a')}
         </StyledText>
-        <Flex
-          border={`${String(SPACING.spacingXXS)} solid ${String(
-            COLORS.medGreyEnabled
-          )}`}
-        >
+        <Flex border={`1px solid ${COLORS.medGreyEnabled}`}>
           <Flex
             padding={`${String(SPACING.spacing4)} 5rem ${String(
               SPACING.spacing16
@@ -75,7 +69,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
               paddingRight={SPACING.spacing16}
               paddingLeft={SPACING.spacing16}
               flexDirection={DIRECTION_ROW}
-              marginRight={SPACING.spacingSM}
+              marginRight={SPACING.spacing12}
               data-testid="attach_adapter_2a_body_text"
             >
               <Flex
@@ -101,7 +95,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
             </Flex>
             <TertiaryButton
               marginLeft={SIZE_AUTO}
-              marginRight={SPACING.spacingSM}
+              marginRight={SPACING.spacing12}
               marginY={SPACING.spacing16}
               onClick={toggleLatch}
               disabled={isShaking}
@@ -119,7 +113,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing16}
@@ -128,15 +122,13 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3b')}
         </StyledText>
         <Flex
-          border={`${String(SPACING.spacingXXS)} solid ${String(
-            COLORS.medGreyEnabled
-          )}`}
+          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
           width="100%"
         >
           <Flex
             padding={`${String(SPACING.spacing20)} ${String(
-              SPACING.spacingXXL
-            )} ${String(SPACING.spacingXL)} ${String(SPACING.spacingXL)}`}
+              SPACING.spacing40
+            )} ${String(SPACING.spacing32)} ${String(SPACING.spacing32)}`}
             data-testid="attach_adapter_alignment_image"
           >
             <img
@@ -146,7 +138,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacingL}
+            marginTop={SPACING.spacing24}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             marginRight="3rem"
             data-testid="attach_adapter_alignment_text"
@@ -158,7 +150,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing16}
@@ -167,16 +159,14 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3c')}
         </StyledText>
         <Flex
-          border={`${String(SPACING.spacingXXS)} solid ${String(
-            COLORS.medGreyEnabled
-          )}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           flexDirection={DIRECTION_COLUMN}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           padding={`${String(SPACING.spacing16)} ${String(
             SPACING.spacing20
           )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
           width="100%"
-          marginBottom={SPACING.spacingSM}
+          marginBottom={SPACING.spacing12}
           data-testid="attach_adapter_check_alignment_instructions"
         >
           <StyledText>{t('check_alignment_instructions')}</StyledText>

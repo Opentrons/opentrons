@@ -1,19 +1,19 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
-import isEqual from 'lodash/isEqual'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { render, screen } from '@testing-library/react'
 import {
   getDefaultFormState,
   LabwareFields,
   yesNoOptions,
 } from '../../../fields'
 import { isEveryFieldHidden, getLabwareName } from '../../../utils'
-import { Grid } from '../../sections/Grid'
-import { FormAlerts } from '../../alerts/FormAlerts'
-import { TextField } from '../../TextField'
 import { RadioField } from '../../RadioField'
+import { TextField } from '../../TextField'
+import { FormAlerts } from '../../alerts/FormAlerts'
+import { Grid } from '../../sections/Grid'
 import { wrapInFormik } from '../../utils/wrapInFormik'
+import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
+import isEqual from 'lodash/isEqual'
+import React from 'react'
 
 jest.mock('../../../utils')
 jest.mock('../../TextField')

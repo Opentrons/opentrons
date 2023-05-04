@@ -1,6 +1,6 @@
-import styled from 'styled-components'
-import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import styled from 'styled-components'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};

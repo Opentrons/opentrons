@@ -1,5 +1,4 @@
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-
 import type {
   LoadedLabware,
   LoadedModule,

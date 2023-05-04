@@ -1,6 +1,14 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { Banner } from '../../../../atoms/Banner'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { Divider } from '../../../../atoms/structure'
+// import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
+import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
+import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
+import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
+import { getShellUpdateState } from '../../../../redux/shell'
+import { useRobot } from '../../hooks'
+import { UpdateBuildroot } from '../UpdateBuildroot'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -10,18 +18,9 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { getShellUpdateState } from '../../../../redux/shell'
-import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
-// import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
-
-import { StyledText } from '../../../../atoms/text'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { Banner } from '../../../../atoms/Banner'
-import { Modal } from '../../../../molecules/Modal'
-import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
-import { Divider } from '../../../../atoms/structure'
-import { useRobot } from '../../hooks'
-import { UpdateBuildroot } from '../UpdateBuildroot'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 const TECHNICAL_CHANGE_LOG_URL =
   'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'

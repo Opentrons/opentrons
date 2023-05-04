@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { Skeleton } from '.'
+import { Modal } from '../../molecules/Modal'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -9,10 +10,8 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { Skeleton } from '.'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/Skeleton',
@@ -28,7 +27,7 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
           paddingX={SPACING.spacing32}
           paddingTop={SPACING.spacing32}
           marginBottom={SPACING.spacing48}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Flex
             flexDirection={DIRECTION_COLUMN}

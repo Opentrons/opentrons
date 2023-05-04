@@ -1,13 +1,13 @@
-import Ajv from 'ajv'
-import glob from 'glob'
-import last from 'lodash/last'
-import path from 'path'
+import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import protocolV1Schema from '@opentrons/shared-data/protocol/schemas/1.json'
 import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
 import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
-import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
+import Ajv from 'ajv'
+import glob from 'glob'
+import last from 'lodash/last'
+import path from 'path'
 
 // TODO: copied from createFile.test.js
 const getAjvValidator = (_protocolSchema: object) => {

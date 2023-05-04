@@ -1,14 +1,13 @@
-import * as React from 'react'
-import { useFormikContext } from 'formik'
-import { LabwareFields } from '../../fields'
 import { maskLoadName } from '../../fieldMasks'
+import { LabwareFields } from '../../fields'
 import { getDefaultDisplayName, getDefaultLoadName } from '../../formSelectors'
-import { isEveryFieldHidden } from '../../utils'
-import { FormAlerts } from '../alerts/FormAlerts'
-import { TextField } from '../TextField'
-import { SectionBody } from './SectionBody'
-
 import styles from '../../styles.css'
+import { isEveryFieldHidden } from '../../utils'
+import { TextField } from '../TextField'
+import { FormAlerts } from '../alerts/FormAlerts'
+import { SectionBody } from './SectionBody'
+import { useFormikContext } from 'formik'
+import * as React from 'react'
 
 const Content = (props: { values: LabwareFields }): JSX.Element => (
   <div className={styles.flex_row}>

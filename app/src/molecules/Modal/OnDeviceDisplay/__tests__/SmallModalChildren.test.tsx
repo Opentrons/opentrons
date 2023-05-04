@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { SmallModalChildren } from '../SmallModalChildren'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const props = {
   header: 'header',

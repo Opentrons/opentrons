@@ -1,9 +1,8 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { ColorResult, TwitterPicker } from 'react-color'
-import { COLORS } from '@opentrons/components'
-
 import styles from './ColorPicker.css'
+import { COLORS } from '@opentrons/components'
+import cx from 'classnames'
+import * as React from 'react'
+import { ColorResult, TwitterPicker } from 'react-color'
 
 interface ColorPickerProps {
   value: string

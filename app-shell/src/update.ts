@@ -1,12 +1,10 @@
 // app updater
-import { autoUpdater as updater } from 'electron-updater'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import { createLogger } from './log'
 import { getConfig } from './config'
-
-import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
+import { createLogger } from './log'
 import type { Action, Dispatch, PlainError } from './types'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
+import { autoUpdater as updater } from 'electron-updater'
 
 updater.logger = createLogger('update')
 updater.autoDownload = false

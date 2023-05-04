@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   Link,
   LinkProps,
@@ -7,6 +5,7 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
+import * as React from 'react'
 
 export interface ExternalLinkProps extends LinkProps {
   href: string

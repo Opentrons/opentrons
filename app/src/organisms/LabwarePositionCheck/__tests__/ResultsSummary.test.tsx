@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
-import { ResultsSummary } from '../ResultsSummary'
-import { SECTIONS } from '../constants'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { ResultsSummary } from '../ResultsSummary'
 import {
   mockCompletedAnalysis,
   mockExistingOffsets,
   mockWorkingOffsets,
 } from '../__fixtures__'
+import { SECTIONS } from '../constants'
+import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../redux/config')
 

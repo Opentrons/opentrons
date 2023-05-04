@@ -1,7 +1,7 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import { Icon } from '@opentrons/components'
 import { TitledStepList } from '../TitledStepList'
+import { Icon } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import React from 'react'
 
 describe('TitledStepLest', () => {
   let props: React.ComponentProps<typeof TitledStepList>

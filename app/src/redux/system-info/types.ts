@@ -1,5 +1,4 @@
 // system-info types
-
 import {
   INITIALIZED,
   USB_DEVICE_ADDED,

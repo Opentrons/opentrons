@@ -1,6 +1,3 @@
-import React from 'react'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 import { WellOrderField, WellOrderFieldProps } from '../WellOrderField'
 import {
   WellOrderModal,
@@ -8,6 +5,9 @@ import {
   ResetButton,
   WellOrderModalProps,
 } from '../WellOrderField/WellOrderModal'
+import { mount } from 'enzyme'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
 
 describe('WellOrderField', () => {
   const render = (_props: WellOrderFieldProps) =>

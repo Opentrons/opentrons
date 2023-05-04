@@ -1,8 +1,7 @@
 // navigation components tests
+import { SidePanel } from '..'
 import React from 'react'
 import Renderer from 'react-test-renderer'
-
-import { SidePanel } from '..'
 
 describe('SidePanel', () => {
   it('renders sidebar with title', () => {

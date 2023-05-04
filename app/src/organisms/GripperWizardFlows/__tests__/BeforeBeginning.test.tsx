@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../../CalibrationPanels'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { GRIPPER_FLOW_TYPES } from '../constants'
+import { renderWithProviders } from '@opentrons/components'
+import { waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 

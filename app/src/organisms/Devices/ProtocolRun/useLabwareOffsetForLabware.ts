@@ -1,12 +1,10 @@
-import { useRunQuery } from '@opentrons/react-api-client'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
-
 import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
 import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
-
-import type { LabwareOffset } from '@opentrons/api-client'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import type { LabwareOffset } from '@opentrons/api-client'
+import { useRunQuery } from '@opentrons/react-api-client'
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 export function useLabwareOffsetForLabware(
   runId: string,

@@ -1,10 +1,8 @@
-import * as React from 'react'
-
-import { Box, SIZE_3 } from '@opentrons/components'
-import { ICON_DATA_BY_NAME } from './icon-data'
 import { Icon as IconComponent } from './Icon'
-
+import { ICON_DATA_BY_NAME } from './icon-data'
+import { Box, SIZE_3 } from '@opentrons/components'
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'Library/Atoms/Icon',

@@ -1,16 +1,17 @@
-import type {
-  CommandsAndWarnings,
-  InvariantContext,
-  RobotState,
-} from '../types'
+import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
 import {
   makeContext,
   getInitialRobotStateStandard,
   getSuccessResult,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
+import type {
+  CommandsAndWarnings,
+  InvariantContext,
+  RobotState,
+} from '../types'
+
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 let initialRobotState: RobotState

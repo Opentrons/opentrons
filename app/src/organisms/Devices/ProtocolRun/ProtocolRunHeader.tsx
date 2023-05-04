@@ -1,8 +1,48 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { Link, useHistory } from 'react-router-dom'
-
+import { Banner } from '../../../atoms/Banner'
+import { Tooltip } from '../../../atoms/Tooltip'
+import { StyledText } from '../../../atoms/text'
+import {
+  useCloseCurrentRun,
+  useCurrentRunId,
+} from '../../../organisms/ProtocolUpload/hooks'
+import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+import {
+  useRunControls,
+  useRunStatus,
+  useRunTimestamps,
+} from '../../../organisms/RunTimeControl/hooks'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_RUN_PAUSE,
+  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_RESUME,
+} from '../../../redux/analytics'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
+import type { State } from '../../../redux/types'
+import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
+import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
+import { RunProgressMeter } from '../../RunProgressMeter'
+import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
+import { EMPTY_TIMESTAMP } from '../constants'
+import {
+  useProtocolDetailsForRun,
+  useProtocolAnalysisErrors,
+  useRunCalibrationStatus,
+  useRunCreatedAtTimestamp,
+  useUnmatchedModulesForProtocol,
+  useIsRobotViewable,
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
+} from '../hooks'
+import { formatTimestamp } from '../utils'
+import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
+import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
+import { RunTimer } from './RunTimer'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
@@ -16,8 +56,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RunStatus,
 } from '@opentrons/api-client'
-import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import type { Run } from '@opentrons/api-client'
 import {
   Box,
   Flex,
@@ -39,54 +78,12 @@ import {
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
-import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
-import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
-import { Banner } from '../../../atoms/Banner'
-import {
-  useTrackEvent,
-  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
-  ANALYTICS_PROTOCOL_RUN_FINISH,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
-} from '../../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
-import { Tooltip } from '../../../atoms/Tooltip'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
-import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
-import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
-import {
-  useRunControls,
-  useRunStatus,
-  useRunTimestamps,
-} from '../../../organisms/RunTimeControl/hooks'
-import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
-import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
-import {
-  useProtocolDetailsForRun,
-  useProtocolAnalysisErrors,
-  useRunCalibrationStatus,
-  useRunCreatedAtTimestamp,
-  useUnmatchedModulesForProtocol,
-  useIsRobotViewable,
-  useTrackProtocolRunEvent,
-  useRobotAnalyticsData,
-} from '../hooks'
-import { formatTimestamp } from '../utils'
-import { RunTimer } from './RunTimer'
-import { EMPTY_TIMESTAMP } from '../constants'
-
-import type { Run } from '@opentrons/api-client'
-import type { State } from '../../../redux/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
-import { RunProgressMeter } from '../../RunProgressMeter'
+import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { Link, useHistory } from 'react-router-dom'
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -534,7 +531,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        padding={`${SPACING.spacingSM} ${SPACING.spacing16}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
         disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"

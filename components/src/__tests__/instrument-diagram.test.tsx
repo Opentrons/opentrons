@@ -1,7 +1,6 @@
+import { InstrumentDiagram, InstrumentGroup } from '..'
 import React from 'react'
 import Renderer from 'react-test-renderer'
-
-import { InstrumentDiagram, InstrumentGroup } from '..'
 
 // TODO(bc, 2021-03-03): unit test this component and split out InstrumentDiagram from InstrumentGroup
 

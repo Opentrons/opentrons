@@ -1,13 +1,11 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
-import { SetWifiCred } from '../SetWifiCred'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
+import { SetWifiCred } from '../SetWifiCred'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 const mockPush = jest.fn()
 const mockSetShowSelectAuthenticationType = jest.fn()

@@ -1,7 +1,4 @@
 // modal component tests
-import React from 'react'
-import Renderer from 'react-test-renderer'
-
 import {
   Modal,
   AlertModal,
@@ -10,6 +7,8 @@ import {
   SpinnerModalPage,
   Overlay,
 } from '..'
+import React from 'react'
+import Renderer from 'react-test-renderer'
 
 describe('modals', () => {
   it('Modal has a clickable overlay', () => {

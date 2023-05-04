@@ -1,15 +1,14 @@
+import { UpdateAppModal } from '..'
+import type { UpdateAppModalProps } from '..'
+import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
+import { ErrorModal } from '../../../molecules/modals'
+import * as Shell from '../../../redux/shell'
+import type { ShellUpdateState } from '../../../redux/shell/types'
+import type { State, Action } from '../../../redux/types'
+import { mountWithStore, BaseModal, Flex, Icon } from '@opentrons/components'
+import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Link as InternalLink } from 'react-router-dom'
-import { mountWithStore, BaseModal, Flex, Icon } from '@opentrons/components'
-import * as Shell from '../../../redux/shell'
-import { ErrorModal } from '../../../molecules/modals'
-import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
-import { UpdateAppModal } from '..'
-
-import type { State, Action } from '../../../redux/types'
-import type { ShellUpdateState } from '../../../redux/shell/types'
-import type { UpdateAppModalProps } from '..'
-import type { HTMLAttributes, ReactWrapper } from 'enzyme'
 
 // TODO(mc, 2020-10-06): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors

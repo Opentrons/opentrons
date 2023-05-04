@@ -1,8 +1,8 @@
-import assert from 'assert'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, EngageMagnetArgs } from '../../types'
+import { uuid } from '../../utils'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import assert from 'assert'
 
 /** Engage magnet of specified magnetic module to given engage height. */
 export const engageMagnet: CommandCreator<EngageMagnetArgs> = (

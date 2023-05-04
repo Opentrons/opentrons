@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
 import {
   getBatchEditSelectedStepTypes,
   getHoveredItem,
 } from '../ui/steps/selectors'
 import { DeckSetup } from './DeckSetup'
 import { NullDeckState } from './DeckSetup/DeckSetup'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 export const DeckSetupManager = (): JSX.Element => {
   const batchEditSelectedStepTypes = useSelector(getBatchEditSelectedStepTypes)

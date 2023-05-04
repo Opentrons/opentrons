@@ -1,6 +1,6 @@
 // discovery actions test
-import * as actions from '../actions'
 import type { Action } from '../../types'
+import * as actions from '../actions'
 
 describe('discovery actions', () => {
   const SPECS: Array<{

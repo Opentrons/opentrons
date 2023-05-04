@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import type {
   TemperatureModuleAwaitTemperatureCreateCommand,
   TemperatureModuleSetTargetTemperatureCreateCommand,
@@ -6,6 +5,7 @@ import type {
   TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useTranslation } from 'react-i18next'
 
 type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand

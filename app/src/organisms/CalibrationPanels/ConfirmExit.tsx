@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
+import { NeedHelpLink } from './NeedHelpLink'
 import {
   Icon,
   Flex,
@@ -13,9 +13,8 @@ import {
   AlertPrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-
-import { NeedHelpLink } from './NeedHelpLink'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ConfirmExitProps {
   back: () => void

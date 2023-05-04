@@ -1,5 +1,5 @@
-import isArray from 'lodash/isArray'
 import { i18n } from '../../localization'
+import isArray from 'lodash/isArray'
 
 /*******************
  ** Error Messages **

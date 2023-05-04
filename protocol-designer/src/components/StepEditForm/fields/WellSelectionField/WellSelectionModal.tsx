@@ -1,8 +1,14 @@
-import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
-import omit from 'lodash/omit'
-
+import { StepFieldName } from '../../../../form-types'
+import { selectors } from '../../../../labware-ingred/selectors'
+import { ContentsByWell } from '../../../../labware-ingred/types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { WellIngredientNames } from '../../../../steplist/types'
+import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
+import { arrayToWellGroup } from '../../../../utils'
+import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
+import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
+import modalStyles from '../../../modals/modal.css'
+import styles from './WellSelectionModal.css'
 import {
   Modal,
   OutlineButton,
@@ -15,20 +21,10 @@ import {
   LabwareDefinition2,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-
-import { arrayToWellGroup } from '../../../../utils'
-import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
-import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
-
-import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { ContentsByWell } from '../../../../labware-ingred/types'
-import { WellIngredientNames } from '../../../../steplist/types'
-import { StepFieldName } from '../../../../form-types'
-
-import styles from './WellSelectionModal.css'
-import modalStyles from '../../../modals/modal.css'
+import cx from 'classnames'
+import omit from 'lodash/omit'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 interface WellSelectionModalProps {
   isOpen: boolean

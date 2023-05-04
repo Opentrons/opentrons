@@ -1,5 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Portal } from '../../../../App/portal'
+import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
+import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
 import {
   Flex,
   Link,
@@ -11,10 +13,8 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
-import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
-import { StyledText } from '../../../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'

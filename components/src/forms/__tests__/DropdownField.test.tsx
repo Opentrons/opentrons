@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { mount } from 'enzyme'
-
 import { DropdownField } from '../DropdownField'
+import { mount } from 'enzyme'
+import * as React from 'react'
 
 describe('DropdownField', () => {
   it('populates the dropdown with value when present', () => {

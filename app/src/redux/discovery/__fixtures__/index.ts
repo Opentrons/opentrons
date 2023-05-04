@@ -5,7 +5,6 @@ import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
 } from '../constants'
-
 import type {
   BaseRobot,
   Robot,

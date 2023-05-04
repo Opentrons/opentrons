@@ -1,11 +1,12 @@
-import omit from 'lodash/omit'
+import { RehydratePersistedAction } from '../persist'
+import { Action } from '../types'
+import { SetFeatureFlagAction } from './actions'
+import { Flags, FlagTypes, userFacingFlags, DEPRECATED_FLAGS } from './types'
 import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
 import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { Flags, FlagTypes, userFacingFlags, DEPRECATED_FLAGS } from './types'
-import { RehydratePersistedAction } from '../persist'
-import { SetFeatureFlagAction } from './actions'
-import { Action } from '../types'
+
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.

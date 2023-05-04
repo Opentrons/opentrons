@@ -1,11 +1,11 @@
-import * as React from 'react'
-import type { MatcherFunction } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ReturnTip } from '../ReturnTip'
-import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
+import { SECTIONS } from '../constants'
+import { renderWithProviders } from '@opentrons/components'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+import type { MatcherFunction } from '@testing-library/react'
+import * as React from 'react'
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
   text: string

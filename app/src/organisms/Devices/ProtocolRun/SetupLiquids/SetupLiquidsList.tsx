@@ -1,11 +1,21 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import { StyledText } from '../../../../atoms/text'
+import {
+  useTrackEvent,
+  ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
+  ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+} from '../../../../redux/analytics'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
+import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
+import {
+  getTotalVolumePerLiquidId,
+  getTotalVolumePerLiquidLabwarePair,
+} from './utils'
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
 } from '@opentrons/api-client'
-
+import type { LabwareByLiquidId } from '@opentrons/api-client'
 import {
   Flex,
   SPACING,
@@ -23,21 +33,9 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import {
-  useTrackEvent,
-  ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
-  ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
-} from '../../../../redux/analytics'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { StyledText } from '../../../../atoms/text'
-import { getSlotLabwareName } from '../utils/getSlotLabwareName'
-import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-import {
-  getTotalVolumePerLiquidId,
-  getTotalVolumePerLiquidLabwarePair,
-} from './utils'
-
-import type { LabwareByLiquidId } from '@opentrons/api-client'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 interface SetupLiquidsListProps {
   runId: string

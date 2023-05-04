@@ -1,7 +1,6 @@
 // access main process remote modules via attachments to `global`
-import assert from 'assert'
-
 import type { Remote } from './types'
+import assert from 'assert'
 
 const emptyRemote: Remote = {} as any
 

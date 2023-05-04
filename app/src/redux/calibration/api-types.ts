@@ -10,7 +10,6 @@ import {
   CALIBRATION_SOURCE_UNKNOWN,
   CALIBRATION_SOURCE_LEGACY,
 } from './constants'
-
 import type { Mount } from '@opentrons/components'
 
 export type DeckCalibrationStatus =

@@ -1,13 +1,11 @@
-import pipetteNameSpecsFixtures from '../../../pipette/fixtures/name/pipetteNameSpecFixtures.json'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
-
-import { makeWellSetHelpers } from '../wellSets'
-import { findWellAt } from '../getWellNamePerMultiTip'
-
+import pipetteNameSpecsFixtures from '../../../pipette/fixtures/name/pipetteNameSpecFixtures.json'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../../types'
+import { findWellAt } from '../getWellNamePerMultiTip'
+import { makeWellSetHelpers } from '../wellSets'
 import type { WellSetHelpers } from '../wellSets'
 
 const fixtureP10Single = pipetteNameSpecsFixtures.p10_single as PipetteNameSpecs

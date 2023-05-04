@@ -1,5 +1,10 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { TertiaryButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
+import {
+  useTrackEvent,
+  ANALYTICS_JUPYTER_OPEN,
+} from '../../../../redux/analytics'
 import {
   Link,
   Flex,
@@ -9,13 +14,8 @@ import {
   Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useTrackEvent,
-  ANALYTICS_JUPYTER_OPEN,
-} from '../../../../redux/analytics'
-import { StyledText } from '../../../../atoms/text'
-import { TertiaryButton } from '../../../../atoms/buttons'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 

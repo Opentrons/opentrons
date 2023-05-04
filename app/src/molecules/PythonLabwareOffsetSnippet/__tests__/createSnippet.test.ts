@@ -1,6 +1,6 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 import { createSnippet } from '../createSnippet'
 import { ModuleModel, CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
 
 const protocolWithMagTempTC = ({
   ..._protocolWithMagTempTC,

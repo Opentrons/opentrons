@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import screenImage from '../../assets/images/on-device-display/welcome_background.png'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   SPACING,
@@ -9,10 +9,9 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-
-import screenImage from '../../assets/images/on-device-display/welcome_background.png'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 const IMAGE_ALT = 'Welcome screen background image'
 
@@ -49,7 +48,7 @@ export function Welcome(): JSX.Element {
           {t('welcome_description')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacingXXL}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing40}>
         <SmallButton
           buttonType="primary"
           buttonText={t('shared:get_started')}

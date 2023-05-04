@@ -1,31 +1,31 @@
-import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { PipetteWizardFlows } from '..'
+import { i18n } from '../../../i18n'
+import { getIsOnDevice } from '../../../redux/config'
+import {
+  mock96ChannelAttachedPipetteInformation,
+  mockAttachedPipetteInformation,
+} from '../../../redux/pipettes/__fixtures__'
+import * as RobotApi from '../../../redux/robot-api'
+import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
+import { useRunStatus } from '../../RunTimeControl/hooks'
+import { ExitModal } from '../ExitModal'
+import { UnskippableModal } from '../UnskippableModal'
+import { FLOWS, SECTIONS } from '../constants'
+import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { renderWithProviders } from '@opentrons/components'
+import {
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
+} from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import {
-  useCreateMaintenanceRunMutation,
-  useDeleteMaintenanceRunMutation,
-} from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
-import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
-import {
-  mock96ChannelAttachedPipetteInformation,
-  mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
-import * as RobotApi from '../../../redux/robot-api'
-import { getIsOnDevice } from '../../../redux/config'
-import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
-import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
-import { ExitModal } from '../ExitModal'
-import { FLOWS, SECTIONS } from '../constants'
-import { UnskippableModal } from '../UnskippableModal'
-import { PipetteWizardFlows } from '..'
+import { fireEvent, waitFor } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')

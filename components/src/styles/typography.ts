@@ -1,7 +1,5 @@
-import { css } from 'styled-components'
-
 import { C_DARK_GRAY, C_WHITE } from './colors'
-
+import { css } from 'styled-components'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 // font size values

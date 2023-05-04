@@ -1,17 +1,14 @@
 // tests for the robot-api fetch wrapper
-
-import { promisify } from 'util'
-import express from 'express'
-import multer from 'multer'
-import portfinder from 'portfinder'
-import fetch from 'node-fetch'
-import FormData from 'form-data'
-
-import { robotApiUrl, fetchRobotApi } from '../http'
 import { HTTP_API_VERSION, GET, POST, PATCH, DELETE } from '../constants'
-
-import type { Application } from 'express'
+import { robotApiUrl, fetchRobotApi } from '../http'
 import type { RobotHost } from '../types'
+import express from 'express'
+import type { Application } from 'express'
+import FormData from 'form-data'
+import multer from 'multer'
+import fetch from 'node-fetch'
+import portfinder from 'portfinder'
+import { promisify } from 'util'
 
 jest.unmock('node-fetch')
 

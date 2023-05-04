@@ -1,7 +1,7 @@
+import styles from './tooltips.css'
+import cx from 'classnames'
 import * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
-import cx from 'classnames'
-import styles from './tooltips.css'
 
 const DISTANCE_FROM_REFERENCE = 8
 

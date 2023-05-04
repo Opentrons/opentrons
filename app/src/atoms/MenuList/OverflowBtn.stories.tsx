@@ -1,7 +1,6 @@
-import * as React from 'react'
 import { OverflowBtn } from './OverflowBtn'
-
 import type { Story, Meta } from '@storybook/react'
+import * as React from 'react'
 
 export default {
   title: 'App/Atoms/OverflowBtn',

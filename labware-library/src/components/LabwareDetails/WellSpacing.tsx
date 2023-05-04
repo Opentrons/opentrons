@@ -1,7 +1,4 @@
 // well dimensions and spacing for details page
-import * as React from 'react'
-import round from 'lodash/round'
-
 import {
   SPACING,
   X_OFFSET,
@@ -12,13 +9,12 @@ import {
   VARIOUS,
   MM,
 } from '../../localization'
-
-import styles from './styles.css'
-
-import { LabeledValueTable, LowercaseText } from '../ui'
-import { getSpacingDiagram } from '../measurement-guide'
-
 import type { LabwareWellGroupProperties } from '../../types'
+import { getSpacingDiagram } from '../measurement-guide'
+import { LabeledValueTable, LowercaseText } from '../ui'
+import styles from './styles.css'
+import round from 'lodash/round'
+import * as React from 'react'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

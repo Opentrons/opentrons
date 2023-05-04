@@ -1,8 +1,10 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
+import { TertiaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
+import { getLocalRobot } from '../../../redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
+import type { Dispatch, State } from '../../../redux/types'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,15 +18,10 @@ import {
   JUSTIFY_CENTER,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { getLocalRobot } from '../../../redux/discovery'
-import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
-
-import type { Dispatch, State } from '../../../redux/types'
-import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
-import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 interface SelectAuthenticationTypeProps {
   ssid: string
@@ -73,8 +70,8 @@ export function SelectAuthenticationType({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       padding={`${String(SPACING.spacing32)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+        SPACING.spacing40
+      )} ${String(SPACING.spacing40)}`}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -131,7 +128,9 @@ export function SelectAuthenticationType({
             backgroundColor={
               selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
             }
-            padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing32)}`}
+            padding={`${String(SPACING.spacing16)} ${String(
+              SPACING.spacing32
+            )}`}
             borderRadius="3.5625rem"
             onClick={() => {
               setSelectedAuthType('wpa-psk')
@@ -149,7 +148,9 @@ export function SelectAuthenticationType({
           <Btn
             backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
-            padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing32)}`}
+            padding={`${String(SPACING.spacing16)} ${String(
+              SPACING.spacing32
+            )}`}
             onClick={() => {
               setSelectedAuthType('none')
             }}
@@ -200,7 +201,7 @@ export function SelectAuthenticationType({
             {t('switch_to_usb_description')}
           </StyledText>
           <Btn
-            marginLeft={SPACING.spacingSM}
+            marginLeft={SPACING.spacing12}
             padding={`0.75rem ${String(SPACING.spacing24)}`}
             width="13.8125rem"
             onClick={() => history.push('/network-setup/usb')}

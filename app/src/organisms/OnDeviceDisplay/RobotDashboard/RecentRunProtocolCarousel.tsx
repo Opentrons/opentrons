@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { RecentRunProtocolCard } from './RecentRunProtocolCard'
 import {
   ALIGN_FLEX_START,
   DIRECTION_ROW,
@@ -8,9 +8,8 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { RecentRunProtocolCard } from './RecentRunProtocolCard'
-
 import type { ProtocolResource } from '@opentrons/shared-data'
+import * as React from 'react'
 
 interface RecentRunProtocolCarouselProps {
   sortedProtocols: ProtocolResource[]

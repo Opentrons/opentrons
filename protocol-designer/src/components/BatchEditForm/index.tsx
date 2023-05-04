@@ -1,22 +1,22 @@
-import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
-import { NoBatchEditSharedSettings } from './NoBatchEditSharedSettings'
+import {
+  changeBatchEditField,
+  resetBatchEditFieldChanges,
+  saveStepFormsMulti,
+} from '../../step-forms/actions'
+import { getBatchEditFormHasUnsavedChanges } from '../../step-forms/selectors'
+import { maskField, StepFieldName } from '../../steplist/fieldLevel'
 import {
   getBatchEditSelectedStepTypes,
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
   getMultiSelectItemIds,
 } from '../../ui/steps/selectors'
-import { getBatchEditFormHasUnsavedChanges } from '../../step-forms/selectors'
-import {
-  changeBatchEditField,
-  resetBatchEditFieldChanges,
-  saveStepFormsMulti,
-} from '../../step-forms/actions'
-import { maskField, StepFieldName } from '../../steplist/fieldLevel'
-import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
+import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
+import { NoBatchEditSharedSettings } from './NoBatchEditSharedSettings'
+import { makeBatchEditFieldProps } from './makeBatchEditFieldProps'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 export const BatchEditForm = (): JSX.Element => {
   const dispatch = useDispatch()

@@ -1,13 +1,14 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
+import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../atoms/text'
+import { GripperCard } from '../GripperCard'
+import { ModuleCard } from '../ModuleCard'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { PipetteCard } from './PipetteCard'
+import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useModulesQuery,
-  usePipettesQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
-
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from './utils'
 import {
   Flex,
   ALIGN_CENTER,
@@ -19,18 +20,15 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { ModuleCard } from '../ModuleCard'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
-  getIs96ChannelPipetteAttached,
-  getOffsetCalibrationForMount,
-} from './utils'
-import { PipetteCard } from './PipetteCard'
-import { GripperCard } from '../GripperCard'
+  useAllPipetteOffsetCalibrationsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
+import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const EQUIPMENT_POLL_MS = 5000
 const FETCH_PIPETTE_CAL_POLL = 30000
@@ -213,10 +211,10 @@ export function InstrumentsAndModules({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingSM}
+            gridGap={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             minHeight={SIZE_3}
-            padding={SPACING.spacingSM}
+            padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText

@@ -1,9 +1,8 @@
 // shell/update tests
-
-import * as ShellUpdate from '../update'
+import type { State } from '../../types'
 import { shellUpdateReducer } from '../reducer'
 import type { ShellUpdateState, ShellUpdateAction } from '../types'
-import type { State } from '../../types'
+import * as ShellUpdate from '../update'
 
 describe('shell/update', () => {
   describe('action creators', () => {

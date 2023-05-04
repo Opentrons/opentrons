@@ -14,7 +14,6 @@ Style props will pass their value directly into CSS, but for safety, try to use 
 
 ```js static
 import { Box, C_DARK_GRAY, C_WHITE } from '@opentrons/components'
-
 const GrayBox = () => <Box color={C_WHITE} backgroundColor={C_DARK_GRAY} />
 ```
 
@@ -36,7 +35,6 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_TITLE,
 } from '@opentrons/components'
-
 const Heading = () => (
   <Text
     fontSize={FONT_SIZE_HEADER}
@@ -67,7 +65,6 @@ const Heading = () => (
 
 ```js static
 import { Box, SPACING_AUTO, SPACING_3 } from '@opentrons/components'
-
 const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 ```
 
@@ -92,7 +89,6 @@ import {
   BORDER_SOLID_LIGHT,
   BORDER_RADIUS_DEFAULT,
 } from '@opentrons/components'
-
 const Heading = () => (
   <Box border={BORDER_SOLID_LIGHT} borderRadius={BORDER_RADIUS_DEFAULT} />
 )
@@ -114,7 +110,6 @@ import {
   ALIGN_ITEMS_CENTER,
   JUSTIFY_CONTENT_CENTER,
 } from '@opentrons/components'
-
 const Heading = () => (
   <Flex
     alignItems={ALIGN_ITEMS_CENTER}
@@ -141,7 +136,6 @@ const Heading = () => (
 
 ```js static
 import { Box, SIZE_4, OVERFLOW_HIDDEN } from '@opentrons/components'
-
 const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 ```
 
@@ -158,7 +152,6 @@ const Heading = () => <Box size={SIZE_4} overflow={OVERFLOW_HIDDEN} />
 
 ```js static
 import { Box, POSITION_ABSOLUTE } from '@opentrons/components'
-
 const Fill = () => (
   <Box position={POSITION_ABSOLUTE} top={0} right={0} bottom={0} left={0} />
 )
@@ -174,11 +167,9 @@ If you find yourself in a place where...
 ...you can create your own primitive with the style props above using `styleProps` (to apply the styles based on props) and `isntStyleProp` (to ensure style props don't get passed down to the DOM):
 
 ```js static
-import styled from 'styled-components'
 import { styleProps, isntStyleProp, C_DARK_GRAY } from '@opentrons/components'
-
 import type { PrimitiveComponent } from '@opentrons/components'
-
+import styled from 'styled-components'
 export const Gray: PrimitiveComponent<'div'> = styled.div.withConfig({
   shouldForwardProp: isntStyleProp,
 })`

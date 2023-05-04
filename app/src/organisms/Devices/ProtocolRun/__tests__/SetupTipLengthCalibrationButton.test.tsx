@@ -1,17 +1,14 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
 import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
-import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
 import { useDashboardCalibrateTipLength } from '../../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
+import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
-
+import { renderWithProviders } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('@opentrons/components/src/hooks')
 jest.mock('../../../../organisms/RunTimeControl/hooks')

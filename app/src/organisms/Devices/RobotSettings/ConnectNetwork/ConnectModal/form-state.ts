@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
-import { useFormikContext, useField } from 'formik'
-import { usePrevious } from '@opentrons/components'
-
 import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
+import { usePrevious } from '@opentrons/components'
+import { useFormikContext, useField } from 'formik'
+import { useEffect } from 'react'
 
 export const useResetFormOnSecurityChange = (): void => {
   const {

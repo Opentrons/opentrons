@@ -1,7 +1,12 @@
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import pick from 'lodash/pick'
-import { Trans, useTranslation } from 'react-i18next'
+import { Portal } from '../../App/portal'
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { StyledText } from '../../atoms/text'
+import { ModalHeader, ModalShell } from '../../molecules/Modal'
+import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
+import { LabwareOffsetTable } from './LabwareOffsetTable'
+import type { LabwareOffset } from '@opentrons/api-client'
 import {
   Flex,
   Link,
@@ -14,20 +19,15 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   CheckboxField,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-import { ModalHeader, ModalShell } from '../../molecules/Modal'
-import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
-import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { StyledText } from '../../atoms/text'
-import { LabwareOffsetTable } from './LabwareOffsetTable'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
-import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import pick from 'lodash/pick'
+import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

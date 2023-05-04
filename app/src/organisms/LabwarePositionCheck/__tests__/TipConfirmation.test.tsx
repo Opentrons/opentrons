@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
-import { TipConfirmation } from '../TipConfirmation'
 import { i18n } from '../../../i18n'
+import { TipConfirmation } from '../TipConfirmation'
+import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof TipConfirmation>) => {
   return renderWithProviders(<TipConfirmation {...props} />, {

@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { StepFieldName } from '../../../steplist/fieldLevel'
+import styles from '../StepEditForm.css'
+import { FieldProps } from '../types'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
-import styles from '../StepEditForm.css'
-import { StepFieldName } from '../../../steplist/fieldLevel'
-import { FieldProps } from '../types'
+import * as React from 'react'
 
 export interface StepFormDropdownProps extends FieldProps {
   options: Options

@@ -1,6 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StatusLabel } from '../../../atoms/StatusLabel'
+import { StyledText } from '../../../atoms/text'
 import {
   Flex,
   DIRECTION_ROW,
@@ -8,9 +7,8 @@ import {
   TYPOGRAPHY,
   COLORS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import { StatusLabel } from '../../../atoms/StatusLabel'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface CalibrationHealthCheckResultsProps {
   isCalibrationCompleted: boolean

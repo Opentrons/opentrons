@@ -1,14 +1,14 @@
-import isEqual from 'lodash/isEqual'
-import uniqWith from 'lodash/uniqWith'
-import round from 'lodash/round'
-import sortedUniq from 'lodash/sortedUniq'
-import uniq from 'lodash/uniq'
 import type {
   LabwareWell,
   LabwareWellShapeProperties,
   LabwareWellGroupProperties,
   LabwareDefinition,
 } from '../../../pages/Labware/types'
+import isEqual from 'lodash/isEqual'
+import round from 'lodash/round'
+import sortedUniq from 'lodash/sortedUniq'
+import uniq from 'lodash/uniq'
+import uniqWith from 'lodash/uniqWith'
 
 const ROUNDING_PRECISION = 2
 

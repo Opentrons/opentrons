@@ -1,5 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { CheckPipetteButton } from './CheckPipetteButton'
+import { FLOWS } from './constants'
+import type { PipetteWizardStepProps } from './types'
 import {
   COLORS,
   TYPOGRAPHY,
@@ -8,11 +11,8 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { CheckPipetteButton } from './CheckPipetteButton'
-import { FLOWS } from './constants'
-import type { PipetteWizardStepProps } from './types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void

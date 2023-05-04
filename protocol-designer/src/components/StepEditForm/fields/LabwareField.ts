@@ -1,8 +1,8 @@
-import { connect } from 'react-redux'
+import { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { StepFormDropdown } from './StepFormDropdownField'
 import { Options } from '@opentrons/components'
-import { BaseState } from '../../../types'
+import { connect } from 'react-redux'
 
 interface SP {
   options: Options

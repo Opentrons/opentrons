@@ -1,5 +1,4 @@
 // common types
-
 import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 export interface StoredProtocolDir {

@@ -1,8 +1,7 @@
 // tests for main navbar
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { MainNav } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('MainNav', () => {
   it('component renders', () => {

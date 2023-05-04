@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { RadioGroup } from '@opentrons/components'
 import { StepFieldName } from '../../../steplist/fieldLevel'
 import { FieldProps } from '../types'
+import { RadioGroup } from '@opentrons/components'
+import * as React from 'react'
 
 interface RadioGroupFieldProps extends FieldProps {
   name: StepFieldName

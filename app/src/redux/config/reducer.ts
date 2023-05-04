@@ -1,8 +1,7 @@
-import { setIn } from '@thi.ng/paths'
-import { INITIALIZED, VALUE_UPDATED } from './constants'
-
 import type { Action } from '../types'
+import { INITIALIZED, VALUE_UPDATED } from './constants'
 import type { ConfigState } from './types'
+import { setIn } from '@thi.ng/paths'
 
 // config reducer
 export function configReducer(

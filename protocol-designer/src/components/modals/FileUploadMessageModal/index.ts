@@ -1,14 +1,14 @@
 import {
+  selectors as loadFileSelectors,
+  actions as loadFileActions,
+} from '../../../load-file'
+import { BaseState } from '../../../types'
+import {
   FileUploadMessageModal as FileUploadMessageModalComponent,
   FileUploadMessageModalProps,
 } from './FileUploadMessageModal'
 import { connect } from 'react-redux'
-import {
-  selectors as loadFileSelectors,
-  actions as loadFileActions,
-} from '../../../load-file'
 import { Dispatch } from 'redux'
-import { BaseState } from '../../../types'
 
 type Props = FileUploadMessageModalProps
 interface SP {

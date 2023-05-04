@@ -1,6 +1,6 @@
-import * as React from 'react'
 import styles from './styles.css'
 import type { VersionProps } from './types'
+import * as React from 'react'
 
 export function VersionList(props: VersionProps): JSX.Element {
   return (

@@ -1,6 +1,8 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { InputField } from '../../atoms/InputField'
+import { Slideout } from '../../atoms/Slideout'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import type { MagneticModule } from '../../redux/modules/types'
 import {
   Flex,
   DIRECTION_ROW,
@@ -11,6 +13,7 @@ import {
   SPACING,
   JUSTIFY_END,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
@@ -20,16 +23,11 @@ import {
   MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
   MM,
 } from '@opentrons/shared-data'
-
-import { StyledText } from '../../atoms/text'
-import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
-
-import type { TFunctionResult } from 'i18next'
-import type { MagneticModule } from '../../redux/modules/types'
 import type { MagneticModuleModel } from '@opentrons/shared-data'
 import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { TFunctionResult } from 'i18next'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ModelContents {
   version: string

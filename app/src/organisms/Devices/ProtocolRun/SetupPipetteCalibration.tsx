@@ -1,6 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../../atoms/text'
+import * as PipetteConstants from '../../../redux/pipettes/constants'
+import { useRunPipetteInfoByMount } from '../hooks'
+import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,11 +9,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
-import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useRunPipetteInfoByMount } from '../hooks'
-import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SetupPipetteCalibrationProps {
   robotName: string

@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { Collapsible } from '../Collapsible'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof Collapsible>) => {
   return renderWithProviders(<Collapsible {...props} />)[0]

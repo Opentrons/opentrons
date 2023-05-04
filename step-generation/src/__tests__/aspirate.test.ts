@@ -1,18 +1,6 @@
-import { when } from 'jest-when'
+import type { InvariantContext, RobotState } from '../'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import {
-  pipetteIntoHeaterShakerLatchOpen,
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
@@ -22,9 +10,21 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
+import {
+  pipetteIntoHeaterShakerLatchOpen,
+  thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+} from '../utils'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { InvariantContext, RobotState } from '../'
+import { when } from 'jest-when'
 
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2

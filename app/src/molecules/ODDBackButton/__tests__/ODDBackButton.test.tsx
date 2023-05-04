@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ODDBackButton } from '..'
+import { renderWithProviders, COLORS } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof ODDBackButton>) => {
   return renderWithProviders(<ODDBackButton {...props} />)[0]

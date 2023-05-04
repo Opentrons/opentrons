@@ -1,9 +1,8 @@
+import { StyledText } from '../../../atoms/text'
+import * as Sessions from '../../../redux/sessions'
+import type { SessionType } from '../../../redux/sessions/types'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import * as Sessions from '../../../redux/sessions'
-import { StyledText } from '../../../atoms/text'
-
-import type { SessionType } from '../../../redux/sessions/types'
 
 interface BodyProps {
   sessionType: SessionType

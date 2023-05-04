@@ -1,6 +1,12 @@
-import React from 'react'
-import { Formik } from 'formik'
-import { shallow } from 'enzyme'
+import { FormState } from '..'
+import { FilePipettesModal, Props } from '../'
+import { i18n } from '../../../../localization'
+import { FormPipettesByMount } from '../../../../step-forms'
+import { CrashInfoBox } from '../../../modules'
+import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConfirmModal'
+import { ModuleFields } from '../ModuleFields'
+import { PipetteFields } from '../PipetteFields'
+import { Modal, InputField, OutlineButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -10,15 +16,9 @@ import {
   MAGNETIC_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { Modal, InputField, OutlineButton } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { CrashInfoBox } from '../../../modules'
-import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConfirmModal'
-import { PipetteFields } from '../PipetteFields'
-import { ModuleFields } from '../ModuleFields'
-import { FilePipettesModal, Props } from '../'
-import { FormPipettesByMount } from '../../../../step-forms'
-import { FormState } from '..'
+import { shallow } from 'enzyme'
+import { Formik } from 'formik'
+import React from 'react'
 
 describe('FilePipettesModal', () => {
   const tiprackDefURI = 'tiprack_300'

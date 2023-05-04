@@ -1,6 +1,7 @@
 import { getNextDefaultPipetteId } from '../'
 import { FormData, StepIdType } from '../../../../form-types'
 import { PipetteOnDeck } from '../../../../step-forms'
+
 describe('getNextDefaultPipetteId', () => {
   describe('no previous forms', () => {
     const testCases: Array<{

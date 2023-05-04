@@ -1,11 +1,11 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import {
   PreviousVersionModal,
   UNINSTALL_APP_URL,
   PREVIOUS_RELEASES_URL,
 } from '../PreviousVersionModal'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof PreviousVersionModal>) => {
   return renderWithProviders(<PreviousVersionModal {...props} />, {

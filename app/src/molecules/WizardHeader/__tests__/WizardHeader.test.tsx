@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { WizardHeader } from '..'
+import { StepMeter } from '../../../atoms/StepMeter'
 import { i18n } from '../../../i18n'
 import { getIsOnDevice } from '../../../redux/config'
-import { StepMeter } from '../../../atoms/StepMeter'
-import { WizardHeader } from '..'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import * as React from 'react'
 
 jest.mock('../../../atoms/StepMeter')
 jest.mock('../../../redux/config')

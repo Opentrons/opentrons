@@ -1,12 +1,12 @@
-import sortBy from 'lodash/sortBy'
-import * as React from 'react'
-import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
+import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
 import { i18n } from '../../../localization'
 import { resetScrollElements } from '../../../ui/steps/utils'
+import modalStyles from '../../modals/modal.css'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
-import modalStyles from '../../modals/modal.css'
-import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
+import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
+import sortBy from 'lodash/sortBy'
+import * as React from 'react'
 
 export interface Props {
   flags: Flags

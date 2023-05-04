@@ -1,11 +1,9 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
-import { i18n } from '../../../i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
-import { MagneticModuleData } from '../MagneticModuleData'
+import { i18n } from '../../../i18n'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { MagneticModuleData } from '../MagneticModuleData'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../../atoms/StatusLabel')
 

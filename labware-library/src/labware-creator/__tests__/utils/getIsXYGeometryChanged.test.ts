@@ -1,5 +1,6 @@
 import { getDefaultFormState } from '../../fields'
 import { getIsXYGeometryChanged } from '../../utils/getIsXYGeometryChanged'
+
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
 // would break this test (though it's not directly used)
 jest.mock('../../../definitions')

@@ -1,16 +1,15 @@
 // functions for downloading and storing release files
-import assert from 'assert'
-import path from 'path'
-import { promisify } from 'util'
-import tempy from 'tempy'
-import { move, readdir, remove } from 'fs-extra'
-import StreamZip from 'node-stream-zip'
-import getStream from 'get-stream'
-
-import { createLogger } from '../log'
 import { fetchToFile } from '../http'
 import type { DownloadProgress } from '../http'
+import { createLogger } from '../log'
 import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
+import assert from 'assert'
+import { move, readdir, remove } from 'fs-extra'
+import getStream from 'get-stream'
+import StreamZip from 'node-stream-zip'
+import path from 'path'
+import tempy from 'tempy'
+import { promisify } from 'util'
 
 const VERSION_FILENAME = 'VERSION.json'
 

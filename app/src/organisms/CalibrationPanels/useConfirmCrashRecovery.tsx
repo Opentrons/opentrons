@@ -1,6 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../atoms/text'
+import * as Sessions from '../../redux/sessions'
+import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
+import type { CalibrationPanelProps } from './types'
 import {
   Flex,
   Link,
@@ -8,12 +9,8 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-
-import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
-import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
-
-import type { CalibrationPanelProps } from './types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useConfirmCrashRecovery(
   props: CalibrationPanelProps

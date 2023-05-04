@@ -1,30 +1,28 @@
-import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { saveAs } from 'file-saver'
-import { OT3_PIPETTES } from '@opentrons/shared-data'
+import { i18n } from '../../../../i18n'
+import {
+  useDeckCalibrationData,
+  useRunStatuses,
+  useAttachedPipettesFromInstrumentsQuery,
+} from '../../../../organisms/Devices/hooks'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
+import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
+import { OverflowMenu } from '../OverflowMenu'
+import {
+  mockPipetteOffsetCalibrationsResponse,
+  mockTipLengthCalibrationResponse,
+} from '../__fixtures__'
 import { renderWithProviders, Mount } from '@opentrons/components'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
 } from '@opentrons/react-api-client'
-
-import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { PipetteWizardFlows } from '../../../PipetteWizardFlows'
-import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import {
-  useDeckCalibrationData,
-  useRunStatuses,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '../../../../organisms/Devices/hooks'
-import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
-
-import { OverflowMenu } from '../OverflowMenu'
-import {
-  mockPipetteOffsetCalibrationsResponse,
-  mockTipLengthCalibrationResponse,
-} from '../__fixtures__'
+import { OT3_PIPETTES } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
+import { saveAs } from 'file-saver'
+import * as React from 'react'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>

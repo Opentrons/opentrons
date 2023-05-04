@@ -1,6 +1,5 @@
-import * as React from 'react'
-import cx from 'classnames'
 import { i18n } from '../../../../localization'
+import styles from '../../StepEditForm.css'
 import {
   VolumeField,
   PipetteField,
@@ -8,10 +7,11 @@ import {
   DisposalVolumeField,
   PathField,
 } from '../../fields'
-import styles from '../../StepEditForm.css'
 import { StepFormProps } from '../../types'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
+import cx from 'classnames'
+import * as React from 'react'
 
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path

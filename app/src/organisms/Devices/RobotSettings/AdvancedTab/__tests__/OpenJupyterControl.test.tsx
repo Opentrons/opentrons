@@ -1,13 +1,13 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_JUPYTER_OPEN,
 } from '../../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../../redux/analytics')
 

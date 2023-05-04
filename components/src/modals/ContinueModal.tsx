@@ -1,8 +1,6 @@
-import * as React from 'react'
-
 import { AlertModal } from './AlertModal'
-
 import type { AlertModalProps } from './AlertModal'
+import * as React from 'react'
 
 export interface ContinueModalProps extends Omit<AlertModalProps, 'buttons'> {
   onCancelClick: () => unknown

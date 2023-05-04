@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
+import { StepMeter } from '../../atoms/StepMeter'
+import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { CardButton } from '../../molecules/CardButton'
 import {
   Flex,
   SPACING,
@@ -12,13 +12,10 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-
-import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { StepMeter } from '../../atoms/StepMeter'
-import { CardButton } from '../../molecules/CardButton'
-
 import type { IconName } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 const NetworkSetupOptions = [
   {
@@ -49,8 +46,8 @@ export function NetworkSetupMenu(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={1} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
@@ -70,7 +67,7 @@ export function NetworkSetupMenu(): JSX.Element {
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           <StyledText
             fontSize="1.375rem"

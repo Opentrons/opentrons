@@ -1,6 +1,4 @@
 // set of functions that parse details out of a protocol record and it's internals
-import reduce from 'lodash/reduce'
-
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
@@ -18,6 +16,7 @@ import type {
   LoadPipetteRunTimeCommand,
   LoadLiquidRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import reduce from 'lodash/reduce'
 
 interface PipetteNamesByMount {
   left: PipetteName | null

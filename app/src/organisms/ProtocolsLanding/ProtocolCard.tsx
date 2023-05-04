@@ -1,14 +1,20 @@
-import * as React from 'react'
-import { format } from 'date-fns'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
-
+import { InstrumentContainer } from '../../atoms/InstrumentContainer'
+import { StyledText } from '../../atoms/text'
+import { DeckThumbnail } from '../../molecules/DeckThumbnail'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { State } from '../../redux/types'
+import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import {
-  getModuleType,
-  getPipetteNameSpecs,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+  getAnalysisStatus,
+  getProtocolDisplayName,
+  getRobotTypeDisplayName,
+} from './utils'
+import {
+  parseInitialPipetteNamesByMount,
+  parseAllRequiredModuleModels,
+} from '@opentrons/api-client'
 import {
   Box,
   Flex,
@@ -26,26 +32,16 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-
 import {
-  parseInitialPipetteNamesByMount,
-  parseAllRequiredModuleModels,
-} from '@opentrons/api-client'
-
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
-import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import {
-  getAnalysisStatus,
-  getProtocolDisplayName,
-  getRobotTypeDisplayName,
-} from './utils'
-
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State } from '../../redux/types'
+  getModuleType,
+  getPipetteNameSpecs,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
+import { format } from 'date-fns'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

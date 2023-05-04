@@ -1,7 +1,8 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
+import { ToggleButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
+import { updateSetting } from '../../../../redux/robot-settings'
+import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+import type { Dispatch } from '../../../../redux/types'
 import {
   Flex,
   ALIGN_CENTER,
@@ -10,13 +11,9 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../../atoms/text'
-import { ToggleButton } from '../../../../atoms/buttons'
-import { updateSetting } from '../../../../redux/robot-settings'
-
-import type { Dispatch } from '../../../../redux/types'
-import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 interface LegacySettingsProps {
   settings: RobotSettingsField | undefined
@@ -44,7 +41,7 @@ export function LegacySettings({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacingXXL}
+      marginTop={SPACING.spacing40}
     >
       <Box width="70%">
         <StyledText

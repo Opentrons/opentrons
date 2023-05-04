@@ -1,5 +1,3 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   getAddLabwareFailure,
   clearAddCustomLabwareFailure,
@@ -7,11 +5,12 @@ import {
   clearNewLabwareName,
   getValidCustomLabware,
 } from '../../redux/custom-labware'
-import { getAllDefinitions } from './helpers/definitions'
 import type { Dispatch } from '../../redux/types'
-
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import { getAllDefinitions } from './helpers/definitions'
 import type { LabwareFilter, LabwareSort } from './types'
+import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
 export interface LabwareDefAndDate {
   definition: LabwareDefinition

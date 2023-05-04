@@ -1,12 +1,10 @@
-import * as Constants from './constants'
-import * as Types from './types'
-
-import type { AllPipetteOffsetCalibrations } from '../api-types'
-
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../../robot-api/types'
+import type { AllPipetteOffsetCalibrations } from '../api-types'
+import * as Constants from './constants'
+import * as Types from './types'
 
 export const fetchPipetteOffsetCalibrations = (
   robotName: string

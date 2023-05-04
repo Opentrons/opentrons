@@ -1,7 +1,6 @@
-import head from 'lodash/head'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-
 import { getLatestLabwareDef } from './getLabware'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import head from 'lodash/head'
 
 // TODO(mc, 2021-05-19): this function does not filter by namespace
 // nor version. Instead, it short-circuits as soon as it finds a loadName match

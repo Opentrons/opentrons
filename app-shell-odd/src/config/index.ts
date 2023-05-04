@@ -1,25 +1,22 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
-import Store from 'electron-store'
-import get from 'lodash/get'
-import mergeOptions from 'merge-options'
-import yargsParser from 'yargs-parser'
-import fs from 'fs-extra'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as Cfg from '@opentrons/app/src/redux/config'
-import systemd from '../systemd'
 import { createLogger } from '../log'
+import systemd from '../systemd'
+import type { Action, Dispatch, Logger } from '../types'
 import { DEFAULTS_V12, migrate } from './migrate'
+import type { Config, Overrides } from './types'
 import { shouldUpdate, getNextValue } from './update'
-
+import * as Cfg from '@opentrons/app/src/redux/config'
 import type {
   ConfigV12,
   ConfigValueChangeAction,
 } from '@opentrons/app/src/redux/config/types'
-
-import type { Action, Dispatch, Logger } from '../types'
-import type { Config, Overrides } from './types'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import Store from 'electron-store'
+import fs from 'fs-extra'
+import get from 'lodash/get'
+import mergeOptions from 'merge-options'
+import yargsParser from 'yargs-parser'
 
 export * from './types'
 

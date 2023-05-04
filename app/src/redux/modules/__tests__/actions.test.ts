@@ -1,5 +1,4 @@
 import * as Actions from '../actions'
-
 import type { ModulesAction } from '../types'
 
 interface ActionSpec {

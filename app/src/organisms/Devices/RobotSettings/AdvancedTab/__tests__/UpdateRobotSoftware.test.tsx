@@ -1,12 +1,9 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../../i18n'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
-
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
 jest.mock('../../../../../redux/discovery')

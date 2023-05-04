@@ -1,25 +1,21 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import type { FormattedPipetteOffsetCalibration } from '..'
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
+import {
+  useAttachedPipettes,
+  useTipLengthCalibrations,
+} from '../../../organisms/Devices/hooks'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
 } from '../../../redux/calibration/tip-length/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
-import {
-  useAttachedPipettes,
-  useTipLengthCalibrations,
-} from '../../../organisms/Devices/hooks'
-
-import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
-import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
-
-import type { FormattedPipetteOffsetCalibration } from '..'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
+import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../organisms/Devices/hooks')

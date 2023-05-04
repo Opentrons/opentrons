@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
+import { StyledText } from '../../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -10,8 +8,8 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function SearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
@@ -32,7 +30,7 @@ export function SearchNetwork(): JSX.Element {
           fontSize="2rem"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight="2.72375rem"
-          marginTop={SPACING.spacingXXL}
+          marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
         </StyledText>

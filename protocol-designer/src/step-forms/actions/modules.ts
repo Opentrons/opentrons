@@ -1,6 +1,7 @@
+import { DeckSlot } from '../../types'
 import { uuid } from '../../utils'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import { DeckSlot } from '../../types'
+
 export interface CreateModuleAction {
   type: 'CREATE_MODULE'
   payload: {

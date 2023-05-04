@@ -1,22 +1,6 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { RobotSettingsCalibration } from '..'
 import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
-import { useFeatureFlag } from '../../../redux/config'
-import * as RobotApi from '../../../redux/robot-api'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-  mockPipetteOffsetCalibration3,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import {
-  mockAttachedPipette,
-  mockAttachedPipetteInformation,
-} from '../../../redux/pipettes/__fixtures__'
 import {
   useIsOT3,
   usePipetteOffsetCalibrations,
@@ -25,16 +9,28 @@ import {
   useRunStatuses,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
-
+import {
+  mockPipetteOffsetCalibration1,
+  mockPipetteOffsetCalibration2,
+  mockPipetteOffsetCalibration3,
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import {
+  mockAttachedPipette,
+  mockAttachedPipetteInformation,
+} from '../../../redux/pipettes/__fixtures__'
+import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import * as RobotApi from '../../../redux/robot-api'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
-import { RobotSettingsCalibration } from '..'
-
-import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../organisms/CalibrationStatusCard')
 jest.mock('../../../redux/config')

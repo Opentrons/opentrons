@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Banner } from '../../../../atoms/Banner'
+import { StyledText } from '../../../../atoms/text'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -7,8 +7,8 @@ import {
   SPACING,
   Box,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
-import { Banner } from '../../../../atoms/Banner'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 export const UnMatchedModuleWarning = (): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')

@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { NavTab } from '..'
 import {
   renderWithProviders,
   SPACING,
@@ -8,7 +6,9 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-import { NavTab } from '..'
+import { fireEvent } from '@testing-library/react'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 const render = (props: React.ComponentProps<typeof NavTab>) => {
   return renderWithProviders(

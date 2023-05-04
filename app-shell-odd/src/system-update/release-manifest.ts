@@ -1,8 +1,8 @@
-import { readJson, outputJson } from 'fs-extra'
 import { fetchJson } from '../http'
 import { createLogger } from '../log'
 import { getManifestCacheDir } from './directories'
 import type { ReleaseManifest, ReleaseSetUrls } from './types'
+import { readJson, outputJson } from 'fs-extra'
 
 const log = createLogger('systemUpdate/release-manifest')
 

@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
+import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal'
+import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,10 +14,9 @@ import {
   SPACING,
   BORDERS,
 } from '@opentrons/components'
-
-import { Modal } from '../../../molecules/Modal'
-import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
-import { StyledText } from '../../../atoms/text'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 interface RobotSystemVersionModalProps {
   version: string
@@ -38,7 +36,7 @@ export function RobotSystemVersionModal({
   const history = useHistory()
 
   return (
-    <Flex padding={SPACING.spacingXXL}>
+    <Flex padding={SPACING.spacing40}>
       <Modal
         title={t('robot_system_version_available', {
           releaseVersion: version,

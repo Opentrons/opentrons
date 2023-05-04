@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { StyledText } from '../../atoms/text'
 import {
   Icon,
   Flex,
@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
 
 interface LoadingStateProps {
   header?: string

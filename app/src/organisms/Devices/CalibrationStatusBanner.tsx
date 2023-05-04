@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link as RouterLink } from 'react-router-dom'
-
+import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../atoms/text'
+import { useCalibrationTaskList } from './hooks'
 import {
   Flex,
   ALIGN_CENTER,
@@ -12,10 +11,9 @@ import {
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
-import { useCalibrationTaskList } from './hooks'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link as RouterLink } from 'react-router-dom'
 
 interface CalibrationStatusBannerProps {
   robotName: string

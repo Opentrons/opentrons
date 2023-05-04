@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { renderWithProviders, SPACING, TYPOGRAPHY } from '@opentrons/components'
-
 import { OffsetVector } from '../'
+import { renderWithProviders, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof OffsetVector>) => {
   return renderWithProviders(<OffsetVector {...props} />)[0]

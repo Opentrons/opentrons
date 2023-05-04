@@ -1,19 +1,18 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { i18n } from '../../../i18n'
+import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+import { useTrackEvent } from '../../../redux/analytics'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import {
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
-
-import { i18n } from '../../../i18n'
-import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
-import { useTrackEvent } from '../../../redux/analytics'
-import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../RunTimeControl/hooks')

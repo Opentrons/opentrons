@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
 import { i18n } from '../../../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
-import { SetupModules } from '../index'
-import { SetupModulesList } from '../SetupModulesList'
-import { SetupModulesMap } from '../SetupModulesMap'
+import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
-import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
+import { SetupModulesList } from '../SetupModulesList'
+import { SetupModulesMap } from '../SetupModulesMap'
+import { SetupModules } from '../index'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { when } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../hooks')
 jest.mock('../SetupModulesList')

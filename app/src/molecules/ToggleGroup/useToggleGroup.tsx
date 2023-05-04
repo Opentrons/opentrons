@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { css } from 'styled-components'
+import { useTrackEvent } from '../../redux/analytics'
 import {
   BORDERS,
   COLORS,
@@ -7,7 +6,8 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
-import { useTrackEvent } from '../../redux/analytics'
+import * as React from 'react'
+import { css } from 'styled-components'
 
 const BUTTON_GROUP_STYLES = css`
   border-radius: ${BORDERS.radiusSoftCorners};

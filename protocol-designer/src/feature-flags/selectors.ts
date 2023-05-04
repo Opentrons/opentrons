@@ -1,7 +1,8 @@
-import { createSelector } from 'reselect'
-import { getFlagsFromQueryParams } from './utils'
 import { BaseState, Selector } from '../types'
 import { Flags } from './types'
+import { getFlagsFromQueryParams } from './utils'
+import { createSelector } from 'reselect'
+
 export const getFeatureFlagData = (state: BaseState): Flags => ({
   ...state.featureFlags.flags,
   ...getFlagsFromQueryParams(),

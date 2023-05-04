@@ -1,6 +1,12 @@
-import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import upperFirst from 'lodash/upperFirst'
+import {
+  SPAN7_8_10_11_SLOT,
+  DEFAULT_MODEL_FOR_MODULE_TYPE,
+} from '../../constants'
+import { i18n } from '../../localization'
+import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
+import { ModuleDiagram } from './ModuleDiagram'
+import styles from './styles.css'
+import { isModuleWithCollisionIssue } from './utils'
 import {
   LabeledValue,
   OutlineButton,
@@ -12,17 +18,10 @@ import {
   SIZE_1,
   SPACING,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
-import {
-  SPAN7_8_10_11_SLOT,
-  DEFAULT_MODEL_FOR_MODULE_TYPE,
-} from '../../constants'
-import { ModuleDiagram } from './ModuleDiagram'
-import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.css'
-
 import { ModuleType } from '@opentrons/shared-data'
+import upperFirst from 'lodash/upperFirst'
+import * as React from 'react'
+import { useDispatch } from 'react-redux'
 
 interface Props {
   moduleOnDeck?: ModuleOnDeck

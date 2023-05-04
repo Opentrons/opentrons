@@ -1,13 +1,3 @@
-import * as React from 'react'
-import { Link as InternalLink } from 'react-router-dom'
-import styled from 'styled-components'
-
-import {
-  AlertModal,
-  DeprecatedCheckboxField,
-  Link,
-  useToggle,
-} from '@opentrons/components'
 import {
   useTrackEvent,
   ANALYTICS_U2E_DRIVE_ALERT_DISMISSED,
@@ -20,6 +10,15 @@ import {
   U2E_DRIVER_OUTDATED_CTA,
 } from '../../redux/system-info'
 import type { AlertProps } from './types'
+import {
+  AlertModal,
+  DeprecatedCheckboxField,
+  Link,
+  useToggle,
+} from '@opentrons/components'
+import * as React from 'react'
+import { Link as InternalLink } from 'react-router-dom'
+import styled from 'styled-components'
 
 // TODO(mc, 2020-05-07): i18n
 const DRIVER_OUT_OF_DATE = 'Realtek USB-to-Ethernet Driver Update Available'

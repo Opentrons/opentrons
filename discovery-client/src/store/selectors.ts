@@ -1,5 +1,3 @@
-import { createSelector } from 'reselect'
-import unionBy from 'lodash/unionBy'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
@@ -9,7 +7,6 @@ import {
   RE_HOSTNAME_LOCALHOST,
   RE_HOSTNAME_LOOPBACK,
 } from '../constants'
-
 import type { DiscoveryClientRobot } from '../types'
 import type {
   State,
@@ -18,6 +15,8 @@ import type {
   Address,
   HealthStatus,
 } from './types'
+import unionBy from 'lodash/unionBy'
+import { createSelector } from 'reselect'
 
 export const getRobotStates: (state: State) => RobotState[] = createSelector(
   state => state.robotsByName,

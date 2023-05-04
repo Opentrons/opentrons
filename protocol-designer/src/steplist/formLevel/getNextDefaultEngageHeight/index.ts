@@ -1,5 +1,6 @@
-import last from 'lodash/last'
 import { StepIdType, FormData } from '../../../form-types'
+import last from 'lodash/last'
+
 export function getNextDefaultEngageHeight(
   savedForms: Record<StepIdType, FormData>,
   orderedStepIds: StepIdType[]

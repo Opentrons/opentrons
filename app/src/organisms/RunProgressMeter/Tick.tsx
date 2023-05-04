@@ -1,5 +1,6 @@
-import * as React from 'react'
-import { RunTimeCommand } from '@opentrons/shared-data'
+import { Portal } from '../../App/portal'
+import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   Icon,
@@ -10,12 +11,10 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-
-import { Tooltip } from '../../atoms/Tooltip'
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
-import { useTranslation } from 'react-i18next'
 import type { IconName } from '@opentrons/components'
+import { RunTimeCommand } from '@opentrons/shared-data'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface TickProps {
   index: number

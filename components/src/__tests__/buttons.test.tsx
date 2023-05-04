@@ -1,7 +1,4 @@
 // button component tests
-import React from 'react'
-import Renderer from 'react-test-renderer'
-
 import {
   Button,
   FlatButton,
@@ -9,6 +6,8 @@ import {
   OutlineButton,
   IconButton,
 } from '..'
+import React from 'react'
+import Renderer from 'react-test-renderer'
 
 describe('buttons', () => {
   const onClick = jest.fn()

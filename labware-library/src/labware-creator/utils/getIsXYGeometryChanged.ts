@@ -1,6 +1,6 @@
-import difference from 'lodash/difference'
 import { LabwareFields } from '../fields'
 import { DEFAULTED_DEF_PATCH } from '../getDefaultedDef'
+import difference from 'lodash/difference'
 
 export const getIsXYGeometryChanged = (
   prevValues: LabwareFields,

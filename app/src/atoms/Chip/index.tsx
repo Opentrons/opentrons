@@ -1,5 +1,4 @@
-import * as React from 'react'
-
+import { StyledText } from '../text'
 import {
   BORDERS,
   Flex,
@@ -10,10 +9,8 @@ import {
   Icon,
   COLORS,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
-
 import type { IconName, StyleProps } from '@opentrons/components'
+import * as React from 'react'
 
 export type ChipType = 'basic' | 'success' | 'warning' | 'neutral'
 

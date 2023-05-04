@@ -1,9 +1,9 @@
+import { waitForTemperature } from '../commandCreators/atomic/waitForTemperature'
 import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../constants'
-import { waitForTemperature } from '../commandCreators/atomic/waitForTemperature'
 import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,

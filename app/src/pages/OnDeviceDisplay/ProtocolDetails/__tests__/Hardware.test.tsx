@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useRequiredProtocolHardware } from '../../../Protocols/hooks'
 import { Hardware } from '../Hardware'
+import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('../../../Protocols/hooks')
 

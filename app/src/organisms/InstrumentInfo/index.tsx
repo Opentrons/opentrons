@@ -1,5 +1,11 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
+import { formatTimestamp } from '../Devices/utils'
+import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { FLOWS } from '../PipetteWizardFlows/constants'
+import type { InstrumentData } from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -10,21 +16,14 @@ import {
   TYPOGRAPHY,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
-import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
-import { StyledText } from '../../atoms/text'
-import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { FLOWS } from '../PipetteWizardFlows/constants'
-import { formatTimestamp } from '../Devices/utils'
-import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-
-import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { StyleProps } from '@opentrons/components'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface InstrumentInfoProps {
   instrument: InstrumentData

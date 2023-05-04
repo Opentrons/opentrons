@@ -1,7 +1,4 @@
-import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
 import { Success } from '../Success'
 import {
   SECTIONS,
@@ -10,6 +7,8 @@ import {
   SUCCESSFULLY_CALIBRATED,
   SUCCESSFULLY_DETACHED,
 } from '../constants'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 describe('Success', () => {
   let render: (

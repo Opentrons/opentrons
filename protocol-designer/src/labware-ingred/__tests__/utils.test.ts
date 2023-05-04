@@ -1,4 +1,5 @@
 import { getNextNickname } from '../utils'
+
 describe('getNextNickname', () => {
   const testCases = [
     {

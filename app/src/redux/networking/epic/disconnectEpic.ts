@@ -1,20 +1,18 @@
-import { ofType, combineEpics } from 'redux-observable'
-import { map } from 'rxjs/operators'
-
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { Action, Epic } from '../../types'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
 import {
   PostWifiDisconnectAction,
   PostWifiDisconnectSuccessAction,
 } from '../types'
+import { ofType, combineEpics } from 'redux-observable'
+import { map } from 'rxjs/operators'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
   method: POST,

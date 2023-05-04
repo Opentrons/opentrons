@@ -1,6 +1,6 @@
 // logger
-import { useRef } from 'react'
 import { remote } from './redux/shell/remote'
+import { useRef } from 'react'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =

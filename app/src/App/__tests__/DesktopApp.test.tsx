@@ -1,21 +1,19 @@
-import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../i18n'
+import { Alerts } from '../../organisms/Alerts'
 import { Breadcrumbs } from '../../organisms/Breadcrumbs'
+import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { CalibrationDashboard } from '../../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
-import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
-import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
-import { Alerts } from '../../organisms/Alerts'
-import { useSoftwareUpdatePoll } from '../hooks'
+import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { DesktopApp } from '../DesktopApp'
+import { useSoftwareUpdatePoll } from '../hooks'
+import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import * as React from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../organisms/Alerts')
 jest.mock('../../organisms/Breadcrumbs')

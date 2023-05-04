@@ -1,23 +1,13 @@
-import React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
-import * as Formik from 'formik'
-import { OutlineButton, SlotMap } from '@opentrons/components'
-import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V2,
-  getIsLabwareAboveHeight,
-} from '@opentrons/shared-data'
+import { EditModulesModal, EditModulesModalProps } from '..'
 import {
   getMockDeckSetup,
   getMockMagneticModule,
   getMockTemperatureModule,
-  getMockHeaterShakerModule,
-  // @ts-expect-error(sa, 2021-6-27): TODO: add another ts config for /fixtures, or move them into src
+  getMockHeaterShakerModule, // @ts-expect-error(sa, 2021-6-27): TODO: add another ts config for /fixtures, or move them into src
 } from '../../../../../fixtures/state/deck'
+import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
+import { selectors as featureSelectors } from '../../../../feature-flags'
+import * as moduleData from '../../../../modules/moduleData'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
@@ -27,16 +17,25 @@ import {
   getSlotsBlockedBySpanning,
   getSlotIsEmpty,
 } from '../../../../step-forms/utils'
-import * as moduleData from '../../../../modules/moduleData'
-import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
-import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModal, EditModulesModalProps } from '..'
+import { isModuleWithCollisionIssue } from '../../../modules/utils'
+import { ConnectedSlotMap } from '../ConnectedSlotMap'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
-import { ConnectedSlotMap } from '../ConnectedSlotMap'
+import { OutlineButton, SlotMap } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V2,
+  getIsLabwareAboveHeight,
+} from '@opentrons/shared-data'
+import { mount } from 'enzyme'
+import * as Formik from 'formik'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')

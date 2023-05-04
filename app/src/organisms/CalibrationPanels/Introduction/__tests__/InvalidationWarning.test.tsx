@@ -1,9 +1,7 @@
-import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../../i18n'
 import { InvalidationWarning } from '../InvalidationWarning'
+import { renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (sessionType: 'tipLengthCalibration' | 'deckCalibration') => {
   return renderWithProviders(

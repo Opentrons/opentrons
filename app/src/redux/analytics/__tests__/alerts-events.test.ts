@@ -1,9 +1,7 @@
-import { makeEvent } from '../make-event'
-
 import * as Alerts from '../../alerts'
-
-import type { State } from '../../types'
 import type { AlertId } from '../../alerts/types'
+import type { State } from '../../types'
+import { makeEvent } from '../make-event'
 
 const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ALERT_ID: AlertId = 'fizzbuzz' as any

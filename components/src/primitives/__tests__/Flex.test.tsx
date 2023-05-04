@@ -1,7 +1,6 @@
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { Flex } from '..'
+import { shallow } from 'enzyme'
+import * as React from 'react'
 
 describe('Flex primitive component', () => {
   it('should be a div with display: flex', () => {

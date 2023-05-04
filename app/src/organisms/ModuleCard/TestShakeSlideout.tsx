@@ -1,7 +1,15 @@
-import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { Portal } from '../../App/portal'
+import { InputField } from '../../atoms/InputField'
+import { Slideout } from '../../atoms/Slideout'
+import { Tooltip } from '../../atoms/Tooltip'
+import { TertiaryButton } from '../../atoms/buttons'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { getIsHeaterShakerAttached } from '../../redux/config'
+import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
+import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
+import { useLatchControls } from './hooks'
 import {
   Flex,
   TYPOGRAPHY,
@@ -19,7 +27,7 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
-import { getIsHeaterShakerAttached } from '../../redux/config'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CreateCommand,
   getModuleDisplayName,
@@ -27,23 +35,14 @@ import {
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
-import { Slideout } from '../../atoms/Slideout'
-import { TertiaryButton } from '../../atoms/buttons'
-import { Divider } from '../../atoms/structure'
-import { InputField } from '../../atoms/InputField'
-import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
-import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
-import { useLatchControls } from './hooks'
-
-import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule
@@ -196,7 +195,7 @@ export const TestShakeSlideout = (
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginY={SPACING.spacingSM}
+          marginY={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>

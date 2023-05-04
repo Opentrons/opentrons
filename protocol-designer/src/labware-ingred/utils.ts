@@ -1,7 +1,8 @@
-import { sortedSlotnames } from '@opentrons/components'
-import { getSlotIsEmpty } from '../step-forms/utils'
 import { InitialDeckSetup } from '../step-forms/types'
+import { getSlotIsEmpty } from '../step-forms/utils'
 import { DeckSlot } from '../types'
+import { sortedSlotnames } from '@opentrons/components'
+
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup
 ): DeckSlot | null | undefined {

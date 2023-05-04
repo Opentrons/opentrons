@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
   COLORS,
@@ -8,10 +8,8 @@ import {
   Box,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
-
-import { StyledText } from '../../atoms/text'
+import * as React from 'react'
 
 export default {
   title: 'Design Tokens/Spacing',

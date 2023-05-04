@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { TYPOGRAPHY, renderWithProviders } from '@opentrons/components'
 import { StyledText } from '../'
+import { TYPOGRAPHY, renderWithProviders } from '@opentrons/components'
+import * as React from 'react'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {
   return renderWithProviders(<StyledText {...props} />)[0]

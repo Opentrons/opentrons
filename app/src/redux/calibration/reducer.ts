@@ -1,10 +1,9 @@
+import type { Action } from '../types'
 import * as Constants from './constants'
 import * as pipetteOffset from './pipette-offset'
 import * as tipLength from './tip-length'
-
-import type { Reducer } from 'redux'
-import type { Action } from '../types'
 import type { CalibrationState, PerRobotCalibrationState } from './types'
+import type { Reducer } from 'redux'
 
 const INITIAL_STATE: CalibrationState = {}
 

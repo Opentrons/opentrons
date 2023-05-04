@@ -1,10 +1,11 @@
-import * as React from 'react'
-import { saveAs } from 'file-saver'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
+import {
+  useDeckCalibrationData,
+  useIsOT3,
+  usePipetteOffsetCalibrations,
+  useRobot,
+  useTipLengthCalibrations,
+} from '../../../organisms/Devices/hooks'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
@@ -21,15 +22,11 @@ import {
   mockTipLengthCalibration3,
 } from '../../../redux/calibration/tip-length/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import {
-  useDeckCalibrationData,
-  useIsOT3,
-  usePipetteOffsetCalibrations,
-  useRobot,
-  useTipLengthCalibrations,
-} from '../../../organisms/Devices/hooks'
-
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
+import { renderWithProviders } from '@opentrons/components'
+import { saveAs } from 'file-saver'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
 
 jest.mock('file-saver')
 jest.mock('../../../redux/analytics')

@@ -1,18 +1,18 @@
-import * as React from 'react'
+import {
+  DEFAULT_MODEL_FOR_MODULE_TYPE,
+  MODELS_FOR_MODULE_TYPE,
+} from '../../../constants'
+import { i18n } from '../../../localization'
+import { FormModulesByType } from '../../../step-forms'
+import { ModuleDiagram } from '../../modules'
+import styles from './FilePipettesModal.css'
 import {
   DeprecatedCheckboxField,
   DropdownField,
   FormGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
-import {
-  DEFAULT_MODEL_FOR_MODULE_TYPE,
-  MODELS_FOR_MODULE_TYPE,
-} from '../../../constants'
-import { FormModulesByType } from '../../../step-forms'
-import { ModuleDiagram } from '../../modules'
-import styles from './FilePipettesModal.css'
 import type { ModuleType } from '@opentrons/shared-data'
+import * as React from 'react'
 
 export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed

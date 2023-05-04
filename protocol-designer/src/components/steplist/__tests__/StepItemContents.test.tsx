@@ -1,12 +1,12 @@
-import React from 'react'
-import { shallow } from 'enzyme'
+import { THERMOCYCLER_STATE } from '../../../constants'
+import { ModuleStepItems } from '../ModuleStepItems'
+import { StepItemContents, StepItemContentsProps } from '../StepItem'
 import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { THERMOCYCLER_STATE } from '../../../constants'
-import { StepItemContents, StepItemContentsProps } from '../StepItem'
-import { ModuleStepItems } from '../ModuleStepItems'
+import { shallow } from 'enzyme'
+import React from 'react'
 
 describe('StepItemContents', () => {
   let props: any

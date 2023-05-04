@@ -1,18 +1,16 @@
-import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
-
+import { useIsRobotViewable } from '..'
 import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
-
-import { useIsRobotViewable } from '..'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import * as React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
 jest.mock('../../../../redux/discovery')
 

@@ -1,7 +1,6 @@
-import head from 'lodash/head'
-
 import type { State } from '../../types'
 import type { PipetteOffsetCalibration } from '../api-types'
+import head from 'lodash/head'
 
 export const getPipetteOffsetCalibrations: (
   state: State,
