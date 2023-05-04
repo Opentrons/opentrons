@@ -11,7 +11,7 @@ const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing1};
+  border-spacing: 0 ${SPACING.spacing2};
   margin: ${SPACING.spacing16} 0;
   text-align: left;
 `

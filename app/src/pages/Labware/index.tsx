@@ -193,7 +193,7 @@ export function Labware(): JSX.Element {
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
               top="8.5rem"
-              right={SPACING.spacing1}
+              right={SPACING.spacing2}
               flexDirection={DIRECTION_COLUMN}
               ref={sortOverflowWrapperRef}
             >

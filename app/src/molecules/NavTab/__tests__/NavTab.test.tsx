@@ -50,7 +50,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `border-bottom-color: ${String(COLORS.blueEnabled)}`
     )
-    expect(tab).toHaveStyle(`border-bottom-width: ${String(SPACING.spacing1)}`)
+    expect(tab).toHaveStyle(`border-bottom-width: ${String(SPACING.spacing2)}`)
     expect(tab).toHaveStyle(
       `border-bottom-style: ${String(BORDERS.styleSolid)}`
     )

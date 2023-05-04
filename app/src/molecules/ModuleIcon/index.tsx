@@ -32,7 +32,7 @@ export function ModuleIcon(props: ModuleIconProps): JSX.Element {
         <SharedModuleIcon
           moduleType={module.moduleType}
           size={SPACING.spacing16}
-          marginX={SPACING.spacing1}
+          marginX={SPACING.spacing2}
           color={COLORS.darkGreyEnabled}
           css={MODULE_ICON_STYLE}
         />

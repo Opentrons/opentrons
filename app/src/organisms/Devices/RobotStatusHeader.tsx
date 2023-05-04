@@ -83,7 +83,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           as="h6"
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing1}
+          paddingBottom={SPACING.spacing2}
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}

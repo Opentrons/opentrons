@@ -136,7 +136,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          paddingRight={SPACING.spacing1}
+          paddingRight={SPACING.spacing2}
           alignItems={ALIGN_CENTER}
         >
           <StyledText

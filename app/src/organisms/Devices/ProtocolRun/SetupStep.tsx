@@ -78,7 +78,7 @@ export function SetupStep({
               <StyledText
                 color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
-                marginBottom={SPACING.spacing1}
+                marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}
               >
                 {label}

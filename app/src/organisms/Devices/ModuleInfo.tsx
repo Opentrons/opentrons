@@ -61,7 +61,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing1}
+        gridGap={SPACING.spacing2}
         justifyContent={JUSTIFY_CENTER}
       >
         {!runHasStarted ? (

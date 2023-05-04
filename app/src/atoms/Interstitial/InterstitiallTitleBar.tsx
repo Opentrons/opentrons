@@ -48,7 +48,7 @@ export function InterstitialTitleBar(
           name="ot-logo"
           width={TYPOGRAPHY.lineHeight18}
           height={TYPOGRAPHY.lineHeight18}
-          paddingTop={SPACING.spacing1}
+          paddingTop={SPACING.spacing2}
           aria-label="ot-logo"
         />
         <Flex

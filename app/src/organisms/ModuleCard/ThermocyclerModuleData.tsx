@@ -71,7 +71,7 @@ export const ThermocyclerModuleData = (
   return (
     <Flex
       flexWrap={WRAP}
-      gridGap={`${String(SPACING.spacing1)} ${String(SPACING.spacing6)}`}
+      gridGap={`${String(SPACING.spacing2)} ${String(SPACING.spacing6)}`}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -108,7 +108,7 @@ export const ThermocyclerModuleData = (
         <StyledText
           title="lid_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginBottom={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
         >
           {t(data.lidTargetTemperature == null ? 'na_temp' : 'target_temp', {
             temp: data.lidTargetTemperature,
@@ -141,7 +141,7 @@ export const ThermocyclerModuleData = (
         <StyledText
           title="tc_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginBottom={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
         >
           {t(data.targetTemperature == null ? 'na_temp' : 'target_temp', {
             temp: data.targetTemperature,

@@ -44,7 +44,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         borderRadius={BORDERS.radiusSoftCorners}
         gridGap={SPACING.spacing4}
         paddingX="0.375rem"
-        paddingY={SPACING.spacing1}
+        paddingY={SPACING.spacing2}
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing4}
         marginBottom={SPACING.spacing4}

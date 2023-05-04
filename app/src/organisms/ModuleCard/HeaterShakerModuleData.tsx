@@ -108,7 +108,7 @@ export const HeaterShakerModuleData = (
   return (
     <Flex
       flexWrap={WRAP}
-      gridGap={`${String(SPACING.spacing1)} ${String(SPACING.spacing6)}`}
+      gridGap={`${String(SPACING.spacing2)} ${String(SPACING.spacing6)}`}
     >
       {showTemperatureData && (
         <Flex
@@ -131,7 +131,7 @@ export const HeaterShakerModuleData = (
           <StyledText
             title="heater_target_temp"
             fontSize={TYPOGRAPHY.fontSizeH6}
-            marginBottom={SPACING.spacing1}
+            marginBottom={SPACING.spacing2}
           >
             {t(
               moduleData.targetTemperature != null ? 'target_temp' : 'na_temp',
@@ -166,7 +166,7 @@ export const HeaterShakerModuleData = (
         <StyledText
           title="shaker_target_speed"
           fontSize={TYPOGRAPHY.fontSizeH6}
-          marginBottom={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
         >
           {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
             speed: moduleData.targetSpeed,

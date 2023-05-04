@@ -56,7 +56,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
         <Flex
           fontSize={TYPOGRAPHY.fontSizeH6}
           paddingLeft={leftPadding}
-          paddingTop={SPACING.spacing1}
+          paddingTop={SPACING.spacing2}
           alignItems={ALIGN_CENTER}
         >
           {props.subtext}

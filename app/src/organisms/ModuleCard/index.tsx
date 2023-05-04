@@ -358,7 +358,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   <ModuleIcon
                     moduleType={module.moduleType}
                     size="1rem"
-                    marginRight={SPACING.spacing1}
+                    marginRight={SPACING.spacing2}
                     color={COLORS.darkGreyEnabled}
                   />
                   <StyledText>

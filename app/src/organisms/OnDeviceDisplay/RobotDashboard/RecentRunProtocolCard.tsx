@@ -43,7 +43,7 @@ export function RecentRunProtocolCard({
         : COLORS.yellow_three_pressed};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
+      box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.fundamentalsFocus};
     }
   `
 

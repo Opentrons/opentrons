@@ -85,7 +85,7 @@ export function Tick(props: TickProps): JSX.Element {
       <Portal>
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
-            padding={SPACING.spacing1}
+            padding={SPACING.spacing2}
             gridGap={SPACING.spacing4}
             alignItems={ALIGN_CENTER}
           >

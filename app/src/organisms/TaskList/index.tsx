@@ -155,7 +155,7 @@ function ProgressTrackerItem({
                   borderColor={
                     isFutureSubTask ? COLORS.medGreyHover : COLORS.blueEnabled
                   }
-                  borderWidth={SPACING.spacing1}
+                  borderWidth={SPACING.spacing2}
                   color={COLORS.white}
                   margin={SPACING.spacing16}
                   height="0.75rem"

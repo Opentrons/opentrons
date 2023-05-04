@@ -255,7 +255,7 @@ const RobotSettingButton = ({
           <Icon name={iconName} size="3rem" />
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing1}
+            gridGap={SPACING.spacing2}
             alignItems={ALIGN_FLEX_START}
             justifyContent={JUSTIFY_CENTER}
           >

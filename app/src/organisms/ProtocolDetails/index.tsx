@@ -482,8 +482,8 @@ export function ProtocolDetails(
           </Flex>
           <Box
             position={POSITION_RELATIVE}
-            top={SPACING.spacing1}
-            right={SPACING.spacing1}
+            top={SPACING.spacing2}
+            right={SPACING.spacing2}
           >
             <ProtocolOverflowMenu
               handleRunProtocol={() =>
