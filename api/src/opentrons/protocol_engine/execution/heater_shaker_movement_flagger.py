@@ -15,10 +15,17 @@ from ..errors import (
 )
 from ..state import StateStore
 from ..state.module_substates import HeaterShakerModuleSubState
-from ..types import HeaterShakerMovementRestrictors, LabwareLocation, ModuleLocation
+from ..types import (
+    HeaterShakerMovementRestrictors,
+    HeaterShakerLatchStatus,
+    LabwareLocation,
+    ModuleLocation,
+)
 from ...hardware_control import HardwareControlAPI
 from ...hardware_control.modules import HeaterShaker as HardwareHeaterShaker
-from ...drivers.types import HeaterShakerLabwareLatchStatus
+from ...drivers.types import (
+    HeaterShakerLabwareLatchStatus as HeaterShakerHardwareLatchStatus,
+)
 
 
 class HeaterShakerMovementFlagger:
@@ -53,14 +60,14 @@ class HeaterShakerMovementFlagger:
         except WrongModuleTypeError:
             return  # Labware on a module, but not a Heater-Shaker.
 
-        if hs_substate.is_labware_latch_closed:
+        if hs_substate.is_labware_latch_closed == HeaterShakerLatchStatus.CLOSED:
             # TODO (spp, 2022-10-27): This only raises if latch status is 'idle_closed'.
             #  We need to update the flagger to raise if latch status is anything other
             #  than 'idle_open'
             raise HeaterShakerLabwareLatchNotOpenError(
                 "Heater-Shaker labware latch must be open when moving labware to/from it."
             )
-        elif hs_substate.is_labware_latch_closed is None:
+        elif hs_substate.is_labware_latch_closed == HeaterShakerLatchStatus.UNKNOWN:
             raise HeaterShakerLabwareLatchStatusUnknown(
                 "Heater-Shaker labware latch must be opened before moving labware to/from it."
             )
@@ -83,7 +90,7 @@ class HeaterShakerMovementFlagger:
                 " but can't confirm its current status."
             ) from e
 
-        if hs_latch_status != HeaterShakerLabwareLatchStatus.IDLE_OPEN:
+        if hs_latch_status != HeaterShakerHardwareLatchStatus.IDLE_OPEN:
             raise HeaterShakerLabwareLatchNotOpenError(
                 f"H/S latch must be open when moving a labware on it,"
                 f" but the latch is currently {hs_latch_status}"
@@ -92,7 +99,7 @@ class HeaterShakerMovementFlagger:
     async def _get_hardware_heater_shaker_latch_status(
         self,
         module_id: str,
-    ) -> HeaterShakerLabwareLatchStatus:
+    ) -> HeaterShakerHardwareLatchStatus:
         """Get latch status of the hardware H/S corresponding with the module ID.
 
         Returns:

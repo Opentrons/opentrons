@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
     ModuleModel,
+    HeaterShakerLatchStatus,
 )
 
 from opentrons.protocol_engine.state.modules import (
@@ -67,7 +68,7 @@ def test_initial_state() -> None:
             ModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=None,
+                is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
@@ -184,7 +185,7 @@ def test_load_module(
             },
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=True,
+                is_labware_latch_closed=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=True,
                 plate_target_temperature=123,
             ),
@@ -275,7 +276,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=None,
+            is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=42,
         )
@@ -284,7 +285,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=None,
+            is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -320,7 +321,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=None,
+            is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=True,
             plate_target_temperature=None,
         )
@@ -329,7 +330,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=None,
+            is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -366,7 +367,7 @@ def test_handle_hs_labware_latch_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=None,
+            is_labware_latch_closed=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -376,7 +377,7 @@ def test_handle_hs_labware_latch_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=True,
+            is_labware_latch_closed=HeaterShakerLatchStatus.CLOSED,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -385,7 +386,7 @@ def test_handle_hs_labware_latch_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )

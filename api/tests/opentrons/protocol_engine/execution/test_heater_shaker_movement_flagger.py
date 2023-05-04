@@ -2,7 +2,7 @@
 
 import pytest
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Any, NamedTuple, Optional
+from typing import ContextManager, Any, NamedTuple
 from decoy import Decoy
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
@@ -13,6 +13,7 @@ from opentrons.hardware_control.modules.heater_shaker import (
 
 from opentrons.protocol_engine.types import (
     HeaterShakerMovementRestrictors,
+    HeaterShakerLatchStatus,
     ModuleLocation,
     DeckSlotLocation,
 )
@@ -288,15 +289,21 @@ async def test_does_not_raise_when_idle_and_latch_closed(
 @pytest.mark.parametrize(
     argnames=["latch_status", "expected_raise_cm"],
     argvalues=[
-        (True, pytest.raises(HeaterShakerLabwareLatchNotOpenError)),
-        (None, pytest.raises(HeaterShakerLabwareLatchStatusUnknown)),
+        (
+            HeaterShakerLatchStatus.CLOSED,
+            pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        (
+            HeaterShakerLatchStatus.UNKNOWN,
+            pytest.raises(HeaterShakerLabwareLatchStatusUnknown),
+        ),
     ],
 )
 async def test_raises_depending_on_heater_shaker_substate_latch_status(
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
     decoy: Decoy,
-    latch_status: Optional[bool],
+    latch_status: HeaterShakerLatchStatus,
     expected_raise_cm: ContextManager[Any],
 ) -> None:
     """It should flag movement depending on engine's h/s state."""
@@ -371,7 +378,7 @@ async def test_raises_depending_on_heater_shaker_latch_status(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -405,7 +412,7 @@ async def test_raises_if_hardware_module_has_gone_missing(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         ),
@@ -434,7 +441,7 @@ async def test_passes_if_virtual_module_latch_open(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            is_labware_latch_closed=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         ),

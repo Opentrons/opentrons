@@ -2,7 +2,11 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
-from opentrons.protocol_engine.types import TemperatureRange, SpeedRange
+from opentrons.protocol_engine.types import (
+    TemperatureRange,
+    SpeedRange,
+    HeaterShakerLatchStatus,
+)
 from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
@@ -27,7 +31,7 @@ class HeaterShakerModuleSubState:
     """
 
     module_id: HeaterShakerModuleId
-    is_labware_latch_closed: Optional[bool]
+    is_labware_latch_closed: HeaterShakerLatchStatus
     is_plate_shaking: bool
     plate_target_temperature: Optional[float]
 
@@ -70,11 +74,11 @@ class HeaterShakerModuleSubState:
 
     def raise_if_labware_latch_not_closed(self) -> None:
         """Raise an error if labware is not latched on the heater-shaker."""
-        if self.is_labware_latch_closed is None:
+        if self.is_labware_latch_closed == HeaterShakerLatchStatus.UNKNOWN:
             raise CannotPerformModuleAction(
                 "Heater-Shaker cannot start shaking if the labware latch status has not been set to closed."
             )
-        elif not self.is_labware_latch_closed:
+        elif self.is_labware_latch_closed == HeaterShakerLatchStatus.OPEN:
             raise CannotPerformModuleAction(
                 "Heater-Shaker cannot start shaking while the labware latch is open."
             )

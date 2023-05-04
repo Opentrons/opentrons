@@ -531,6 +531,14 @@ class TemperatureRange(NamedTuple):
     max: float
 
 
+class HeaterShakerLatchStatus(Enum):
+    """Heater-Shaker latch status for determining pipette and labware movement errors."""
+
+    CLOSED = "closed"
+    OPEN = "open"
+    UNKNOWN = "unknown"
+
+
 @dataclass(frozen=True)
 class HeaterShakerMovementRestrictors:
     """Shaking status, latch status and slot location for determining movement restrictions."""
