@@ -108,7 +108,7 @@ export function ConfirmCancelRunModal({
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
-            disabled={isCanceling && isDismissing}
+            disabled={isCanceling || isDismissing}
           />
         </Flex>
       </Flex>
