@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Optional
+from functools import lru_cache
 
 import anyio
 import sqlalchemy
@@ -315,6 +316,13 @@ class _CompletedAnalysisResource:
             "completed_analysis": serialized_completed_analysis,
         }
 
+    @staticmethod
+    @lru_cache
+    def _parse_completed_analysis(pickle_str: str) -> CompletedAnalysis:
+        return CompletedAnalysis.parse_obj(
+                legacy_pickle.loads(pickle_str)
+            )
+
     @classmethod
     async def from_sql_row(
         cls, sql_row: sqlalchemy.engine.Row
@@ -341,9 +349,7 @@ class _CompletedAnalysisResource:
         assert isinstance(protocol_id, str)
 
         def parse_completed_analysis() -> CompletedAnalysis:
-            return CompletedAnalysis.parse_obj(
-                legacy_pickle.loads(sql_row.completed_analysis)
-            )
+            return cls._parse_completed_analysis(sql_row.completed_analysis)
 
         completed_analysis = await anyio.to_thread.run_sync(
             parse_completed_analysis,
