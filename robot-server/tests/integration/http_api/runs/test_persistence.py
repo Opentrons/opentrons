@@ -111,7 +111,10 @@ async def test_runs_persist_via_actions_router(
     """Test that runs commands and state
     are persisted when calling play action through dev server restart."""
     client, server = client_and_server
-
+    # await client.post_protocol([Path("./tests/integration/protocols/simple.py")])
+    #
+    # protocols = (await client.get_protocols()).json()["data"]
+    # protocol_id = protocols[0]["id"]
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]

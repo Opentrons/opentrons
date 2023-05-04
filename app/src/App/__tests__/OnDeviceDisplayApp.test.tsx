@@ -9,14 +9,17 @@ import { ConnectViaEthernet } from '../../pages/OnDeviceDisplay/ConnectViaEthern
 import { ConnectViaUSB } from '../../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
-import { AttachInstrumentsDashboard } from '../../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
+import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
+import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
+import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 
+jest.mock('../../pages/OnDeviceDisplay/Welcome')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
@@ -25,9 +28,11 @@ jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
-jest.mock('../../pages/OnDeviceDisplay/AttachInstrumentsDashboard')
+jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
+jest.mock('../../pages/OnDeviceDisplay/RunSummary')
 
+const mockWelcome = Welcome as jest.MockedFunction<typeof Welcome>
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
   typeof NetworkSetupMenu
 >
@@ -52,12 +57,13 @@ const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
 const mockRobotSettingsDashboard = RobotSettingsDashboard as jest.MockedFunction<
   typeof RobotSettingsDashboard
 >
-const mockAttachInstrumentsDashboard = AttachInstrumentsDashboard as jest.MockedFunction<
-  typeof AttachInstrumentsDashboard
+const mockInstrumentsDashboard = InstrumentsDashboard as jest.MockedFunction<
+  typeof InstrumentsDashboard
 >
 const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
   typeof RunningProtocol
 >
+const mockRunSummary = RunSummary as jest.MockedFunction<typeof RunSummary>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -70,9 +76,10 @@ const render = (path = '/') => {
 
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
-    mockAttachInstrumentsDashboard.mockReturnValue(
-      <div>Mock AttachInstrumentsDashboard</div>
+    mockInstrumentsDashboard.mockReturnValue(
+      <div>Mock InstrumentsDashboard</div>
     )
+    mockWelcome.mockReturnValue(<div>Mock Welcome</div>)
     mockNetworkSetupMenu.mockReturnValue(<div>Mock NetworkSetupMenu</div>)
     mockConnectViaEthernet.mockReturnValue(<div>Mock ConnectViaEthernet</div>)
     mockConnectViaUSB.mockReturnValue(<div>Mock ConnectViaUSB</div>)
@@ -84,53 +91,63 @@ describe('OnDeviceDisplayApp', () => {
       <div>Mock RobotSettingsDashboard</div>
     )
     mockRunningProtocol.mockReturnValue(<div>Mock RunningProtocol</div>)
+    mockRunSummary.mockReturnValue(<div>Mock RunSummary</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('renders a NetworkSetupMenu component from /network-setup', () => {
+  it('renders Welcome component from /welcome', () => {
+    const [{ getByText }] = render('/welcome')
+    getByText('Mock Welcome')
+  })
+
+  it('renders NetworkSetupMenu component from /network-setup', () => {
     const [{ getByText }] = render('/network-setup')
     getByText('Mock NetworkSetupMenu')
   })
 
-  it('renders a ConnectViaEthernet component from /network-setup/ethernet', () => {
+  it('renders ConnectViaEthernet component from /network-setup/ethernet', () => {
     const [{ getByText }] = render('/network-setup/ethernet')
     getByText('Mock ConnectViaEthernet')
   })
 
-  it('renders a ConnectViaUSB component from /network-setup/usb', () => {
+  it('renders ConnectViaUSB component from /network-setup/usb', () => {
     const [{ getByText }] = render('/network-setup/usb')
     getByText('Mock ConnectViaUSB')
   })
 
-  it('renders a ConnectViaWifi component from /network-setup/wifi', () => {
+  it('renders ConnectViaWifi component from /network-setup/wifi', () => {
     const [{ getByText }] = render('/network-setup/wifi')
     getByText('Mock ConnectViaWifi')
   })
 
-  it('renders a RobotDashboard component from /dashboard', () => {
+  it('renders RobotDashboard component from /dashboard', () => {
     const [{ getByText }] = render('/dashboard')
     getByText('Mock RobotDashboard')
   })
-  it('renders a ProtocolDashboard component from /protocols', () => {
+  it('renders ProtocolDashboard component from /protocols', () => {
     const [{ getByText }] = render('/protocols')
     getByText('Mock ProtocolDashboard')
   })
-  it('renders a ProtocolSetup component from /protocols/:runId/setup', () => {
+  it('renders ProtocolSetup component from /protocols/:runId/setup', () => {
     const [{ getByText }] = render('/protocols/my-protocol-id/setup')
     getByText('Mock ProtocolSetup')
   })
-  it('renders a RobotSettingsDashboard component from /robot-settings', () => {
+  it('renders RobotSettingsDashboard component from /robot-settings', () => {
     const [{ getByText }] = render('/robot-settings')
     getByText('Mock RobotSettingsDashboard')
   })
-  it('renders a AttachInstrumentsDashboard component from /attach-instruments', () => {
-    const [{ getByText }] = render('/attach-instruments')
-    getByText('Mock AttachInstrumentsDashboard')
+  it('renders InstrumentsDashboard component from /instruments', () => {
+    const [{ getByText }] = render('/instruments')
+    getByText('Mock InstrumentsDashboard')
   })
-  it('renders a RunningProtocol component from /protocols/:runId/run', () => {
+  it('renders RunningProtocol component from /protocols/:runId/run', () => {
     const [{ getByText }] = render('/protocols/my-run-id/run')
     getByText('Mock RunningProtocol')
+  })
+  it('renders a RunSummary component from /protocols/:runId/summary', () => {
+    const [{ getByText }] = render('/protocols/my-run-id/summary')
+    getByText('Mock RunSummary')
   })
 })

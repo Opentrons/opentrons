@@ -3,10 +3,10 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from hardware_testing.data import ui
+from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -42,13 +42,15 @@ async def _main(cfg: TestConfig) -> None:
         report.set_operator(input("enter operator name: "))
     else:
         report.set_operator("simulation")
-    report.set_version("unknown")  # FIXME: figure out what this should be
+    report.set_version(get_git_description())
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
         ui.print_title(section.value)
         await test_run(api, report, section.value)
 
+    # DISENGAGE XY FOR OPERATOR TO RELOAD GRIPPER
+    await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
     ui.print_title("DONE")
 
     # SAVE REPORT

@@ -16,11 +16,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RunStatus,
 } from '@opentrons/api-client'
-import {
-  useRunQuery,
-  useModulesQuery,
-  usePipettesQuery,
-} from '@opentrons/react-api-client'
+import { useRunQuery, useModulesQuery } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Box,
@@ -48,7 +44,15 @@ import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_RUN_PAUSE,
+  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_RESUME,
+} from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
@@ -122,8 +126,6 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  // NOTE: we are polling pipettes, though not using their value directly here
-  usePipettesQuery({}, { refetchInterval: EQUIPMENT_POLL_MS })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
 
   React.useEffect(() => {
@@ -135,7 +137,7 @@ export function ProtocolRunHeader({
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
-        name: 'runFinish',
+        name: ANALYTICS_PROTOCOL_RUN_FINISH,
         properties: {
           ...robotAnalyticsData,
         },
@@ -184,7 +186,7 @@ export function ProtocolRunHeader({
 
   const handleClearClick = (): void => {
     trackProtocolRunEvent({
-      name: 'runFinish',
+      name: ANALYTICS_PROTOCOL_RUN_FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
     closeCurrentRun()
@@ -382,7 +384,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const history = useHistory()
   const { t } = useTranslation('run_details')
   const attachedModules =
-    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+    useModulesQuery({
+      refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: runStatus != null && START_RUN_STATUSES.includes(runStatus),
+    })?.data?.data ?? []
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -426,7 +431,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware
   const handleProceedToRunClick = (): void => {
-    trackEvent({ name: 'proceedToRun', properties: {} })
+    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
     play()
   }
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
@@ -477,7 +482,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     buttonText = t('pause_run')
     handleButtonClick = (): void => {
       pause()
-      trackProtocolRunEvent({ name: 'runPause' })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
     }
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     buttonIconName = 'ot-spinner'
@@ -498,7 +503,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       } else {
         play()
         trackProtocolRunEvent({
-          name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
+          name:
+            runStatus === RUN_STATUS_IDLE
+              ? ANALYTICS_PROTOCOL_RUN_START
+              : ANALYTICS_PROTOCOL_RUN_RESUME,
           properties:
             runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
               ? robotAnalyticsData
@@ -512,10 +520,10 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     handleButtonClick = () => {
       reset()
       trackEvent({
-        name: 'proceedToRun',
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RunRecordDetail' },
       })
-      trackProtocolRunEvent({ name: 'runAgain' })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
     }
   }
 

@@ -6,9 +6,10 @@ import {
   SPACING,
   BORDERS,
   Btn,
-  styleProps,
-  DIRECTION_ROW,
   Icon,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { StyledText } from '../../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -24,11 +25,13 @@ interface LargeButtonProps extends StyleProps {
 }
 
 export function LargeButton(props: LargeButtonProps): JSX.Element {
-  const { onClick, buttonType, buttonText, iconName, disabled } = props
-  const buttonProps = {
-    onClick,
-    disabled,
-  }
+  const {
+    buttonType,
+    buttonText,
+    iconName,
+    disabled = false,
+    ...buttonProps
+  } = props
 
   const LARGE_BUTTON_PROPS_BY_TYPE: Record<
     LargeButtonTypes,
@@ -41,8 +44,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   > = {
     secondary: {
       defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.foundationalBlue,
-      activeBackgroundColor: COLORS.medBluePressed,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
       iconColor: COLORS.blueEnabled,
     },
     alert: {
@@ -69,11 +72,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     box-shadow: none;
     padding: ${SPACING.spacing5};
     line-height: ${TYPOGRAPHY.lineHeight20};
-    max-height: 14.375rem;
-    text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
 
-    ${styleProps}
     &:focus {
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
@@ -103,15 +103,17 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
   `
   return (
     <Btn
-      {...buttonProps}
+      display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
       aria-label={`LargeButton_${buttonType}`}
-      flexDirection={DIRECTION_ROW}
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      disabled={disabled}
+      {...buttonProps}
     >
       <StyledText
         fontSize="2rem"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        paddingBottom="3.75rem"
         lineHeight="2.625rem"
       >
         {buttonText}

@@ -9,13 +9,17 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  RESPONSIVENESS,
+  ALIGN_CENTER,
+  StyleProps,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
 
-interface Props {
+interface Props extends StyleProps {
   iconColor: string
   header: string
   isSuccess: boolean
@@ -30,7 +34,7 @@ const HEADER_STYLE = css`
   margin-top: ${SPACING.spacing5};
   margin-bottom: ${SPACING.spacing3};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;
     font-weight: 700;
   }
@@ -42,9 +46,9 @@ const SUBHEADER_STYLE = css`
   text-align: ${TYPOGRAPHY.textAlignCenter};
   height: 1.75rem;
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
-    font-size: 1.75rem;
-    line-height: 2.25rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: ${TYPOGRAPHY.fontSize28};
+    line-height: ${TYPOGRAPHY.lineHeight36};
     margin-left: 4.5rem;
     margin-right: 4.5rem;
   }
@@ -54,23 +58,36 @@ const BUTTON_STYLE = css`
   padding-right: ${SPACING.spacing6};
   padding-bottom: ${SPACING.spacing6};
 
-  @media ${ODD_MEDIA_QUERY_SPECS} {
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding-bottom: ${SPACING.spacing6};
   }
 `
 
 export function SimpleWizardBody(props: Props): JSX.Element {
-  const { iconColor, children, header, subHeader, isSuccess, isPending } = props
+  const {
+    iconColor,
+    children,
+    header,
+    subHeader,
+    isSuccess,
+    isPending,
+    ...styleProps
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      height={isOnDevice ? '472px' : 'auto'}
+      minHeight="394px"
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      {...styleProps}
+    >
       <Flex
-        alignItems={TYPOGRAPHY.textAlignCenter}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        height="100%"
-        marginBottom={isOnDevice ? '3.9365rem' : '5.6875rem'}
-        marginTop="6.8125rem"
+        flex="1 0 auto"
       >
         {isPending ? (
           <Flex
@@ -109,7 +126,14 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           </>
         )}
       </Flex>
-      <Flex css={BUTTON_STYLE}>{children}</Flex>
+      <Flex
+        position={POSITION_ABSOLUTE}
+        bottom={0}
+        right={0}
+        css={BUTTON_STYLE}
+      >
+        {children}
+      </Flex>
     </Flex>
   )
 }

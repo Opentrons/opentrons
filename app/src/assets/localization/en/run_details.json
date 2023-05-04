@@ -117,5 +117,15 @@
   "preview_of_protocol_steps": "This is a preview of your protocol's steps",
   "steps_total": "{{count}} steps total",
   "protocol_completed": "Protocol completed",
-  "complete_protocol_to_download": "Complete the protocol to download the run log"
+  "complete_protocol_to_download": "Complete the protocol to download the run log",
+  "run_complete": "Run completed",
+  "return_to_dashboard": "Return to dashboard",
+  "view_error_details": "View error details",
+  "duration": "Duration",
+  "start": "Start",
+  "end": "End",
+  "run_failed_modal_title": "Run failed",
+  "run_failed_modal_header": "{{errorName}}: {{errorCode}} at protocol step {{count}}",
+  "run_failed_modal_body": "Error occurred when protocol was {{command}}",
+  "run_failed_modal_description": "Please contact support@opentrons.com with relevant information for assistance with troubleshooting."
 }

@@ -86,23 +86,26 @@ export function RobotSettingsDashboard(): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
 
   return (
-    <Flex
-      padding={`${SPACING.spacing6} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
-      flexDirection={DIRECTION_COLUMN}
-      columnGap={SPACING.spacing3}
-    >
+    // This top level Flexbox only exists to position the temporary
+    // "To ODD Menu" button on the bottom. When it goes, so can this.
+    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
       {currentOption != null ? (
-        <SettingsContent
-          currentOption={currentOption}
-          setCurrentOption={setCurrentOption}
-          networkConnection={networkConnection}
-          robotName={robotName}
-          robotServerVersion={robotServerVersion ?? 'Unknown'}
-          isUpdateAvailable={isUpdateAvailable}
-          devToolsOn={devToolsOn}
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+          <SettingsContent
+            currentOption={currentOption}
+            setCurrentOption={setCurrentOption}
+            networkConnection={networkConnection}
+            robotName={robotName}
+            robotServerVersion={robotServerVersion ?? 'Unknown'}
+            isUpdateAvailable={isUpdateAvailable}
+            devToolsOn={devToolsOn}
+          />
+        </Flex>
       ) : (
-        <>
+        <Flex
+          padding={`0 ${SPACING.spacingXXL}`}
+          flexDirection={DIRECTION_COLUMN}
+        >
           <Navigation routes={onDeviceDisplayRoutes} />
 
           {/* Network Settings */}
@@ -181,7 +184,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             settingName={t('app_settings:update_channel')}
             currentOption="UpdateChannel"
             setCurrentOption={setCurrentOption}
-            iconName="wifi"
+            iconName="update-channel"
           />
           {/* Enable Developer Tools */}
           <RobotSettingButton
@@ -191,12 +194,12 @@ export function RobotSettingsDashboard(): JSX.Element {
             enabledDevTools
             devToolsOn={devToolsOn}
           />
-        </>
+        </Flex>
       )}
 
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        padding={SPACING.spacingXXL}
         width="fit-content"
       >
         <Link to="menu">
@@ -224,7 +227,6 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
-  robotName,
   isUpdateAvailable,
   iconName,
   enabledDevTools,
@@ -260,7 +262,7 @@ const RobotSettingButton = ({
             <StyledText
               fontSize="1.5rem"
               lineHeight="1.875rem"
-              fontWeight="700"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {settingName}
             </StyledText>

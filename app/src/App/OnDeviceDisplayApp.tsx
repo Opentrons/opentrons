@@ -26,8 +26,10 @@ import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDa
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
+import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
-import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
+import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
+import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings } from '../redux/config'
@@ -39,8 +41,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: Welcome,
     exact: true,
-    name: 'Get started',
-    path: '/get-started',
+    name: 'Welcome',
+    path: '/welcome',
   },
   {
     Component: TempODDMenu,
@@ -107,11 +109,23 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/run',
   },
   {
-    Component: AttachInstrumentsDashboard,
+    Component: RunSummary,
+    exact: true,
+    name: 'Protocol Run Summary',
+    path: '/protocols/:runId/summary',
+  },
+  {
+    Component: InstrumentsDashboard,
     exact: true,
     name: 'Instruments',
-    navLinkTo: '/attach-instruments',
-    path: '/attach-instruments',
+    navLinkTo: '/instruments',
+    path: '/instruments',
+  },
+  {
+    Component: InstrumentDetail,
+    exact: true,
+    name: 'Instrument Detail',
+    path: '/instruments/:mount',
   },
   // insert attach instruments subroutes
   {
@@ -175,7 +189,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%">
+      <Box width="100%" css="user-select: none;">
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (

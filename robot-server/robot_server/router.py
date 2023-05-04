@@ -6,6 +6,7 @@ from .errors import LegacyErrorResponse, ErrorBody
 from .health import health_router
 from .protocols import protocols_router
 from .runs import runs_router
+from .maintenance_runs.router import maintenance_runs_router
 from .commands import commands_router
 from .modules import modules_router
 from .instruments import instruments_router
@@ -51,6 +52,12 @@ router.include_router(
     responses={
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
     },
+)
+
+router.include_router(
+    router=maintenance_runs_router,
+    tags=["Maintenance Run Management"],
+    dependencies=[Depends(check_version_header)],
 )
 
 router.include_router(

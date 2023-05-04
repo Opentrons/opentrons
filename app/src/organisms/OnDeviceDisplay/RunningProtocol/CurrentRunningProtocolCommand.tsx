@@ -49,13 +49,13 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const RUN_TIMER_STYLE = css`
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
   color: ${COLORS.darkBlackEnabled};
 `
@@ -84,7 +84,7 @@ interface CurrentRunningProtocolCommandProps {
   runTimerInfo: RunTimerInfo
   playRun: () => void
   pauseRun: () => void
-  stopRun: () => void
+  setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
   protocolName?: string
   currentRunCommandIndex?: number
@@ -96,7 +96,7 @@ export function CurrentRunningProtocolCommand({
   runTimerInfo,
   playRun,
   pauseRun,
-  stopRun,
+  setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
   protocolName,
   currentRunCommandIndex,
@@ -110,8 +110,7 @@ export function CurrentRunningProtocolCommand({
   // ToDo (kj:04/09/2023 Add confirm modal)
   // jira ticket RCORE-562 and RCORE-563
   const onStop = (): void => {
-    stopRun() // from useRunActionMutations
-    trackProtocolRunEvent({ name: 'runCancel' })
+    setShowConfirmCancelRunModal(true)
   }
 
   const onTogglePlayPause = (): void => {
@@ -168,7 +167,7 @@ export function CurrentRunningProtocolCommand({
       </Flex>
       <Flex
         padding={`0.75rem ${SPACING.spacing5}`}
-        backgroundColor={COLORS.foundationalBlue}
+        backgroundColor={COLORS.mediumBlueEnabled}
         borderRadius={BORDERS.size_two}
         justifyContent={JUSTIFY_CENTER}
       >

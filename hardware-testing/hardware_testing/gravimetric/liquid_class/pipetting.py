@@ -89,7 +89,13 @@ def _get_approach_submerge_retract_heights(
     aspirate: Optional[float],
     dispense: Optional[float],
     blank: bool,
+    channel_count: int,
 ) -> Tuple[float, float, float]:
+    # the actual volume of liquid moved depends on how many channels are being tested
+    if aspirate:
+        aspirate *= channel_count
+    elif dispense:
+        dispense *= channel_count
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
@@ -110,22 +116,30 @@ def _get_approach_submerge_retract_heights(
 
 
 def _submerge(
-    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+    pipette: InstrumentContext,
+    well: Well,
+    height: float,
+    channel_offset: Point,
+    speed: float,
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
-        speed=config.TIP_SPEED_WHILE_SUBMERGING,
+        speed=speed,
     )
 
 
 def _retract(
-    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+    pipette: InstrumentContext,
+    well: Well,
+    height: float,
+    channel_offset: Point,
+    speed: float,
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
-        speed=config.TIP_SPEED_WHILE_RETRACTING,
+        speed=speed,
     )
     pipette.move_to(
         well.top().move(channel_offset),
@@ -139,6 +153,7 @@ def _pipette_with_liquid_settings(
     liquid_class: LiquidClassSettings,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     aspirate: Optional[float] = None,
@@ -180,8 +195,23 @@ def _pipette_with_liquid_settings(
 
     # CALCULATE TIP HEIGHTS FOR EACH PHASE
     approach_mm, submerge_mm, retract_mm = _get_approach_submerge_retract_heights(
-        pipette, well, liquid_tracker, liquid_class, aspirate, dispense, blank
+        pipette,
+        well,
+        liquid_tracker,
+        liquid_class,
+        aspirate,
+        dispense,
+        blank,
+        channel_count,
     )
+
+    # SET Z SPEEDS DURING SUBMERGE/RETRACT
+    if aspirate:
+        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
+        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
+    else:
+        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_DISPENSE
+        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_DISPENSE
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
@@ -203,10 +233,10 @@ def _pipette_with_liquid_settings(
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
                 _retract(
-                    pipette, well, approach_mm, channel_offset
+                    pipette, well, approach_mm, channel_offset, retract_speed
                 )  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
-                _submerge(pipette, well, submerge_mm, channel_offset)
+                _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
@@ -245,12 +275,12 @@ def _pipette_with_liquid_settings(
 
     # PHASE 2: SUBMERGE
     callbacks.on_submerging()
-    _submerge(pipette, well, submerge_mm, channel_offset)
+    _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
     _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract(pipette, well, retract_mm, channel_offset)
+    _retract(pipette, well, retract_mm, channel_offset, retract_speed)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
@@ -265,6 +295,7 @@ def aspirate_with_liquid_class(
     aspirate_volume: float,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -281,6 +312,7 @@ def aspirate_with_liquid_class(
         liquid_class,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks,
         aspirate=aspirate_volume,
@@ -297,6 +329,7 @@ def dispense_with_liquid_class(
     dispense_volume: float,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -313,6 +346,7 @@ def dispense_with_liquid_class(
         liquid_class,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks,
         dispense=dispense_volume,

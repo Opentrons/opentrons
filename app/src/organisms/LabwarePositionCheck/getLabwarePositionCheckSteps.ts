@@ -17,6 +17,11 @@ export const getLabwarePositionCheckSteps = (
         )
     )
     const { labware, modules, commands } = protocolData
+    if (pipettesUsedInProtocol.length === 0) {
+      throw new Error(
+        'pipettes do not pick up a tip within protocol, labware position check cannot be performed'
+      )
+    }
     const pipettesById = pipettesUsedInProtocol.reduce(
       (acc, pip) => ({ ...acc, [pip.id]: pip }),
       {}

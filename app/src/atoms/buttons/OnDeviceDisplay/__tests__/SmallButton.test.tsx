@@ -13,11 +13,11 @@ describe('SmallButton', () => {
   beforeEach(() => {
     props = {
       onClick: jest.fn(),
-      buttonType: 'default',
+      buttonType: 'primary',
       buttonText: 'small button',
     }
   })
-  it('renders the default button and it works as expected', () => {
+  it('renders the primary button and it works as expected', () => {
     const { getByText, getByRole } = render(props)
     getByText('small button').click()
     expect(props.onClick).toHaveBeenCalled()
@@ -38,14 +38,14 @@ describe('SmallButton', () => {
       `background-color: ${COLORS.red_two}`
     )
   })
-  it('renders the alt button', () => {
+  it('renders the secondary button', () => {
     props = {
       ...props,
-      buttonType: 'alt',
+      buttonType: 'secondary',
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.foundationalBlue}`
+      `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
   it('renders the tertiary high light button', () => {
@@ -54,9 +54,7 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryHighLight',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
-    )
+    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
   })
   it('renders the tertiary low light', () => {
     props = {
@@ -64,7 +62,9 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryLowLight',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    expect(getByRole('button')).toHaveStyle(
+      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
+    )
   })
   it('renders the button as disabled', () => {
     props = {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -15,6 +15,7 @@ import {
   OVERFLOW_HIDDEN,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   useProtocolQuery,
   useRunQuery,
@@ -35,6 +36,7 @@ import {
   RunningProtocolSkeleton,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -45,7 +47,7 @@ const Bullet = styled.div`
   height: 0.5rem;
   width: 0.5rem;
   border-radius: 50%;
-  z-index: 10;
+  z-index: 2;
   background: ${(props: BulletProps) =>
     props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_forty};
   transform: ${(props: BulletProps) =>
@@ -61,6 +63,11 @@ export function RunningProtocol(): JSX.Element {
   const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
+  const [
+    showConfirmCancelRunModal,
+    setShowConfirmCancelRunModal,
+  ] = React.useState<boolean>(false)
+  const history = useHistory()
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -78,7 +85,7 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const { playRun, pauseRun, stopRun } = useRunActionMutations(runId)
+  const { playRun, pauseRun } = useRunActionMutations(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
 
   React.useEffect(() => {
@@ -99,6 +106,12 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
+      history.push(`/protocols/${runId}/summary`)
+    }
+  }, [history, runId, runStatus])
+
   return (
     <>
       <Flex
@@ -117,6 +130,13 @@ export function RunningProtocol(): JSX.Element {
             OnDevice
           />
         ) : null}
+        {showConfirmCancelRunModal ? (
+          <ConfirmCancelRunModal
+            runId={runId}
+            setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+            isActiveRun={true}
+          />
+        ) : null}
         <Flex
           ref={swipe.ref}
           padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
@@ -127,7 +147,7 @@ export function RunningProtocol(): JSX.Element {
               <CurrentRunningProtocolCommand
                 playRun={playRun}
                 pauseRun={pauseRun}
-                stopRun={stopRun}
+                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
                 protocolName={protocolName}
                 runStatus={runStatus}
@@ -141,7 +161,7 @@ export function RunningProtocol(): JSX.Element {
                 runStatus={runStatus}
                 playRun={playRun}
                 pauseRun={pauseRun}
-                stopRun={stopRun}
+                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
                 currentRunCommandIndex={currentRunCommandIndex}
                 robotSideAnalysis={robotSideAnalysis}
