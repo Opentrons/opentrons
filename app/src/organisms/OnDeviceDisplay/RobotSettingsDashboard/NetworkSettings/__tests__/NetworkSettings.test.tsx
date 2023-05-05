@@ -2,25 +2,30 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../../i18n'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { getWifiList } from '../../../../redux/networking'
-import { NetworkSettings } from '../NetworkSettings'
-import { WifiConnectionDetails } from '../../SetupNetwork'
+import { i18n } from '../../../../../i18n'
+import { getLocalRobot } from '../../../../../redux/discovery'
+import { getWifiList } from '../../../../../redux/networking'
+import { WifiConnectionDetails } from '../WifiConnectionDetails'
+import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
+import { NetworkSettings } from '..'
 
-import type { DiscoveredRobot } from '../../../../redux/discovery/types'
-import type { WifiNetwork } from '../../../../redux/networking/types'
+import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
+import type { WifiNetwork } from '../../../../../redux/networking/types'
 
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/networking')
-jest.mock('../../SetupNetwork')
+jest.mock('../../../../../redux/discovery')
+jest.mock('../../../../../redux/networking')
+jest.mock('../WifiConnectionDetails')
+jest.mock('../EthernetConnectionDetails')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
 const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
-const MockWifiConnectionDetails = WifiConnectionDetails as jest.MockedFunction<
+const mockWifiSettings = WifiConnectionDetails as jest.MockedFunction<
   typeof WifiConnectionDetails
+>
+const mockEthernetConnectionDetails = EthernetConnectionDetails as jest.MockedFunction<
+  typeof EthernetConnectionDetails
 >
 const mockSetCurrentOption = jest.fn()
 
@@ -54,7 +59,10 @@ describe('NetworkSettings', () => {
         securityType: 'wpa-psk',
       } as WifiNetwork,
     ])
-    MockWifiConnectionDetails.mockReturnValue(<div>WIFI DETAILS</div>)
+    mockWifiSettings.mockReturnValue(<div>mock WifiConnectionDetails</div>)
+    mockEthernetConnectionDetails.mockReturnValue(
+      <div>mock EthernetConnectionDetails</div>
+    )
   })
 
   afterEach(() => {
@@ -71,7 +79,7 @@ describe('NetworkSettings', () => {
   it('selecting the Wi-Fi option displays the wifi details', () => {
     const [{ getByText }] = render(props)
     getByText('Wi-Fi').click()
-    expect(getByText('WIFI DETAILS')).toBeTruthy()
+    expect(getByText('mock WifiConnectionDetails')).toBeTruthy()
   })
 
   it('clicking back on the wifi details screen shows the network settings page again', () => {
@@ -81,4 +89,24 @@ describe('NetworkSettings', () => {
     expect(queryByText('WIFI DETAILS')).toBeFalsy()
     expect(getByText('Network Settings')).toBeTruthy()
   })
+
+  it('selecting the Ethernet option displays the ethernet details', () => {
+    const [{ getByText }] = render(props)
+    getByText('Ethernet').click()
+    expect(getByText('mock EthernetConnectionDetails')).toBeTruthy()
+  })
+
+  it('clicking back on the ethernet details screen shows the network settings page again', () => {
+    const [{ getByText, queryByText, container }] = render(props)
+    getByText('Ethernet').click()
+    container.querySelector('button')?.click()
+    expect(queryByText('ETHERNET DETAILS')).toBeFalsy()
+    expect(getByText('Network Settings')).toBeTruthy()
+  })
+
+  it.todo('selecting the USB option displays the usb details')
+
+  it.todo(
+    'clicking back on the usb details screen shows the network settings page again'
+  )
 })

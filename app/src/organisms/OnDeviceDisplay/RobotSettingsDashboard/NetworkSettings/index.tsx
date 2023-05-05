@@ -16,18 +16,18 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { Chip } from '../../../atoms/Chip'
-import { WifiConnectionDetails } from '../SetupNetwork'
-import { getWifiList } from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
-import { EthernetConnectionDetails } from '../SetupNetwork/EthernetConnectionDetails'
+import { StyledText } from '../../../../atoms/text'
+import { Chip } from '../../../../atoms/Chip'
+import { getWifiList } from '../../../../redux/networking'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { EthernetConnectionDetails } from './EthernetConnectionDetails'
+import { WifiConnectionDetails } from './WifiConnectionDetails'
 
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
-import type { ChipType } from '../../../atoms/Chip'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import type { State } from '../../../redux/types'
+import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
+import type { ChipType } from '../../../../atoms/Chip'
+import type { SettingOption } from '../../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { State } from '../../../../redux/types'
 
 export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
 
@@ -92,9 +92,6 @@ export function NetworkSettings({
           <WifiConnectionDetails
             ssid={activeSsid}
             authType={connectedWifiAuthType}
-            wifiList={list}
-            showHeader={false}
-            showWifiListButton={true}
           />
         )
       case 'ethernet':
@@ -199,24 +196,28 @@ function NetworkSettingButton({
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
           <Flex gridGap={SPACING.spacing3} width="34.8125rem">
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing5}>
               <Icon name={iconName} size="3rem" />
-              <StyledText
-                fontSize="1.5rem"
-                lineHeight="2.0625rem"
-                fontWeight="700"
-              >
-                {buttonTitle}
-              </StyledText>
-              {networkName != null ? (
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing1}>
                 <StyledText
-                  fontSize="1.5rem"
-                  lineHeight="2.0625rem"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  fontSize={TYPOGRAPHY.fontSize28}
+                  lineHeight={TYPOGRAPHY.lineHeight36}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  textAlign={TYPOGRAPHY.textAlignLeft}
                 >
-                  {networkName}
+                  {buttonTitle}
                 </StyledText>
-              ) : null}
+                {networkName != null ? (
+                  <StyledText
+                    fontSize={TYPOGRAPHY.fontSize28}
+                    lineHeight={TYPOGRAPHY.lineHeight36}
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    color={COLORS.darkBlack70}
+                  >
+                    {networkName}
+                  </StyledText>
+                ) : null}
+              </Flex>
             </Flex>
           </Flex>
           <Flex alignItems={ALIGN_CENTER} width="15.1875rem">
