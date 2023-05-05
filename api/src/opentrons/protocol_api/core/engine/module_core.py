@@ -135,6 +135,12 @@ class NonConnectedModuleCore(AbstractModuleCore):
             self.module_id
         ).displayName
 
+    def get_deck_slot_id(self) -> str:
+        slot_name = self.get_deck_slot()
+        return validation.ensure_deck_slot_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
+
 
 class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
     """Temperature Module core logic implementation for Python protocols."""

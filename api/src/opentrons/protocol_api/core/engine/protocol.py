@@ -483,7 +483,7 @@ class ProtocolCore(
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, None]:
+    ) -> Union[str, ModuleCore, NonConnectedModuleCore, None]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
