@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LargeButton } from '.'
+import { LargeButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {

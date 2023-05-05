@@ -20,7 +20,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 
 import type {
@@ -40,12 +40,12 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   padding: ${SPACING.spacing4} ${SPACING.spacing5};
   border-radius: ${BORDERS.size_three};
   background-color: ${({ isReady }) =>
-    isReady ? COLORS.green_three : COLORS.yellow_three};
+    isReady ? COLORS.green3 : COLORS.yellow3};
   &:hover,
   &:active,
   &:focus {
     background-color: ${({ isReady }) =>
-      isReady ? COLORS.green_three_pressed : COLORS.yellow_three_pressed};
+      isReady ? COLORS.green3Pressed : COLORS.yellow3Pressed};
   }
 `
 interface ProtocolInstrumentMountItemProps {
@@ -127,7 +127,7 @@ export function ProtocolInstrumentMountItem(
               }
             />
             <CalibrationStatus
-              color={isAttachedWithCal ? COLORS.green_one : COLORS.yellow_one}
+              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}
             >
               {i18n.format(
                 t(isAttachedWithCal ? 'calibrated' : 'no_data'),

@@ -39,7 +39,7 @@ export function SmallModalChildren(
           {header}
         </StyledText>
         <StyledText
-          color={COLORS.darkBlack_ninety}
+          color={COLORS.darkBlack90}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}

@@ -17,7 +17,7 @@ import {
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
-import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
@@ -145,7 +145,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       </StyledText>
       <StyledText
         as="h4"
-        color={COLORS.darkBlack_seventy}
+        color={COLORS.darkBlack70}
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
       >

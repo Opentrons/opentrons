@@ -15,6 +15,7 @@ from typing import (
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
@@ -75,6 +76,13 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         return DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+
+def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+    if robot_type == "OT-2 Standard":
+        return str(slot_name)
+    else:
+        return slot_name.as_coordinate()
 
 
 def ensure_lowercase_name(name: str) -> str:

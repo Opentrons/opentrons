@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { RadioButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { RadioButton } from '../../../atoms/buttons'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,

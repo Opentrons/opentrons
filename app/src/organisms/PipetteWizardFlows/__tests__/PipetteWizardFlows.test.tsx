@@ -155,6 +155,7 @@ describe('PipetteWizardFlows', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -323,6 +324,7 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -379,6 +381,7 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -450,6 +453,7 @@ describe('PipetteWizardFlows', () => {
               pipetteName: 'p1000_96',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -512,6 +516,7 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -548,6 +553,7 @@ describe('PipetteWizardFlows', () => {
               pipetteName: 'p1000_96',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
