@@ -1956,8 +1956,89 @@ class OT3API(
         mount: OT3Mount,
         moving_axis: OT3Axis,
         target_pos: float,
+        pass_settings: CapacitivePassSettings,
+        retract_after: bool = True,
+    ) -> float:
+        """Determine the position of something using the capacitive sensor.
+        This function orchestrates detecting the position of a collision between the
+        capacitive probe on the tool on the specified mount, and some fixed element
+        of the robot.
+        When calling this function, the mount's probe critical point should already
+        be aligned in the probe axis with the item to be probed.
+        It will move the mount's probe critical point to a small distance behind
+        the expected position of the element (which is target_pos, in deck coordinates,
+        in the axis to be probed) while running the tool's capacitive sensor. When the
+        sensor senses contact, the mount stops.
+        This function moves away and returns the sensed position.
+        This sensed position can be used in several ways, including
+        - To get an absolute position in deck coordinates of whatever was
+        targeted, if something was guaranteed to be physically present.
+        - To detect whether a collision occured at all. If this function
+        returns a value far enough past the anticipated position, then it indicates
+        there was no material there.
+        """
+        if moving_axis not in [
+            OT3Axis.X,
+            OT3Axis.Y,
+        ] and moving_axis != OT3Axis.by_mount(mount):
+            raise RuntimeError(
+                "Probing must be done with a gantry axis or the mount of the sensing"
+                " tool"
+            )
+
+        here = await self.gantry_position(mount, refresh=True)
+        origin_pos = moving_axis.of_point(here)
+        if origin_pos < target_pos:
+            pass_start = target_pos - pass_settings.prep_distance_mm
+            pass_distance = (
+                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
+            )
+        else:
+            pass_start = target_pos + pass_settings.prep_distance_mm
+            pass_distance = -1.0 * (
+                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
+            )
+        machine_pass_distance = moving_axis.of_point(
+            machine_vector_from_deck_vector(
+                moving_axis.set_in_point(top_types.Point(0, 0, 0), pass_distance),
+                self._transforms.deck_calibration.attitude,
+            )
+        )
+        pass_start_pos = moving_axis.set_in_point(here, pass_start)
+        await self.move_to(mount, pass_start_pos)
+        if mount == OT3Mount.GRIPPER:
+            probe = self._gripper_handler.get_attached_probe()
+            assert probe
+            await self._backend.capacitive_probe(
+                mount,
+                moving_axis,
+                machine_pass_distance,
+                pass_settings.speed_mm_per_s,
+                pass_settings.sensor_threshold_pf,
+                GripperProbe.to_type(probe),
+            )
+        else:
+            await self._backend.capacitive_probe(
+                mount,
+                moving_axis,
+                machine_pass_distance,
+                pass_settings.speed_mm_per_s,
+                pass_settings.sensor_threshold_pf,
+                probe=InstrumentProbeType.PRIMARY,
+            )
+        end_pos = await self.gantry_position(mount, refresh=True)
+        if retract_after:
+            await self.move_to(mount, pass_start_pos)
+        return moving_axis.of_point(end_pos)
+
+    async def capacitive_nozzle(
+        self,
+        mount: OT3Mount,
+        moving_axis: OT3Axis,
+        target_pos: float,
         direction: float,
         pass_settings: CapacitivePassSettings,
+        probe_type: Optional[InstrumentProbeType] = InstrumentProbeType.PRIMARY,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -1997,7 +2078,7 @@ class OT3API(
         # if origin_pos < target_pos:
         #     pass_start = target_pos - pass_settings.prep_distance_mm
         #     # print(f"pass_start: {pass_start}")
-        pass_distance = -direction * (
+        pass_distance = direction * (
                 pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
             )
         # else:
@@ -2034,11 +2115,14 @@ class OT3API(
                 machine_pass_distance,
                 pass_settings.speed_mm_per_s,
                 pass_settings.sensor_threshold_pf,
-                probe=InstrumentProbeType.PRIMARY,
+                probe=probe_type,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
         # await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
+
+
+
 
     async def capacitive_sweep(
         self,
