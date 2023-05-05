@@ -126,7 +126,7 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         module_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(location, ModuleCore) or isinstance(
+        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             location, NonConnectedModuleCore
         ):
             module_location = ModuleLocation(moduleId=location.module_id)
