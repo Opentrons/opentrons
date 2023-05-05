@@ -19,11 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import {
-  getNetworkInterfaces,
-  fetchStatus,
-  fetchWifiList,
-} from '../../../redux/networking'
+import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -38,7 +34,6 @@ interface WifiConnectionDetailsProps {
   authType?: WifiSecurityType
   showHeader?: boolean
   showWifiListButton?: boolean
-  wifiList?: WifiNetwork[]
 }
 
 export function WifiConnectionDetails({
@@ -46,7 +41,6 @@ export function WifiConnectionDetails({
   authType,
   showHeader = true,
   showWifiListButton = false,
-  wifiList,
 }: WifiConnectionDetailsProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -57,7 +51,6 @@ export function WifiConnectionDetails({
 
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
   }, [robotName, dispatch])
 
   return (

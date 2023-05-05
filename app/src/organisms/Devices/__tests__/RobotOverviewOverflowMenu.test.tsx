@@ -14,7 +14,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { fetchWifiList, getCanDisconnect } from '../../../redux/networking'
+import { getCanDisconnect } from '../../../redux/networking'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -60,9 +60,6 @@ const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
 >
 const mockGetCanDisconnect = getCanDisconnect as jest.MockedFunction<
   typeof getCanDisconnect
->
-const mockFetchWifiList = fetchWifiList as jest.MockedFunction<
-  typeof fetchWifiList
 >
 
 const render = (
@@ -281,24 +278,5 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
     expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
-  })
-
-  it('dispatches fetchWifiList on mount and on an interval', () => {
-    render({ robot: mockUnreachableRobot })
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      1,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(20000)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      2,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      3,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(3)
   })
 })

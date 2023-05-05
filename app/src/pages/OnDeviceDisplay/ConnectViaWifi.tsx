@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import {
   Flex,
   DIRECTION_COLUMN,
-  // useInterval,
   SPACING,
 } from '@opentrons/components'
 
@@ -28,7 +27,7 @@ import {
   WifiConnectionDetails,
 } from '../../organisms/OnDeviceDisplay/SetupNetwork'
 
-import type { State, Dispatch } from '../../redux/types'
+import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
@@ -51,7 +50,6 @@ export function ConnectViaWifi(): JSX.Element {
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatch = useDispatch<Dispatch>()
   const list = useWifiList(robotName)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
@@ -158,10 +156,6 @@ export function ConnectViaWifi(): JSX.Element {
       return null
     }
   }
-
-  React.useEffect(() => {
-    dispatch(Networking.fetchWifiList(robotName))
-  }, [dispatch, robotName])
 
   React.useEffect(() => {
     if (list != null && list.length > 0) {

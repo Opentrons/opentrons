@@ -52,26 +52,6 @@ export interface FetchStatusFailureAction {
   meta: RobotApiRequestMeta
 }
 
-// fetch wifi list
-
-export interface FetchWifiListAction {
-  type: typeof FETCH_WIFI_LIST
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface FetchWifiListSuccessAction {
-  type: typeof FETCH_WIFI_LIST_SUCCESS
-  payload: { robotName: string; wifiList: ApiTypes.WifiNetwork[] }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchWifiListFailureAction {
-  type: typeof FETCH_WIFI_LIST_FAILURE
-  payload: { robotName: string; error: RobotApiErrorResponse }
-  meta: RobotApiRequestMeta
-}
-
 // connect to new network
 
 export interface PostWifiConfigureAction {
@@ -182,9 +162,6 @@ export type NetworkingAction =
   | FetchStatusAction
   | FetchStatusSuccessAction
   | FetchStatusFailureAction
-  | FetchWifiListAction
-  | FetchWifiListSuccessAction
-  | FetchWifiListFailureAction
   | PostWifiConfigureAction
   | PostWifiConfigureSuccessAction
   | PostWifiConfigureFailureAction
