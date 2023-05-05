@@ -96,18 +96,21 @@ def ot3_run_server(
 
         while True:
             try:
-                request_session.get(
+                health_response = request_session.get(
                     f"{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}/health"
                 )
             except ConnectionError:
+                # The server isn't up yet to accept requests. Keep polling.
                 pass
             else:
-                break
-            time.sleep(0.5)
-        request_session.post(
-            f"{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}/home",
-            json={"target": "robot"},
-        )
+                if health_response.status_code == 503:
+                    # The server is accepting requests but reporting not ready. Keep polling.
+                    pass
+                else:
+                    # The server's replied with something other than a busy indicator. Stop polling.
+                    break
+
+            time.sleep(0.1)
 
         yield
 

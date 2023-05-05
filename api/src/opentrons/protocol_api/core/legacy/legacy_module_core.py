@@ -88,7 +88,7 @@ class LegacyModuleCore(AbstractModuleCore):
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
 
     def get_deck_slot_id(self) -> str:
-        return str(self.get_deck_slot())
+        return self.get_deck_slot().id
 
     def get_display_name(self) -> str:
         """Get the module's display name."""
