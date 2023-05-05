@@ -69,7 +69,7 @@ Useful Types and Definitions
    Explicitly name the things that we expect to be public, excluding everything else.
 
 .. automodule:: opentrons.types
-   :members: Point, Location, Mount
+   :members: PipetteNotAttachedError, Point, Location, Mount
 
 
 Executing and Simulating Protocols
