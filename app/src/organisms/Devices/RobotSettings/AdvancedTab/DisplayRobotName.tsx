@@ -64,7 +64,7 @@ export function DisplayRobotName({
         id="RobotSettings_RenameRobot"
         disabled={isRobotBusy}
       >
-        {t('robot_rename_button')}
+        {t('robot_rename')}
       </TertiaryButton>
     </Flex>
   )

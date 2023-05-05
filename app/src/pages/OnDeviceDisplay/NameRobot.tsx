@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import { css } from 'styled-components'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -21,6 +21,8 @@ import {
   Icon,
   Btn,
 } from '@opentrons/components'
+import { getOnDeviceDisplaySettings } from '../../redux/config'
+
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
 import {
@@ -69,9 +71,9 @@ export function NameRobot(): JSX.Element {
   ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const dispatch = useDispatch<Dispatch>()
-  const { state: fromPath } = useLocation()
   const history = useHistory()
-  const isFromRobotSettings = fromPath === 'robotSettings'
+  const { targetPath } = useSelector(getOnDeviceDisplaySettings)
+  const isInitialSetup = targetPath !== '/dashboard'
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>
@@ -122,7 +124,7 @@ export function NameRobot(): JSX.Element {
     onSuccess: (data: UpdatedRobotName) => {
       if (data.name != null) {
         setNewName(data.name)
-        if (isFromRobotSettings) {
+        if (!isInitialSetup) {
           history.push('/robot-settings')
         } else {
           setIsShowConfirmRobotName(true)
@@ -152,11 +154,11 @@ export function NameRobot(): JSX.Element {
 
   return (
     <>
-      {isShowConfirmRobotName && !isFromRobotSettings ? (
+      {isShowConfirmRobotName && isInitialSetup ? (
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>
-          {!isFromRobotSettings ? (
+          {isInitialSetup ? (
             <StepMeter totalSteps={5} currentStep={4} OnDevice />
           ) : null}
           <Flex
@@ -168,7 +170,7 @@ export function NameRobot(): JSX.Element {
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={
-                isFromRobotSettings ? JUSTIFY_SPACE_BETWEEN : JUSTIFY_CENTER
+                isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
               }
               position={POSITION_RELATIVE}
               marginBottom="3.041875rem"
@@ -176,7 +178,7 @@ export function NameRobot(): JSX.Element {
               <Flex position={POSITION_ABSOLUTE} left="0">
                 <Btn
                   onClick={() => {
-                    if (!isFromRobotSettings) {
+                    if (isInitialSetup) {
                       history.push('/robot-settings/update-robot')
                     } else {
                       history.push('/robot-settings')
@@ -186,15 +188,13 @@ export function NameRobot(): JSX.Element {
                   <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
                 </Btn>
               </Flex>
-              <Flex marginLeft={isFromRobotSettings ? '4rem' : '0'}>
+              <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSize38}
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                   lineHeight={TYPOGRAPHY.lineHeight48}
                 >
-                  {!isFromRobotSettings
-                    ? t('name_your_robot')
-                    : t('rename_robot')}
+                  {isInitialSetup ? t('name_your_robot') : t('rename_robot')}
                 </StyledText>
               </Flex>
               <Flex position={POSITION_ABSOLUTE} right="0">
@@ -220,7 +220,7 @@ export function NameRobot(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_CENTER}
             >
-              {!isFromRobotSettings ? (
+              {isInitialSetup ? (
                 <StyledText
                   color={COLORS.black}
                   fontSize="1.375rem"
