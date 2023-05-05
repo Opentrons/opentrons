@@ -225,11 +225,9 @@ export function RunSummary(): JSX.Element {
                 height="17rem"
               />
               {!isRunSucceeded ? (
-                // Note: (04/28/2023) info icon will be added by NetworkDetailsModal.
-                // Once the PR is merged into edge this icon name will be updated.
                 <LargeButton
                   flex="1"
-                  iconName="information"
+                  iconName="info"
                   buttonType="alert"
                   onClick={handleViewErrorDetails}
                   buttonText={t('view_error_details')}
