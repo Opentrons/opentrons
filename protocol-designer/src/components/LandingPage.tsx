@@ -15,7 +15,7 @@ function LandingPageComponent(props: PageProps): JSX.Element {
   return (
     <div className={styles.pd_landing_page}>
       <StyledText as="h1">{i18n.t('flex.landing_page.welcome')}</StyledText>
-      <Icon name={'ot-flex-logo'} className={styles.ot_flex_logo} />
+      <Icon name={'ot-logo'} className={styles.ot_flex_logo} />
       <div className={styles.flex_landing_buttons_wrapper}>
         <OutlineButton
           className={styles.flex_landing_button}

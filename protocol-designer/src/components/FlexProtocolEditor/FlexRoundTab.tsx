@@ -8,7 +8,7 @@ interface RoundTabsProps {
   currentTab: number
 }
 
-export const RoundTabs: React.FC<RoundTabsProps> = ({
+export const FlexRoundTab: React.FC<RoundTabsProps> = ({
   setCurrentTab,
   currentTab,
 }): JSX.Element => {

@@ -7,9 +7,9 @@ import {
   DropdownField,
   useHoverTooltip,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { StyledText } from './StyledText'
-import styles from './FlexComponents.css'
+import { i18n } from '../../../localization'
+import { StyledText } from '../StyledText'
+import styles from '../FlexComponents.css'
 import {
   ModuleType,
   ModuleModel,
@@ -18,14 +18,14 @@ import {
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_FLEX_MODULE_TYPE,
-} from '../../constants'
+} from '../../../constants'
 import { MiniCard } from './MiniCard'
-import { ConnectedSlotMap } from '../modals/EditModulesModal/ConnectedSlotMap'
+import { ConnectedSlotMap } from '../../modals/EditModulesModal/ConnectedSlotMap'
 import { getAllFlexModuleSlotsByType } from './FlexModuleData'
-import { PDAlert } from '../alerts/PDAlert'
-import { ModuleOnDeck } from '../../step-forms'
-import { ModelModuleInfo } from '../EditModules'
-import { ModuleDiagram } from '../modules'
+import { PDAlert } from '../../alerts/PDAlert'
+import { ModuleOnDeck } from '../../../step-forms'
+import { ModelModuleInfo } from '../../EditModules'
+import { ModuleDiagram } from '../../modules'
 import { useFormikContext } from 'formik'
 
 export interface EditModulesModalProps {

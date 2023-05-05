@@ -22,14 +22,13 @@ import {
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import { i18n } from '../../localization'
-import { FlexModules } from './FlexModules'
-import { FlexProtocolName } from './FlexProtocolName'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 import { mountSide, navPillTabListLength, pipetteSlot } from './constant'
-import { RoundTabs } from './RoundTab'
-import { SelectPipetteOption } from './SelectPipette'
+import { FlexRoundTab } from './FlexRoundTab'
 import { DeckSlot } from '../../types'
+import { FlexProtocolName, SelectPipetteOption } from './FlexPillForm'
+import { FlexModules } from './FlexModules'
 
 export interface FormModule {
   onDeck: boolean
@@ -159,7 +158,7 @@ function FlexProtocolEditor(): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex>
-        <RoundTabs setCurrentTab={setTab} currentTab={selectedTab} />
+        <FlexRoundTab setCurrentTab={setTab} currentTab={selectedTab} />
       </Flex>
       <Box
         backgroundColor={COLORS.white}

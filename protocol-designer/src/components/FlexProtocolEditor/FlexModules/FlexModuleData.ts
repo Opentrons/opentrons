@@ -6,14 +6,16 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import { DropdownOption } from '@opentrons/components'
-import { SPAN7_8_10_11_SLOT } from '../../constants'
+import { SPAN7_8_10_11_SLOT } from '../../../constants'
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 ]
+
 type SupportedSlotMap = Record<ModuleType, DropdownOption[]>
+
 export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [
     {

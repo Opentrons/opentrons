@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import { RadioGroup } from '@opentrons/components'
-import { pipetteNameBlocklist } from './constant'
+import { pipetteNameBlocklist } from '../constant'
 import { useFormikContext } from 'formik'
 import type { ActionMeta } from 'react-select'
 

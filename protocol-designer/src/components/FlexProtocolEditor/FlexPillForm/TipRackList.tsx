@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getLabwareDefsByURI } from '../../labware-defs/selectors'
+import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { useFormikContext } from 'formik'
 import {
   blockedTipRackListForFlex,
   customTiprackOption,
   fontSize14,
-} from './constant'
+} from '../constant'
 import {
   CheckboxField,
   DropdownOption,
   Flex,
   OutlineButton,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { createCustomTiprackDef } from '../../labware-defs/actions'
-import { StyledText } from './StyledText'
+import { i18n } from '../../../localization'
+import { createCustomTiprackDef } from '../../../labware-defs/actions'
+import { StyledText } from '../StyledText'
 import cx from 'classnames'
 
-import styles from './FlexComponents.css'
+import styles from '../FlexComponents.css'
 import { reduce } from 'lodash'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
