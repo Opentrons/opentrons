@@ -41,9 +41,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   const pipetteName =
-    attachedPipettes[mount] != null
-      ? attachedPipettes[mount]?.modelSpecs.displayName
-      : ''
+    attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -104,7 +102,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       buttonText={buttonText}
-      buttonType="default"
+      buttonType="primary"
     />
   ) : (
     <PrimaryButton

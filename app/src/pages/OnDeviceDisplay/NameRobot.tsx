@@ -27,7 +27,7 @@ import {
   getUnreachableRobots,
   getLocalRobot,
 } from '../../redux/discovery'
-import { useTrackEvent } from '../../redux/analytics'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
@@ -129,8 +129,9 @@ export function NameRobot(): JSX.Element {
 
   const handleConfirm = (): void => {
     // check robot name in the same network
+    // ToDo (kj:04/09/2023) need to specify for odd
     trackEvent({
-      name: 'renameRobot',
+      name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName: previousName,
         newRobotName: formik.values.newRobotName,

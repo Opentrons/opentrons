@@ -10,22 +10,20 @@ import {
   MOVE_PIN_TO_FRONT_JAW,
   REMOVE_PIN_FROM_REAR_JAW,
 } from './constants'
-import { useCreateRunCommandMutation } from '../../resources/runs/hooks'
 import movePinStorageToFront from '../../assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
 import movePinFrontToRear from '../../assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
 import movePinRearToStorage from '../../assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
 import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING_FRONT_JAW.webm'
 import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
-import type { GripperWizardStepProps, MovePinStep } from './types'
 import type { Coordinates } from '@opentrons/shared-data'
+import type { CreateMaintenaceCommand } from '../../resources/runs/hooks'
+import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Coordinates) => void
   frontJawOffset: Coordinates | null
-  createRunCommand: ReturnType<
-    typeof useCreateRunCommandMutation
-  >['createRunCommand']
+  createRunCommand: CreateMaintenaceCommand
 }
 
 export const MovePin = (props: MovePinProps): JSX.Element | null => {

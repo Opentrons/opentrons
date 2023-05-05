@@ -4,7 +4,9 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
+  Icon,
   Flex,
+  Box,
   COLORS,
   SPACING,
   DIRECTION_ROW,
@@ -12,12 +14,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
-  ALIGN_END,
   TYPOGRAPHY,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../../atoms/text'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
 import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
@@ -25,37 +26,19 @@ import type { RouteProps } from '../../../App/types'
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
-  const [showNavMenu, setNavMenu] = React.useState<boolean>(false)
+  const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
-  const NavigationLink = styled(NavLink)`
-    color: ${COLORS.black};
-    display: flex;
-    grid-gap: ${SPACING.spacing3};
-    border-bottom: 0.3125rem solid transparent;
-    height: 3.5rem;
 
-    &.active {
-      border-bottom: 0.3125rem solid transparent;
-      border-image: linear-gradient(
-        to right,
-        white 33.3%,
-        ${COLORS.highlightPurple_one} 33.3%,
-        ${COLORS.highlightPurple_one} 66.6%,
-        white 66.6%
-      );
-      border-image-slice: 1;
-    }
-  `
   return (
     <>
       <Flex
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing5}
+        height="124px"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -63,46 +46,74 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing3}
         >
-          <NavigationLink to="/dashboard">
-            <StyledText
-              fontSize={TYPOGRAPHY.fontSize32}
-              fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-              lineHeight={TYPOGRAPHY.lineHeight42}
-              color={COLORS.darkBlackEnabled}
-            >
-              {robotName}
-            </StyledText>
-          </NavigationLink>
+          <NavigationLink to="/dashboard" name={robotName} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing6}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-            <NavigationLink key={name} to={navLinkTo as string}>
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSize32}
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                lineHeight={TYPOGRAPHY.lineHeight42}
-                color={COLORS.darkBlack_seventy}
-                marginRight={TYPOGRAPHY.fontSize32}
-              >
-                {name}
-              </StyledText>
-            </NavigationLink>
+            <NavigationLink key={name} to={navLinkTo as string} name={name} />
           ))}
         </Flex>
-        <Flex alignItems={ALIGN_END}>
-          <OverflowBtn
-            isOnDevice={true}
-            onClick={() => setNavMenu(true)}
-            aria-label="Navigation_OverflowBtn"
+        <IconButton
+          aria-label="overflow menu button"
+          onClick={() => setShowNavMenu(true)}
+        >
+          <Icon
+            name="overflow-btn-touchscreen"
+            height="60px"
+            width="48px"
+            color={COLORS.darkBlack70}
           />
-        </Flex>
+        </IconButton>
       </Flex>
       {showNavMenu && (
         <NavigationMenu
-          onClick={() => setNavMenu(false)}
+          onClick={() => setShowNavMenu(false)}
           robotName={robotName}
         />
       )}
     </>
   )
 }
+
+const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
+  <TouchNavLink to={props.to}>
+    {props.name}
+    <Box width="2.5rem" height="5px" borderRadius="2px" />
+  </TouchNavLink>
+)
+
+const TouchNavLink = styled(NavLink)`
+  ${TYPOGRAPHY.level3HeaderSemiBold}
+  color: ${COLORS.darkBlack70};
+  height: 3.5rem;
+  display: flex;
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_CENTER};
+  &.active {
+    color: ${COLORS.black};
+  }
+  &.active > div {
+    background-color: ${COLORS.highlightPurple1};
+  }
+`
+
+const IconButton = styled('button')`
+  border-radius: ${SPACING.spacing2};
+  max-height: 100%;
+  background-color: ${COLORS.white};
+
+  &:hover {
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:active,
+  &:focus {
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
+`

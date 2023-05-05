@@ -56,8 +56,8 @@ export function RecentRunProtocolCard({
   const PROTOCOL_CARD_STYLE = css`
     &:active {
       background-color: ${isReadyToBeReRun
-        ? COLORS.green_three_pressed
-        : COLORS.yellow_three_pressed};
+        ? COLORS.green3Pressed
+        : COLORS.yellow3Pressed};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -131,9 +131,7 @@ export function RecentRunProtocolCard({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing5}
       gridGap={SPACING.spacing5}
-      backgroundColor={
-        isReadyToBeReRun ? COLORS.green_three : COLORS.yellow_three
-      }
+      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
       borderRadius={BORDERS.size_four}
       onClick={handleCardClick}
@@ -151,7 +149,7 @@ export function RecentRunProtocolCard({
       <Flex width="100%" height="14rem">
         <StyledText
           fontSize={TYPOGRAPHY.fontSize32}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight42}
           css={PROTOCOL_TEXT_STYLE}
         >
@@ -162,7 +160,7 @@ export function RecentRunProtocolCard({
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        color={COLORS.darkBlack_seventy}
+        color={COLORS.darkBlack70}
       >
         {i18n.format(t('last_run_time'), 'capitalize')}{' '}
         {lastRun != null

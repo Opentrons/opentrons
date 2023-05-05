@@ -283,7 +283,7 @@ describe('ProtocolRunSetup', () => {
       getByText('Module Setup')
 
       getByText(
-        'Plug in and turn on the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.'
+        "Plug in and turn on the required modules via the robot's USB Ports. Place the modules as shown in the deck map."
       )
       getByText('STEP 3')
       getByText('Labware Setup')
@@ -321,7 +321,7 @@ describe('ProtocolRunSetup', () => {
       getByText('Module Setup')
 
       getByText(
-        'Plug in and turn on the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
+        "Plug in and turn on the required module via the robot's USB Port. Place the module as shown in the deck map."
       )
       getByText('STEP 3')
       getByText('Labware Setup')

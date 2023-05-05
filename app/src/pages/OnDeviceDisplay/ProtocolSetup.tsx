@@ -15,6 +15,7 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
+  truncateString,
   TYPOGRAPHY,
   BORDERS,
   SPACING,
@@ -41,7 +42,7 @@ import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
-import { ConfirmCancelModal } from '../../organisms/RunDetails/ConfirmCancelModal'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
@@ -51,6 +52,7 @@ import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -70,9 +72,9 @@ function ProtocolSetupStep({
   subDetail,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: `${COLORS.successEnabled}${COLORS.opacity20HexCode}`,
-    'not ready': COLORS.warningBackgroundMed,
-    general: COLORS.light_two,
+    ready: COLORS.green3,
+    'not ready': COLORS.yellow3,
+    general: COLORS.light1,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">
@@ -80,32 +82,33 @@ function ProtocolSetupStep({
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
         borderRadius={BORDERS.size_four}
-        gridGap={SPACING.spacing5}
-        padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
+        gridGap={SPACING.spacing4}
+        padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
       >
         {status !== 'general' ? (
           <Icon
-            color={
-              status === 'ready' ? COLORS.successEnabled : COLORS.warningEnabled
-            }
+            color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText as="h1">{title}</StyledText>
+        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {title}
+        </StyledText>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
-          <StyledText as="h2" textAlign={TEXT_ALIGN_RIGHT}>
+          <StyledText as="p" textAlign={TEXT_ALIGN_RIGHT}>
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon name="chevron-right" size="3rem" />
+        <Icon marginLeft={SPACING.spacing3} name="more" size="3rem" />
       </Flex>
     </Btn>
   )
 }
 
+// TODO(ew, 05/03/2023): refactor the run buttons into a shared component
 interface CloseButtonProps {
   onClose: () => void
 }
@@ -114,7 +117,7 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.errorEnabled}
+      backgroundColor={COLORS.red2}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -123,7 +126,7 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       onClick={onClose}
       aria-label="close"
     >
-      <Icon color={COLORS.white} name="close" size="2.5rem" />
+      <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
     </Btn>
   )
 }
@@ -137,7 +140,7 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.successDisabled : COLORS.blueEnabled}
+      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.blueEnabled}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -148,9 +151,8 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
       aria-label="play"
     >
       <Icon
-        color={COLORS.white}
-        marginLeft="0.25rem"
-        name="play"
+        color={disabled ? COLORS.darkBlack60 : COLORS.white}
+        name="play-icon"
         size="2.5rem"
       />
     </Btn>
@@ -174,6 +176,7 @@ function PrepareToRun({
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+
   const { data: attachedInstruments } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
@@ -182,6 +185,7 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
 
   const { play } = useRunControls(runId)
 
@@ -300,43 +304,28 @@ function PrepareToRun({
         marginBottom={SPACING.spacingXXL}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-            <StyledText
-              fontSize={TYPOGRAPHY.fontSize28}
-              lineHeight={TYPOGRAPHY.lineHeight36}
-              fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-            >
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap="0.25rem"
+            maxWidth="43rem"
+          >
+            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
               {t('prepare_to_run')}
             </StyledText>
             <StyledText
-              fontSize={TYPOGRAPHY.fontSize28}
-              lineHeight={TYPOGRAPHY.lineHeight36}
+              as="h4"
+              color={COLORS.darkGreyEnabled}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack_seventy}
+              overflowWrap="anywhere"
             >
-              {protocolName}
+              {truncateString(protocolName as string, 100)}
             </StyledText>
           </Flex>
-          <Flex gridGap={SPACING.spacing5}>
+          <Flex gridGap={SPACING.spacing4}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
             <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>
         </Flex>
-        {/* <Flex gridGap={SPACING.spacing4}>
-          <Flex
-            backgroundColor={COLORS.fundamentalsBackgroundShade}
-            padding="0.25rem 0.5rem"
-          >
-            {`Run: ${createdAtTimestamp}`}
-          </Flex>
-          <Flex
-            backgroundColor={COLORS.fundamentalsBackgroundShade}
-            padding="0.25rem 0.5rem"
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-          >
-            {`${t('status')}: ${runStatus}`}
-          </Flex>
-        </Flex> */}
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
@@ -356,6 +345,7 @@ function PrepareToRun({
           subDetail={modulesSubDetail}
           status={modulesStatus}
         />
+
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('labware')}
           title={t('labware')}
@@ -364,9 +354,9 @@ function PrepareToRun({
           status="general"
         />
         <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('lpc')}
+          onClickSetupStep={launchLPC}
           title={t('labware_position_check')}
-          detail={t('optional')}
+          detail={t('recommended')}
           status="general"
         />
         <ProtocolSetupStep
@@ -382,8 +372,14 @@ function PrepareToRun({
           }
         />
       </Flex>
+      {LPCWizard}
       {showConfirmCancelModal ? (
-        <ConfirmCancelModal onClose={onConfirmCancelClose} runId={runId} />
+        <ConfirmCancelRunModal
+          runId={runId}
+          setShowConfirmCancelRunModal={setShowConfirmCancelModal}
+          isActiveRun={false}
+          protocolId={protocolId}
+        />
       ) : null}
     </>
   )
@@ -394,7 +390,6 @@ export type SetupScreens =
   | 'instruments'
   | 'modules'
   | 'labware'
-  | 'lpc'
   | 'liquids'
 
 export function ProtocolSetup(): JSX.Element {

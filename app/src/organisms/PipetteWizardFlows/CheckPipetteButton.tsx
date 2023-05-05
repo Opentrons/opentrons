@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { PrimaryButton } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
 
@@ -20,21 +20,18 @@ export const CheckPipetteButton = (
     isFetching,
     isOnDevice,
   } = props
-  const { refetch } = usePipettesQuery(
-    { refresh: true },
-    {
-      enabled: false,
-      onSettled: () => {
-        setFetching(false)
-      },
-    }
-  )
+  const { refetch } = useInstrumentsQuery({
+    enabled: false,
+    onSettled: () => {
+      setFetching(false)
+    },
+  })
 
   return isOnDevice ? (
     <SmallButton
       disabled={isFetching}
       buttonText={proceedButtonText}
-      buttonType="default"
+      buttonType="primary"
       onClick={() => {
         setFetching(true)
         refetch()

@@ -41,7 +41,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
   it('should return no data when calling createMaintenanceRun if the request fails', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateMaintenanceRun)
-      .calledWith(HOST_CONFIG)
+      .calledWith(HOST_CONFIG, {})
       .mockRejectedValue('oh no')
 
     const { result, waitFor } = renderHook(
@@ -52,7 +52,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     )
 
     expect(result.current.data).toBeUndefined()
-    result.current.createMaintenanceRun()
+    result.current.createMaintenanceRun({})
     await waitFor(() => {
       console.log(result.current.status)
       return result.current.status !== 'loading'
@@ -61,9 +61,14 @@ describe('useCreateMaintenanceRunMutation hook', () => {
   })
 
   it('should create a maintenance run when calling the createMaintenanceRun callback with basic run args', async () => {
+    const mockOffset = {
+      definitionUri: 'fakeDefURI',
+      location: { slotName: '1' },
+      vector: { x: 1, y: 2, z: 3 },
+    }
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockCreateMaintenanceRun)
-      .calledWith(HOST_CONFIG)
+      .calledWith(HOST_CONFIG, { labwareOffsets: [mockOffset] })
       .mockResolvedValue({
         data: mockMaintenanceRunResponse,
       } as Response<MaintenanceRun>)
@@ -74,7 +79,9 @@ describe('useCreateMaintenanceRunMutation hook', () => {
         wrapper,
       }
     )
-    act(() => result.current.createMaintenanceRun())
+    act(() =>
+      result.current.createMaintenanceRun({ labwareOffsets: [mockOffset] })
+    )
 
     await waitFor(() => result.current.data != null)
 

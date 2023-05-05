@@ -43,7 +43,10 @@ import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
@@ -321,7 +324,7 @@ export function ProtocolDetails(
 
   const handleRunProtocolButtonClick = (): void => {
     trackEvent({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsDetail' },
     })
     setShowChooseRobotToRunProtocolSlideout(true)
