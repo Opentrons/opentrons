@@ -168,8 +168,7 @@ export function registerDiscovery(
     client.stop()
   })
 
-  let usbHttpAgent: Agent
-  // let destroyHttpAgent: () => void
+  let usbHttpAgent: SerialPortHttpAgent
 
   async function usbListener(
     _event: IpcMainInvokeEvent,
@@ -215,6 +214,21 @@ export function registerDiscovery(
     }
   }
 
+  function removeCachedUsbRobot(): void {
+    const cachedUsbRobotName = client
+      .getRobots()
+      .find(robot =>
+        robot.addresses.some(address => address.ip === 'opentrons-usb')
+      )?.name
+
+    if (cachedUsbRobotName != null) {
+      usbLog.debug(
+        `deleting old opentrons-usb entry with name ${cachedUsbRobotName}`
+      )
+      client.removeRobot(cachedUsbRobotName)
+    }
+  }
+
   function startUsbHttpRequests(): void {
     fetchSerialPortList()
       .then((list: PortInfo[]) => {
@@ -240,23 +254,11 @@ export function registerDiscovery(
           logger: usbLog,
         })
 
-        usbHttpAgent = httpAgent as Agent
-        // destroyHttpAgent = httpAgent?.destroy ?? (() => {})
+        usbHttpAgent = httpAgent
 
         ipcMain.handle('usb:request', usbListener)
 
-        const cachedUsbRobotName = client
-          .getRobots()
-          .find(robot =>
-            robot.addresses.some(address => address.ip === 'opentrons-usb')
-          )?.name
-
-        if (cachedUsbRobotName != null) {
-          usbLog.debug(
-            `deleting old opentrons-usb entry with name ${cachedUsbRobotName}`
-          )
-          client.removeRobot(cachedUsbRobotName)
-        }
+        removeCachedUsbRobot()
 
         client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
@@ -309,9 +311,11 @@ export function registerDiscovery(
         break
       case USB_DEVICE_REMOVED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          // TODO: should probably close serialport here
-          // destroyHttpAgent?.()
+          usbHttpAgent.destroy()
           ipcMain.removeHandler('usb:request')
+          // TODO(bh, 2023-05-05): we actually still want this robot to show up in the not available list
+          removeCachedUsbRobot()
+
           client.start({
             healthPollInterval: FAST_POLL_INTERVAL_MS,
             manualAddresses: [],

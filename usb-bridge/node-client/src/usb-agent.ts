@@ -109,6 +109,9 @@ export function createSerialPortListMonitor(
 }
 
 class SerialPortSocket extends SerialPort {
+  // allow node socket destroy
+  destroy(): void {}
+
   // added these to squash keepAlive errors
   setKeepAlive(): void {}
   unref(): void {}
