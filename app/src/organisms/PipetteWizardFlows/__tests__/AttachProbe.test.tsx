@@ -91,9 +91,7 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
     }
     const { getByText, getByTestId } = render(props)
-    getByText(
-      'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
-    )
+    getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
     getByText(
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
     )
@@ -155,5 +153,13 @@ describe('AttachProbe', () => {
     })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
+  })
+
+  it('does not render the goBack button when following a results screen from attach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+    }
+    expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
 })

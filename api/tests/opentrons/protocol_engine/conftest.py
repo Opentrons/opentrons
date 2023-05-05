@@ -159,3 +159,10 @@ def heater_shaker_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 heater-shaker."""
     definition = load_shared_data("module/definitions/3/heaterShakerModuleV1.json")
     return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def mag_block_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 Mag Block."""
+    definition = load_shared_data("module/definitions/3/magneticBlockV1.json")
+    return ModuleDefinition.parse_raw(definition)

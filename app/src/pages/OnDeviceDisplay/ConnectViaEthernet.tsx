@@ -181,7 +181,7 @@ const DisplayConnectionStatus = ({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
-          backgroundColor={COLORS.light_two}
+          backgroundColor={COLORS.light2}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
@@ -237,7 +237,7 @@ const DisplayEthernetInfo = ({
   const { t } = useTranslation(['device_settings', 'shared'])
 
   return (
-    <Flex backgroundColor={COLORS.light_two} flexDirection={DIRECTION_COLUMN}>
+    <Flex backgroundColor={COLORS.light2} flexDirection={DIRECTION_COLUMN}>
       <Flex
         padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing6)}}`}
         flexDirection={DIRECTION_ROW}

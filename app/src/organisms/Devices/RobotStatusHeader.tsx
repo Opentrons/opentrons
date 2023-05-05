@@ -15,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  truncateString,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
@@ -60,8 +61,8 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           paddingRight={SPACING.spacing3}
           overflowWrap="anywhere"
         >
-          {`${String(displayName)}; ${t(
-            `run_details:status_${String(currentRunStatus)}`
+          {`${truncateString(displayName, 80, 65)}; ${t(
+            `run_details:status_${currentRunStatus}`
           )}`}
         </StyledText>
         <Link

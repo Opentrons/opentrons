@@ -560,7 +560,7 @@ describe('discovery selectors', () => {
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['fizzbuzz'],
-      expected: 'OT-3',
+      expected: 'Opentrons Flex',
     },
     {
       name: 'getRobotType returns type of a connectable OT-2',
@@ -581,7 +581,7 @@ describe('discovery selectors', () => {
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['qux'],
-      expected: 'OT-3',
+      expected: 'Opentrons Flex',
     },
   ]
 

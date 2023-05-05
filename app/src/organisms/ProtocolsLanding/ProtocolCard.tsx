@@ -8,6 +8,7 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
+  OT3_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -193,7 +194,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
             <Flex gridGap={SPACING.spacing4}>
               <Flex
-                flex={`0 0 ${String(SIZE_2)}`}
+                flex={`0 0 ${
+                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                }`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
               >
