@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   Box,
   POSITION_RELATIVE,
   COLORS,
-  OVERFLOW_SCROLL,
+  OVERFLOW_AUTO,
   useIdle,
+  useScrolling,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -87,14 +89,13 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     navLinkTo: '/protocols',
     path: '/protocols',
   },
-  // insert protocol subroutes
+  // insert protocol sub-routes
   {
     Component: ProtocolDetails,
     exact: true,
     name: 'Protocol Details',
     path: '/protocols/:protocolId',
   },
-  // TODO(bh: 2022-12-5): these "protocol run" page are a rough guess based on existing designs and site map
   // expect to change or add additional route params
   {
     Component: ProtocolSetup,
@@ -127,7 +128,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     name: 'Instrument Detail',
     path: '/instruments/:mount',
   },
-  // insert attach instruments subroutes
+  // insert attach instruments sub-routes
   {
     Component: RobotSettingsDashboard,
     exact: true,
@@ -135,7 +136,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     navLinkTo: '/robot-settings',
     path: '/robot-settings',
   },
-  // insert robot settings subroutes
+  // insert robot settings sub-routes
   {
     Component: () => (
       <>
@@ -186,10 +187,37 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     initialState: false,
   }
   const isIdle = useIdle(sleepTime, options)
+  const scrollRef = React.useRef(null)
+  const isScrolling = useScrolling(scrollRef)
+
+  console.log('scroll', isScrolling)
+
+  const TOUCH_SCREEN_STYLE = css`
+    position: ${POSITION_RELATIVE};
+    width: 100%;
+    height: 100%;
+    background-color: ${COLORS.white};
+    overflow-y: ${OVERFLOW_AUTO};
+
+    &::-webkit-scrollbar {
+      display: ${isScrolling ? undefined : 'none'};
+      width: 0.75rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      margin-top: 170px;
+      margin-bottom: 170px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${COLORS.darkBlack40};
+      border-radius: 11px;
+    }
+  `
 
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%" css="user-select: none;">
+      <Box width="100%" css="user-select: none;" ref={scrollRef}>
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (
@@ -199,13 +227,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 ({ Component, exact, path }: RouteProps) => {
                   return (
                     <Route key={path} exact={exact} path={path}>
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.white}
-                        overflow={OVERFLOW_SCROLL}
-                      >
+                      <Box css={TOUCH_SCREEN_STYLE}>
                         <ModalPortalRoot />
                         <Component />
                       </Box>

@@ -12,13 +12,13 @@ import {
   ALIGN_CENTER,
   SIZE_2,
   SPACING_1,
-  SPACING_2,
   C_NEAR_WHITE,
   C_LIGHT_GRAY,
   C_DARK_GRAY,
   BORDER_SOLID_MEDIUM,
   POSITION_STICKY,
   IconName,
+  SPACING,
 } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
@@ -61,7 +61,7 @@ export const ClickableIcon = (props: ClickableIconProps): JSX.Element => {
   })
 
   const boxStyles = {
-    padding: SPACING_1,
+    padding: SPACING.spacing2,
     marginLeft: props.alignRight ? 'auto' : 0,
   }
 
@@ -226,7 +226,7 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
         <Flex
           alignItems={ALIGN_CENTER}
           height={SIZE_2}
-          padding={`0 ${SPACING_2}`}
+          paddingX={SPACING.spacing3}
           backgroundColor={C_NEAR_WHITE}
           zIndex="100"
         >
