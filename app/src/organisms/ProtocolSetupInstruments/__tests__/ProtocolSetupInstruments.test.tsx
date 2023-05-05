@@ -86,17 +86,14 @@ describe('ProtocolSetupInstruments', () => {
   })
 
   it('renders the Instruments Setup page', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText }] = render()
     getByText('Instruments')
     getByText('Location')
     getByText('Calibration Status')
-    getByRole('button', { name: 'continue' })
   })
 
   it('correctly navigates with the nav buttons', () => {
-    const [{ getByRole, getAllByRole }] = render()
-    getByRole('button', { name: 'continue' }).click()
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
+    const [{ getAllByRole }] = render()
     getAllByRole('button')[0].click()
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })

@@ -38,6 +38,7 @@ jest.mock(
 )
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
+jest.mock('../../../redux/discovery')
 
 const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
   typeof useProtocolAnalysesQuery

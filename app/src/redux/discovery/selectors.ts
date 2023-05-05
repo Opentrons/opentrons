@@ -244,5 +244,7 @@ export const getRobotModelByName = (
   robotName: string
 ): string | null => {
   const robot = getDiscoverableRobotByName(state, robotName)
-  return robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
+  const robotModelName =
+    robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
+  return robotModelName === 'OT-3' ? 'Opentrons Flex' : robotModelName
 }

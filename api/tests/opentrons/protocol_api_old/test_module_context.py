@@ -145,6 +145,10 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         assert ctx_with_tempdeck.load_module("the cool module", 1)
 
 
+# TODO(mm, 2023-04-28): This test uses mod.geometry, which was always a quasi-implementation-detail
+# and was removed in PAPIv2.14. We should make sure this logic is adequately covered elsewhere
+# in a way that doesn't depend on mod.geometry, and then delete this test.
+@pytest.mark.apiv2_non_pe_only
 @pytest.mark.parametrize(
     "loadname,klass,model",
     [
@@ -243,6 +247,7 @@ def test_thermocycler_profile_no_hold(ctx_with_thermocycler, mock_module_control
         )
 
 
+@pytest.mark.apiv2_non_pe_only  # Semi plate configuration removed in PAPIv2.14.
 def test_thermocycler_semi_plate_configuration(ctx):
     labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
     mod = ctx.load_module("thermocycler", configuration="semi")
@@ -411,6 +416,7 @@ def test_deprecated_module_load_labware_by_name(ctx_with_tempdeck):
     )
 
 
+@pytest.mark.apiv2_non_pe_only  # engage(height=...) param was removed in PAPIv2.14.
 async def test_magdeck_gen1_labware_props(ctx):
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = "biorad_96_wellplate_200ul_pcr"
@@ -454,6 +460,7 @@ async def test_magdeck_gen1_labware_props(ctx):
     )
 
 
+@pytest.mark.apiv2_non_pe_only  # engage(height=...) param was removed in PAPIv2.14.
 def test_magdeck_gen2_labware_props(ctx):
     mod = ctx.load_module("magnetic module gen2", 1)
     mod.engage(height=25)

@@ -471,6 +471,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     ) -> float:
         if action == "aspirate":
             sequence = self._active_tip_settings.aspirate[specific_tip]
+        elif action == "blowout":
+            return self._config.shaft_ul_per_mm
         else:
             sequence = self._active_tip_settings.dispense[specific_tip]
         return piecewise_volume_conversion(ul, sequence)
@@ -503,14 +505,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
                 "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate,
-                "default_blow_out_flow_rates": self.active_tip_settings.default_dispense_flowrate,
-                "default_dispense_flow_rates": self.active_tip_settings.default_blowout_flowrate,
+                "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate,
+                "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
                 "fw_update_required": self._fw_update_info.update_required,
                 "fw_current_version": self._fw_update_info.current_version,
                 "fw_next_version": self._fw_update_info.next_version,
+                "back_compat_names": self._config.pipette_backcompat_names,
             }
         )
         return self._config_as_dict

@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -17,12 +16,10 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
-  ALIGN_FLEX_END,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
 import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
@@ -86,23 +83,26 @@ export function RobotSettingsDashboard(): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
 
   return (
-    <Flex
-      padding={SPACING.spacingXXL}
-      flexDirection={DIRECTION_COLUMN}
-      columnGap={SPACING.spacing3}
-    >
+    // This top level Flexbox only exists to position the temporary
+    // "To ODD Menu" button on the bottom. When it goes, so can this.
+    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
       {currentOption != null ? (
-        <SettingsContent
-          currentOption={currentOption}
-          setCurrentOption={setCurrentOption}
-          networkConnection={networkConnection}
-          robotName={robotName}
-          robotServerVersion={robotServerVersion ?? 'Unknown'}
-          isUpdateAvailable={isUpdateAvailable}
-          devToolsOn={devToolsOn}
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+          <SettingsContent
+            currentOption={currentOption}
+            setCurrentOption={setCurrentOption}
+            networkConnection={networkConnection}
+            robotName={robotName}
+            robotServerVersion={robotServerVersion ?? 'Unknown'}
+            isUpdateAvailable={isUpdateAvailable}
+            devToolsOn={devToolsOn}
+          />
+        </Flex>
       ) : (
-        <>
+        <Flex
+          padding={`0 ${SPACING.spacingXXL}`}
+          flexDirection={DIRECTION_COLUMN}
+        >
           <Navigation routes={onDeviceDisplayRoutes} />
 
           {/* Network Settings */}
@@ -191,18 +191,8 @@ export function RobotSettingsDashboard(): JSX.Element {
             enabledDevTools
             devToolsOn={devToolsOn}
           />
-        </>
+        </Flex>
       )}
-
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
     </Flex>
   )
 }
@@ -224,7 +214,6 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
-  robotName,
   isUpdateAvailable,
   iconName,
   enabledDevTools,

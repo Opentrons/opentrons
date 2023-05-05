@@ -34,8 +34,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     flowType,
     section: SECTIONS.DETACH_PIPETTE,
   }
-  const is96ChannelPipette = attachedPipettes[mount]?.name === 'p1000_96'
-  const channel = attachedPipettes[mount]?.modelSpecs.channels
+  const is96ChannelPipette =
+    attachedPipettes[mount]?.instrumentName === 'p1000_96'
+  const channel = attachedPipettes[mount]?.data.channels
   let bodyText: React.ReactNode = <div></div>
   if (isFetching) {
     bodyText = (
@@ -68,7 +69,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           />
         ) : (
           `${i18n.format(t('loose_detach'))}${
-            attachedPipettes[mount]?.modelSpecs.displayName
+            attachedPipettes[mount]?.displayName
           }`
         )
       }

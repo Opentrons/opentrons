@@ -18,17 +18,19 @@ import {
 import {
   EIGHT_CHANNEL,
   NINETY_SIX_CHANNEL,
+  RIGHT,
+  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
-import { useAttachedPipettes } from '../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
 import { getIsGantryEmpty } from './utils'
@@ -76,14 +78,14 @@ const ON_DEVICE_UNSELECTED_OPTIONS_STYLE = css`
 `
 const ON_DEVICE_SELECTED_OPTIONS_STYLE = css`
   ${ON_DEVICE_UNSELECTED_OPTIONS_STYLE}
-  background-color: ${COLORS.highlightPurple_one};
+  background-color: ${COLORS.highlightPurple1};
   color: ${COLORS.white};
 `
 export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-  const attachedPipettesByMount = useAttachedPipettes()
+  const attachedPipettesByMount = useAttachedPipettesFromInstrumentsQuery()
   const isGantryEmpty = getIsGantryEmpty(attachedPipettesByMount)
   const [
     showExitConfirmation,
@@ -113,8 +115,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   if (!isGantryEmpty) {
     ninetySix = t('detach_pipette_to_attach_96', {
       pipetteName:
-        attachedPipettesByMount.right?.modelSpecs.displayName ??
-        attachedPipettesByMount.left?.modelSpecs.displayName,
+        attachedPipettesByMount[LEFT]?.displayName ??
+        attachedPipettesByMount[RIGHT]?.displayName,
     })
   }
   const singleMount = t('single_or_8_channel', {
@@ -198,7 +200,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               onClick={proceed}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               buttonText={t('continue')}
-              buttonType="default"
+              buttonType="primary"
             />
           </Flex>
         </Flex>

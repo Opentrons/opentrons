@@ -23,6 +23,7 @@ if TYPE_CHECKING:
         MagneticModuleType,
         TemperatureModuleType,
         HeaterShakerModuleType,
+        MagneticBlockType,
     )
 
 
@@ -48,6 +49,7 @@ class ModuleType(str, Enum):
     TEMPERATURE: TemperatureModuleType = "temperatureModuleType"
     MAGNETIC: MagneticModuleType = "magneticModuleType"
     HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
+    MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:
@@ -59,6 +61,8 @@ class ModuleType(str, Enum):
             return cls.THERMOCYCLER
         if isinstance(model, HeaterShakerModuleModel):
             return cls.HEATER_SHAKER
+        if isinstance(model, MagneticBlockModel):
+            return cls.MAGNETIC_BLOCK
 
 
 class MagneticModuleModel(str, Enum):
@@ -80,12 +84,17 @@ class HeaterShakerModuleModel(str, Enum):
     HEATER_SHAKER_V1: str = "heaterShakerModuleV1"
 
 
+class MagneticBlockModel(str, Enum):
+    MAGNETIC_BLOCK_V1: str = "magneticBlockV1"
+
+
 def module_model_from_string(model_string: str) -> ModuleModel:
     for model_enum in {
         MagneticModuleModel,
         TemperatureModuleModel,
         ThermocyclerModuleModel,
         HeaterShakerModuleModel,
+        MagneticBlockModel,
     }:
         try:
             return cast(ModuleModel, model_enum(model_string))
@@ -128,6 +137,7 @@ ModuleModel = Union[
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
 ]
 
 

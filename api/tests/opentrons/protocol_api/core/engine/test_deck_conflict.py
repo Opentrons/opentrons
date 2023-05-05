@@ -225,6 +225,7 @@ def test_maps_different_module_models(
             or module_model is ModuleModel.MAGNETIC_MODULE_V2
             or module_model is ModuleModel.TEMPERATURE_MODULE_V1
             or module_model is ModuleModel.TEMPERATURE_MODULE_V2
+            or module_model is ModuleModel.MAGNETIC_BLOCK_V1
         ):
             return wrapped_deck_conflict.OtherModule(
                 name_for_errors=expected_name_for_errors,

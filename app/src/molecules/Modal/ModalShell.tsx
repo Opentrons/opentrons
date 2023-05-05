@@ -1,11 +1,8 @@
 import * as React from 'react'
-
+import styled from 'styled-components'
 import {
-  Box,
-  Flex,
   StyleProps,
   COLORS,
-  SPACING,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
   ALIGN_CENTER,
@@ -14,50 +11,10 @@ import {
   OVERFLOW_AUTO,
   POSITION_STICKY,
   BORDERS,
+  RESPONSIVENESS,
+  styleProps,
+  SPACING,
 } from '@opentrons/components'
-
-const BASE_STYLE = {
-  position: POSITION_ABSOLUTE,
-  alignItems: ALIGN_CENTER,
-  justifyContent: JUSTIFY_CENTER,
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-} as const
-
-const MODAL_STYLE = {
-  backgroundColor: COLORS.white,
-  position: POSITION_RELATIVE,
-  overflowY: OVERFLOW_AUTO,
-  maxHeight: '100%',
-  width: '100%',
-  margin: SPACING.spacing5,
-  borderRadius: BORDERS.radiusSoftCorners,
-  boxShadow: BORDERS.smallDropShadow,
-} as const
-
-const FULL_PAGE_STYLE = {
-  overflowY: OVERFLOW_AUTO,
-  height: '100%',
-  width: '100%',
-} as const
-
-const HEADER_STYLE = {
-  backgroundColor: COLORS.white,
-  position: POSITION_STICKY,
-  top: 0,
-} as const
-
-const FOOTER_STYLE = {
-  backgroundColor: COLORS.white,
-  position: POSITION_STICKY,
-  bottom: 0,
-  boxShadow: '0px 3px 6px 0px #0000003B',
-} as const
-
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
@@ -69,8 +26,6 @@ export interface ModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
-  /** For on device display */
-  isOnDeviceDisplay?: boolean
 }
 
 /**
@@ -91,44 +46,84 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
     footer,
     fullPage = false,
     children,
-    isOnDeviceDisplay = false,
     ...styleProps
   } = props
 
   return (
-    <Flex
-      position={POSITION_FIXED}
-      left="0"
-      right="0"
-      top="0"
-      bottom="0"
+    <Overlay
       aria-label="BackgroundOverlay_ModalShell"
-      zIndex="1"
-      backgroundColor={
-        isOnDeviceDisplay ? COLORS.darkBlack_sixty : COLORS.backgroundOverlay
-      }
-      cursor="default"
       onClick={e => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
       }}
     >
-      <Flex {...BASE_STYLE} zIndex={zIndex}>
-        <Box
-          {...(fullPage ? FULL_PAGE_STYLE : MODAL_STYLE)}
-          // apply background color style prop only to full page - omitting width, margin, etc
-          {...(fullPage
-            ? { backgroundColor: styleProps.backgroundColor ?? COLORS.white }
-            : styleProps)}
+      <ContentArea zIndex={zIndex}>
+        <ModalArea
+          isFullPage={fullPage}
           onClick={e => {
             e.stopPropagation()
           }}
+          {...styleProps}
         >
-          {header != null ? <Box {...HEADER_STYLE}>{header}</Box> : null}
+          {header != null ? <Header>{header}</Header> : null}
           {children}
-          {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
-        </Box>
-      </Flex>
-    </Flex>
+          {footer != null ? <Footer>{footer}</Footer> : null}
+        </ModalArea>
+      </ContentArea>
+    </Overlay>
   )
 }
+
+const Overlay = styled.div`
+  position: ${POSITION_FIXED};
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  background-color: ${COLORS.backgroundOverlay};
+  cursor: default;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.darkBlack60};
+  }
+`
+const ContentArea = styled.div<{ zIndex: string | number }>`
+  display: flex;
+  position: ${POSITION_ABSOLUTE};
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: ${({ zIndex }) => zIndex};
+  padding: ${SPACING.spacing4};
+`
+
+const ModalArea = styled.div<
+  { isFullPage: boolean; backgroundColor?: string } & StyleProps
+>`
+  position: ${POSITION_RELATIVE};
+  overflow-y: ${OVERFLOW_AUTO};
+  max-height: 100%;
+  width: 100%;
+  border-radius: ${BORDERS.radiusSoftCorners};
+  box-shadow: ${BORDERS.smallDropShadow};
+  height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
+  background-color: ${COLORS.white};
+  ${styleProps};
+`
+
+const Footer = styled.div`
+  background-color: ${COLORS.white};
+  position: ${POSITION_STICKY};
+  bottom: 0;
+`
+const Header = styled.div`
+  background-color: ${COLORS.white};
+  position: ${POSITION_STICKY};
+  top: 0;
+`

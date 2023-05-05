@@ -35,6 +35,7 @@
     "partialTipSupported": true,
     "availableConfigurations": [1, 8, 12, 96]
   },
+  "backCompatNames": [],
   "channels": 96,
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904

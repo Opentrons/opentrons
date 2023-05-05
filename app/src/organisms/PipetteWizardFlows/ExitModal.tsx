@@ -9,7 +9,7 @@ import {
   SecondaryButton,
   AlertPrimaryButton,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
@@ -55,7 +55,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           </Flex>
           <SmallButton
             buttonText={t('shared:go_back')}
-            buttonType="default"
+            buttonType="primary"
             onClick={goBack}
           />
         </>

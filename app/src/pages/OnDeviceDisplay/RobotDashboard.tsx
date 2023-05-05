@@ -37,16 +37,11 @@ export function RobotDashboard(): JSX.Element {
     MAXIMUM_RECENT_RUN_PROTOCOLS
   )
   return (
-    <Flex
-      padding={`0 ${SPACING.spacingXXL} ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
-      flexDirection={DIRECTION_COLUMN}
-    >
+    <Flex paddingX={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {sortedProtocols.length === 0 ? (
-          <>
-            <EmptyRecentRun />
-          </>
+          <EmptyRecentRun />
         ) : (
           <>
             <StyledText

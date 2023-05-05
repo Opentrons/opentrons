@@ -236,7 +236,7 @@ class LegacyProtocolCore(
         """Load a module."""
         resolved_type = ModuleType.from_model(model)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, deck_slot
+            resolved_type, (None if deck_slot is None else deck_slot.id)
         )
 
         selected_hardware = None
