@@ -88,7 +88,7 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 8
 
 .PHONY: test-gravimetric
-test-gravimetric: test-gravimetric-single test-gravimetric-multi
+test-gravimetric: patch-for-gravimetric test-gravimetric-single test-gravimetric-multi
 
 .PHONY: test-production-qc
 test-production-qc:
