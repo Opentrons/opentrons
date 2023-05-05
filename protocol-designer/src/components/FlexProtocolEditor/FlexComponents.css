@@ -179,3 +179,7 @@
   margin: 32px 0 45px;
   width: 100%;
 }
+
+.error_message {
+  color: #ff0000;
+}

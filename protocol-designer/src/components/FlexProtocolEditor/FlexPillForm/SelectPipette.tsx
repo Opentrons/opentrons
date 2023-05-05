@@ -17,7 +17,8 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   pipetteName,
 }) => {
   const {
-    values: { pipettesByMount },
+    values: { pipettesByMount = {}, mountSide },
+    errors = { pipettesByMount, mountSide },
   } = useFormikContext<any>()
 
   const is96ChannelSelected = checkSelectedPipette(
@@ -42,14 +43,29 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
             pipetteName={`pipettesByMount.${pipetteName}.pipetteName`}
             pipetteType={pipettesByMount[pipetteName].pipetteName}
           />
+          {Boolean(errors?.pipettesByMount?.[pipetteName]?.pipetteName) && (
+            <StyledText as="label" className={styles.error_message}>
+              {errors?.pipettesByMount?.[pipetteName]?.pipetteName}
+            </StyledText>
+          )}
           <hr />
           {/* Pipette Mount Selection here */}
           <Flex className={styles[className]}>
             <SelectPipetteMount pipetteName={pipetteName} />
+            {Boolean(errors?.mountSide) && (
+              <StyledText as="label" className={styles.error_message}>
+                {errors?.mountSide}
+              </StyledText>
+            )}
           </Flex>
           {channel96SelectionNote(is96ChannelSelected)}
           <hr />
           <TipRackOptions pipetteName={pipetteName} />
+          {Boolean(errors?.pipettesByMount?.[pipetteName]?.tipRackList) && (
+            <StyledText as="label" className={styles.error_message}>
+              {errors?.pipettesByMount?.[pipetteName]?.tipRackList}
+            </StyledText>
+          )}
         </>
       }
     </>

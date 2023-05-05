@@ -6,7 +6,7 @@ import styles from '../FlexComponents.css'
 import { useFormikContext } from 'formik'
 
 interface flexProtocolName {
-  fields: any
+  fields: { name: string; author: string; description: string }
   handleChange: () => void
   handleBlur: () => void
 }
@@ -14,6 +14,8 @@ interface flexProtocolName {
 function FlexProtocolNameComponent(): JSX.Element {
   const {
     values,
+    errors,
+    touched,
     handleChange,
     handleBlur,
   } = useFormikContext<flexProtocolName>()
@@ -42,9 +44,11 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.name}
           name="fields.name"
         />
-        <StyledText as="label">
-          {i18n.t('flex.name_and_description.supporting_error_text')}
-        </StyledText>
+        {Boolean(errors?.fields?.name) && touched?.fields?.name && (
+          <StyledText as="label" className={styles.error_message}>
+            {errors?.fields?.name}
+          </StyledText>
+        )}
       </FormGroup>
 
       <div className={styles.flex_sub_heading}>
@@ -65,9 +69,11 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.author}
           name="fields.author"
         />
-        <StyledText as="label">
-          {i18n.t('flex.name_and_description.supporting_error_text')}
-        </StyledText>
+        {Boolean(errors?.fields?.author) && touched?.fields?.author && (
+          <StyledText as="label" className={styles.error_message}>
+            {errors?.fields?.author}
+          </StyledText>
+        )}
       </FormGroup>
 
       <FormGroup className={styles.form_group}>
@@ -83,9 +89,11 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.description}
           name="fields.description"
         />
-        <StyledText as="label">
-          {i18n.t('flex.name_and_description.supporting_error_text')}
-        </StyledText>
+        {Boolean(errors?.fields?.description) && touched?.fields?.description && (
+          <StyledText as="label" className={styles.error_message}>
+            {errors?.fields?.description}
+          </StyledText>
+        )}
       </FormGroup>
     </>
   )

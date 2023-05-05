@@ -29,6 +29,7 @@ import { FlexRoundTab } from './FlexRoundTab'
 import { DeckSlot } from '../../types'
 import { FlexProtocolName, SelectPipetteOption } from './FlexPillForm'
 import { FlexModules } from './FlexModules'
+import * as Yup from 'yup'
 
 export interface FormModule {
   onDeck: boolean
@@ -57,6 +58,29 @@ export interface InitialValues {
     heaterShakerModuleType: FormModule
   }
 }
+
+const validationSchema = Yup.object().shape({
+  fields: Yup.object().shape({
+    name: Yup.string().required('Name is required'),
+  }),
+  mountSide: Yup.string().required('Mount side is required'),
+  pipettesByMount: Yup.object().shape({
+    left: Yup.object().shape({
+      pipetteName: Yup.string().required('First pipette is required'),
+      tipRackList: Yup.array().min(
+        1,
+        'Select at least one tip rack for first pipette'
+      ),
+    }),
+    right: Yup.object().shape({
+      pipetteName: Yup.string().required('Second pipette is required'),
+      tipRackList: Yup.array().min(
+        1,
+        'Select at least one tip rack for second pipette'
+      ),
+    }),
+  }),
+})
 
 const getInitialValues: InitialValues = {
   fields: {
@@ -171,12 +195,17 @@ function FlexProtocolEditor(): JSX.Element {
           <Formik
             enableReinitialize
             initialValues={getInitialValues}
-            validateOnChange={false}
+            validateOnChange={true}
+            validationSchema={validationSchema}
             onSubmit={(values, actions) => {
               console.log({ values })
             }}
           >
-            {(props: { handleSubmit: () => void }) => (
+            {(props: {
+              handleSubmit: () => void
+              errors: any
+              isValid: any
+            }) => (
               <form onSubmit={props.handleSubmit}>
                 <section className={styles.editor_form}>
                   {selectComponent(selectedTab)}
@@ -202,6 +231,10 @@ function FlexProtocolEditor(): JSX.Element {
                         ? styles.flex_round_tabs_button_50p
                         : styles.flex_round_tabs_button_100p
                     }
+                    // disabled={
+                    //   !Boolean(props.isValid) ||
+                    //   !(Object.values(props.errors).length === 0)
+                    // }
                   >
                     <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>
