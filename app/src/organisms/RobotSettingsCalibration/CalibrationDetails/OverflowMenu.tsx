@@ -84,8 +84,8 @@ export function OverflowMenu({
   ] = React.useState<boolean>(false)
   const isGen3Pipette = isOT3Pipette(pipetteName as PipetteName)
   const ot3PipCal =
-    useAttachedPipettesFromInstrumentsQuery()[mount]?.data.calibratedOffset
-      .offset ?? null
+    useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
+      ?.offset ?? null
 
   const applicablePipetteOffsetCal = pipetteOffsetCalibrations?.find(
     p => p.mount === mount && p.pipette === serialNumber

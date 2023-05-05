@@ -34,7 +34,7 @@ describe('getIsOT3Protocol', () => {
 describe('getRobotTypeDisplayName', () => {
   it('should return OT-3 for protocols intended for an OT-3', () => {
     const result = getRobotTypeDisplayName('OT-3 Standard')
-    expect(result).toBe('OT-3')
+    expect(result).toBe('Opentrons Flex')
   })
 
   it('should return OT-2 for protocols intended for an OT-2', () => {
