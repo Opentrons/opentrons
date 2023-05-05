@@ -143,4 +143,4 @@ class LoadLabwareCreate(BaseCommandCreate[LoadLabwareParams]):
 
     def normalize(self, robot_type: RobotType) -> LoadLabwareCreate:
         canonicalized_params = self.params.canonicalize(robot_type)
-        return LoadLabwareCreate.construct(params=canonicalized_params)
+        return self.copy(update={"params": canonicalized_params})
