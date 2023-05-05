@@ -9,6 +9,7 @@ import {
   getConnectableRobots,
   getReachableRobots,
 } from '../../../redux/discovery'
+import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -17,7 +18,15 @@ import {
 import { NameRobot } from '../NameRobot'
 
 jest.mock('../../../redux/discovery/selectors')
+jest.mock('../../../redux/config')
 jest.mock('../../../redux/analytics')
+
+const mockSettings = {
+  sleepMs: 0,
+  brightness: 1,
+  textSize: 1,
+  targetPath: '/robot-settings/rename-robot',
+} as any
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -27,6 +36,9 @@ const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
+  typeof getOnDeviceDisplaySettings
 >
 let mockTrackEvent: jest.Mock
 
@@ -47,6 +59,7 @@ describe('NameRobot', () => {
     mockReachableRobot.name = 'reachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
+    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
   })
 
   it('should render text, button and keyboard', () => {
@@ -124,15 +137,15 @@ describe('NameRobot', () => {
     expect(mockTrackEvent).toHaveBeenCalled()
   })
 
-  it.todo('should render text and button when coming from robot settings')
-  // it('should render text and button when coming from robot settings', () => {
-  //   const [{ getByText, queryByText }] = render()
-  //   getByText('Name your robot')
-  //   expect(
-  //     queryByText('Don’t worry, you can always change this in your settings.')
-  //   ).not.toBeInTheDocument()
-  //   getByText('Enter up to 17 characters (letters and numbers only)')
-  //   getByText('Confirm')
-  // })
-  it.todo('add test for targetPath in a following PR')
+  it('should render text and button when coming from robot settings', () => {
+    mockSettings.targetPath = '/dashboard'
+    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
+    const [{ getByText, queryByText }] = render()
+    getByText('Rename robot')
+    expect(
+      queryByText('Don’t worry, you can always change this in your settings.')
+    ).not.toBeInTheDocument()
+    getByText('Enter up to 17 characters (letters and numbers only)')
+    getByText('Confirm')
+  })
 })
