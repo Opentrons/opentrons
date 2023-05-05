@@ -2,7 +2,7 @@ import * as http from 'http'
 import agent from 'agent-base'
 import type { Duplex } from 'stream'
 
-import { SerialPort } from 'serialport'
+import { ReadlineParser, SerialPort } from 'serialport'
 
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
@@ -109,14 +109,6 @@ export function createSerialPortListMonitor(
 }
 
 class SerialPortSocket extends SerialPort {
-  // TODO: pass log function
-
-  // log write method
-  write(args: any): any {
-    console.log(`serialport writing ${args}`)
-    return super.write(args)
-  }
-
   // added these to squash keepAlive errors
   setKeepAlive(): void {}
   unref(): void {}
@@ -262,10 +254,11 @@ function installListeners(
   s.on('timeout', onTimeout)
 
   function onData(chunk: unknown): void {
-    agent.log('info', `received chunk:  ${chunk}`)
-    agent.log('info', 'end chunk')
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    agent.log('info', `${chunk}`)
   }
-  s.on('data', onData)
+  const parser = s.pipe(new ReadlineParser())
+  parser.on('data', onData)
 
   function onFinish(): void {
     agent.log('info', 'socket finishing: closing serialport')
@@ -281,7 +274,7 @@ function installListeners(
     // We need this function for cases like HTTP 'upgrade'
     // (defined by WebSockets) where we need to remove a socket from the
     // pool because it'll be locked up indefinitely
-    // debug('CLIENT socket onRemove');
+    agent.log('debug', 'CLIENT socket onRemove')
     agent.totalSocketCount--
     agent.removeSocket(s, options)
     s.removeListener('close', onClose)

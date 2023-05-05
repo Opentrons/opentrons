@@ -51,6 +51,7 @@ import type { Action, Dispatch } from './types'
 import type { Config } from './config'
 
 const log = createLogger('discovery')
+const usbLog = createLogger('usb')
 
 // TODO(mc, 2018-08-09): values picked arbitrarily and should be researched
 const FAST_POLL_INTERVAL_MS = 3000
@@ -210,7 +211,7 @@ export function registerDiscovery(
       return { data: response.data }
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      log.debug(`usbListener error ${e?.message ?? 'unknown'}`)
+      usbLog.debug(`usbListener error ${e?.message ?? 'unknown'}`)
     }
   }
 
@@ -225,7 +226,7 @@ export function registerDiscovery(
 
         // bail if no OT-3 found
         if (ot3UsbSerialPort == null) {
-          log.debug('no OT-3 serial port found')
+          usbLog.debug('no OT-3 serial port found')
           return
         }
 
@@ -236,7 +237,7 @@ export function registerDiscovery(
           keepAlive: true,
           keepAliveMsecs: 10000,
           path: ot3UsbSerialPort?.path ?? '',
-          logger: log,
+          logger: usbLog,
         })
 
         usbHttpAgent = httpAgent as Agent
@@ -251,7 +252,7 @@ export function registerDiscovery(
           )?.name
 
         if (cachedUsbRobotName != null) {
-          log.debug(
+          usbLog.debug(
             `deleting old opentrons-usb entry with name ${cachedUsbRobotName}`
           )
           client.removeRobot(cachedUsbRobotName)
@@ -268,7 +269,9 @@ export function registerDiscovery(
           ],
         })
       })
-      .catch(e => log.debug(`fetchSerialPortList error ${JSON.stringify(e)}`))
+      .catch(e =>
+        usbLog.debug(`fetchSerialPortList error ${JSON.stringify(e)}`)
+      )
   }
 
   return function handleIncomingAction(action: Action) {
