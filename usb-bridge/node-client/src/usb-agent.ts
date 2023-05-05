@@ -253,12 +253,12 @@ function installListeners(
   }
   s.on('timeout', onTimeout)
 
-  function onData(chunk: unknown): void {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    agent.log('info', `${chunk}`)
+  function onLineParserData(line: string): void {
+    agent.log('info', line)
   }
+  // TODO(bh, 2023-05-05): determine delimiter for end of response body or use different parser
   const parser = s.pipe(new ReadlineParser())
-  parser.on('data', onData)
+  parser.on('data', onLineParserData)
 
   function onFinish(): void {
     agent.log('info', 'socket finishing: closing serialport')
@@ -280,7 +280,7 @@ function installListeners(
     s.removeListener('close', onClose)
     s.removeListener('free', onFree)
     s.removeListener('timeout', onTimeout)
-    s.removeListener('data', onData)
+    parser.removeListener('data', onLineParserData)
     s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
     if (agent[kOnKeylog] != null) {
