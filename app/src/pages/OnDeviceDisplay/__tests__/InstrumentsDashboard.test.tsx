@@ -7,6 +7,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { formatTimestamp } from '../../../organisms/Devices/utils'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '../InstrumentsDashboard'
@@ -116,14 +117,18 @@ describe('InstrumentsDashboard', () => {
     await getByText('left Mount').click()
     getByText('serial number')
     getByText(mockLeftPipetteData.serialNumber)
-    getByText('05/04/2023 09:38:26')
+    getByText(
+      formatTimestamp(mockLeftPipetteData.data.calibratedOffset.last_modified)
+    )
   })
   it('should route to right mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()
     await getByText('right Mount').click()
     getByText('serial number')
     getByText(mockRightPipetteData.serialNumber)
-    getByText('05/04/2022 09:38:26')
+    getByText(
+      formatTimestamp(mockRightPipetteData.data.calibratedOffset.last_modified)
+    )
   })
   it('should route to extension mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()
