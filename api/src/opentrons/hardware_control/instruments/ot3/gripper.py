@@ -4,6 +4,7 @@ from __future__ import annotations
 """
 import logging
 from typing import Any, Optional, Set
+from math import isclose
 
 from opentrons.types import Point
 from opentrons.config import gripper_config
@@ -117,6 +118,15 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         )
         self._current_jaw_displacement = mm
 
+    def _verify_current_jaw_state(self, state: GripperJawState) -> bool:
+        """Verify jaw state by checking the current jaw displacement."""
+        assert state != GripperJawState.UNHOMED, "cannot verify unhomed gripper jaw"
+        if state == GripperJawState.IDLE:
+            return isclose(self.current_jaw_displacement, self._max_jaw_displacement(), rel_tol=2.0)
+        elif state == GripperJawState.HOME:
+            return isclose(self.current_jaw_displacement, 0.0)
+        return self.current_jaw_displacement >= 0.0
+
     @property
     def default_grip_force(self) -> float:
         return self.grip_force_profile.default_grip_force
@@ -124,10 +134,17 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     @property
     def default_home_force(self) -> float:
         return self.grip_force_profile.default_home_force
+    
+    @property
+    def default_idle_force(self) -> float:
+        return self.grip_force_profile.default_idle_force
 
     def _max_jaw_displacement(self) -> float:
         geometry = self._config.geometry
         return (geometry.jaw_width["max"] - geometry.jaw_width["min"]) / 2
+
+    def is_ready_for_jaw_move(self) -> bool:
+        return self._state != GripperJawState.UNHOMED
 
     @property
     def state(self) -> GripperJawState:
@@ -135,6 +152,8 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     @state.setter
     def state(self, s: GripperJawState) -> None:
+        assert self._verify_current_jaw_state(s), \
+            f"jaw displacement {self.current_jaw_displacement} does not reflect {s}"
         self._state = s
 
     @property

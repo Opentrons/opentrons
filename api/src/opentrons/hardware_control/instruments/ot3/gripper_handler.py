@@ -1,6 +1,7 @@
 from typing import Optional
 import logging
 
+from math import isclose
 from opentrons.types import Point
 from .instrument_calibration import (
     GripperCalibrationOffset,
@@ -15,6 +16,7 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.errors import (
     InvalidMoveError,
     GripperNotAttachedError,
+    MustHomeError
 )
 from .gripper import Gripper
 
@@ -30,6 +32,12 @@ class GripError(Exception):
 
 class CalibrationError(Exception):
     """An error raised if a gripper calibration is blocked"""
+
+    pass
+
+
+class ActiveGripperJaw(Exception):
+    """An error raised if a jaw action is blocked because it is currently engaged"""
 
     pass
 
@@ -131,22 +139,12 @@ class GripperHandler:
         gripper = self.get_gripper()
         gripper.check_calibration_pin_location_is_accurate()
 
-    def check_ready_for_jaw_move(self) -> None:
-        """Raise an exception if it is not currently valid to move the jaw."""
-        gripper = self.get_gripper()
-        if gripper.state == GripperJawState.UNHOMED:
-            raise GripError("Gripper jaw must be homed before moving")
-
     def set_jaw_state(self, state: GripperJawState) -> None:
         self.get_gripper().state = state
-    
-    def default_home_duty_cycle(self):
+
+    def default_home_duty_cycle(self) -> float:
         gripper = self.get_gripper()
         return gripper.duty_cycle_by_force(gripper.default_home_force)
-
-    def get_duty_cycle_by_grip_force(self, newton: float) -> float:
-        gripper = self.get_gripper()
-        return gripper.duty_cycle_by_force(newton)
 
     def set_jaw_displacement(self, mm: float) -> None:
         gripper = self.get_gripper()
@@ -158,3 +156,30 @@ class GripperHandler:
 
     def check_jaw_state(self, state: GripperJawState) -> bool:
         return self.get_gripper().state == state
+
+    def prepare_for_grip(self, force: Optional[float] = None) -> float:
+        gripper = self.get_gripper()
+        if gripper.state == GripperJawState.HOME:
+            return gripper.duty_cycle_by_force(force or gripper.default_grip_force)
+        raise GripError(f"Gripper jaw must be in home position before gripping")
+    
+    def prepare_for_ungrip(self, force: Optional[float] = None) -> float:
+        gripper = self.get_gripper()
+        return gripper.duty_cycle_by_force(force or gripper.default_home_force)
+    
+    def prepare_for_idle(self) -> float:
+        gripper = self.get_gripper()
+        if gripper.state == GripperJawState.UNHOMED:
+            raise MustHomeError
+        if gripper.state == GripperJawState.HOME:
+            return gripper.duty_cycle_by_force(gripper.default_idle_force)
+        raise ActiveGripperJaw
+    
+    def prepare_for_hold_width(self, width_mm: float) -> float:
+        gripper = self.get_gripper()
+        if gripper.state != GripperJawState.UNHOMED:
+            if not self.is_valid_jaw_width(width_mm):
+                raise ValueError("Setting gripper jaw width out of bounds")
+            width_max = gripper.config.geometry.jaw_width["max"]
+            return (width_max - width_mm) / 2.0
+        raise GripError(f"Jaw must be homed before holding")

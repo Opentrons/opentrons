@@ -120,7 +120,7 @@ from .instruments.ot3.pipette_handler import (
     TipMotorPickUpTipSpec,
 )
 from .instruments.ot3.instrument_calibration import load_pipette_offset
-from .instruments.ot3.gripper_handler import GripperHandler
+from .instruments.ot3.gripper_handler import GripperHandler, ActiveGripperJaw
 from .instruments.ot3.instrument_calibration import (
     load_gripper_calibration_offset,
 )
@@ -701,10 +701,7 @@ class OT3API(
         """
         try:
             self._log.info("Homing gripper jaw.")
-            await self._ungrip(
-                duty_cycle=self._gripper_handler.default_home_duty_cycle()
-            )
-            self._gripper_handler.set_jaw_state(GripperJawState.HOME)
+            await self.ungrip()
         except GripperNotAttachedError:
             pass
 
@@ -1045,7 +1042,8 @@ class OT3API(
 
     async def prepare_for_mount_move(self, mount: OT3Mount) -> None:
         await self._cache_and_retract_other_mount(mount)
-        await self._idle_gripper()
+        if self._gripper_handler.has_gripper():
+            await self._idle_gripper()
 
     async def _cache_and_retract_other_mount(self, mount: OT3Mount) -> None:
         """Retract the 'other' mount(s) if necessary
@@ -1058,13 +1056,6 @@ class OT3API(
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
-
-    async def _idle_gripper(self) -> None:
-        """Close gripper jaw when gripper is not actively gripper."""
-        if self._gripper_handler.has_gripper() and \
-                self._gripper_handler.check_jaw_state(GripperJawState.HOME):
-            await self._grip(force_newtons=IDLE_STATE_GRIP_FORCE)
-            self._gripper_handler.set_jaw_state(GripperJawState.IDLE)
 
     def _build_moves(
         self,
@@ -1369,14 +1360,9 @@ class OT3API(
             raise
 
     @ExecutionManagerProvider.wait_for_running
-    async def _hold_jaw_width(self, jaw_width_mm: float) -> None:
+    async def _hold_jaw_width(self, jaw_displacement_mm: float) -> None:
         """Move the gripper jaw to a specific width."""
         try:
-            if not self._gripper_handler.is_valid_jaw_width(jaw_width_mm):
-                raise ValueError("Setting gripper jaw width out of bounds")
-            gripper = self._gripper_handler.get_gripper()
-            width_max = gripper.config.geometry.jaw_width["max"]
-            jaw_displacement_mm = (width_max - jaw_width_mm) / 2.0
             await self._backend.gripper_hold_jaw(int(1000 * jaw_displacement_mm))
             await self._cache_encoder_position()
         except Exception:
@@ -1384,24 +1370,18 @@ class OT3API(
             raise
 
     async def grip(self, force_newtons: Optional[float] = None) -> None:
-        self._gripper_handler.check_ready_for_jaw_move()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            force_newtons or self._gripper_handler.get_gripper().default_grip_force
-        )
+        dc = self._gripper_handler.prepare_for_grip(force_newtons)
         await self._grip(duty_cycle=dc)
         self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
-        # get default grip force for release if not provided
-        self._gripper_handler.check_ready_for_jaw_move()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons) \
-            if force_newtons else self._gripper_handler.default_home_duty_cycle()
+        dc = self._gripper_handler.prepare_for_ungrip(force_newtons)
         await self._ungrip(duty_cycle=dc)
         self._gripper_handler.set_jaw_state(GripperJawState.HOME)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
-        self._gripper_handler.check_ready_for_jaw_move()
-        await self._hold_jaw_width(jaw_width_mm)
+        disp_mm = self._gripper_handler.prepare_for_hold_width(jaw_width_mm)
+        await self._hold_jaw_width(disp_mm)
         self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     async def _move_to_plunger_bottom(
@@ -1471,6 +1451,15 @@ class OT3API(
             speed=(speed * rate),
             acquire_lock=acquire_lock,
         )
+
+    async def _idle_gripper(self) -> None:
+        """Close gripper jaw when gripper is not active."""
+        try:
+            dc = self._gripper_handler.prepare_for_idle()
+            await self._grip(duty_cycle=dc)
+            self._gripper_handler.set_jaw_state(GripperJawState.IDLE)
+        except ActiveGripperJaw:
+            pass
 
     # Pipette action API
     async def prepare_for_aspirate(

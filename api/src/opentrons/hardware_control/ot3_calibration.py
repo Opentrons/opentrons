@@ -11,7 +11,7 @@ from math import floor, copysign, isclose
 from logging import getLogger
 from opentrons.util.linal import solve_attitude
 
-from .types import OT3Mount, OT3Axis, GripperProbe
+from .types import OT3Mount, OT3Axis, GripperProbe, GripperJawState
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
 import json
@@ -719,7 +719,7 @@ async def calibrate_gripper_jaw(
     Before running this function, make sure that the appropriate probe
     has been attached or prepped on the tool (for instance, a capacitive
     tip has been attached, or the conductive probe has been attached,
-    or the probe has been lowered). The robot should be homed.
+    or the probe has been lowered). The robot and the gripper jaw have hoemd.
 
     This process must be performed on the front
     and rear calibration pins separately. The gripper calibration offset is

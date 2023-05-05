@@ -952,7 +952,7 @@ async def test_gripper_action_works_with_gripper(
     }
     await ot3_hardware.cache_gripper(instr_data)
 
-    with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
+    with pytest.raises(GripError, match="Gripper jaw must be in home position before gripping"):
         await ot3_hardware.grip(5.0)
     await ot3_hardware.home_gripper_jaw()
     mock_ungrip.assert_called_once()
