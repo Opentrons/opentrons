@@ -29,6 +29,7 @@ import {
   LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
@@ -44,7 +45,59 @@ import { getIsGantryEmpty } from './utils'
 import type { StyleProps } from '@opentrons/components'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
-import { i18n } from '../../i18n'
+
+const UNSELECTED_OPTIONS_STYLE = css`
+  background-color: ${COLORS.white};
+  border: 1px solid ${COLORS.medGreyEnabled};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  height: 14.5625rem;
+  width: 14.5625rem;
+  cursor: pointer;
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  grid-gap: ${SPACING.spacing3}
+
+  &:hover {
+    border: 1px solid ${COLORS.medGreyHover};
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    flex-direction: ${DIRECTION_ROW};
+    justify-content: ${JUSTIFY_FLEX_START};
+    background-color: ${COLORS.mediumBlueEnabled};
+    border-width: 0; 
+    border-radius: ${BORDERS.size_four};
+    padding: ${SPACING.spacing5};
+    height: 5.25rem;
+    width: 57.8125rem;
+
+    &:hover {
+      border-width: 0px;
+    }
+  }
+`
+const SELECTED_OPTIONS_STYLE = css`
+  ${UNSELECTED_OPTIONS_STYLE}
+  border: 1px solid ${COLORS.blueEnabled};
+  background-color: ${COLORS.lightBlue};
+
+  &:hover {
+    border: 1px solid ${COLORS.blueEnabled};
+    background-color: ${COLORS.lightBlue};
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-width: 0px;
+    background-color: ${COLORS.blueEnabled};
+    color: ${COLORS.white};
+
+    &:hover {
+      border-width: 0px;
+      background-color: ${COLORS.blueEnabled};
+    }
+  }
+`
 
 interface ChoosePipetteProps {
   proceed: () => void
@@ -225,59 +278,6 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
     </Portal>
   )
 }
-
-const UNSELECTED_OPTIONS_STYLE = css`
-  background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  height: 14.5625rem;
-  width: 14.5625rem;
-  cursor: pointer;
-  flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_CENTER};
-  align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing3}
-
-  &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    flex-direction: ${DIRECTION_ROW};
-    justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
-    border-width: 0; 
-    border-radius: ${BORDERS.size_four};
-    padding: ${SPACING.spacing5};
-    height: 5.25rem;
-    width: 57.8125rem;
-
-    &:hover {
-      border-width: 0px;
-    }
-  }
-`
-const SELECTED_OPTIONS_STYLE = css`
-  ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
-
-  &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
-
-    &:hover {
-      border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
-    }
-  }
-`
 
 interface PipetteMountOptionProps extends StyleProps {
   isSelected: boolean
