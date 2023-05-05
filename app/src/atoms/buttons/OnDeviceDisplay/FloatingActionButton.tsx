@@ -36,16 +36,16 @@ export function FloatingActionButton(
     ...buttonProps
   } = props
 
-  const contentColor = disabled ? COLORS.darkBlack_sixty : COLORS.white
+  const contentColor = disabled ? COLORS.darkBlack60 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
-    background-color: ${COLORS.highlightPurple_one};
+    background-color: ${COLORS.highlightPurple1};
     border-radius: ${BORDERS.size_five};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: default;
 
     &:active {
-      background-color: ${COLORS.highlightPurple_one_pressed};
+      background-color: ${COLORS.highlightPurple1Pressed};
     }
 
     &:focus-visible {
@@ -55,7 +55,7 @@ export function FloatingActionButton(
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack_twenty};
+      background-color: ${COLORS.darkBlack20};
       color: ${contentColor};
     }
   `

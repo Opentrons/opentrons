@@ -35,7 +35,7 @@ const BUTTON_STYLE = css`
   }
 
   &:active {
-    color: ${COLORS.darkBlack_forty};
+    color: ${COLORS.darkBlack40};
   }
 `
 

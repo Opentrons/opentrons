@@ -44,7 +44,7 @@ export function Welcome(): JSX.Element {
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
         >
           {t('welcome_description')}
         </StyledText>
