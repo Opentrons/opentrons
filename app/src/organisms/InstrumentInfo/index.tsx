@@ -177,7 +177,7 @@ function InfoItem(props: InfoItemProps): JSX.Element {
       </StyledText>
       <StyledText
         as="h4"
-        color={COLORS.darkBlack_seventy}
+        color={COLORS.darkBlack70}
         fontSize={TYPOGRAPHY.fontSize28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
       >

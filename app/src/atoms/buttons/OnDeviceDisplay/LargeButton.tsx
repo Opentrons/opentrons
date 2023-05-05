@@ -49,10 +49,10 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       iconColor: COLORS.blueEnabled,
     },
     alert: {
-      defaultColor: COLORS.red_one,
-      defaultBackgroundColor: COLORS.red_three,
-      activeBackgroundColor: COLORS.red_three_pressed,
-      iconColor: COLORS.red_one,
+      defaultColor: COLORS.red1,
+      defaultBackgroundColor: COLORS.red3,
+      activeBackgroundColor: COLORS.red3Pressed,
+      iconColor: COLORS.red1,
     },
     primary: {
       defaultColor: COLORS.white,
@@ -97,8 +97,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack_twenty};
-      color: ${COLORS.darkBlack_sixty};
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack60};
     }
   `
   return (
@@ -123,7 +123,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         aria-label={`LargeButton_${iconName}`}
         color={
           disabled
-            ? COLORS.darkBlack_sixty
+            ? COLORS.darkBlack60
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
         size="5rem"

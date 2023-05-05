@@ -34,6 +34,7 @@ interface RunFailedModalProps {
   errors?: RunError[]
 }
 
+// ToDo (kj:05/03/2023) This component is needed to refactor to handle error messages
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
@@ -107,7 +108,7 @@ export function RunFailedModal({
         </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.light_one}
+          backgroundColor={COLORS.light1}
           borderRadius={BORDERS.size_three}
           gridGap={SPACING.spacing3}
           padding={SPACING.spacing4}
