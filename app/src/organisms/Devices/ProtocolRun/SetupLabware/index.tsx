@@ -19,7 +19,6 @@ import {
 import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
-import { LaunchLabwarePositionCheck } from './LaunchLabwarePositionCheck'
 
 import type { StepKey } from '../ProtocolRunSetup'
 
@@ -77,7 +76,6 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             robotName={robotName}
           />
         )}
-        <LaunchLabwarePositionCheck robotName={robotName} runId={runId} />
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
         {nextStep == null ? (

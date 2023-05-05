@@ -88,26 +88,23 @@ describe('ProtocolSetupModules', () => {
 
   it('should render text and buttons', () => {
     const [{ getByRole, getByText }] = render()
-    getByText('Modules')
     getByText('Module Name')
     getByText('Location')
     getByText('Status')
-    getByRole('button', { name: 'Setup Instructions' })
-    getByRole('button', { name: 'continue' })
-    getByRole('button', { name: 'Deck Map' })
+    getByText('Setup Instructions')
+    getByRole('button', { name: 'Map View' })
   })
 
   it('should launch deck map on button click', () => {
-    const [{ getByRole, getByText }] = render()
+    const [{ getByRole }] = render()
 
-    getByRole('button', { name: 'Deck Map' }).click()
-    getByText('Map View')
+    getByRole('button', { name: 'Map View' }).click()
   })
 
   it('should launch setup instructions modal on button click', () => {
-    const [{ getByRole, getByText }] = render()
+    const [{ getByText }] = render()
 
-    getByRole('button', { name: 'Setup Instructions' }).click()
+    getByText('Setup Instructions').click()
     getByText('TODO: setup instructions modal')
   })
 })

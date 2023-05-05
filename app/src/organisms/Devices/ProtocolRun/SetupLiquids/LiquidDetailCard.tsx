@@ -20,7 +20,10 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+} from '../../../../redux/analytics'
 import { getIsOnDevice } from '../../../../redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
@@ -74,7 +77,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
 
   const handleSelectedValue = (): void => {
     setSelectedValue(liquidId)
-    trackEvent({ name: 'highlightLiquidInDetailModal', properties: {} })
+    trackEvent({
+      name: ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,
+      properties: {},
+    })
   }
 
   return isOnDevice ? (
@@ -115,7 +121,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={COLORS.darkBlack_twenty}
+          backgroundColor={COLORS.darkBlack20}
           borderRadius={BORDERS.radiusSoftCorners}
           height="2.75rem"
           padding={`${SPACING.spacing3} 0.75rem`}
@@ -131,7 +137,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Box borderBottom={`3px solid ${COLORS.darkBlack_twenty}`} />
+          <Box borderBottom={`3px solid ${COLORS.darkBlack20}`} />
           <Flex
             padding={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
@@ -152,14 +158,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.darkBlack_seventy}
+                    color={COLORS.darkBlack70}
                   >
                     {well.wellName}
                   </StyledText>
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.darkBlack_seventy}
+                    color={COLORS.darkBlack70}
                   >
                     {well.volume} {MICRO_LITERS}
                   </StyledText>

@@ -26,7 +26,7 @@ describe('HowCalibrationWorksModal', () => {
   it('should render the correct body', () => {
     const { getByRole, getByText } = render(props)
     getByText(
-      'Robot calibration establishes how the OT-2 knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols successfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.'
+      'Robot calibration establishes how the robot knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols successfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.'
     )
     expect(getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
     getByText(
