@@ -23,7 +23,6 @@ import { Divider } from '../../../atoms/structure'
 
 import {
   fetchStatus,
-  fetchWifiList,
   getCanDisconnect,
   getNetworkInterfaces,
 } from '../../../redux/networking'
@@ -49,7 +48,7 @@ export function RobotSettingsNetworking({
   updateRobotStatus,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const wifiList = useWifiList(robotName)
+  const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isOT3 = useIsOT3(robotName)
@@ -73,7 +72,6 @@ export function RobotSettingsNetworking({
   const ssid = activeNetwork?.ssid ?? null
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
-  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
 
   React.useEffect(() => {
     updateRobotStatus(isRobotBusy)
