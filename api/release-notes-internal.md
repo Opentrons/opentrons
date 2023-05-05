@@ -54,6 +54,8 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Fixed an issue where pinging `GET /instruments` during automated calibration would cause calibration to fail
 - Increased reliability of automated calibration
 - Increased reliability of gripper pickups from modules
+- Python API `load_labware`, `load_module` and `move_labware` can accept location as deck coordinates (e.g. "A1", "D3") in addition to slot numbers
+- The `.parent` property for Module and Labware objects (loaded on the deck) will return a coordinate style deck location (e.g. "B2", "C3") for protocols with robotType "OT-3 Standard" instead of the slot number
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
