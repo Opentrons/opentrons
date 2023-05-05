@@ -127,12 +127,12 @@ _aspirate_defaults = {
         50: {  # P50
             50: {  # T50
                 1: AspirateSettings(  # 1uL
-                    flow_rate=7.85,
+                    flow_rate=57,
                     delay=1.0,
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=1.5,
+                        leading_air_gap=3.5,
                         trailing_air_gap=0.1,
                     ),
                 ),
