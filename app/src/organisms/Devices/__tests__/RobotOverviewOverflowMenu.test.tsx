@@ -14,7 +14,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { getCanDisconnect } from '../../../redux/networking'
+import { useCanDisconnect } from '../../../resources/networking/hooks'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -28,7 +28,7 @@ jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../hooks')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../redux/networking')
+jest.mock('../../../resources/networking/hooks')
 jest.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 )
@@ -58,8 +58,8 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
   typeof DisconnectModal
 >
-const mockGetCanDisconnect = getCanDisconnect as jest.MockedFunction<
-  typeof getCanDisconnect
+const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
+  typeof useCanDisconnect
 >
 
 const render = (
@@ -95,8 +95,8 @@ describe('RobotOverviewOverflowMenu', () => {
       <div>choose protocol slideout</div>
     )
     when(mockDisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, mockConnectableRobot.name)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
       .mockReturnValue(true)
   })
   afterEach(() => {
@@ -203,8 +203,8 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, mockConnectableRobot.name)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
       .mockReturnValue(false)
 
     const { getByRole, queryByText } = render(props)

@@ -6,7 +6,10 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
-import { useWifiList } from '../../../../resources/networking/hooks'
+import {
+  useCanDisconnect,
+  useWifiList,
+} from '../../../../resources/networking/hooks'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { useIsOT3, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
@@ -26,8 +29,8 @@ const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedF
   typeof Networking.getNetworkInterfaces
 >
 const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<
-  typeof Networking.getCanDisconnect
+const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
+  typeof useCanDisconnect
 >
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
@@ -90,9 +93,7 @@ describe('RobotSettingsNetworking', () => {
 
     when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(false)
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue(false)
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(false)
     mockDisconnectModal.mockReturnValue(<div>mock disconnect modal</div>)
   })
 
@@ -259,9 +260,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render Disconnect from Wi-Fi button when robot can disconnect and is not busy', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue(true)
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ getByRole, getByText, queryByText }] = render()
 
     expect(queryByText('mock disconnect modal')).toBeNull()
@@ -271,9 +270,7 @@ describe('RobotSettingsNetworking', () => {
 
   it('should not render Disconnect from Wi-Fi button when robot is busy', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue(true)
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(true)
     const [{ queryByRole }] = render()
 

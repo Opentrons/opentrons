@@ -1,8 +1,9 @@
 import uniqBy from 'lodash/uniqBy'
 import orderBy from 'lodash/orderBy'
 import { useWifiQuery } from '@opentrons/react-api-client'
-import { WifiNetwork } from '@opentrons/api-client'
-import { useRobot } from '../../organisms/Devices/hooks'
+import { useRobot } from '../../../organisms/Devices/hooks'
+
+import type { WifiNetwork } from '@opentrons/api-client'
 
 const LIST_ORDER = [
   ['active', 'ssid'],

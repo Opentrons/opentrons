@@ -16,16 +16,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useWifiList } from '../../../resources/networking/hooks'
+import {
+  useCanDisconnect,
+  useWifiList,
+} from '../../../resources/networking/hooks'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 
-import {
-  fetchStatus,
-  getCanDisconnect,
-  getNetworkInterfaces,
-} from '../../../redux/networking'
+import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 
 import { useIsOT3, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
@@ -57,9 +56,7 @@ export function RobotSettingsNetworking({
     false
   )
 
-  const canDisconnect = useSelector((state: State) =>
-    getCanDisconnect(state, robotName)
-  )
+  const canDisconnect = useCanDisconnect(robotName)
 
   // TODO(bh, 2023-1-18): get the real OT-3 USB connection info
   const isOT3ConnectedViaUSB = false
