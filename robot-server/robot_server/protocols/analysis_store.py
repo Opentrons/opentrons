@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from logging import getLogger
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Deque
+from typing_extensions import Final
+from collections import deque
 
 import anyio
 import sqlalchemy
@@ -31,6 +33,8 @@ from .analysis_models import (
 
 _log = getLogger(__name__)
 
+_CACHE_MAX_SIZE: Final = 32
+
 
 # We mark every analysis stored in the database with a version string.
 #
@@ -53,7 +57,7 @@ _log = getLogger(__name__)
 #
 # This does not necessarily have any correspondence with the user-facing
 # robot software version.
-_CURRENT_ANALYZER_VERSION = "initial"
+_CURRENT_ANALYZER_VERSION: Final = "initial"
 
 
 class AnalysisNotFoundError(ValueError):
@@ -64,14 +68,19 @@ class AnalysisNotFoundError(ValueError):
         super().__init__(f'Analysis "{analysis_id}" not found.')
 
 
-# TODO(mm, 2022-05-19): Unlike ProtocolStore and RunStore, this class doesn't
-# have an in-memory cache. This is because of implementation difficulties:
-# this class is currently the only one of the three to have any async methods,
-# which functools.lru_cache() doesn't support.
+# TODO(sf, 2023-05-05): Like for protocols and runs, there's an in-memory cache for
+# elements of this store. Unlike for protocols and runs, it isn't just an lru_cache
+# on the top-level store's access methods, because those access methods have to be
+# async to handle the sql deserialization and lru_caches don't work with those. Also
+# unlike protocols and runs, analyses have a dichotomy between in-progress analyses
+# (which are all in memory) and completed analyses (which are persisted). So the
+# in-memory cache is special, custom, and only really for the completed analyses.
 #
-# We should have a consistent strategy across all stores.
-# Either figure out an in-memory cache that supports async methods,
-# or remove in-memory caching from all stores.
+# The todo is to make this reusable or more similar to run and protocol stores or
+# just not part of the python side of this (via memcached or something) or just
+# make this all fast enough to not need caching.
+
+
 class AnalysisStore:
     """Storage interface for protocol analyses.
 
@@ -361,13 +370,31 @@ class _CompletedAnalysisResource:
 
 
 class _CompletedAnalysisStore:
-    """A SQL-backed persistent store of protocol analyses that are completed."""
+    """A SQL-persistent and memory-cached store of protocol analyses that are completed.
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
+    To make accesses to analyses faster, this class does its own in-memory caching of
+    completed analyses. This is an annoying thing to have to do, but we can't use an LRU
+    cache because the access methods are async, and lru_cache doesn't work with those.
+    """
+
+    def __init__(
+        self, sql_engine: sqlalchemy.engine.Engine, cache_max_size: Optional[int] = None
+    ) -> None:
         self._sql_engine = sql_engine
+        self._completed_analysis_cache_by_analysis_id: Dict[
+            str, _CompletedAnalysisResource
+        ] = {}
+        self._cache_size = (
+            cache_max_size if cache_max_size is not None else _CACHE_MAX_SIZE
+        )
+        self._cache_order: Deque[str] = deque()
 
     async def get_by_id(self, analysis_id: str) -> Optional[_CompletedAnalysisResource]:
         """Return the analysis with the given ID, if it exists."""
+        try:
+            return self._completed_analysis_cache_by_analysis_id[analysis_id]
+        except KeyError:
+            pass
         statement = sqlalchemy.select(analysis_table).where(
             analysis_table.c.id == analysis_id
         )
@@ -376,7 +403,9 @@ class _CompletedAnalysisStore:
                 result = transaction.execute(statement).one()
             except sqlalchemy.exc.NoResultFound:
                 return None
-        return await _CompletedAnalysisResource.from_sql_row(result)
+        resource = await _CompletedAnalysisResource.from_sql_row(result)
+        self._cache_size_limited(resource)
+        return resource
 
     async def get_by_protocol(
         self, protocol_id: str
@@ -386,14 +415,41 @@ class _CompletedAnalysisStore:
         If protocol_id doesn't point to a valid protocol, returns an empty list;
         doesn't raise an error.
         """
-        statement = (
-            sqlalchemy.select(analysis_table)
+        id_statement = (
+            sqlalchemy.select(analysis_table.c.id)
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
         )
         with self._sql_engine.begin() as transaction:
-            results = transaction.execute(statement).all()
-        return [await _CompletedAnalysisResource.from_sql_row(r) for r in results]
+            ordered_analyses_for_protocol = [
+                row.id for row in transaction.execute(id_statement).all()
+            ]
+
+        analysis_set = set(ordered_analyses_for_protocol)
+        cached_analyses = {
+            analysis_id
+            for analysis_id in ordered_analyses_for_protocol
+            if analysis_id in self._completed_analysis_cache_by_analysis_id
+        }
+        uncached_analyses = analysis_set - cached_analyses
+
+        if uncached_analyses:
+            statement = (
+                sqlalchemy.select(analysis_table)
+                .where(analysis_table.c.id.in_(uncached_analyses))
+                .order_by(sqlite_rowid)
+            )
+            with self._sql_engine.begin() as transaction:
+                results = transaction.execute(statement).all()
+            for r in results:
+                self._cache_size_limited(
+                    await _CompletedAnalysisResource.from_sql_row(r)
+                )
+
+        return [
+            self._completed_analysis_cache_by_analysis_id[analysis_id]
+            for analysis_id in ordered_analyses_for_protocol
+        ]
 
     def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
         """Like `get_by_protocol()`, but return only the ID of each analysis."""
@@ -420,6 +476,28 @@ class _CompletedAnalysisStore:
         )
         with self._sql_engine.begin() as transaction:
             transaction.execute(statement)
+        self._cache_size_limited(completed_analysis_resource)
+
+    def _cache_size_limited(self, resource: _CompletedAnalysisResource) -> None:
+        # a lot of warnings are easier to implement if we special case no-cache
+        if self._cache_size == 0:
+            return
+
+        if len(self._completed_analysis_cache_by_analysis_id) >= self._cache_size:
+            try:
+                eldest = self._cache_order.pop()
+            except IndexError:
+                _log.error(
+                    f"cache order queue was empty with {len(self._completed_analysis_cache_by_analysis_id)} elements in cache"
+                )
+                eldest = "<incorrect because cache order was empty>"
+            try:
+                del self._completed_analysis_cache_by_analysis_id[eldest]
+            except KeyError:
+                _log.error(f"oldest-cached analysis id {eldest} was not present")
+
+        self._completed_analysis_cache_by_analysis_id[resource.id] = resource
+        self._cache_order.appendleft(resource.id)
 
 
 def _summarize_pending(pending_analysis: PendingAnalysis) -> AnalysisSummary:

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, NamedTuple
 
 from sqlalchemy.engine import Engine as SQLEngine
+import sqlalchemy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -35,6 +36,8 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
 )
+
+from robot_server.persistence import analysis_table
 
 
 @pytest.fixture
@@ -253,3 +256,115 @@ async def test_update_infers_status_from_errors(
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)
     assert analysis.result == expected_result
+
+
+async def test_completed_analyses_use_cache(
+    subject: AnalysisStore, protocol_store: ProtocolStore, sql_engine: SQLEngine
+) -> None:
+    """It should return analyses without using SQL the second time the analyses are accessed."""
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+
+    labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    await subject.update(
+        analysis_id="analysis-id",
+        labware=[labware],
+        pipettes=[pipette],
+        modules=[],
+        commands=[],
+        errors=[],
+        liquids=[],
+    )
+    analysis_from_sql = await subject.get("analysis-id")
+    # The analysis should now be cached, and if we delete it out from under the store we
+    # should still be able to retrieve it
+    with sql_engine.begin() as transaction:
+        transaction.execute(
+            sqlalchemy.delete(analysis_table).where(
+                analysis_table.c.id == "analysis-id"
+            )
+        )
+
+    analysis_from_cache = await subject.get("analysis-id")
+    # the cached analysis should be the same as the old one
+    assert analysis_from_cache == analysis_from_sql
+    # and in fact it should be the same object
+    assert analysis_from_cache is analysis_from_sql
+
+
+async def test_completed_analysis_cache_is_bounded(
+    subject: AnalysisStore, protocol_store: ProtocolStore, sql_engine: SQLEngine
+) -> None:
+    """It should eject old elements from the cache to avoid exceeding the cache limit."""
+    labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    subject._completed_store._cache_size = 2
+    for protocol_id, analysis_id in (
+        ("protocol-id-1", "analysis-id-1"),
+        ("protocol-id-2", "analysis-id-2"),
+        ("protocol-id-3", "analysis-id-3"),
+    ):
+        protocol_store.insert(make_dummy_protocol_resource(protocol_id=protocol_id))
+
+        subject.add_pending(protocol_id=protocol_id, analysis_id=analysis_id)
+        await subject.update(
+            analysis_id=analysis_id,
+            labware=[labware],
+            pipettes=[pipette],
+            modules=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+        )
+
+    # we now have 3 protocols in sql and a cache limit of 2. That means we should be able
+    # to do our little cache-hit check with two of them
+    analysis_1_from_sql = await subject.get("analysis-id-1")
+    analysis_2_from_sql = await subject.get("analysis-id-2")
+    with sql_engine.begin() as transaction:
+        transaction.execute(
+            sqlalchemy.delete(analysis_table).where(
+                analysis_table.c.id.in_(("analysis-id-1", "analysis-id-2"))
+            )
+        )
+    analysis_1_from_cache = await subject.get("analysis-id-1")
+    analysis_2_from_cache = await subject.get("analysis-id-2")
+
+    assert analysis_1_from_sql is analysis_1_from_cache
+    assert analysis_2_from_sql is analysis_2_from_cache
+
+    # if we now do this with the third, it should also work
+    analysis_3_from_sql = await subject.get("analysis-id-3")
+    analysis_3_from_cache = await subject.get("analysis-id-3")
+    assert analysis_3_from_sql is analysis_3_from_cache
+    # but now analysis-1 - since it was  the first added - should not be in the cache, and since
+    # we deleted it from the database if we try and retrieve it again we can't
+    with pytest.raises(AnalysisNotFoundError):
+        await subject.get("analysis-id-1")
+
+    # but 2 should still be in the cache
+    assert await subject.get("analysis-id-2") is analysis_2_from_cache
