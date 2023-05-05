@@ -20,7 +20,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
 
 import type {

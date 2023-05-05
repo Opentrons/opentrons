@@ -14,7 +14,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'

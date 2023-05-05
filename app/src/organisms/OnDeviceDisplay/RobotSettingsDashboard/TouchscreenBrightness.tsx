@@ -20,7 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
