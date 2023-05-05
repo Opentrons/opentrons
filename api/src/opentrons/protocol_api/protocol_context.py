@@ -533,7 +533,7 @@ class ProtocolContext(CommandPublisher):
             and self._api_version <= ENGINE_CORE_API_VERSION
         ):
             raise APIVersionError(
-                f"Module of type {module_name} is only available in versions higher than 2.14."
+                f"Module of type {module_name} is only available in versions higher than 2.15."
             )
 
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
