@@ -16,8 +16,6 @@ from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedErro
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
-    LoadedModule,
-    ModuleModel,
     ModuleOffsetVector,
 )
 
@@ -45,7 +43,6 @@ async def test_calibrate_module_implementation(
     subject = CalibrateModuleImplementation(state_view, ot3_hardware_api)
 
     location = DeckSlotLocation(slotName=DeckSlotName("3"))
-    model = ModuleModel.TEMPERATURE_MODULE_V2
     module_id = "module123"
     labware_id = "labware123"
     module_serial = "TC1234abcd"
@@ -55,14 +52,10 @@ async def test_calibrate_module_implementation(
         mount=MountType.LEFT,
     )
 
-    module = LoadedModule.construct(
-        id=module_id,
-        location=location,
-        model=model,
-        serialNumber=module_serial,
+    decoy.when(subject._state_view.modules.get_serial_number(module_id)).then_return(
+        "TC1234abcd"
     )
 
-    decoy.when(subject._state_view.modules.get(module_id)).then_return(module)
     decoy.when(subject._state_view.modules.get_location(module_id)).then_return(
         location
     )

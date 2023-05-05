@@ -30,9 +30,7 @@ describe('MediumButton', () => {
       buttonType: 'alert',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red_two}`
-    )
+    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
   })
   it('renders the secondary button', () => {
     props = {
@@ -50,9 +48,7 @@ describe('MediumButton', () => {
       buttonType: 'alertSecondary',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red_three}`
-    )
+    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
   })
   it('renders the tertiary high button', () => {
     props = {

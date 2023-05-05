@@ -115,5 +115,5 @@ const ColumnLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `

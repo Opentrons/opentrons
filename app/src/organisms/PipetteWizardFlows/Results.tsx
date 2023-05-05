@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'

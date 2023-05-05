@@ -7,7 +7,7 @@ import {
   BORDERS,
   Flex,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
+import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { StyleProps } from '@opentrons/components'
@@ -55,8 +55,8 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const DISABLED_BUTTON_STYLE = css`
-    background-color: ${COLORS.darkBlack_twenty};
-    color: ${COLORS.darkBlack_sixty};
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
     cursor: not-allowed;
   `
 
