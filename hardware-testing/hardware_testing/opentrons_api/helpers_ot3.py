@@ -142,14 +142,14 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-        kwargs["use_usb_bus"] = True
+        kwargs["use_usb_bus"] = True  # type: ignore[assignment]
     try:
         return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     except Exception as e:
         if is_simulating:
             raise e
         print(e)
-        kwargs["use_usb_bus"] = False
+        kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
 
 
@@ -426,7 +426,7 @@ async def move_tip_motor_relative_ot3(
 ) -> None:
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
-        raise RuntimeError(f"No pipette found on LEFT mount")
+        raise RuntimeError("No pipette found on LEFT mount")
     if distance < 0:
         action = "home"
     else:

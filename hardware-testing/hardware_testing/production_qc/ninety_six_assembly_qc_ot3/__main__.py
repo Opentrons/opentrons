@@ -24,7 +24,6 @@ async def _main(cfg: TestConfig) -> None:
         # FIXME: Do not home the plunger using the normal home method.
         #        See section below where we use OT3Controller to home it.
         await api.home()
-        home_pos = await api.gantry_position(OT3Mount.LEFT)
         await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
         while not api.hardware_pipettes[mount.to_mount()]:
             ui.get_user_ready("attach a 96ch pipette")

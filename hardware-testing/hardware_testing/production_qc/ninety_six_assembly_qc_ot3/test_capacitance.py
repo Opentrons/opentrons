@@ -1,13 +1,12 @@
 """Test Capacitance."""
 from asyncio import sleep
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 
 from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 from opentrons.hardware_control.types import InstrumentProbeType
 
@@ -47,20 +46,19 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-async def read_once(
+async def _read_once(
     api: OT3API,
     driver: sensor_driver.SensorDriver,
     sensor: sensor_types.CapacitiveSensor,
     timeout: int = 1,
-) -> float:
-    if not api.is_simulator and isinstance(api._backend, OT3Controller):
-        data = await driver.read(
-            api._backend._messenger, sensor, offset=False, timeout=timeout
-        )
-        if isinstance(data, sensor_types.SensorDataType):
-            return data.to_float()
-        raise helpers_ot3.SensorResponseBad("no response from sensor")
-    return 0.0
+) -> Optional[float]:
+    if api.is_simulator:
+        return 1.234
+    messenger = api._backend._messenger  # type: ignore[union-attr]
+    data = await driver.read(messenger, sensor, offset=False, timeout=timeout)
+    if isinstance(data, sensor_types.SensorDataType):
+        return data.to_float()
+    return None
 
 
 async def _read_from_sensor(
@@ -68,23 +66,26 @@ async def _read_from_sensor(
     driver: sensor_driver.SensorDriver,
     sensor: sensor_types.CapacitiveSensor,
     num_readings: int = 10,
-) -> float:
+) -> Optional[float]:
     readings: List[float] = []
     sequential_failures = 0
-    while len(readings) != num_readings:
-        try:
-            r = await read_once(api, driver, sensor)
-            sequential_failures = 0
-            readings.append(r)
-            print(f"\t{r}")
-            if not api.is_simulator:
-                await sleep(0.2)
-        except helpers_ot3.SensorResponseBad as e:
+
+    def _check_if_ok(result: Optional[float]) -> None:
+        nonlocal sequential_failures
+        if result is None:
             sequential_failures += 1
             if sequential_failures == 3:
-                raise e
-            else:
-                continue
+                return None
+        else:
+            sequential_failures = 0
+
+    while len(readings) != num_readings:
+        r = await _read_once(api, driver, sensor)
+        _check_if_ok(r)  # raises error after 3x failures in a row
+        readings.append(r)  # type: ignore[arg-type]
+        print(f"\t{r}")
+        if not api.is_simulator:
+            await sleep(0.2)
     return sum(readings) / num_readings
 
 
@@ -121,13 +122,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.home([z_ax, p_ax, t_ax])
 
         # AIR-pF
-        air_pf = 0.0
-        if not api.is_simulator:
-            try:
-                air_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
-            except helpers_ot3.SensorResponseBad:
-                ui.print_error(f"{probe} cap sensor not working, skipping")
-                continue
+        air_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+        if not air_pf:
+            ui.print_error(f"{probe} cap sensor not working, skipping")
+            continue
         print(f"air-pf: {air_pf}")
         # FIXME: create stricter pass/fail criteria
         report(section, _get_test_tag(probe, "air-pf"), [air_pf, CSVResult.PASS])
@@ -136,13 +134,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator:
             ui.get_user_ready(f"ATTACH probe to {probe.name} channel")
         await api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
-        attached_pf = 0.0
-        if not api.is_simulator:
-            try:
-                attached_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
-            except helpers_ot3.SensorResponseBad:
-                ui.print_error(f"{probe} cap sensor not working, skipping")
-                continue
+        attached_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+        if not attached_pf:
+            ui.print_error(f"{probe} cap sensor not working, skipping")
+            continue
         print(f"attached-pf: {attached_pf}")
         # FIXME: create stricter pass/fail criteria
         report(
@@ -195,24 +190,21 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         )
 
         # DECK-pF
-        deck_pf = 0.0
         if deck_mm_is_valid:
             if not api.is_simulator:
                 ui.get_user_ready("about to PRESS into the DECK")
             await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=deck_mm))
-            if not api.is_simulator:
-                try:
-                    deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
-                except helpers_ot3.SensorResponseBad:
-                    ui.print_error(f"{probe} cap sensor not working, skipping")
-                    continue
+            deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+            if not deck_pf:
+                ui.print_error(f"{probe} cap sensor not working, skipping")
+                continue
             print(f"deck-pf: {deck_pf}")
+            # FIXME: create stricter pass/fail criteria
+            report(section, _get_test_tag(probe, "deck-pf"), [deck_pf, CSVResult.PASS])
         else:
             print("skipping deck-pf")
-        # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "deck-pf"), [deck_pf, CSVResult.PASS])
 
         await api.home_z()
         if not api.is_simulator:
-            ui.get_user_ready(f"REMOVE probe")
+            ui.get_user_ready("REMOVE probe")
         await api.remove_tip(OT3Mount.LEFT)

@@ -40,7 +40,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-async def read_once(
+async def _read_once(
     api: OT3API,
     driver: sensor_driver.SensorDriver,
     sensor: sensor_types.PressureSensor,
@@ -66,7 +66,7 @@ async def _read_from_sensor(
     sequential_failures = 0
     while len(readings) != num_readings:
         try:
-            r = await read_once(api, driver, sensor)
+            r = await _read_once(api, driver, sensor)
             sequential_failures = 0
             readings.append(r)
             print(f"\t{r}")
@@ -83,7 +83,6 @@ async def _read_from_sensor(
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-
     s_driver = sensor_driver.SensorDriver()
 
     for probe in InstrumentProbeType:
@@ -156,5 +155,5 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         )
 
         if not api.is_simulator:
-            ui.get_user_ready(f"REMOVE tip")
+            ui.get_user_ready("REMOVE tip")
         await api.remove_tip(OT3Mount.LEFT)

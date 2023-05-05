@@ -1,6 +1,6 @@
 """Test Tip Sensor."""
 import asyncio
-from typing import List, Union, Dict, Callable, cast
+from typing import List, Union, cast
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -17,25 +17,36 @@ from opentrons.hardware_control.ot3api import OT3API
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
+    CSVResult,
     CSVLine,
     CSVLineRepeating,
 )
+from hardware_testing.opentrons_api.types import OT3Axis
+from hardware_testing.opentrons_api import helpers_ot3
+
+TIP_PRESENCE_POSITION = 6
+EXPECTED_STATE_AT_HOME_POSITION = True
+
+
+def _get_tag_for_state(tips_dropped: bool) -> str:
+    t = "empty" if tips_dropped else "with-tips"
+    return f"tip-sensor-{t}"
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
-    return []
+    return [CSVLine(_get_tag_for_state(state), [CSVResult]) for state in [True, False]]
 
 
-async def get_tip_status(api: OT3API) -> int:
+async def get_tip_status(api: OT3API) -> bool:
     """Get the tip status for the 96 channel."""
-    can_messenger: CanMessenger = api._backend._messenger
+    can_messenger: CanMessenger = api._backend._messenger  # type: ignore[union-attr]
     node: NodeId = NodeId.pipette_left
     event = asyncio.Event()
-    response = -1
+    value = 0
 
     def _listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
-        nonlocal response
+        nonlocal value
         try:
             originator = NodeId(arbitration_id.parts.originating_node_id)
             if message.message_id == MessageId.error_message:
@@ -45,7 +56,7 @@ async def get_tip_status(api: OT3API) -> int:
         except (RuntimeError, AssertionError, ValueError) as e:
             ui.print_error(str(e))
         else:
-            response = cast(
+            value = cast(
                 PushTipPresenceNotification, message
             ).payload.ejector_flag_status.value
             event.set()
@@ -59,14 +70,31 @@ async def get_tip_status(api: OT3API) -> int:
         await asyncio.wait_for(event.wait(), 1.0)
     finally:
         can_messenger.remove_listener(_listener)
-    return response
+    result = bool(value)
+    print(f"tip-status: {result}")
+    return result
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    ui.print_error("skipping")
-    if not api.is_simulator:
-        result = await get_tip_status(api)
-    else:
-        result = 1
-    print(f"got {result} as tip-status")
+    ax = OT3Axis.Q
+    for expected_state in [False, True]:
+        print("homing...")
+        await api.home([ax])
+        if not api.is_simulator:
+            if expected_state:
+                ui.get_user_ready("remove all tips from the pipette")
+            else:
+                ui.get_user_ready("press on tips to channels A1 + H12")
+        if not api.is_simulator:
+            init_state = await get_tip_status(api)
+            if init_state != EXPECTED_STATE_AT_HOME_POSITION:
+                ui.print_error("tip sensor is not in expected state at home position")
+        print(f"moving to tip-presence position ({TIP_PRESENCE_POSITION} mm)")
+        await helpers_ot3.move_tip_motor_relative_ot3(api, TIP_PRESENCE_POSITION)
+        state = expected_state if api.is_simulator else await get_tip_status(api)
+        tag = _get_tag_for_state(expected_state)
+        result = state == expected_state
+        report(section, tag, [CSVResult.from_bool(result)])
+        print("homing...")
+        await api.home([ax])

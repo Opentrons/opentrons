@@ -1,7 +1,7 @@
 """Test Droplets."""
 from asyncio import sleep
 from time import time
-from typing import List, Union, Tuple, Optional
+from typing import List, Union, Tuple, Optional, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.motion_utilities import target_position_from_relative
@@ -38,24 +38,66 @@ TIP_RACK_96_ADAPTER_HEIGHT = 11  # DVT adapter
 # move to same spot over labware, regardless of number of tips attached
 OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
-PARTIAL_CURRENTS = {1: 0.05, 8: 0.55, 12: 0.8, 16: 1.1, 24: 1.5}
+PARTIAL_CURRENTS: Dict[int, float] = {1: 0.05, 8: 0.55, 12: 0.8, 16: 1.1, 24: 1.5}
 
-PARTIAL_TESTS = {
+PARTIAL_TESTS: Dict[str, Tuple[Point, float]] = {
     # test-name: [offset-from-A1, z-current]
-    "1-tip-front-left": [Point(x=9 * 11, y=9 * 7), PARTIAL_CURRENTS[1]],
-    "1-tip-back-left": [Point(x=9 * 11, y=9 * -7), PARTIAL_CURRENTS[1]],
-    "1-tip-front-right": [Point(x=9 * -11, y=9 * 7), PARTIAL_CURRENTS[1]],
-    "1-tip-back-right": [Point(x=9 * -11, y=9 * -7), PARTIAL_CURRENTS[1]],
-    "8-tips-left": [Point(x=9 * 11), PARTIAL_CURRENTS[8]],
-    "8-tips-right": [Point(x=9 * -11), PARTIAL_CURRENTS[8]],
-    "16-tips-left": [Point(x=9 * 10), PARTIAL_CURRENTS[16]],
-    "16-tips-right": [Point(x=9 * -10), PARTIAL_CURRENTS[16]],
-    "24-tips-left": [Point(x=9 * 9), PARTIAL_CURRENTS[24]],
-    "24-tips-right": [Point(x=9 * -9), PARTIAL_CURRENTS[24]],
-    "12-tips-front": [Point(y=9 * 7), PARTIAL_CURRENTS[12]],
-    "12-tips-back": [Point(y=9 * -7), PARTIAL_CURRENTS[12]],
-    "24-tips-front": [Point(y=9 * 6), PARTIAL_CURRENTS[24]],
-    "24-tips-back": [Point(y=9 * -6), PARTIAL_CURRENTS[24]],
+    "1-tip-front-left": (
+        Point(x=9 * 11, y=9 * 7),
+        PARTIAL_CURRENTS[1],
+    ),
+    "1-tip-back-left": (
+        Point(x=9 * 11, y=9 * -7),
+        PARTIAL_CURRENTS[1],
+    ),
+    "1-tip-front-right": (
+        Point(x=9 * -11, y=9 * 7),
+        PARTIAL_CURRENTS[1],
+    ),
+    "1-tip-back-right": (
+        Point(x=9 * -11, y=9 * -7),
+        PARTIAL_CURRENTS[1],
+    ),
+    "8-tips-left": (
+        Point(x=9 * 11),
+        PARTIAL_CURRENTS[8],
+    ),
+    "8-tips-right": (
+        Point(x=9 * -11),
+        PARTIAL_CURRENTS[8],
+    ),
+    "16-tips-left": (
+        Point(x=9 * 10),
+        PARTIAL_CURRENTS[16],
+    ),
+    "16-tips-right": (
+        Point(x=9 * -10),
+        PARTIAL_CURRENTS[16],
+    ),
+    "24-tips-left": (
+        Point(x=9 * 9),
+        PARTIAL_CURRENTS[24],
+    ),
+    "24-tips-right": (
+        Point(x=9 * -9),
+        PARTIAL_CURRENTS[24],
+    ),
+    "12-tips-front": (
+        Point(y=9 * 7),
+        PARTIAL_CURRENTS[12],
+    ),
+    "12-tips-back": (
+        Point(y=9 * -7),
+        PARTIAL_CURRENTS[12],
+    ),
+    "24-tips-front": (
+        Point(y=9 * 6),
+        PARTIAL_CURRENTS[24],
+    ),
+    "24-tips-back": (
+        Point(y=9 * -6),
+        PARTIAL_CURRENTS[24],
+    ),
 }
 
 
@@ -65,7 +107,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     partial_tests = [
         CSVLine(f"droplets-{name}", [float, CSVResult]) for name in PARTIAL_TESTS.keys()
     ]
-    return all_tips_test + partial_tests
+    return all_tips_test + partial_tests  # type: ignore[return-value]
 
 
 def get_trash_nominal() -> Point:
@@ -240,10 +282,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # TEST DROPLETS for 96 TIPS
         ui.print_header("96 Tips: ASPIRATE and WAIT")
         await _find_reservoir_pos()
+        assert reservoir_a1_actual
         result, duration = await aspirate_and_wait(
             api, reservoir_a1_actual, seconds=delay_seconds
         )
-        report(section, f"droplets-96-tips", [duration, CSVResult.from_bool(result)])
+        report(section, "droplets-96-tips", [duration, CSVResult.from_bool(result)])
         await _drop_tip(api, trash_nominal)
 
     if not api.is_simulator:
@@ -271,6 +314,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.get_user_ready(f"about to pick-up ({test_name})")
         await _partial_pick_up(api, pick_up_position, current=details[1])
         await _find_reservoir_pos()
+        assert reservoir_a1_actual
         result, duration = await aspirate_and_wait(
             api, reservoir_a1_actual, seconds=delay_seconds
         )
