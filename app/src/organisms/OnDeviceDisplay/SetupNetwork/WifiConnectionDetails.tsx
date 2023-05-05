@@ -25,7 +25,6 @@ import { getLocalRobot } from '../../../redux/discovery'
 import type { State, Dispatch } from '../../../redux/types'
 import type {
   SimpleInterfaceStatus,
-  WifiNetwork,
   WifiSecurityType,
 } from '../../../redux/networking/types'
 

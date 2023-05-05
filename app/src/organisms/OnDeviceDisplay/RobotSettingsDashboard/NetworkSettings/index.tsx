@@ -27,7 +27,6 @@ import type { IconName } from '@opentrons/components'
 import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
 import type { ChipType } from '../../../../atoms/Chip'
 import type { SettingOption } from '../../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import type { State } from '../../../../redux/types'
 
 export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
 

@@ -60,7 +60,7 @@ describe('useNetworkConnection', () => {
     )
 
     when(mockUseWifiList)
-      .calledWith(mockRobotName)
+      .calledWith(mockRobotName, 10000)
       .mockReturnValue(mockWifiList)
     when(mockGetNetworkInterface)
       .calledWith(undefined as any, mockRobotName)

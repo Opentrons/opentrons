@@ -1,8 +1,6 @@
 import { createSelector } from 'reselect'
 import find from 'lodash/find'
 import map from 'lodash/map'
-import orderBy from 'lodash/orderBy'
-import uniqBy from 'lodash/uniqBy'
 import { long2ip } from 'netmask'
 
 import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'

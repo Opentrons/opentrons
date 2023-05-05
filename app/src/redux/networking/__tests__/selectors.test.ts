@@ -1,5 +1,4 @@
 import noop from 'lodash/noop'
-import * as Discovery from '../../discovery'
 import * as Selectors from '../selectors'
 import * as Constants from '../constants'
 import * as Fixtures from '../__fixtures__'
@@ -8,10 +7,6 @@ import type { State } from '../../types'
 
 jest.mock('../../config/selectors')
 jest.mock('../../discovery/selectors')
-
-const getRobotApiVersionByName = Discovery.getRobotApiVersionByName as jest.MockedFunction<
-  typeof Discovery.getRobotApiVersionByName
->
 
 interface SelectorSpec {
   name: string

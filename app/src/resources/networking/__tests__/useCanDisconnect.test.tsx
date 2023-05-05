@@ -15,8 +15,6 @@ import { SECURITY_WPA_EAP, WifiNetwork } from '@opentrons/api-client'
 jest.mock('../hooks/useWifiList')
 jest.mock('../../../redux/discovery')
 
-const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-
 const mockGetRobotApiVersionByName = getRobotApiVersionByName as jest.MockedFunction<
   typeof getRobotApiVersionByName
 >
