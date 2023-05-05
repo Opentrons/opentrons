@@ -16,7 +16,7 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
