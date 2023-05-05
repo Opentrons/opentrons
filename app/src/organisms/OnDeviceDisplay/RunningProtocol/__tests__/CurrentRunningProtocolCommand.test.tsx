@@ -39,6 +39,7 @@ describe('CurrentRunningProtocolCommand', () => {
       pauseRun: mockPauseRun,
       setShowConfirmCancelRunModal: mockShowModal,
       trackProtocolRunEvent: jest.fn(), // temporary
+      robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
     }

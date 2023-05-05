@@ -14,7 +14,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import type { IconName } from '@opentrons/components'
 
@@ -48,8 +48,8 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlack_twenty};
-    color: ${COLORS.darkBlack_seventy};
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack70};
   }
 `
 
@@ -83,16 +83,14 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
-      backgroundColor={
-        disabled ? COLORS.darkBlack_twenty : COLORS.mediumBlueEnabled
-      }
+      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.mediumBlueEnabled}
       disabled={disabled}
     >
       <Icon
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? COLORS.darkBlack_sixty : COLORS.blueEnabled}
+        color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
       />
       <Flex marginTop={SPACING.spacing4}>
         <StyledText
@@ -100,7 +98,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           fontSize="1.75rem"
           lineHeight="2.25rem"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -115,7 +113,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
           fontSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}

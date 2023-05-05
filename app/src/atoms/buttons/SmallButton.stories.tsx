@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SmallButton } from './SmallButton'
+import { SmallButton } from './'
 
 import type { Story, Meta } from '@storybook/react'
 

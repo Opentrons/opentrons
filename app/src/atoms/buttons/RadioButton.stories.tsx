@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RadioButton } from '.'
+import { RadioButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
