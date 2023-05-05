@@ -118,7 +118,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
             },
           },
         ],
-        false
+        true
       ).then(() => {
         proceed()
       })

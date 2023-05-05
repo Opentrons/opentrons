@@ -16,7 +16,7 @@ import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 
 interface ExitModalProps {
-  isRobotMoving: boolean
+  isRobotMoving?: boolean
   proceed: () => void
   goBack: () => void
   flowType: PipetteWizardFlow

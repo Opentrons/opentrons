@@ -76,8 +76,8 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData = false
-  // attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
+  const hasCalData =
+    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
