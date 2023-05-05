@@ -528,12 +528,11 @@ class ProtocolContext(CommandPublisher):
                 )
 
         requested_model = validation.ensure_module_model(module_name)
-        if (
-            isinstance(requested_model, MagneticBlockModel)
-            and self._api_version <= ENGINE_CORE_API_VERSION
-        ):
+        if isinstance(
+            requested_model, MagneticBlockModel
+        ) and self._api_version >= APIVersion(2, 15):
             raise APIVersionError(
-                f"Module of type {module_name} is only available in versions higher than 2.15."
+                f"Module of type {module_name} is only available in versions 2.15 and above."
             )
 
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
