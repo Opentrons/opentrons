@@ -121,7 +121,6 @@ export function RobotSettingsDashboard(): JSX.Element {
           <Link
             to={{
               pathname: '/robot-settings/rename-robot',
-              state: 'robotSettings',
             }}
           >
             <RobotSettingButton
