@@ -83,7 +83,6 @@ async def _test_wifi(report: CSVReport, section: str) -> None:
     def _finish() -> None:
         report(section, "wifi", [ssid, password, wifi_ip, result])
 
-    
     wifi_status = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
     wifi_ip = wifi_status["ipAddress"]
     if wifi_ip:
@@ -235,4 +234,3 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # FIXME: add the Aux port tests back once the new tests are complete
     for t in AUX_PORT_TESTS:
         report(section, t, [CSVResult.PASS])
-
