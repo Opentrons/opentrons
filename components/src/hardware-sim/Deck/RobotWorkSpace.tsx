@@ -1,5 +1,4 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { StyleProps, Svg } from '../../primitives'
 import { DeckFromData } from './DeckFromData'
 
