@@ -28,8 +28,7 @@ import {
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { LargeButton, TertiaryButton } from '../../atoms/buttons'
 import {
   useRunTimestamps,
   useRunControls,

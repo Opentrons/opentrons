@@ -11,7 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DISPLAY_FLEX,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
+import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 

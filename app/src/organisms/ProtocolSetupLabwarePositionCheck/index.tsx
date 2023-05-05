@@ -7,7 +7,7 @@ import {
 } from '@opentrons/components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { MediumButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { MediumButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 

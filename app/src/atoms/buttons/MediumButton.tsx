@@ -10,7 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
+import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { IconName, StyleProps } from '@opentrons/components'
