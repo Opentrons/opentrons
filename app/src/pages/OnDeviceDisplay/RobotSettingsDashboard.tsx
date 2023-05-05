@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import {
   Flex,
@@ -118,11 +118,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
 
           {/* Robot Name */}
-          <RouterLink
-            to={{
-              pathname: '/robot-settings/rename-robot',
-            }}
-          >
+          <Link to="/robot-settings/rename-robot">
             <RobotSettingButton
               settingName={t('robot_name')}
               settingInfo={robotName}
@@ -130,7 +126,7 @@ export function RobotSettingsDashboard(): JSX.Element {
               setCurrentOption={setCurrentOption}
               iconName="flex-robot"
             />
-          </RouterLink>
+          </Link>
 
           {/* Robot System Version */}
           <RobotSettingButton
