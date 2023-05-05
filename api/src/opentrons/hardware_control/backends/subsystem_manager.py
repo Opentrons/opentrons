@@ -83,6 +83,7 @@ class SubsystemManager:
         }
         self._refreshed = asyncio.Event()
         self._updates_required = {}
+        self._updates_ongoing = {}
         if self._usb_messenger:
             self._expected_core_targets.add(USBTarget.rear_panel)
 
