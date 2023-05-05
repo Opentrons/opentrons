@@ -25,7 +25,7 @@ import {
   ALIGN_STRETCH,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
