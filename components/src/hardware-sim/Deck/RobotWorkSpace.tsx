@@ -2,7 +2,6 @@ import * as React from 'react'
 import cx from 'classnames'
 import { StyleProps, Svg } from '../../primitives'
 import { DeckFromData } from './DeckFromData'
-import styles from './RobotWorkSpace.css'
 
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
 
@@ -17,7 +16,6 @@ export interface RobotWorkSpaceRenderProps {
 export interface RobotWorkSpaceProps extends StyleProps {
   deckDef?: DeckDefinition
   viewBox?: string | null
-  className?: string
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckLayerBlocklist?: string[]
   id?: string
@@ -68,10 +66,11 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
   }
   return (
     <Svg
-      className={cx(styles.robot_work_space, props.className)}
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
       id={id}
+      /* reflect horizontally about the center of the DOM elem */
+      transform="scale(1, -1)"
       {...styleProps}
     >
       {deckDef != null && (
