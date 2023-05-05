@@ -134,4 +134,5 @@ describe('NameRobot', () => {
   //   getByText('Enter up to 17 characters (letters and numbers only)')
   //   getByText('Confirm')
   // })
+  it.todo('add test for targetPath in a following PR')
 })

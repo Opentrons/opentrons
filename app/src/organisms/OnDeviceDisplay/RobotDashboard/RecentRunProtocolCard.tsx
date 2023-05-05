@@ -102,7 +102,6 @@ export function RecentRunProtocolCard({
     history.push(`protocols/${protocolId}`)
   }
 
-  console.log(protocolName)
   return (
     <Flex
       aria-label="RecentRunCard"

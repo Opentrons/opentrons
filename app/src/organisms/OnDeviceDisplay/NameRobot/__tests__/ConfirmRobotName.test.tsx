@@ -5,7 +5,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import { updateConfigValue } from '../../../../redux/config'
 import { ConfirmRobotName } from '../ConfirmRobotName'
+
+jest.mock('../../../../redux/config')
 
 const mockPush = jest.fn()
 
@@ -16,6 +19,10 @@ jest.mock('react-router-dom', () => {
     useHistory: () => ({ push: mockPush } as any),
   }
 })
+
+const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
+  typeof updateConfigValue
+>
 
 const render = (props: React.ComponentProps<typeof ConfirmRobotName>) => {
   return renderWithProviders(
@@ -47,6 +54,7 @@ describe('ConfirmRobotName', () => {
     const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Finish setup' })
     fireEvent.click(button)
+    expect(mockUpdateConfigValue).toHaveBeenCalled()
     expect(mockPush).toBeCalledWith('/dashboard')
   })
 })
