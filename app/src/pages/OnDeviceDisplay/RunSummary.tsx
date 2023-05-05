@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
@@ -22,19 +23,36 @@ import {
   DIRECTION_ROW,
   DISPLAY_FLEX,
   SIZE_2,
+  Btn,
 } from '@opentrons/components'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
-import { useRunCreatedAtTimestamp } from '../../organisms/Devices/hooks'
+import {
+  useRunTimestamps,
+  useRunControls,
+} from '../../organisms/RunTimeControl/hooks'
+import {
+  useRunCreatedAtTimestamp,
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
+} from '../../organisms/Devices/hooks'
+import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
 import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
 import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
+import {
+  useTrackEvent,
+  // ANALYTICS_PROTOCOL_RUN_CANCEL,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
+} from '../../redux/analytics'
 
+import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
+import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -62,7 +80,16 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(true)
+  const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const onResetSuccess = (createRunResponse: Run): void =>
+    history.push(`/protocols/${runId}/setup`)
+  const { reset } = useRunControls(runId, onResetSuccess)
+  const trackEvent = useTrackEvent()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? 'no name'
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const runStatusText = isRunSucceeded
     ? t('run_complete')
@@ -73,7 +100,12 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleRunAgain = (): void => {
-    history.push(`/protocols/${runId}/setup`)
+    reset()
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RunSummary' },
+    })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
   }
 
   const handleViewErrorDetails = (): void => {
@@ -81,16 +113,26 @@ export function RunSummary(): JSX.Element {
     console.log('will be added')
   }
 
+  const handleClickSplash = (): void => {
+    trackProtocolRunEvent({
+      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      properties: robotAnalyticsData ?? undefined,
+    })
+    closeCurrentRun()
+    setShowSplash(false)
+  }
+
   return (
     <>
-      <Flex
+      <Btn
+        display={DISPLAY_FLEX}
+        width="100%"
         height="100vh"
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
-        onClick={() => {
-          setShowSplash(false)
-        }}
+        disabled={isClosingCurrentRun}
+        onClick={handleClickSplash}
       >
         {showSplash ? (
           <Flex
@@ -113,7 +155,7 @@ export function RunSummary(): JSX.Element {
                 />
                 <SplashHeader> {runStatusText} </SplashHeader>
               </Flex>
-              <Flex width="49rem">
+              <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
                 <SplashBody>{protocolName}</SplashBody>
               </Flex>
             </SplashFrame>
@@ -198,7 +240,7 @@ export function RunSummary(): JSX.Element {
             </Flex>
           </Flex>
         )}
-      </Flex>
+      </Btn>
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
@@ -257,6 +299,12 @@ const ProtocolName = styled.h4`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   color: ${COLORS.darkBlack70};
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const SummaryDatum = styled.div`

@@ -10,12 +10,16 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
-import { useStopRunMutation } from '@opentrons/react-api-client'
+import {
+  useStopRunMutation,
+  useDismissCurrentRunMutation,
+} from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 
@@ -23,15 +27,21 @@ interface ConfirmCancelRunModalProps {
   runId: string
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   isActiveRun: boolean
+  protocolId?: string | null
 }
 
 export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
+  protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
+  const {
+    dismissCurrentRun,
+    isLoading: isDismissing,
+  } = useDismissCurrentRunMutation()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -46,8 +56,17 @@ export function ConfirmCancelRunModal({
   const handleCancelRun = (): void => {
     stopRun(runId, {
       onSuccess: () => {
-        trackProtocolRunEvent({ name: 'runCancel' })
-        history.push('/dashboard')
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
+        dismissCurrentRun(runId)
+        if (isActiveRun) {
+          history.push(`/protocols/${runId}/summary`)
+        } else {
+          if (protocolId != null) {
+            history.push(`/protocols/${protocolId}`)
+          } else {
+            history.push(`/protocols`)
+          }
+        }
       },
       onError: () => {
         setIsCanceling(false)
@@ -99,7 +118,7 @@ export function ConfirmCancelRunModal({
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
-            disabled={isCanceling}
+            disabled={isCanceling || isDismissing}
           />
         </Flex>
       </Flex>
