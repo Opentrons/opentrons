@@ -1,4 +1,6 @@
 // tip length calibration types
+import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
+
 import {
   TIP_LENGTH_STEP_SESSION_STARTED,
   TIP_LENGTH_STEP_LABWARE_LOADED,
@@ -9,8 +11,6 @@ import {
   TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
 } from '../constants'
 import type { CalibrationLabware } from '../types'
-
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 export type TipLengthCalibrationStep =
   | typeof TIP_LENGTH_STEP_SESSION_STARTED

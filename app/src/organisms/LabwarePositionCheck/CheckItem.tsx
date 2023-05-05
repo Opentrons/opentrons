@@ -1,11 +1,6 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
-import { Trans, useTranslation } from 'react-i18next'
+import type { LabwareOffset } from '@opentrons/api-client'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
 import {
   CreateCommand,
   FIXED_TRASH_ID,
@@ -17,20 +12,25 @@ import {
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
-import { UnorderedList } from '../../molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { useChainRunCommands } from '../../resources/runs/hooks'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-
-import type { LabwareOffset } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import isEqual from 'lodash/isEqual'
+import { Trans, useTranslation } from 'react-i18next'
+
+import { StyledText } from '../../atoms/text'
+import type { Jog } from '../../molecules/JogControls/types'
+import { UnorderedList } from '../../molecules/UnorderedList'
+import { useChainRunCommands } from '../../resources/runs/hooks'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { JogToWell } from './JogToWell'
+import { PrepareSpace } from './PrepareSpace'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import type {
   CheckLabwareStep,
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { Jog } from '../../molecules/JogControls/types'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDef } from './utils/labware'
 
 interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS'

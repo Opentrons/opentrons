@@ -7,6 +7,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+
 import { ModuleOnDeck } from '../../../../step-forms'
 import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
 

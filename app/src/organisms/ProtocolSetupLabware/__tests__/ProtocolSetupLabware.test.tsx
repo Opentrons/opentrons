@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { MemoryRouter } from 'react-router-dom'
-
+import { renderWithProviders } from '@opentrons/components'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
+import { ProtocolSetupLabware } from '..'
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '..'
 import {
   mockProtocolModuleInfo,
   mockRecentAnalysis,

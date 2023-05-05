@@ -1,8 +1,10 @@
 import uniqBy from 'lodash/uniqBy'
+
 import type {
   LabwareWellGroupProperties,
   LabwareDefinition,
 } from '../../../pages/Labware/types'
+
 const WELL_TYPE_BY_CATEGORY = {
   tubeRack: 'tube',
   tipRack: 'tip',

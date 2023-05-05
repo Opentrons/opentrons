@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { Box, SIZE_6 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
 
 import { RadioGroup as RadioGroupComponent } from './RadioGroup'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Radio Group',

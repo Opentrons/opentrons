@@ -1,6 +1,7 @@
-import reduce from 'lodash/reduce'
-import { uuid } from '../../../utils'
 import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import reduce from 'lodash/reduce'
+
+import { uuid } from '../../../utils'
 
 export interface DesignerApplicationData {
   ingredients: Record<

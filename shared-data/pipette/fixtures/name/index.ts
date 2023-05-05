@@ -1,5 +1,6 @@
-import _pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 import type { PipetteName, PipetteNameSpecs } from '@opentrons/shared-data'
+
+import _pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 
 const pipetteNameSpecFixtures = _pipetteNameSpecFixtures as Record<
   PipetteName,

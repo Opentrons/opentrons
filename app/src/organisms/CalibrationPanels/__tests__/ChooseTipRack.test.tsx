@@ -1,22 +1,22 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { LEFT } from '@opentrons/shared-data'
-import { i18n } from '../../../i18n'
-import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
-import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
-import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { fireEvent } from '@testing-library/react'
+
 import { Select } from '../../../atoms/SelectField/Select'
+import { i18n } from '../../../i18n'
 import {
   getCalibrationForPipette,
   getTipLengthForPipetteAndTiprack,
   getTipLengthCalibrations,
 } from '../../../redux/calibration'
 import { getCustomTipRackDefinitions } from '../../../redux/custom-labware'
-import { ChooseTipRack } from '../ChooseTipRack'
-
+import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
+import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
+import { ChooseTipRack } from '../ChooseTipRack'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/pipettes/selectors')

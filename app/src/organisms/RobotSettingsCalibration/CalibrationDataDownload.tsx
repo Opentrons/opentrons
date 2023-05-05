@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { saveAs } from 'file-saver'
-import { useTranslation, Trans } from 'react-i18next'
-
 import {
   Flex,
   Icon,
@@ -12,6 +9,8 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { saveAs } from 'file-saver'
+import { useTranslation, Trans } from 'react-i18next'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'

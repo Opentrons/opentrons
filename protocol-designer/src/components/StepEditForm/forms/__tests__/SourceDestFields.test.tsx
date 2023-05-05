@@ -1,10 +1,11 @@
+import { mount } from 'enzyme'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+
+import { FormData } from '../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
-import { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')

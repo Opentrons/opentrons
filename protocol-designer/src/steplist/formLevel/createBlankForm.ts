@@ -1,6 +1,7 @@
+import { StepType, StepIdType, BlankForm, FormData } from '../../form-types'
 import { i18n } from '../../localization'
 import { getDefaultsForStepType } from './getDefaultsForStepType'
-import { StepType, StepIdType, BlankForm, FormData } from '../../form-types'
+
 interface NewFormArgs {
   stepId: StepIdType
   stepType: StepType

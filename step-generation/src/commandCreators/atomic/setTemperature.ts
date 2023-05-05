@@ -3,9 +3,10 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, SetTemperatureArgs } from '../../types'
+import { uuid } from '../../utils'
 
 /** Set temperature target for specified module. */
 export const setTemperature: CommandCreator<SetTemperatureArgs> = (

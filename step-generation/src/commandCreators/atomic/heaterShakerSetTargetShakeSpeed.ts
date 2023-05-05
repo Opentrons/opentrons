@@ -1,8 +1,10 @@
-import assert from 'assert'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+import assert from 'assert'
+
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, SetShakeSpeedArgs } from '../../types'
+import { uuid } from '../../utils'
+
 export const heaterShakerSetTargetShakeSpeed: CommandCreator<SetShakeSpeedArgs> = (
   args,
   invariantContext,

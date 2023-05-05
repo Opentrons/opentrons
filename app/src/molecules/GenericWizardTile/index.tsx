@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -18,10 +15,14 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons'
+import { getIsOnDevice } from '../../redux/config'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

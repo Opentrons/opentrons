@@ -1,14 +1,15 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
-import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
-import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
+import cx from 'classnames'
+
 import { PathOption } from '../../../../form-types'
+import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
+import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
+import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
+import { i18n } from '../../../../localization'
+import styles from '../../StepEditForm.css'
 import { FieldProps } from '../../types'
 import { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
-import styles from '../../StepEditForm.css'
 
 const PATH_ANIMATION_IMAGES = {
   single: require('../../../../images/path_single.gif'),

@@ -1,17 +1,19 @@
-import assert from 'assert'
-import isUndefined from 'lodash/isUndefined'
-import mapValues from 'lodash/mapValues'
-import omit from 'lodash/omit'
-import omitBy from 'lodash/omitBy'
-import flow from 'lodash/flow'
 import { getLabwareV1Def, getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   FileLabware,
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV1'
-import { FormPatch } from '../../steplist/actions'
+import assert from 'assert'
+import flow from 'lodash/flow'
+import isUndefined from 'lodash/isUndefined'
+import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
+
 import { FormData } from '../../form-types'
+import { FormPatch } from '../../steplist/actions'
+
 export interface PDMetadata {
   pipetteTiprackAssignments: Record<string, string>
   dismissedWarnings: {

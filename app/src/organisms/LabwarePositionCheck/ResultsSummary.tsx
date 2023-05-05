@@ -1,19 +1,8 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
-import { useSelector } from 'react-redux'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
-import {
-  CompletedProtocolAnalysis,
-  getLabwareDefURI,
-  getLabwareDisplayName,
-  getVectorDifference,
-  getVectorSum,
-  IDENTITY_VECTOR,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
-import { NeedHelpLink } from '../CalibrationPanels'
+import type {
+  LabwareOffset,
+  LabwareOffsetCreateData,
+} from '@opentrons/api-client'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -25,18 +14,29 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import {
+  CompletedProtocolAnalysis,
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getVectorDifference,
+  getVectorSum,
+  IDENTITY_VECTOR,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
+import isEqual from 'lodash/isEqual'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
+
+import { StyledText } from '../../atoms/text'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
-
-import type { ResultsSummaryStep, WorkingOffset } from './types'
-import type {
-  LabwareOffset,
-  LabwareOffsetCreateData,
-} from '@opentrons/api-client'
-import { getDisplayLocation } from './utils/getDisplayLocation'
+import { NeedHelpLink } from '../CalibrationPanels'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
+import { getDisplayLocation } from './utils/getDisplayLocation'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

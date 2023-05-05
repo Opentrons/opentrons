@@ -1,14 +1,13 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
-
-import type { State, Dispatch } from '../../../redux/types'
 import type {
   RobotSettings,
   RobotSettingsField,
 } from '../../../redux/robot-settings/types'
+import type { State, Dispatch } from '../../../redux/types'
 import { SettingToggle } from './SettingToggle'
 
 interface RobotSettingsPrivacyProps {

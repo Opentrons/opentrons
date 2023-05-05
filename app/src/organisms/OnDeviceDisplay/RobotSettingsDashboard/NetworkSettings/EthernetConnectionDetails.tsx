@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -13,11 +9,13 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
 import { StyledText } from '../../../../atoms/text'
-import { getNetworkInterfaces, fetchStatus } from '../../../../redux/networking'
 import { getLocalRobot } from '../../../../redux/discovery'
-
+import { getNetworkInterfaces, fetchStatus } from '../../../../redux/networking'
 import type { State, Dispatch } from '../../../../redux/types'
 
 const STRETCH_LIST_STYLE = css`

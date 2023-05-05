@@ -5,13 +5,13 @@ import {
   fileIsBinary,
   parseProtocolData,
 } from '@opentrons/shared-data/js/helpers'
-import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
-
-import type { ProtocolType } from './types'
 import type {
   ProtocolData,
   ProtocolParseErrorHandler,
 } from '@opentrons/shared-data/js/helpers'
+
+import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
+import type { ProtocolType } from './types'
 
 export function filenameToType(filename: string): ProtocolType | null {
   if (fileExtensionIsJson(filename)) return TYPE_JSON

@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import cx from 'classnames'
 import {
   Tooltip,
   DeprecatedPrimaryButton,
@@ -15,19 +13,22 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { stepIconsByType, StepType } from '../form-types'
 import { i18n } from '../localization'
-import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
+import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
+import styles from './listButtons.css'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, StepType } from '../form-types'
-import styles from './listButtons.css'
 
 interface StepButtonComponentProps {
   children: React.ReactNode

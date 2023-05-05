@@ -1,6 +1,7 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { TitledList } from '@opentrons/components'
+import cx from 'classnames'
+
 import styles from './styles.css'
 
 type Props = React.ComponentProps<typeof TitledList>

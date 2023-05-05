@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   BORDERS,
   COLORS,
@@ -14,6 +10,9 @@ import {
   useInterval,
   useMountEffect,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import { Portal } from '../../App/portal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
@@ -27,14 +26,13 @@ import { UpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBui
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
+import type { DiscoveredRobot } from '../../redux/discovery/types'
 import { fetchWifiList, getCanDisconnect } from '../../redux/networking'
-import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
-import { useIsRobotBusy } from './hooks'
-
-import type { DiscoveredRobot } from '../../redux/discovery/types'
+import { checkShellUpdate } from '../../redux/shell'
 import type { Dispatch, State } from '../../redux/types'
+import { useIsRobotBusy } from './hooks'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot

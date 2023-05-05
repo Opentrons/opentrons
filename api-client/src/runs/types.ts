@@ -3,8 +3,10 @@ import type {
   LoadedPipette,
   ModuleModel,
 } from '@opentrons/shared-data'
+
 import type { ResourceLink } from '../types'
 import type { RunCommandSummary } from './commands/types'
+
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const

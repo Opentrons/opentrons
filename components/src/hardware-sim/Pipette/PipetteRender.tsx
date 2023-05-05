@@ -1,10 +1,11 @@
 import * as React from 'react'
-import classNames from 'classnames'
 import {
   getPipetteNameSpecs,
   LabwareDefinition2,
   PipetteName,
 } from '@opentrons/shared-data'
+import classNames from 'classnames'
+
 import { C_MED_DARK_GRAY, C_MED_GRAY } from '../../styles'
 import { RobotCoordsForeignDiv } from '../Deck/RobotCoordsForeignDiv'
 import {
@@ -15,8 +16,8 @@ import {
   MULTI_CHANNEL_CENTER_Y_NOZZLE,
   MULTI_CHANNEL_Y_OFFSET,
 } from './constants'
-import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
+import { EmanatingNozzle } from './EmanatingNozzle'
 import styles from './styles.css'
 
 interface PipetteRenderProps {

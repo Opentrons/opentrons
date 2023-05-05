@@ -2,12 +2,12 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { heaterShaker } from '../commandCreators'
-import { getModuleState } from '../robotStateSelectors'
-import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 
-import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
+import { heaterShaker } from '../commandCreators'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
+import { getModuleState } from '../robotStateSelectors'
+import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
 
 jest.mock('../robotStateSelectors')
 

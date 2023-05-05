@@ -1,33 +1,33 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
-import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import '@testing-library/jest-dom'
 import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks } from 'jest-when'
+import { StaticRouter } from 'react-router-dom'
+
+import { ProtocolDetails } from '..'
 import { i18n } from '../../../i18n'
+import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
 } from '../../../redux/discovery'
-import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
-import { ProtocolDetails } from '..'
-import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
-import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
+import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { ChooseRobotToRunProtocolSlideout } from '../../ChooseRobotToRunProtocolSlideout'
-
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/custom-labware/selectors')

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { TYPOGRAPHY, renderWithProviders } from '@opentrons/components'
+
 import { StyledText } from '../'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {

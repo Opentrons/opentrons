@@ -5,10 +5,11 @@ import {
   LabwareLocation,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-import { getModuleDisplayLocation } from './getModuleDisplayLocation'
-import { getModuleModel } from './getModuleModel'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/'
 import type { TFunction } from 'react-i18next'
+
+import { getModuleDisplayLocation } from './getModuleDisplayLocation'
+import { getModuleModel } from './getModuleModel'
 
 export function getLabwareDisplayLocation(
   robotSideAnalysis: CompletedProtocolAnalysis,

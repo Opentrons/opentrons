@@ -1,11 +1,11 @@
+import type { DeckCalibrationData } from '@opentrons/api-client'
+import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
+
 import {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_BAD_CALIBRATION,
 } from '../../../redux/calibration'
-
-import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 import { useRobot } from './useRobot'
-import type { DeckCalibrationData } from '@opentrons/api-client'
 
 /**
  * Returns deck calibration data, whether deck calibration is done or not,

@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { waitFor } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../../CalibrationPanels'

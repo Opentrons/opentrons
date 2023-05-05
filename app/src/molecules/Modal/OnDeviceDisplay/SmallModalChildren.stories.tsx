@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { SmallModalChildren } from './SmallModalChildren'
 import type { Story, Meta } from '@storybook/react'
+
+import { SmallModalChildren } from './SmallModalChildren'
 
 export default {
   title: 'ODD/Molecules/Modals/SmallModalChildren',

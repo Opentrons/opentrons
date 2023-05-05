@@ -1,3 +1,5 @@
+import { dropTip } from '../commandCreators/atomic/dropTip'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   makeStateArgsStandard,
   makeContext,
@@ -5,9 +7,8 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '../constants'
-import { dropTip } from '../commandCreators/atomic/dropTip'
 import type { InvariantContext, RobotState } from '../types'
+
 describe('dropTip', () => {
   let invariantContext: InvariantContext
   beforeEach(() => {

@@ -1,11 +1,12 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
+
 import * as PipetteConstants from '../../redux/pipettes/constants'
-import { FLOWS, SECTIONS } from './constants'
 import type { Mount } from '../../redux/pipettes/types'
 import type {
   AttachedPipettesFromInstrumentsQuery,
   PipetteInfo,
 } from '../Devices/hooks'
+import { FLOWS, SECTIONS } from './constants'
 import type { PipetteWizardStep } from './types'
 
 export const getPipetteWizardStepsForProtocol = (

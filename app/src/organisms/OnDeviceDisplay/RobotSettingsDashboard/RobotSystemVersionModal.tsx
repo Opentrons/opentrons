@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -15,10 +12,12 @@ import {
   SPACING,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
+import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../molecules/Modal'
 import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
-import { StyledText } from '../../../atoms/text'
 
 interface RobotSystemVersionModalProps {
   version: string

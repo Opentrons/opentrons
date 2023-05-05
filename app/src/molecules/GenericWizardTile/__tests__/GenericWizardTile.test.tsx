@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+
+import { GenericWizardTile } from '..'
 import { i18n } from '../../../i18n'
 import { getIsOnDevice } from '../../../redux/config'
-import { GenericWizardTile } from '..'
 
 jest.mock('../../../redux/config')
 

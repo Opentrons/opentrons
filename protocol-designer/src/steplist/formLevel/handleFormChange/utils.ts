@@ -1,12 +1,14 @@
+import { LabwareDefinition2, PipetteChannels } from '@opentrons/shared-data'
+import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
-import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { LabwareDefinition2, PipetteChannels } from '@opentrons/shared-data'
-import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
-import { FormPatch } from '../../actions/types'
+
 import { FormData, PathOption, StepFieldName } from '../../../form-types'
+import { getPipetteCapacity } from '../../../pipettes/pipetteData'
+import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
+import { FormPatch } from '../../actions/types'
+
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
   fns: Array<(arg0: FormPatch) => FormPatch>

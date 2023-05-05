@@ -1,9 +1,9 @@
 import * as React from 'react'
+import { AlertModal } from '@opentrons/components'
 import { mount } from 'enzyme'
 
-import { AlertModal } from '@opentrons/components'
-import { ProgressBar } from '../progress'
 import { DownloadUpdateModal } from '../DownloadUpdateModal'
+import { ProgressBar } from '../progress'
 
 describe('DownloadUpdateModal', () => {
   const handleClose = jest.fn()

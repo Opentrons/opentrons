@@ -1,6 +1,6 @@
 import * as Yup from 'yup'
+
 import { getAllLoadNames, getAllDisplayNames } from '../definitions'
-import { getDefaultLoadName, getDefaultDisplayName } from './formSelectors'
 import {
   labwareTypeOptions,
   wellBottomShapeOptions,
@@ -21,6 +21,7 @@ import {
   LabwareFields,
 } from './fields'
 import type { ProcessedLabwareFields } from './fields'
+import { getDefaultLoadName, getDefaultDisplayName } from './formSelectors'
 
 // global overrides for Yup's default error messages.
 Yup.setLocale({

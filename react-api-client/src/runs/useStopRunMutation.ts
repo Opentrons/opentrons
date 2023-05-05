@@ -5,13 +5,13 @@ import {
   createRunAction,
 } from '@opentrons/api-client'
 import { useMutation } from 'react-query'
-import { useHost } from '../api'
-
 import type {
   UseMutationResult,
   UseMutateFunction,
   UseMutationOptions,
 } from 'react-query'
+
+import { useHost } from '../api'
 
 export type UseStopRunMutationResult = UseMutationResult<
   RunAction,

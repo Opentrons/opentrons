@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { renderHook } from '@testing-library/react-hooks'
+import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { i18n } from '../../../i18n'
-import { I18nextProvider } from 'react-i18next'
-import { getAllDefs } from '../helpers/getAllDefs'
+import type { Store } from 'redux'
 
+import { i18n } from '../../../i18n'
 import {
   getValidCustomLabware,
   getAddLabwareFailure,
@@ -15,12 +15,10 @@ import {
   mockDefinition,
   mockValidLabware,
 } from '../../../redux/custom-labware/__fixtures__'
-
-import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
-
-import type { Store } from 'redux'
-import type { State } from '../../../redux/types'
 import { FailedLabwareFile } from '../../../redux/custom-labware/types'
+import type { State } from '../../../redux/types'
+import { getAllDefs } from '../helpers/getAllDefs'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 
 jest.mock('../../../redux/custom-labware')
 jest.mock('../helpers/getAllDefs')

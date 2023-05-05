@@ -1,4 +1,6 @@
 // pipette offset calibration types
+import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
+
 import {
   PIP_OFFSET_STEP_SESSION_STARTED,
   PIP_OFFSET_STEP_LABWARE_LOADED,
@@ -11,7 +13,6 @@ import {
   PIP_OFFSET_STEP_SESSION_EXITED,
 } from '../constants'
 import type { CalibrationLabware, SessionCommandString } from '../types'
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 export type PipetteOffsetCalibrationStep =
   | typeof PIP_OFFSET_STEP_SESSION_STARTED

@@ -1,6 +1,6 @@
 import last from 'lodash/last'
+
 import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
-import { stripNoOpCommands } from './stripNoOpCommands'
 import type {
   InvariantContext,
   RobotState,
@@ -8,6 +8,8 @@ import type {
   CurriedCommandCreator,
   RobotStateAndWarnings,
 } from '../types'
+import { stripNoOpCommands } from './stripNoOpCommands'
+
 export const commandCreatorsTimeline = (
   commandCreators: CurriedCommandCreator[],
   invariantContext: InvariantContext,

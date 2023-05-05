@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../i18n'
-import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
-import { HeaterShakerModuleData } from '../../../ModuleCard/HeaterShakerModuleData'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { HeaterShakerModuleData } from '../../../ModuleCard/HeaterShakerModuleData'
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 
 jest.mock('../../../ModuleCard/HeaterShakerModuleData')
 

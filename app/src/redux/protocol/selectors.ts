@@ -1,12 +1,11 @@
-import path from 'path'
-import uniq from 'lodash/uniq'
-import { createSelector } from 'reselect'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import uniq from 'lodash/uniq'
+import path from 'path'
+import { createSelector } from 'reselect'
 
-import { createLogger } from '../../logger'
 import * as PipetteConstants from '../pipettes/constants'
-
+import { createLogger } from '../../logger'
 import type { State } from '../types'
 import type {
   ProtocolData,

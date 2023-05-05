@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { fireEvent, waitFor } from '@testing-library/react'
+
+import { i18n } from '../../../i18n'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerWizard } from '../../Devices/HeaterShakerWizard'

@@ -1,13 +1,12 @@
 // discovery client reducer
+import * as Actions from '../actions'
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
 } from '../../__fixtures__/health'
-
-import * as Actions from '../actions'
-import { reducer, robotsByNameReducer } from '../reducer'
 import type { HealthResponse, ServerHealthResponse } from '../../types'
+import { reducer, robotsByNameReducer } from '../reducer'
 import type { Action, RobotsByNameMap } from '../types'
 
 describe('robotsByName reducer', () => {

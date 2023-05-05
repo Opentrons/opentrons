@@ -1,28 +1,28 @@
 import * as React from 'react'
-import cx from 'classnames'
 import {
   DeprecatedPrimaryButton,
   AlertModal,
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
-import { useBlockingHint } from '../Hints/useBlockingHint'
-import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import { resetScrollElements } from '../../ui/steps/utils'
-import { Portal } from '../portals/MainPageModalPortal'
-import { getUnusedEntities } from './utils'
-import modalStyles from '../modals/modal.css'
-import styles from './FileSidebar.css'
+import type { CreateCommand, ProtocolFile } from '@opentrons/shared-data'
+import cx from 'classnames'
 
-import { HintKey } from '../../tutorial'
+import { i18n } from '../../localization'
 import type {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
-import type { CreateCommand, ProtocolFile } from '@opentrons/shared-data'
+import { HintKey } from '../../tutorial'
+import { resetScrollElements } from '../../ui/steps/utils'
+import { useBlockingHint } from '../Hints/useBlockingHint'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import modalStyles from '../modals/modal.css'
+import { Portal } from '../portals/MainPageModalPortal'
+import styles from './FileSidebar.css'
+import { getUnusedEntities } from './utils'
 
 export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown

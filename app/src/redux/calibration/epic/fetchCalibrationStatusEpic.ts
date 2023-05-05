@@ -1,10 +1,9 @@
 import { ofType } from 'redux-observable'
 
-import { GET } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
-
+import { GET } from '../../robot-api/constants'
+import { mapToRobotApiRequest } from '../../robot-api/operators'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,

@@ -1,21 +1,22 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+import { ProtocolSetupLiquids } from '..'
 import { i18n } from '../../../i18n'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { getTotalVolumePerLiquidId } from '../../Devices/ProtocolRun/SetupLiquids/utils'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { LiquidDetails } from '../LiquidDetails'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import {
   MOCK_LABWARE_INFO_BY_LIQUID_ID,
   MOCK_LIQUIDS_IN_LOAD_ORDER,
   MOCK_PROTOCOL_ANALYSIS,
 } from '../fixtures'
-import { ProtocolSetupLiquids } from '..'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { LiquidDetails } from '../LiquidDetails'
 
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
 jest.mock('../../../atoms/buttons')

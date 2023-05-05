@@ -1,6 +1,6 @@
-import path from 'path'
-import glob from 'glob'
 import Ajv from 'ajv'
+import glob from 'glob'
+import path from 'path'
 
 import schema from '../../labware/schemas/2.json'
 import type { LabwareDefinition2, LabwareWell } from '../types'

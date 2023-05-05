@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+
+import { AddCustomLabwareSlideout } from '..'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_ADD_CUSTOM_LABWARE,
 } from '../../../redux/analytics'
-import { AddCustomLabwareSlideout } from '..'
 
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../pages/Labware/helpers/getAllDefs')

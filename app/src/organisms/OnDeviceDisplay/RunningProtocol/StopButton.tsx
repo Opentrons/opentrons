@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
 import {
   Icon,
   Btn,
@@ -9,6 +7,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 const STOP_BUTTON_STYLE = css`
   display: flex;

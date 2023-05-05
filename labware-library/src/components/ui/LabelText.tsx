@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+
 import styles from './styles.css'
 
 export type LabelPosition = 'top' | 'left'

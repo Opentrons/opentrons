@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../i18n'
-import { RenderResult } from '../RenderResult'
 import { CalibrationResult } from '../CalibrationResult'
+import { RenderResult } from '../RenderResult'
 
 jest.mock('../RenderResult')
 

@@ -2,6 +2,7 @@
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
 import { of, interval, concat, EMPTY } from 'rxjs'
+import type { Observable } from 'rxjs'
 import {
   filter,
   map,
@@ -18,9 +19,7 @@ import {
   finishDiscovery,
   removeRobot,
 } from '../discovery/actions'
-
-import { GET, POST, fetchRobotApi } from '../robot-api'
-
+import type { ViewableRobot } from '../discovery/types'
 import {
   RESTART_PATH,
   RESTART_STATUS_CHANGED,
@@ -28,14 +27,10 @@ import {
   RESTART_TIMED_OUT_STATUS,
   restartRobotSuccess,
 } from '../robot-admin'
-
-import {
-  getBuildrootTargetVersion,
-  getBuildrootSession,
-  getBuildrootRobotName,
-  getBuildrootRobot,
-} from './selectors'
-
+import type { RestartStatusChangedAction } from '../robot-admin/types'
+import { GET, POST, fetchRobotApi } from '../robot-api'
+import type { RobotApiResponse } from '../robot-api/types'
+import type { State, Action, Epic } from '../types'
 import {
   startBuildrootUpdate,
   startBuildrootPremigration,
@@ -47,7 +42,6 @@ import {
   setBuildrootSessionStep,
   unexpectedBuildrootError,
 } from './actions'
-
 import {
   PREMIGRATION_RESTART,
   GET_TOKEN,
@@ -63,13 +57,12 @@ import {
   BR_CREATE_SESSION,
   BR_CREATE_SESSION_SUCCESS,
 } from './constants'
-
-import type { Observable } from 'rxjs'
-import type { State, Action, Epic } from '../types'
-import type { ViewableRobot } from '../discovery/types'
-import type { RobotApiResponse } from '../robot-api/types'
-import type { RestartStatusChangedAction } from '../robot-admin/types'
-
+import {
+  getBuildrootTargetVersion,
+  getBuildrootSession,
+  getBuildrootRobotName,
+  getBuildrootRobot,
+} from './selectors'
 import type {
   BuildrootAction,
   StartBuildrootUpdateAction,

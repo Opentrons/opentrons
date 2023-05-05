@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
-import { MixForm } from '../MixForm'
-import { AspDispSection } from '../AspDispSection'
+
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { FormData } from '../../../../form-types'
 import { WellOrderField } from '../../fields'
+import { AspDispSection } from '../AspDispSection'
+import { MixForm } from '../MixForm'
 
 const { DelayFields } = jest.requireActual('../../fields')
 

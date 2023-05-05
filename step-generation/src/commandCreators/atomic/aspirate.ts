@@ -1,5 +1,9 @@
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
@@ -12,9 +16,6 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
 } from '../../utils'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Aspirate with given args. Requires tip. */
 export const aspirate: CommandCreator<AspirateParams> = (

@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-import { format, formatDistance } from 'date-fns'
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -15,12 +12,14 @@ import {
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
+import type { UseLongPressResult } from '@opentrons/components'
+import type { ProtocolResource } from '@opentrons/shared-data'
+import { format, formatDistance } from 'date-fns'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 import { StyledText } from '../../../atoms/text'
 import { LongPressModal } from './LongPressModal'
-
-import type { UseLongPressResult } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
 
 export type CardSizeType = 'full' | 'half' | 'regular'
 

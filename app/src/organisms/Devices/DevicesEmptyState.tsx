@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-
 import {
   Box,
   Flex,
@@ -17,9 +14,11 @@ import {
   PrimaryButton,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
-import { startDiscovery } from '../../redux/discovery'
 import { StyledText } from '../../atoms/text'
+import { startDiscovery } from '../../redux/discovery'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

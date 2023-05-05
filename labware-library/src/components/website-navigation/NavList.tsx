@@ -1,12 +1,13 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { ClickOutside } from '@opentrons/components'
+import cx from 'classnames'
+
 import { aboutLinkProps, applicationLinkProps } from './nav-data'
 import { NavMenu } from './NavMenu'
 import { ProductMenu } from './ProductMenu'
 import { ProtocolMenu } from './ProtocolMenu'
-import { SupportMenu } from './SupportMenu'
 import styles from './styles.css'
+import { SupportMenu } from './SupportMenu'
 import type { MenuName } from './types'
 
 interface State {

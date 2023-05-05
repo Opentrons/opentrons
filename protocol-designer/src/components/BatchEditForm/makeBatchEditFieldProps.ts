@@ -1,14 +1,16 @@
 import noop from 'lodash/noop'
+
+import { StepFieldName } from '../../form-types'
 import {
   DisabledFields,
   MultiselectFieldValues,
 } from '../../ui/steps/selectors'
+import { FieldPropsByName } from '../StepEditForm/types'
 import {
   getFieldDefaultTooltip,
   getFieldIndeterminateTooltip,
 } from '../StepEditForm/utils'
-import { FieldPropsByName } from '../StepEditForm/types'
-import { StepFieldName } from '../../form-types'
+
 export const makeBatchEditFieldProps = (
   fieldValues: MultiselectFieldValues,
   disabledFields: DisabledFields,

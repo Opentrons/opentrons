@@ -1,6 +1,6 @@
-import { getLoadedModule } from './accessors'
-
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+import { getLoadedModule } from './accessors'
 
 export function getModuleDisplayLocation(
   analysis: CompletedProtocolAnalysis,

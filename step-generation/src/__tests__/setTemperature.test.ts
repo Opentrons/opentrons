@@ -1,5 +1,5 @@
-import { getStateAndContextTempTCModules } from '../fixtures'
 import { setTemperature } from '../commandCreators/atomic/setTemperature'
+import { getStateAndContextTempTCModules } from '../fixtures'
 import type { InvariantContext, RobotState, SetTemperatureArgs } from '../types'
 
 const temperatureModuleId = 'temperatureModuleId'

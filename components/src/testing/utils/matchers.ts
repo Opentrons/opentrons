@@ -1,5 +1,5 @@
-import { when } from 'jest-when'
 import type { Matcher } from '@testing-library/react'
+import { when } from 'jest-when'
 
 // these are needed because under the hood react calls components with two arguments (props and some second argument nobody seems to know)
 // https://github.com/timkindberg/jest-when/issues/66

@@ -1,9 +1,9 @@
-import { getLoadedModule } from './accessors'
-
 import type {
   ModuleModel,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
+
+import { getLoadedModule } from './accessors'
 
 export function getModuleModel(
   analysis: CompletedProtocolAnalysis,

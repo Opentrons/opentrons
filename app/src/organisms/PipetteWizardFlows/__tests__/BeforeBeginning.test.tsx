@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -7,9 +6,11 @@ import {
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+import { fireEvent, waitFor } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 // import { NeedHelpLink } from '../../CalibrationPanels'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'

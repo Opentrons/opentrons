@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -15,9 +13,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import { Skeleton } from '../../atoms/Skeleton'
+import { StyledText } from '../../atoms/text'
+import { getIsOnDevice } from '../../redux/config'
 
 interface Props extends StyleProps {
   iconColor: string

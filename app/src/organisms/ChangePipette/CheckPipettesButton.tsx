@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { usePipettesQuery } from '@opentrons/react-api-client'
-import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 import {
   Icon,
   DIRECTION_ROW,
@@ -12,6 +9,10 @@ import {
   SIZE_1,
   PrimaryButton,
 } from '@opentrons/components'
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+
+import { StyledText } from '../../atoms/text'
 import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {

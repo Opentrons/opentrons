@@ -1,8 +1,13 @@
 import * as React from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
+
+import { FormData, StepType } from '../../form-types'
 import { StepFieldName } from '../../steplist/fieldLevel'
+import formStyles from '../forms/forms.css'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
+import { ButtonRow } from './ButtonRow'
+import { FormAlerts } from './FormAlerts'
 import {
   MixForm,
   MoveLiquidForm,
@@ -12,11 +17,7 @@ import {
   ThermocyclerForm,
   HeaterShakerForm,
 } from './forms'
-import { FormAlerts } from './FormAlerts'
-import { ButtonRow } from './ButtonRow'
-import formStyles from '../forms/forms.css'
 import styles from './StepEditForm.css'
-import { FormData, StepType } from '../../form-types'
 import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
 type StepFormMap = {

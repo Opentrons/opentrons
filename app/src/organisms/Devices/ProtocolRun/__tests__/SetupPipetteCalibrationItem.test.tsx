@@ -1,14 +1,13 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
 import { useDeckCalibrationData } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
-import { MemoryRouter } from 'react-router-dom'
 
 jest.mock('../../hooks')
 

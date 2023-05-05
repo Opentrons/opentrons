@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import { DeprecatedCheckboxField } from '../DeprecatedCheckboxField'
 import { Icon } from '../../icons'
+import { DeprecatedCheckboxField } from '../DeprecatedCheckboxField'
 
 describe('DeprecatedCheckboxField', () => {
   describe('DeprecatedCheckboxField', () => {

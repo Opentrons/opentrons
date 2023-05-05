@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import capitalize from 'lodash/capitalize'
-import { makeMaskToDecimal } from '../../fieldMasks'
-import { displayAsTube, getLabwareName } from '../../utils'
-import { LabwareFields } from '../../fields'
-import { FormAlerts } from '../alerts/FormAlerts'
-import { wellShapeOptionsWithIcons } from '../optionsWithImages'
-import { TextField } from '../TextField'
-import { RadioField } from '../RadioField'
-import { WellXYImg } from '../diagrams'
-import { SectionBody } from './SectionBody'
 
+import { makeMaskToDecimal } from '../../fieldMasks'
+import { LabwareFields } from '../../fields'
 import styles from '../../styles.css'
+import { displayAsTube, getLabwareName } from '../../utils'
+import { FormAlerts } from '../alerts/FormAlerts'
+import { WellXYImg } from '../diagrams'
+import { wellShapeOptionsWithIcons } from '../optionsWithImages'
+import { RadioField } from '../RadioField'
+import { TextField } from '../TextField'
+import { SectionBody } from './SectionBody'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

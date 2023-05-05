@@ -1,16 +1,15 @@
-import semver from 'semver'
 import { createSelector } from 'reselect'
+import semver from 'semver'
 
+import * as Constants from './constants'
 import {
   HEALTH_STATUS_OK,
   getViewableRobots,
   getRobotApiVersion,
   getRobotByName,
 } from '../discovery'
-import * as Constants from './constants'
-
-import type { State } from '../types'
 import type { ViewableRobot } from '../discovery/types'
+import type { State } from '../types'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,

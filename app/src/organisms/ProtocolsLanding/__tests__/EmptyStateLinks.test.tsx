@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import '@testing-library/jest-dom'
 import { BrowserRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import { EmptyStateLinks } from '../EmptyStateLinks'
 

@@ -1,9 +1,10 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
-import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
-import { getLabwareLocation } from '../getLabwareLocation'
-import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
 import type { LoadedModule, ProtocolAnalysisFile } from '@opentrons/shared-data'
+import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+
+import { getLabwareLocation } from '../getLabwareLocation'
+import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
+import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
 
 jest.mock('../getLabwareLocation')
 jest.mock('../getModuleInitialLoadInfo')

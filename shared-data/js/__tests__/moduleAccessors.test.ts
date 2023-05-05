@@ -1,11 +1,4 @@
 import {
-  getModuleDef2,
-  getModuleType,
-  getModuleDisplayName,
-  normalizeModuleModel,
-} from '../modules'
-
-import {
   MODULE_MODELS,
   MODULE_TYPES,
   TEMPDECK,
@@ -15,6 +8,12 @@ import {
   TEMPERATURE_MODULE_V1,
   THERMOCYCLER_MODULE_V1,
 } from '../constants'
+import {
+  getModuleDef2,
+  getModuleType,
+  getModuleDisplayName,
+  normalizeModuleModel,
+} from '../modules'
 
 describe('all valid models work', () => {
   MODULE_MODELS.forEach(model => {

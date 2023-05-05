@@ -1,19 +1,17 @@
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-
-import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '..'
-
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
 
 jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')

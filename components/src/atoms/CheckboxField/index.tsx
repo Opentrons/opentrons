@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { Flex, Box } from '../../primitives'
+
 import { Icon } from '../../icons'
+import { Flex, Box } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 export interface CheckboxFieldProps {
   /** change handler */

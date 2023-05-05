@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   DIRECTION_ROW,
   Flex,
@@ -12,9 +10,11 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
-
 import type { AttachedModule } from '../../redux/modules/types'
 
 interface FirmwareUpdateFailedModalProps {

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Flex, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-
 import type { StyleProps } from '@opentrons/components'
+
+import { StyledText } from '../../atoms/text'
 
 interface OffsetVectorProps extends StyleProps {
   x: number

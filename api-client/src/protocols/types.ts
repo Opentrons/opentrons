@@ -3,6 +3,7 @@ import type {
   PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
+
 import type { ResourceLinks } from '../types'
 
 export interface ProtocolMetadata {

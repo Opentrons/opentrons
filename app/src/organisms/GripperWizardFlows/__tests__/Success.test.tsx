@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
 
-import { Success } from '../Success'
+import { i18n } from '../../../i18n'
 import {
   SECTIONS,
   SUCCESSFULLY_ATTACHED,
@@ -10,6 +9,7 @@ import {
   SUCCESSFULLY_CALIBRATED,
   SUCCESSFULLY_DETACHED,
 } from '../constants'
+import { Success } from '../Success'
 
 describe('Success', () => {
   let render: (

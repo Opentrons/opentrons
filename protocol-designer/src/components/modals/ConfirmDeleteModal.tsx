@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
+
 import { i18n } from '../../localization'
 import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from './modal.css'

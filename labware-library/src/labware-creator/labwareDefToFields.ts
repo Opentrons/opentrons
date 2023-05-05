@@ -1,8 +1,9 @@
-import { getUniqueWellProperties } from '../labwareInference'
 import type {
   LabwareDefinition2,
   LabwareWellGroup,
 } from '@opentrons/shared-data'
+
+import { getUniqueWellProperties } from '../labwareInference'
 import type { LabwareFields, BooleanString } from './fields'
 
 // NOTE: this is just String() with some typing for flow

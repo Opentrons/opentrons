@@ -1,13 +1,10 @@
 import * as React from 'react'
-import map from 'lodash/map'
-import omit from 'lodash/omit'
-import isEmpty from 'lodash/isEmpty'
-import startCase from 'lodash/startCase'
-import { format } from 'date-fns'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
+import {
+  parseInitialPipetteNamesByMount,
+  parseInitialLoadedModulesBySlot,
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedLabwareByModuleId,
+} from '@opentrons/api-client'
 import {
   Box,
   Btn,
@@ -30,13 +27,16 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import {
-  parseInitialPipetteNamesByMount,
-  parseInitialLoadedModulesBySlot,
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-} from '@opentrons/api-client'
 import { protocolHasLiquids } from '@opentrons/shared-data'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
+import { format } from 'date-fns'
+import isEmpty from 'lodash/isEmpty'
+import map from 'lodash/map'
+import omit from 'lodash/omit'
+import startCase from 'lodash/startCase'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -51,21 +51,19 @@ import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
 } from '../../redux/protocol-storage'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { State, Dispatch } from '../../redux/types'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
+import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
-
-import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
-import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { State, Dispatch } from '../../redux/types'
 
 const GRID_STYLE = css`
   display: grid;

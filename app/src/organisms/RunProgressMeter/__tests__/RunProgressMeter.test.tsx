@@ -1,25 +1,25 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useAllCommandsQuery,
   useCommandQuery,
 } from '@opentrons/react-api-client'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { when, resetAllWhenMocks } from 'jest-when'
 
-import { i18n } from '../../../i18n'
+import { RunProgressMeter } from '..'
 import { ProgressBar } from '../../../atoms/ProgressBar'
-import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useLastRunCommandKey } from '../../Devices/hooks/useLastRunCommandKey'
+import { i18n } from '../../../i18n'
 import { useDownloadRunLog } from '../../Devices/hooks'
+import { useLastRunCommandKey } from '../../Devices/hooks/useLastRunCommandKey'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
   mockUseCommandResultNonDeterministic,
   NON_DETERMINISTIC_COMMAND_ID,
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
-import { RunProgressMeter } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../RunTimeControl/hooks')

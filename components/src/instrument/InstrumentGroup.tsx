@@ -1,8 +1,7 @@
 import * as React from 'react'
 
-import { InstrumentInfo } from './InstrumentInfo'
 import styles from './instrument.css'
-
+import { InstrumentInfo } from './InstrumentInfo'
 import type { InstrumentInfoProps } from './InstrumentInfo'
 
 export interface InstrumentGroupProps {

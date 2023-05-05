@@ -1,7 +1,9 @@
 import * as React from 'react'
-import toPairs from 'lodash/toPairs'
-import pick from 'lodash/pick'
 import { AlertItem } from '@opentrons/components'
+import type { FormikTouched, FormikErrors } from 'formik'
+import pick from 'lodash/pick'
+import toPairs from 'lodash/toPairs'
+
 import {
   getLabel,
   LabwareFields,
@@ -16,7 +18,6 @@ import {
 } from '../../fields'
 import { LinkOut } from '../LinkOut'
 
-import type { FormikTouched, FormikErrors } from 'formik'
 export interface Props {
   values: LabwareFields
   fieldList: Array<keyof LabwareFields>

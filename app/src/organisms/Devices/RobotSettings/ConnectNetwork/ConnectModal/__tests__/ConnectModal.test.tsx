@@ -1,15 +1,13 @@
 import * as React from 'react'
-import { Formik } from 'formik'
 import { shallow, mount } from 'enzyme'
+import type { ShallowWrapper } from 'enzyme'
+import { Formik } from 'formik'
 
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import * as FormFields from '../form-fields'
-
 import { ConnectModal, ConnectModalComponent } from '..'
-import { FormModal } from '../FormModal'
 import { ConnectFormField } from '../../types'
-
-import type { ShallowWrapper } from 'enzyme'
+import { FormModal } from '../FormModal'
 
 jest.mock('../form-fields')
 

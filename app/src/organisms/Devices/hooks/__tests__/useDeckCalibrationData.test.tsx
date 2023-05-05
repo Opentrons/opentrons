@@ -1,24 +1,22 @@
 import * as React from 'react'
+import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 
+import { useDeckCalibrationData } from '..'
 import {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_BAD_CALIBRATION,
   DECK_CAL_STATUS_IDENTITY,
 } from '../../../../redux/calibration'
-import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
-
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-
-import { useDeckCalibrationData } from '..'
+import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { useDispatchApiRequest } from '../../../../redux/robot-api'
+import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/calibration')

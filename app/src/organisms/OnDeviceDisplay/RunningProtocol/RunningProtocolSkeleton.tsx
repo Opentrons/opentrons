@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -10,11 +9,10 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { Skeleton } from '../../../atoms/Skeleton'
+import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtocol'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import { Skeleton } from '../../../atoms/Skeleton'
-
-import type { ScreenOption } from '../../../pages/OnDeviceDisplay/RunningProtocol'
 
 const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
 const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen

@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Flex,
   Icon,
@@ -16,10 +13,11 @@ import {
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { IconName, IconProps, StyleProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { StyledText } from '../text'
-
-import type { IconName, IconProps, StyleProps } from '@opentrons/components'
 
 export const SUCCESS_TOAST: 'success' = 'success'
 export const WARNING_TOAST: 'warning' = 'warning'

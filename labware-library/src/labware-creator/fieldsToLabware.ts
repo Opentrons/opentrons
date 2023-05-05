@@ -1,15 +1,14 @@
 import {
   createRegularLabware,
-  LabwareWellGroup,
-  //   createIrregularLabware,
+  LabwareWellGroup, //   createIrregularLabware,
 } from '@opentrons/shared-data'
-import { DISPLAY_VOLUME_UNITS } from './fields'
-
 import type {
   LabwareDefinition2,
   LabwareDisplayCategory,
   LabwareWellProperties,
 } from '@opentrons/shared-data'
+
+import { DISPLAY_VOLUME_UNITS } from './fields'
 import type { ProcessedLabwareFields } from './fields'
 import { getIsCustomTubeRack } from './utils'
 

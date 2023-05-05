@@ -1,5 +1,5 @@
-import head from 'lodash/head'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import head from 'lodash/head'
 
 import { getLatestLabwareDef } from './getLabware'
 

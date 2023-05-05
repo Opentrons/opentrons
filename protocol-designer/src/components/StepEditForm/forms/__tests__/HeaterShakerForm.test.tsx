@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import {
   DropdownOption,
   renderWithProviders,
   partialComponentPropsMatcher,
 } from '@opentrons/components'
-import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import { i18n } from '../../../../localization'
+import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import { StepFormDropdown, TextField, ToggleRowField } from '../../fields'
 import { HeaterShakerForm } from '../HeaterShakerForm'
 

@@ -1,4 +1,5 @@
 import { InnerDelayArgs } from '@opentrons/step-generation'
+
 import { getDefaultMmFromBottom } from '../../../components/StepEditForm/fields/TipPositionField/utils'
 import {
   DelayCheckboxFields,
@@ -6,6 +7,7 @@ import {
   HydratedMoveLiquidFormData,
   HydratedMixFormDataLegacy,
 } from '../../../form-types'
+
 export function getMoveLiquidDelayData(
   hydratedFormData: HydratedMoveLiquidFormData['fields'],
   checkboxField: DelayCheckboxFields,

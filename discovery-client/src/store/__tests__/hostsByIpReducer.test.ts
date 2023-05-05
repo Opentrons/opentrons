@@ -1,4 +1,6 @@
 // discovery client reducer
+import * as Constants from '../../constants'
+import * as Actions from '../actions'
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
@@ -9,11 +11,7 @@ import {
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
 } from '../../__fixtures__/health'
-
-import * as Constants from '../../constants'
-import * as Actions from '../actions'
 import { reducer, hostsByIpReducer } from '../reducer'
-
 import type { Action } from '../types'
 
 describe('hostsByIp reducer', () => {

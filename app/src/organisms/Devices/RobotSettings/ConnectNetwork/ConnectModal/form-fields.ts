@@ -2,7 +2,6 @@ import get from 'lodash/get'
 
 import * as Constants from '../constants'
 import * as Copy from '../i18n'
-
 import type {
   WifiNetwork,
   WifiKey,

@@ -1,4 +1,29 @@
 import {
+  LabwareEntity,
+  PipetteEntity,
+  InvariantContext,
+} from '@opentrons/step-generation'
+
+import {
+  MIN_TEMP_MODULE_TEMP,
+  MAX_TEMP_MODULE_TEMP,
+  MIN_HEATER_SHAKER_MODULE_TEMP,
+  MAX_HEATER_SHAKER_MODULE_TEMP,
+  MIN_TC_BLOCK_TEMP,
+  MAX_TC_BLOCK_TEMP,
+  MIN_TC_LID_TEMP,
+  MAX_TC_LID_TEMP,
+  MIN_TC_DURATION_SECONDS,
+  MAX_TC_DURATION_SECONDS,
+  MIN_HEATER_SHAKER_MODULE_RPM,
+  MAX_HEATER_SHAKER_MODULE_RPM,
+  MIN_HEATER_SHAKER_DURATION_SECONDS,
+  MAX_HEATER_SHAKER_DURATION_SECONDS,
+  MIN_TC_PROFILE_VOLUME,
+  MAX_TC_PROFILE_VOLUME,
+} from '../../constants'
+import { StepFieldName } from '../../form-types'
+import {
   requiredField,
   minimumWellCount,
   nonZero,
@@ -19,30 +44,7 @@ import {
   ValueMasker,
   ValueCaster,
 } from './processing'
-import {
-  MIN_TEMP_MODULE_TEMP,
-  MAX_TEMP_MODULE_TEMP,
-  MIN_HEATER_SHAKER_MODULE_TEMP,
-  MAX_HEATER_SHAKER_MODULE_TEMP,
-  MIN_TC_BLOCK_TEMP,
-  MAX_TC_BLOCK_TEMP,
-  MIN_TC_LID_TEMP,
-  MAX_TC_LID_TEMP,
-  MIN_TC_DURATION_SECONDS,
-  MAX_TC_DURATION_SECONDS,
-  MIN_HEATER_SHAKER_MODULE_RPM,
-  MAX_HEATER_SHAKER_MODULE_RPM,
-  MIN_HEATER_SHAKER_DURATION_SECONDS,
-  MAX_HEATER_SHAKER_DURATION_SECONDS,
-  MIN_TC_PROFILE_VOLUME,
-  MAX_TC_PROFILE_VOLUME,
-} from '../../constants'
-import {
-  LabwareEntity,
-  PipetteEntity,
-  InvariantContext,
-} from '@opentrons/step-generation'
-import { StepFieldName } from '../../form-types'
+
 export type { StepFieldName }
 
 const getLabwareEntity = (

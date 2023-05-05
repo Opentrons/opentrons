@@ -1,16 +1,18 @@
-import assert from 'assert'
 import { getIsTiprack } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+import assert from 'assert'
+
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { ThunkAction } from '../../types'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import { ThunkAction } from '../../types'
+
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {

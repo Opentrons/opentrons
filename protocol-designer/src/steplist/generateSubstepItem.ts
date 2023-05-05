@@ -1,8 +1,3 @@
-import assert from 'assert'
-import cloneDeep from 'lodash/cloneDeep'
-import range from 'lodash/range'
-import mapValues from 'lodash/mapValues'
-import isEmpty from 'lodash/isEmpty'
 import {
   consolidate,
   distribute,
@@ -10,9 +5,6 @@ import {
   mix,
   curryCommandCreator,
 } from '@opentrons/step-generation'
-import { substepTimeline } from './substepTimeline'
-import * as steplistUtils from './utils'
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import type {
   CurriedCommandCreator,
   InvariantContext,
@@ -22,7 +14,16 @@ import type {
   MixArgs,
   TransferArgs,
 } from '@opentrons/step-generation'
+import assert from 'assert'
+import cloneDeep from 'lodash/cloneDeep'
+import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
+import range from 'lodash/range'
+
+import * as steplistUtils from './utils'
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import { StepIdType } from '../form-types'
+import { substepTimeline } from './substepTimeline'
 import {
   NamedIngred,
   StepArgsAndErrors,
@@ -32,6 +33,7 @@ import {
   SubstepTimelineFrame,
   LabwareNamesByModuleId,
 } from './types'
+
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =
   | ConsolidateArgs

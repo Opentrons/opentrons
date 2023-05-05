@@ -1,11 +1,10 @@
+import { DispatchRequestsType } from '../../redux/robot-api'
+import type { PipetteOffsetCalibrationStep } from '../../redux/sessions/pipette-offset-calibration/types'
 import type {
   SessionCommandParams,
   PipetteOffsetCalibrationSession,
   CalibrationLabware,
 } from '../../redux/sessions/types'
-
-import type { PipetteOffsetCalibrationStep } from '../../redux/sessions/pipette-offset-calibration/types'
-import { DispatchRequestsType } from '../../redux/robot-api'
 
 export interface CalibratePipetteOffsetParentProps {
   robotName: string

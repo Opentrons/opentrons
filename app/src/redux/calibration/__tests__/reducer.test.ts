@@ -1,9 +1,9 @@
 import * as Fixtures from '../__fixtures__'
+import * as Actions from '../actions'
 import * as PipetteOffset from '../pipette-offset'
 import * as PipetteOffsetFixtures from '../pipette-offset/__fixtures__'
 import * as TipLength from '../tip-length'
 import * as TipLengthFixtures from '../tip-length/__fixtures__'
-import * as Actions from '../actions'
 import { calibrationReducer } from '../reducer'
 
 describe('calibration reducer', () => {

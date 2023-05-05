@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,15 +12,17 @@ import {
   JUSTIFY_CENTER,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
-import { StyledText } from '../../../atoms/text'
 import { TertiaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
 import { getLocalRobot } from '../../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
-
 import type { Dispatch, State } from '../../../redux/types'
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
-import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
 
 interface SelectAuthenticationTypeProps {
   ssid: string

@@ -1,13 +1,12 @@
 // simple fetch wrapper to format URL for robot and parse JSON response
-import { of, from } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
 import mapValues from 'lodash/mapValues'
-import toString from 'lodash/toString'
 import omitBy from 'lodash/omitBy'
+import toString from 'lodash/toString'
+import { of, from } from 'rxjs'
+import type { Observable } from 'rxjs'
+import { map, switchMap, catchError } from 'rxjs/operators'
 
 import { HTTP_API_VERSION } from './constants'
-
-import type { Observable } from 'rxjs'
 import type {
   RobotHost,
   RobotApiRequestOptions,

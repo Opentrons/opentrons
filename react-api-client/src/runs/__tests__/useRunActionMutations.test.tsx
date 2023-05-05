@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook } from '@testing-library/react-hooks'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { RUN_ID_1 } from '../__fixtures__'
 import {
   useRunActionMutations,
   UsePlayRunMutationResult,
@@ -12,6 +11,7 @@ import {
   usePauseRunMutation,
   useStopRunMutation,
 } from '..'
+import { RUN_ID_1 } from '../__fixtures__'
 
 jest.mock('../usePlayRunMutation')
 jest.mock('../usePauseRunMutation')

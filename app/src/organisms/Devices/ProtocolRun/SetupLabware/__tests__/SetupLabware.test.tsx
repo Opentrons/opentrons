@@ -1,14 +1,13 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { SetupLabware } from '..'
 import { i18n } from '../../../../../i18n'
-import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
-import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
-import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
+import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import {
   useLPCDisabledReason,
   useProtocolDetailsForRun,
@@ -16,9 +15,10 @@ import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../../hooks'
+import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
+import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
-import { SetupLabware } from '..'
 
 jest.mock('../SetupLabwareList')
 jest.mock('../SetupLabwareMap')

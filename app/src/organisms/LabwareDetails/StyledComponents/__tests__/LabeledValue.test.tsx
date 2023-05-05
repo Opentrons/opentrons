@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+
 import { LabeledValue } from '../LabeledValue'
 
 const render = (props: React.ComponentProps<typeof LabeledValue>) => {

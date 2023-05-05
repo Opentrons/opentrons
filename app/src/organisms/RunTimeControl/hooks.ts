@@ -1,6 +1,4 @@
-import last from 'lodash/last'
 import * as React from 'react'
-
 import {
   RUN_ACTION_TYPE_PLAY,
   RUN_ACTION_TYPE_PAUSE,
@@ -13,15 +11,16 @@ import {
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
+import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import last from 'lodash/last'
+import { UseQueryOptions } from 'react-query'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useRunCommands,
 } from '../ProtocolUpload/hooks'
-import { UseQueryOptions } from 'react-query'
-import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 
 export interface RunControls {
   play: () => void

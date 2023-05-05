@@ -1,4 +1,5 @@
 import { GEN_ONE_MULTI_PIPETTES } from '@opentrons/shared-data'
+
 import { MODULES_WITH_COLLISION_ISSUES } from '../constants'
 import type {
   DeckSlot,
@@ -6,6 +7,7 @@ import type {
   InvariantContext,
   RobotState,
 } from '../types'
+
 export const modulePipetteCollision = (args: {
   pipette: string | null | undefined
   labware: string | null | undefined

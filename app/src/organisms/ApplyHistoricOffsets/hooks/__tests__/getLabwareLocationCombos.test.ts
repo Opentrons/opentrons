@@ -1,12 +1,11 @@
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
-import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 import {
   getLabwareDefURI,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+
+import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const mockLoadLabwareCommands: RunTimeCommand[] = [

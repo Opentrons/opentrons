@@ -4,6 +4,13 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+
+import {
+  sortLabwareBySlot,
+  getNextTiprack,
+  _getNextTip,
+  getModuleState,
+} from '../'
 import {
   makeContext,
   makeState,
@@ -11,13 +18,8 @@ import {
   getTiprackTipstate,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import {
-  sortLabwareBySlot,
-  getNextTiprack,
-  _getNextTip,
-  getModuleState,
-} from '../'
 import { InvariantContext } from '../types'
+
 let invariantContext: InvariantContext
 
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2

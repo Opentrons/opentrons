@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -12,27 +9,28 @@ import {
   TOOLTIP_LEFT,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
+import * as Calibration from '../../redux/calibration'
+import * as Config from '../../redux/config'
+import * as Pipettes from '../../redux/pipettes'
+import * as Sessions from '../../redux/sessions'
 import { Portal } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {
-  useTrackEvent,
-  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
-} from '../../redux/analytics'
-import * as Calibration from '../../redux/calibration'
-import * as Config from '../../redux/config'
-import * as Pipettes from '../../redux/pipettes'
-import * as Sessions from '../../redux/sessions'
-import {
   useDeckCalibrationStatus,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStatuses,
 } from '../../organisms/Devices/hooks'
-
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../redux/analytics'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,

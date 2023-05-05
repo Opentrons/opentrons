@@ -1,13 +1,7 @@
+import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import { when } from 'jest-when'
-import {
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
+
+import { dispense } from '../commandCreators/atomic/dispense'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
@@ -17,9 +11,16 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
-import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import {
+  thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+} from '../utils'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/heaterShakerCollision')

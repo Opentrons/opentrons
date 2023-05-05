@@ -1,6 +1,6 @@
 import * as React from 'react'
-import styled, { FlattenSimpleInterpolation, css } from 'styled-components'
 import { Text, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
+import styled, { FlattenSimpleInterpolation, css } from 'styled-components'
 
 export interface Props extends React.ComponentProps<typeof Text> {
   children: React.ReactNode

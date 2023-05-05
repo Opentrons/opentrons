@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
@@ -8,16 +6,18 @@ import {
   Btn,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { UNREACHABLE } from '../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
-import { UpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
-
 import type { StyleProps } from '@opentrons/components'
-import type { State } from '../../redux/types'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
+import { Portal } from '../../App/portal'
+import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../atoms/text'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import { UNREACHABLE } from '../../redux/discovery'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { State } from '../../redux/types'
+import { UpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
 interface UpdateRobotBannerProps extends StyleProps {
   robot: DiscoveredRobot

@@ -1,6 +1,4 @@
-import React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
+import { DeprecatedCheckboxField } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
@@ -9,7 +7,10 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { DeprecatedCheckboxField } from '@opentrons/components'
+import { mount } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
+
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
 import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { TYPOGRAPHY, PrimaryBtn, COLORS, SPACING } from '@opentrons/components'
-import { Slideout } from './index'
-import { StyledText } from '../text'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { StyledText } from '../text'
+import { Slideout } from './index'
 
 export default {
   title: 'App/Atoms/Slideout',

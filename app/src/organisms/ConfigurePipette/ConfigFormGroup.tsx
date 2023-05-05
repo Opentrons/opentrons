@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Field } from 'formik'
 import {
   FormGroup,
   Flex,
@@ -8,12 +7,13 @@ import {
   TYPOGRAPHY,
   CheckboxField,
 } from '@opentrons/components'
+import { Field } from 'formik'
+import type { FieldProps } from 'formik'
+
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
-import styles from './styles.css'
-
-import type { FieldProps } from 'formik'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
+import styles from './styles.css'
 
 export interface FormColumnProps {
   children: React.ReactNode

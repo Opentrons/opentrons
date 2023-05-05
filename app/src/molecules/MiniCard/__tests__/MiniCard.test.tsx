@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   COLORS,
   SPACING,
   BORDERS,
 } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
 import { MiniCard } from '../'
 
 const render = (props: React.ComponentProps<typeof MiniCard>) => {

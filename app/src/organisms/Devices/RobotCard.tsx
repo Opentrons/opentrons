@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
 import {
   Box,
   Flex,
@@ -19,26 +15,28 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   getGripperDisplayName,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
-import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
+import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
+import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { State } from '../../redux/types'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { useAttachedModules, useAttachedPipettes, useIsOT3 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
-
-import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { State } from '../../redux/types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot

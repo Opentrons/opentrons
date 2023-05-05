@@ -1,28 +1,23 @@
+import isEqual from 'lodash/isEqual'
 import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
+import type { Observable } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
-import isEqual from 'lodash/isEqual'
-
-import { fetchRobotApi } from '../../robot-api'
-import { withRobotHost } from '../../robot-api/operators'
 
 import * as Constants from '../constants'
-
-import type { Observable } from 'rxjs'
-import type { Action, State, Epic } from '../../types'
+import { fetchRobotApi } from '../../robot-api'
+import { withRobotHost } from '../../robot-api/operators'
 import type { RobotHost } from '../../robot-api/types'
-
-import {
-  mapActionToRequest as mapActionToFetchAllRequest,
-  mapResponseToAction as mapFetchAllResponseToAction,
-} from './fetchAllSessionsEpic'
-
+import type { Action, State, Epic } from '../../types'
+import type { EnsureSessionAction, SessionResponseAttributes } from '../types'
 import {
   mapActionToRequest as mapActionToCreateRequest,
   mapResponseToAction as mapCreateResponseToAction,
 } from './createSessionEpic'
-
-import type { EnsureSessionAction, SessionResponseAttributes } from '../types'
+import {
+  mapActionToRequest as mapActionToFetchAllRequest,
+  mapResponseToAction as mapFetchAllResponseToAction,
+} from './fetchAllSessionsEpic'
 
 // this epic exists to ensure that a session of a given type exists in state
 // it will fetch all sessions and, if the correct session type doesn't already

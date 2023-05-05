@@ -1,15 +1,14 @@
 import * as React from 'react'
+import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
-
-import { DECK_CAL_STATUS_OK } from '../../../../redux/calibration'
-import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 
 import { useDeckCalibrationStatus } from '..'
+import { DECK_CAL_STATUS_OK } from '../../../../redux/calibration'
+import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')

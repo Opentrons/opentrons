@@ -1,10 +1,10 @@
 import * as React from 'react'
-import styled from 'styled-components'
 import { Icon, FONT_BODY_1_DARK } from '@opentrons/components'
-import { SECURITY_NONE } from '../../../../../redux/networking'
-
-import type { StyledComponent } from 'styled-components'
 import type { IconName } from '@opentrons/components'
+import styled from 'styled-components'
+import type { StyledComponent } from 'styled-components'
+
+import { SECURITY_NONE } from '../../../../../redux/networking'
 import type { WifiNetwork } from '../../../../../redux/networking/types'
 
 const SIGNAL_LEVEL_LOW: number = 25

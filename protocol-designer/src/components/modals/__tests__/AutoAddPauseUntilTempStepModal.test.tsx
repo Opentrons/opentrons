@@ -1,7 +1,8 @@
 import * as React from 'react'
-import i18next from 'i18next'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import i18next from 'i18next'
+
 import { AutoAddPauseUntilTempStepModal } from '../AutoAddPauseUntilTempStepModal'
 
 const render = (

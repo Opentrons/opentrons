@@ -11,9 +11,10 @@ import {
   Link,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import { TertiaryButton } from '../buttons'
 import { Tooltip } from './index'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Tooltip',

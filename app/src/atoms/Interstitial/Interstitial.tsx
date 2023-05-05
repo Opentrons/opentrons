@@ -11,10 +11,12 @@ import {
   SPACING,
   Overlay,
 } from '@opentrons/components'
+
 import {
   InterstitialTitleBar,
   InterstitialTitleBarProps,
 } from './InterstitiallTitleBar'
+
 export interface InterstitialProps {
   titleBar: InterstitialTitleBarProps
   contentsClassName?: string

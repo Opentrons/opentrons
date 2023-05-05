@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,10 +9,12 @@ import {
   COLORS,
   PrimaryButton,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
-import { StyledText } from '../../atoms/text'
-import { StepMeter } from '../../atoms/StepMeter'
 import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
+import { StepMeter } from '../../atoms/StepMeter'
+import { StyledText } from '../../atoms/text'
 
 const IMAGE_ALT = 'finish setting up a robot'
 

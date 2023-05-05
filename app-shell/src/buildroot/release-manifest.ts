@@ -1,5 +1,6 @@
 // functions and utilities for retrieving the releases manifest
 import fse from 'fs-extra'
+
 import { fetchJson } from '../http'
 import type { ReleaseManifest, ReleaseSetUrls } from './types'
 

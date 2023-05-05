@@ -1,8 +1,9 @@
-import React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { FormikConfig } from 'formik'
-import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import { when, resetAllWhenMocks } from 'jest-when'
+import React from 'react'
+
 import {
   getDefaultFormState,
   getInitialStatus,

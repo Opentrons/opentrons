@@ -1,14 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import pick from 'lodash/pick'
-
-import {
-  getLabwareDisplayName,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -17,19 +8,27 @@ import {
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import { StyledText } from '../../../../atoms/text'
-import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
-import { OffsetVector } from '../../../../molecules/OffsetVector'
-import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
-import { getLatestCurrentOffsets } from './utils'
-import type { LabwareOffset } from '@opentrons/api-client'
+import {
+  getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import type {
   RunTimeCommand,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
+import pick from 'lodash/pick'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+
+import { StyledText } from '../../../../atoms/text'
+import { OffsetVector } from '../../../../molecules/OffsetVector'
+import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
+import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
+import { getLatestCurrentOffsets } from './utils'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}

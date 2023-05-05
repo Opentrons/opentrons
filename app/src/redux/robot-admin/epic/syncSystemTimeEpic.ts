@@ -1,13 +1,12 @@
+import { parseISO, differenceInSeconds } from 'date-fns'
 import { ofType } from 'redux-observable'
 import { filter, map, switchMap, ignoreElements } from 'rxjs/operators'
-import { parseISO, differenceInSeconds } from 'date-fns'
 
+import * as Constants from '../constants'
 import { GET, PUT, fetchRobotApi } from '../../robot-api'
 import { withRobotHost } from '../../robot-api/operators'
-import * as Constants from '../constants'
-
-import type { Action, Epic } from '../../types'
 import type { RobotApiRequestOptions } from '../../robot-api/types'
+import type { Action, Epic } from '../../types'
 import type { SyncSystemTimeAction } from '../types'
 
 const SYNC_THRESHOLD_SEC = 60

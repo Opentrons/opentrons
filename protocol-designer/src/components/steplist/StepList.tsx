@@ -1,17 +1,15 @@
 import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 
-import { PresavedStepItem } from './PresavedStepItem'
-import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
-import { TerminalItem } from './TerminalItem'
 import { END_TERMINAL_TITLE } from '../../constants'
+import { StepIdType } from '../../form-types'
 import { END_TERMINAL_ITEM_ID } from '../../steplist'
-
 import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
-
-import { StepIdType } from '../../form-types'
+import { PresavedStepItem } from './PresavedStepItem'
+import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
+import { TerminalItem } from './TerminalItem'
 
 export interface StepListProps {
   isMultiSelectMode?: boolean | null

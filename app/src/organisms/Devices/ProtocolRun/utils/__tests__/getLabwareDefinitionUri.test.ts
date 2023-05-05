@@ -1,6 +1,7 @@
 import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
-import { getLabwareDefinitionUri } from '../getLabwareDefinitionUri'
 import type { LoadedLabware } from '@opentrons/shared-data'
+
+import { getLabwareDefinitionUri } from '../getLabwareDefinitionUri'
 
 jest.mock('@opentrons/shared-data')
 

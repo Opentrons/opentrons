@@ -1,27 +1,27 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+import { when } from 'jest-when'
+
+import { ChangePipette } from '..'
 import { i18n } from '../../../i18n'
-import { getHasCalibrationBlock } from '../../../redux/config'
-import { getMovementStatus } from '../../../redux/robot-controls'
-import { getCalibrationForPipette } from '../../../redux/calibration'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
+import { getCalibrationForPipette } from '../../../redux/calibration'
+import { getHasCalibrationBlock } from '../../../redux/config'
+import type { AttachedPipette } from '../../../redux/pipettes/types'
 import {
   getRequestById,
   SUCCESS,
   useDispatchApiRequests,
 } from '../../../redux/robot-api'
-import { useAttachedPipettes } from '../../Devices/hooks'
-import { PipetteSelection } from '../PipetteSelection'
-import { ExitModal } from '../ExitModal'
-import { ConfirmPipette } from '../ConfirmPipette'
-import { ChangePipette } from '..'
-
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
+import { getMovementStatus } from '../../../redux/robot-controls'
+import { useAttachedPipettes } from '../../Devices/hooks'
+import { ConfirmPipette } from '../ConfirmPipette'
+import { ExitModal } from '../ExitModal'
+import { PipetteSelection } from '../PipetteSelection'
 
 const mockPush = jest.fn()
 

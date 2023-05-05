@@ -1,3 +1,5 @@
+import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { blowout } from '../commandCreators/atomic/blowout'
 import {
@@ -9,8 +11,8 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { RobotState, InvariantContext } from '../types'
+
 describe('blowout', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState

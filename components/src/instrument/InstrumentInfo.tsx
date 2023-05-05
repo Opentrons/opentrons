@@ -1,11 +1,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { InfoItem } from './InfoItem'
-import { InstrumentDiagram } from './InstrumentDiagram'
-import styles from './instrument.css'
-
 import type { Mount } from '../robot-types'
+import { InfoItem } from './InfoItem'
+import styles from './instrument.css'
+import { InstrumentDiagram } from './InstrumentDiagram'
 import type { InstrumentDiagramProps } from './InstrumentDiagram'
 
 export interface InstrumentInfoProps {

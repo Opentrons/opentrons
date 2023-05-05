@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
 import {
   Flex,
   Btn,
@@ -17,18 +13,20 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
   resetConfig,
 } from '../../../redux/robot-admin'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-
-import type { Dispatch, State } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
+import type { Dispatch, State } from '../../../redux/types'
 
 interface LabelProps {
   isSelected?: boolean

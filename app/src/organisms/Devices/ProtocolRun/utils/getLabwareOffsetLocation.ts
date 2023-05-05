@@ -1,5 +1,6 @@
 import type { LabwareOffsetLocation } from '@opentrons/api-client'
 import { LoadedModule, ProtocolAnalysisOutput } from '@opentrons/shared-data'
+
 import { getLabwareLocation } from './getLabwareLocation'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 

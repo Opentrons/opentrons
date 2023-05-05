@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Svg as SvgComponent } from './Svg'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { Svg as SvgComponent } from './Svg'
 
 export default {
   title: 'Library/Atoms/Svg',

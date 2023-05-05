@@ -1,28 +1,26 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
-import { i18n } from '../../../i18n'
-import { home } from '../../../redux/robot-controls'
 import * as Buildroot from '../../../redux/buildroot'
-import { restartRobot } from '../../../redux/robot-admin'
+import { i18n } from '../../../i18n'
+import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { fetchWifiList, getCanDisconnect } from '../../../redux/networking'
-import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { restartRobot } from '../../../redux/robot-admin'
+import { home } from '../../../redux/robot-controls'
+import type { State } from '../../../redux/types'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { useIsRobotBusy } from '../hooks'
+import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
-
-import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')

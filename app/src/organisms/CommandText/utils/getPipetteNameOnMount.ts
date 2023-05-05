@@ -1,9 +1,9 @@
-import { getLoadedPipette } from './accessors'
-
 import type {
   CompletedProtocolAnalysis,
   PipetteName,
 } from '@opentrons/shared-data'
+
+import { getLoadedPipette } from './accessors'
 
 export function getPipetteNameOnMount(
   analysis: CompletedProtocolAnalysis,

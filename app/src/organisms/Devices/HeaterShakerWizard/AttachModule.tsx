@@ -1,5 +1,3 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   COLORS,
   Flex,
@@ -16,11 +14,15 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../../atoms/text'
-import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.png'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+
+import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.png'
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.png'
+import { StyledText } from '../../../atoms/text'
 import { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+
 interface AttachModuleProps {
   moduleFromProtocol?: ProtocolModuleInfo
 }

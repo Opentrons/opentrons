@@ -1,9 +1,10 @@
-import React from 'react'
-import { shallow } from 'enzyme'
 import { Modal, OutlineButton } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import * as persist from '../../../../persist'
-import { AnnouncementModal } from '../'
 import * as announcements from '../announcements'
+import { AnnouncementModal } from '../'
 import { Announcement } from '../announcements'
 
 jest.mock('../../../../persist')

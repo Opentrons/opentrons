@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { TabbedButton } from './'
 import type { Story, Meta } from '@storybook/react'
+
+import { TabbedButton } from './'
 
 export default {
   title: 'ODD/Atoms/Buttons/TabbedButton',

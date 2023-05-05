@@ -8,15 +8,13 @@ import {
   getBuildrootDownloadProgress,
   getBuildrootDownloadError,
 } from '../../../../redux/buildroot'
-
-import { MigrationWarningModal } from './MigrationWarningModal'
-import { DownloadUpdateModal } from './DownloadUpdateModal'
-import { ReleaseNotesModal } from './ReleaseNotesModal'
-
 import type {
   BuildrootUpdateType,
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
+import { DownloadUpdateModal } from './DownloadUpdateModal'
+import { MigrationWarningModal } from './MigrationWarningModal'
+import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 export interface ViewUpdateModalProps {
   robotName: string

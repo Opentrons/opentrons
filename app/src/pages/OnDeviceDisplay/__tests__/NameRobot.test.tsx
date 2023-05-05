@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
 import { useTrackEvent } from '../../../redux/analytics'
 import {
   getConnectableRobots,
@@ -13,7 +13,6 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-
 import { NameRobot } from '../NameRobot'
 
 jest.mock('../../../redux/discovery/selectors')

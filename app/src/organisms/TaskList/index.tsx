@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import {
   Flex,
   Icon,
@@ -21,7 +20,6 @@ import {
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
-
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 
 interface ProgressTrackerItemProps {

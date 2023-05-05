@@ -1,17 +1,18 @@
-import React from 'react'
+import { render, screen } from '@testing-library/react'
 import { FormikConfig } from 'formik'
 import isEqual from 'lodash/isEqual'
-import { render, screen } from '@testing-library/react'
+import React from 'react'
+
 import {
   getDefaultFormState,
   getInitialStatus,
   LabwareFields,
   snugLooseOptions,
 } from '../../../fields'
-import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { FormAlerts } from '../../alerts/FormAlerts'
 import { TipFitAlerts } from '../../alerts/TipFitAlerts'
 import { Dropdown } from '../../Dropdown'
+import { HandPlacedTipFit } from '../../sections/HandPlacedTipFit'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../Dropdown')

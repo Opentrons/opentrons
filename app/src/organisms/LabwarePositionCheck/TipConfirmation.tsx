@@ -10,14 +10,14 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-
-import { NeedHelpLink } from '../CalibrationPanels'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
-import { getIsOnDevice } from '../../redux/config'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+
 import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 import { i18n } from '../../i18n'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { getIsOnDevice } from '../../redux/config'
+import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

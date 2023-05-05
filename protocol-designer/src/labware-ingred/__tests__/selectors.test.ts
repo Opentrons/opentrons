@@ -1,4 +1,5 @@
 import { selectors } from '../selectors'
+
 // FIXTURES
 const baseIngredFields = {
   groupId: '0',

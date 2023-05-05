@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { fireEvent } from '@testing-library/react'
+
+import { i18n } from '../../../i18n'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from '../hooks'
 
 jest.mock('@opentrons/react-api-client')

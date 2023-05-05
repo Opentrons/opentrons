@@ -1,5 +1,4 @@
 // calibration check session contants
-
 import { sharedCalCommands } from '../common-calibration/constants'
 
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'

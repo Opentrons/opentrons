@@ -1,10 +1,10 @@
-import assert from 'assert'
 import * as React from 'react'
+import assert from 'assert'
+import { mount } from 'enzyme'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-
 import type { Store } from 'redux'
+
 import type { MockStore, WrapperWithStore } from './mountWithStore'
 
 export interface MountWithProvidersOptions<State> {

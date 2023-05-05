@@ -1,20 +1,18 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { MemoryRouter, Route } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
-
-import { i18n } from '../../../../i18n'
 import { CalibrationDashboard } from '..'
-
+import { i18n } from '../../../../i18n'
 import {
   useCalibrationTaskList,
   useAttachedPipettes,
 } from '../../../../organisms/Devices/hooks'
-import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
-import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
-import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
+import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
+import { useDashboardCalibratePipOffset } from '../hooks/useDashboardCalibratePipOffset'
+import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTipLength'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../hooks/useDashboardCalibratePipOffset')

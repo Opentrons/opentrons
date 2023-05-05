@@ -8,9 +8,10 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import { StyledText } from '../text'
 import { Snackbar } from './index'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Snackbar',

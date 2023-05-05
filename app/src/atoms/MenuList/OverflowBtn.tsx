@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { Btn, COLORS, SPACING } from '@opentrons/components'
+import { css } from 'styled-components'
 
 export const OverflowBtn = React.forwardRef(
   (

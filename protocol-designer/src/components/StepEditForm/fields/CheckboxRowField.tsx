@@ -5,10 +5,11 @@ import {
   Tooltip,
   TOOLTIP_TOP,
 } from '@opentrons/components'
+import type { Placement } from '@opentrons/components'
 import cx from 'classnames'
+
 import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
-import type { Placement } from '@opentrons/components'
 
 type CheckboxRowProps = FieldProps & {
   children?: React.ReactNode

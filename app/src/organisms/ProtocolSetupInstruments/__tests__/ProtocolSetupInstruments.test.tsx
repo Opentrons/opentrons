@@ -1,17 +1,16 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { MemoryRouter } from 'react-router-dom'
-
+import { renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useAllPipetteOffsetCalibrationsQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
+import { ProtocolSetupInstruments } from '..'
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockRecentAnalysis } from '../__fixtures__'
-import { ProtocolSetupInstruments } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock(

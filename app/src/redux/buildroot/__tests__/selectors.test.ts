@@ -1,9 +1,8 @@
-import * as selectors from '../selectors'
-import * as Constants from '../constants'
-import { mockReachableRobot } from '../../discovery/__fixtures__'
-import { HEALTH_STATUS_NOT_OK } from '../../discovery'
 import * as discoSelectors from '../../discovery/selectors'
-
+import * as Constants from '../constants'
+import * as selectors from '../selectors'
+import { HEALTH_STATUS_NOT_OK } from '../../discovery'
+import { mockReachableRobot } from '../../discovery/__fixtures__'
 import type { State } from '../../types'
 
 jest.mock('../../discovery/selectors')

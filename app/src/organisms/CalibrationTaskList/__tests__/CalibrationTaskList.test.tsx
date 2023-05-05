@@ -1,8 +1,15 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { i18n } from '../../../i18n'
+
 import { CalibrationTaskList } from '..'
+import { i18n } from '../../../i18n'
+import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
+import {
+  useCalibrationTaskList,
+  useRunHasStarted,
+  useAttachedPipettes,
+} from '../../Devices/hooks'
 import {
   mockDeckCalLauncher,
   mockTipLengthCalLauncher,
@@ -15,12 +22,6 @@ import {
   expectedIncompleteRightMountTaskList,
   expectedIncompleteLeftMountTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
-import {
-  useCalibrationTaskList,
-  useRunHasStarted,
-  useAttachedPipettes,
-} from '../../Devices/hooks'
-import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
 
 jest.mock('../../Devices/hooks')
 jest.mock('../../ProtocolUpload/hooks')

@@ -1,12 +1,11 @@
 import { pipe } from 'rxjs'
+import type { Observable, UnaryFunction, OperatorFunction } from 'rxjs'
 import { map, mergeMap, withLatestFrom, filter } from 'rxjs/operators'
 
-import { getRobotByName } from '../discovery/selectors'
-import { fetchRobotApi } from './http'
 import * as Types from './types'
-
-import type { Observable, UnaryFunction, OperatorFunction } from 'rxjs'
+import { getRobotByName } from '../discovery/selectors'
 import type { State, Action } from '../types'
+import { fetchRobotApi } from './http'
 import type { RobotHost } from './types'
 
 export type ActionToRequestMapper<TriggerAction> = (

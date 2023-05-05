@@ -1,12 +1,12 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../../i18n'
 import { useRunHasStarted } from '../../hooks'
 import { formatTimestamp } from '../../utils'
 import { SetupCalibrationItem } from '../SetupCalibrationItem'
-import { when, resetAllWhenMocks } from 'jest-when'
 
 jest.mock('../../hooks')
 jest.mock('../../utils')

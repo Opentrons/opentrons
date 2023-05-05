@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { C_SKY_BLUE, COLORS, renderWithProviders } from '@opentrons/components'
+
 import { StatusLabel } from '..'
 
 const render = (props: React.ComponentProps<typeof StatusLabel>) => {

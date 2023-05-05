@@ -2,9 +2,11 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
-import { makeContext, getInitialRobotStateStandard } from '../fixtures'
+
 import { disengageMagnet } from '../commandCreators/atomic/disengageMagnet'
+import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import { InvariantContext, RobotState } from '../types'
+
 const moduleId = 'magneticModuleId'
 const commandCreatorFnName = 'disengageMagnet'
 describe('disengageMagnet', () => {

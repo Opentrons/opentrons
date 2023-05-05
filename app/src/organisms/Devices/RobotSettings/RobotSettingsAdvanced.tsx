@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-
 import {
   Box,
   SPACING,
@@ -9,12 +7,25 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useSelector, useDispatch } from 'react-redux'
 
+import { Portal } from '../../../App/portal'
+import { ToggleButton } from '../../../atoms/buttons'
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
-import { ToggleButton } from '../../../atoms/buttons'
+import { UNREACHABLE } from '../../../redux/discovery'
+import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
+import {
+  updateSetting,
+  getRobotSettings,
+  fetchSettings,
+} from '../../../redux/robot-settings'
+import type {
+  RobotSettings,
+  RobotSettingsField,
+} from '../../../redux/robot-settings/types'
+import type { State, Dispatch } from '../../../redux/types'
 import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
-import { UsageSettings } from './AdvancedTab/UsageSettings'
 import {
   DisableHoming,
   DisplayRobotName,
@@ -29,24 +40,11 @@ import {
   UseOlderAspirateBehavior,
   UseOlderProtocol,
 } from './AdvancedTab'
-import {
-  updateSetting,
-  getRobotSettings,
-  fetchSettings,
-} from '../../../redux/robot-settings'
-import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
-import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
+import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
+import { UsageSettings } from './AdvancedTab/UsageSettings'
 import { UpdateBuildroot } from './UpdateBuildroot'
-import { UNREACHABLE } from '../../../redux/discovery'
-import { Portal } from '../../../App/portal'
-
-import type { State, Dispatch } from '../../../redux/types'
-import type {
-  RobotSettings,
-  RobotSettingsField,
-} from '../../../redux/robot-settings/types'
-import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string

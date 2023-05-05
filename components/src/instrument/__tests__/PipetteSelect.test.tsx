@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
@@ -8,10 +6,11 @@ import {
   GEN2,
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
-import { PipetteSelect } from '../PipetteSelect'
-import { Select } from '../../forms'
-
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import { shallow } from 'enzyme'
+
+import { Select } from '../../forms'
+import { PipetteSelect } from '../PipetteSelect'
 
 describe('PipetteSelect', () => {
   it('renders a Select', () => {

@@ -1,21 +1,20 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { SPACING } from '@opentrons/components'
-import { FLOWS, SECTIONS } from './constants'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { css } from 'styled-components'
 
 import attachLeft18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
 import attachRight18 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
+import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import detachLeft1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
 import detachRight1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_1_R.webm'
 import detachLeft8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_8_L.webm'
 import detachRight8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_8_R.webm'
-import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
-
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import { FLOWS, SECTIONS } from './constants'
 import type { PipetteWizardStep } from './types'
 
 export function getIsGantryEmpty(

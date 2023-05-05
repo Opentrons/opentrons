@@ -1,15 +1,13 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../../i18n'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
-import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
-import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
-
 import type { PipetteInfo } from '../../hooks'
+import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
+import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 jest.mock('../../../../redux/config')
 jest.mock('../../hooks')

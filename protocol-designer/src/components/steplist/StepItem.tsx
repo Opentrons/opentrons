@@ -1,6 +1,4 @@
 import * as React from 'react'
-import cx from 'classnames'
-import sum from 'lodash/sum'
 import { Icon } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -9,6 +7,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
+import cx from 'classnames'
+import sum from 'lodash/sum'
+
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import {
   stepIconsByType,
@@ -19,6 +20,12 @@ import {
   ProfileStepItem,
 } from '../../form-types'
 import { i18n } from '../../localization'
+import {
+  SubstepIdentifier,
+  SubstepItemData,
+  ThermocyclerProfileSubstepItem,
+  WellIngredientNames,
+} from '../../steplist/types'
 import {
   makeLidLabelText,
   makeSpeedText,
@@ -33,13 +40,6 @@ import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
 import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
-
-import {
-  SubstepIdentifier,
-  SubstepItemData,
-  ThermocyclerProfileSubstepItem,
-  WellIngredientNames,
-} from '../../steplist/types'
 
 export interface StepItemProps {
   description?: string | null

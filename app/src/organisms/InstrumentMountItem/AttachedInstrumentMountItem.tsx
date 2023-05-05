@@ -1,20 +1,20 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-
+import type { InstrumentData } from '@opentrons/api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
-import { FLOWS } from '../PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '../PipetteWizardFlows'
+import { useHistory } from 'react-router-dom'
+
+import type { Mount } from '../../redux/pipettes/types'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import { LabeledMount } from './LabeledMount'
-import type { InstrumentData } from '@opentrons/api-client'
-import type { Mount } from '../../redux/pipettes/types'
+import { PipetteWizardFlows } from '../PipetteWizardFlows'
+import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
+import { FLOWS } from '../PipetteWizardFlows/constants'
 import type { SelectablePipettes } from '../PipetteWizardFlows/types'
+import { LabeledMount } from './LabeledMount'
 
 interface AttachedInstrumentMountItemProps {
   mount: Mount | 'extension'

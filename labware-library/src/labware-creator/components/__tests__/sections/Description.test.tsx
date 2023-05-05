@@ -1,15 +1,16 @@
-import React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { FormikConfig } from 'formik'
-import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import { resetAllWhenMocks, when } from 'jest-when'
+import React from 'react'
+
 import {
   getDefaultFormState,
   getInitialStatus,
   LabwareFields,
 } from '../../../fields'
-import { Description } from '../../sections/Description'
 import { isEveryFieldHidden } from '../../../utils/isEveryFieldHidden'
+import { Description } from '../../sections/Description'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils/isEveryFieldHidden')

@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   SPACING,
@@ -9,17 +7,18 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { CheckPipettesButton } from './CheckPipettesButton'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { LevelPipette } from './LevelPipette'
-
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 import type { Mount } from '../../redux/pipettes/types'
+import { CheckPipettesButton } from './CheckPipettesButton'
+import { LevelPipette } from './LevelPipette'
 
 export interface ConfirmPipetteProps {
   robotName: string

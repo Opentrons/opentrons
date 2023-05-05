@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { renderWithProviders } from '@opentrons/components'
 
 import { RunningProtocolSkeleton } from '../RunningProtocolSkeleton'

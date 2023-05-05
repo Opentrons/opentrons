@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,13 +13,14 @@ import {
   Btn,
   Icon,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
-import { StyledText } from '../../../atoms/text'
-import { InputField } from '../../../atoms/InputField'
 import { TertiaryButton } from '../../../atoms/buttons'
+import { InputField } from '../../../atoms/InputField'
 import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
+import { StyledText } from '../../../atoms/text'
 import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants'
-
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const SSID_INPUT_FIELD_STYLE = css`

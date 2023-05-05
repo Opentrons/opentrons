@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import {
   C_BLUE,
   FONT_SIZE_INHERIT,

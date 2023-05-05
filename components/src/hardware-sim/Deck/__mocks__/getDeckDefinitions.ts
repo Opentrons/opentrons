@@ -1,9 +1,8 @@
+import type { DeckDefinition } from '@opentrons/shared-data'
 import assert from 'assert'
-import path from 'path'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
-
-import type { DeckDefinition } from '@opentrons/shared-data'
+import path from 'path'
 
 const DECK_FIXTURE_PATTERN = path.join(
   __dirname,

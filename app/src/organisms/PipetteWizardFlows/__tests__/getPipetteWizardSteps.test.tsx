@@ -3,11 +3,12 @@ import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
+
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import type { AttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import type { PipetteWizardStep } from '../types'
-import type { AttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
 
 const mockAttachedPipettesEmpty: AttachedPipettesFromInstrumentsQuery = {
   left: null,

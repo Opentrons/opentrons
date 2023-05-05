@@ -1,7 +1,7 @@
-import { useRunQuery } from '@opentrons/react-api-client'
-import { useCurrentRunId } from './useCurrentRunId'
-
 import type { Run } from '@opentrons/api-client'
+import { useRunQuery } from '@opentrons/react-api-client'
+
+import { useCurrentRunId } from './useCurrentRunId'
 
 const REFETCH_INTERVAL = 5000
 

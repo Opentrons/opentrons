@@ -7,14 +7,15 @@ import {
   useLongPress,
   PrimaryButton,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
+import { StyledText } from '../text'
 import {
   TertiaryButton,
   QuaternaryButton,
   SubmitPrimaryButton,
   ToggleButton,
 } from './index'
-import { StyledText } from '../text'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Buttons',

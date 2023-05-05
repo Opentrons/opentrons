@@ -1,5 +1,4 @@
 import * as React from 'react'
-import styled from 'styled-components'
 import {
   Flex,
   Text,
@@ -22,10 +21,11 @@ import {
   createIrregularLabware,
   createRegularLabware,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import styled from 'styled-components'
+
+import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
 const SLOT_OPTIONS = standardDeckDef.locations.orderedSlots.map(slot => slot.id)
 const DEFAULT_LABWARE_SLOT = SLOT_OPTIONS[0]

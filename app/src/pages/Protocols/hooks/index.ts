@@ -1,16 +1,16 @@
-import last from 'lodash/last'
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
-import {
-  useAttachedModules,
-  useAttachedPipettes,
-} from '../../../organisms/Devices/hooks'
-import { getLabwareSetupItemGroups } from '../utils'
-
 import type {
   CompletedProtocolAnalysis,
   ModuleModel,
   PipetteName,
 } from '@opentrons/shared-data'
+import last from 'lodash/last'
+
+import {
+  useAttachedModules,
+  useAttachedPipettes,
+} from '../../../organisms/Devices/hooks'
+import { getLabwareSetupItemGroups } from '../utils'
 import type { LabwareSetupItem } from '../utils'
 
 interface ProtocolPipette {

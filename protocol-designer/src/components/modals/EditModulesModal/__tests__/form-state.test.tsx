@@ -1,6 +1,7 @@
+import * as Formik from 'formik'
 import * as React from 'react'
 import { mount } from 'enzyme'
-import * as Formik from 'formik'
+
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { useResetSlotOnModelChange } from '../form-state'
 import { EditModulesFormValues } from '../index'

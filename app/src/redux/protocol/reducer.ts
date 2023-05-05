@@ -1,4 +1,5 @@
 import type { Reducer } from 'redux'
+
 import type { Action } from '../types'
 import type { ProtocolState } from './types'
 

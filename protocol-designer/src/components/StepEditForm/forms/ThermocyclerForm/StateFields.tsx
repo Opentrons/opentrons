@@ -1,13 +1,12 @@
 import * as React from 'react'
+import { FormGroup } from '@opentrons/components'
 import cx from 'classnames'
 
+import { FormData } from '../../../../form-types'
 import { i18n } from '../../../../localization'
-import { FormGroup } from '@opentrons/components'
 import { ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
-
 import { FieldPropsByName } from '../../types'
-import { FormData } from '../../../../form-types'
 
 interface Props {
   propsForFields: FieldPropsByName

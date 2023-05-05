@@ -1,9 +1,7 @@
+import * as Store from './store'
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
-
-import * as Store from './store'
-
 import type {
   DiscoveryClient,
   DiscoveryClientConfig,

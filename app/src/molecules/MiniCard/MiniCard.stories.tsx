@@ -7,12 +7,12 @@ import {
   Flex,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import { MiniCard } from './'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-
-import type { Story, Meta } from '@storybook/react'
+import { MiniCard } from './'
 
 export default {
   title: 'App/Molecules/MiniCard',

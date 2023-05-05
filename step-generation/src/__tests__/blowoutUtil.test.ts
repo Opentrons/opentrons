@@ -1,12 +1,6 @@
 import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+
 import { blowout } from '../commandCreators/atomic/blowout'
-import { InvariantContext } from '../types'
-import {
-  blowoutUtil,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-} from '../utils'
-import { curryCommandCreator } from '../utils/curryCommandCreator'
 import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
@@ -16,6 +10,14 @@ import {
   BLOWOUT_OFFSET_FROM_TOP_MM,
   makeContext,
 } from '../fixtures'
+import { InvariantContext } from '../types'
+import {
+  blowoutUtil,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../utils'
+import { curryCommandCreator } from '../utils/curryCommandCreator'
+
 jest.mock('../utils/curryCommandCreator')
 
 const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<

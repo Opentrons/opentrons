@@ -1,5 +1,4 @@
 // deck calibration sessioin constants
-
 import { sharedCalCommands } from '../common-calibration/constants'
 
 export const DECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'

@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
@@ -17,11 +14,15 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'
+
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string

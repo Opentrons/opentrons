@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Flex, COLORS, SPACING } from '@opentrons/components'
-import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
+
+import { Chip } from '.'
 
 export default {
   title: 'ODD/Atoms/Chip',

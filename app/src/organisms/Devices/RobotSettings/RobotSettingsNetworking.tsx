@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
-
 import {
   Box,
   Flex,
@@ -15,11 +11,14 @@ import {
   SecondaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
+import { Portal } from '../../../App/portal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
-
+import { StyledText } from '../../../atoms/text'
 import {
   fetchStatus,
   fetchWifiList,
@@ -27,13 +26,11 @@ import {
   getNetworkInterfaces,
   getWifiList,
 } from '../../../redux/networking'
-
+import type { State, Dispatch } from '../../../redux/types'
 import { useIsOT3, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 
-import type { State, Dispatch } from '../../../redux/types'
-import { Portal } from '../../../App/portal'
 interface NetworkingProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void

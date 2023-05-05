@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
 import {
   Flex,
   SPACING,
@@ -33,18 +30,19 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-
-import { ToggleButton } from '../../../../atoms/buttons'
-import { StyledText } from '../../../../atoms/text'
-import { SecureLabwareModal } from './SecureLabwareModal'
-
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleRenderInfoForProtocol } from '../../hooks'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
+
+import { ToggleButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { SecureLabwareModal } from './SecureLabwareModal'
 
 const LabwareRow = styled.div`
   display: grid;

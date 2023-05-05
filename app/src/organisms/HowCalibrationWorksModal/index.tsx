@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Box,
   Flex,
@@ -13,6 +10,8 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { Portal } from '../../App/portal'
 import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'

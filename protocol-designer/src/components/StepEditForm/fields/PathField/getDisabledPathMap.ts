@@ -1,12 +1,14 @@
+import { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
+
+import { PathOption } from '../../../../form-types'
 import { i18n } from '../../../../localization'
-import { getWellRatio } from '../../../../steplist/utils'
 import { getPipetteCapacity } from '../../../../pipettes/pipetteData'
 import {
   volumeInCapacityForMultiDispense,
   volumeInCapacityForMultiAspirate,
 } from '../../../../steplist/formLevel/handleFormChange/utils'
-import { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
-import { PathOption } from '../../../../form-types'
+import { getWellRatio } from '../../../../steplist/utils'
+
 export type DisabledPathMap = Partial<Record<PathOption, string>> | null
 export interface ValuesForPath {
   aspirate_airGap_checkbox?: boolean | null

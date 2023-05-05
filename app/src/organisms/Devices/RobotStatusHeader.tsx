@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link, useHistory } from 'react-router-dom'
-
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
@@ -17,14 +13,16 @@ import {
   TYPOGRAPHY,
   truncateString,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+import { Link, useHistory } from 'react-router-dom'
 
 import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
-
-import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
 type RobotStatusHeaderProps = StyleProps &

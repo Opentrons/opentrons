@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { StepItem } from './StepItem'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
+
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../ui/steps'
+import { StepItem } from './StepItem'
 
 export const PresavedStepItem = (): JSX.Element | null => {
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)

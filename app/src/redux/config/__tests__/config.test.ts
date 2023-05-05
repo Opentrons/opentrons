@@ -1,8 +1,7 @@
 // config tests
 import * as Cfg from '..'
-import { configReducer } from '../reducer'
-
 import type { State } from '../../types'
+import { configReducer } from '../reducer'
 
 jest.mock('../../shell/remote', () => ({
   remote: { INITIAL_CONFIG: { isConfig: true } },

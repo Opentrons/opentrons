@@ -11,10 +11,9 @@ import {
   TOTAL_LENGTH,
   MM,
 } from '../../localization'
-import { LabeledValueTable, LowercaseText } from '../ui'
-import { getMeasurementDiagram } from '../measurement-guide'
-
 import type { LabwareWellGroupProperties, LabwareParameters } from '../../types'
+import { getMeasurementDiagram } from '../measurement-guide'
+import { LabeledValueTable, LowercaseText } from '../ui'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)

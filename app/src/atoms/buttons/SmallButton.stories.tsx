@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { SmallButton } from './'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { SmallButton } from './'
 
 export default {
   title: 'ODD/Atoms/Buttons/SmallButton',

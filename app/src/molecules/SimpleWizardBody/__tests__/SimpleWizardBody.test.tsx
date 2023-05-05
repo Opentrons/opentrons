@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
+
+import { SimpleWizardBody } from '..'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { getIsOnDevice } from '../../../redux/config'
-import { SimpleWizardBody } from '..'
 
 jest.mock('../../../atoms/Skeleton')
 jest.mock('../../../redux/config')

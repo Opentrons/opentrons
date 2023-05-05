@@ -10,10 +10,10 @@ import {
   COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-
 import type { StyleProps } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
+
+import { StyledText } from '../../atoms/text'
 
 interface OffsetVectorProps extends StyleProps {
   x: number

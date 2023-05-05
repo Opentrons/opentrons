@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+
+import * as Sessions from '../../../redux/sessions'
 import { i18n } from '../../../i18n'
 import {
   mockTipLengthCalBlock,
   mockTipLengthTipRack,
 } from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
-
 import { MeasureNozzle } from '../MeasureNozzle'
 
 describe('MeasureNozzle', () => {

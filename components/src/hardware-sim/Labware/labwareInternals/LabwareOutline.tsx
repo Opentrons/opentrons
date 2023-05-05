@@ -1,10 +1,11 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import cx from 'classnames'
+import type { CSSProperties } from 'styled-components'
+
 import styles from './LabwareOutline.css'
 
-import type { CSSProperties } from 'styled-components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 export interface LabwareOutlineProps {
   definition?: LabwareDefinition2
   width?: number

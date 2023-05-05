@@ -1,6 +1,5 @@
-import { robotControlsReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { robotControlsReducer } from '../reducer'
 import type { PerRobotControlsState } from '../types'
 
 interface ReducerSpec {

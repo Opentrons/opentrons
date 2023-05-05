@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { actions as stepActions } from '../../ui/steps'
 import { getCountPerStepType } from '../../ui/steps/selectors'

@@ -1,23 +1,25 @@
-import { connect } from 'react-redux'
 import {
   getAreSlotsHorizontallyAdjacent,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { connect } from 'react-redux'
+
 import {
-  LabwareSelectionModal as LabwareSelectionModalComponent,
-  Props as LabwareSelectionModalProps,
-} from './LabwareSelectionModal'
+  actions as labwareDefActions,
+  selectors as labwareDefSelectors,
+} from '../../labware-defs'
 import {
   closeLabwareSelector,
   createContainer,
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import {
-  actions as labwareDefActions,
-  selectors as labwareDefSelectors,
-} from '../../labware-defs'
 import { selectors as stepFormSelectors, ModuleOnDeck } from '../../step-forms'
 import { BaseState, ThunkDispatch } from '../../types'
+import {
+  LabwareSelectionModal as LabwareSelectionModalComponent,
+  Props as LabwareSelectionModalProps,
+} from './LabwareSelectionModal'
+
 interface SP {
   customLabwareDefs: LabwareSelectionModalProps['customLabwareDefs']
   slot: LabwareSelectionModalProps['slot']

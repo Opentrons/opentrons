@@ -1,4 +1,9 @@
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
+import type { MoveToWellParams as v6MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+
 import * as errorCreators from '../../errorCreators'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 import {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
@@ -11,10 +16,6 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
 } from '../../utils'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
-import type { MoveToWellParams as v6MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveToWell: CommandCreator<v5MoveToWellParams> = (

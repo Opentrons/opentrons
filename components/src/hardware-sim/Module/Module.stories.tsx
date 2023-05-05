@@ -10,14 +10,13 @@ import {
   getModuleDef2,
 } from '@opentrons/shared-data'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
-import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
-
-import { LabwareRender } from '../Labware'
-import { Module as ModuleComponent } from './'
+import type { Story, Meta } from '@storybook/react'
 
 import type { RobotWorkSpaceRenderProps } from '../Deck'
-import type { Story, Meta } from '@storybook/react'
+import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
+import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
+import { LabwareRender } from '../Labware'
+import { Module as ModuleComponent } from './'
 
 const slots = ['1', '3', '4', '6', '7', '9', '10']
 

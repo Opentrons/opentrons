@@ -1,7 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import { useInterval } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   fetchStatus,
@@ -9,7 +8,6 @@ import {
   getNetworkInterfaces,
   getWifiList,
 } from '../../../redux/networking'
-
 import type { Dispatch, State } from '../../../redux/types'
 
 export interface NetworkConnection {

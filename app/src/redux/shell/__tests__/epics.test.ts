@@ -1,15 +1,14 @@
 // tests for the shell module
 import { EMPTY } from 'rxjs'
-import { TestScheduler } from 'rxjs/testing'
 import { take } from 'rxjs/operators'
+import { TestScheduler } from 'rxjs/testing'
 
 import * as Alerts from '../../alerts'
 import * as Config from '../../config'
 import * as ShellUpdate from '../update'
-import { remote as mockRemote } from '../remote'
-import { shellEpic } from '../epic'
-
 import type { Action, State } from '../../types'
+import { shellEpic } from '../epic'
+import { remote as mockRemote } from '../remote'
 
 const { ipcRenderer: mockIpc } = mockRemote
 

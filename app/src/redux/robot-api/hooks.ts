@@ -1,7 +1,7 @@
 // hooks for components that depend on API state
+import uniqueId from 'lodash/uniqueId'
 import { useReducer, useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import uniqueId from 'lodash/uniqueId'
 
 import type { State, Action } from '../types'
 import { PENDING } from './constants'

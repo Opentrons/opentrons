@@ -1,6 +1,8 @@
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
-import { shouldShowCoolingHint as _shouldShowCoolingHint } from '../selectors'
+
 import { ThermocyclerModuleState } from '../../step-forms/types'
+import { shouldShowCoolingHint as _shouldShowCoolingHint } from '../selectors'
+
 // TODO(IL, 2020-05-19): Flow doesn't have type for resultFunc
 const shouldShowCoolingHint: any = _shouldShowCoolingHint
 const tcModuleId = 'tcModuleId'

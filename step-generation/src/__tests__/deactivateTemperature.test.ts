@@ -1,10 +1,11 @@
-import { getStateAndContextTempTCModules } from '../fixtures'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
+import { getStateAndContextTempTCModules } from '../fixtures'
 import {
   InvariantContext,
   RobotState,
   DeactivateTemperatureArgs,
 } from '../types'
+
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 const commandCreatorFnName = 'deactivateTemperature'

@@ -1,13 +1,13 @@
 /** Ensure that protocol schema v5 definition itself functions as intended,
  *  and that all v5 protocol fixtures will validate */
 import Ajv from 'ajv'
-import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
+import path from 'path'
 
-import protocolSchema from '../../protocol/schemas/5.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
 import simpleV5Fixture from '../../protocol/fixtures/5/simpleV5.json'
+import protocolSchema from '../../protocol/schemas/5.json'
 
 const fixturesGlobPath = path.join(
   __dirname,

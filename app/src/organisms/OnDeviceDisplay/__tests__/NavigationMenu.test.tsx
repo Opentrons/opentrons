@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
+import { i18n } from '../../../i18n'
 import { restartRobot } from '../../../redux/robot-admin'
 import { home } from '../../../redux/robot-controls'
 import { useLights } from '../../Devices/hooks'

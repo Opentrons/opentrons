@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
+import { act } from 'react-dom/test-utils'
 
-import { Tooltip, Arrow } from '../Tooltip'
-import * as UsePopper from '../usePopper'
-import { useTooltip } from '../useTooltip'
 import * as Types from '../types'
+import * as UsePopper from '../usePopper'
+import { Tooltip, Arrow } from '../Tooltip'
+import { useTooltip } from '../useTooltip'
 
 // mocking out usePopper because it calls stuff async and that makes
 // react complain about wrapping stuff in `act`, which we can't

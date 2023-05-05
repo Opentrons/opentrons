@@ -1,5 +1,4 @@
 import { createBrowser, tcp, ServiceType } from 'mdns-js'
-
 import type {
   Browser as BaseBrowser,
   BrowserService as BaseBrowserService,

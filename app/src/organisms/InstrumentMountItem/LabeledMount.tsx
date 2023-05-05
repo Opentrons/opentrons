@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   Flex,
@@ -14,6 +12,9 @@ import {
   ALIGN_FLEX_START,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import { StyledText } from '../../atoms/text'
 import type { Mount } from '../../redux/pipettes/types'
 

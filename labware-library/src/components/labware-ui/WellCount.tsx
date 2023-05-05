@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import { COUNT } from '../../localization'
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 import styles from './styles.css'

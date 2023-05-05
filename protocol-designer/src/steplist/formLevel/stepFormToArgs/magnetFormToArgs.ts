@@ -1,9 +1,11 @@
-import assert from 'assert'
 import {
   EngageMagnetArgs,
   DisengageMagnetArgs,
 } from '@opentrons/step-generation'
+import assert from 'assert'
+
 import { HydratedMagnetFormData } from '../../../form-types'
+
 type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs
 export const magnetFormToArgs = (
   hydratedFormData: HydratedMagnetFormData

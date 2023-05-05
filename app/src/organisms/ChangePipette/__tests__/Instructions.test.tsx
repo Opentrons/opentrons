@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { fireEvent, screen } from '@testing-library/react'
 import { LEFT } from '@opentrons/shared-data'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
-import { Instructions } from '../Instructions'
 import { CheckPipettesButton } from '../CheckPipettesButton'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { Instructions } from '../Instructions'
 
 jest.mock('../CheckPipettesButton')
 

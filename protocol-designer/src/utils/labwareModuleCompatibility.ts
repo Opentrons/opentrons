@@ -1,5 +1,4 @@
 // PD-specific info about labware<>module compatibilty
-import assert from 'assert'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -8,8 +7,11 @@ import {
   ModuleType,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import assert from 'assert'
+
 import { LabwareDefByDefURI } from '../labware-defs'
 import { LabwareOnDeck } from '../step-forms'
+
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   ModuleType,

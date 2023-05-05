@@ -1,11 +1,10 @@
-import { useQueryClient } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 import {
   useHost,
   useRunQuery,
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
-
-import type { Run } from '@opentrons/api-client'
+import { useQueryClient } from 'react-query'
 
 interface UseCloneRunResult {
   cloneRun: () => void

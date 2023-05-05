@@ -1,6 +1,7 @@
-import { createSelector } from 'reselect'
-import { sortWells } from '@opentrons/shared-data'
 import { WellGroup } from '@opentrons/components'
+import { sortWells } from '@opentrons/shared-data'
+import { createSelector } from 'reselect'
+
 import { BaseState, Selector } from '../types'
 
 const rootSelector = (state: BaseState): BaseState['wellSelection'] =>

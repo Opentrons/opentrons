@@ -1,8 +1,9 @@
+import { getWellDepth } from '@opentrons/shared-data'
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import { getWellDepth } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
+
 import * as errorCreators from '../../errorCreators'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
   ConsolidateArgs,
@@ -24,6 +25,7 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
+
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,

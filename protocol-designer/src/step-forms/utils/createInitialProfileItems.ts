@@ -4,6 +4,7 @@ import {
   ProfileStepItem,
   ProfileCycleItem,
 } from '../../form-types'
+
 export const createInitialProfileStep = (id: string): ProfileStepItem => ({
   type: PROFILE_STEP,
   id,

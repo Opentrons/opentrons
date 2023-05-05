@@ -1,5 +1,6 @@
-import { getLatestCurrentOffsets } from '../utils'
 import type { LabwareOffset } from '@opentrons/api-client'
+
+import { getLatestCurrentOffsets } from '../utils'
 
 describe('getLatestCurrentOffsets', () => {
   it('should return the latest offsets when there are multiple offsets', () => {

@@ -1,12 +1,12 @@
 import * as React from 'react'
+import { renderHook } from '@testing-library/react-hooks'
 import { resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { syncSystemTime } from '../../../../redux/robot-admin'
 import { useSyncRobotClock } from '..'
+import { syncSystemTime } from '../../../../redux/robot-admin'
 
 jest.mock('../../../../redux/discovery')
 

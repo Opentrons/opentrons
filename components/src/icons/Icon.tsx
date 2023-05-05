@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { css, keyframes } from 'styled-components'
 import cx from 'classnames'
+import { css, keyframes } from 'styled-components'
 
 import { Svg } from '../primitives'
-import { ICON_DATA_BY_NAME } from './icon-data'
-
 import type { SvgProps } from '../primitives'
+import { ICON_DATA_BY_NAME } from './icon-data'
 
 export type IconName = keyof typeof ICON_DATA_BY_NAME
 

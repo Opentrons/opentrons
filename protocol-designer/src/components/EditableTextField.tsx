@@ -1,6 +1,7 @@
 // TODO: Ian 2018-10-30 if we like this, add it to components library
 import * as React from 'react'
 import { ClickOutside, Icon, InputField } from '@opentrons/components'
+
 import styles from './editableTextField.css'
 
 interface Props {

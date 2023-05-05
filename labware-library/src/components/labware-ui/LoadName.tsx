@@ -1,8 +1,9 @@
 // labware load name with copy button
 import * as React from 'react'
 import { IconButton, DeprecatedTooltip } from '@opentrons/components'
-import { LabelText, LABEL_TOP } from '../ui'
+
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
+import { LabelText, LABEL_TOP } from '../ui'
 import styles from './styles.css'
 
 const COPY_ICON = 'ot-copy-text'

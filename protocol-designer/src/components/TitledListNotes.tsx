@@ -1,5 +1,6 @@
-import { i18n } from '../localization'
 import * as React from 'react'
+
+import { i18n } from '../localization'
 import styles from './TitledListNotes.css'
 
 interface Props {

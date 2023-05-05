@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 import { LabwareRender, WellGroup } from '@opentrons/components'
+import { connect } from 'react-redux'
 
-import { selectors } from '../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
-import { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
+import * as wellContentsSelectors from '../../top-selectors/well-contents'
+import { selectors } from '../../labware-ingred/selectors'
 import { ContentsByWell } from '../../labware-ingred/types'
+import { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
 import { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 

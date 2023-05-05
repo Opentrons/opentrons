@@ -1,12 +1,11 @@
 import * as React from 'react'
-import { shallow } from 'enzyme'
-
 import { AlertModal, SpinnerModal } from '@opentrons/components'
-import { ErrorModal } from '../../../../../molecules/modals'
-import { ResultModal } from '../ResultModal'
-import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
-
+import { shallow } from 'enzyme'
 import type { ShallowWrapper } from 'enzyme'
+
+import { ErrorModal } from '../../../../../molecules/modals'
+import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
+import { ResultModal } from '../ResultModal'
 import type { ResultModalProps } from '../ResultModal'
 
 describe("SelectNetwork's ResultModal", () => {

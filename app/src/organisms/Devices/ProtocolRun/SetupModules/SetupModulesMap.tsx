@@ -1,6 +1,4 @@
 import * as React from 'react'
-import map from 'lodash/map'
-
 import {
   Flex,
   Box,
@@ -13,11 +11,13 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { ModuleInfo } from '../../ModuleInfo'
+import map from 'lodash/map'
+
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../../hooks'
+import { ModuleInfo } from '../../ModuleInfo'
 import { getStandardDeckViewBox } from '../utils/getStandardDeckViewBox'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 

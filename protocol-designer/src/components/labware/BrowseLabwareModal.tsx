@@ -1,23 +1,20 @@
-import assert from 'assert'
-import { i18n } from '../../localization'
 import * as React from 'react'
+import { Modal } from '@opentrons/components'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import assert from 'assert'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 
-import { Modal } from '@opentrons/components'
-import { BrowsableLabware } from './BrowsableLabware'
-
+import * as labwareIngredsActions from '../../labware-ingred/actions'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import * as labwareIngredsActions from '../../labware-ingred/actions'
-
-import { BaseState, ThunkDispatch } from '../../types'
 import { ContentsByWell } from '../../labware-ingred/types'
+import { i18n } from '../../localization'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { WellIngredientNames } from '../../steplist/types'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-
+import { BaseState, ThunkDispatch } from '../../types'
 import modalStyles from '../modals/modal.css'
+import { BrowsableLabware } from './BrowsableLabware'
 import styles from './labware.css'
 
 interface SP {

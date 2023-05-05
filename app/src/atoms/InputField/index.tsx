@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -13,6 +11,7 @@ import {
   TYPOGRAPHY,
   COLOR_WARNING_DARK,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const

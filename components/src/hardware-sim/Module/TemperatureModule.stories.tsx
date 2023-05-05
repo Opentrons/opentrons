@@ -1,12 +1,11 @@
 import * as React from 'react'
-import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
-import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
-
-import { Module } from './'
+import { TEMPERATURE_MODULE_V2, getModuleDef2 } from '@opentrons/shared-data'
+import type { Story, Meta } from '@storybook/react'
 
 import type { RobotWorkSpaceRenderProps } from '../Deck'
-import type { Story, Meta } from '@storybook/react'
-import { TEMPERATURE_MODULE_V2, getModuleDef2 } from '@opentrons/shared-data'
+import { getDeckDefinitions } from '../Deck/getDeckDefinitions'
+import { RobotWorkSpace } from '../Deck/RobotWorkSpace'
+import { Module } from './'
 
 const slots = ['1', '3', '4', '6', '7', '9', '10']
 

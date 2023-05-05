@@ -1,4 +1,5 @@
 import { ingredients, ingredLocations } from '../reducers'
+
 jest.mock('../../labware-defs/utils')
 
 describe('DUPLICATE_LABWARE action', () => {

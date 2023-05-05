@@ -1,3 +1,4 @@
+import interact from 'interactjs'
 import {
   useState,
   useEffect,
@@ -5,7 +6,6 @@ import {
   MutableRefObject,
   CSSProperties,
 } from 'react'
-import interact from 'interactjs'
 
 interface UseSwipeResult {
   ref: MutableRefObject<null>

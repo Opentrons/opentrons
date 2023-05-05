@@ -8,7 +8,12 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
+
+import { WellOrderOption } from '../../form-types'
 import { i18n } from '../../localization'
+// TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
+import formStyles from '../forms/forms.css'
+import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -18,17 +23,13 @@ import {
   WellOrderField,
 } from '../StepEditForm/fields'
 import { MixFields } from '../StepEditForm/fields/MixFields'
+import styles from '../StepEditForm/StepEditForm.css'
+import { FieldPropsByName } from '../StepEditForm/types'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../StepEditForm/utils'
 import { FormColumn } from './FormColumn'
-import { FieldPropsByName } from '../StepEditForm/types'
-import { WellOrderOption } from '../../form-types'
-// TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
-import formStyles from '../forms/forms.css'
-import styles from '../StepEditForm/StepEditForm.css'
-import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
 
 const SourceDestBatchEditMoveLiquidFields = (props: {
   prefix: 'aspirate' | 'dispense'

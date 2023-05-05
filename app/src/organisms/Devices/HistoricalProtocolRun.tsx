@@ -1,8 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import type { RunData } from '@opentrons/api-client'
 import {
   Flex,
   Box,
@@ -13,15 +10,19 @@ import {
   ALIGN_CENTER,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
+
 import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
-import { formatInterval } from '../RunTimeControl/utils'
-import { formatTimestamp } from './utils'
-import { EMPTY_TIMESTAMP } from './constants'
-import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
-import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
-import type { RunData } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
+import { formatInterval } from '../RunTimeControl/utils'
+import { EMPTY_TIMESTAMP } from './constants'
+import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
+import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
+import { formatTimestamp } from './utils'
 
 const CLICK_STYLE = css`
   cursor: pointer;

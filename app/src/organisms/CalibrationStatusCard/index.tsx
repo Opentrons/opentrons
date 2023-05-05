@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link as RouterLink } from 'react-router-dom'
-
 import {
   Flex,
   Link,
@@ -15,11 +12,12 @@ import {
   JUSTIFY_CENTER,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { Link as RouterLink } from 'react-router-dom'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
-
 import { useCalibrationTaskList } from '../Devices/hooks'
 
 export interface CalibrationStatusCardProps {

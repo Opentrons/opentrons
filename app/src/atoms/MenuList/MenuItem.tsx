@@ -1,4 +1,3 @@
-import styled from 'styled-components'
 import {
   SPACING,
   COLORS,
@@ -7,6 +6,7 @@ import {
   RESPONSIVENESS,
   StyleProps,
 } from '@opentrons/components'
+import styled from 'styled-components'
 
 interface ButtonProps extends StyleProps {
   /** optional isAlert boolean to turn the background red, only seen in ODD */

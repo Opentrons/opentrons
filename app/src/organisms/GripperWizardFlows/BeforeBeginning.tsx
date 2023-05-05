@@ -1,6 +1,13 @@
 import * as React from 'react'
-import { UseMutateFunction } from 'react-query'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
+import { CreateCommand, LEFT } from '@opentrons/shared-data'
+import type { AxiosError } from 'axios'
 import { Trans, useTranslation } from 'react-i18next'
+import { UseMutateFunction } from 'react-query'
+
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -11,13 +18,7 @@ import {
   GRIPPER_LOADNAME,
   CAL_PIN_LOADNAME,
 } from './constants'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
-import type { AxiosError } from 'axios'
-import { CreateCommand, LEFT } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string

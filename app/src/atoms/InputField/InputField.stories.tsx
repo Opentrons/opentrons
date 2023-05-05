@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { InputField } from './index'
 import type { Story, Meta } from '@storybook/react'
+
+import { InputField } from './index'
 
 export default {
   title: 'App/Atoms/InputField',

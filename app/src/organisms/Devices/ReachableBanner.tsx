@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { SPACING } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { Banner } from '../../atoms/Banner'
 import { REACHABLE } from '../../redux/discovery'
-
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
 interface ReachableBannerProps {

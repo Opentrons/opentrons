@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import { SelectField } from '../SelectField'
 import { Select } from '../Select'
 import type { SelectOption, SelectProps } from '../Select'
+import { SelectField } from '../SelectField'
 
 describe('SelectField', () => {
   it('renders a Select', () => {

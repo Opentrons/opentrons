@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
-import { ErrorInfo } from '../ErrorInfo'
 import {
   mockHeaterShaker,
   mockTemperatureModule,
@@ -12,6 +12,7 @@ import type {
   HeaterShakerModule,
   ThermocyclerModule,
 } from '../../../redux/modules/types'
+import { ErrorInfo } from '../ErrorInfo'
 
 const mockErrorThermocycler = {
   id: 'thermocycler_id',

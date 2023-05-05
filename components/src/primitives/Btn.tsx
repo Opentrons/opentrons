@@ -2,7 +2,6 @@ import styled, { css } from 'styled-components'
 
 import * as Styles from '../styles'
 import { styleProps, isntStyleProp } from './style-props'
-
 import type { PrimitiveComponent } from './types'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'

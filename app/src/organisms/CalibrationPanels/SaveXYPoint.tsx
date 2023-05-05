@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -11,19 +9,11 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
 } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
-import { useLogger } from '../../logger'
 import * as Sessions from '../../redux/sessions'
-import {
-  JogControls,
-  MEDIUM_STEP_SIZE_MM,
-  SMALL_STEP_SIZE_MM,
-} from '../../molecules/JogControls'
-import { StyledText } from '../../atoms/text'
-import { formatJogVector } from './utils'
-import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
-import { NeedHelpLink } from './NeedHelpLink'
-
 import slot1LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_1_LEFT_SINGLE_X-Y.webm'
 import slot1RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_1_RIGHT_MULTI_X-Y.webm'
@@ -36,16 +26,24 @@ import slot7LeftMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LEF
 import slot7LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LEFT_SINGLE_X-Y.webm'
 import slot7RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
 import slot7RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
-
+import { StyledText } from '../../atoms/text'
+import { useLogger } from '../../logger'
+import {
+  JogControls,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+} from '../../molecules/JogControls'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
   CalibrationSessionStep,
   SessionCommandString,
   CalibrationLabware,
 } from '../../redux/sessions/types'
-import type { Mount } from '@opentrons/components'
+import { NeedHelpLink } from './NeedHelpLink'
+import type { CalibrationPanelProps } from './types'
+import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
+import { formatJogVector } from './utils'
 
 const assetMap: Record<
   CalibrationLabware['slot'],

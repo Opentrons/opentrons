@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
+import type { FormattedPipetteOffsetCalibration } from '.'
 import { StyledText } from '../../atoms/text'
 import {
   useAttachedPipettesFromInstrumentsQuery,
@@ -15,8 +15,6 @@ import {
   usePipetteOffsetCalibrations,
 } from '../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
-
-import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsPipetteOffsetCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]

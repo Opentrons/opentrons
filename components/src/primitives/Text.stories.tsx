@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Text as TextComponent } from './Text'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { Text as TextComponent } from './Text'
 
 export default {
   title: 'Library/Atoms/Text',

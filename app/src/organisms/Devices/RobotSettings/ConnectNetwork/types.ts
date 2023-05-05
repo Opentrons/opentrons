@@ -5,7 +5,6 @@ import type {
   EapOption,
   WifiKey,
 } from '../../../../redux/networking/types'
-
 import {
   CONNECT,
   DISCONNECT,

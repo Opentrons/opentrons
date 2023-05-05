@@ -1,12 +1,11 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
+import type { ProtocolResource } from '@opentrons/shared-data'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
-
-import { i18n } from '../../../../i18n'
 import { ProtocolCard } from '../'
+import { i18n } from '../../../../i18n'
 
 const mockPush = jest.fn()
 

@@ -1,4 +1,5 @@
 import isArray from 'lodash/isArray'
+
 import { i18n } from '../../localization'
 
 /*******************

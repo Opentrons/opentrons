@@ -1,14 +1,15 @@
+import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import some from 'lodash/some'
 import { useTranslation } from 'react-i18next'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+
 import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '.'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 export function useLPCDisabledReason(
   robotName: string,

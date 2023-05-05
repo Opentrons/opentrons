@@ -1,28 +1,29 @@
-import last from 'lodash/last'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
   getPipetteNameSpecs,
   getLabwareDefURI,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import last from 'lodash/last'
+
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
   useStoredProtocolAnalysis,
 } from '.'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { MATCH, INEXACT_MATCH, INCOMPATIBLE } from '../../../redux/pipettes'
 import type {
   Mount,
   AttachedPipette,
   TipRackCalibrationData,
 } from '../../../redux/pipettes/types'
-import type {
-  LabwareDefinition2,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 

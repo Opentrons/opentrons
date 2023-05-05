@@ -1,17 +1,16 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
+import { useDispatch, useSelector } from 'react-redux'
 
-import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
+import * as RobotApi from '../../../redux/robot-api'
 import { Portal } from '../../../App/portal'
-import { SelectSsid } from './ConnectNetwork/SelectSsid'
-import { ConnectModal } from './ConnectNetwork/ConnectModal'
-import { ResultModal } from './ConnectNetwork/ResultModal'
-import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
-
-import type { State, Dispatch } from '../../../redux/types'
 import type { WifiNetwork } from '../../../redux/networking/types'
+import type { State, Dispatch } from '../../../redux/types'
+import { ConnectModal } from './ConnectNetwork/ConnectModal'
+import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
+import { ResultModal } from './ConnectNetwork/ResultModal'
+import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import type {
   WifiConfigureRequest,
   NetworkChangeState,

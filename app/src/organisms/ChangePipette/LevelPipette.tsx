@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -12,8 +9,10 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
+import { StyledText } from '../../atoms/text'
 import type { Mount } from '../../redux/pipettes/types'
 
 interface LevelPipetteProps {

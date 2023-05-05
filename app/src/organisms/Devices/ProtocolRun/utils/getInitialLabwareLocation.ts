@@ -1,5 +1,5 @@
-import { FIXED_TRASH_ID } from '@opentrons/shared-data/js'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import { FIXED_TRASH_ID } from '@opentrons/shared-data/js'
 import type {
   LoadLabwareRunTimeCommand,
   LabwareLocation,

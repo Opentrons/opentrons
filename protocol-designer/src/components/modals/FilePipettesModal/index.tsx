@@ -1,16 +1,5 @@
-import assert from 'assert'
-import reduce from 'lodash/reduce'
 import * as React from 'react'
-import cx from 'classnames'
-import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import {
-  getIsCrashablePipetteSelected,
-  PipetteOnDeck,
-  FormPipette,
-  FormPipettesByMount,
-  FormModulesByType,
-} from '../../../step-forms'
 import {
   Modal,
   FormGroup,
@@ -29,17 +18,29 @@ import {
   getPipetteNameSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
+import assert from 'assert'
+import cx from 'classnames'
+import { Formik, FormikProps } from 'formik'
+import reduce from 'lodash/reduce'
+
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
+import { NewProtocolFields } from '../../../load-file'
+import { i18n } from '../../../localization'
+import {
+  getIsCrashablePipetteSelected,
+  PipetteOnDeck,
+  FormPipette,
+  FormPipettesByMount,
+  FormModulesByType,
+} from '../../../step-forms'
+import { DeckSlot } from '../../../types'
+import formStyles from '../../forms/forms.css'
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
+import modalStyles from '../modal.css'
+import styles from './FilePipettesModal.css'
 import { ModuleFields } from './ModuleFields'
 import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
-import modalStyles from '../modal.css'
-import { DeckSlot } from '../../../types'
-import { NewProtocolFields } from '../../../load-file'
 
 export type PipetteFieldsData = Omit<
   PipetteOnDeck,

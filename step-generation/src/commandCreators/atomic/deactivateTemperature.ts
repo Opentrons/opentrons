@@ -3,9 +3,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, DeactivateTemperatureArgs } from '../../types'
+import { uuid } from '../../utils'
 
 /** Disengage temperature target for specified module. */
 export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = (

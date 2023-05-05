@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+
 import { LabwareOffsetTabs } from '..'
+import { i18n } from '../../../i18n'
 
 const mockTableComponent = <div>Table Component</div>
 const mockJupyterComponent = <div>Jupyter Component</div>

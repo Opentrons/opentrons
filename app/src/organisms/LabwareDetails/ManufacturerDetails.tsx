@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Box,
@@ -11,6 +10,8 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../atoms/text'
 import type { LabwareBrand } from '../../pages/Labware/types'
 

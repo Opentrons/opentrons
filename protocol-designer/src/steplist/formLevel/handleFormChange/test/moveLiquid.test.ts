@@ -1,16 +1,17 @@
+import { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
   PipetteEntities,
   LabwareEntities,
 } from '@opentrons/step-generation'
+
 import { FormData } from '../../../../form-types'
 import {
   dependentFieldsUpdateMoveLiquid,

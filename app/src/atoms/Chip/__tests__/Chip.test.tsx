@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { Chip } from '..'

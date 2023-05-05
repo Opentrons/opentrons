@@ -1,9 +1,11 @@
+import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
+import { when, resetAllWhenMocks } from 'jest-when'
 import last from 'lodash/last'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import { when, resetAllWhenMocks } from 'jest-when'
-import * as utils from '../../../../utils'
+
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import * as utils from '../../../../utils'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
 import { getMultiSelectLastSelected } from '../../selectors'
 import { selectStep, selectAllSteps, deselectAllSteps } from '../actions'
@@ -13,7 +15,6 @@ import {
   saveHeaterShakerFormWithAddedPauseUntilTemp,
   saveSetTempFormWithAddedPauseUntilTemp,
 } from '../thunks'
-import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
 
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../selectors')

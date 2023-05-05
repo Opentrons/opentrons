@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   ALIGN_CENTER,
@@ -12,16 +10,18 @@ import {
   Link,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
 import { Portal } from '../../../../App/portal'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
+import { StyledText } from '../../../../atoms/text'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
+import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
+import type { State } from '../../../../redux/types'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsOT3, useRobot } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
-
-import type { State } from '../../../../redux/types'
 
 interface RobotServerVersionProps {
   robotName: string

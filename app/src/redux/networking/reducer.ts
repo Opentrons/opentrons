@@ -2,12 +2,11 @@ import intersection from 'lodash/intersection'
 import keyBy from 'lodash/keyBy'
 import union from 'lodash/union'
 import uniq from 'lodash/uniq'
+import { Reducer } from 'redux'
 
 import * as Constants from './constants'
-
 import type { Action } from '../types'
 import type { NetworkingState, PerRobotNetworkingState } from './types'
-import { Reducer } from 'redux'
 
 const INITIAL_STATE: NetworkingState = {}
 const INITIAL_ROBOT_STATE: PerRobotNetworkingState = {}

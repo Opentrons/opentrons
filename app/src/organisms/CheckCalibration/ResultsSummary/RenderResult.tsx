@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   ALIGN_CENTER,
@@ -8,6 +7,8 @@ import {
   SPACING,
   SIZE_1,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../../atoms/text'
 
 interface RenderResultProps {

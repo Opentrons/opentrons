@@ -1,9 +1,19 @@
-import last from 'lodash/last'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import {
+  PipetteEntities,
+  LabwareEntities,
+  RobotState,
+  Timeline,
+} from '@opentrons/step-generation'
+import last from 'lodash/last'
+
+import { FormData, StepType, StepIdType } from '../../form-types'
+import { FormPatch } from '../../steplist/actions/types'
+import { maskField } from '../../steplist/fieldLevel'
 import {
   createBlankForm,
   getNextDefaultEngageHeight,
@@ -17,17 +27,9 @@ import {
   getModuleOnDeckByType,
   getMagnetLabwareEngageHeight,
 } from '../../ui/modules/utils'
-import { maskField } from '../../steplist/fieldLevel'
-import {
-  PipetteEntities,
-  LabwareEntities,
-  RobotState,
-  Timeline,
-} from '@opentrons/step-generation'
-import { FormData, StepType, StepIdType } from '../../form-types'
-import { InitialDeckSetup } from '../types'
-import { FormPatch } from '../../steplist/actions/types'
 import { SavedStepFormState, OrderedStepIdsState } from '../reducers'
+import { InitialDeckSetup } from '../types'
+
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
   stepType: StepType

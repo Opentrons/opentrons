@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import snakeCase from 'lodash/snakeCase'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -20,19 +16,24 @@ import {
   CheckboxField,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
+import snakeCase from 'lodash/snakeCase'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { UNREACHABLE } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
-import {
-  getResetConfigOptions,
-  fetchResetConfigOptions,
-} from '../../../../../redux/robot-admin'
+import { StyledText } from '../../../../../atoms/text'
 import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '../../../../../redux/analytics'
+import { UNREACHABLE } from '../../../../../redux/discovery'
+import {
+  getResetConfigOptions,
+  fetchResetConfigOptions,
+} from '../../../../../redux/robot-admin'
+import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import type { State, Dispatch } from '../../../../../redux/types'
 import {
   useDeckCalibrationData,
   useIsOT3,
@@ -40,9 +41,6 @@ import {
   useTipLengthCalibrations,
   useRobot,
 } from '../../../hooks'
-
-import type { State, Dispatch } from '../../../../../redux/types'
-import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetSlideoutProps {
   isExpanded: boolean

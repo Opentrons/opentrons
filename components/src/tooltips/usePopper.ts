@@ -1,5 +1,5 @@
-import { useRef, useLayoutEffect } from 'react'
 import { createPopper } from '@popperjs/core'
+import { useRef, useLayoutEffect } from 'react'
 
 import type {
   UsePopperOptions,

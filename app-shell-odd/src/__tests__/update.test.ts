@@ -1,10 +1,10 @@
 // app-shell self-update tests
 import { when, resetAllWhenMocks } from 'jest-when'
-import * as http from '../http'
-import { registerUpdate } from '../update'
-import * as Cfg from '../config'
 
+import * as Cfg from '../config'
+import * as http from '../http'
 import type { Dispatch } from '../types'
+import { registerUpdate } from '../update'
 
 jest.unmock('electron-updater')
 jest.mock('electron-updater')

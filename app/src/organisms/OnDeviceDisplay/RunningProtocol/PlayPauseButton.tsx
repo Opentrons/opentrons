@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   Btn,
   Icon,
@@ -9,9 +9,7 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-
-import type { RunStatus } from '@opentrons/api-client'
+import { css } from 'styled-components'
 
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;

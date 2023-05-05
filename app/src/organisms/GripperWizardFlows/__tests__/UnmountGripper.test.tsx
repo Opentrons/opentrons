@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
 
-import { UnmountGripper } from '../UnmountGripper'
+import { i18n } from '../../../i18n'
 import { GRIPPER_FLOW_TYPES } from '../constants'
+import { UnmountGripper } from '../UnmountGripper'
 
 describe('UnmountGripper', () => {
   let render: (

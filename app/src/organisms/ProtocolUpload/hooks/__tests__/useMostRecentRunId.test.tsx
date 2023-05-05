@@ -1,6 +1,7 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import { useMostRecentRunId } from '../useMostRecentRunId'
 
 jest.mock('@opentrons/react-api-client')

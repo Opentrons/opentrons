@@ -4,9 +4,10 @@ import {
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
+
 import { i18n } from '../../localization'
-import modalStyles from './modal.css'
 import styles from './AutoAddPauseUntilTempStepModal.css'
+import modalStyles from './modal.css'
 
 interface Props {
   displayTemperature: string

@@ -1,8 +1,9 @@
 import * as React from 'react'
-import map from 'lodash/map'
-import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import map from 'lodash/map'
 import type { CSSProperties } from 'styled-components'
+
+import { Well } from './Well'
 
 export interface FilledWellsProps {
   definition: LabwareDefinition2

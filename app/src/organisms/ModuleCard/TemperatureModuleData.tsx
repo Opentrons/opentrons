@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,6 +6,8 @@ import {
   COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 import type { TemperatureStatus } from '../../redux/modules/api-types'

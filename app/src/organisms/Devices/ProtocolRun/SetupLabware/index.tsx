@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import map from 'lodash/map'
 import {
   JUSTIFY_CENTER,
   Flex,
@@ -8,8 +6,10 @@ import {
   PrimaryButton,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import map from 'lodash/map'
+import { useTranslation } from 'react-i18next'
+
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsOT3,
@@ -17,10 +17,10 @@ import {
   useStoredProtocolAnalysis,
 } from '../../hooks'
 import { ProceedToRunButton } from '../ProceedToRunButton'
-import { SetupLabwareMap } from './SetupLabwareMap'
-import { SetupLabwareList } from './SetupLabwareList'
-
 import type { StepKey } from '../ProtocolRunSetup'
+import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { SetupLabwareList } from './SetupLabwareList'
+import { SetupLabwareMap } from './SetupLabwareMap'
 
 interface SetupLabwareProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null

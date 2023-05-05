@@ -1,8 +1,8 @@
+import * as ApiTypes from './api-types'
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../robot-api/types'
-
 import {
   FETCH_STATUS,
   FETCH_STATUS_SUCCESS,
@@ -23,8 +23,6 @@ import {
   FETCH_EAP_OPTIONS_SUCCESS,
   FETCH_EAP_OPTIONS_FAILURE,
 } from './constants'
-
-import * as ApiTypes from './api-types'
 
 export * from './api-types'
 

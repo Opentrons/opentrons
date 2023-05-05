@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
-import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'
+
+import { ModalHeader } from './ModalHeader'
 
 export default {
   title: 'ODD/Molecules/Modals/ModalHeader',

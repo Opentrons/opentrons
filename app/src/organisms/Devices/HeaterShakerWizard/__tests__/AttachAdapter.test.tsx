@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { AttachAdapter } from '../AttachAdapter'
-import { useLatchControls } from '../../../ModuleCard/hooks'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
+import { useLatchControls } from '../../../ModuleCard/hooks'
+import { AttachAdapter } from '../AttachAdapter'
 
 jest.mock('../../../ModuleCard/hooks')
 

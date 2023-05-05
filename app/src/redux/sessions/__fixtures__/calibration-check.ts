@@ -1,3 +1,12 @@
+import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+
+import {
+  CHECK_STEP_COMPARING_HEIGHT,
+  CHECK_STEP_COMPARING_POINT_ONE,
+  CHECK_STEP_COMPARING_POINT_THREE,
+  CHECK_STEP_COMPARING_POINT_TWO,
+  CHECK_STEP_COMPARING_TIP,
+} from '../calibration-check/constants'
 import type {
   CheckCalibrationSessionDetails,
   CalibrationCheckComparisonsPerCalibration,
@@ -6,15 +15,6 @@ import type {
   CheckCalibrationSessionParams,
   CalibrationLabware,
 } from '../types'
-
-import tipRackFixture from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import {
-  CHECK_STEP_COMPARING_HEIGHT,
-  CHECK_STEP_COMPARING_POINT_ONE,
-  CHECK_STEP_COMPARING_POINT_THREE,
-  CHECK_STEP_COMPARING_POINT_TWO,
-  CHECK_STEP_COMPARING_TIP,
-} from '../calibration-check/constants'
 
 export const mockCalibrationCheckLabware: CalibrationLabware = {
   slot: '8',

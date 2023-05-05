@@ -1,5 +1,6 @@
 // protocol actions tests
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
+
 import { ingestProtocolFile } from '../utils'
 
 describe('ingestProtocolFile', () => {

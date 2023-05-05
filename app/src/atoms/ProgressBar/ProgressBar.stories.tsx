@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -7,11 +6,10 @@ import {
   COLORS,
   SecondaryButton,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
 
 import { StyledText } from '../text'
 import { ProgressBar } from './index'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/ProgressBar',

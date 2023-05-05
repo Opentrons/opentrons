@@ -1,14 +1,15 @@
 import { connect } from 'react-redux'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import { getSelectedTerminalItemId } from '../../ui/steps'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import {
   selectors as stepFormSelectors,
   InitialDeckSetup,
 } from '../../step-forms'
-import { DeckSetup as DeckSetupComponent, DeckSetupProps } from './DeckSetup'
 import { TerminalItemId } from '../../steplist'
 import { BaseState, ThunkDispatch } from '../../types'
+import { getSelectedTerminalItemId } from '../../ui/steps'
+import { DeckSetup as DeckSetupComponent, DeckSetupProps } from './DeckSetup'
 
 type Props = DeckSetupProps
 interface SP {

@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
 import {
   ALIGN_FLEX_END,
   BORDERS,
@@ -22,21 +18,25 @@ import {
   LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
+import type { PipetteMount } from '@opentrons/shared-data'
+import startCase from 'lodash/startCase'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import { Portal } from '../../App/portal'
+import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
 import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
+import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
-import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
-import { getIsGantryEmpty } from './utils'
-
-import type { PipetteMount } from '@opentrons/shared-data'
+import { ExitModal } from './ExitModal'
 import type { SelectablePipettes } from './types'
+import { getIsGantryEmpty } from './utils'
 
 interface ChoosePipetteProps {
   proceed: () => void

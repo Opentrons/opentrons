@@ -1,15 +1,14 @@
 import * as React from 'react'
 import { renderHook } from '@testing-library/react-hooks'
-import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
 
 import { i18n } from '../../i18n'
 import { checkShellUpdate } from '../../redux/shell'
-import { useSoftwareUpdatePoll } from '../hooks'
-
-import type { Store } from 'redux'
 import type { State } from '../../redux/types'
+import { useSoftwareUpdatePoll } from '../hooks'
 
 describe('useSoftwareUpdatePoll', () => {
   let wrapper: React.FunctionComponent<{}>

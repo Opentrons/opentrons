@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   COLORS,
@@ -11,6 +10,8 @@ import {
   SIZE_1,
   WRAP,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 import type {

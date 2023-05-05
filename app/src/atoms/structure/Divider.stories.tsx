@@ -6,9 +6,10 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import { StyledText } from '../text'
 import { Divider } from './index'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Divider',

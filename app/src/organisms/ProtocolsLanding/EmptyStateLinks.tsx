@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   TYPOGRAPHY,
   Icon,
@@ -12,6 +11,8 @@ import {
   JUSTIFY_CENTER,
   WRAP,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../atoms/text'
 
 const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'

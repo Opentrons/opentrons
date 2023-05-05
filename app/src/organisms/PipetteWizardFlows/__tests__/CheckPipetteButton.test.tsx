@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {

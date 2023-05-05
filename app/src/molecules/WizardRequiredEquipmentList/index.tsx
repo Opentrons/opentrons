@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   Flex,
   ALIGN_CENTER,
@@ -15,14 +12,17 @@ import {
   Box,
   BORDERS,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
-import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { getIsOnDevice } from '../../redux/config'
 import { equipmentImages } from './equipmentImages'
 
-import type { StyleProps } from '@opentrons/components'
 interface WizardRequiredEquipmentListProps extends StyleProps {
   equipmentList: Array<React.ComponentProps<typeof RequiredEquipmentCard>>
   footer?: string

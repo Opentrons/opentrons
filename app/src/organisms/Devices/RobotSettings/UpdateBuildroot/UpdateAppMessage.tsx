@@ -1,5 +1,6 @@
 import * as React from 'react'
 import semver from 'semver'
+
 import styles from './styles.css'
 import type { VersionProps } from './types'
 

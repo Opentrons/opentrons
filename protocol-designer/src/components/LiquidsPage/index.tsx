@@ -1,14 +1,13 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 import assert from 'assert'
+import { connect } from 'react-redux'
 
-import { LiquidEditForm } from './LiquidEditForm'
-import { LiquidsPageInfo } from './LiquidsPageInfo'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-
 import { LiquidGroup } from '../../labware-ingred/types'
 import { BaseState, ThunkDispatch } from '../../types'
+import { LiquidEditForm } from './LiquidEditForm'
+import { LiquidsPageInfo } from './LiquidsPageInfo'
 
 type Props = React.ComponentProps<typeof LiquidEditForm>
 interface WrapperProps {

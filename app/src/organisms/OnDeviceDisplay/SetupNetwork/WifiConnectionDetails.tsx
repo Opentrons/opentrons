@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -17,21 +13,23 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import { StyledText } from '../../../atoms/text'
+import { getLocalRobot } from '../../../redux/discovery'
 import {
   getNetworkInterfaces,
   fetchStatus,
   fetchWifiList,
 } from '../../../redux/networking'
-import { getLocalRobot } from '../../../redux/discovery'
-
-import type { State, Dispatch } from '../../../redux/types'
 import type {
   SimpleInterfaceStatus,
   WifiNetwork,
   WifiSecurityType,
 } from '../../../redux/networking/types'
+import type { State, Dispatch } from '../../../redux/types'
 
 interface WifiConnectionDetailsProps {
   ssid?: string

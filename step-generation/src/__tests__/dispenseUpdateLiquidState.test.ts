@@ -1,19 +1,18 @@
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
-
+import produce from 'immer'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import produce from 'immer'
-import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
 
+import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
 import {
   dispenseUpdateLiquidState,
   DispenseUpdateLiquidStateArgs,
 } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
+import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2

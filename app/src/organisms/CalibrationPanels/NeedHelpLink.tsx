@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Link,
@@ -10,6 +9,7 @@ import {
   ALIGN_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 const SUPPORT_PAGE_URL = 'https://support.opentrons.com/s/ot2-calibration'
 

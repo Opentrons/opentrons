@@ -1,13 +1,5 @@
 import * as React from 'react'
 import {
-  AlertModal,
-  BaseModal,
-  ContinueModal,
-  Overlay,
-  SpinnerModal,
-  SpinnerModalPage,
-} from './'
-import {
   Box,
   Text,
   Flex,
@@ -20,8 +12,16 @@ import {
   FONT_WEIGHT_REGULAR,
   SPACING_2,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
+
+import {
+  AlertModal,
+  BaseModal,
+  ContinueModal,
+  Overlay,
+  SpinnerModal,
+  SpinnerModalPage,
+} from './'
 
 export default {
   title: 'Library/Molecules/Modal',

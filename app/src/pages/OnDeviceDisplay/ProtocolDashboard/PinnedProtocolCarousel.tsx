@@ -8,9 +8,9 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { PinnedProtocol } from './PinnedProtocol'
-
 import type { ProtocolResource } from '@opentrons/shared-data'
+
+import { PinnedProtocol } from './PinnedProtocol'
 import type { CardSizeType } from './PinnedProtocol'
 
 export function PinnedProtocolCarousel(props: {

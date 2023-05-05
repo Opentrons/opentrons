@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Redirect, useParams } from 'react-router-dom'
-
 import {
   Box,
   Flex,
@@ -14,24 +11,25 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-
-import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
-import { getBuildrootSession } from '../../../redux/buildroot'
-import { getDevtoolsEnabled } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
-import { Banner } from '../../../atoms/Banner'
-import { useRobot } from '../../../organisms/Devices/hooks'
-import { Line } from '../../../atoms/structure'
-import { NavTab } from '../../../molecules/NavTab'
-import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibration'
-import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
-import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
-import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
-import { RobotSettingsPrivacy } from '../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
-import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
+import { Redirect, useParams } from 'react-router-dom'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
+import { Banner } from '../../../atoms/Banner'
+import { Line } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
+import { NavTab } from '../../../molecules/NavTab'
+import { useRobot } from '../../../organisms/Devices/hooks'
+import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
+import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
+import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
+import { RobotSettingsPrivacy } from '../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
+import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibration'
+import { getBuildrootSession } from '../../../redux/buildroot'
+import { getDevtoolsEnabled } from '../../../redux/config'
+import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')

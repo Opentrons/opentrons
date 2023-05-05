@@ -1,13 +1,8 @@
-import assert from 'assert'
-import reduce from 'lodash/reduce'
-import values from 'lodash/values'
-import find from 'lodash/find'
 import {
   getPipetteNameSpecs,
   GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
 import {
   NormalizedPipette,
@@ -15,6 +10,12 @@ import {
   PipetteEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import assert from 'assert'
+import find from 'lodash/find'
+import reduce from 'lodash/reduce'
+import values from 'lodash/values'
+
+import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import { DeckSlot } from '../../types'
 import {
@@ -24,6 +25,7 @@ import {
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
+
 export { createPresavedStepForm } from './createPresavedStepForm'
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],

@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
+import type { ProtocolAnalyses } from '@opentrons/api-client'
+import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { UseQueryResult } from 'react-query'
 
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
 import {
   useAttachedModules,
   useAttachedPipettes,
 } from '../../../../organisms/Devices/hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
-import type { ProtocolAnalyses } from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')

@@ -1,8 +1,9 @@
 import type { OutputSelector } from 'reselect'
+
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
-import type { RootState as FileData } from './file-data'
 import type { RootState as FeatureFlags } from './feature-flags'
+import type { RootState as FileData } from './file-data'
 import type { RootState as LabwareIngred } from './labware-ingred/reducers'
 import type { RootState as LoadFile } from './load-file'
 import type { RootState as Navigation } from './navigation'
@@ -10,6 +11,7 @@ import type { RootState as StepForms } from './step-forms'
 import type { RootState as Tutorial } from './tutorial'
 import type { RootState as UI } from './ui'
 import type { RootState as WellSelection } from './well-selection/reducers'
+
 export interface BaseState {
   analytics: Analytics
   dismiss: Dismiss

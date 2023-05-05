@@ -1,5 +1,4 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
 import {
   TYPOGRAPHY,
   COLORS,
@@ -7,10 +6,11 @@ import {
   BORDERS,
   Flex,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+import styled, { css } from 'styled-components'
+
 import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
-
-import type { StyleProps } from '@opentrons/components'
 
 interface RadioButtonProps extends StyleProps {
   buttonLabel: string

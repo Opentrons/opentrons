@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
 import { InputField } from '..'
 
 const render = (props: React.ComponentProps<typeof InputField>) => {

@@ -3,19 +3,18 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type {
   CreateCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { SetupRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   TCOpenLidCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
+import type { SetupRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 type LPCPrepCommand =
   | HomeCreateCommand

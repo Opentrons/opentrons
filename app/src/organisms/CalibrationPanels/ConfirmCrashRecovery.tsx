@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   Link,
@@ -12,6 +10,8 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../atoms/text'
 
 export interface ConfirmCrashRecoveryProps {

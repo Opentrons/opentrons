@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
-
 import type { Method, AxiosPromise, AxiosResponse } from 'axios'
+
 import type { HostConfig } from './types'
 
 export type ResponsePromise<Data> = AxiosPromise<Data>

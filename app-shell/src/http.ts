@@ -1,13 +1,11 @@
 // fetch wrapper to throw if response is not ok
-import fs from 'fs'
-import { Transform, Readable } from 'stream'
-import pump from 'pump'
-import _fetch from 'node-fetch'
-import FormData from 'form-data'
-
 import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
-
+import FormData from 'form-data'
+import fs from 'fs'
+import _fetch from 'node-fetch'
 import type { Request, RequestInit, Response } from 'node-fetch'
+import pump from 'pump'
+import { Transform, Readable } from 'stream'
 
 type RequestInput = Request | string
 

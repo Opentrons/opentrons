@@ -2,9 +2,9 @@ import * as React from 'react'
 
 import * as Styles from '../styles'
 import { Box, Flex } from '../primitives'
-import { COLORS, SPACING } from '../ui-style-constants'
 import type { StyleProps } from '../primitives'
 import { POSITION_FIXED } from '../styles'
+import { COLORS, SPACING } from '../ui-style-constants'
 
 const BASE_STYLE = {
   position: Styles.POSITION_ABSOLUTE,

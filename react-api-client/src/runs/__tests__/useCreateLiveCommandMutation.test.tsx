@@ -1,14 +1,13 @@
 import * as React from 'react'
+import { createLiveCommand } from '@opentrons/api-client'
+import type { HostConfig } from '@opentrons/api-client'
+import { act, renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { createLiveCommand } from '@opentrons/api-client'
+
 import { useHost } from '../../api'
-import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
-
 import { mockAnonLoadCommand } from '../__fixtures__'
-
-import type { HostConfig } from '@opentrons/api-client'
+import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

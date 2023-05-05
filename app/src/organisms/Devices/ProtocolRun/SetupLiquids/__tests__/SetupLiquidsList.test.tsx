@@ -1,28 +1,29 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
-import { i18n } from '../../../../../i18n'
+import {
+  parseLiquidsInLoadOrder,
+  parseLabwareInfoByLiquidId,
+} from '@opentrons/api-client'
 import {
   renderWithProviders,
   partialComponentPropsMatcher,
   nestedTextMatcher,
 } from '@opentrons/components'
-import {
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
+import { fireEvent } from '@testing-library/react'
+import { when } from 'jest-when'
+
+import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../../redux/analytics'
 import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
 } from '../utils'
-import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {

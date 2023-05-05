@@ -1,7 +1,4 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import {
   LabwareRender,
   Module,
@@ -26,12 +23,14 @@ import {
 } from '@opentrons/shared-data'
 import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
-import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { getIsOnDevice } from '../../redux/config'
 import { NeedHelpLink } from '../CalibrationPanels'
-
 import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =

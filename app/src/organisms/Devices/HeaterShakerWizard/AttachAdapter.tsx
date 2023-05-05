@@ -1,5 +1,5 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
+import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
+import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapter_screwdriver.png'
 import {
   COLORS,
   Flex,
@@ -11,15 +11,14 @@ import {
   SIZE_AUTO,
   useHoverTooltip,
 } from '@opentrons/components'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapter_screwdriver.png'
-import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
-import { useLatchControls } from '../../ModuleCard/hooks'
-
+import { Tooltip } from '../../../atoms/Tooltip'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { useLatchControls } from '../../ModuleCard/hooks'
 
 interface AttachAdapterProps {
   module: HeaterShakerModule

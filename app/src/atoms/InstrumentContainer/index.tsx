@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import { Flex, BORDERS, COLORS, SPACING } from '@opentrons/components'
 
 import { StyledText } from '../text'

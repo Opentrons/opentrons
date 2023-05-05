@@ -1,11 +1,13 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
-import { getDefaultsForStepType } from '../../getDefaultsForStepType'
-import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
-import { FormData } from '../../../../form-types'
 import type {
   ThermocyclerStateStepArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
+
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
+import { FormData } from '../../../../form-types'
+import { getDefaultsForStepType } from '../../getDefaultsForStepType'
+import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
+
 const tcModuleId = 'tcModuleId'
 
 describe('thermocyclerFormToArgs', () => {

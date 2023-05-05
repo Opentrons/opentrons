@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { InterventionModal as InterventionModalComponent } from './'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { InterventionModal as InterventionModalComponent } from './'
 
 export default {
   title: 'App/Organisms/InterventionModal',

@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { useHistoricRunDetails } from '../useHistoricRunDetails'
-import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
-import { mockSuccessQueryResults } from '../../../../__fixtures__'
-
 import type { RunData } from '@opentrons/api-client'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when } from 'jest-when'
+
+import { mockSuccessQueryResults } from '../../../../__fixtures__'
+import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
+import { useHistoricRunDetails } from '../useHistoricRunDetails'
 
 jest.mock('@opentrons/react-api-client')
 

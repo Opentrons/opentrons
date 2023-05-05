@@ -1,3 +1,6 @@
+import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { Liquid } from '@opentrons/shared-data'
+
 import {
   getWellFillFromLabwareId,
   getTotalVolumePerLiquidId,
@@ -7,8 +10,6 @@ import {
   getWellRangeForLiquidLabwarePair,
   getDisabledWellGroupForLiquidId,
 } from '../utils'
-import type { LabwareByLiquidId } from '@opentrons/api-client'
-import type { Liquid } from '@opentrons/shared-data'
 
 const LABWARE_ID =
   '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'

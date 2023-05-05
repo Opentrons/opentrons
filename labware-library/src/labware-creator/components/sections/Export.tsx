@@ -1,17 +1,18 @@
-import cx from 'classnames'
 import * as React from 'react'
-import { useFormikContext } from 'formik'
 import { PrimaryBtn } from '@opentrons/components'
+import cx from 'classnames'
+import { useFormikContext } from 'formik'
+
 import { reportEvent } from '../../../analytics'
 import { FormStatus, LabwareFields } from '../../fields'
+import styles from '../../styles.css'
 import { isEveryFieldHidden } from '../../utils'
-import { getPipetteNameOptions } from '../getPipetteOptions'
+import { determineMultiChannelSupport } from '../../utils/determineMultiChannelSupport'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { Dropdown } from '../Dropdown'
+import { getPipetteNameOptions } from '../getPipetteOptions'
 import { LinkOut } from '../LinkOut'
 import { SectionBody } from './SectionBody'
-import styles from '../../styles.css'
-import { determineMultiChannelSupport } from '../../utils/determineMultiChannelSupport'
 
 const LABWARE_PDF_URL =
   'https://insights.opentrons.com/hubfs/Products/Consumables%20and%20Reagents/labwareDefinition_testGuide.pdf'

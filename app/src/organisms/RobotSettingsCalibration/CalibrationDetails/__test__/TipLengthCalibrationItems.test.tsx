@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders, Mount } from '@opentrons/components'
-import { i18n } from '../../../../i18n'
 
-import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
+import { i18n } from '../../../../i18n'
 import { OverflowMenu } from '../OverflowMenu'
+import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 
 jest.mock('../../../../redux/custom-labware/selectors')
 jest.mock('../../../../redux/config')

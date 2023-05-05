@@ -1,15 +1,14 @@
 import * as React from 'react'
+import { SelectField } from '@opentrons/components'
+import type { SelectOption } from '@opentrons/components'
 import { mount } from 'enzyme'
+import type { ActionMeta } from 'react-select'
 
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
-import { SelectField } from '@opentrons/components'
-import { SecurityField } from '../SecurityField'
 import * as FormState from '../form-state'
-
-import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../../i18n'
 import { SECURITY_NONE, SECURITY_WPA_PSK } from '../../constants'
-import type { ActionMeta } from 'react-select'
-import type { SelectOption } from '@opentrons/components'
+import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../../i18n'
+import { SecurityField } from '../SecurityField'
 
 jest.mock('../form-state')
 

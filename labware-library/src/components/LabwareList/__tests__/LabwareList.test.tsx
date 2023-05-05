@@ -2,9 +2,9 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
+import * as definitions from '../../../definitions'
 import { LabwareList } from '..'
 import { LabwareCard } from '../LabwareCard'
-import * as definitions from '../../../definitions'
 
 jest.mock('../../../definitions')
 

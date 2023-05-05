@@ -1,38 +1,38 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import {
-  DispatchApiRequestType,
-  useDispatchApiRequest,
-} from '../../../redux/robot-api'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+import { fireEvent } from '@testing-library/react'
+import { resetAllWhenMocks, when } from 'jest-when'
+
 import * as RobotApi from '../../../redux/robot-api'
-import { useToaster } from '../../ToasterOven'
-import { MagneticModuleData } from '../MagneticModuleData'
-import { TemperatureModuleData } from '../TemperatureModuleData'
-import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
-import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
-import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
-import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
+import { i18n } from '../../../i18n'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
-import { mockRobot } from '../../../redux/robot-api/__fixtures__'
-
 import type {
   HeaterShakerModule,
   MagneticModule,
   ThermocyclerModule,
 } from '../../../redux/modules/types'
+import {
+  DispatchApiRequestType,
+  useDispatchApiRequest,
+} from '../../../redux/robot-api'
+import { mockRobot } from '../../../redux/robot-api/__fixtures__'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+import { useToaster } from '../../ToasterOven'
+import { ErrorInfo } from '../ErrorInfo'
+import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
+import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
+import { MagneticModuleData } from '../MagneticModuleData'
+import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
+import { TemperatureModuleData } from '../TemperatureModuleData'
+import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
 
 jest.mock('../ErrorInfo')
 jest.mock('../MagneticModuleData')

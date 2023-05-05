@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,6 +15,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
 import {

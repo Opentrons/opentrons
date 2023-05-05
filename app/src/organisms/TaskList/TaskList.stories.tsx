@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { TaskList as TaskListComponent } from './'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { TaskList as TaskListComponent } from './'
 
 export default {
   title: 'App/Organisms/TaskList',

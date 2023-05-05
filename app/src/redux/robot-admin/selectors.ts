@@ -1,5 +1,8 @@
 import { add, isWithinInterval } from 'date-fns'
+
 import { CONNECTABLE } from '../discovery'
+import type { ConnectivityStatus } from '../discovery/types'
+import type { State } from '../types'
 import {
   RESTART_TIMEOUT_SEC,
   RESTART_PENDING_STATUS,
@@ -7,9 +10,6 @@ import {
   RESTART_SUCCEEDED_STATUS,
   RESTART_TIMED_OUT_STATUS,
 } from './constants'
-
-import type { ConnectivityStatus } from '../discovery/types'
-import type { State } from '../types'
 import type {
   PerRobotAdminState,
   ResetConfigOption,

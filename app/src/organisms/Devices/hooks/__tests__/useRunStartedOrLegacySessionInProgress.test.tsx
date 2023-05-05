@@ -1,12 +1,11 @@
-import { UseQueryResult } from 'react-query'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import type { Sessions } from '@opentrons/api-client'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+import { UseQueryResult } from 'react-query'
 
+import { useRunStartedOrLegacySessionInProgress } from '..'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useRunStartedOrLegacySessionInProgress } from '..'
-
-import type { Sessions } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')

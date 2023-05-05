@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   SPACING,
@@ -12,10 +10,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
-
 import type { ModalHeaderBaseProps } from '../../../../molecules/Modal/OnDeviceDisplay/types'
 
 interface NetworkDetailsModalProps {

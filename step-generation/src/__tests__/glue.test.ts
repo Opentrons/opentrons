@@ -1,14 +1,15 @@
+import { DEFAULT_CONFIG } from '../fixtures'
 import {
   getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
 } from '../getNextRobotStateAndWarnings'
+import type { InvariantContext } from '../types'
 import {
   curryCommandCreator,
   reduceCommandCreators,
   commandCreatorsTimeline,
 } from '../utils'
-import { DEFAULT_CONFIG } from '../fixtures'
-import type { InvariantContext } from '../types'
+
 jest.mock('../getNextRobotStateAndWarnings')
 
 let invariantContext: InvariantContext

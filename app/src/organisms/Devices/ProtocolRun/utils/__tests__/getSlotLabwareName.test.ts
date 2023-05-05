@@ -1,4 +1,5 @@
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+
 import { getSlotLabwareName } from '../getSlotLabwareName'
 
 const LABWARE_ID =

@@ -1,7 +1,8 @@
-import * as errorCreators from '../../errorCreators'
-import { getIsTallLabwareEastWestOfHeaterShaker, uuid } from '../../utils'
 import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+
+import * as errorCreators from '../../errorCreators'
 import type { CommandCreator } from '../../types'
+import { getIsTallLabwareEastWestOfHeaterShaker, uuid } from '../../utils'
 
 const LEFT_SLOTS = ['1', '4', '7', '10']
 export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (

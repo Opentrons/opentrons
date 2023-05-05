@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory, useParams } from 'react-router-dom'
-import first from 'lodash/first'
-
 import {
   Btn,
   Flex,
@@ -30,29 +26,31 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+import first from 'lodash/first'
+import { useTranslation } from 'react-i18next'
+import { useHistory, useParams } from 'react-router-dom'
 
-import { StyledText } from '../../atoms/text'
+import type { OnDeviceRouteParams } from '../../App/types'
 import { Skeleton } from '../../atoms/Skeleton'
+import { StyledText } from '../../atoms/text'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
-import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
-import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
-import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
-import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
+import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
+import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
-
-import type { OnDeviceRouteParams } from '../../App/types'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void

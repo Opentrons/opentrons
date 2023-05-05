@@ -1,9 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { Field, Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { i18n } from '../../localization'
-import { swatchColors } from '../swatchColors'
 import {
   Card,
   DeprecatedCheckboxField,
@@ -12,13 +8,17 @@ import {
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import { selectors } from '../../labware-ingred/selectors'
-import styles from './LiquidEditForm.css'
-import formStyles from '../forms/forms.css'
-
-import { LiquidGroup } from '../../labware-ingred/types'
-import { ColorPicker } from '../ColorPicker'
+import { Field, Formik, FormikProps } from 'formik'
 import { ColorResult } from 'react-color'
+import { useSelector } from 'react-redux'
+
+import { selectors } from '../../labware-ingred/selectors'
+import { LiquidGroup } from '../../labware-ingred/types'
+import { i18n } from '../../localization'
+import { ColorPicker } from '../ColorPicker'
+import formStyles from '../forms/forms.css'
+import { swatchColors } from '../swatchColors'
+import styles from './LiquidEditForm.css'
 
 type Props = LiquidGroup & {
   canDelete: boolean

@@ -1,6 +1,14 @@
-import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import uniq from 'lodash/uniq'
+import { createSelector } from 'reselect'
+
+import {
+  CountPerStepType,
+  FormData,
+  StepFieldName,
+  StepIdType,
+  StepType,
+} from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
 import {
@@ -8,7 +16,7 @@ import {
   TerminalItemId,
   PRESAVED_STEP_ID,
 } from '../../steplist/types'
-
+import { BaseState, Selector } from '../../types'
 import { getLabwareOnModule } from '../modules/utils'
 import {
   SelectableItem,
@@ -20,7 +28,6 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
 } from './reducers'
-
 import {
   getAspirateLabwareDisabledFields,
   getDispenseLabwareDisabledFields,
@@ -31,14 +38,7 @@ import {
   getPipetteDifferentDisabledFields,
   getLabwareDisabledFields,
 } from './utils'
-import {
-  CountPerStepType,
-  FormData,
-  StepFieldName,
-  StepIdType,
-  StepType,
-} from '../../form-types'
-import { BaseState, Selector } from '../../types'
+
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 // ======= Selectors ===============================================
 // NOTE: when the selected step is deleted, we need to fall back to the last step

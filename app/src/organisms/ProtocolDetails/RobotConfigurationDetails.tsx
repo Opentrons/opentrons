@@ -1,6 +1,3 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -18,6 +15,10 @@ import {
   getPipetteNameSpecs,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
@@ -25,9 +26,6 @@ import { StyledText } from '../../atoms/text'
 import { useFeatureFlag } from '../../redux/config'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
-
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName, RobotType } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null

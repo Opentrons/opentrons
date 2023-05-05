@@ -1,4 +1,5 @@
 import { readJson, outputJson } from 'fs-extra'
+
 import { fetchJson } from '../http'
 import { createLogger } from '../log'
 import { getManifestCacheDir } from './directories'

@@ -1,17 +1,18 @@
-import assert from 'assert'
 import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import assert from 'assert'
+
+import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
+import { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
+import { getOrderedWells } from '../../../utils'
 import {
   moveLiquidFormToArgs,
   getAirGapData,
   getMixData,
 } from '../moveLiquidFormToArgs'
-import { getOrderedWells } from '../../../utils'
-import { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
-import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
 
 jest.mock('../../../utils')
 jest.mock('assert')

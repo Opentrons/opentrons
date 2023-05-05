@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { MemoryRouter, Route } from 'react-router-dom'
-
 import {
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import { resetAllWhenMocks, when } from 'jest-when'
+import { MemoryRouter, Route } from 'react-router-dom'
 
+import { DeviceDetails } from '..'
 import { i18n } from '../../../../i18n'
 import {
   useRobot,
@@ -17,8 +17,6 @@ import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocol
 import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
-import { DeviceDetails } from '..'
-
 import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../organisms/Devices/hooks')

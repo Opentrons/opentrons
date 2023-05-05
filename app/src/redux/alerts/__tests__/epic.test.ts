@@ -2,9 +2,8 @@ import { TestScheduler } from 'rxjs/testing'
 
 import * as Cfg from '../../config'
 import * as Actions from '../actions'
-import { alertsEpic } from '../epic'
-
 import type { Action, State } from '../../types'
+import { alertsEpic } from '../epic'
 import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')

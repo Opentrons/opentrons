@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   COLORS,
@@ -9,12 +6,13 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
+import * as RobotApi from '../../redux/robot-api'
 import { StyledText } from '../../atoms/text'
 import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
 import { useDeckCalibrationData, useRobot } from '../../organisms/Devices/hooks'
-import * as RobotApi from '../../redux/robot-api'
-
 import type { State } from '../../redux/types'
 
 interface RobotSettingsDeckCalibrationProps {

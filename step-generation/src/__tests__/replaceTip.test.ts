@@ -1,4 +1,6 @@
 import merge from 'lodash/merge'
+
+import { replaceTip } from '../commandCreators/atomic/replaceTip'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -9,7 +11,6 @@ import {
   dropTipHelper,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import { replaceTip } from '../commandCreators/atomic/replaceTip'
 import type { InvariantContext, RobotState } from '../types'
 
 const tiprack1Id = 'tiprack1Id'

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Icon,
@@ -12,11 +11,12 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { StyledText } from '../../../atoms/text'
-import heaterShakerModule from '../../../assets/images/heater_shaker_module_transparent.png'
-import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
+import { useTranslation } from 'react-i18next'
 
+import heaterShakerModule from '../../../assets/images/heater_shaker_module_transparent.png'
+import { StyledText } from '../../../atoms/text'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
 
 interface HeaterShakerModuleCardProps {
   module: HeaterShakerModule

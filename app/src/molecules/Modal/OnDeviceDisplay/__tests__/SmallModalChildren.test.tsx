@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+
 import { SmallModalChildren } from '../SmallModalChildren'
 
 const props = {

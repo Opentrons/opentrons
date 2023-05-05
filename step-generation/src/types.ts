@@ -19,12 +19,13 @@ import type {
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { Command } from '@opentrons/shared-data/protocol/types/schemaV5Addendum'
+import { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+
 import type {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
 } from './constants'
-import { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 export type { Command }
 

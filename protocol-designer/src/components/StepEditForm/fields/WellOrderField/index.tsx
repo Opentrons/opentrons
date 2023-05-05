@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   FormGroup,
   Text,
@@ -10,13 +9,15 @@ import {
   C_LIGHT_GRAY,
 } from '@opentrons/components'
 import cx from 'classnames'
-import { i18n } from '../../../../localization'
-import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
-import { WellOrderModal } from './WellOrderModal'
-import stepEditStyles from '../../StepEditForm.css'
-import styles from './WellOrderInput.css'
-import { FieldProps } from '../../types'
+import { css } from 'styled-components'
+
 import { WellOrderOption } from '../../../../form-types'
+import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
+import { i18n } from '../../../../localization'
+import stepEditStyles from '../../StepEditForm.css'
+import { FieldProps } from '../../types'
+import styles from './WellOrderInput.css'
+import { WellOrderModal } from './WellOrderModal'
 
 export interface WellOrderFieldProps {
   className?: string | null

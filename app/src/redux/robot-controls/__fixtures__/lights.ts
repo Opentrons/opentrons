@@ -1,5 +1,4 @@
 // mock HTTP responses for /robot/lights endpoints
-
 import { mockRobot } from '../../robot-api/__fixtures__'
 import type { Method } from '../../robot-api/types'
 

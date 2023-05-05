@@ -1,5 +1,6 @@
-import { resetAllWhenMocks, when } from 'jest-when'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import { resetAllWhenMocks, when } from 'jest-when'
+
 import { determineMultiChannelSupport } from '../../utils/determineMultiChannelSupport'
 
 jest.mock('@opentrons/shared-data')

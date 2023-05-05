@@ -1,12 +1,13 @@
 import { add } from 'date-fns'
+
 import { CONNECTABLE, REACHABLE } from '../../discovery'
+import { ConnectivityStatus } from '../../discovery/types'
+import type { State } from '../../types'
 import {
   getRobotRestarting,
   getNextRestartStatus,
   getResetConfigOptions,
 } from '../selectors'
-import type { State } from '../../types'
-import { ConnectivityStatus } from '../../discovery/types'
 
 const START_TIME = new Date('2000-01-01')
 

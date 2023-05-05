@@ -1,7 +1,9 @@
-import get from 'lodash/get'
 import assert from 'assert'
+import get from 'lodash/get'
 import { Store } from 'redux'
+
 import { dismissedHintsPersist } from './tutorial/reducers'
+
 export interface RehydratePersistedAction {
   type: 'REHYDRATE_PERSISTED'
   payload: {

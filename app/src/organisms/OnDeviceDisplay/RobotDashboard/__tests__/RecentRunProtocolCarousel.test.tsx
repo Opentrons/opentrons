@@ -1,11 +1,9 @@
 import * as React from 'react'
-
 import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
-
-import type { ProtocolResource } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../RecentRunProtocolCard')

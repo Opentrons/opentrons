@@ -1,6 +1,4 @@
 import * as React from 'react'
-import map from 'lodash/map'
-
 import {
   Flex,
   Box,
@@ -16,6 +14,9 @@ import {
   RunTimeCommand,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import map from 'lodash/map'
+
+import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -23,7 +24,6 @@ import {
 } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 
 interface SetupLabwareMapProps {

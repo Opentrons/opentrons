@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -8,6 +7,8 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../atoms/text'
 
 export interface ClearDeckModalProps {

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -7,6 +6,8 @@ import {
   TYPOGRAPHY,
   SecondaryButton,
 } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
+
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 

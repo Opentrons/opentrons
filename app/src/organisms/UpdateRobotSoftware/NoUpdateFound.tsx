@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
 import {
   Flex,
   SPACING,
@@ -12,6 +9,8 @@ import {
   PrimaryButton,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 import { StyledText } from '../../atoms/text'
 

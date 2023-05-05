@@ -1,7 +1,8 @@
 import * as React from 'react'
-import cx from 'classnames'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { InstrumentDiagram } from '@opentrons/components'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import cx from 'classnames'
+
 import { FormPipette } from '../../../step-forms/types'
 import styles from './FilePipettesModal.css'
 

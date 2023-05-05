@@ -2,11 +2,12 @@
 // Instances of BlockingHint need to be individually placed by whatever component
 // is controlling the flow that this modal will block, via useBlockingHint.
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { actions, selectors, HintKey } from '../../tutorial'
 import { ContinueModal, DeprecatedCheckboxField } from '@opentrons/components'
-import { Portal } from '../portals/MainPageModalPortal'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { i18n } from '../../localization'
+import { actions, selectors, HintKey } from '../../tutorial'
+import { Portal } from '../portals/MainPageModalPortal'
 import styles from './hints.css'
 
 export interface HintProps {

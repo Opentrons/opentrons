@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
+import { isOT3Pipette } from '@opentrons/shared-data'
 import { fireEvent } from '@testing-library/react'
 import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../i18n'
-import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
-import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
-import { isOT3Pipette } from '@opentrons/shared-data'
 
+import { i18n } from '../../../../i18n'
+import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
 import type { Mount } from '../../../../redux/pipettes/types'
+import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 
 jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data', () => {

@@ -1,11 +1,12 @@
-import difference from 'lodash/difference'
-import isEqual from 'lodash/isEqual'
-import without from 'lodash/without'
+import { Options } from '@opentrons/components'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
+import difference from 'lodash/difference'
+import isEqual from 'lodash/isEqual'
+import without from 'lodash/without'
+
 import {
   PROFILE_CYCLE,
   FormData,
@@ -14,11 +15,12 @@ import {
   StepType,
   PathOption,
 } from '../../form-types'
+import { i18n } from '../../localization'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { Options } from '@opentrons/components'
 import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import { FormWarning } from '../../steplist/formLevel/warnings'
 import { StepFormErrors } from '../../steplist/types'
+
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType
   path?: PathOption | null | undefined

@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link as RouterLink } from 'react-router-dom'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -12,6 +9,8 @@ import {
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { Link as RouterLink } from 'react-router-dom'
 
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'

@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
+import { fireEvent } from '@testing-library/react'
 
+import { i18n } from '../../../i18n'
 import {
   mockMagneticModule,
   mockMagneticModuleGen2,
 } from '../../../redux/modules/__fixtures__'
+import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
 jest.mock('@opentrons/react-api-client')
 

@@ -1,5 +1,6 @@
 import { HostConfig, Session, getSession } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
+
 import { useHost } from '../api'
 
 export function useSessionQuery(sessionId: string): UseQueryResult<Session> {

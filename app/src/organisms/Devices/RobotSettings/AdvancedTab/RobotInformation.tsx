@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,6 +7,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../../../atoms/text'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import {

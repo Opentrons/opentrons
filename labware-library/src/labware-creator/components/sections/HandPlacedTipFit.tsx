@@ -1,14 +1,13 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
+
 import { snugLooseOptions } from '../../fields'
+import type { LabwareFields } from '../../fields'
+import styles from '../../styles.css'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { TipFitAlerts } from '../alerts/TipFitAlerts'
 import { Dropdown } from '../Dropdown'
 import { SectionBody } from './SectionBody'
-
-import styles from '../../styles.css'
-
-import type { LabwareFields } from '../../fields'
 
 const Content = (): JSX.Element => (
   <div className={styles.flex_row}>

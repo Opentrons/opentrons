@@ -1,8 +1,9 @@
-import capitalize from 'lodash/capitalize'
 import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
+import capitalize from 'lodash/capitalize'
+
 import { displayAsTube, getLabwareName } from './utils'
 
 export const MAX_X_DIMENSION = 129

@@ -1,24 +1,22 @@
 import * as React from 'react'
+import { AlertModal } from '@opentrons/components'
+import type { ButtonProps } from '@opentrons/components'
 import { useSelector } from 'react-redux'
 
+import { Portal } from '../../../../App/portal'
+import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
+import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
 import { getRobotApiVersion } from '../../../../redux/discovery'
+import type { ViewableRobot } from '../../../../redux/discovery/types'
 import {
   CURRENT_VERSION,
   getAvailableShellUpdate,
 } from '../../../../redux/shell'
-
-import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../../../App/portal'
-import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
+import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
+import styles from './styles.css'
+import { SyncRobotMessage } from './SyncRobotMessage'
 import { UpdateAppMessage } from './UpdateAppMessage'
 import { VersionList } from './VersionList'
-import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
-import { SyncRobotMessage } from './SyncRobotMessage'
-import styles from './styles.css'
-
-import type { ButtonProps } from '@opentrons/components'
-import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
-import type { ViewableRobot } from '../../../../redux/discovery/types'
 
 export interface VersionInfoModalProps {
   robot: ViewableRobot

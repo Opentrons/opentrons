@@ -1,9 +1,4 @@
 import {
-  formatTimestamp,
-  getIs96ChannelPipetteAttached,
-  getOffsetCalibrationForMount,
-} from '../utils'
-import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
@@ -12,6 +7,11 @@ import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
 } from '../../../redux/pipettes/types'
+import {
+  formatTimestamp,
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from '../utils'
 
 describe('formatTimestamp', () => {
   it('should format an ISO 8601 date string', () => {

@@ -1,8 +1,7 @@
-import * as Selectors from '../selectors'
 import * as SessionsSelectors from '../../sessions/selectors'
-
-import type { State } from '../../types'
+import * as Selectors from '../selectors'
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
+import type { State } from '../../types'
 
 jest.mock('../../sessions/selectors')
 

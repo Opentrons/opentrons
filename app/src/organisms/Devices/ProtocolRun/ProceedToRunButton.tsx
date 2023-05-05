@@ -1,8 +1,7 @@
 import * as React from 'react'
+import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-
-import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
 
 import { Tooltip } from '../../../atoms/Tooltip'
 import {

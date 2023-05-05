@@ -1,6 +1,7 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { Modal, OutlineButton } from '@opentrons/components'
+import cx from 'classnames'
+
 import { i18n } from '../../../localization'
 import {
   setLocalStorageItem,
@@ -8,8 +9,8 @@ import {
   localStorageAnnouncementKey,
 } from '../../../persist'
 import modalStyles from '../modal.css'
-import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
+import { announcements } from './announcements'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { announcementKey, message, heading, image } = announcements[

@@ -1,7 +1,8 @@
 // labware filters
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { Icon } from '@opentrons/components'
+import { Link } from 'react-router-dom'
+
 import {
   LABWARE_GUIDE,
   WHAT_IS_A_LABWARE_DEFINITION,

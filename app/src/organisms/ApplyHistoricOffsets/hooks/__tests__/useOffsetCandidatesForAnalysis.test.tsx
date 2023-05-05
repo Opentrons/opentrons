@@ -1,18 +1,17 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
-import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
-
-import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../../redux/protocol-storage/__fixtures__'
-
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { renderHook } from '@testing-library/react-hooks'
+import { resetAllWhenMocks, when } from 'jest-when'
+
+import { storedProtocolData as storedProtocolDataFixture } from '../../../../redux/protocol-storage/__fixtures__'
+import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
+import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 jest.mock('../useAllHistoricOffsets')

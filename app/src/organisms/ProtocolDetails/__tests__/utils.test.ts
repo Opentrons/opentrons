@@ -4,6 +4,7 @@ import {
   OT2_STANDARD_MODEL,
   OT3_STANDARD_MODEL,
 } from '@opentrons/shared-data'
+
 import { getSlotsForThermocycler } from '../utils'
 
 describe('getSlotsForThermocylcer', () => {

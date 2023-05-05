@@ -7,8 +7,8 @@ import {
   ADD_UNIQUE_VALUE,
   SUBTRACT_VALUE,
 } from './constants'
-
 import type { Config } from './schema-types'
+
 export * from './schema-types'
 
 export type ConfigState = Config | null

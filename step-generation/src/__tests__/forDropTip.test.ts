@@ -1,13 +1,14 @@
+import { makeImmutableStateUpdater } from '../__utils__'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   makeStateArgsStandard,
   makeContext,
   makeState,
   DEFAULT_PIPETTE,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '../constants'
-import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 import { InvariantContext, RobotState } from '../types'
+
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
 describe('dropTip', () => {
   let invariantContext: InvariantContext

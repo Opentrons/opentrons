@@ -1,14 +1,13 @@
 import * as React from 'react'
-
 import { mountWithStore } from '@opentrons/components'
+
 import * as AppAlerts from '../../../redux/alerts'
 import { Alerts } from '..'
-import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
-import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
-import { UpdateAppModal } from '../../UpdateAppModal'
-
-import type { State } from '../../../redux/types'
 import type { AlertId } from '../../../redux/alerts/types'
+import type { State } from '../../../redux/types'
+import { AnalyticsSettingsModal } from '../../AnalyticsSettingsModal'
+import { UpdateAppModal } from '../../UpdateAppModal'
+import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 
 jest.mock('../../AnalyticsSettingsModal', () => ({
   AnalyticsSettingsModal: () => <></>,

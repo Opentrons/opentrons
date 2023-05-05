@@ -4,15 +4,16 @@ import {
   DropdownField,
   FormGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import type { ModuleType } from '@opentrons/shared-data'
+
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
 } from '../../../constants'
+import { i18n } from '../../../localization'
 import { FormModulesByType } from '../../../step-forms'
 import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
-import type { ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed

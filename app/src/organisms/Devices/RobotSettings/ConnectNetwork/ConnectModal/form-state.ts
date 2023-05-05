@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
-import { useFormikContext, useField } from 'formik'
 import { usePrevious } from '@opentrons/components'
+import { useFormikContext, useField } from 'formik'
+import { useEffect } from 'react'
 
 import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
 

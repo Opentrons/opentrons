@@ -1,12 +1,13 @@
 // labware details page title and category
 import * as React from 'react'
+
 import {
   MANUFACTURER,
   MANUFACTURER_NO,
   MANUFACTURER_VALUES,
 } from '../../localization'
-import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
 import type { LabwareBrand } from '../../types'
+import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
 import styles from './styles.css'
 
 export interface ManufacturerStatsProps {

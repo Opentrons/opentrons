@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { COLORS } from '@opentrons/components'
-import { StatusLabel } from './index'
 import type { Story, Meta } from '@storybook/react'
+
+import { StatusLabel } from './index'
 
 export default {
   title: 'App/Atoms/StatusLabel',

@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { Flex as FlexComponent } from './Flex'
 import {
   Box,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { Flex as FlexComponent } from './Flex'
 
 export default {
   title: 'Library/Atoms/Flex',

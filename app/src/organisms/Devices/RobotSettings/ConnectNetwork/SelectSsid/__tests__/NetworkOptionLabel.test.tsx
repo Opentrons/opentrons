@@ -4,7 +4,6 @@ import { mount } from 'enzyme'
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import { SECURITY_NONE } from '../../constants'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
-
 import type { NetworkOptionLabelProps } from '../NetworkOptionLabel'
 
 describe('NetworkOptionLabel presentational component', () => {

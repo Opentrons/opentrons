@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
+import { act } from 'react-dom/test-utils'
 
 import { useHover } from '../useHover'
 import type { UseHoverOptions, UseHoverResult } from '../useHover'

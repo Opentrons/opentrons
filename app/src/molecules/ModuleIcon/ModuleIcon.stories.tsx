@@ -1,17 +1,15 @@
 import * as React from 'react'
-
 import {
   Flex,
   SPACING,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-
-import { ModuleIcon } from './index'
-import { StyledText } from '../../atoms/text'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { StyledText } from '../../atoms/text'
 import type { AttachedModule } from '../../redux/modules/types'
+import { ModuleIcon } from './index'
 
 export default {
   title: 'App/Molecules/ModuleIcon',

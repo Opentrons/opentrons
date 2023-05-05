@@ -1,12 +1,11 @@
-import { UseQueryResult } from 'react-query'
+import type { Sessions, Runs } from '@opentrons/api-client'
 import {
   useAllSessionsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
+import { UseQueryResult } from 'react-query'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
-
-import type { Sessions, Runs } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')

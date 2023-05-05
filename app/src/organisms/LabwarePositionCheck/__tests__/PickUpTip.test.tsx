@@ -1,13 +1,14 @@
 import * as React from 'react'
-import type { MatcherFunction } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { PickUpTip } from '../PickUpTip'
-import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { CommandData } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+import type { MatcherFunction } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
+
+import { i18n } from '../../../i18n'
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
+import { SECTIONS } from '../constants'
+import { PickUpTip } from '../PickUpTip'
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 

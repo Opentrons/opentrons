@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import type { RunStatus, RunData } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import type { RunStatus, RunData } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 

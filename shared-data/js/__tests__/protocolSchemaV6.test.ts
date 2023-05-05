@@ -1,13 +1,13 @@
 /** Ensure that protocol schema v6 definition itself functions as intended,
  *  and that all v6 protocol fixtures will validate */
 import Ajv from 'ajv'
-import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
+import path from 'path'
 
-import protocolSchema from '../../protocol/schemas/6.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
 import simpleV6Fixture from '../../protocol/fixtures/6/simpleV6.json'
+import protocolSchema from '../../protocol/schemas/6.json'
 
 const fixturesGlobPath = path.join(
   __dirname,

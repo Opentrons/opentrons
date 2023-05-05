@@ -4,7 +4,6 @@ import {
   THERMOCYCLER,
   ModuleType,
 } from '@opentrons/shared-data'
-
 import type {
   MagneticModuleModel,
   TemperatureModuleModel,

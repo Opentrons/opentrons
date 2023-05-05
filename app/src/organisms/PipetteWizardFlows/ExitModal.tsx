@@ -1,6 +1,4 @@
 import * as React from 'react'
-import capitalize from 'lodash/capitalize'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   SPACING,
@@ -9,6 +7,9 @@ import {
   SecondaryButton,
   AlertPrimaryButton,
 } from '@opentrons/components'
+import capitalize from 'lodash/capitalize'
+import { useTranslation } from 'react-i18next'
+
 import { SmallButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

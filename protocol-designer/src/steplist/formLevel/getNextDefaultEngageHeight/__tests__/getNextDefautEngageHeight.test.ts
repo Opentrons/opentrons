@@ -1,5 +1,6 @@
 import { getNextDefaultEngageHeight } from '../'
 import { StepType } from '../../../../form-types'
+
 describe('getNextDefaultEngageHeight', () => {
   describe('no previous forms', () => {
     const testCases = [

@@ -1,6 +1,5 @@
 import * as Fixtures from '../__fixtures__'
 import * as actions from '../actions'
-
 import type { Action } from '../../types'
 
 interface ActionSpec {

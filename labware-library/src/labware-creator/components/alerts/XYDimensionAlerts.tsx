@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { FormikTouched } from 'formik'
 import { AlertItem } from '@opentrons/components'
+import { FormikTouched } from 'formik'
+
 import {
   SUGGESTED_X,
   SUGGESTED_Y,

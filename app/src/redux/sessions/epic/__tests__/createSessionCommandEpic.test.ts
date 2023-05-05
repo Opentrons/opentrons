@@ -1,10 +1,8 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as RobotApiHttp from '../../../robot-api/http'
-
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
-
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import type { Action } from '../../../types'
 import { CreateSessionCommandAction } from '../../types'
 

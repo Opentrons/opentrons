@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   DropdownField,
   FormGroup,
@@ -13,20 +12,19 @@ import {
   getLabwareDisplayName,
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
+import type { PipetteName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
-import { i18n } from '../../../localization'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { PipetteDiagram } from './PipetteDiagram'
-
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
-
+import { i18n } from '../../../localization'
 import { FormPipettesByMount } from '../../../step-forms'
-import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
-
-import type { PipetteName } from '@opentrons/shared-data'
+import formStyles from '../../forms/forms.css'
+import styles from './FilePipettesModal.css'
+import { PipetteDiagram } from './PipetteDiagram'
 
 export interface Props {
   initialTabIndex?: number

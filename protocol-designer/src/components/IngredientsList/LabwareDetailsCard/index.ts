@@ -1,15 +1,17 @@
-import { connect } from 'react-redux'
-import assert from 'assert'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import assert from 'assert'
+import { connect } from 'react-redux'
+
+import * as labwareIngredActions from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { BaseState, ThunkDispatch } from '../../../types'
+import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import {
   LabwareDetailsCard as LabwareDetailsCardComponent,
   Props as LabwareDetailsCardProps,
 } from './LabwareDetailsCard'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
-import { BaseState, ThunkDispatch } from '../../../types'
+
 type SP = Omit<LabwareDetailsCardProps, 'renameLabware'> & {
   _labwareId?: string
 }

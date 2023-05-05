@@ -1,8 +1,5 @@
 // app info card with version and updated
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-
 import {
   SPACING_AUTO,
   Flex,
@@ -18,17 +15,18 @@ import {
   ALIGN_START,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
+import { Portal } from '../../App/portal'
+import { Banner } from '../../atoms/Banner'
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import {
-  CURRENT_VERSION,
-  getAvailableShellUpdate,
-  checkShellUpdate,
-} from '../../redux/shell'
+import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
+import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
+import { UpdateAppModal } from '../../organisms/UpdateAppModal'
 import {
   ALERT_APP_UPDATE_AVAILABLE,
   getAlertIsPermanentlyIgnored,
@@ -39,11 +37,11 @@ import {
   useTrackEvent,
   ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
 } from '../../redux/analytics'
-import { UpdateAppModal } from '../../organisms/UpdateAppModal'
-import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
-import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
-import { Portal } from '../../App/portal'
-
+import {
+  CURRENT_VERSION,
+  getAvailableShellUpdate,
+  checkShellUpdate,
+} from '../../redux/shell'
 import type { Dispatch, State } from '../../redux/types'
 
 const SOFTWARE_SYNC_URL =

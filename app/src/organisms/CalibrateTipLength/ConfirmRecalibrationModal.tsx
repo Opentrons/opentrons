@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import {
   AlertModal,
   Box,
@@ -12,7 +11,6 @@ import {
 } from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
-
 import styles from './styles.css'
 
 const TITLE = 'Are you sure you want to continue?'

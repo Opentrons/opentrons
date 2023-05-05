@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { StatusLabel } from '../../atoms/StatusLabel'
 import {
   Flex,
   TYPOGRAPHY,
@@ -12,8 +10,10 @@ import {
   Box,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { useTranslation } from 'react-i18next'
 
+import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
 import type { ThermocyclerData } from '../../redux/modules/api-types'
 
 interface ThermocyclerModuleProps {

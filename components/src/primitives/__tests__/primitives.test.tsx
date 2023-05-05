@@ -1,7 +1,6 @@
 // test concrete implementations of primitive components to ensure that they:
 // - Apply the style props to CSS
 // - Don't pass the style props down to the DOM
-
 import * as React from 'react'
 import { shallow } from 'enzyme'
 

@@ -1,14 +1,13 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import React from 'react'
+
 import {
   getDefaultFormState,
   getInitialStatus,
   LabwareFields,
 } from '../../../fields'
-
 import { CustomTiprackWarning } from '../../sections/CustomTiprackWarning'
-
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 let formikConfig: FormikConfig<LabwareFields>

@@ -1,5 +1,5 @@
-import { MATCH, INEXACT_MATCH } from '../../../redux/pipettes'
 import { useDeckCalibrationStatus, useIsOT3, useRunPipetteInfoByMount } from '.'
+import { MATCH, INEXACT_MATCH } from '../../../redux/pipettes'
 
 export interface ProtocolCalibrationStatus {
   complete: boolean

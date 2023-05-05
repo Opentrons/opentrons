@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   Flex,
   COLORS,
@@ -11,11 +8,14 @@ import {
   ALIGN_FLEX_END,
   useConditionalConfirm,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Portal } from '../../App/portal'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -27,12 +27,10 @@ import {
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
-import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
-import { getIsOT3Protocol } from './utils'
-
-import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { Dispatch } from '../../redux/types'
+import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
+import { getIsOT3Protocol } from './utils'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void

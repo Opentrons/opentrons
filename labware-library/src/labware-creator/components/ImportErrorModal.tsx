@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
-import styles from '../styles.css'
+
 import type { ImportError, ImportErrorKey } from '../fields'
+import styles from '../styles.css'
 
 const ERROR_MAP: Record<ImportErrorKey, React.ReactNode> = {
   INVALID_FILE_TYPE: 'This is not a .json file',

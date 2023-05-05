@@ -1,10 +1,11 @@
 import * as React from 'react'
-import i18next from 'i18next'
 import { renderWithProviders } from '@opentrons/components'
 import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
+import i18next from 'i18next'
+
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
 
 jest.mock('../../Hints/useBlockingHint')

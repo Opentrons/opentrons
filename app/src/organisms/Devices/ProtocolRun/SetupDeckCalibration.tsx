@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -12,6 +9,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import { TertiaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'

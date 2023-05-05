@@ -5,6 +5,7 @@ import {
   SessionType,
 } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
+
 import { useHost } from '../api'
 
 export function useSessionsByTypeQuery(args: {

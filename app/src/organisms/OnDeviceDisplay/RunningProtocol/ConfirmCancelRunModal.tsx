@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -14,14 +11,15 @@ import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
-import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
-
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string

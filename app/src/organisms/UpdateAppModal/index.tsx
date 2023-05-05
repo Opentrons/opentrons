@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Link as InternalLink } from 'react-router-dom'
-
 import {
   ALIGN_CENTER,
   C_BLUE,
@@ -27,16 +24,16 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useSelector, useDispatch } from 'react-redux'
+import { Link as InternalLink } from 'react-router-dom'
 
+import { ErrorModal } from '../../molecules/modals'
+import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 import {
   getShellUpdateState,
   downloadShellUpdate,
   applyShellUpdate,
 } from '../../redux/shell'
-
-import { ErrorModal } from '../../molecules/modals'
-import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-
 import type { Dispatch } from '../../redux/types'
 
 export interface UpdateAppModalProps {

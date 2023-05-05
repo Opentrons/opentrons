@@ -1,12 +1,8 @@
-import path from 'path'
-import { app } from 'electron'
-import uuid from 'uuid/v4'
 import {
   CONFIG_VERSION_LATEST,
   OT2_MANIFEST_URL,
   OT3_MANIFEST_URL,
 } from '@opentrons/app/src/redux/config'
-
 import type {
   Config,
   ConfigV12,
@@ -14,6 +10,10 @@ import type {
   ConfigV14,
   ConfigV15,
 } from '@opentrons/app/src/redux/config/types'
+import { app } from 'electron'
+import path from 'path'
+import uuid from 'uuid/v4'
+
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration

@@ -2,10 +2,9 @@ import { TestScheduler } from 'rxjs/testing'
 
 import * as Alerts from '../../alerts'
 import * as Selectors from '../selectors'
+import type { Action, State } from '../../types'
 import { NOT_APPLICABLE, UP_TO_DATE, OUTDATED } from '../constants'
 import { systemInfoEpic } from '../epic'
-
-import type { Action, State } from '../../types'
 import type { DriverStatus } from '../types'
 
 jest.mock('../selectors')

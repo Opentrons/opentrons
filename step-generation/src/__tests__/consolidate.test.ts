@@ -1,3 +1,6 @@
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+
 import { consolidate } from '../commandCreators/compound/consolidate'
 import { FIXED_TRASH_ID } from '../constants'
 import {
@@ -23,10 +26,9 @@ import {
   SOURCE_LABWARE,
   AIR_GAP_META,
 } from '../fixtures'
-import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
+import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
+
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',

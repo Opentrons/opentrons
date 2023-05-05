@@ -1,3 +1,6 @@
+import type { CreateCommand } from '@opentrons/shared-data'
+
+import { distribute } from '../commandCreators/compound/distribute'
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -21,8 +24,6 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { distribute } from '../commandCreators/compound/distribute'
-import type { CreateCommand } from '@opentrons/shared-data'
 import type { DistributeArgs, InvariantContext, RobotState } from '../types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,

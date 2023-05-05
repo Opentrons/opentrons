@@ -1,7 +1,8 @@
-import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
-import { getCheckSteps } from './utils/getCheckSteps'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 import type { LabwarePositionCheckStep } from './types'
+import { getCheckSteps } from './utils/getCheckSteps'
+import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
 
 export const getLabwarePositionCheckSteps = (
   protocolData: CompletedProtocolAnalysis

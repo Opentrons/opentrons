@@ -4,9 +4,9 @@ import {
   getMaintenanceRun,
 } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
-import { useHost } from '../api'
-
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
+
+import { useHost } from '../api'
 
 export function useMaintenanceRunQuery<TError = Error>(
   maintenanceRunId: string | null,

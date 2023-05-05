@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
 import { ApplyHistoricOffsets } from '..'
+import { i18n } from '../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 

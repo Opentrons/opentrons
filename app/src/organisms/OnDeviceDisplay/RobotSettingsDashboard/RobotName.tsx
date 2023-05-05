@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   Btn,
@@ -8,9 +6,9 @@ import {
   JUSTIFY_FLEX_START,
   Icon,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../../atoms/text'
-
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface RobotNameProps {

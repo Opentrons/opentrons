@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
 import { InterstitialTitleBar } from '../InterstitiallTitleBar'
 
 const render = (props: React.ComponentProps<typeof InterstitialTitleBar>) => {

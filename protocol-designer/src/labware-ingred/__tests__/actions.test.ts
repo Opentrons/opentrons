@@ -1,8 +1,9 @@
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
+
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'

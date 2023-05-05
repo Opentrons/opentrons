@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
-import { LiquidsListItemDetails } from '../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
+
+import { LiquidsListItemDetails } from '../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
+import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
 
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
 jest.mock('@opentrons/api-client')

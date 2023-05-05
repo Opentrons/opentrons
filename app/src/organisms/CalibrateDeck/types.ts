@@ -1,5 +1,5 @@
-import type { DeckCalibrationSession } from '../../redux/sessions/types'
 import { DispatchRequestsType } from '../../redux/robot-api'
+import type { DeckCalibrationSession } from '../../redux/sessions/types'
 
 export interface CalibrateDeckParentProps {
   robotName: string

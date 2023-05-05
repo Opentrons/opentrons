@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CELSIUS,
   getModuleDisplayName,
@@ -8,24 +15,17 @@ import {
   TEMP_BLOCK_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
-import { SubmitPrimaryButton } from '../../atoms/buttons'
-
-import type { ThermocyclerModule } from '../../redux/modules/types'
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useTranslation } from 'react-i18next'
+
+import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { InputField } from '../../atoms/InputField'
+import { Slideout } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
+import type { ThermocyclerModule } from '../../redux/modules/types'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule

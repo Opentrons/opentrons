@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   Btn,
@@ -10,17 +7,18 @@ import {
   ALIGN_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { StyledText } from '../../../atoms/text'
+import { SLEEP_NEVER_MS } from '../../../App/constants'
 import { RadioButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../../redux/config'
-import { SLEEP_NEVER_MS } from '../../../App/constants'
-
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 

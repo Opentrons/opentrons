@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   Flex,
@@ -8,15 +7,16 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+
+import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
-
 import type { GripperWizardStepProps } from './types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 export const UnmountGripper = (
   props: GripperWizardStepProps

@@ -1,5 +1,4 @@
 import * as React from 'react'
-
 import {
   Text,
   Flex,
@@ -11,10 +10,10 @@ import {
   SPACING,
   BORDERS,
 } from '@opentrons/components'
-import { ICON_DATA_BY_NAME } from './icon-data'
-import { Icon as IconComponent, IconName } from './Icon'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { Icon as IconComponent, IconName } from './Icon'
+import { ICON_DATA_BY_NAME } from './icon-data'
 
 export default {
   title: 'Library/Atoms/IconList',

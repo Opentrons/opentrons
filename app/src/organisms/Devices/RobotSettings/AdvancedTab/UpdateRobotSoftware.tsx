@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -13,16 +9,18 @@ import {
   useHoverTooltip,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
-import { StyledText } from '../../../../atoms/text'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
+import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
 } from '../../../../redux/buildroot'
-
 import type { State, Dispatch } from '../../../../redux/types'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'

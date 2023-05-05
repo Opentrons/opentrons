@@ -1,20 +1,18 @@
-import React from 'react'
-import { Provider } from 'react-redux'
-import { act } from 'react-dom/test-utils'
-import thunk from 'redux-thunk'
-import { mount } from 'enzyme'
-import configureMockStore from 'redux-mock-store'
-import { when, resetAllWhenMocks } from 'jest-when'
-
+import { DeprecatedPrimaryButton, Tooltip } from '@opentrons/components'
 import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
+import { mount } from 'enzyme'
+import { when, resetAllWhenMocks } from 'jest-when'
+import React from 'react'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
-
-import { DeprecatedPrimaryButton, Tooltip } from '@opentrons/components'
 import {
   StepCreationButton,
   StepCreationButtonComponent,

@@ -1,14 +1,13 @@
 import * as React from 'react'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { renderHook } from '@testing-library/react-hooks'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-
-import { useSortedProtocols } from '../hooks'
-import { StoredProtocolData } from '../../../redux/protocol-storage'
-
 import type { Store } from 'redux'
+
+import { StoredProtocolData } from '../../../redux/protocol-storage'
 import type { State } from '../../../redux/types'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { useSortedProtocols } from '../hooks'
 
 const mockStoredProtocolData = [
   {

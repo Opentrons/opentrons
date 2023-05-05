@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,10 +9,11 @@ import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
 
+import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,

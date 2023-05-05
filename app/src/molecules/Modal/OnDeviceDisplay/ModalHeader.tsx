@@ -10,6 +10,7 @@ import {
   COLORS,
   SIZE_2,
 } from '@opentrons/components'
+
 import { StyledText } from '../../../atoms/text'
 import type { ModalHeaderBaseProps } from './types'
 

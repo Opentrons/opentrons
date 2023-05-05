@@ -1,9 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-import capitalize from 'lodash/capitalize'
-import { useDispatch } from 'react-redux'
-
 import {
   Flex,
   SPACING,
@@ -16,10 +11,13 @@ import {
   JUSTIFY_CENTER,
   DIRECTION_ROW,
 } from '@opentrons/components'
+import capitalize from 'lodash/capitalize'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import { StyledText } from '../../atoms/text'
 import { startBuildrootUpdate } from '../../redux/buildroot'
-
 import type { Dispatch } from '../../redux/types'
 
 interface ErrorUpdateSoftwareProps {

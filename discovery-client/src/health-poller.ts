@@ -1,14 +1,13 @@
-import net from 'net'
-import fetch from 'node-fetch'
 import intersectionBy from 'lodash/intersectionBy'
 import unionBy from 'lodash/unionBy'
 import xorBy from 'lodash/xorBy'
+import net from 'net'
+import fetch from 'node-fetch'
 
 import {
   ROBOT_SERVER_HEALTH_PATH,
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
-
 import type {
   HealthPoller,
   HealthPollerTarget,

@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   TYPOGRAPHY,
@@ -8,18 +6,20 @@ import {
   COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CELSIUS,
   getModuleDisplayName,
   TEMP_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
+import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useTranslation } from 'react-i18next'
+
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
+import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-
 import type { TemperatureModule } from '../../redux/modules/types'
 
 interface TemperatureModuleSlideoutProps {

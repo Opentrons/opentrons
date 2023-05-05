@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import noop from 'lodash/noop'
+import { Provider } from 'react-redux'
 
 import * as Selectors from '../selectors'
 import { useFeatureFlag } from '../hooks'

@@ -1,22 +1,20 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
-
-import { renderWithProviders, useLongPress } from '@opentrons/components'
 import {
   getProtocol,
   deleteProtocol,
   deleteRun,
   HostConfig,
 } from '@opentrons/api-client'
+import { renderWithProviders, useLongPress } from '@opentrons/components'
+import type { UseLongPressResult } from '@opentrons/components'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import { fireEvent } from '@testing-library/react'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../../i18n'
 import { LongPressModal } from '../LongPressModal'
-
-import type { UseLongPressResult } from '@opentrons/components'
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = jest.fn((id: string) => {})

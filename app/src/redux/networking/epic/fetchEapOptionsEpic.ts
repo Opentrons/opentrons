@@ -2,14 +2,13 @@ import { ofType } from 'redux-observable'
 
 import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-import { fetchEapOptionsSuccess, fetchEapOptionsFailure } from '../actions'
-import { FETCH_EAP_OPTIONS, EAP_OPTIONS_PATH } from '../constants'
-
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 import type { Action, Epic } from '../../types'
+import { fetchEapOptionsSuccess, fetchEapOptionsFailure } from '../actions'
+import { FETCH_EAP_OPTIONS, EAP_OPTIONS_PATH } from '../constants'
 import { FetchEapOptionsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchEapOptionsAction> = action => ({

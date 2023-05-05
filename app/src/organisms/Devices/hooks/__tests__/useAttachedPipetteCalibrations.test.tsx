@@ -1,15 +1,16 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
+import { useAttachedPipetteCalibrations } from '..'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -18,8 +19,6 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
 } from '../../../../redux/calibration/tip-length/__fixtures__'
-
-import { useAttachedPipetteCalibrations } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/calibration')

@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { BrowserRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
@@ -14,6 +10,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useRunQuery,
@@ -21,7 +18,13 @@ import {
   usePipettesQuery,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import '@testing-library/jest-dom'
+import { fireEvent, waitFor } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import type { UseQueryResult } from 'react-query'
+import { BrowserRouter } from 'react-router-dom'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -29,11 +32,6 @@ import {
   useCurrentRunId,
 } from '../../../../organisms/ProtocolUpload/hooks'
 import { ConfirmCancelModal } from '../../../../organisms/RunDetails/ConfirmCancelModal'
-import {
-  useRunTimestamps,
-  useRunControls,
-  useRunStatus,
-} from '../../../../organisms/RunTimeControl/hooks'
 import {
   mockFailedRun,
   mockIdleUnstartedRun,
@@ -44,7 +42,11 @@ import {
   mockStopRequestedRun,
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import {
+  useRunTimestamps,
+  useRunControls,
+  useRunStatus,
+} from '../../../../organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -56,7 +58,11 @@ import {
 } from '../../../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
-
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
+import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
+import { RunProgressMeter } from '../../../RunProgressMeter'
+import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -66,16 +72,8 @@ import {
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
 } from '../../hooks'
-import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
-import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
-import { RunProgressMeter } from '../../../RunProgressMeter'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
-import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
-
-import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 

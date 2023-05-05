@@ -1,3 +1,5 @@
+import type { Mount } from '@opentrons/components'
+
 import {
   DECK_CAL_STATUS_OK,
   DECK_CAL_STATUS_IDENTITY,
@@ -10,8 +12,6 @@ import {
   CALIBRATION_SOURCE_UNKNOWN,
   CALIBRATION_SOURCE_LEGACY,
 } from './constants'
-
-import type { Mount } from '@opentrons/components'
 
 export type DeckCalibrationStatus =
   | typeof DECK_CAL_STATUS_OK

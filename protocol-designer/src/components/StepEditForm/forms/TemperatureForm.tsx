@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import { useSelector } from 'react-redux'
 
+import { i18n } from '../../../localization'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
 import styles from '../StepEditForm.css'
 import { StepFormProps } from '../types'

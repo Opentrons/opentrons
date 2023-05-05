@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   Link,
@@ -13,17 +12,17 @@ import {
   SecondaryButton,
   CheckboxField,
 } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import styles from './styles.css'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
-import { StyledText } from '../../atoms/text'
-
 import type { Dispatch } from '../../redux/types'
+import styles from './styles.css'
 
 const BLOCK_REQUEST_EMAIL_BODY =
   '• Full name\n• Company or institution name\n• Shipping address\n• VAT ID (if outside the US)'

@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { UseMutateFunction } from 'react-query'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
 import {
   LEFT,
@@ -8,12 +11,16 @@ import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { AxiosError } from 'axios'
 import { Trans, useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
+import { UseMutateFunction } from 'react-query'
+
 import { Banner } from '../../atoms/Banner'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
   CALIBRATION_PROBE,
@@ -24,14 +31,8 @@ import {
   NINETY_SIX_CHANNEL_MOUNTING_PLATE,
   BODY_STYLE,
 } from './constants'
-import { getIsGantryEmpty } from './utils'
-import type { AxiosError } from 'axios'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
+import { getIsGantryEmpty } from './utils'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createMaintenanceRun: UseMutateFunction<

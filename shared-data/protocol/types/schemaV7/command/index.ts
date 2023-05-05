@@ -1,12 +1,4 @@
 import type {
-  PipettingRunTimeCommand,
-  PipettingCreateCommand,
-} from './pipetting'
-import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
-import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
-import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
-import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
-import type {
   AnnotationRunTimeCommand,
   AnnotationCreateCommand,
 } from './annotation'
@@ -14,6 +6,14 @@ import type {
   CalibrationRunTimeCommand,
   CalibrationCreateCommand,
 } from './calibration'
+import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
+import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
+import type {
+  PipettingRunTimeCommand,
+  PipettingCreateCommand,
+} from './pipetting'
+import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
+import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to

@@ -1,3 +1,4 @@
+import { StepType } from '../../form-types'
 import {
   FormError,
   composeErrors,
@@ -19,7 +20,6 @@ import {
   lidTemperatureHoldRequired,
   volumeTooHigh,
 } from './errors'
-
 import {
   FormWarning,
   FormWarningType,
@@ -31,7 +31,6 @@ import {
   minDispenseAirGapVolume,
 } from './warnings'
 
-import { StepType } from '../../form-types'
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'

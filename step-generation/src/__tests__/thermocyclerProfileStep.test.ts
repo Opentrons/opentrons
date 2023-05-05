@@ -1,11 +1,12 @@
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
   getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../fixtures'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,

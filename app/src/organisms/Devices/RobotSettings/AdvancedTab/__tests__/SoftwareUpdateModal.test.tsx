@@ -1,14 +1,13 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
+import { MemoryRouter } from 'react-router-dom'
+
 import { i18n } from '../../../../../i18n'
-import { getShellUpdateState } from '../../../../../redux/shell'
-import { useRobot } from '../../../hooks'
 import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
-
-import { SoftwareUpdateModal } from '../SoftwareUpdateModal'
-
+import { getShellUpdateState } from '../../../../../redux/shell'
 import type { ShellUpdateState } from '../../../../../redux/shell/types'
+import { useRobot } from '../../../hooks'
+import { SoftwareUpdateModal } from '../SoftwareUpdateModal'
 
 jest.mock('../../../../../redux/shell/update', () => ({
   ...jest.requireActual<{}>('../../../../../redux/shell/update'),

@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, BORDERS, SPACING, COLORS } from '../ui-style-constants'
+
+import { Btn } from '../primitives'
 import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
   DISPLAY_BLOCK,
   SIZE_1,
 } from '../styles'
-import { Btn } from '../primitives'
+import { TYPOGRAPHY, BORDERS, SPACING, COLORS } from '../ui-style-constants'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}

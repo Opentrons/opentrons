@@ -1,29 +1,27 @@
 import * as React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
-
 import {
   Box,
   POSITION_RELATIVE,
   COLORS,
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
+import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
 import { ToasterOven } from '../organisms/ToasterOven'
+import { AppSettings } from '../pages/AppSettings'
 import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
-import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
-import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
-import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
+import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
+import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot } from './portal'
-
 import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {

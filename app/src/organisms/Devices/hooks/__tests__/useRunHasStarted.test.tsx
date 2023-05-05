@@ -1,7 +1,6 @@
+import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
-
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { useRunHasStarted } from '../useRunHasStarted'

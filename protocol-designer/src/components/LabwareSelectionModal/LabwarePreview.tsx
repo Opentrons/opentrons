@@ -1,5 +1,4 @@
 import * as React from 'react'
-import reduce from 'lodash/reduce'
 import {
   Icon,
   LabwareRender,
@@ -11,6 +10,8 @@ import {
   getLabwareDefIsStandard,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import reduce from 'lodash/reduce'
+
 import { i18n } from '../../localization'
 import styles from './styles.css'
 

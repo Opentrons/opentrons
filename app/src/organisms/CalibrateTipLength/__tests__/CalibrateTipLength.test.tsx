@@ -1,15 +1,13 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { when, resetAllWhenMocks } from 'jest-when'
 
-import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
+import { i18n } from '../../../i18n'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
-
-import { CalibrateTipLength } from '../index'
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
+import { CalibrateTipLength } from '../index'
 
 jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')

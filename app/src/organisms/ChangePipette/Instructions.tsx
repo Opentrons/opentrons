@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -13,17 +11,19 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { CheckPipettesButton } from './CheckPipettesButton'
-import { InstructionStep } from './InstructionStep'
-import { PipetteSelection } from './PipetteSelection'
-
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
+import { StyledText } from '../../atoms/text'
 import type { Mount } from '../../redux/pipettes/types'
+import { CheckPipettesButton } from './CheckPipettesButton'
+import { InstructionStep } from './InstructionStep'
+import { PipetteSelection } from './PipetteSelection'
 import type { Direction } from './types'
 
 interface Props {

@@ -1,17 +1,16 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
-import { radiusSoftCorners } from '../ui-style-constants/borders'
-import { fontSizeH4 } from '../ui-style-constants/typography'
-import { spacing3 } from '../ui-style-constants/spacing'
-import { white, darkGreyEnabled } from '../ui-style-constants/colors'
-import { ARROW_SIZE_PX } from './styles'
-import { Box } from '../primitives'
-
 import type { CSSProperties } from 'react'
+import { css } from 'styled-components'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Placement } from './types'
+
+import { Box } from '../primitives'
 import type { StyleProps } from '../primitives'
+import { radiusSoftCorners } from '../ui-style-constants/borders'
+import { white, darkGreyEnabled } from '../ui-style-constants/colors'
+import { spacing3 } from '../ui-style-constants/spacing'
+import { fontSizeH4 } from '../ui-style-constants/typography'
+import { ARROW_SIZE_PX } from './styles'
+import type { Placement } from './types'
 
 export interface TooltipProps extends StyleProps {
   /** Whether or not the tooltip should be rendered */

@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+
+import * as Sessions from '../../../redux/sessions'
 import { i18n } from '../../../i18n'
 import {
   mockDeckCalTipRack,
   mockRobotCalibrationCheckSessionDetails,
   mockTipLengthCalBlock,
 } from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
-
 import { DeckSetup } from '../DeckSetup'
 
 jest.mock('../../../assets/labware/getLabware')

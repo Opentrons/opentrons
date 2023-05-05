@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
 import {
   HandleKeypress,
   TYPOGRAPHY,
@@ -15,11 +13,12 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
-
 import type { StepSize } from './types'
 
 const JUMP_SIZE_SUBTITLE = '- / +'

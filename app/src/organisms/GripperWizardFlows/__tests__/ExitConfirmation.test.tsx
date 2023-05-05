@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
 
-import { ExitConfirmation } from '../ExitConfirmation'
+import { i18n } from '../../../i18n'
 import { GRIPPER_FLOW_TYPES } from '../constants'
+import { ExitConfirmation } from '../ExitConfirmation'
 
 describe('ExitConfirmation', () => {
   let render: (

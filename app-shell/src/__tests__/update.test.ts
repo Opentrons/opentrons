@@ -1,9 +1,9 @@
 // app-shell self-update tests
 import * as ElectronUpdater from 'electron-updater'
-import { registerUpdate } from '../update'
-import * as Cfg from '../config'
 
+import * as Cfg from '../config'
 import type { Dispatch } from '../types'
+import { registerUpdate } from '../update'
 
 jest.unmock('electron-updater')
 jest.mock('electron-updater')

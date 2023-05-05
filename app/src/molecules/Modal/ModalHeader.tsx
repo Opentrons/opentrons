@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Btn,
   Icon,
@@ -11,10 +10,11 @@ import {
   JUSTIFY_CENTER,
   COLORS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
 import type { IconProps } from '@opentrons/components'
+import { css } from 'styled-components'
+
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 
 export interface ModalHeaderProps {
   onClose?: React.MouseEventHandler

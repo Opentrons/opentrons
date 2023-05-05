@@ -8,11 +8,13 @@ import {
   Reducer,
 } from 'redux'
 import thunk from 'redux-thunk'
+
 import { trackEventMiddleware } from './analytics/middleware'
-import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
+import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
 import { BaseState, Action } from './types'
+
 const timelineMiddleware = makeTimelineMiddleware()
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined

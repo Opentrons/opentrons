@@ -6,12 +6,13 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
+
+import { StepType } from '../../../form-types'
 import { i18n } from '../../../localization'
+import styles from '../StepEditForm.css'
+import { FieldProps } from '../types'
 import { getFieldDefaultTooltip } from '../utils'
 import { TextField } from './TextField'
-import { StepType } from '../../../form-types'
-import { FieldProps } from '../types'
-import styles from '../StepEditForm.css'
 
 type Props = FieldProps & {
   stepType: StepType

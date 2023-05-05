@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
+
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
+import { i18n } from '../../localization'
 import { FormError } from './errors'
+
 /*******************
  ** Warning Messages **
  ********************/

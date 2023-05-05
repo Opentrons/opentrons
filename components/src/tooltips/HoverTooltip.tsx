@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import { DeprecatedTooltip } from './DeprecatedTooltip'
-
 import type { DeprecatedTooltipProps } from './DeprecatedTooltip'
 
 const OPEN_DELAY_MS = 300

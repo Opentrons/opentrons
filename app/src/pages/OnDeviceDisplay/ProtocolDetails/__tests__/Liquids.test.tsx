@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
-import { when } from 'jest-when'
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
   ProtocolAnalyses,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import { when } from 'jest-when'
+import { UseQueryResult } from 'react-query'
+
 import { i18n } from '../../../../i18n'
 import { Liquids } from '../Liquids'
 

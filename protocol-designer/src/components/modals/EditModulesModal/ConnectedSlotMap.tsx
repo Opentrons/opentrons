@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { useField } from 'formik'
 import { SlotMap } from '@opentrons/components'
+import { useField } from 'formik'
+
 import styles from './EditModules.css'
 
 interface ConnectedSlotMapProps {

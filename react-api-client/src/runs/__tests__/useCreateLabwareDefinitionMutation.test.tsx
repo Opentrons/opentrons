@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
 import { createLabwareDefinition } from '@opentrons/api-client'
-import { useHost } from '../../api'
-
-import { useCreateLabwareDefinitionMutation } from '../useCreateLabwareDefinitionMutation'
 import type { HostConfig } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { act, renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
+
+import { useHost } from '../../api'
+import { useCreateLabwareDefinitionMutation } from '../useCreateLabwareDefinitionMutation'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

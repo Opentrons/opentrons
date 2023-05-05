@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Icon,
@@ -10,9 +9,11 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
+import { Modal } from '../../../../molecules/Modal'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'

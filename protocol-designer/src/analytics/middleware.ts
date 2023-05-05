@@ -1,19 +1,20 @@
 import uniq from 'lodash/uniq'
+import { Middleware } from 'redux'
+
+import { getFileMetadata } from '../file-data/selectors'
+import { FormData, StepIdType, StepType } from '../form-types'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
   getSavedStepForms,
 } from '../step-forms/selectors'
-import { getFileMetadata } from '../file-data/selectors'
+import { StepArgsAndErrors } from '../steplist'
+import { BaseState } from '../types'
+import { SaveStepFormAction } from '../ui/steps/actions/thunks'
+import { AnalyticsEventAction } from './actions'
 import { trackEvent, AnalyticsEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
-import { Middleware } from 'redux'
-import { BaseState } from '../types'
-import { FormData, StepIdType, StepType } from '../form-types'
-import { StepArgsAndErrors } from '../steplist'
-import { SaveStepFormAction } from '../ui/steps/actions/thunks'
-import { AnalyticsEventAction } from './actions'
 
 // Converts Redux actions to analytics events (read: Mixpanel events).
 // Returns null if there is no analytics event associated with the action,

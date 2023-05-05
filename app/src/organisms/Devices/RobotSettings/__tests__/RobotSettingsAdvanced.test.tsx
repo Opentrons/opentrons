@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
+import { ShellUpdateState } from '../../../../redux/shell/types'
 import { useIsOT3 } from '../../hooks'
 import {
   DisableHoming,
@@ -23,8 +23,6 @@ import {
   UseOlderProtocol,
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
-
-import { ShellUpdateState } from '../../../../redux/shell/types'
 
 jest.mock('../../../../redux/robot-settings/selectors')
 jest.mock('../../../../redux/discovery/selectors')

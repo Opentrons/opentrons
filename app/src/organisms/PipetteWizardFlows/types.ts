@@ -1,8 +1,9 @@
-import { SECTIONS, FLOWS } from './constants'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { PipetteMount } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
+
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
+import { SECTIONS, FLOWS } from './constants'
 
 export type PipetteWizardStep =
   | BeforeBeginningStep

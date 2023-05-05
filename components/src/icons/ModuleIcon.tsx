@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { Icon, IconName } from './Icon'
 import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
 import type { ModuleType } from '@opentrons/shared-data'
+
 import type { StyleProps } from '../primitives/types'
+import { Icon, IconName } from './Icon'
 
 const MODULE_ICON_NAME_BY_TYPE: { [type in ModuleType]: IconName } = {
   [HEATERSHAKER_MODULE_TYPE]: 'ot-heater-shaker',

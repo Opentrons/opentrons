@@ -1,7 +1,8 @@
-import groupBy from 'lodash/groupBy'
 import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
-import { getAllDefs } from './getAllDefs'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import groupBy from 'lodash/groupBy'
+
+import { getAllDefs } from './getAllDefs'
 
 const getOnlyLatestDefs = (
   labwareList: LabwareDefinition2[]

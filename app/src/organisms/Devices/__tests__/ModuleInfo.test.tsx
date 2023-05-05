@@ -1,11 +1,12 @@
-import React from 'react'
+import { renderWithProviders } from '@opentrons/components'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components'
+import React from 'react'
+
 import { i18n } from '../../../i18n'
-import { ModuleInfo } from '../ModuleInfo'
 import { useRunHasStarted } from '../hooks'
+import { ModuleInfo } from '../ModuleInfo'
 
 jest.mock('../hooks')
 

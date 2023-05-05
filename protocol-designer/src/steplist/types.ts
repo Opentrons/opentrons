@@ -1,12 +1,14 @@
-import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import { ModuleType } from '@opentrons/shared-data'
 import {
   CommandCreatorArgs,
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
-import { ModuleType } from '@opentrons/shared-data'
+
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import { StepIdType } from '../form-types'
 import { FormError } from './formLevel/errors'
+
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'

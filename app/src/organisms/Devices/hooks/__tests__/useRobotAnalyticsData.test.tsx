@@ -1,21 +1,20 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
-import { createStore, Store } from 'redux'
-import { Provider } from 'react-redux'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { createStore, Store } from 'redux'
 
 import { useRobot } from '../'
-import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
-import { getAttachedPipettes } from '../../../../redux/pipettes'
-import { getRobotSettings } from '../../../../redux/robot-settings'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
 } from '../../../../redux/discovery'
-
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
+import { getAttachedPipettes } from '../../../../redux/pipettes'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
+import { getRobotSettings } from '../../../../redux/robot-settings'
+import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../hooks')

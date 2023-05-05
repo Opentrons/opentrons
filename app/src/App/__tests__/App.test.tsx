@@ -1,17 +1,14 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { App } from '../'
 import { i18n } from '../../i18n'
 import { getIsOnDevice, getConfig } from '../../redux/config'
-
+import type { State } from '../../redux/types'
 import { DesktopApp } from '../DesktopApp'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
-import { App } from '../'
-
-import type { State } from '../../redux/types'
 
 jest.mock('../../redux/config')
 jest.mock('../DesktopApp')

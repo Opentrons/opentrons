@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { InterstitialTitleBar } from './InterstitiallTitleBar'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { InterstitialTitleBar } from './InterstitiallTitleBar'
 
 export default {
   title: 'App/Atoms/InterstitialTitleBar',

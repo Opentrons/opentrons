@@ -1,19 +1,17 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { resetAllWhenMocks, when } from 'jest-when'
 import {
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
-
-import { i18n } from '../../../../i18n'
-import { getStoredProtocol } from '../../../../redux/protocol-storage'
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import { ProtocolDetails as ProtocolDetailsContents } from '../../../../organisms/ProtocolDetails'
+import { resetAllWhenMocks, when } from 'jest-when'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
 import { ProtocolDetails } from '../'
-
+import { i18n } from '../../../../i18n'
+import { ProtocolDetails as ProtocolDetailsContents } from '../../../../organisms/ProtocolDetails'
+import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import type { State } from '../../../../redux/types'
 
 const mockProtocolKey = 'protocolKeyStub'

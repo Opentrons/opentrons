@@ -10,7 +10,6 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
 
 import { StyledText } from '../../atoms/text'

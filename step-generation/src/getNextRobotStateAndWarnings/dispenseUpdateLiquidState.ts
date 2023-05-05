@@ -1,18 +1,20 @@
 import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {
-  splitLiquid,
-  mergeLiquid,
-  getWellsForTips,
-  getLocationTotalVolume,
-} from '../utils/misc'
+
 import type {
   RobotState,
   InvariantContext,
   LocationLiquidState,
   SourceAndDest,
 } from '../types'
+import {
+  splitLiquid,
+  mergeLiquid,
+  getWellsForTips,
+  getLocationTotalVolume,
+} from '../utils/misc'
+
 type LiquidState = RobotState['liquidState']
 export interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext

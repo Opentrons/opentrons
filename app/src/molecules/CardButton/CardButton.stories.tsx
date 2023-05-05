@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
 import { Flex, SPACING } from '@opentrons/components'
-import { GlobalStyle } from '../../atoms/GlobalStyle'
-import { CardButton } from '.'
-
 import type { Story, Meta } from '@storybook/react'
+import { MemoryRouter } from 'react-router-dom'
+
+import { CardButton } from '.'
+import { GlobalStyle } from '../../atoms/GlobalStyle'
 
 export default {
   title: 'Odd/Molecules/CardButton',

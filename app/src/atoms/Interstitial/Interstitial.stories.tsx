@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { Interstitial } from './Interstitial'
 import type { Story, Meta } from '@storybook/react'
+
+import { Interstitial } from './Interstitial'
 
 export default {
   title: 'App/Atoms/Interstitial',

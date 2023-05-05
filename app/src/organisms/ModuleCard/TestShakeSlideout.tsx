@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   TYPOGRAPHY,
@@ -18,7 +15,7 @@ import {
   useConditionalConfirm,
   PrimaryButton,
 } from '@opentrons/components'
-import { getIsHeaterShakerAttached } from '../../redux/config'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   CreateCommand,
   getModuleDisplayName,
@@ -26,23 +23,26 @@ import {
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
-import { Slideout } from '../../atoms/Slideout'
-import { TertiaryButton } from '../../atoms/buttons'
-import { Divider } from '../../atoms/structure'
-import { InputField } from '../../atoms/InputField'
-import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
-import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
-import { useLatchControls } from './hooks'
-
-import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
+import { Portal } from '../../App/portal'
+import { TertiaryButton } from '../../atoms/buttons'
+import { InputField } from '../../atoms/InputField'
+import { Slideout } from '../../atoms/Slideout'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
+import { getIsHeaterShakerAttached } from '../../redux/config'
+import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
+import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
+import { useLatchControls } from './hooks'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule

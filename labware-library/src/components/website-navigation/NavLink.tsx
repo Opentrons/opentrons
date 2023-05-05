@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
-import styles from './styles.css'
 
+import styles from './styles.css'
 import type { Link } from './types'
 
 interface Props extends Link {

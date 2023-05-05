@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Btn,
   ButtonProps,
@@ -12,6 +11,8 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { css } from 'styled-components'
+
 import { StyledText } from '../text'
 
 export interface InterstitialTitleBarProps {

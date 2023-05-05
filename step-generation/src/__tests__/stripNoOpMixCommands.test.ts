@@ -1,5 +1,6 @@
-import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
 import type { CreateCommand } from '@opentrons/shared-data'
+
+import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
 
 describe('_stripNoOpMixCommands', () => {
   it('should remove pairs of aspirate+dispense commands when they result in no liquid changes', () => {

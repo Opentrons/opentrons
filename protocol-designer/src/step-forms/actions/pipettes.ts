@@ -1,5 +1,7 @@
 import { NormalizedPipetteById } from '@opentrons/step-generation'
+
 import { StepIdType } from '../../form-types'
+
 export interface CreatePipettesAction {
   type: 'CREATE_PIPETTES'
   payload: NormalizedPipetteById

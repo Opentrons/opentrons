@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
-import { renderWithProviders } from '@opentrons/components'
+
 import { NormalKeyboard } from '..'
 
 const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {

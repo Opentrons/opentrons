@@ -1,4 +1,5 @@
 import difference from 'lodash/difference'
+
 import { LabwareFields } from '../fields'
 import { DEFAULTED_DEF_PATCH } from '../getDefaultedDef'
 

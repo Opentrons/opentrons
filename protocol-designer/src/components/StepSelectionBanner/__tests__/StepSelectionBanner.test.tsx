@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
-import configureMockStore from 'redux-mock-store'
-import { Provider } from 'react-redux'
-import thunk from 'redux-thunk'
-import { act } from 'react-dom/test-utils'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
+
 import * as stepFormSelectors from '../../../step-forms/selectors'
+import { StepSelectionBanner } from '..'
 import { actions as stepActions } from '../../../ui/steps'
 import { getCountPerStepType } from '../../../ui/steps/selectors'
 import { ConfirmDeleteModal } from '../../modals/ConfirmDeleteModal'
 import { ExitBatchEditButton } from '../StepSelectionBannerComponent'
-import { StepSelectionBanner } from '..'
 
 jest.mock('../../../step-forms/selectors')
 jest.mock('../../../ui/steps/selectors')

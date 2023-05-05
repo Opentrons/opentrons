@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { Link as InternalLink } from 'react-router-dom'
-import styled from 'styled-components'
-
 import {
   AlertModal,
   DeprecatedCheckboxField,
   Link,
   useToggle,
 } from '@opentrons/components'
+import { Link as InternalLink } from 'react-router-dom'
+import styled from 'styled-components'
+
 import {
   useTrackEvent,
   ANALYTICS_U2E_DRIVE_ALERT_DISMISSED,

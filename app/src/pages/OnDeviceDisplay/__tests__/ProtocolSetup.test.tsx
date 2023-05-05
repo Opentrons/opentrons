@@ -1,18 +1,18 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { renderWithProviders } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
   useRunQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
@@ -20,19 +20,18 @@ import {
   useAttachedModules,
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
-import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
 import { ProtocolSetup } from '../ProtocolSetup'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
+
 import { useAnalyticsOptInOrOut } from './useAnalyticsOptInOrOut'
 
 interface Props {

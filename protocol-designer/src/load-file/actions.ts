@@ -1,14 +1,15 @@
-import { migration } from './migration'
 import { selectors as fileDataSelectors } from '../file-data'
-import { saveFile } from './utils'
 import { PDProtocolFile } from '../file-types'
 import { GetState, ThunkAction, ThunkDispatch } from '../types'
+import { migration } from './migration'
 import {
   FileUploadErrorType,
   FileUploadMessage,
   LoadFileAction,
   NewProtocolFields,
 } from './types'
+import { saveFile } from './utils'
+
 export interface FileUploadMessageAction {
   type: 'FILE_UPLOAD_MESSAGE'
   payload: FileUploadMessage

@@ -1,10 +1,11 @@
-import assert from 'assert'
-import cx from 'classnames'
 import * as React from 'react'
 import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
+import assert from 'assert'
+import cx from 'classnames'
+
+import { LabwareUploadMessage } from '../../../labware-defs'
 import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
-import { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: {
   message: LabwareUploadMessage

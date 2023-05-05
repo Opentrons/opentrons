@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 
 import {
   useRunCalibrationStatus,
@@ -8,8 +7,8 @@ import {
   useIsOT3,
   useRunPipetteInfoByMount,
 } from '..'
-
 import type { PipetteInfo } from '..'
+import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 
 jest.mock('../useDeckCalibrationStatus')
 jest.mock('../useIsOT3')

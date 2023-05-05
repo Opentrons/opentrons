@@ -1,8 +1,7 @@
 import { useSelector } from 'react-redux'
 
-import { getFeatureFlags } from './selectors'
-
 import type { State } from '../types'
+import { getFeatureFlags } from './selectors'
 import type { DevInternalFlag } from './types'
 
 export const useFeatureFlag = (flag: DevInternalFlag): boolean => {

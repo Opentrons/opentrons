@@ -1,12 +1,4 @@
 import * as React from 'react'
-import path from 'path'
-import first from 'lodash/first'
-import { Trans, useTranslation } from 'react-i18next'
-import { Link, NavLink, useHistory } from 'react-router-dom'
-import { ApiHostProvider } from '@opentrons/react-api-client'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   SPACING,
   SIZE_1,
@@ -22,21 +14,27 @@ import {
   PrimaryButton,
   COLORS,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
+import first from 'lodash/first'
+import path from 'path'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { Link, NavLink, useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
-import { useLogger } from '../../logger'
-import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import { MiniCard } from '../../molecules/MiniCard'
+import { useLogger } from '../../logger'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
-import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
-import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
-import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-
+import { MiniCard } from '../../molecules/MiniCard'
 import type { Robot } from '../../redux/discovery/types'
+import { getStoredProtocols } from '../../redux/protocol-storage'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
+import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 
 interface ChooseProtocolSlideoutProps {
   robot: Robot

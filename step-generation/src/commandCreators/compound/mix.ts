@@ -1,16 +1,17 @@
 import flatMap from 'lodash/flatMap'
-import {
-  repeatArray,
-  blowoutUtil,
-  curryCommandCreator,
-  reduceCommandCreators,
-} from '../../utils'
+
 import * as errorCreators from '../../errorCreators'
 import type {
   MixArgs,
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
+import {
+  repeatArray,
+  blowoutUtil,
+  curryCommandCreator,
+  reduceCommandCreators,
+} from '../../utils'
 import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */

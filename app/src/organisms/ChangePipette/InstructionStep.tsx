@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Box, Flex, JUSTIFY_SPACE_EVENLY, SPACING } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
 import type {
   PipetteChannels,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '@opentrons/components'
+
 import type { Diagram, Direction } from './types'
 
 interface Props {

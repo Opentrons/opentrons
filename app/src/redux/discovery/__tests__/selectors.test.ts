@@ -10,6 +10,8 @@ import {
   mockHealthFetchErrorResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
 
+import * as discovery from '../selectors'
+import type { State } from '../../types'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
@@ -20,10 +22,6 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../constants'
-
-import * as discovery from '../selectors'
-
-import type { State } from '../../types'
 
 const MOCK_STATE: State = {
   discovery: {

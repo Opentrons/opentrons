@@ -1,7 +1,9 @@
 import findKey from 'lodash/findKey'
 import last from 'lodash/last'
-import { PipetteOnDeck } from '../../../step-forms'
+
 import { StepIdType, FormData } from '../../../form-types'
+import { PipetteOnDeck } from '../../../step-forms'
+
 // TODO: Ian 2018-09-18 once we support switching pipettes mid-protocol,
 // this should use pipette state in RobotState, instead of pipettes/ selectors
 // (which represent initial pipette state, expected to be static across the timeline)

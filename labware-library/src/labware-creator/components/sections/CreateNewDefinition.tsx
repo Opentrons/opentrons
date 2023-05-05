@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { useFormikContext } from 'formik'
-import cx from 'classnames'
 import { PrimaryBtn } from '@opentrons/components'
+import cx from 'classnames'
+import { useFormikContext } from 'formik'
+
 import { Dropdown } from '../../components/Dropdown'
-import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
 import { labwareTypeOptions, labwareTypeAutofills } from '../../fields'
+import type { LabwareFields } from '../../fields'
+import styles from '../../styles.css'
+import { isEveryFieldHidden, makeAutofillOnChange } from '../../utils'
 import { FormAlerts } from '../alerts/FormAlerts'
 import { SectionBody } from './SectionBody'
-
-import styles from '../../styles.css'
-import type { LabwareFields } from '../../fields'
 
 interface Props {
   showDropDownOptions: boolean

@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
-
 import {
   Box,
   POSITION_RELATIVE,
@@ -10,6 +7,8 @@ import {
   useIdle,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import { useSelector } from 'react-redux'
+import { Switch, Route, Redirect } from 'react-router-dom'
 
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
@@ -17,24 +16,23 @@ import { ToasterOven } from '../organisms/ToasterOven'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
+import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
+import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
-import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
-import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
-import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
+import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
+import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
+import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
+import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
-import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
-import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
-import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
-
+import { PortalRoot as ModalPortalRoot } from './portal'
 import type { RouteProps } from './types'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [

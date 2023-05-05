@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks } from 'jest-when'
+
 import { i18n } from '../../../../i18n'
 import { DeckThumbnail } from '../../../../molecules/DeckThumbnail'
 import { Deck } from '../Deck'

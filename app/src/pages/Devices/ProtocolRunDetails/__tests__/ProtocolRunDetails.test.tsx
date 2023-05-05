@@ -1,26 +1,25 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 
+import { ProtocolRunDetails } from '..'
 import { i18n } from '../../../../i18n'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 import {
   useModuleRenderInfoForProtocolById,
   useRobot,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { RunPreviewComponent } from '../../../../organisms/RunPreview'
+import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
-import { ProtocolRunDetails } from '..'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-
-import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
+import { RunPreviewComponent } from '../../../../organisms/RunPreview'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 jest.mock(
   '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'

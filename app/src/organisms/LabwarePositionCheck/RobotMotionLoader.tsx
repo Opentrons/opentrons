@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 
 interface RobotMotionLoaderProps {

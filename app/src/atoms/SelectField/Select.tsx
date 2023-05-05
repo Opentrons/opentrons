@@ -1,5 +1,4 @@
 import * as React from 'react'
-import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import {
   Icon,
   BORDERS,
@@ -11,7 +10,7 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
-
+import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import type {
   Props as ReactSelectProps,
   StylesConfig,

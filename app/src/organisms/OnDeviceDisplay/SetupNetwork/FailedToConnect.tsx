@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -14,11 +11,12 @@ import {
   TYPOGRAPHY,
   Icon,
 } from '@opentrons/components'
+import capitalize from 'lodash/capitalize'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../../atoms/text'
-import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
-
 import type { RequestState } from '../../../redux/robot-api/types'
+import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
 import type {
   NetworkChangeType,
   NetworkChangeState,

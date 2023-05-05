@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
+import type { Story, Meta } from '@storybook/react'
+
 import { Flex, Text } from '../primitives'
 import { DIRECTION_ROW } from '../styles'
+import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import { RoundTab } from './RoundTab'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/RoundTab',

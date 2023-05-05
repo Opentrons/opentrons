@@ -1,11 +1,11 @@
 // ListItem component to be used as a child of TitledList
 import * as React from 'react'
-import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
+import { NavLink } from 'react-router-dom'
 
-import styles from './lists.css'
 import { Icon } from '../icons'
 import type { IconName } from '../icons'
+import styles from './lists.css'
 
 // TODO(bc, 2021-03-31): this is only used in the app
 // reconsider whether this belongs in components library

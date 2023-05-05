@@ -1,5 +1,6 @@
-import { AIR } from '@opentrons/step-generation'
 import { COLORS } from '@opentrons/components'
+import { AIR } from '@opentrons/step-generation'
+
 export const MIXED_WELL_COLOR = '#9b9b9b' // NOTE: matches `--c-med-gray` in COLORS.liquidColors.css
 
 export const swatchColors = (ingredGroupId: string): string => {

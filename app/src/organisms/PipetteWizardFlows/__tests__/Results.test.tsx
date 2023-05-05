@@ -1,17 +1,18 @@
 import * as React from 'react'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { COLORS, renderWithProviders } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { COLORS, renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
+import { act, fireEvent, screen } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { Results } from '../Results'
 import { FLOWS } from '../constants'
+import { Results } from '../Results'
 
 jest.mock('@opentrons/react-api-client')
 

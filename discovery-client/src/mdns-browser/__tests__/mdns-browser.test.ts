@@ -1,7 +1,9 @@
-import Mdns from 'mdns-js'
 import { when } from 'jest-when'
 import isEqual from 'lodash/isEqual'
+import Mdns from 'mdns-js'
 
+import * as Ifaces from '../interfaces'
+import { createMdnsBrowser } from '..'
 import {
   mockBaseBrowser,
   mockBrowserService,
@@ -9,9 +11,7 @@ import {
   mockBrowserServiceWithSurpriseTXT,
   mockBrowserServiceWithoutTXT,
 } from '../__fixtures__'
-import * as Ifaces from '../interfaces'
 import { repeatCall as mockRepeatCall } from '../repeat-call'
-import { createMdnsBrowser } from '..'
 
 jest.mock('../interfaces')
 jest.mock('../repeat-call')

@@ -1,7 +1,6 @@
-import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
+import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import { OT3_PIPETTES } from './constants'
-
 import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
 
 type SortableProps = 'maxVolume' | 'channels'

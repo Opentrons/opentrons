@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -7,10 +6,11 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
-import { Modal } from '../../molecules/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 
 export const UNINSTALL_APP_URL =
   'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'

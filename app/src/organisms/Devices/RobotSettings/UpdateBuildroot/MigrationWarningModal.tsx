@@ -1,11 +1,10 @@
 import * as React from 'react'
-
 import { AlertModal } from '@opentrons/components'
-import { UPGRADE } from '../../../../redux/buildroot'
-import styles from './styles.css'
-
 import type { ButtonProps } from '@opentrons/components'
+
+import { UPGRADE } from '../../../../redux/buildroot'
 import type { BuildrootUpdateType } from '../../../../redux/buildroot/types'
+import styles from './styles.css'
 
 export interface MigrationWarningModalProps {
   notNowButton: ButtonProps

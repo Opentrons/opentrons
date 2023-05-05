@@ -1,8 +1,8 @@
 // download robot logs manager
-import { download } from 'electron-dl'
-import { createLogger } from './log'
-
 import type { BrowserWindow } from 'electron'
+import { download } from 'electron-dl'
+
+import { createLogger } from './log'
 import type { Action, Dispatch } from './types'
 
 const log = createLogger('robot-logs')

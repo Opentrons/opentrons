@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -13,10 +11,12 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
-
 import type { IconName } from '@opentrons/components'
+import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
+
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { StyledText } from '../../atoms/text'
 
 const CARD_BUTTON_STYLE = css`
   display: flex;

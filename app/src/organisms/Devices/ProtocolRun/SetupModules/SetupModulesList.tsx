@@ -1,7 +1,4 @@
 import * as React from 'react'
-import map from 'lodash/map'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   BORDERS,
   Box,
@@ -23,22 +20,25 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
+import type { ModuleModel } from '@opentrons/shared-data'
+import map from 'lodash/map'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import { Banner } from '../../../../atoms/Banner'
-import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
-import { MultipleModulesModal } from './MultipleModulesModal'
+import { StyledText } from '../../../../atoms/text'
+import type { AttachedModule } from '../../../../redux/modules/types'
+import { HeaterShakerWizard } from '../../HeaterShakerWizard'
 import {
   ModuleRenderInfoForProtocol,
   useIsOT3,
   useModuleRenderInfoForProtocolById,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
-import { HeaterShakerWizard } from '../../HeaterShakerWizard'
+import { MultipleModulesModal } from './MultipleModulesModal'
+import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
-
-import type { ModuleModel } from '@opentrons/shared-data'
-import type { AttachedModule } from '../../../../redux/modules/types'
 
 interface SetupModulesListProps {
   robotName: string

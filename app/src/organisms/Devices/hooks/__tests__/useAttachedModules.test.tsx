@@ -1,11 +1,11 @@
+import { mockModulesResponse } from '@opentrons/api-client'
+import type { Modules } from '@opentrons/api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
 import { resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
-import { mockModulesResponse } from '@opentrons/api-client'
-import { useModulesQuery } from '@opentrons/react-api-client'
-import { useAttachedModules } from '..'
 
-import type { Modules } from '@opentrons/api-client'
+import { useAttachedModules } from '..'
 
 jest.mock('@opentrons/react-api-client')
 

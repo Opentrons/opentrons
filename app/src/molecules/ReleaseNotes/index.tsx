@@ -1,6 +1,7 @@
 import * as React from 'react'
 import remark from 'remark'
 import reactRenderer from 'remark-react'
+
 import styles from './styles.css'
 
 export interface ReleaseNotesProps {

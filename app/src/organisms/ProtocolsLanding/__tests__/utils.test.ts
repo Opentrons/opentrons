@@ -1,5 +1,6 @@
-import { getIsOT3Protocol, getRobotTypeDisplayName } from '../utils'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+
+import { getIsOT3Protocol, getRobotTypeDisplayName } from '../utils'
 
 const mockOT3ProtocolAnalysisOutput = {
   robotType: 'OT-3 Standard',

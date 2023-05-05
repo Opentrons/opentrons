@@ -1,8 +1,7 @@
 import omit from 'lodash/omit'
+import type { Reducer } from 'redux'
 
 import * as Constants from './constants'
-
-import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { SessionState, PerRobotSessionState } from './types'
 

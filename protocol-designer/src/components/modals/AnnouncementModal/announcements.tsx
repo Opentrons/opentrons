@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { Flex, JUSTIFY_SPACE_AROUND, SPACING_3 } from '@opentrons/components'
+import { css } from 'styled-components'
+
 import styles from './AnnouncementModal.css'
 
 export interface Announcement {

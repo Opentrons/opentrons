@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   COLORS,
@@ -7,6 +6,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 
 import { SubmitPrimaryButton } from '..'
 

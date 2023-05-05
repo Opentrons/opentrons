@@ -1,9 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { useFormik } from 'formik'
-import { css } from 'styled-components'
-
+import type { UpdatedRobotName } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -19,7 +15,18 @@ import {
   Icon,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
+import { useFormik } from 'formik'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
+import { TertiaryButton } from '../../atoms/buttons'
+import { InputField } from '../../atoms/InputField'
+import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
+import { StepMeter } from '../../atoms/StepMeter'
+import { StyledText } from '../../atoms/text'
+import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
+import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
 import {
   removeRobot,
   getConnectableRobots,
@@ -27,15 +34,6 @@ import {
   getUnreachableRobots,
   getLocalRobot,
 } from '../../redux/discovery'
-import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { StyledText } from '../../atoms/text'
-import { InputField } from '../../atoms/InputField'
-import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../atoms/buttons'
-import { StepMeter } from '../../atoms/StepMeter'
-import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
-
-import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
 // Note: kj 12/15/2022 the current input field is optimized for the desktop

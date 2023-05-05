@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import cx from 'classnames'
 import { RobotCoordsForeignDiv, Text } from '@opentrons/components'
 import {
   getModuleVizDims,
@@ -18,11 +16,14 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
-import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
+import cx from 'classnames'
+import { useSelector } from 'react-redux'
+
 import * as uiSelectors from '../../ui/steps'
+import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
+import { i18n } from '../../localization'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { makeSpeedText, makeTemperatureText } from '../../utils'
 import styles from './ModuleTag.css'

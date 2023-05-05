@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Flex,
   DIRECTION_ROW,
@@ -10,6 +7,8 @@ import {
   COLORS,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { StyledText } from '../../../atoms/text'
 import { RenderResult } from './RenderResult'

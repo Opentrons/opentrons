@@ -1,7 +1,6 @@
-import { networkInterfaces } from 'os'
 import isEqual from 'lodash/isEqual'
-
 import type { Browser as BaseBrowser } from 'mdns-js'
+import { networkInterfaces } from 'os'
 
 export interface NetworkInterface {
   name: string

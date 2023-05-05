@@ -12,7 +12,7 @@ module.exports = {
   jsxBracketSameLine: false, // default
   arrowParens: 'avoid', // default
   endOfLine: 'lf',
-  importOrder: ["<THIRD_PARTY_TS_TYPES>", "^[./]", "<TS_TYPES>^[./]"],
+  importOrder: ['<THIRD_PARTY_TS_TYPES>', '^[./]', '<TS_TYPES>^[./]'],
   importOrderSeparation: true,
   importOrderGroupNamespaceSpecifiers: true,
   importOrderCaseInsensitive: true,

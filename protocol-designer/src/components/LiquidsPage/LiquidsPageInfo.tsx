@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
+
 import styles from './LiquidsPageInfo.css'
 
 export function LiquidsPageInfo(): JSX.Element {

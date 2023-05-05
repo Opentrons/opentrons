@@ -1,10 +1,9 @@
 import * as React from 'react'
-import last from 'lodash/last'
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import last from 'lodash/last'
 
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
-
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export const Deck = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(

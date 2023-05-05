@@ -1,17 +1,18 @@
-import {
-  getArgsAndErrorsByStepId,
-  getOrderedStepIds,
-  getInvariantContext,
-} from '../step-forms/selectors'
-import { getInitialRobotState } from '../file-data/selectors'
+import { Middleware } from 'redux'
+
 import {
   computeRobotStateTimelineRequest,
   computeRobotStateTimelineSuccess,
   ComputeRobotStateTimelineSuccessAction,
 } from '../file-data/actions'
-import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
-import { Middleware } from 'redux'
+import { getInitialRobotState } from '../file-data/selectors'
+import {
+  getArgsAndErrorsByStepId,
+  getOrderedStepIds,
+  getInvariantContext,
+} from '../step-forms/selectors'
 import { BaseState } from '../types'
+import { getLabwareNamesByModuleId } from '../ui/modules/selectors'
 import { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 import { SubstepsArgsNoTimeline } from './types'
 

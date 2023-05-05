@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Icon,
   Flex,
@@ -13,8 +12,9 @@ import {
   AlertPrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from './NeedHelpLink'
 
 interface ConfirmExitProps {

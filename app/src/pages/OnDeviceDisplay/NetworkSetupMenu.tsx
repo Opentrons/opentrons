@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
 import {
   Flex,
   SPACING,
@@ -12,13 +9,14 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
+import { StyledText } from '../../atoms/text'
 import { CardButton } from '../../molecules/CardButton'
-
-import type { IconName } from '@opentrons/components'
 
 const NetworkSetupOptions = [
   {

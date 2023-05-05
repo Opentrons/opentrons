@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   parseLabwareInfoByLiquidId,
   parseLiquidsInLoadOrder,
 } from '@opentrons/api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import { css } from 'styled-components'
+
 import { Divider } from '../../atoms/structure'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
-
-import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface ProtocolLiquidsDetailsProps {
   commands: RunTimeCommand[]

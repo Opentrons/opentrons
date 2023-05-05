@@ -1,4 +1,6 @@
 import { RunTimeCommand } from '@opentrons/shared-data'
+
+import { simpleAnalysisFileFixture } from '../__fixtures__'
 import {
   parsePipetteEntity,
   parseInitialPipetteNamesByMount,
@@ -11,8 +13,6 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '../utils'
-
-import { simpleAnalysisFileFixture } from '../__fixtures__'
 
 const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 const mockLoadLiquidRunTimeCommands = [

@@ -1,4 +1,3 @@
-import styled, { css } from 'styled-components'
 import {
   Btn,
   BORDERS,
@@ -7,6 +6,7 @@ import {
   styleProps,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import styled, { css } from 'styled-components'
 
 const SELECTED_STYLE = css`
   background-color: ${COLORS.highlightPurple1};

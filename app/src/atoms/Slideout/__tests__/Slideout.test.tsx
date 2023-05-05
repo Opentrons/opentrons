@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+
 import { Slideout } from '..'
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
 
 const render = (props: React.ComponentProps<typeof Slideout>) => {
   return renderWithProviders(<Slideout {...props} />, {

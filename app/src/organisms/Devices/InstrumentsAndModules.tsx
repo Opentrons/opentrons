@@ -1,13 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useModulesQuery,
-  usePipettesQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -19,18 +10,26 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
+import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { StyledText } from '../../atoms/text'
+import { GripperCard } from '../GripperCard'
 import { ModuleCard } from '../ModuleCard'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
+import { PipetteCard } from './PipetteCard'
 import {
   getIs96ChannelPipetteAttached,
   getOffsetCalibrationForMount,
 } from './utils'
-import { PipetteCard } from './PipetteCard'
-import { GripperCard } from '../GripperCard'
 
 const EQUIPMENT_POLL_MS = 5000
 const FETCH_PIPETTE_CAL_POLL = 30000

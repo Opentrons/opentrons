@@ -1,14 +1,15 @@
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { getModuleState } from '../robotStateSelectors'
+import type {
+  TemperatureParams,
+  ModuleOnlyParams,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
 } from '../constants'
-import type {
-  TemperatureParams,
-  ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { getModuleState } from '../robotStateSelectors'
 import type {
   InvariantContext,
   RobotStateAndWarnings,

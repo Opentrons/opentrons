@@ -1,8 +1,10 @@
-import thunk from 'redux-thunk'
-import configureMockStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
+import configureMockStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
+
 import { saveStepFormsMulti } from '../actions'
 import { getBatchEditFieldChanges } from '../selectors'
+
 jest.mock('../selectors')
 const mockStore = configureMockStore([thunk])
 const mockGetBatchEditFieldChanges = getBatchEditFieldChanges as jest.MockedFunction<

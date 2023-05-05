@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import {
   nestedTextMatcher,
   renderWithProviders,
   SPACING,
   COLORS,
 } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,

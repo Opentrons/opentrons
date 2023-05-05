@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { css, keyframes } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-
+import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   Flex,
   COLORS,
@@ -14,26 +13,25 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { css, keyframes } from 'styled-components'
 
 import { StyledText } from '../../../atoms/text'
-import { CommandText } from '../../CommandText'
-import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
 import {
   ANALYTICS_PROTOCOL_RUN_START,
   ANALYTICS_PROTOCOL_RUN_RESUME,
   ANALYTICS_PROTOCOL_RUN_PAUSE,
 } from '../../../redux/analytics'
-
-import type {
-  CompletedProtocolAnalysis,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type { RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import { CommandText } from '../../CommandText'
+import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
 
 const fadeIn = keyframes`
 from {

@@ -1,8 +1,7 @@
 // Actions for triggering analytics events that don't work well as epics looking
 // for unrelated events
-
-import * as Types from './types'
 import * as Constants from './constants'
+import * as Types from './types'
 
 export const pipetteOffsetCalibrationStarted = (
   mount: string,

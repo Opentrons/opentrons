@@ -1,11 +1,9 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { renderWithProviders } from '@opentrons/components'
-
-import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
-
 import { getRobotSettings } from '../../../../redux/robot-settings'
+import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
 
 jest.mock('../../../../redux/robot-settings')
 

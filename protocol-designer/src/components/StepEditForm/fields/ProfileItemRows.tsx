@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import cx from 'classnames'
 import {
   Icon,
   InputField,
@@ -11,7 +9,9 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_TOP_END,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import cx from 'classnames'
+import { useDispatch } from 'react-redux'
+
 import * as steplistActions from '../../../steplist/actions'
 import {
   PROFILE_CYCLE,
@@ -19,6 +19,7 @@ import {
   ProfileItem,
   ProfileCycleItem,
 } from '../../../form-types'
+import { i18n } from '../../../localization'
 import {
   getProfileFieldErrors,
   maskProfileField,
@@ -27,10 +28,9 @@ import {
   ConfirmDeleteModal,
   DELETE_PROFILE_CYCLE,
 } from '../../modals/ConfirmDeleteModal'
-import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
-
 import { FocusHandlers } from '../types'
+import { getDynamicFieldFocusHandlerId } from '../utils'
 
 export const showProfileFieldErrors = ({
   fieldId,

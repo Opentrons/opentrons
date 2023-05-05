@@ -1,8 +1,8 @@
-import { UseQueryResult } from 'react-query'
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
-import { useIsLegacySessionInProgress } from '../useIsLegacySessionInProgress'
-
 import type { Sessions } from '@opentrons/api-client'
+import { useAllSessionsQuery } from '@opentrons/react-api-client'
+import { UseQueryResult } from 'react-query'
+
+import { useIsLegacySessionInProgress } from '../useIsLegacySessionInProgress'
 
 jest.mock('@opentrons/react-api-client')
 

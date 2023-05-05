@@ -1,11 +1,10 @@
 // protocol state and loading actions
-import { filenameToType } from './utils'
-
 import type {
   LoadProtocolAction,
   CloseProtocolAction,
   ProtocolData,
 } from './types'
+import { filenameToType } from './utils'
 
 export function loadProtocol(
   file: File,

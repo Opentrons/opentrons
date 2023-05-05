@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
 import { FormGroup, DropdownField, Options } from '@opentrons/components'
+import { connect } from 'react-redux'
+
 import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { BaseState } from '../../../types'

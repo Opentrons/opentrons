@@ -1,10 +1,11 @@
 import { connect } from 'react-redux'
-import { BaseState, ThunkDispatch } from '../types'
-import { StepIdType } from '../form-types'
-import { actions as steplistActions } from '../steplist'
-import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
-import { selectors as stepFormSelectors } from '../step-forms'
+
 import { StepList, StepListProps } from '../components/steplist'
+import { StepIdType } from '../form-types'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { actions as steplistActions } from '../steplist'
+import { BaseState, ThunkDispatch } from '../types'
+import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 
 type Props = StepListProps
 interface SP {

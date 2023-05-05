@@ -1,21 +1,22 @@
-import React from 'react'
-import { mount, ReactWrapper } from 'enzyme'
-import { Provider } from 'react-redux'
-import {
-  MAGNETIC_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-} from '@opentrons/shared-data'
 import {
   Tooltip,
   SlotMap,
   LabeledValue,
   OutlineButton,
 } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+} from '@opentrons/shared-data'
+import { mount, ReactWrapper } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
+
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../constants'
 import { actions as stepFormActions, ModuleOnDeck } from '../../../step-forms'
-import { ModuleRow } from '../ModuleRow'
 import { ModuleDiagram } from '../ModuleDiagram'
+import { ModuleRow } from '../ModuleRow'
 
 describe('ModuleRow', () => {
   let store: any

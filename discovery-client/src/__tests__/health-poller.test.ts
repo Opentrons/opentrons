@@ -1,10 +1,9 @@
-import nodeFetch from 'node-fetch'
 import isError from 'lodash/isError'
+import nodeFetch from 'node-fetch'
+import type { RequestInit, Response } from 'node-fetch'
 
 import * as Fixtures from '../__fixtures__'
 import { createHealthPoller } from '../health-poller'
-
-import type { RequestInit, Response } from 'node-fetch'
 import type { HealthPoller } from '../types'
 
 // TODO(mc, 2020-07-13): remove __mocks__/node-fetch

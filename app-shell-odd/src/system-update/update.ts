@@ -1,8 +1,9 @@
-import { postFile } from '../http'
 import type {
   RobotModel,
   ViewableRobot,
 } from '@opentrons/app/src/redux/discovery/types'
+
+import { postFile } from '../http'
 
 const OT2_FILENAME = 'ot2-system.zip'
 const SYSTEM_FILENAME = 'system-update.zip'

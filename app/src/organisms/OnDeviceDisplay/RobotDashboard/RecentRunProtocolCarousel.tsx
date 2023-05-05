@@ -8,9 +8,9 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { RecentRunProtocolCard } from './RecentRunProtocolCard'
-
 import type { ProtocolResource } from '@opentrons/shared-data'
+
+import { RecentRunProtocolCard } from './RecentRunProtocolCard'
 
 interface RecentRunProtocolCarouselProps {
   sortedProtocols: ProtocolResource[]

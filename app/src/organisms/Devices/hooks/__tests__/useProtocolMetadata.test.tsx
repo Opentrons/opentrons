@@ -1,14 +1,14 @@
 // tests for the HostConfig context and hook
 import * as React from 'react'
+import { renderHook } from '@testing-library/react-hooks'
 import { when } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import type { Store } from 'redux'
+
+import type { State } from '../../../../redux/types'
 import { useCurrentProtocol } from '../../../ProtocolUpload/hooks'
 import { useProtocolMetadata } from '../useProtocolMetadata'
-
-import type { Store } from 'redux'
-import type { State } from '../../../../redux/types'
 
 jest.mock('../../../ProtocolUpload/hooks')
 

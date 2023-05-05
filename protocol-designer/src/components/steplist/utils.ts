@@ -1,4 +1,5 @@
 import round from 'lodash/round'
+
 const VOLUME_SIG_DIGITS_DEFAULT = 2
 export function formatVolume(
   inputVolume?: string | number | null,

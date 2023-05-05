@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -9,16 +8,16 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import * as Sessions from '../../redux/sessions'
-import { NeedHelpLink } from './NeedHelpLink'
 import { StyledText } from '../../atoms/text'
-
-import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
   SessionCommandString,
 } from '../../redux/sessions/types'
+import { NeedHelpLink } from './NeedHelpLink'
+import type { CalibrationPanelProps } from './types'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

@@ -1,11 +1,11 @@
 import assert from 'assert'
 import uniq from 'lodash/uniq'
 
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
+import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'

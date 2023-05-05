@@ -1,11 +1,12 @@
+import { ModuleType } from '@opentrons/shared-data'
+import { mount } from 'enzyme'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { ModuleType } from '@opentrons/shared-data'
-import { FilePage, Props } from '../FilePage'
-import { EditModules } from '../EditModules'
-import { EditModulesCard } from '../modules'
+
 import { ModulesForEditModulesCard } from '../../step-forms'
+import { EditModules } from '../EditModules'
+import { FilePage, Props } from '../FilePage'
+import { EditModulesCard } from '../modules'
 
 jest.mock('../EditModules')
 jest.mock('../../step-forms/utils')

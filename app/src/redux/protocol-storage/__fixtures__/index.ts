@@ -1,7 +1,7 @@
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
-import { StoredProtocolData, StoredProtocolDir } from '../types'
-
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+
+import { StoredProtocolData, StoredProtocolDir } from '../types'
 
 export const storedProtocolData: StoredProtocolData = {
   protocolKey: 'protocolKeyStub',

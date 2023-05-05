@@ -1,3 +1,4 @@
+import * as React from 'react'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -5,13 +6,12 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { MediumButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
-
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
 export interface ProtocolSetupLabwarePositionCheckProps {
   runId: string

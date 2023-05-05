@@ -1,8 +1,6 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useParams, useHistory, Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -25,32 +23,32 @@ import {
   SIZE_2,
   Btn,
 } from '@opentrons/components'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { useParams, useHistory, Link } from 'react-router-dom'
+import styled, { css } from 'styled-components'
 
+import type { OnDeviceRouteParams } from '../../App/types'
 import { LargeButton, TertiaryButton } from '../../atoms/buttons'
-import {
-  useRunTimestamps,
-  useRunControls,
-} from '../../organisms/RunTimeControl/hooks'
+import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import {
   useRunCreatedAtTimestamp,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
-import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
-import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
-import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
+import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
+import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
 import {
-  useTrackEvent,
-  // ANALYTICS_PROTOCOL_RUN_CANCEL,
+  useRunTimestamps,
+  useRunControls,
+} from '../../organisms/RunTimeControl/hooks'
+import {
+  useTrackEvent, // ANALYTICS_PROTOCOL_RUN_CANCEL,
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
-
-import type { Run } from '@opentrons/api-client'
-import type { OnDeviceRouteParams } from '../../App/types'
 import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {

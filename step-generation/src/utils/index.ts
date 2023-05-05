@@ -1,12 +1,14 @@
 import uuidv4 from 'uuid/v4'
+
 import { commandCreatorsTimeline } from './commandCreatorsTimeline'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreators } from './reduceCommandCreators'
-import { modulePipetteCollision } from './modulePipetteCollision'
-import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
-import { orderWells } from './orderWells'
-import { isValidSlot } from './isValidSlot'
 import { getLabwareSlot } from './getLabwareSlot'
+import { isValidSlot } from './isValidSlot'
+import { modulePipetteCollision } from './modulePipetteCollision'
+import { orderWells } from './orderWells'
+import { reduceCommandCreators } from './reduceCommandCreators'
+import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
+
 export {
   commandCreatorsTimeline,
   curryCommandCreator,

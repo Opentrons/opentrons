@@ -1,17 +1,18 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import {
   LabwareLiquidState,
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+
 import { DismissedWarningState } from '../../../dismiss/reducers'
-import { IngredientsState } from '../../../labware-ingred/reducers'
 import { LabwareDefByDefURI } from '../../../labware-defs'
+import { IngredientsState } from '../../../labware-ingred/reducers'
 import { FileMetadataFields } from '../../types'
 
 const fixture96Plate = _fixture_96_plate as LabwareDefinition2

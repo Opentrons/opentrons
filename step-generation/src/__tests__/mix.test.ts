@@ -1,4 +1,5 @@
 import flatMap from 'lodash/flatMap'
+
 import { mix } from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,

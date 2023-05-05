@@ -1,10 +1,10 @@
 import { of } from 'rxjs'
 import { map, filter, switchMap } from 'rxjs/operators'
+
 import { getRobotRestarting } from '../../robot-admin'
+import type { Epic } from '../../types'
 import { clearRestartPath } from '../actions'
 import { getAllRestartRequiredRobots } from '../selectors'
-
-import type { Epic } from '../../types'
 
 export const clearRestartPathEpic: Epic = (action$, state$) => {
   return state$.pipe(

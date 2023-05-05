@@ -1,6 +1,5 @@
 import * as React from 'react'
-import groupBy from 'lodash/groupBy'
-import { useTranslation } from 'react-i18next'
+import { Box, Flex } from '@opentrons/components'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
@@ -9,11 +8,12 @@ import {
   SINGLE_CHANNEL,
   EIGHT_CHANNEL,
 } from '@opentrons/shared-data'
-import { Box, Flex } from '@opentrons/components'
-import { Select } from '../../atoms/SelectField/Select'
-
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import groupBy from 'lodash/groupBy'
+import { useTranslation } from 'react-i18next'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
+
+import { Select } from '../../atoms/SelectField/Select'
 import type { SelectOption } from '../../atoms/SelectField/Select'
 
 export interface PipetteSelectProps {

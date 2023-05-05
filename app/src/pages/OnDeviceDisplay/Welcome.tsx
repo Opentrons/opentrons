@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 import {
   Flex,
   SPACING,
@@ -9,10 +7,12 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 
 import screenImage from '../../assets/images/on-device-display/welcome_background.png'
+import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 
 const IMAGE_ALT = 'Welcome screen background image'
 

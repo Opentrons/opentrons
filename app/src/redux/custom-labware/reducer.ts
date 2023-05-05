@@ -1,10 +1,10 @@
 // custom labware reducer
 import keyBy from 'lodash/keyBy'
-import * as Actions from './actions'
+import { Reducer } from 'redux'
 
+import * as Actions from './actions'
 import type { Action } from '../types'
 import type { CustomLabwareState } from './types'
-import { Reducer } from 'redux'
 
 export const INITIAL_STATE: CustomLabwareState = {
   filenames: [],

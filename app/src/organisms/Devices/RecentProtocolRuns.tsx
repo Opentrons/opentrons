@@ -1,9 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-  useAllRunsQuery,
-  useAllProtocolsQuery,
-} from '@opentrons/react-api-client'
 import {
   Flex,
   ALIGN_CENTER,
@@ -16,6 +11,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useAllRunsQuery,
+  useAllProtocolsQuery,
+} from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'

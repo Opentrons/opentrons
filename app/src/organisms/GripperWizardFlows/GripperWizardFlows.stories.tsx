@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { GripperWizardFlows } from './'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { GripperWizardFlows } from './'
 
 export default {
   title: 'App/organisms/GripperWizardFlows',

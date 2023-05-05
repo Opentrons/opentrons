@@ -6,9 +6,10 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import { StyledText } from '../text'
 import { Toast } from './index'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Toast',

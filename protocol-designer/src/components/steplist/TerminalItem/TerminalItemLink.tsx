@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+
+import { i18n } from '../../../localization'
+import { TerminalItemId } from '../../../steplist'
 import { ThunkDispatch } from '../../../types'
 import { actions as stepsActions } from '../../../ui/steps'
-import { TerminalItemId } from '../../../steplist'
-import { i18n } from '../../../localization'
 import styles from './styles.css'
 
 interface OP {

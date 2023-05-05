@@ -1,16 +1,17 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
   DeckSlot,
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { DND_TYPES } from '../../../../constants'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
+import { DND_TYPES } from '../../../../constants'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
-import { SlotControlsComponent, SlotControlsProps } from '../SlotControls'
 import { BlockedSlot } from '../BlockedSlot'
+import { SlotControlsComponent, SlotControlsProps } from '../SlotControls'
 
 describe('SlotControlsComponent', () => {
   let props: SlotControlsProps

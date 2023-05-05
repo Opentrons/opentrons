@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { hot } from 'react-hot-loader/root'
-
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
+import { hot } from 'react-hot-loader/root'
+import { useSelector } from 'react-redux'
 
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { getConfig, getIsOnDevice } from '../redux/config'

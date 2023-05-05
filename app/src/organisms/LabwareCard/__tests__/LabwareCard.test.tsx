@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+
+import { LabwareCard } from '..'
 import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
-import { LabwareCard } from '..'
 
 jest.mock('../../../pages/Labware/hooks')
 jest.mock('../CustomLabwareOverflowMenu')

@@ -1,19 +1,20 @@
-import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
-import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerWaitForBlockTemperature'
-import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
-import { thermocyclerDeactivateBlock } from '../commandCreators/atomic/thermocyclerDeactivateBlock'
-import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocyclerDeactivateLid'
-import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
-import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerCloseLid'
-import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
-import { getSuccessResult } from '../fixtures'
 import type {
   AtomicProfileStep,
   ModuleOnlyParams,
   TemperatureParams,
   TCProfileParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
+
+import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerCloseLid'
+import { thermocyclerDeactivateBlock } from '../commandCreators/atomic/thermocyclerDeactivateBlock'
+import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocyclerDeactivateLid'
+import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
+import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
+import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
+import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
+import { thermocyclerWaitForBlockTemperature } from '../commandCreators/atomic/thermocyclerWaitForBlockTemperature'
+import { thermocyclerWaitForLidTemperature } from '../commandCreators/atomic/thermocyclerWaitForLidTemperature'
+import { getSuccessResult } from '../fixtures'
 import type { CommandCreator } from '../types'
 
 const getRobotInitialState = (): any => {

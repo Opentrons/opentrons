@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -9,10 +8,10 @@ import {
   BORDERS,
   RoundTab,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../atoms/text'
-
-import type { StyleProps } from '@opentrons/components'
 
 type TabOptions = 'table' | 'jupyter' | 'cli'
 

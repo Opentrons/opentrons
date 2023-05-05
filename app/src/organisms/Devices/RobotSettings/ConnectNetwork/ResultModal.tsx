@@ -1,10 +1,9 @@
 import * as React from 'react'
-
 import { AlertModal, SpinnerModal } from '@opentrons/components'
+
+import * as Copy from './i18n'
 import { ErrorModal } from '../../../../molecules/modals'
 import { DISCONNECT } from './constants'
-import * as Copy from './i18n'
-
 import type { NetworkChangeType } from './types'
 
 export interface ResultModalProps {

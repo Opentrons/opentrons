@@ -7,6 +7,7 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
 } from '@opentrons/components'
+
 import { i18n } from '../../localization'
 
 export const NoBatchEditSharedSettings = (): JSX.Element => {

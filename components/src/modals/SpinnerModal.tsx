@@ -1,10 +1,10 @@
 // titled modal page component
 import * as React from 'react'
 import cx from 'classnames'
-import { Overlay } from './Overlay'
-import { Icon } from '../icons'
 
+import { Icon } from '../icons'
 import styles from './modals.css'
+import { Overlay } from './Overlay'
 
 export interface SpinnerModalProps {
   /** Additional/Override style */

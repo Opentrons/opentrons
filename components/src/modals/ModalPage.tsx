@@ -4,10 +4,9 @@ import cx from 'classnames'
 
 import { Box } from '../primitives'
 import { TitleBar } from '../structure'
-import { Overlay } from './Overlay'
-import styles from './modals.css'
-
 import type { TitleBarProps } from '../structure'
+import styles from './modals.css'
+import { Overlay } from './Overlay'
 
 export interface ModalPageProps {
   /** Props for title bar at top of modal page */

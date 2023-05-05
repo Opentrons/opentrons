@@ -1,8 +1,9 @@
-import { getLatestLabwareDef } from '../getLabware'
-import { findLabwareDefWithCustom } from '../findLabware'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+
+import { findLabwareDefWithCustom } from '../findLabware'
+import { getLatestLabwareDef } from '../getLabware'
 
 jest.mock('../getLabware', () => ({
   getLatestLabwareDef: jest.fn(),

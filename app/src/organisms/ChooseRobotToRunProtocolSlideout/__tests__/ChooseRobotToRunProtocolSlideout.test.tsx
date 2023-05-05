@@ -1,19 +1,22 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { StaticRouter } from 'react-router-dom'
 
+import { ChooseRobotToRunProtocolSlideout } from '../'
 import { i18n } from '../../../i18n'
 import {
   useProtocolDetailsForRun,
   useTrackCreateProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
+import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
 } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -21,19 +24,15 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
-import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { ChooseRobotToRunProtocolSlideout } from '../'
-
-import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
 import type { State } from '../../../redux/types'
+import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../organisms/ProtocolUpload/hooks')

@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { LabeledValue } from './StyledComponents/LabeledValue'
-import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import { getSpacingDiagram } from './measurementGuide'
+import { useTranslation } from 'react-i18next'
 
 import type { LabwareWellGroupProperties } from '../../pages/Labware/types'
+import { getSpacingDiagram } from './measurementGuide'
+import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
+import { LabeledValue } from './StyledComponents/LabeledValue'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 

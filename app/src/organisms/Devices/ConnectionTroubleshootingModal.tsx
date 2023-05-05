@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -11,6 +9,8 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'

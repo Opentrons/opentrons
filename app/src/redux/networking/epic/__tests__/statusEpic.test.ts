@@ -1,8 +1,7 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
-
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import type { Action } from '../../../types'
 
 const makeTriggerAction = (robotName: string) => Actions.fetchStatus(robotName)

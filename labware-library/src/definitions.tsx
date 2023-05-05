@@ -1,14 +1,14 @@
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
 import * as React from 'react'
-import { Route } from 'react-router-dom'
+import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
-import { getPublicPath } from './public-path'
-
+import { Route } from 'react-router-dom'
 import type { RouteComponentProps } from 'react-router-dom'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+import { getPublicPath } from './public-path'
 import type { LabwareList, LabwareDefinition } from './types'
 
 // require all definitions in the labware/definitions/2 directory

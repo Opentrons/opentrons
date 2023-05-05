@@ -6,14 +6,15 @@ import {
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
+import { ChangeTipOptions } from '@opentrons/step-generation'
+
 import { i18n } from '../../../../localization'
+import styles from '../../StepEditForm.css'
+import { FieldProps } from '../../types'
 import {
   getDisabledChangeTipOptions,
   DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
-import { ChangeTipOptions } from '@opentrons/step-generation'
-import { FieldProps } from '../../types'
-import styles from '../../StepEditForm.css'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',

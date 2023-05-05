@@ -1,5 +1,11 @@
 import assert from 'assert'
 import last from 'lodash/last'
+
+import * as fileDataSelectors from '../../../../file-data/selectors'
+import * as uiModuleSelectors from '../../../../ui/modules/selectors'
+import { PAUSE_UNTIL_TEMP } from '../../../../constants'
+import { StepType, StepIdType, FormData } from '../../../../form-types'
+import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
@@ -8,24 +14,20 @@ import {
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import { uuid } from '../../../../utils'
-import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
-import { addStep } from '../actions'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../../../tutorial'
-import * as uiModuleSelectors from '../../../../ui/modules/selectors'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType, StepIdType, FormData } from '../../../../form-types'
 import { ThunkAction } from '../../../../types'
+import { uuid } from '../../../../utils'
+import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+import { addStep } from '../actions'
 import {
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
   SelectMultipleStepsAction,
 } from '../types'
+
 export const addAndSelectStepWithHints: (arg: {
   stepType: StepType
 }) => ThunkAction<any> = payload => (dispatch, getState) => {

@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable'
-import { updateModuleEpic } from './updateModuleEpic'
 
 import type { Epic } from '../../types'
+import { updateModuleEpic } from './updateModuleEpic'
 
 export const modulesEpic: Epic = combineEpics<Epic>(updateModuleEpic)

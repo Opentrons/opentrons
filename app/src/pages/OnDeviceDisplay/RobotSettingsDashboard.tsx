@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -18,15 +14,14 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
-import { StyledText } from '../../atoms/text'
-import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
-import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
-import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
-import { UNREACHABLE } from '../../redux/discovery/constants'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
-import { useNetworkConnection } from './hooks'
+import { StyledText } from '../../atoms/text'
+import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import {
   DeviceReset,
   DisplayLEDLights,
@@ -38,10 +33,13 @@ import {
   RobotSystemVersion,
   UpdateChannel,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
-
-import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from './hooks'
+import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
+import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
+import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
+import { UNREACHABLE } from '../../redux/discovery/constants'
 import type { Dispatch, State } from '../../redux/types'
+import { useNetworkConnection } from './hooks'
+import type { NetworkConnection } from './hooks'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;

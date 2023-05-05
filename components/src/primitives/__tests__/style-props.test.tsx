@@ -4,7 +4,6 @@ import styled from 'styled-components'
 
 import * as Styles from '../../styles'
 import { styleProps, isntStyleProp } from '..'
-
 import type { PrimitiveComponent } from '..'
 
 const TestStyles: PrimitiveComponent<'div'> = styled.div.withConfig({

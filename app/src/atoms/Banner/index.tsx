@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -16,6 +15,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
+import { css } from 'styled-components'
 
 export type BannerType =
   | 'success'

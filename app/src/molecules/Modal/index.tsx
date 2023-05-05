@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { SPACING, COLORS, Box } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
-import type { StyleProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
 export * from './ModalShell'

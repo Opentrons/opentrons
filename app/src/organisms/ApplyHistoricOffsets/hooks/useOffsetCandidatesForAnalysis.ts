@@ -1,14 +1,15 @@
-import isEqual from 'lodash/isEqual'
+import type { LabwareOffset } from '@opentrons/api-client'
 import {
   getLabwareDisplayName,
   IDENTITY_VECTOR,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-import { useAllHistoricOffsets } from './useAllHistoricOffsets'
-import { getLabwareLocationCombos } from './getLabwareLocationCombos'
-
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { LabwareOffset } from '@opentrons/api-client'
+import isEqual from 'lodash/isEqual'
+
+import { getLabwareLocationCombos } from './getLabwareLocationCombos'
+import { useAllHistoricOffsets } from './useAllHistoricOffsets'
+
 export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string

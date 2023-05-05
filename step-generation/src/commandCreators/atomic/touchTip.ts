@@ -1,8 +1,9 @@
-import { uuid } from '../../utils'
-import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
-import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { TouchTipParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+
+import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
+import type { CommandCreator, CommandCreatorError } from '../../types'
+import { uuid } from '../../utils'
 
 export const touchTip: CommandCreator<TouchTipParams> = (
   args,

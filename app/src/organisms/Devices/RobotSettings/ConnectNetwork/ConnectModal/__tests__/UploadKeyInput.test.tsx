@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 
-import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import * as Networking from '../../../../../../redux/networking'
-import { UploadKeyInput } from '../UploadKeyInput'
-
+import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import type { Action } from '../../../../../../redux/types'
+import { UploadKeyInput } from '../UploadKeyInput'
 
 jest.mock('../../../../../../redux/networking/selectors')
 

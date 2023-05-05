@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { Nav, Breadcrumbs } from '../../components/Nav'
+
 import { AnalyticsOptInModal } from '../../analytics/AnalyticsOptInModal'
+import { Nav, Breadcrumbs } from '../../components/Nav'
 import styles from './LabwareCreator.css'
 
 interface Props {

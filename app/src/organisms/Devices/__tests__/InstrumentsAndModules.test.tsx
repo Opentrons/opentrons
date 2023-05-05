@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -6,21 +7,21 @@ import {
   useInstrumentsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
-import { i18n } from '../../../i18n'
+
 import { Banner } from '../../../atoms/Banner'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from '../hooks'
-import { ModuleCard } from '../../ModuleCard'
-import { InstrumentsAndModules } from '../InstrumentsAndModules'
-import { GripperCard } from '../../GripperCard'
-import { PipetteCard } from '../PipetteCard'
-import { getIs96ChannelPipetteAttached } from '../utils'
+import { i18n } from '../../../i18n'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
+import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import { GripperCard } from '../../GripperCard'
+import { ModuleCard } from '../../ModuleCard'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import { useIsOT3, useIsRobotViewable, useRunStatuses } from '../hooks'
+import { InstrumentsAndModules } from '../InstrumentsAndModules'
+import { PipetteCard } from '../PipetteCard'
+import { getIs96ChannelPipetteAttached } from '../utils'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')

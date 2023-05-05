@@ -1,21 +1,22 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
+import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
-import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { CheckPipetteButton } from '../CheckPipetteButton'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
-import { CheckPipetteButton } from '../CheckPipetteButton'
 
 jest.mock('../CheckPipetteButton')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')

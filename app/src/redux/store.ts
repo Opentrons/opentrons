@@ -1,12 +1,10 @@
+import { routerMiddleware } from 'connected-react-router'
 import { createStore, applyMiddleware, compose } from 'redux'
+import { createEpicMiddleware } from 'redux-observable'
 import thunk from 'redux-thunk'
 
-import { routerMiddleware } from 'connected-react-router'
-import { createEpicMiddleware } from 'redux-observable'
-
-import { rootReducer, history } from './reducer'
 import { rootEpic } from './epic'
-
+import { rootReducer, history } from './reducer'
 import type { Action, State } from './types'
 
 const epicMiddleware = createEpicMiddleware<Action, Action, State, any>()

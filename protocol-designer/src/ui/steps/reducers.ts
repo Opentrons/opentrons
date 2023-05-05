@@ -1,23 +1,22 @@
-import { Reducer, combineReducers } from 'redux'
-
-import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
+import { Reducer, combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+
 import { getPDMetadata } from '../../file-types'
+import { StepIdType } from '../../form-types'
+import { LoadFileAction } from '../../load-file'
+import {
+  DeleteStepAction,
+  DeleteMultipleStepsAction,
+} from '../../steplist/actions'
 import {
   SubstepIdentifier,
   TerminalItemId,
   START_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist/types'
-
 import { Action } from '../../types'
-import { LoadFileAction } from '../../load-file'
-import { StepIdType } from '../../form-types'
 import { SaveStepFormAction } from '../steps/actions/thunks'
-import {
-  DeleteStepAction,
-  DeleteMultipleStepsAction,
-} from '../../steplist/actions'
 import {
   AddStepAction,
   HoverOnStepAction,
@@ -30,6 +29,7 @@ import {
   ExpandMultipleStepsAction,
   CollapseMultipleStepsAction,
 } from './actions/types'
+
 export type CollapsedStepsState = Record<StepIdType, boolean>
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081

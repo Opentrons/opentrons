@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -10,19 +8,19 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../../redux/sessions'
 import { StyledText } from '../../../atoms/text'
-import { NeedHelpLink } from '../NeedHelpLink'
-import { ChooseTipRack } from '../ChooseTipRack'
-
-import { TRASH_BIN_LOAD_NAME } from '../constants'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { ChooseTipRack } from '../ChooseTipRack'
+import { TRASH_BIN_LOAD_NAME } from '../constants'
+import { NeedHelpLink } from '../NeedHelpLink'
+import type { CalibrationPanelProps } from '../types'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { CalibrationPanelProps } from '../types'
 
 const TRASH_BIN = 'Removable black plastic trash bin'
 

@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,19 +7,21 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import styled, { css } from 'styled-components'
 
+import type { FormattedPipetteOffsetCalibration } from '..'
 import { StyledText } from '../../../atoms/text'
-import { OverflowMenu } from './OverflowMenu'
-import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
-import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
 import {
   useAttachedPipettes,
   useIsOT3,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
-
+import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
 import type { State } from '../../../redux/types'
-import type { FormattedPipetteOffsetCalibration } from '..'
+import { OverflowMenu } from './OverflowMenu'
+import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
 const StyledTable = styled.table`
   width: 100%;

@@ -1,24 +1,22 @@
-import fse from 'fs-extra'
-import { app, shell } from 'electron'
-import { getFullConfig, handleConfigChange } from '../config'
-import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
-import * as Definitions from './definitions'
-import { validateLabwareFiles, validateNewLabwareFile } from './validation'
-import { sameIdentity } from './compare'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
 import * as ConfigActions from '@opentrons/app/src/redux/config'
-
+import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
 import type {
   UncheckedLabwareFile,
   DuplicateLabwareFile,
   CheckedLabwareFile,
   CustomLabwareListActionSource as ListSource,
 } from '@opentrons/app/src/redux/custom-labware/types'
-
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { app, shell } from 'electron'
 import type { BrowserWindow } from 'electron'
+import fse from 'fs-extra'
+
+import * as Definitions from './definitions'
+import { getFullConfig, handleConfigChange } from '../config'
+import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
 import type { Action, Dispatch } from '../types'
+import { sameIdentity } from './compare'
+import { validateLabwareFiles, validateNewLabwareFile } from './validation'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 

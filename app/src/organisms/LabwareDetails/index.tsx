@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { format } from 'date-fns'
-import { css } from 'styled-components'
-
 import {
   Box,
   Link,
@@ -20,21 +16,25 @@ import {
   useHoverTooltip,
   TOOLTIP_TOP_START,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import { Slideout } from '../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
+import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
+import { Dimensions } from './Dimensions'
+import { Gallery } from './Gallery'
 import { getWellLabel } from './helpers/labels'
 import { getUniqueWellProperties } from './helpers/labwareInference'
-import { WellCount } from './WellCount'
-import { WellProperties } from './WellProperties'
-import { Dimensions } from './Dimensions'
-import { WellDimensions } from './WellDimensions'
-import { WellSpacing } from './WellSpacing'
-import { ManufacturerDetails } from './ManufacturerDetails'
 import { InsertDetails } from './InsertDetails'
-import { Gallery } from './Gallery'
-import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
-import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { ManufacturerDetails } from './ManufacturerDetails'
+import { WellCount } from './WellCount'
+import { WellDimensions } from './WellDimensions'
+import { WellProperties } from './WellProperties'
+import { WellSpacing } from './WellSpacing'
 
 const CLOSE_ICON_STYLE = css`
   border-radius: 50%;

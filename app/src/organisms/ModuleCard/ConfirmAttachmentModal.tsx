@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import {
   DIRECTION_ROW,
   Flex,
@@ -14,11 +12,14 @@ import {
   CheckboxField,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
 import { StyledText } from '../../atoms/text'
-import { Dispatch } from '../../redux/types'
-import { UpdateConfigValueAction } from '../../redux/config/types'
+import { Modal } from '../../molecules/Modal'
 import { updateConfigValue } from '../../redux/config'
+import { UpdateConfigValueAction } from '../../redux/config/types'
+import { Dispatch } from '../../redux/types'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean

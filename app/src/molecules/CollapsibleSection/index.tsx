@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -11,6 +9,8 @@ import {
   COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { css } from 'styled-components'
+
 import { StyledText } from '../../atoms/text'
 
 const ACCORDION_STYLE = css`

@@ -1,7 +1,7 @@
-import { sortProtocols } from '../utils'
-
-import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
+import type { ProtocolResource } from '@opentrons/shared-data'
+
+import { sortProtocols } from '../utils'
 
 const mockProtocols = [
   {

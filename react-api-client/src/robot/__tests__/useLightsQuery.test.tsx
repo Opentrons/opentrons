@@ -1,14 +1,13 @@
 // tests for the useLights hooks
 import * as React from 'react'
+import { getLights as mockGetLights } from '@opentrons/api-client'
+import type { HostConfig, Response, Lights } from '@opentrons/api-client'
+import { renderHook } from '@testing-library/react-hooks'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
 
-import { getLights as mockGetLights } from '@opentrons/api-client'
-import { useHost as mockUseHost } from '../../api'
 import { useLightsQuery } from '..'
-
-import type { HostConfig, Response, Lights } from '@opentrons/api-client'
+import { useHost as mockUseHost } from '../../api'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

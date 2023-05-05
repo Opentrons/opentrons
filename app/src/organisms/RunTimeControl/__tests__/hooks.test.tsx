@@ -1,22 +1,14 @@
+import type { Run } from '@opentrons/api-client'
+import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import { act, renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useRunCommands,
 } from '../../ProtocolUpload/hooks'
-
-import {
-  useRunControls,
-  useRunStatus,
-  useCurrentRunStatus,
-  useRunTimestamps,
-  useRunErrors,
-} from '../hooks'
-
 import {
   RUN_ID_2,
   mockPausedRun,
@@ -28,8 +20,14 @@ import {
   mockIdleStartedRun,
   mockCommand,
 } from '../__fixtures__'
+import {
+  useRunControls,
+  useRunStatus,
+  useCurrentRunStatus,
+  useRunTimestamps,
+  useRunErrors,
+} from '../hooks'
 
-import type { Run } from '@opentrons/api-client'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../ProtocolUpload/hooks')
 

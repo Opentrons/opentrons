@@ -1,13 +1,12 @@
-import { of } from 'rxjs'
-import { switchMap, delay } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
+import { of } from 'rxjs'
+import type { Observable } from 'rxjs'
+import { switchMap, delay } from 'rxjs/operators'
 
 import { UI_INITIALIZED } from '../shell'
-import { DISCOVERY_START, finishDiscovery } from './actions'
-
-import type { Observable } from 'rxjs'
-import type { Action, Epic } from '../types'
 import type { UiInitializedAction } from '../shell/types'
+import type { Action, Epic } from '../types'
+import { DISCOVERY_START, finishDiscovery } from './actions'
 import type { DiscoveryAction, StartDiscoveryAction } from './types'
 
 export const DISCOVERY_TIMEOUT_MS = 30000

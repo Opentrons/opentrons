@@ -1,9 +1,3 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import {
-  getModuleDef2,
-  inferModuleOrientationFromXCoordinate,
-} from '@opentrons/shared-data'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -12,10 +6,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
-import { ModuleInfo } from '../ModuleInfo'
+import {
+  getModuleDef2,
+  inferModuleOrientationFromXCoordinate,
+} from '@opentrons/shared-data'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
+import { StyledText } from '../../../atoms/text'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import { ModuleInfo } from '../ModuleInfo'
 
 const VIEW_BOX = '-150 -38 440 128'
 interface PowerOnProps {

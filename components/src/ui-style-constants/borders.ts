@@ -1,11 +1,12 @@
 import { css } from 'styled-components'
-import { spacing1, spacingXXS } from './spacing'
+
 import {
   blueEnabled,
   medGreyEnabled,
   transparent,
   medGreyHover,
 } from './colors'
+import { spacing1, spacingXXS } from './spacing'
 
 export const radiusSoftCorners = '4px'
 export const radiusRoundEdge = '20px'

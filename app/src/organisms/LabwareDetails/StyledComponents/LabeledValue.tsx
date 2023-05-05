@@ -7,6 +7,7 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
+
 import { StyledText } from '../../../atoms/text'
 
 export interface LabeledValueProps {

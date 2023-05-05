@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import { FilterManufacturerComponent } from '../FilterManufacturer'
 import * as filters from '../../../filters'
+import { FilterManufacturerComponent } from '../FilterManufacturer'
 
 jest.mock('../../../filters')
 

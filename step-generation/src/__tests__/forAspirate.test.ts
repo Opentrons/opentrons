@@ -1,4 +1,6 @@
-import { AIR, createTipLiquidState } from '../utils/misc'
+import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
+
+import * as warningCreators from '../warningCreators'
 import { makeImmutableStateUpdater } from '../__utils__'
 import {
   makeContext,
@@ -7,11 +9,9 @@ import {
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../fixtures'
-
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
-import * as warningCreators from '../warningCreators'
 import { CommandCreatorWarning, InvariantContext, RobotState } from '../types'
-import { AspDispAirgapParams } from '@opentrons/shared-data/lib/protocol/types/schemaV6/command/pipetting'
+import { AIR, createTipLiquidState } from '../utils/misc'
 
 const forAspirate = makeImmutableStateUpdater(_forAspirate)
 

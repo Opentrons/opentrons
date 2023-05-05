@@ -1,16 +1,16 @@
-import noop from 'lodash/noop'
-import { app } from 'electron'
-import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import * as SystemInfo from '@opentrons/app/src/redux/system-info'
+import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
-import * as OS from '../../os'
-import * as UsbDevices from '../usb-devices'
-import * as NetworkInterfaces from '../network-interfaces'
-import { registerSystemInfo } from '..'
+import { app } from 'electron'
+import noop from 'lodash/noop'
 
+import * as OS from '../../os'
+import * as NetworkInterfaces from '../network-interfaces'
+import * as UsbDevices from '../usb-devices'
+import { registerSystemInfo } from '..'
 import type { Dispatch } from '../../types'
-import type { UsbDeviceMonitor } from '../usb-devices'
 import type { NetworkInterfaceMonitor } from '../network-interfaces'
+import type { UsbDeviceMonitor } from '../usb-devices'
 
 jest.mock('../../os')
 jest.mock('../usb-devices')

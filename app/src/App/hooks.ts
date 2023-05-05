@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { useInterval } from '@opentrons/components'
-import { checkShellUpdate } from '../redux/shell'
+import { useDispatch } from 'react-redux'
 
+import { checkShellUpdate } from '../redux/shell'
 import type { Dispatch } from '../redux/types'
 
 const UPDATE_RECHECK_INTERVAL_MS = 60000

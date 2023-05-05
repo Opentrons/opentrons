@@ -1,5 +1,6 @@
 // collapsable side panel
 import * as React from 'react'
+
 import styles from './SidePanel.css'
 
 export interface SidePanelProps {

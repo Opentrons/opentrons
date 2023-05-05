@@ -2,12 +2,10 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon } from '../icons'
-import { FlatButton } from './FlatButton'
-
-import styles from './buttons.css'
-
 import type { IconProps } from '../icons'
 import type { ButtonProps } from './Button'
+import styles from './buttons.css'
+import { FlatButton } from './FlatButton'
 
 interface Props extends ButtonProps {
   name: IconProps['name']

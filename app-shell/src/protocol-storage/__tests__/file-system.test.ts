@@ -1,12 +1,13 @@
 // tests for labware directory utilities
-
-import path from 'path'
-import fs from 'fs-extra'
-import tempy from 'tempy'
 import Electron from 'electron'
-import uuid from 'uuid/v4'
+import fs from 'fs-extra'
 import { when } from 'jest-when'
+import path from 'path'
+import tempy from 'tempy'
+import uuid from 'uuid/v4'
 
+import { getConfig } from '../../config'
+import { analyzeProtocolSource } from '../../protocol-analysis'
 import {
   readDirectoriesWithinDirectory,
   readFilesWithinDirectory,
@@ -16,8 +17,6 @@ import {
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
-import { getConfig } from '../../config'
-import { analyzeProtocolSource } from '../../protocol-analysis'
 
 jest.mock('uuid/v4')
 jest.mock('electron')

@@ -1,8 +1,5 @@
 import * as React from 'react'
-import { useParams, Link, useHistory } from 'react-router-dom'
-import styled from 'styled-components'
-import { useSelector } from 'react-redux'
-
+import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,34 +13,35 @@ import {
   OVERFLOW_HIDDEN,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   useProtocolQuery,
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
+import { useSelector } from 'react-redux'
+import { useParams, Link, useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
+import type { OnDeviceRouteParams } from '../../App/types'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
 import {
-  useRunStatus,
-  useRunTimestamps,
-} from '../../organisms/RunTimeControl/hooks'
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
+} from '../../organisms/Devices/hooks'
+import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   CurrentRunningProtocolCommand,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import {
-  useTrackProtocolRunEvent,
-  useRobotAnalyticsData,
-} from '../../organisms/Devices/hooks'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
+import {
+  useRunStatus,
+  useRunTimestamps,
+} from '../../organisms/RunTimeControl/hooks'
 import { getLocalRobot } from '../../redux/discovery'
-
-import type { OnDeviceRouteParams } from '../../App/types'
 
 interface BulletProps {
   isActive: boolean

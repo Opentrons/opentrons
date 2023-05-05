@@ -1,4 +1,5 @@
 // deck calibration types
+import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 import {
   DECK_STEP_SESSION_STARTED,
@@ -12,7 +13,6 @@ import {
   DECK_STEP_CALIBRATION_COMPLETE,
 } from '../constants'
 import type { CalibrationLabware, SessionCommandString } from '../types'
-import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
 export type DeckCalibrationStep =
   | typeof DECK_STEP_SESSION_STARTED

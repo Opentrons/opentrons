@@ -1,9 +1,10 @@
-import React from 'react'
+import { nestedTextMatcher } from '@opentrons/components'
 import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { render, screen } from '@testing-library/react'
-import { nestedTextMatcher } from '@opentrons/components'
+import React from 'react'
+
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Height } from '../../sections/Height'

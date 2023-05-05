@@ -1,14 +1,31 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import uniq from 'lodash/uniq'
-import UAParser from 'ua-parser-js'
 import { useConditionalConfirm } from '@opentrons/components'
+import uniq from 'lodash/uniq'
+import { useDispatch, useSelector } from 'react-redux'
+import UAParser from 'ua-parser-js'
 
-import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import {
+  CLOSE_BATCH_EDIT_FORM,
+  CLOSE_STEP_FORM_WITH_CHANGES,
+  CLOSE_UNSAVED_STEP_FORM,
+  ConfirmDeleteModal,
+  DeleteModalType,
+} from '../components/modals/ConfirmDeleteModal'
+import {
+  StepItem,
+  StepItemContents,
+  StepItemContentsProps,
+  StepItemProps,
+} from '../components/steplist/StepItem'
 import { selectors as dismissSelectors } from '../dismiss'
+import { selectors as fileDataSelectors } from '../file-data'
+import { StepIdType } from '../form-types'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../step-forms'
+import { SubstepIdentifier } from '../steplist/types'
+import { ThunkAction } from '../types'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import {
   actions as stepsActions,
   getCollapsedSteps,
@@ -23,25 +40,6 @@ import {
   ToggleStepCollapsedAction,
   SelectMultipleStepsAction,
 } from '../ui/steps'
-import { selectors as fileDataSelectors } from '../file-data'
-
-import {
-  StepItem,
-  StepItemContents,
-  StepItemContentsProps,
-  StepItemProps,
-} from '../components/steplist/StepItem'
-import {
-  CLOSE_BATCH_EDIT_FORM,
-  CLOSE_STEP_FORM_WITH_CHANGES,
-  CLOSE_UNSAVED_STEP_FORM,
-  ConfirmDeleteModal,
-  DeleteModalType,
-} from '../components/modals/ConfirmDeleteModal'
-
-import { SubstepIdentifier } from '../steplist/types'
-import { StepIdType } from '../form-types'
-import { ThunkAction } from '../types'
 
 interface Props {
   stepId: StepIdType

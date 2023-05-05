@@ -1,10 +1,11 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../../../i18n'
-import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
+import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../../../hooks'
 import { UpdateBuildroot } from '../../UpdateBuildroot'

@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 import { i18n } from '../../../i18n'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
-import { getSlotLabwareName } from '../../Devices/ProtocolRun/utils/getSlotLabwareName'
-import { getTotalVolumePerLiquidId } from '../../Devices/ProtocolRun/SetupLiquids/utils'
-import { LiquidDetails } from '../LiquidDetails'
 import { LiquidsLabwareDetailsModal } from '../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
+import { getTotalVolumePerLiquidId } from '../../Devices/ProtocolRun/SetupLiquids/utils'
+import { getSlotLabwareName } from '../../Devices/ProtocolRun/utils/getSlotLabwareName'
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import {
   MOCK_LABWARE_INFO_BY_LIQUID_ID,
   MOCK_PROTOCOL_ANALYSIS,
 } from '../fixtures'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { LiquidDetails } from '../LiquidDetails'
 
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
 jest.mock('../../Devices/ProtocolRun/utils/getSlotLabwareName')

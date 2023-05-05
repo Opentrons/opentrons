@@ -1,5 +1,6 @@
 import { getProfileFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
+
 jest.mock('../../steplist/fieldLevel')
 const mockGetProfileFieldErrors = getProfileFieldErrors as jest.MockedFunction<
   typeof getProfileFieldErrors

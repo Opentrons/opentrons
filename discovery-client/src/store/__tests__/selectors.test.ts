@@ -1,18 +1,15 @@
+import * as Selectors from '../selectors'
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
 } from '../../__fixtures__/health'
-
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_NOT_OK,
   HEALTH_STATUS_UNREACHABLE,
 } from '../../constants'
-
-import * as Selectors from '../selectors'
-
 import type { State, HostState } from '../types'
 
 const STATE: State = {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { syncSystemTime } from '../../../redux/robot-admin'
 
+import { syncSystemTime } from '../../../redux/robot-admin'
 import type { Dispatch } from '../../../redux/types'
 
 /**

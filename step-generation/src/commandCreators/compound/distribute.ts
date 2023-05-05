@@ -1,10 +1,23 @@
+import { getWellDepth } from '@opentrons/shared-data'
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
-import { getWellDepth } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
+
 import * as errorCreators from '../../errorCreators'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import type {
+  DistributeArgs,
+  CommandCreator,
+  CurriedCommandCreator,
+  CommandCreatorError,
+} from '../../types'
+import {
+  curryCommandCreator,
+  reduceCommandCreators,
+  blowoutUtil,
+  getDispenseAirGapLocation,
+} from '../../utils'
 import {
   aspirate,
   delay,
@@ -15,18 +28,7 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
-import {
-  curryCommandCreator,
-  reduceCommandCreators,
-  blowoutUtil,
-  getDispenseAirGapLocation,
-} from '../../utils'
-import type {
-  DistributeArgs,
-  CommandCreator,
-  CurriedCommandCreator,
-  CommandCreatorError,
-} from '../../types'
+
 export const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,

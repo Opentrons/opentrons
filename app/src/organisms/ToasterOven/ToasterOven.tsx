@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { v4 as uuidv4 } from 'uuid'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,14 +8,15 @@ import {
   POSITION_FIXED,
   SPACING,
 } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Snackbar } from '../../atoms/Snackbar'
+import type { SnackbarProps } from '../../atoms/Snackbar'
 import { Toast } from '../../atoms/Toast'
+import type { ToastProps, ToastType } from '../../atoms/Toast'
 import { getIsOnDevice } from '../../redux/config'
 import { ToasterContext } from './ToasterContext'
-
-import type { SnackbarProps } from '../../atoms/Snackbar'
-import type { ToastProps, ToastType } from '../../atoms/Toast'
 import type { MakeSnackbarOptions, MakeToastOptions } from './ToasterContext'
 
 interface ToasterOvenProps {

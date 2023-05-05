@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -13,6 +11,8 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 import { StyledText } from '../../../atoms/text'
 import { useRequiredProtocolLabware } from '../../Protocols/hooks'

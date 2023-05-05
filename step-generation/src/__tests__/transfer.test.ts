@@ -1,3 +1,4 @@
+import { transfer } from '../commandCreators/compound/transfer'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
@@ -20,12 +21,11 @@ import {
   makeDispenseAirGapHelper,
   AIR_GAP_META,
 } from '../fixtures'
+import type { InvariantContext, RobotState, TransferArgs } from '../types'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
-import { transfer } from '../commandCreators/compound/transfer'
-import type { InvariantContext, RobotState, TransferArgs } from '../types'
 
 const airGapHelper = makeAirGapHelper({
   wellLocation: {

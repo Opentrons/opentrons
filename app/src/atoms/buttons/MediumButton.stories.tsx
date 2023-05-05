@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { MediumButton } from './'
-import type { Story, Meta } from '@storybook/react'
 import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
+import type { Story, Meta } from '@storybook/react'
+
+import { MediumButton } from './'
 
 export default {
   title: 'ODD/Atoms/Buttons/MediumButton',

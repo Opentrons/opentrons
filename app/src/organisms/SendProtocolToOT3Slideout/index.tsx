@@ -1,11 +1,12 @@
 import * as React from 'react'
+import { PrimaryButton } from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
+import { useCreateProtocolMutation } from '@opentrons/react-api-client'
+import type { AxiosError } from 'axios'
 import path from 'path'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useCreateProtocolMutation } from '@opentrons/react-api-client'
-
-import { PrimaryButton } from '@opentrons/components'
 import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { ChooseRobotSlideout } from '../../organisms/ChooseRobotSlideout'
 import {
@@ -13,11 +14,8 @@ import {
   getProtocolDisplayName,
 } from '../../organisms/ProtocolsLanding/utils'
 import { useToaster } from '../../organisms/ToasterOven'
-import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
-
-import type { AxiosError } from 'axios'
-import type { IconProps, StyleProps } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
+import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 

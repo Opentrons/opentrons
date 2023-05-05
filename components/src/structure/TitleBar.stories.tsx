@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { TitleBar } from './TitleBar'
 import { Text, Icon, SIZE_1 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { TitleBar } from './TitleBar'
 
 export default {
   title: 'Library/Molecules/TitleBar',

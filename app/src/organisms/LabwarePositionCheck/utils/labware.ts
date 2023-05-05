@@ -1,4 +1,3 @@
-import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
@@ -9,14 +8,16 @@ import {
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { LabwareToOrder } from '../types'
-import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import reduce from 'lodash/reduce'
+
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
+import type { LabwareToOrder } from '../types'
 
 const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 

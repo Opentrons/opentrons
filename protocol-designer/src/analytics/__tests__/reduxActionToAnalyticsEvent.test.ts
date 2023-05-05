@@ -1,12 +1,13 @@
 import { when, resetAllWhenMocks } from 'jest-when'
-import { reduxActionToAnalyticsEvent } from '../middleware'
+
 import { getFileMetadata } from '../../file-data/selectors'
+import { SaveStepFormsMultiAction } from '../../step-forms/actions'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
-import { SaveStepFormsMultiAction } from '../../step-forms/actions'
+import { reduxActionToAnalyticsEvent } from '../middleware'
 
 jest.mock('../../file-data/selectors')
 jest.mock('../../step-forms/selectors')

@@ -1,12 +1,11 @@
 // custom labware selectors
+import { getIsTiprack } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import sortBy from 'lodash/sortBy'
 import { basename } from 'path'
 import { createSelector } from 'reselect'
-import sortBy from 'lodash/sortBy'
 
 import { getConfig } from '../config'
-import { getIsTiprack } from '@opentrons/shared-data'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type {
   CheckedLabwareFile,

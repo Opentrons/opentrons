@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { renderWithProviders, COLORS } from '@opentrons/components'
+import { css } from 'styled-components'
+
 import { ProgressBar } from '..'
 
 const render = (props: React.ComponentProps<typeof ProgressBar>) => {

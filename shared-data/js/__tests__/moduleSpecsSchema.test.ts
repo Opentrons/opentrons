@@ -1,10 +1,11 @@
 import Ajv from 'ajv'
-import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
+import glob from 'glob'
+import path from 'path'
+
 import moduleSpecsV1 from '../../module/definitions/1.json'
+import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
 import moduleSpecsSchemaV2 from '../../module/schemas/2.json'
 import moduleSpecsSchemaV3 from '../../module/schemas/3.json'
-import path from 'path'
-import glob from 'glob'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validateModuleSpecsV1 = ajv.compile(moduleSpecsSchemaV1)

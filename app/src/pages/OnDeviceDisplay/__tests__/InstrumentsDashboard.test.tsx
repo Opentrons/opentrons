@@ -1,17 +1,18 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
+
 import { i18n } from '../../../i18n'
-import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { getIs96ChannelPipetteAttached } from '../../../organisms/Devices/utils'
-import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
-import { InstrumentsDashboard } from '../InstrumentsDashboard'
+import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
+import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { InstrumentDetail } from '../InstrumentDetail'
+import { InstrumentsDashboard } from '../InstrumentsDashboard'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')

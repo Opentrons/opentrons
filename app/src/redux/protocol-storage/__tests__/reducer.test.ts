@@ -1,7 +1,6 @@
 import * as Fixtures from '../__fixtures__'
-import { INITIAL_STATE, protocolStorageReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { INITIAL_STATE, protocolStorageReducer } from '../reducer'
 import type { ProtocolStorageState } from '../types'
 
 interface ReducerSpec {

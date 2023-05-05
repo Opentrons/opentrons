@@ -1,12 +1,13 @@
-import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
+import type { CreateCommand } from '@opentrons/shared-data'
+
 import { thermocyclerStateStep } from '../commandCreators/compound/thermocyclerStateStep'
 import { getStateAndContextTempTCModules, getSuccessResult } from '../fixtures'
-import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   ThermocyclerStateStepArgs,
 } from '../types'
+import { thermocyclerStateDiff, Diff } from '../utils/thermocyclerStateDiff'
 
 jest.mock('../utils/thermocyclerStateDiff')
 

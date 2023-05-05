@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   SPACING,
   COLORS,
@@ -7,6 +6,7 @@ import {
   TYPOGRAPHY,
   styleProps,
 } from '@opentrons/components'
+import { css } from 'styled-components'
 
 interface SubmitPrimaryButtonProps {
   form: string

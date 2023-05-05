@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 
 import { styleProps, isntStyleProp } from './style-props'
-
 import type { StyleProps, PrimitiveComponent } from './types'
 
 export interface ForeignObjectProps extends StyleProps {

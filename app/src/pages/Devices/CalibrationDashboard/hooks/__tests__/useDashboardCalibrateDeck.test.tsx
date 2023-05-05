@@ -1,16 +1,14 @@
 import * as React from 'react'
-import uniqueId from 'lodash/uniqueId'
 import { mountWithStore, renderWithProviders } from '@opentrons/components'
+import uniqueId from 'lodash/uniqueId'
 import { act } from 'react-dom/test-utils'
 
-import { LoadingState } from '../../../../../organisms/CalibrationPanels'
 import * as RobotApi from '../../../../../redux/robot-api'
 import * as Sessions from '../../../../../redux/sessions'
 import { i18n } from '../../../../../i18n'
+import { LoadingState } from '../../../../../organisms/CalibrationPanels'
 import { mockDeckCalibrationSessionAttributes } from '../../../../../redux/sessions/__fixtures__'
-
 import { useDashboardCalibrateDeck } from '../useDashboardCalibrateDeck'
-
 import type { DashboardCalDeckInvoker } from '../useDashboardCalibrateDeck'
 
 jest.mock('../../../../../redux/sessions/selectors')

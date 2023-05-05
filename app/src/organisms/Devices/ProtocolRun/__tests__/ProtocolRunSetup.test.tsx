@@ -1,13 +1,16 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import {
+  ProtocolAnalysisOutput,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
@@ -20,16 +23,11 @@ import {
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../../hooks'
-import { SetupLabware } from '../SetupLabware'
-import { SetupRobotCalibration } from '../SetupRobotCalibration'
-import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import { SetupLabware } from '../SetupLabware'
+import { SetupLiquids } from '../SetupLiquids'
 import { SetupModules } from '../SetupModules'
-
-import {
-  ProtocolAnalysisOutput,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')

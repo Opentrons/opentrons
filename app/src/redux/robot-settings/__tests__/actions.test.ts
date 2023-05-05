@@ -1,5 +1,5 @@
-import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
+import * as Actions from '../actions'
 import type { RobotSettingsAction } from '../types'
 
 interface ActionSpec {

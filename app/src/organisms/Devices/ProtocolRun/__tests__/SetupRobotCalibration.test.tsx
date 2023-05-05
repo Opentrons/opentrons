@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -13,8 +12,8 @@ import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
-import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
+import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
 jest.mock('../../../../redux/analytics')
 jest.mock('../../hooks')

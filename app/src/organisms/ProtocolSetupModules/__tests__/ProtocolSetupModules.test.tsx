@@ -1,21 +1,20 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { MemoryRouter } from 'react-router-dom'
-
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
+import { ProtocolSetupModules } from '..'
 import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import { useAttachedModules } from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from '../utils'
-import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../organisms/Devices/hooks')

@@ -1,6 +1,7 @@
 import * as React from 'react'
-import styles from './MagneticModuleWarningModalContent.css'
+
 import { KnowledgeBaseLink } from '../../KnowledgeBaseLink'
+import styles from './MagneticModuleWarningModalContent.css'
 
 export const MagneticModuleWarningModalContent = (): JSX.Element => (
   <div className={styles.content}>

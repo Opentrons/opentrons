@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
-import { format } from 'date-fns'
-
 import {
   Box,
   Flex,
@@ -18,11 +14,13 @@ import {
   ALIGN_FLEX_END,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { format } from 'date-fns'
+import startCase from 'lodash/startCase'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../atoms/text'
-import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
-
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate

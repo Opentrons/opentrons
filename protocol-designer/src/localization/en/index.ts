@@ -11,6 +11,7 @@ import modules from './modules.json'
 import nav from './nav.json'
 import tooltip from './tooltip.json'
 import well_selection from './well_selection.json'
+
 export const en = {
   translation: {
     alert,

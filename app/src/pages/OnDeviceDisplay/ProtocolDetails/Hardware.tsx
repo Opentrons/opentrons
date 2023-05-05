@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import {
   BORDERS,
   COLORS,
@@ -12,10 +10,13 @@ import {
   getModuleDisplayName,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'react-i18next'
+import styled from 'styled-components'
+
 import { StyledText } from '../../../atoms/text'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import type { ProtocolHardware } from '../../Protocols/hooks'
-import type { TFunction } from 'react-i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}

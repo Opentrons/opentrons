@@ -1,5 +1,4 @@
 import * as React from 'react'
-import styled from 'styled-components'
 import {
   StyleProps,
   COLORS,
@@ -15,6 +14,8 @@ import {
   styleProps,
   SPACING,
 } from '@opentrons/components'
+import styled from 'styled-components'
+
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode

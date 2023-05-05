@@ -1,6 +1,6 @@
-import first from 'lodash/first'
 import { OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
+import first from 'lodash/first'
 
 type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
 

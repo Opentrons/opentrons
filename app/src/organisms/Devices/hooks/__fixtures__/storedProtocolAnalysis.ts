@@ -1,11 +1,11 @@
-import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-
 import type {
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+
+import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 
 export const LABWARE_ENTITY: LoadedLabware = {
   id: 'labware-0',

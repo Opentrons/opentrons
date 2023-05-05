@@ -1,6 +1,3 @@
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -14,28 +11,31 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   RPM,
   HS_RPM_MAX,
   HS_RPM_MIN,
   CreateCommand,
 } from '@opentrons/shared-data'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Tooltip } from '../../../atoms/Tooltip'
-import { StyledText } from '../../../atoms/text'
-import { Divider } from '../../../atoms/structure'
-import { InputField } from '../../../atoms/InputField'
-import { Collapsible } from '../../ModuleCard/Collapsible'
-import { useLatchControls } from '../../ModuleCard/hooks'
-import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
-
-import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+
+import { TertiaryButton } from '../../../atoms/buttons'
+import { InputField } from '../../../atoms/InputField'
+import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
+import { Tooltip } from '../../../atoms/Tooltip'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { Collapsible } from '../../ModuleCard/Collapsible'
+import { useLatchControls } from '../../ModuleCard/hooks'
+import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 interface TestShakeProps {
   module: HeaterShakerModule

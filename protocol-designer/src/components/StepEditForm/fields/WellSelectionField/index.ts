@@ -1,12 +1,13 @@
 import { connect } from 'react-redux'
+
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { BaseState } from '../../../../types'
+import { FieldProps } from '../../types'
 import {
   WellSelectionInput,
   Props as WellSelectionInputProps,
   DP,
 } from './WellSelectionInput'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
 
 type Props = Omit<
   JSX.LibraryManagedAttributes<

@@ -1,3 +1,9 @@
+import {
+  HEALTH_STATUS_UNREACHABLE,
+  HEALTH_STATUS_NOT_OK,
+  HEALTH_STATUS_OK,
+} from '../constants'
+import type { MdnsBrowserService } from '../mdns-browser'
 import type {
   HealthResponse,
   ServerHealthResponse,
@@ -5,15 +11,6 @@ import type {
   HealthPollerResult,
   DiscoveryClientRobot,
 } from '../types'
-
-import type { MdnsBrowserService } from '../mdns-browser'
-
-import {
-  HEALTH_STATUS_UNREACHABLE,
-  HEALTH_STATUS_NOT_OK,
-  HEALTH_STATUS_OK,
-} from '../constants'
-
 import {
   INITIALIZE_STATE,
   SERVICE_FOUND,

@@ -1,12 +1,13 @@
-import { useMutation, useQueryClient } from 'react-query'
 import { deleteMaintenanceRun } from '@opentrons/api-client'
-import { useHost } from '../api'
 import type { HostConfig, EmptyResponse } from '@opentrons/api-client'
+import { useMutation, useQueryClient } from 'react-query'
 import type {
   UseMutationResult,
   UseMutationOptions,
   UseMutateFunction,
 } from 'react-query'
+
+import { useHost } from '../api'
 
 export type UseDeleteMaintenanceRunMutationResult = UseMutationResult<
   EmptyResponse,

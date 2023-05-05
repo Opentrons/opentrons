@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { RadioGroup } from '@opentrons/components'
+
 import { StepFieldName } from '../../../steplist/fieldLevel'
 import { FieldProps } from '../types'
 

@@ -1,28 +1,27 @@
 // buildroot update files
-import path from 'path'
-import { readFile, ensureDir } from 'fs-extra'
-import { app } from 'electron'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import { createLogger } from '../log'
-import { getConfig } from '../config'
-import { CURRENT_VERSION } from '../update'
-import { downloadManifest, getReleaseSet } from './release-manifest'
-import {
-  getReleaseFiles,
-  readUserFileInfo,
-  cleanupReleaseFiles,
-} from './release-files'
-import { startPremigration, uploadSystemFile } from './update'
-
-import type { DownloadProgress } from '../http'
-import type { Action, Dispatch } from '../types'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
   BuildrootUpdateInfo,
   BuildrootAction,
 } from '@opentrons/app/src/redux/buildroot/types'
 import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
+import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { app } from 'electron'
+import { readFile, ensureDir } from 'fs-extra'
+import path from 'path'
+
+import { getConfig } from '../config'
+import type { DownloadProgress } from '../http'
+import { createLogger } from '../log'
+import type { Action, Dispatch } from '../types'
+import { CURRENT_VERSION } from '../update'
+import {
+  getReleaseFiles,
+  readUserFileInfo,
+  cleanupReleaseFiles,
+} from './release-files'
+import { downloadManifest, getReleaseSet } from './release-manifest'
+import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
+import { startPremigration, uploadSystemFile } from './update'
 
 const log = createLogger('buildroot/index')
 

@@ -1,59 +1,42 @@
+import { connectRouter } from 'connected-react-router'
 import createHistory from 'history/createHashHistory'
 import { combineReducers } from 'redux'
-import { connectRouter } from 'connected-react-router'
-
-// api state
-import { robotApiReducer } from './robot-api/reducer'
-
-// robot administration state
-import { robotAdminReducer } from './robot-admin/reducer'
-
-// robot controls state
-import { robotControlsReducer } from './robot-controls/reducer'
-
-// robot settings state
-import { robotSettingsReducer } from './robot-settings/reducer'
-
-// robot buildroot update state
-import { buildrootReducer } from './buildroot/reducer'
-
-// pipettes state
-import { pipettesReducer } from './pipettes/reducer'
-
-// networking state
-import { networkingReducer } from './networking/reducer'
-
-// app shell state
-import { shellReducer } from './shell/reducer'
-
-// config state
-import { configReducer } from './config/reducer'
-
-// discovery state
-import { discoveryReducer } from './discovery/reducer'
-
-// protocol state
-import { protocolReducer } from './protocol/reducer'
-
-// custom labware state
-import { customLabwareReducer } from './custom-labware/reducer'
-
-// system info state
-import { systemInfoReducer } from './system-info/reducer'
+import type { Reducer } from 'redux'
 
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
-
-// robot  calibration and (eventually) protocol sessions state
-import { sessionReducer } from './sessions/reducer'
-
+// robot buildroot update state
+import { buildrootReducer } from './buildroot/reducer'
 // calibration data state
 import { calibrationReducer } from './calibration/reducer'
-
+// config state
+import { configReducer } from './config/reducer'
+// custom labware state
+import { customLabwareReducer } from './custom-labware/reducer'
+// discovery state
+import { discoveryReducer } from './discovery/reducer'
+// networking state
+import { networkingReducer } from './networking/reducer'
+// pipettes state
+import { pipettesReducer } from './pipettes/reducer'
 // local protocol storage from file system state
 import { protocolStorageReducer } from './protocol-storage/reducer'
-
-import type { Reducer } from 'redux'
+// protocol state
+import { protocolReducer } from './protocol/reducer'
+// robot administration state
+import { robotAdminReducer } from './robot-admin/reducer'
+// api state
+import { robotApiReducer } from './robot-api/reducer'
+// robot controls state
+import { robotControlsReducer } from './robot-controls/reducer'
+// robot settings state
+import { robotSettingsReducer } from './robot-settings/reducer'
+// robot  calibration and (eventually) protocol sessions state
+import { sessionReducer } from './sessions/reducer'
+// app shell state
+import { shellReducer } from './shell/reducer'
+// system info state
+import { systemInfoReducer } from './system-info/reducer'
 import type { State, Action } from './types'
 
 export const history = createHistory<any>()

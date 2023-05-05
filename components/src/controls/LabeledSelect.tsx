@@ -1,10 +1,9 @@
 import * as React from 'react'
 
 import { DropdownField } from '../forms'
+import type { DropdownFieldProps } from '../forms'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
-
-import type { DropdownFieldProps } from '../forms'
 
 export interface LabeledSelectProps extends DropdownFieldProps {
   label: string

@@ -1,8 +1,9 @@
-import round from 'lodash/round'
 import {
   createRegularLoadName,
   createDefaultDisplayName,
 } from '@opentrons/shared-data'
+import round from 'lodash/round'
+
 import {
   aluminumBlockAutofills,
   DISPLAY_VOLUME_UNITS,
@@ -11,8 +12,9 @@ import {
   DEFAULT_RACK_BRAND,
 } from './fields'
 import type { LabwareFields } from './fields'
-import { getIsOpentronsTubeRack } from './utils/getIsOpentronsTubeRack'
 import { getIsCustomTubeRack } from './utils/getIsCustomTubeRack'
+import { getIsOpentronsTubeRack } from './utils/getIsOpentronsTubeRack'
+
 // TODO(Ian, 2019-07-24): consolidate `tubeRackAutofills/aluminumBlockAutofills`-getting logic btw here and makeAutofillOnChange
 export const _getIsAutofilled = (
   name: keyof LabwareFields,

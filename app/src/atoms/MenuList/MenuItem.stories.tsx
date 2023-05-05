@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { MenuItem } from './MenuItem'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { MenuItem } from './MenuItem'
 
 export default {
   title: 'App/Atoms/MenuItem',

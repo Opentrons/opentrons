@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-
 import {
   Btn,
   Flex,
@@ -11,13 +9,13 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { AnalysisError } from '@opentrons/shared-data'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { Portal } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
-import { Modal } from '../../../molecules/Modal'
 import { StyledText } from '../../../atoms/text'
-
-import type { AnalysisError } from '@opentrons/shared-data'
+import { Modal } from '../../../molecules/Modal'
 
 interface ProtocolAnalysisErrorBannerProps {
   errors: AnalysisError[]

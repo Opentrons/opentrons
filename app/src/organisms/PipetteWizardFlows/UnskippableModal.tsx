@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { COLORS, AlertPrimaryButton } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { SmallButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 

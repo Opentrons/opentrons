@@ -6,6 +6,7 @@ import {
   COLORS,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+
 import { Tooltip } from '..'
 
 const render = (props: React.ComponentProps<typeof Tooltip>) => {

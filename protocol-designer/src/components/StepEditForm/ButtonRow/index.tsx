@@ -1,8 +1,8 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import cx from 'classnames'
 
+import { i18n } from '../../../localization'
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
 

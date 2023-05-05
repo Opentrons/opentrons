@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   COLORS,
@@ -10,6 +8,7 @@ import {
   JUSTIFY_CENTER,
   Icon,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../atoms/text'
 

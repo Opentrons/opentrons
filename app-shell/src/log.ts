@@ -1,14 +1,13 @@
 // create logger function
+import dateFormat from 'dateformat'
 import { app } from 'electron'
-import { inspect } from 'util'
 import fse from 'fs-extra'
 import path from 'path'
-import dateFormat from 'dateformat'
+import { inspect } from 'util'
 import winston from 'winston'
+import type Transport from 'winston-transport'
 
 import { getConfig } from './config'
-
-import type Transport from 'winston-transport'
 import type { Config } from './config'
 
 export const LOG_DIR = path.join(app.getPath('userData'), 'logs')

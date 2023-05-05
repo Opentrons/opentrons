@@ -1,20 +1,21 @@
 // mock HTTP responses for pipettes endpoints
+import { PipetteData } from '@opentrons/api-client'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+
+import type {
+  PipetteInfo,
+  PipetteInformation,
+} from '../../../organisms/Devices/hooks'
+import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
+import type {
+  RobotApiResponse,
+  RobotApiResponseMeta,
+} from '../../robot-api/types'
 import type {
   AttachedPipette,
   PipetteSettings,
   PipetteSettingsFieldsMap,
 } from '../types'
-import type {
-  RobotApiResponse,
-  RobotApiResponseMeta,
-} from '../../robot-api/types'
-import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
-import type {
-  PipetteInfo,
-  PipetteInformation,
-} from '../../../organisms/Devices/hooks'
-import { PipetteData } from '@opentrons/api-client'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 

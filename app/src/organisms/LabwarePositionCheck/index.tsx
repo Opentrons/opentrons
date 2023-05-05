@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { useLogger } from '../../logger'
-import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
-import { FatalErrorModal } from './FatalErrorModal'
-
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+import { useLogger } from '../../logger'
+import { FatalErrorModal } from './FatalErrorModal'
+import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void

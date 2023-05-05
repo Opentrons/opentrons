@@ -1,9 +1,8 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { resetConfigEpic } from '../resetConfigEpic'
-
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import type { Action } from '../../../types'
+import { resetConfigEpic } from '../resetConfigEpic'
 
 const makeResetConfigAction = (robotName: string) =>
   Actions.resetConfig(robotName, {

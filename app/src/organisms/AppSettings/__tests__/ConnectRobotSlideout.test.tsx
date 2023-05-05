@@ -1,12 +1,11 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 
-import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
-import { getScanning, getViewableRobots } from '../../../redux/discovery'
 import { getConfig } from '../../../redux/config'
+import { getScanning, getViewableRobots } from '../../../redux/discovery'
 import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
 
 jest.mock('../../../redux/discovery')

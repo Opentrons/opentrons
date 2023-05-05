@@ -1,8 +1,7 @@
 import * as React from 'react'
+import type { Story, Meta } from '@storybook/react'
 
 import { DropdownField as DropdownFieldComponent } from './DropdownField'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Dropdown Field',

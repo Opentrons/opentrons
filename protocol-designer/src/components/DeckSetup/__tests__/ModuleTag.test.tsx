@@ -5,20 +5,20 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
-import React from 'react'
-import { Provider } from 'react-redux'
-import { render, mount } from 'enzyme'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
-import { ModuleStatus, ModuleTag, ModuleTagProps } from '../ModuleTag'
+import { render, mount } from 'enzyme'
+import React from 'react'
+import { Provider } from 'react-redux'
 
 import * as timelineFramesSelectors from '../../../top-selectors/timelineFrames'
-import { selectors as stepFormSelectors } from '../../../step-forms'
 import * as uiSelectors from '../../../ui/steps'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { ModuleStatus, ModuleTag, ModuleTagProps } from '../ModuleTag'
 
 jest.mock('../../../ui/steps')
 jest.mock('../../../top-selectors/timelineFrames')

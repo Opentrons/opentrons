@@ -1,18 +1,15 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
-
+import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
 import {
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { UseQueryResult } from 'react-query'
 
 import { useProtocolDetailsForRun } from '..'
-
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
-
-import type { Protocol, Run, ProtocolAnalyses } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 

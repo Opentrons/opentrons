@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -13,16 +12,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
-import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Portal } from '../../App/portal'
-import { LabwareDetails } from '../LabwareDetails'
-import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { useTranslation } from 'react-i18next'
+
+import { Portal } from '../../App/portal'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+import { LabwareDetails } from '../LabwareDetails'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null

@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
-import { labwareImages } from '../labware-images'
-import { Gallery } from '../Gallery'
 import { fireEvent } from '@testing-library/react'
+
+import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { Gallery } from '../Gallery'
+import { labwareImages } from '../labware-images'
 
 const render = (props: React.ComponentProps<typeof Gallery>) => {
   return renderWithProviders(<Gallery {...props} />)

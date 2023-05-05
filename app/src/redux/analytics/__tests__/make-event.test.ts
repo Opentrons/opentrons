@@ -1,6 +1,6 @@
 // events map tests
-import { makeEvent } from '../make-event'
 import * as selectors from '../selectors'
+import { makeEvent } from '../make-event'
 
 jest.mock('../selectors')
 jest.mock('../../sessions/selectors')

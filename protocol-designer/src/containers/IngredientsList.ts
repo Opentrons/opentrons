@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
-import { removeWellsContents } from '../labware-ingred/actions'
-import { BaseState } from '../types'
 import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'
+import { removeWellsContents } from '../labware-ingred/actions'
 import { SelectedContainerId } from '../labware-ingred/reducers'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import { BaseState } from '../types'
+
 type Props = React.ComponentProps<typeof IngredientsListComponent>
 type SP = Omit<Props, 'removeWellsContents'> & {
   _labwareId: string | null | undefined

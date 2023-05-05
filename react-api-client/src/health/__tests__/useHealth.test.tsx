@@ -1,14 +1,13 @@
 // tests for the useHealth hooks
 import * as React from 'react'
+import { getHealth as mockGetHealth } from '@opentrons/api-client'
+import type { HostConfig, Response, Health } from '@opentrons/api-client'
+import { renderHook } from '@testing-library/react-hooks'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
 
-import { getHealth as mockGetHealth } from '@opentrons/api-client'
-import { useHost as mockUseHost } from '../../api'
 import { useHealth } from '..'
-
-import type { HostConfig, Response, Health } from '@opentrons/api-client'
+import { useHost as mockUseHost } from '../../api'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

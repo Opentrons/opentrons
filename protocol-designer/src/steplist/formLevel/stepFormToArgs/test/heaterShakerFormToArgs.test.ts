@@ -1,5 +1,5 @@
-import { heaterShakerFormToArgs } from '../heaterShakerFormToArgs'
 import type { HydratedHeaterShakerFormData } from '../../../../form-types'
+import { heaterShakerFormToArgs } from '../heaterShakerFormToArgs'
 
 describe('heaterShakerFormToArgs', () => {
   it('returns heater shaker command creator when temp, shaking, and timer is specified', () => {

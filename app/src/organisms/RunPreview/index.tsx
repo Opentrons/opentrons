@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -16,13 +12,16 @@ import {
   COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { css } from 'styled-components'
 
-import { StyledText } from '../../atoms/text'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { CommandText } from '../CommandText'
-import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { CommandText } from '../CommandText'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { CommandIcon } from './CommandIcon'
 
 const COLOR_FADE_MS = 500

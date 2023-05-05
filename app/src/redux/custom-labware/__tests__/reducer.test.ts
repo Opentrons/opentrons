@@ -1,7 +1,6 @@
 import * as Fixtures from '../__fixtures__'
-import { INITIAL_STATE, customLabwareReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { INITIAL_STATE, customLabwareReducer } from '../reducer'
 import type { CustomLabwareState } from '../types'
 
 interface ReducerSpec {

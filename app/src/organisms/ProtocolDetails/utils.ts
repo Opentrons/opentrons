@@ -4,7 +4,6 @@ import {
   OT2_STANDARD_MODEL,
   OT3_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-
 import type { RobotType } from '@opentrons/shared-data'
 
 export function getSlotsForThermocycler(

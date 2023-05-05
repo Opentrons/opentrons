@@ -1,11 +1,10 @@
+import * as Constants from './constants'
+import * as Types from './types'
 import { resetConfigValue, updateConfigValue } from '../config'
 import type {
   ResetConfigValueAction,
   UpdateConfigValueAction,
 } from '../config/types'
-import * as Constants from './constants'
-import * as Types from './types'
-
 import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,

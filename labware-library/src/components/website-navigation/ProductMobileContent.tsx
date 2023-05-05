@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { NavLink } from './NavLink'
-import styles from './styles.css'
 
 import {
   hardwareLinks,
@@ -8,6 +6,8 @@ import {
   consumableLinks,
   productCTALink,
 } from './nav-data'
+import { NavLink } from './NavLink'
+import styles from './styles.css'
 
 export function ProductMobileContent(): JSX.Element {
   return (

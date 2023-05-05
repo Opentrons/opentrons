@@ -1,31 +1,32 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import {
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
+} from '@opentrons/react-api-client'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import {
-  useCreateMaintenanceRunMutation,
-  useDeleteMaintenanceRunMutation,
-} from '@opentrons/react-api-client'
+import { fireEvent, waitFor } from '@testing-library/react'
+
+import * as RobotApi from '../../../redux/robot-api'
+import { PipetteWizardFlows } from '..'
 import { i18n } from '../../../i18n'
-import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
+import { getIsOnDevice } from '../../../redux/config'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
-import * as RobotApi from '../../../redux/robot-api'
-import { getIsOnDevice } from '../../../redux/config'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
-import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
-import { ExitModal } from '../ExitModal'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import { FLOWS, SECTIONS } from '../constants'
+import { ExitModal } from '../ExitModal'
+import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
 import { UnskippableModal } from '../UnskippableModal'
-import { PipetteWizardFlows } from '..'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')

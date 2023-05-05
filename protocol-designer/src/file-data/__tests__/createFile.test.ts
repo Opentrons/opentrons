@@ -1,18 +1,24 @@
-import Ajv from 'ajv'
-import isEmpty from 'lodash/isEmpty'
-import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
-import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
+import Ajv from 'ajv'
+import isEmpty from 'lodash/isEmpty'
+
+import * as v6Fixture from '../__fixtures__/createFile/v6Fixture'
+import {
+  LabwareEntities,
+  PipetteEntities,
+} from '../../../../step-generation/src/types'
+import { LabwareDefByDefURI } from '../../labware-defs'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 import {
   fileMetadata,
   dismissedWarnings,
@@ -23,12 +29,7 @@ import {
   labwareDefsByURI,
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
-import * as v6Fixture from '../__fixtures__/createFile/v6Fixture'
-import {
-  LabwareEntities,
-  PipetteEntities,
-} from '../../../../step-generation/src/types'
-import { LabwareDefByDefURI } from '../../labware-defs'
+import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 
 jest.mock('../../load-file/migration/utils/getLoadLiquidCommands')
 

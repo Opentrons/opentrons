@@ -1,8 +1,6 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { ViewportList, ViewportListRef } from 'react-viewport-list'
-
+import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import type { RunStatus } from '@opentrons/api-client'
 import {
   Flex,
   DIRECTION_ROW,
@@ -17,23 +15,23 @@ import {
   POSITION_ABSOLUTE,
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import { ViewportList, ViewportListRef } from 'react-viewport-list'
+import { css } from 'styled-components'
 
 import { StyledText } from '../../../atoms/text'
-import { CommandText } from '../../CommandText'
-import { CommandIcon } from '../../RunPreview/CommandIcon'
-import { PlayPauseButton } from './PlayPauseButton'
-import { StopButton } from './StopButton'
 import {
   ANALYTICS_PROTOCOL_RUN_START,
   ANALYTICS_PROTOCOL_RUN_RESUME,
   ANALYTICS_PROTOCOL_RUN_PAUSE,
 } from '../../../redux/analytics'
-
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { RunStatus } from '@opentrons/api-client'
-import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+import { CommandText } from '../../CommandText'
+import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import { CommandIcon } from '../../RunPreview/CommandIcon'
+import { PlayPauseButton } from './PlayPauseButton'
+import { StopButton } from './StopButton'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.darkBlack70};

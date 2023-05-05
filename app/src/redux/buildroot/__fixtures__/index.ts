@@ -1,5 +1,4 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
-
 import type { RobotApiResponse } from '../../robot-api/types'
 
 export {

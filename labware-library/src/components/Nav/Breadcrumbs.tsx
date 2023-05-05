@@ -3,7 +3,6 @@ import * as React from 'react'
 import { BACK_TO_LABWARE_LIBRARY } from '../../localization'
 import { getPublicPath } from '../../public-path'
 import { Link } from '../ui'
-
 import styles from './styles.css'
 
 export function Breadcrumbs(): JSX.Element {

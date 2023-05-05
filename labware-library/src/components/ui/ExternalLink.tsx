@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
+
 import styles from './styles.css'
 
 export interface ExternalLinkProps {

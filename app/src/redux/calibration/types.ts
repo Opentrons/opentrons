@@ -2,21 +2,18 @@ import type {
   RobotApiRequestMeta,
   RobotApiErrorResponse,
 } from '../robot-api/types'
-
 import type {
   CalibrationStatus,
   AllPipetteOffsetCalibrations,
   AllTipLengthCalibrations,
 } from './api-types'
-
-import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
-import type { TipLengthCalibrationsAction } from './tip-length/types'
-
 import {
   FETCH_CALIBRATION_STATUS,
   FETCH_CALIBRATION_STATUS_SUCCESS,
   FETCH_CALIBRATION_STATUS_FAILURE,
 } from './constants'
+import type { PipetteOffsetCalibrationsAction } from './pipette-offset/types'
+import type { TipLengthCalibrationsAction } from './tip-length/types'
 
 export * from './api-types'
 export * from './pipette-offset/types'

@@ -1,10 +1,3 @@
-import { createSelector } from 'reselect'
-import flatMap from 'lodash/flatMap'
-import isEmpty from 'lodash/isEmpty'
-import mapValues from 'lodash/mapValues'
-import map from 'lodash/map'
-import reduce from 'lodash/reduce'
-import uniq from 'lodash/uniq'
 import {
   FIXED_TRASH_ID,
   GEN2,
@@ -16,25 +9,16 @@ import {
   OT3_STANDARD_MODEL,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getFileMetadata } from './fileFields'
-import { getInitialRobotState, getRobotStateTimeline } from './commands'
-import { selectors as dismissSelectors } from '../../dismiss'
-import {
-  selectors as labwareDefSelectors,
-  LabwareDefByDefURI,
-} from '../../labware-defs'
-import { uuid } from '../../utils'
-import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import { swatchColors } from '../../components/swatchColors'
-import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-} from '../../constants'
+import type { PipetteName } from '@opentrons/shared-data/js/pipettes'
+import type {
+  CreateCommand,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/types/schemaV6'
+import type {
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  LoadPipetteCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type {
   ModuleEntity,
   PipetteEntity,
@@ -42,17 +26,35 @@ import type {
   PipetteEntities,
   RobotState,
 } from '@opentrons/step-generation'
-import type {
-  CreateCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+import flatMap from 'lodash/flatMap'
+import isEmpty from 'lodash/isEmpty'
+import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
+import uniq from 'lodash/uniq'
+import { createSelector } from 'reselect'
+
+import { swatchColors } from '../../components/swatchColors'
+import {
+  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+} from '../../constants'
+import { selectors as dismissSelectors } from '../../dismiss'
+import {
+  selectors as labwareDefSelectors,
+  LabwareDefByDefURI,
+} from '../../labware-defs'
+import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import type { Selector } from '../../types'
-import type {
-  LoadLabwareCreateCommand,
-  LoadModuleCreateCommand,
-  LoadPipetteCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName } from '@opentrons/shared-data/js/pipettes'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { uuid } from '../../utils'
+import { getInitialRobotState, getRobotStateTimeline } from './commands'
+import { getFileMetadata } from './fileFields'
+
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))

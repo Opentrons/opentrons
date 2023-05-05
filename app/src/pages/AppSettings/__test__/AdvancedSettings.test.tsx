@@ -1,32 +1,32 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   renderWithProviders,
   useConditionalConfirm,
 } from '@opentrons/components'
-import {
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../redux/discovery'
+import '@testing-library/jest-dom'
+import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
+
+import * as Config from '../../../redux/config'
+import * as CustomLabware from '../../../redux/custom-labware'
+import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
+import * as SystemInfo from '../../../redux/system-info'
+import * as Fixtures from '../../../redux/system-info/__fixtures__'
 import { i18n } from '../../../i18n'
-import {
-  mockReachableRobot,
-  mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../../redux/analytics'
-import * as CustomLabware from '../../../redux/custom-labware'
-import * as Config from '../../../redux/config'
-import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
-import * as SystemInfo from '../../../redux/system-info'
-import * as Fixtures from '../../../redux/system-info/__fixtures__'
-
+import {
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../../redux/discovery'
+import {
+  mockReachableRobot,
+  mockUnreachableRobot,
+} from '../../../redux/discovery/__fixtures__'
 import { AdvancedSettings } from '../AdvancedSettings'
 
 jest.mock('../../../redux/config')

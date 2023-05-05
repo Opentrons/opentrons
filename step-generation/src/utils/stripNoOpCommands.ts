@@ -1,6 +1,7 @@
-import { removePairs } from './removePairs'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+
+import { removePairs } from './removePairs'
 
 const _isEqualMix = (
   a: AspDispAirgapParams,

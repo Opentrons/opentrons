@@ -1,10 +1,4 @@
 import * as React from 'react'
-import isEmpty from 'lodash/isEmpty'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-import { NavLink, Redirect, useParams } from 'react-router-dom'
-import styled, { css } from 'styled-components'
-
 import {
   Box,
   Flex,
@@ -21,6 +15,17 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import isEmpty from 'lodash/isEmpty'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { NavLink, Redirect, useParams } from 'react-router-dom'
+import { ViewportListRef } from 'react-viewport-list'
+import styled, { css } from 'styled-components'
+
+import type {
+  DesktopRouteParams,
+  ProtocolRunDetailsTab,
+} from '../../../App/types'
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
@@ -30,19 +35,13 @@ import {
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
-import { RunPreview } from '../../../organisms/RunPreview'
-import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-import { fetchProtocols } from '../../../redux/protocol-storage'
-
-import type {
-  DesktopRouteParams,
-  ProtocolRunDetailsTab,
-} from '../../../App/types'
-import type { Dispatch } from '../../../redux/types'
+import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ViewportListRef } from 'react-viewport-list'
+import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { RunPreview } from '../../../organisms/RunPreview'
+import { fetchProtocols } from '../../../redux/protocol-storage'
+import type { Dispatch } from '../../../redux/types'
 
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}

@@ -1,6 +1,10 @@
 // @ts-nocheck
 'use strict'
+
 import { _setAnalyticsTags } from './fullstory'
+
+// @ts-nocheck
+
 const FULLSTORY_NAMESPACE = 'FS'
 const FULLSTORY_ORG = process.env.OT_LL_FULLSTORY_ORG
 export const initializeFullstory = (): void => {

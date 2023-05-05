@@ -1,15 +1,14 @@
 import * as React from 'react'
+import { Modal, OutlineButton } from '@opentrons/components'
 import { useSelector, useDispatch } from 'react-redux'
 
+import { Portal } from '../../App/portal'
 import {
   getAnalyticsOptInSeen,
   setAnalyticsOptInSeen,
 } from '../../redux/analytics'
-
-import { Modal, OutlineButton } from '@opentrons/components'
-import { AnalyticsToggle } from './AnalyticsToggle'
-import { Portal } from '../../App/portal'
 import type { Dispatch } from '../../redux/types'
+import { AnalyticsToggle } from './AnalyticsToggle'
 
 // TODO(bc, 2021-02-04): i18n
 const TITLE = 'Privacy Settings'

@@ -1,5 +1,5 @@
-import type { RobotApiRequestMeta } from '../robot-api/types'
 import type { Mount } from '../pipettes/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
 
 // common types
 

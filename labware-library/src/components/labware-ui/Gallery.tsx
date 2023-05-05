@@ -1,10 +1,9 @@
 import * as React from 'react'
-
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
-import { labwareImages } from './labware-images'
-import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
+import { labwareImages } from './labware-images'
+import styles from './styles.css'
 
 export interface GalleryProps {
   definition: LabwareDefinition

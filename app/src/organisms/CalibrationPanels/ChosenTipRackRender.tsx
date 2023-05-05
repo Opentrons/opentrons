@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   Box,
   Flex,
@@ -7,10 +6,12 @@ import {
   DIRECTION_ROW,
   SPACING,
 } from '@opentrons/components'
+import type { SelectOption } from '@opentrons/components'
+import { css } from 'styled-components'
+
 import { StyledText } from '../../atoms/text'
 import { labwareImages } from './labwareImages'
 
-import type { SelectOption } from '@opentrons/components'
 export interface ChosenTipRackRenderProps {
   selectedValue: SelectOption
 }

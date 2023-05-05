@@ -1,3 +1,6 @@
+import * as HealthPollerModule from '../health-poller'
+import * as MdnsBrowserModule from '../mdns-browser'
+import { createDiscoveryClient } from '..'
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
@@ -7,12 +10,8 @@ import {
   mockOT3ServerHealthResponse,
 } from '../__fixtures__'
 import { HEALTH_STATUS_OK } from '../constants'
-import * as HealthPollerModule from '../health-poller'
-import * as MdnsBrowserModule from '../mdns-browser'
-import { createDiscoveryClient } from '..'
-
-import type { HealthPoller, HealthPollerResult, Logger } from '../types'
 import type { MdnsBrowser, MdnsBrowserService } from '../mdns-browser'
+import type { HealthPoller, HealthPollerResult, Logger } from '../types'
 
 jest.mock('../health-poller')
 jest.mock('../mdns-browser')

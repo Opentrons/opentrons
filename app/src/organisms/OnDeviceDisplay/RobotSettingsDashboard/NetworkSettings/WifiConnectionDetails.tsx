@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-
 import {
   Flex,
   SPACING,
@@ -15,17 +12,18 @@ import {
   ALIGN_CENTER,
   DISPLAY_FLEX,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { StyledText } from '../../../../atoms/text'
-import { NetworkDetailsModal } from './NetworkDetailsModal'
 import { getLocalRobot } from '../../../../redux/discovery'
 import {
   fetchStatus,
   fetchWifiList,
   getNetworkInterfaces,
 } from '../../../../redux/networking'
-
 import type { Dispatch, State } from '../../../../redux/types'
+import { NetworkDetailsModal } from './NetworkDetailsModal'
 
 interface WifiConnectionDetailsProps {
   ssid?: string

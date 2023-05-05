@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
 import {
   COLORS,
   SPACING,
@@ -9,14 +7,16 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
+import type { MotorAxis } from '@opentrons/shared-data'
+import capitalize from 'lodash/capitalize'
+import { Trans, useTranslation } from 'react-i18next'
+
+import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { BODY_STYLE, FLOWS } from './constants'
-
-import type { MotorAxis } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders, COLORS } from '@opentrons/components'
-import { ModalHeader } from '../ModalHeader'
+
 import { Modal } from '../Modal'
+import { ModalHeader } from '../ModalHeader'
 
 jest.mock('../ModalHeader')
 

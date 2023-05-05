@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -9,11 +8,12 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../../atoms/text'
 import { Portal } from '../../../App/portal'
-import { Modal } from '../../../molecules/Modal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
+import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/ot2-get-started'

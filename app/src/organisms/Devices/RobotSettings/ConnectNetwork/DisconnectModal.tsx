@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
-
 import {
   Flex,
   Link,
@@ -16,6 +12,9 @@ import {
   AlertPrimaryButton,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+import last from 'lodash/last'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
@@ -30,7 +29,6 @@ import {
   FAILURE,
   SUCCESS,
 } from '../../../../redux/robot-api'
-
 import type { Dispatch, State } from '../../../../redux/types'
 
 export interface DisconnectModalProps {

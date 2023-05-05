@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { AlertItem } from './AlertItem'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { AlertItem } from './AlertItem'
 
 export default {
   title: 'Library/Molecules/AlertItem',

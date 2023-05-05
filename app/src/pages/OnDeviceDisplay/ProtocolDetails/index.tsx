@@ -1,8 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
-import { format } from 'date-fns'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -24,21 +21,24 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
+import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory, useParams } from 'react-router-dom'
+
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
+import type { OnDeviceRouteParams } from '../../../App/types'
 import { MediumButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+import type { Dispatch } from '../../../redux/types'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
-
-import type { Dispatch } from '../../../redux/types'
-import type { OnDeviceRouteParams } from '../../../App/types'
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 const ProtocolHeader = (props: {
   title: string

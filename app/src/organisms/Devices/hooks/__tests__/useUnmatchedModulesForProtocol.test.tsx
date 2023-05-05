@@ -1,16 +1,15 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
 
-import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { mockTemperatureModule } from '../../../../redux/modules/__fixtures__'
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
   useRobot,
   useUnmatchedModulesForProtocol,
 } from '..'
-
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { mockTemperatureModule } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('../useAttachedModules')
 jest.mock('../useModuleRenderInfoForProtocolById')

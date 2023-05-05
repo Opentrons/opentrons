@@ -1,13 +1,12 @@
 import * as React from 'react'
-import styles from './styles.css'
-import { MobileMenu } from './MobileMenu'
+
 import { MobileContent } from './MobileContent'
+import { MobileMenu } from './MobileMenu'
+import { aboutLinkProps, applicationLinkProps } from './nav-data'
 import { ProductMobileContent } from './ProductMobileContent'
 import { ProtocolMobileContent } from './ProtocolMobileContent'
+import styles from './styles.css'
 import { SupportMobileContent } from './SupportMobileContent'
-
-import { aboutLinkProps, applicationLinkProps } from './nav-data'
-
 import type { MenuName } from './types'
 
 interface State {

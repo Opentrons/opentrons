@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 

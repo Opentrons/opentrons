@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
 import { render, fireEvent } from '@testing-library/react'
+import { renderHook } from '@testing-library/react-hooks'
+import { Provider } from 'react-redux'
 import { act } from 'react-test-renderer'
-import { useTrackEvent } from '../../../redux/analytics'
-import { useToggleGroup } from '../useToggleGroup'
-
+import { createStore } from 'redux'
 import type { Store } from 'redux'
+
+import { useTrackEvent } from '../../../redux/analytics'
 import type { State } from '../../../redux/types'
+import { useToggleGroup } from '../useToggleGroup'
 
 jest.mock('../../../redux/analytics')
 

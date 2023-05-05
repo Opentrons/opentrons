@@ -1,9 +1,8 @@
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import type { PipetteModel } from '@opentrons/shared-data'
 
 import * as Constants from '../../../redux/pipettes/constants'
-
-import type { PipetteModel } from '@opentrons/shared-data'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
 const PIPETTE_POLL_MS = 5000

@@ -1,6 +1,7 @@
 import { FormikErrors } from 'formik'
-import { labwareFormSchemaBaseObject } from './labwareFormSchema'
+
 import type { LabwareFields } from './fields'
+import { labwareFormSchemaBaseObject } from './labwareFormSchema'
 import { getLabwareName } from './utils'
 
 export const FORM_LEVEL_ERRORS = 'FORM_LEVEL_ERRORS'

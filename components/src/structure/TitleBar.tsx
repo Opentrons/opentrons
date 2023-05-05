@@ -1,12 +1,10 @@
 // TitleBar component
-
 import * as React from 'react'
 import cx from 'classnames'
 
 import { FlatButton } from '../buttons'
-import styles from './structure.css'
-
 import type { ButtonProps } from '../buttons'
+import styles from './structure.css'
 
 export interface TitleBarProps {
   id?: string

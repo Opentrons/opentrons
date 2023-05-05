@@ -1,8 +1,5 @@
 // TODO(mc, 2020-02-19): still used but deprecated; remove when able
 import * as React from 'react'
-import map from 'lodash/map'
-import assert from 'assert'
-import cx from 'classnames'
 import {
   SLOT_RENDER_WIDTH,
   SLOT_RENDER_HEIGHT,
@@ -10,12 +7,14 @@ import {
   wellIsRect,
 } from '@opentrons/shared-data'
 import type { LabwareDefinition1, WellDefinition } from '@opentrons/shared-data'
-import { SELECTABLE_WELL_CLASS } from '../constants'
+import assert from 'assert'
+import cx from 'classnames'
+import map from 'lodash/map'
 
+import { SELECTABLE_WELL_CLASS } from '../constants'
+import { LabwareOutline, RobotCoordsForeignDiv } from '../hardware-sim'
 import labwareStyles from './Labware.css'
 import wellStyles from './Well.css'
-
-import { LabwareOutline, RobotCoordsForeignDiv } from '../hardware-sim'
 
 export interface LabwareProps {
   /** labware type, to get legacy definition from shared-data */

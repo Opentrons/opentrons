@@ -1,10 +1,8 @@
-import path from 'path'
-import fs from 'fs-extra'
-
-import { shell } from 'electron'
-
-import type { Dirent } from 'fs'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/redux/custom-labware/types'
+import { shell } from 'electron'
+import type { Dirent } from 'fs'
+import fs from 'fs-extra'
+import path from 'path'
 
 const RE_JSON_EXT = /\.json$/i
 

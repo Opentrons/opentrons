@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   Box,
   Btn,
@@ -12,8 +9,12 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
 import { StepMeter } from '../../atoms/StepMeter'
+import { StyledText } from '../../atoms/text'
 import { getIsOnDevice } from '../../redux/config'
 
 interface WizardHeaderProps {

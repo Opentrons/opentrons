@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
-import { ChosenTipRackRender } from '../ChosenTipRackRender'
+
 import type { SelectOption } from '../../../atoms/SelectField/Select'
+import { i18n } from '../../../i18n'
+import { ChosenTipRackRender } from '../ChosenTipRackRender'
 
 const render = (props: React.ComponentProps<typeof ChosenTipRackRender>) => {
   return renderWithProviders(<ChosenTipRackRender {...props} />, {

@@ -1,6 +1,11 @@
 import * as React from 'react'
-import map from 'lodash/map'
-
+import {
+  parseInitialLoadedLabwareBySlot,
+  parseInitialLoadedLabwareByModuleId,
+  parseInitialLoadedModulesBySlot,
+  parseLiquidsInLoadOrder,
+  parseLabwareInfoByLiquidId,
+} from '@opentrons/api-client'
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -9,22 +14,17 @@ import {
   getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import {
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedModulesBySlot,
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
-} from '@opentrons/api-client'
-import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
-import { getStandardDeckViewBox } from './utils/getStandardViewBox'
 import type {
   DeckSlot,
   Liquid,
   LoadedLabware,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import map from 'lodash/map'
+
+import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewBox } from './utils/getStandardViewBox'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]

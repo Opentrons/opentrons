@@ -1,23 +1,16 @@
 import * as React from 'react'
-import { act } from 'react-test-renderer'
-import { Provider } from 'react-redux'
-import { when } from 'jest-when'
-import { createStore } from 'redux'
-import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
-import { i18n } from '../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
-import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
-import {
-  useLatchControls,
-  useModuleOverflowMenu,
-  useIsHeaterShakerInProtocol,
-} from '../hooks'
+import { renderHook } from '@testing-library/react-hooks'
+import { when } from 'jest-when'
+import { I18nextProvider } from 'react-i18next'
+import { Provider } from 'react-redux'
+import { act } from 'react-test-renderer'
+import { createStore } from 'redux'
+import type { Store } from 'redux'
 
+import { i18n } from '../../../i18n'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
@@ -25,10 +18,16 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '../../../redux/modules/__fixtures__'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-
-import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
+import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
+import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+import {
+  useLatchControls,
+  useModuleOverflowMenu,
+  useIsHeaterShakerInProtocol,
+} from '../hooks'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')

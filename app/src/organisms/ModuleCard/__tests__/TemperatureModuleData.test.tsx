@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+
 import { StatusLabel } from '../../../atoms/StatusLabel'
-import { TemperatureModuleData } from '../TemperatureModuleData'
+import { i18n } from '../../../i18n'
 import { mockTemperatureModuleGen2 } from '../../../redux/modules/__fixtures__'
+import { TemperatureModuleData } from '../TemperatureModuleData'
 
 jest.mock('../../../atoms/StatusLabel')
 

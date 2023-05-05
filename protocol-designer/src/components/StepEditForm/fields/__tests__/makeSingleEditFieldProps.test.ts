@@ -1,11 +1,12 @@
-import { makeSingleEditFieldProps } from '../makeSingleEditFieldProps'
+import * as stepEditFormUtils from '../../utils'
+import { FormData } from '../../../../form-types'
+import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDisabledFields,
   getDefaultsForStepType,
 } from '../../../../steplist/formLevel'
-import { getFieldErrors } from '../../../../steplist/fieldLevel'
-import * as stepEditFormUtils from '../../utils'
-import { FormData } from '../../../../form-types'
+import { makeSingleEditFieldProps } from '../makeSingleEditFieldProps'
+
 jest.mock('../../../../steplist/formLevel')
 jest.mock('../../../../steplist/fieldLevel')
 

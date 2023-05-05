@@ -1,16 +1,14 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { when, resetAllWhenMocks } from 'jest-when'
 
-import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
-import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
-
-import { CalibrateDeck } from '../index'
-import type { DeckCalibrationStep } from '../../../redux/sessions/types'
+import { i18n } from '../../../i18n'
 import type { DispatchRequestsType } from '../../../redux/robot-api'
+import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
+import type { DeckCalibrationStep } from '../../../redux/sessions/types'
+import { CalibrateDeck } from '../index'
 
 jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')

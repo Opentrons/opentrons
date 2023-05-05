@@ -1,11 +1,11 @@
 // robot discovery state
 import keyBy from 'lodash/keyBy'
-import { UI_INITIALIZED } from '../shell'
-import * as actions from './actions'
+import { Reducer } from 'redux'
 
+import * as actions from './actions'
+import { UI_INITIALIZED } from '../shell'
 import type { Action } from '../types'
 import type { DiscoveryState } from './types'
-import { Reducer } from 'redux'
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,

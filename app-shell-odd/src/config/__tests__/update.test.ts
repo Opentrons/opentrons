@@ -1,7 +1,7 @@
 import * as Cfg from '@opentrons/app/src/redux/config'
-import { shouldUpdate, getNextValue } from '../update'
 
 import type { Config } from '../types'
+import { shouldUpdate, getNextValue } from '../update'
 
 const CONFIG = ({
   devtools: false,

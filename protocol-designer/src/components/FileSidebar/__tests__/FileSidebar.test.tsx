@@ -1,22 +1,23 @@
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
 import {
   DeprecatedPrimaryButton,
   AlertModal,
   OutlineButton,
 } from '@opentrons/components'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import {
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { FileSidebar, v6WarningContent } from '../FileSidebar'
+import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+import { shallow, mount } from 'enzyme'
+
 import { useBlockingHint } from '../../Hints/useBlockingHint'
+import { FileSidebar, v6WarningContent } from '../FileSidebar'
 
 jest.mock('../../Hints/useBlockingHint')
 

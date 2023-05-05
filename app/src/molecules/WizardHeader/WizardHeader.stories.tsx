@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { WizardHeader } from './index'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { WizardHeader } from './index'
 
 export default {
   title: 'App/Molecules/WizardHeader',

@@ -1,5 +1,6 @@
-import { when, resetAllWhenMocks } from 'jest-when'
 import fse from 'fs-extra'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import * as Http from '../../http'
 import * as Dirs from '../directories'
 import { downloadAndCacheReleaseManifest } from '../release-manifest'

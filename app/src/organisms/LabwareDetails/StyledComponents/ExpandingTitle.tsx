@@ -10,8 +10,9 @@ import {
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
+
 import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
 
 interface ExpandingTitleProps {
   label: React.ReactNode

@@ -1,37 +1,23 @@
-import cloneDeep from 'lodash/cloneDeep'
-import mapValues from 'lodash/mapValues'
 import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import {
   fixtureP10Single as _fixtureP10Single,
   fixtureP10Multi as _fixtureP10Multi,
   fixtureP300Single as _fixtureP300Single,
   fixtureP300Multi as _fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import {
-  TEMPERATURE_APPROACHING_TARGET,
-  TEMPERATURE_AT_TARGET,
-  TEMPERATURE_DEACTIVATED,
-  FIXED_TRASH_ID,
-} from '../constants'
-import {
-  DEFAULT_PIPETTE,
-  MULTI_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-  TROUGH_LABWARE,
-} from './commandFixtures'
-import { makeInitialRobotState } from '../utils'
-import { tiprackWellNamesFlat } from './data'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import cloneDeep from 'lodash/cloneDeep'
+import mapValues from 'lodash/mapValues'
+
 import type {
   Config,
   InvariantContext,
@@ -40,6 +26,21 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../'
+import {
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_DEACTIVATED,
+  FIXED_TRASH_ID,
+} from '../constants'
+import { makeInitialRobotState } from '../utils'
+import {
+  DEFAULT_PIPETTE,
+  MULTI_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  TROUGH_LABWARE,
+} from './commandFixtures'
+import { tiprackWellNamesFlat } from './data'
 
 const fixtureP10Single = _fixtureP10Single
 const fixtureP10Multi = _fixtureP10Multi

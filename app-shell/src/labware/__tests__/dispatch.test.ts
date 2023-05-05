@@ -1,16 +1,15 @@
-import fse from 'fs-extra'
+import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
+import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
+import type { Config } from '@opentrons/app/src/redux/config/types'
+import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import electron from 'electron'
+import fse from 'fs-extra'
+
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
-
-import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
-import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
-import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
-
-import type { Config } from '@opentrons/app/src/redux/config/types'
 import type { Dispatch } from '../../types'
 
 jest.mock('fs-extra')

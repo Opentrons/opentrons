@@ -1,8 +1,10 @@
 import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import { BaseState, Action } from '../../types'
 import { NavigateToPageAction, ToggleNewProtocolModalAction } from '../actions'
 import { Page } from '../types'
+
 const page: Reducer<Page, any> = handleActions(
   {
     LOAD_FILE: (): Page => 'file-detail',

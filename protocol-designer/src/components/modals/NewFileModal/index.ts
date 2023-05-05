@@ -1,31 +1,33 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { NormalizedPipette } from '@opentrons/step-generation'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
+import { connect } from 'react-redux'
+
+import * as labwareDefActions from '../../../labware-defs/actions'
+import * as labwareDefSelectors from '../../../labware-defs/selectors'
+import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
-import { uuid } from '../../../utils'
-import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { selectors, actions as navigationActions } from '../../../navigation'
+import { LabwareDefByDefURI } from '../../../labware-defs/types'
 import {
   actions as fileActions,
   selectors as loadFileSelectors,
   NewProtocolFields,
 } from '../../../load-file'
-import * as labwareDefSelectors from '../../../labware-defs/selectors'
-import * as labwareDefActions from '../../../labware-defs/actions'
-import * as labwareIngredActions from '../../../labware-ingred/actions'
+import { i18n } from '../../../localization'
+import { selectors, actions as navigationActions } from '../../../navigation'
 import { actions as stepFormActions, PipetteOnDeck } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
+import { BaseState, ThunkDispatch } from '../../../types'
+import { uuid } from '../../../utils'
 import {
   ModuleCreationArgs,
   PipetteFieldsData,
   FilePipettesModal as FilePipettesModalComponent,
 } from '../FilePipettesModal'
-import { NormalizedPipette } from '@opentrons/step-generation'
-import { BaseState, ThunkDispatch } from '../../../types'
-import { LabwareDefByDefURI } from '../../../labware-defs/types'
+
 type Props = React.ComponentProps<typeof FilePipettesModalComponent>
 interface OP {
   showProtocolFields: Props['showProtocolFields']

@@ -8,6 +8,7 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
+
 import { ModalShell } from '../../molecules/Modal'
 
 interface MenuListProps {

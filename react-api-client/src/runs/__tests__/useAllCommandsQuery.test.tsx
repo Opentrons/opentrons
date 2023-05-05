@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { getCommands } from '@opentrons/api-client'
+import type { HostConfig, Response, CommandsData } from '@opentrons/api-client'
+import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
-import { getCommands } from '@opentrons/api-client'
-import { useHost } from '../../api'
-import { useAllCommandsQuery, DEFAULT_PARAMS } from '../useAllCommandsQuery'
-import { mockCommandsResponse } from '../__fixtures__'
 
-import type { HostConfig, Response, CommandsData } from '@opentrons/api-client'
+import { useHost } from '../../api'
+import { mockCommandsResponse } from '../__fixtures__'
+import { useAllCommandsQuery, DEFAULT_PARAMS } from '../useAllCommandsQuery'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')

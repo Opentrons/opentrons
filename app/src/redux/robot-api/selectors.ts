@@ -1,5 +1,5 @@
-import type { State } from '../types'
 import * as Types from './types'
+import type { State } from '../types'
 
 export const getRequestById = (
   state: State,

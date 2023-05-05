@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { TYPOGRAPHY } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import { StyledText } from '../text'
 import { Banner } from './index'
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/Banner',

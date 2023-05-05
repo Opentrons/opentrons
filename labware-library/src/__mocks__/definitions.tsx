@@ -1,10 +1,9 @@
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import assert from 'assert'
-// replace webpack-specific require.context with Node-based glob in tests
-import path from 'path'
 import glob from 'glob'
 import uniq from 'lodash/uniq'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+// replace webpack-specific require.context with Node-based glob in tests
+import path from 'path'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,

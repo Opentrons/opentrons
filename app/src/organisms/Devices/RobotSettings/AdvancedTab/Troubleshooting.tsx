@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,18 +8,19 @@ import {
   SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { IconProps } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
 import { INFO_TOAST } from '../../../../atoms/Toast'
 import { useToaster } from '../../../../organisms/ToasterOven'
+import { CONNECTABLE } from '../../../../redux/discovery'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
-import { CONNECTABLE } from '../../../../redux/discovery'
-import { useRobot } from '../../hooks'
-
-import type { IconProps } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
+import { useRobot } from '../../hooks'
 
 interface TroubleshootingProps {
   robotName: string

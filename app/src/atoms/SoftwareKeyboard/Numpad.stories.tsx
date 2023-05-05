@@ -5,10 +5,10 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
+import type { Story, Meta } from '@storybook/react'
+
 import { InputField } from '../InputField'
 import { Numpad } from './'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Odd/Atoms/SoftwareKeyboard/Numpad',

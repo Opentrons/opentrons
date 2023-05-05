@@ -1,38 +1,38 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
+import type { LabwareOffset } from '@opentrons/api-client'
+import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { useConditionalConfirm } from '@opentrons/components'
-import { useSelector } from 'react-redux'
-import { Portal } from '../../App/portal'
-// import { useTrackEvent } from '../../redux/analytics'
-import { IntroScreen } from './IntroScreen'
-import { ExitConfirmation } from './ExitConfirmation'
-import { CheckItem } from './CheckItem'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice } from '../../redux/config'
-import { PickUpTip } from './PickUpTip'
-import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
-
-import type { LabwareOffset } from '@opentrons/api-client'
 import {
   CompletedProtocolAnalysis,
   Coordinates,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type { RegisterPositionAction, WorkingOffset } from './types'
-import { LabwareOffsetCreateData } from '@opentrons/api-client'
-import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import isEqual from 'lodash/isEqual'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
+import { Portal } from '../../App/portal'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { getIsOnDevice } from '../../redux/config'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import { CheckItem } from './CheckItem'
+import { ExitConfirmation } from './ExitConfirmation'
 import { FatalErrorModal } from './FatalErrorModal'
+import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+// import { useTrackEvent } from '../../redux/analytics'
+import { IntroScreen } from './IntroScreen'
+import { PickUpTip } from './PickUpTip'
+import { ResultsSummary } from './ResultsSummary'
+import { ReturnTip } from './ReturnTip'
 import { RobotMotionLoader } from './RobotMotionLoader'
+import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {

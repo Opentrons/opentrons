@@ -1,16 +1,17 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
+import { CommandCreatorError } from '@opentrons/step-generation'
 import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
+
+import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
+import { actions as dismissActions } from '../../dismiss'
+import { selectors as fileDataSelectors } from '../../file-data'
 import { i18n } from '../../localization'
+import { BaseState } from '../../types'
+import { getSelectedStepId } from '../../ui/steps'
+import { Alerts, Props } from './Alerts'
 import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
-import { actions as dismissActions } from '../../dismiss'
-import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { getSelectedStepId } from '../../ui/steps'
-import { selectors as fileDataSelectors } from '../../file-data'
-import { Alerts, Props } from './Alerts'
-import { CommandCreatorError } from '@opentrons/step-generation'
-import { BaseState } from '../../types'
 
 interface SP {
   errors: Props['errors']

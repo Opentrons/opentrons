@@ -1,5 +1,5 @@
-import os from 'os'
 import noop from 'lodash/noop'
+import os from 'os'
 
 import {
   getActiveInterfaces,

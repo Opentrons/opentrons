@@ -1,8 +1,7 @@
 import * as Fixtures from '../__fixtures__'
-import { networkingReducer } from '../reducer'
 import * as Actions from '../actions'
-
 import type { Action } from '../../types'
+import { networkingReducer } from '../reducer'
 import type { NetworkingState } from '../types'
 
 interface ReducerSpec {

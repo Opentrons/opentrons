@@ -1,15 +1,13 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
-
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
 jest.mock('@opentrons/react-api-client')

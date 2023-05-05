@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -11,8 +10,9 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
+import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '../../atoms/text'
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,

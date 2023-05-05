@@ -1,15 +1,16 @@
-import { when, resetAllWhenMocks } from 'jest-when'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
+import { when, resetAllWhenMocks } from 'jest-when'
+
+import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
   makeContext,
 } from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
 
 jest.mock('../utils/heaterShakerCollision')
 

@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
-
 import { getPublicPath } from './public-path'
 import './styles.global.css'
 

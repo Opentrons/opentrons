@@ -1,19 +1,20 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { useTranslation } from 'react-i18next'
+
 import attach96Pipette from '../../assets/images/change-pip/attach-96-pipette.png'
+import { Banner } from '../../atoms/Banner'
 import { Skeleton } from '../../atoms/Skeleton'
+import { StyledText } from '../../atoms/text'
+import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
+import { getPipetteAnimations } from './utils'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean

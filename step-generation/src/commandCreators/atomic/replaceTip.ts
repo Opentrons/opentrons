@@ -1,6 +1,6 @@
-import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { dropTip } from './dropTip'
+import { getNextTiprack } from '../../robotStateSelectors'
+import type { CurriedCommandCreator, CommandCreator } from '../../types'
 import {
   curryCommandCreator,
   getLabwareSlot,
@@ -11,7 +11,8 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
 } from '../../utils'
-import type { CurriedCommandCreator, CommandCreator } from '../../types'
+import { dropTip } from './dropTip'
+
 interface PickUpTipArgs {
   pipette: string
   tiprack: string

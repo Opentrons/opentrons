@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   pipetteDataLeftFixture,
   pipetteResponseRightFixture,
 } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { renderHook } from '@testing-library/react-hooks'
+
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
 
 jest.mock('@opentrons/react-api-client')

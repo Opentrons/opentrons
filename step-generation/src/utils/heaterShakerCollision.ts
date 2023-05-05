@@ -1,4 +1,3 @@
-import some from 'lodash/some'
 import {
   getAreSlotsAdjacent,
   getAreSlotsHorizontallyAdjacent,
@@ -8,6 +7,8 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
+import some from 'lodash/some'
+
 import type {
   LabwareEntities,
   RobotState,

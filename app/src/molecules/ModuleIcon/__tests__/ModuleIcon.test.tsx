@@ -2,7 +2,6 @@ import * as React from 'react'
 import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
 
 import { ModuleIcon } from '../'
-
 import type { AttachedModule } from '../../../redux/modules/types'
 
 jest.mock('@opentrons/components', () => {

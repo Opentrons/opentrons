@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Icon,
   COLORS,
@@ -13,14 +11,16 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { useAttachedModules } from '../hooks'
-import { Modal } from '../../../molecules/Modal'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
-
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useAttachedModules } from '../hooks'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void

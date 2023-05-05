@@ -2,12 +2,11 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { OutlineButton } from '../buttons'
+import type { ButtonProps } from '../buttons'
 import { Icon } from '../icons'
+import type { IconName } from '../icons'
 import { Modal } from './Modal'
 import styles from './modals.css'
-
-import type { ButtonProps } from '../buttons'
-import type { IconName } from '../icons'
 
 export interface AlertModalProps {
   /** optional handler for overlay click */

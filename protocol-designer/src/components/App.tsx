@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { ProtocolEditor } from './ProtocolEditor'
 
 import '../css/reset.css'
+import { ProtocolEditor } from './ProtocolEditor'
 
 export function App(): JSX.Element {
   return (

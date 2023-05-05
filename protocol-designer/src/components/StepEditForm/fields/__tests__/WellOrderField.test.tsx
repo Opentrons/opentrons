@@ -1,6 +1,7 @@
-import React from 'react'
 import { mount } from 'enzyme'
+import React from 'react'
 import { act } from 'react-dom/test-utils'
+
 import { WellOrderField, WellOrderFieldProps } from '../WellOrderField'
 import {
   WellOrderModal,

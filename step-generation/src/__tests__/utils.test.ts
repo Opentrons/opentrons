@@ -1,4 +1,3 @@
-import { when, resetAllWhenMocks } from 'jest-when'
 import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
@@ -10,16 +9,36 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
+import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import {
   fixtureP10Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import pipetteNameSpecsFixtures from '@opentrons/shared-data/pipette/fixtures/name/pipetteNameSpecFixtures.json'
+import { when, resetAllWhenMocks } from 'jest-when'
+
+import type { RobotState } from '../'
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
+import { DEFAULT_CONFIG } from '../fixtures'
+import type {
+  LabwareEntities,
+  LabwareEntity,
+  ThermocyclerModuleState,
+  ThermocyclerStateStepArgs,
+  WellOrderOption,
+} from '../types'
+import {
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsTallLabwareEastWestOfHeaterShaker,
+  orderWells,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  thermocyclerPipetteCollision,
+} from '../utils'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -32,24 +51,6 @@ import {
   splitLiquid,
 } from '../utils/misc'
 import { Diff, thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
-import { DEFAULT_CONFIG } from '../fixtures'
-import {
-  getIsHeaterShakerEastWestWithLatchOpen,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsTallLabwareEastWestOfHeaterShaker,
-  orderWells,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  thermocyclerPipetteCollision,
-} from '../utils'
-import type { RobotState } from '../'
-import type {
-  LabwareEntities,
-  LabwareEntity,
-  ThermocyclerModuleState,
-  ThermocyclerStateStepArgs,
-  WellOrderOption,
-} from '../types'
-import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')

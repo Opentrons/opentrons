@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-
 import {
   Flex,
   ALIGN_CENTER,
@@ -9,10 +7,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
+import { css } from 'styled-components'
 
 import { StyledText } from '../text'
-
-import type { StyleProps } from '@opentrons/components'
 
 export interface SnackbarProps extends StyleProps {
   message: string

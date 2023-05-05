@@ -1,22 +1,20 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
-
 import {
   Flex,
-  DIRECTION_COLUMN,
-  // useInterval,
+  DIRECTION_COLUMN, // useInterval,
   SPACING,
 } from '@opentrons/components'
+import last from 'lodash/last'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { StepMeter } from '../../atoms/StepMeter'
 import * as Networking from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
+import { StepMeter } from '../../atoms/StepMeter'
 import {
   CONNECT,
   JOIN_OTHER,
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
+import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 import {
   ConnectingNetwork,
   DisplayWifiList,
@@ -26,11 +24,10 @@ import {
   SetWifiCred,
   WifiConnectionDetails,
 } from '../../organisms/OnDeviceDisplay/SetupNetwork'
-
-import type { State, Dispatch } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
+import { getLocalRobot } from '../../redux/discovery'
 import type { WifiNetwork } from '../../redux/networking/types'
-import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
+import type { RequestState } from '../../redux/robot-api/types'
+import type { State, Dispatch } from '../../redux/types'
 
 export type AuthType = 'wpa-psk' | 'none'
 

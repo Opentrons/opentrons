@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { Flex, POSITION_RELATIVE } from '@opentrons/components'
+
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import type { AttachedModule } from '../../redux/modules/types'
 import {
   useIsOT3,
   useRunStatuses,
   useIsLegacySessionInProgress,
 } from '../Devices/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useModuleOverflowMenu } from './hooks'
-
-import type { AttachedModule } from '../../redux/modules/types'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule

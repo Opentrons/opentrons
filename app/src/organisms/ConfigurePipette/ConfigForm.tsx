@@ -1,28 +1,26 @@
 import * as React from 'react'
+import { Box } from '@opentrons/components'
 import { Formik, Form } from 'formik'
-
-import startCase from 'lodash/startCase'
-import mapValues from 'lodash/mapValues'
+import type { FormikProps } from 'formik'
 import forOwn from 'lodash/forOwn'
 import keys from 'lodash/keys'
+import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
-import { Box } from '@opentrons/components'
-import { ConfigFormResetButton } from './ConfigFormResetButton'
-import {
-  ConfigFormGroup,
-  FormColumn,
-  ConfigQuirkGroup,
-} from './ConfigFormGroup'
+import startCase from 'lodash/startCase'
 
-import type { FormikProps } from 'formik'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
-
+import {
+  ConfigFormGroup,
+  FormColumn,
+  ConfigQuirkGroup,
+} from './ConfigFormGroup'
 import type { FormValues } from './ConfigFormGroup'
+import { ConfigFormResetButton } from './ConfigFormResetButton'
 
 export interface DisplayFieldProps extends PipetteSettingsField {
   name: string

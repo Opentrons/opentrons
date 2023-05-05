@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
+import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
-import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 jest.mock('../../../redux/config')
 

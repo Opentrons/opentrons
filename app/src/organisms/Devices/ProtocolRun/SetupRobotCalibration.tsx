@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   useHoverTooltip,
@@ -9,6 +7,7 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
@@ -16,13 +15,12 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
 } from '../../../redux/analytics'
+import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
 import { useIsOT3, useRunHasStarted } from '../hooks'
+import type { StepKey } from './ProtocolRunSetup'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupPipetteCalibration } from './SetupPipetteCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
-
-import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
-import type { StepKey } from './ProtocolRunSetup'
 
 interface SetupRobotCalibrationProps {
   robotName: string

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import assert from 'assert'
+
 import { PDAlert } from './PDAlert'
 import { AlertData, AlertType } from './types'
 

@@ -1,8 +1,4 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { StaticRouter } from 'react-router-dom'
-
 import {
   renderWithProviders,
   partialComponentPropsMatcher,
@@ -15,6 +11,9 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import '@testing-library/jest-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { StaticRouter } from 'react-router-dom'
 
 import { i18n } from '../../../../../i18n'
 import {

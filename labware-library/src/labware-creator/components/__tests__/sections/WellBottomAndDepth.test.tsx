@@ -1,8 +1,9 @@
-import React from 'react'
-import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
 import { FormikConfig } from 'formik'
 import { when, resetAllWhenMocks } from 'jest-when'
+import React from 'react'
+
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -11,7 +12,6 @@ import {
 } from '../../../fields'
 import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
-
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
 jest.mock('../../../utils')

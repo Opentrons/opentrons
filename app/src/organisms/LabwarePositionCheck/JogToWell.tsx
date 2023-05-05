@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import type { VectorOffset } from '@opentrons/api-client'
 import {
   Flex,
   RobotWorkSpace,
@@ -18,6 +16,7 @@ import {
   SecondaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { WellStroke } from '@opentrons/components'
 import {
   getIsTiprack,
   getPipetteNameSpecs,
@@ -25,22 +24,22 @@ import {
   getVectorSum,
   PipetteName,
 } from '@opentrons/shared-data'
-
-import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
-import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
-import { getIsOnDevice } from '../../redux/config'
-import { Portal } from '../../App/portal'
-import { ModalShell } from '../../molecules/Modal'
-import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
-import { NeedHelpLink } from '../CalibrationPanels'
-import { JogControls } from '../../molecules/JogControls'
-import { LiveOffsetValue } from './LiveOffsetValue'
-
-import type { Jog } from '../../molecules/JogControls'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellStroke } from '@opentrons/components'
-import type { VectorOffset } from '@opentrons/api-client'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
+
+import { Portal } from '../../App/portal'
+import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
+import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
+import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { JogControls } from '../../molecules/JogControls'
+import type { Jog } from '../../molecules/JogControls'
+import { ModalShell } from '../../molecules/Modal'
+import { getIsOnDevice } from '../../redux/config'
+import { NeedHelpLink } from '../CalibrationPanels'
+import { LiveOffsetValue } from './LiveOffsetValue'
 
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 const LPC_HELP_LINK_URL =

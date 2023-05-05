@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import * as RobotApi from '../../../redux/robot-api'
-import { ConfigurePipette } from '../../ConfigurePipette'
+import { i18n } from '../../../i18n'
+import { getConfig } from '../../../redux/config'
 import { getAttachedPipetteSettingsFieldsById } from '../../../redux/pipettes'
 import { mockPipetteSettingsFieldsMap } from '../../../redux/pipettes/__fixtures__'
-import { getConfig } from '../../../redux/config'
-
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 import type { State } from '../../../redux/types'
+import { ConfigurePipette } from '../../ConfigurePipette'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/config')

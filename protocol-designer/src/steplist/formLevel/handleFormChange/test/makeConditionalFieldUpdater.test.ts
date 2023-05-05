@@ -1,4 +1,5 @@
 import { makeConditionalPatchUpdater } from '../makeConditionalPatchUpdater'
+
 describe('makeConditionalPatchUpdater', () => {
   const foodUpdateMap = [
     {

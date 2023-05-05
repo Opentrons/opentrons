@@ -1,8 +1,7 @@
 import * as React from 'react'
+import type { ModuleDefinition } from '@opentrons/shared-data'
 import parseHtml from 'html-react-parser'
 import { stringify } from 'svgson'
-
-import type { ModuleDefinition } from '@opentrons/shared-data'
 
 export interface ModuleFromDataProps {
   def: ModuleDefinition

@@ -1,6 +1,7 @@
+import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 import 'cypress-file-upload'
 import cloneDeep from 'lodash/cloneDeep'
-import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+
 const semver = require('semver')
 
 // TODO: (sa 2022-03-31: change these migration fixtures to v6 protocols once the liquids key is added to PD protocols

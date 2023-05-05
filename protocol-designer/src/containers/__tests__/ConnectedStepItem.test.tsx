@@ -1,26 +1,25 @@
 import * as React from 'react'
-import { Provider } from 'react-redux'
-import { act } from 'react-dom/test-utils'
-import UAParser from 'ua-parser-js'
 import { mount } from 'enzyme'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { act } from 'react-dom/test-utils'
+import { Provider } from 'react-redux'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
+import UAParser from 'ua-parser-js'
 
-import { ConnectedStepItem, getMetaSelectedSteps } from '../ConnectedStepItem'
-import { StepItem } from '../../components/steplist'
+import * as dismissSelectors from '../../dismiss/selectors'
+import * as fileDataSelectors from '../../file-data/selectors/index'
+import * as stepFormSelectors from '../../step-forms/selectors/index'
+import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
+import * as uiStepSelectors from '../../ui/steps/selectors'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_BATCH_EDIT_FORM,
 } from '../../components/modals/ConfirmDeleteModal'
-
-import * as stepFormSelectors from '../../step-forms/selectors/index'
-import * as dismissSelectors from '../../dismiss/selectors'
-import * as uiStepSelectors from '../../ui/steps/selectors'
-import * as fileDataSelectors from '../../file-data/selectors/index'
-import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
+import { StepItem } from '../../components/steplist'
+import { ConnectedStepItem, getMetaSelectedSteps } from '../ConnectedStepItem'
 
 jest.mock('ua-parser-js')
 jest.mock('../../step-forms/selectors/index')

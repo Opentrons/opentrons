@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders, COLORS } from '@opentrons/components'
+
 import { ModalHeader } from '../ModalHeader'
 
 const render = (props: React.ComponentProps<typeof ModalHeader>) => {

@@ -1,8 +1,7 @@
 import * as React from 'react'
+import type { Story, Meta } from '@storybook/react'
 
 import { StepMeter } from './index'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/StepMeter',

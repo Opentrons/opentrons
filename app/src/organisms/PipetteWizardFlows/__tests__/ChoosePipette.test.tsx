@@ -1,14 +1,15 @@
 import * as React from 'react'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { fireEvent } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
-import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'

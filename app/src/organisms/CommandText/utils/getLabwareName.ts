@@ -1,11 +1,11 @@
-import { getLoadedLabware } from './accessors'
-
 import {
   CompletedProtocolAnalysis,
   getLabwareDefURI,
   getLabwareDisplayName,
 } from '@opentrons/shared-data'
+
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
+import { getLoadedLabware } from './accessors'
 
 const FIXED_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export function getLabwareName(

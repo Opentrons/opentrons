@@ -1,23 +1,24 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { LocationLiquidState } from '@opentrons/step-generation'
 import map from 'lodash/map'
 import noop from 'lodash/noop'
-import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
-import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import reduce from 'lodash/reduce'
+import { useSelector } from 'react-redux'
+
 import { selectors } from '../../labware-ingred/selectors'
-import { IngredPill } from './IngredPill'
-import { PDListItem } from '../lists'
-import { swatchColors } from '../swatchColors'
-import { formatVolume, formatPercentage } from './utils'
-import { LocationLiquidState } from '@opentrons/step-generation'
 import {
   SubstepIdentifier,
   SubstepWellData,
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist/types'
+import { PDListItem } from '../lists'
+import { swatchColors } from '../swatchColors'
+import { IngredPill } from './IngredPill'
 import styles from './StepItem.css'
+import { formatVolume, formatPercentage } from './utils'
 
 interface SubstepRowProps {
   volume: number | string | null | undefined

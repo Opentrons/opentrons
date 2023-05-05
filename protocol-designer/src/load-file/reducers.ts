@@ -1,8 +1,10 @@
 import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+
 import { Action } from '../types'
-import { FileUploadMessage, LoadFileAction } from './types'
 import { FileUploadMessageAction } from './actions'
+import { FileUploadMessage, LoadFileAction } from './types'
+
 // Keep track of file upload errors / messages
 type FileUploadMessageState = FileUploadMessage | null | undefined
 

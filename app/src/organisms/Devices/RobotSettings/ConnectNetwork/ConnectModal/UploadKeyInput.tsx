@@ -1,14 +1,13 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { useSelector } from 'react-redux'
 import last from 'lodash/last'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
-import { useDispatchApiRequest } from '../../../../../redux/robot-api'
 import {
   postWifiKeys,
   getWifiKeyByRequestId,
 } from '../../../../../redux/networking'
-
+import { useDispatchApiRequest } from '../../../../../redux/robot-api'
 import type { State } from '../../../../../redux/types'
 
 export interface UploadKeyInputProps {

@@ -1,8 +1,9 @@
-import { useTranslation } from 'react-i18next'
 import type {
   CompletedProtocolAnalysis,
   MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data/'
+import { useTranslation } from 'react-i18next'
+
 import { getLabwareName } from './utils'
 import { getLoadedLabware } from './utils/accessors'
 import { getLabwareDisplayLocation } from './utils/getLabwareDisplayLocation'

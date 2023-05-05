@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Table, TableEntry, TABLE_COLUMN } from './Table'
+
 import { LabelText, LABEL_LEFT } from './LabelText'
-import { Value } from './Value'
-import { TableTitle } from './TableTitle'
+import { Table, TableEntry, TABLE_COLUMN } from './Table'
 import type { TableDirection } from './Table'
+import { TableTitle } from './TableTitle'
+import { Value } from './Value'
 
 export interface ValueEntry {
   label: React.ReactNode

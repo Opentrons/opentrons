@@ -12,9 +12,9 @@ import {
   BORDERS,
   Btn,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-
 import type { StyleProps } from '@opentrons/components'
+
+import { StyledText } from '../text'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 

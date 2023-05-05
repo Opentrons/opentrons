@@ -1,7 +1,6 @@
 // protocol state reducer tests
-
-import { protocolReducer } from '../reducer'
 import type { Action } from '../../types'
+import { protocolReducer } from '../reducer'
 import type { ProtocolState } from '../types'
 
 describe('protocolReducer', () => {

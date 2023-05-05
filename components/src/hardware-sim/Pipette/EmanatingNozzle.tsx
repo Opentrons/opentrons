@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from './constants'
 

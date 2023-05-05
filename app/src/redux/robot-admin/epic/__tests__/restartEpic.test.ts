@@ -1,12 +1,10 @@
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-
-import * as SettingsSelectors from '../../../robot-settings/selectors'
 import * as DiscoveryActions from '../../../discovery/actions'
+import * as SettingsSelectors from '../../../robot-settings/selectors'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
-
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import type { Action } from '../../../types'
+import { restartEpic, startDiscoveryOnRestartEpic } from '../restartEpic'
 
 jest.mock('../../../robot-settings/selectors')
 

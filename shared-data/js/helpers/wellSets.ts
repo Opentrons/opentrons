@@ -11,11 +11,11 @@
 // A 384 plate has 48 well sets, 2 for each column b/c it has staggered columns.
 //
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
-import { getLabwareDefURI } from '.'
 import uniq from 'lodash/uniq'
 
-import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+import { getLabwareDefURI } from '.'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
+import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 
 type WellSetByPrimaryWell = string[][]
 

@@ -1,8 +1,9 @@
 import * as React from 'react'
 import cx from 'classnames'
+
 import { i18n } from '../../../localization'
-import { PDTitledList, PDListItem } from '../../lists'
 import { EditableTextField } from '../../EditableTextField'
+import { PDTitledList, PDListItem } from '../../lists'
 import styles from './labwareDetailsCard.css'
 
 export interface Props {

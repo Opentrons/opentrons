@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { saveAs } from 'file-saver'
-
 import {
   Box,
   Flex,
@@ -14,20 +11,21 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-
+import { saveAs } from 'file-saver'
 import find from 'lodash/find'
-import { LEFT, RIGHT } from '../../../redux/pipettes'
-import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '../../../redux/sessions'
-import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
-import { RenderMountInformation } from './RenderMountInformation'
-import { CalibrationResult } from './CalibrationResult'
+import { useTranslation } from 'react-i18next'
 
-import type { Mount } from '../../../redux/pipettes/types'
 import type { CalibrationPanelProps } from '../../../organisms/CalibrationPanels/types'
+import { LEFT, RIGHT } from '../../../redux/pipettes'
+import type { Mount } from '../../../redux/pipettes/types'
+import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '../../../redux/sessions'
 import type {
   CalibrationCheckInstrument,
   CalibrationCheckComparisonsPerCalibration,
 } from '../../../redux/sessions/types'
+import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
+import { CalibrationResult } from './CalibrationResult'
+import { RenderMountInformation } from './RenderMountInformation'
 
 export function ResultsSummary(
   props: CalibrationPanelProps

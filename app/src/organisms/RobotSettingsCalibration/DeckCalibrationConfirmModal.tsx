@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,8 +10,10 @@ import {
   SPACING,
   Link,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown

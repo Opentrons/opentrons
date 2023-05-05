@@ -1,5 +1,6 @@
 import * as actions from './actions'
-import { rootReducer, RootState } from './reducers'
 import * as selectors from './selectors'
+import { rootReducer, RootState } from './reducers'
+
 export { actions, rootReducer, selectors }
 export type { RootState }

@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
-
 import {
   Box,
   SPACING,
@@ -9,12 +7,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useDispatch } from 'react-redux'
 
-import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
 import { updateSetting } from '../../../redux/robot-settings'
-import type { Dispatch } from '../../../redux/types'
 import type { RobotSettingsField } from '../../../redux/robot-settings/types'
+import type { Dispatch } from '../../../redux/types'
 
 interface SettingToggleProps extends RobotSettingsField {
   robotName: string

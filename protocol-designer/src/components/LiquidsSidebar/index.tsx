@@ -1,16 +1,15 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { i18n } from '../../localization'
 import { DeprecatedPrimaryButton, SidePanel } from '@opentrons/components'
-import { PDTitledList } from '../lists'
-import { swatchColors } from '../swatchColors'
-import listButtonStyles from '../listButtons.css'
+import { connect } from 'react-redux'
 
+import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { OrderedLiquids } from '../../labware-ingred/types'
-import * as labwareIngredActions from '../../labware-ingred/actions'
+import { i18n } from '../../localization'
 import { BaseState, ThunkDispatch } from '../../types'
-
+import listButtonStyles from '../listButtons.css'
+import { PDTitledList } from '../lists'
+import { swatchColors } from '../swatchColors'
 import styles from './styles.css'
 
 interface SP {

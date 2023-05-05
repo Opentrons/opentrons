@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
+
 import { StatusLabel } from '../../../atoms/StatusLabel'
+import { i18n } from '../../../i18n'
 import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 
 jest.mock('../../../atoms/StatusLabel')

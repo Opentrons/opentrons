@@ -1,14 +1,12 @@
+import type { Run } from '@opentrons/api-client'
+import { useRunQuery } from '@opentrons/react-api-client'
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
-
-import { useRunQuery } from '@opentrons/react-api-client'
+import type { UseQueryResult } from 'react-query'
 
 import { mockIdleUnstartedRun } from '../../../../organisms/RunTimeControl/__fixtures__'
 import { formatTimestamp } from '../../utils'
 import { useRunCreatedAtTimestamp } from '../useRunCreatedAtTimestamp'
-
-import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../utils')

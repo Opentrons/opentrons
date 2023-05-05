@@ -1,18 +1,16 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
 import { renderWithProviders, COLORS } from '@opentrons/components'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
+import { fireEvent } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { MemoryRouter } from 'react-router-dom'
 
 import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
-
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 
 jest.mock('@opentrons/react-api-client')

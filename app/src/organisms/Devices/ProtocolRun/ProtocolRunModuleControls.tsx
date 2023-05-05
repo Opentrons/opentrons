@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   Flex,
@@ -7,6 +6,8 @@ import {
   JUSTIFY_CENTER,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'

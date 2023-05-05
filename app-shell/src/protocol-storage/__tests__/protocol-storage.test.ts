@@ -1,15 +1,14 @@
 // tests for labware directory utilities
-
-import path from 'path'
 import fs from 'fs-extra'
+import path from 'path'
 import tempy from 'tempy'
 
-import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 import {
   fetchProtocols,
   getUnixTimeFromAnalysisPath,
   getParsedAnalysisFromPath,
 } from '../'
+import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string

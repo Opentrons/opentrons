@@ -1,10 +1,10 @@
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
-import type { UseQueryOptions } from 'react-query'
 import type {
   CommandsData,
   RunCommandSummary,
   GetCommandsParams,
 } from '@opentrons/api-client'
+import { useAllCommandsQuery } from '@opentrons/react-api-client'
+import type { UseQueryOptions } from 'react-query'
 
 const REFETCH_INTERVAL = 3000
 

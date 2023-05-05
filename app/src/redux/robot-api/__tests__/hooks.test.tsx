@@ -1,6 +1,7 @@
 import * as React from 'react'
-import uniqueId from 'lodash/uniqueId'
 import { mountWithStore } from '@opentrons/components'
+import uniqueId from 'lodash/uniqueId'
+
 import { PENDING, SUCCESS } from '../constants'
 import { useDispatchApiRequest, useDispatchApiRequests } from '../hooks'
 

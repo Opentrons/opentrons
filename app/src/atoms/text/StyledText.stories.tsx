@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { StyledText } from './index'
 import type { Story, Meta } from '@storybook/react'
+
+import { StyledText } from './index'
 
 export default {
   title: 'App/Atoms/StyledText',

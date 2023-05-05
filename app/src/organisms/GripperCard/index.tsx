@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import { InstrumentData } from '@opentrons/api-client'
 import { SPACING } from '@opentrons/components'
 import { getGripperDisplayName, GripperModel } from '@opentrons/shared-data'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { InstrumentCard } from '../../molecules/InstrumentCard'

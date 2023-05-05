@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
 import { renderWithProviders } from '@opentrons/components'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
+import { renderHook } from '@testing-library/react-hooks'
+import { when, resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
+import { useLaunchLPC } from '../useLaunchLPC'
+import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')

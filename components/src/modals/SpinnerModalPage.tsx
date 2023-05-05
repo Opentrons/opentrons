@@ -2,10 +2,9 @@
 import * as React from 'react'
 
 import { TitleBar } from '../structure'
-import { SpinnerModal } from './SpinnerModal'
-import styles from './modals.css'
-
 import type { TitleBarProps } from '../structure'
+import styles from './modals.css'
+import { SpinnerModal } from './SpinnerModal'
 
 // TODO(mc, 2018-06-20): s/titleBar/titleBarProps
 export interface SpinnerModalPageProps

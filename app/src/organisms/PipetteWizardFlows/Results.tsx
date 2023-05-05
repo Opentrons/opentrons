@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   TYPOGRAPHY,
@@ -8,9 +7,11 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+
+import { SmallButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'

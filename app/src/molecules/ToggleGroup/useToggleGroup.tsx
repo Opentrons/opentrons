@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
   BORDERS,
   COLORS,
@@ -7,6 +6,8 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import { css } from 'styled-components'
+
 import { useTrackEvent } from '../../redux/analytics'
 
 const BUTTON_GROUP_STYLES = css`

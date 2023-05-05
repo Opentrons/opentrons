@@ -1,22 +1,21 @@
 import * as React from 'react'
+import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
-import { QueryClient, QueryClientProvider } from 'react-query'
 
+import { usePipetteOffsetCalibration } from '..'
 import {
   fetchPipetteOffsetCalibrations,
   getCalibrationForPipette,
 } from '../../../../redux/calibration'
 import { mockPipetteOffsetCalibration1 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
-import { useRobot } from '../useRobot'
-import { usePipetteOffsetCalibration } from '..'
-
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 import { AttachedPipette, Mount } from '../../../../redux/pipettes/types'
+import { useDispatchApiRequest } from '../../../../redux/robot-api'
+import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import { useRobot } from '../useRobot'
 
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot-api')

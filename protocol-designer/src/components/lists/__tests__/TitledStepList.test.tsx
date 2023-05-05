@@ -1,6 +1,7 @@
-import React from 'react'
-import { shallow } from 'enzyme'
 import { Icon } from '@opentrons/components'
+import { shallow } from 'enzyme'
+import React from 'react'
+
 import { TitledStepList } from '../TitledStepList'
 
 describe('TitledStepLest', () => {

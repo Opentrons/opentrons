@@ -1,15 +1,7 @@
 import { when } from 'jest-when'
+
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
-import {
-  thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestMultiChannelPipette,
-  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-} from '../utils'
 import {
   getRobotStateWithTipStandard,
   makeContext,
@@ -19,6 +11,15 @@ import {
   SOURCE_LABWARE,
 } from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
+import {
+  thermocyclerPipetteCollision,
+  pipetteIntoHeaterShakerLatchOpen,
+  pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+} from '../utils'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/heaterShakerCollision')

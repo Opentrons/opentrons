@@ -1,10 +1,8 @@
 // system-info reducer tests
-
 import * as Fixtures from '../__fixtures__'
 import * as Actions from '../actions'
-import { systemInfoReducer } from '../reducer'
-
 import type { Action } from '../../types'
+import { systemInfoReducer } from '../reducer'
 import type { SystemInfoState } from '../types'
 
 interface ReducerSpec {

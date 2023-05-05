@@ -1,6 +1,4 @@
 import * as React from 'react'
-import startCase from 'lodash/startCase'
-import reduce from 'lodash/reduce'
 import {
   useOnClickOutside,
   DeprecatedCheckboxField,
@@ -19,19 +17,22 @@ import {
   LabwareDefinition2,
   ModuleType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
+import reduce from 'lodash/reduce'
+import startCase from 'lodash/startCase'
+
 import { SPAN7_8_10_11_SLOT } from '../../constants'
-import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { LabwareDefByDefURI } from '../../labware-defs'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
-import { Portal } from '../portals/TopPortal'
-import { PDTitledList } from '../lists'
+import { i18n } from '../../localization'
+import { DeckSlot } from '../../types'
+import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import { PDTitledList } from '../lists'
+import { Portal } from '../portals/TopPortal'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
-import { DeckSlot } from '../../types'
-import { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface Props {
   onClose: (e?: any) => unknown

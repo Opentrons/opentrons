@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
+
+import { CheckboxField } from '..'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
 import { COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-
-import { CheckboxField } from '..'
 
 const render = (props: React.ComponentProps<typeof CheckboxField>) => {
   return renderWithProviders(<CheckboxField {...props} />)[0]

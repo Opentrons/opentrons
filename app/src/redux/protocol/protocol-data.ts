@@ -1,7 +1,6 @@
 // functions for parsing protocol files
 import { createLogger } from '../../logger'
 import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
-
 import type { ProtocolFile, ProtocolData, ProtocolType } from './types'
 
 const log = createLogger(__filename)

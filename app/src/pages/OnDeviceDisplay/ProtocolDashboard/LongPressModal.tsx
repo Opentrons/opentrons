@@ -1,21 +1,20 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useQueryClient } from 'react-query'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { Flex, Icon, SPACING } from '@opentrons/components'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { Flex, Icon, SPACING } from '@opentrons/components'
+import type { UseLongPressResult } from '@opentrons/components'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { StyledText } from '../../../atoms/text'
 import { MenuList } from '../../../atoms/MenuList'
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { StyledText } from '../../../atoms/text'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
-
-import type { UseLongPressResult } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
 
 export function LongPressModal(props: {

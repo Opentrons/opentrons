@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { SPACING } from '../../ui-style-constants'
-import { DIRECTION_ROW } from '../../styles'
+import type { Story, Meta } from '@storybook/react'
+
 import { Flex } from '../../primitives'
+import { DIRECTION_ROW } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
+import { AlertPrimaryButton } from './AlertPrimaryButton'
 import { PrimaryButton } from './PrimaryButton'
 import { SecondaryButton } from './SecondaryButton'
-import { AlertPrimaryButton } from './AlertPrimaryButton'
-
-import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Atoms/Buttons',

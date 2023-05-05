@@ -1,15 +1,16 @@
 import * as React from 'react'
-import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../i18n'
-import { CheckItem } from '../CheckItem'
-import { SECTIONS } from '../constants'
-import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import {
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import type { MatcherFunction } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
+
+import { i18n } from '../../../i18n'
+import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
+import { CheckItem } from '../CheckItem'
+import { SECTIONS } from '../constants'
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }

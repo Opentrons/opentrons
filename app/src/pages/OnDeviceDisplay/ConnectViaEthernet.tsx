@@ -1,9 +1,4 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import capitalize from 'lodash/capitalize'
-
 import {
   Flex,
   SPACING,
@@ -24,12 +19,15 @@ import {
   PrimaryButton,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import capitalize from 'lodash/capitalize'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
-import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
 import { StepMeter } from '../../atoms/StepMeter'
 import { StyledText } from '../../atoms/text'
-
+import { getLocalRobot } from '../../redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import type { State, Dispatch } from '../../redux/types'
 
 const STATUS_REFRESH_MS = 5000

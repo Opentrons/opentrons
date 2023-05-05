@@ -7,7 +7,6 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../pipettes/types'
-
 import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
 export type PythonProtocolMetadata = ProtocolFileV1<{

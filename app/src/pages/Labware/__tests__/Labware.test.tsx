@@ -1,18 +1,19 @@
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+
+import { Labware } from '..'
 import { i18n } from '../../../i18n'
+import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
+import { LabwareCard } from '../../../organisms/LabwareCard'
+import { useToaster } from '../../../organisms/ToasterOven'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '../../../redux/analytics'
-import { LabwareCard } from '../../../organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
-import { useToaster } from '../../../organisms/ToasterOven'
-import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
-import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 
 jest.mock('../../../organisms/LabwareCard')
 jest.mock('../../../organisms/AddCustomLabwareSlideout')

@@ -8,12 +8,12 @@ import {
   ALIGN_STRETCH,
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
+import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../redux/sessions'
 import { StyledText } from '../../atoms/text'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { SessionCommandString } from '../../redux/sessions/types'
-import { useTranslation } from 'react-i18next'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 export function ReturnTip(props: CalibrationPanelProps): JSX.Element {

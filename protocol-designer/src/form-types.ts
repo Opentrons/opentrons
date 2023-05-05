@@ -1,14 +1,16 @@
-import {
-  PAUSE_UNTIL_RESUME,
-  PAUSE_UNTIL_TIME,
-  PAUSE_UNTIL_TEMP,
-} from './constants'
 import { IconName } from '@opentrons/components'
 import {
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
 } from '@opentrons/step-generation'
+
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_TEMP,
+} from './constants'
+
 export type StepIdType = string
 export type StepFieldName = string
 // | 'aspirate_airGap_checkbox'

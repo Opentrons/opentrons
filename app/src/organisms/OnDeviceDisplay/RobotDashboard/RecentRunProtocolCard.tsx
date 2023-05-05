@@ -1,9 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
-import { formatDistance } from 'date-fns'
-
 import {
   Flex,
   COLORS,
@@ -12,9 +7,13 @@ import {
   DIRECTION_COLUMN,
   BORDERS,
 } from '@opentrons/components'
+import { formatDistance } from 'date-fns'
+import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
-import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
+import { StyledText } from '../../../atoms/text'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 
 interface RecentRunProtocolCardProps {

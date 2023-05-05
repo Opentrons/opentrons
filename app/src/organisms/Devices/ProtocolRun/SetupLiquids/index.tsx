@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   JUSTIFY_CENTER,
   Flex,
@@ -7,6 +6,8 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '../../../../redux/analytics'
 import { ProceedToRunButton } from '../ProceedToRunButton'

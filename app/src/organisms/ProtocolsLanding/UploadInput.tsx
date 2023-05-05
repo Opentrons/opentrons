@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -9,15 +7,17 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
+import { useTranslation, Trans } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+
 import { StyledText } from '../../atoms/text'
+import { useLogger } from '../../logger'
 import { UploadInput as FileImporter } from '../../molecules/UploadInput'
-import { addProtocol } from '../../redux/protocol-storage'
 import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
 } from '../../redux/analytics'
-import { useLogger } from '../../logger'
-
+import { addProtocol } from '../../redux/protocol-storage'
 import type { Dispatch } from '../../redux/types'
 
 export interface UploadInputProps {

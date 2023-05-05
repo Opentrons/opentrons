@@ -1,16 +1,15 @@
 import { ofType } from 'redux-observable'
 import { map } from 'rxjs/operators'
 
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-import * as Constants from '../constants'
-import * as Actions from '../actions'
-
-import type { Epic, Action } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { Epic, Action } from '../../types'
 import {
   ResetConfigAction,
   ResetConfigSuccessAction,

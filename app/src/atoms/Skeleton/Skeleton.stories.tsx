@@ -9,10 +9,10 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
-import { Skeleton } from '.'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { Skeleton } from '.'
+import { Modal } from '../../molecules/Modal'
 
 export default {
   title: 'App/Atoms/Skeleton',

@@ -1,11 +1,12 @@
 import * as React from 'react'
+import { Icon } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
-import { Icon } from '@opentrons/components'
-import { i18n } from '../../../localization'
-import { ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
+
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
+import { i18n } from '../../../localization'
+import { LabwareOnDeck } from '../../../step-forms'
+import { ThunkDispatch } from '../../../types'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 

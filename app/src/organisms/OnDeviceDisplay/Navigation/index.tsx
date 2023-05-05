@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
-
 import {
   Icon,
   Flex,
@@ -17,12 +13,14 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import { NavLink } from 'react-router-dom'
+import styled from 'styled-components'
 
+import type { RouteProps } from '../../../App/types'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
-
-import type { RouteProps } from '../../../App/types'
 
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)

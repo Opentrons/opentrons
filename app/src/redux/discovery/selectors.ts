@@ -1,11 +1,12 @@
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
+import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
-import find from 'lodash/find'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
+import type { State } from '../types'
 import {
   HEALTH_STATUS_OK,
   HEALTH_STATUS_UNREACHABLE,
@@ -21,8 +22,6 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from './constants'
-
-import type { State } from '../types'
 import {
   DiscoveredRobot,
   Robot,

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
+import type { RunData } from '@opentrons/api-client'
 import {
   Flex,
   Box,
@@ -16,12 +15,14 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
+import isEqual from 'lodash/isEqual'
+import { useTranslation } from 'react-i18next'
+
 import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../atoms/text'
+import { OffsetVector } from '../../molecules/OffsetVector'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
-import { OffsetVector } from '../../molecules/OffsetVector'
-import type { RunData } from '@opentrons/api-client'
 
 interface HistoricalProtocolRunOffsetDrawerProps {
   run: RunData

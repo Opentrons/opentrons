@@ -1,6 +1,4 @@
 import * as React from 'react'
-import cx from 'classnames'
-import { useSelector } from 'react-redux'
 import {
   FormGroup,
   Flex,
@@ -9,6 +7,9 @@ import {
   Tooltip,
   TOOLTIP_BOTTOM,
 } from '@opentrons/components'
+import cx from 'classnames'
+import { useSelector } from 'react-redux'
+
 import { i18n } from '../../../../localization'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import {
@@ -18,7 +19,6 @@ import {
   StepFormDropdown,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
-
 import type { StepFormProps } from '../../types'
 
 export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {

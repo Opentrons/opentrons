@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { DeprecatedPrimaryButton } from '@opentrons/components'
-import { ImportLabware } from '../ImportLabware'
+
 import styles from '../../styles.css'
+import { ImportLabware } from '../ImportLabware'
 
 interface Props {
   disabled: boolean

@@ -1,19 +1,21 @@
-import { createSelector } from 'reselect'
-import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
+import { Options } from '@opentrons/components'
 import {
   getIsTiprack,
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
-import { FIXED_TRASH_ID } from '../../constants'
-import { i18n } from '../../localization'
-import * as stepFormSelectors from '../../step-forms/selectors'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getModuleUnderLabware } from '../modules/utils'
-import { Options } from '@opentrons/components'
 import { LabwareEntity } from '@opentrons/step-generation'
+import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
+import { createSelector } from 'reselect'
+
+import * as stepFormSelectors from '../../step-forms/selectors'
+import { FIXED_TRASH_ID } from '../../constants'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { i18n } from '../../localization'
 import { Selector } from '../../types'
+import { getModuleUnderLabware } from '../modules/utils'
+
 export const getLabwareNicknamesById: Selector<
   Record<string, string>
 > = createSelector(

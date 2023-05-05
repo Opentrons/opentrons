@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-
 import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom'
+import { screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
+import * as Shell from '../../../redux/shell'
 import { i18n } from '../../../i18n'
 import { getAlertIsPermanentlyIgnored } from '../../../redux/alerts'
-import * as Shell from '../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
 
 jest.mock('../../../redux/config')

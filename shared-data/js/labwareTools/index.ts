@@ -4,7 +4,6 @@ import range from 'lodash/range'
 import round from 'lodash/round'
 
 import labwareSchema from '../../labware/schemas/2.json'
-
 import {
   toWellName,
   sortWells,
@@ -13,7 +12,6 @@ import {
   getAsciiVolumeUnits,
   ensureVolumeUnits,
 } from '../helpers/index'
-
 import type {
   LabwareDefinition2 as Definition,
   LabwareMetadata as Metadata,

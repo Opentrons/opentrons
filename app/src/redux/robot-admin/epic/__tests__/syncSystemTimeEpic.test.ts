@@ -1,15 +1,15 @@
-import cloneDeep from 'lodash/cloneDeep'
-import set from 'lodash/set'
-import get from 'lodash/get'
 import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
+import cloneDeep from 'lodash/cloneDeep'
+import get from 'lodash/get'
+import set from 'lodash/set'
 
-import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import { GET, PUT } from '../../../robot-api'
-import { syncSystemTime } from '../../actions'
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import {
   mockFetchSystemTimeSuccess,
   mockFetchSystemTimeFailure,
 } from '../../__fixtures__'
+import { syncSystemTime } from '../../actions'
 import { syncSystemTimeEpic } from '../syncSystemTimeEpic'
 
 const createTimeSuccessResponse = (

@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   Link,
@@ -8,11 +6,11 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../redux/sessions'
 import { StyledText } from '../../atoms/text'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
-
 import type { CalibrationPanelProps } from './types'
 
 export function useConfirmCrashRecovery(

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 import {
   COLORS,
   Flex,
@@ -12,12 +11,14 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import { StyledText } from '../../atoms/text'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
-import { getSlotLabwareName } from '../Devices/ProtocolRun/utils/getSlotLabwareName'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
+import { getSlotLabwareName } from '../Devices/ProtocolRun/utils/getSlotLabwareName'
 
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};

@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Link } from './Link'
-
 import type { Story, Meta } from '@storybook/react'
+
+import { Link } from './Link'
 
 export default {
   title: 'Library/Atoms/Link',

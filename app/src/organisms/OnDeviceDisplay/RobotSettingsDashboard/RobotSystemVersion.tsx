@@ -1,7 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   SPACING,
@@ -17,12 +14,13 @@ import {
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { StyledText } from '../../../atoms/text'
-import { RobotSystemVersionModal } from './RobotSystemVersionModal'
-import { getShellUpdateState } from '../../../redux/shell'
-
 import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import { getShellUpdateState } from '../../../redux/shell'
+import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons'
 

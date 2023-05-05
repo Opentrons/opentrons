@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
-
 import {
   Box,
   Flex,
@@ -21,27 +17,29 @@ import {
   ALIGN_FLEX_END,
   useOnClickOutside,
 } from '@opentrons/components'
+import startCase from 'lodash/startCase'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
+import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
+import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/text'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
-import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
+import { LabwareCard } from '../../organisms/LabwareCard'
+import { LabwareDetails } from '../../organisms/LabwareDetails'
+import { useToaster } from '../../organisms/ToasterOven'
 import {
   useTrackEvent,
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
 } from '../../redux/analytics'
-import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
-import { LabwareCard } from '../../organisms/LabwareCard'
-import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
-import { LabwareDetails } from '../../organisms/LabwareDetails'
-import { useToaster } from '../../organisms/ToasterOven'
 import {
   LabwareDefAndDate,
   useAllLabware,
   useLabwareFailure,
   useNewLabwareName,
 } from './hooks'
-
-import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 import type { LabwareFilter, LabwareSort } from './types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'

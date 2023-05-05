@@ -1,8 +1,4 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
-
 import {
   Flex,
   Box,
@@ -22,37 +18,39 @@ import {
   AlertPrimaryButton,
   DIRECTION_ROW,
 } from '@opentrons/components'
+import { Trans, useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
-import * as Config from '../../redux/config'
-import * as ProtocolAnalysis from '../../redux/protocol-analysis'
 import * as Calibration from '../../redux/calibration'
+import * as Config from '../../redux/config'
 import * as CustomLabware from '../../redux/custom-labware'
-import {
-  clearDiscoveryCache,
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../redux/discovery'
-import { Modal } from '../../molecules/Modal'
+import * as ProtocolAnalysis from '../../redux/protocol-analysis'
 import { Portal } from '../../App/portal'
-import { SelectOption } from '../../atoms/SelectField/Select'
+import { Banner } from '../../atoms/Banner'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { SelectField } from '../../atoms/SelectField'
+import { SelectOption } from '../../atoms/SelectField/Select'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
+import { Modal } from '../../molecules/Modal'
+import { useToaster } from '../../organisms/ToasterOven'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../redux/analytics'
 import {
+  clearDiscoveryCache,
+  getReachableRobots,
+  getUnreachableRobots,
+} from '../../redux/discovery'
+import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   OUTDATED,
 } from '../../redux/system-info'
-import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
-import { useToaster } from '../../organisms/ToasterOven'
-
 import type { Dispatch, State } from '../../redux/types'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'

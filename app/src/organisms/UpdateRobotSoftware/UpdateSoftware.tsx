@@ -1,6 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import {
   Flex,
   COLORS,
@@ -10,9 +8,10 @@ import {
   JUSTIFY_CENTER,
   Box,
 } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '../../atoms/text'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { StyledText } from '../../atoms/text'
 
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null

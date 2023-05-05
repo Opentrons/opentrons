@@ -1,9 +1,11 @@
 // replace webpack-specific require.context with Node-based glob in tests
-import assert from 'assert'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { LabwareDefByDefURI } from '../types'
-import path from 'path'
+import assert from 'assert'
 import glob from 'glob'
+import path from 'path'
+
+import { LabwareDefByDefURI } from '../types'
+
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
   '../../../../shared-data/labware/fixtures/2/*.json'

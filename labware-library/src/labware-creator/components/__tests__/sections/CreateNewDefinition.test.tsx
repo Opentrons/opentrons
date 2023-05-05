@@ -1,10 +1,11 @@
-import React from 'react'
-import { FormikConfig } from 'formik'
-import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { render, fireEvent } from '@testing-library/react'
+import { FormikConfig } from 'formik'
+import React from 'react'
+
 import { getDefaultFormState, LabwareFields } from '../../../fields'
-import { wrapInFormik } from '../../utils/wrapInFormik'
 import { CreateNewDefinition } from '../../sections/CreateNewDefinition'
+import { wrapInFormik } from '../../utils/wrapInFormik'
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),

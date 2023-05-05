@@ -1,4 +1,5 @@
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
+import { SelectMultipleStepsAction } from '../actions/types'
 import {
   _allReducers,
   SINGLE_STEP_SELECTION_TYPE,
@@ -6,7 +7,6 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
   SelectableItem,
 } from '../reducers'
-import { SelectMultipleStepsAction } from '../actions/types'
 
 jest.mock('../../../labware-defs/utils')
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders, COLORS, SIZE_1 } from '@opentrons/components'
-import { i18n } from '../../../../i18n'
 
+import { i18n } from '../../../../i18n'
 import { RenderResult } from '../RenderResult'
 
 const render = (props: React.ComponentProps<typeof RenderResult>) => {

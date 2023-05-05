@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
 import { StyledText } from '../../../../atoms/text'
-import { LabwareListItem } from './LabwareListItem'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import { LabwareListItem } from './LabwareListItem'
 
 interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]

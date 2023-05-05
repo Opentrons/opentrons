@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { mount } from 'enzyme'
-import * as Fixtures from '../../../redux/sessions/__fixtures__'
-import * as Sessions from '../../../redux/sessions'
-import { ReturnTip } from '../ReturnTip'
-
-import type { ReactWrapper } from 'enzyme'
 import type { Mount } from '@opentrons/components'
+import { mount } from 'enzyme'
+import type { ReactWrapper } from 'enzyme'
+
+import * as Sessions from '../../../redux/sessions'
+import * as Fixtures from '../../../redux/sessions/__fixtures__'
+import { ReturnTip } from '../ReturnTip'
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 

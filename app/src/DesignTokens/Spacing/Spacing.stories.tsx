@@ -8,7 +8,6 @@ import {
   Box,
   ALIGN_FLEX_START,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
 
 import { StyledText } from '../../atoms/text'

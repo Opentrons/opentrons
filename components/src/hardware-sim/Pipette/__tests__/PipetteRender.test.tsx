@@ -1,20 +1,20 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { render } from '@testing-library/react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import _uncasted_fixtureTiprack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { render } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import { anyProps, partialComponentPropsMatcher } from '../../../testing/utils'
 import { RobotCoordsForeignDiv } from '../../Deck/RobotCoordsForeignDiv'
-import { PipetteRender } from '../PipetteRender'
-import { EmanatingNozzle } from '../EmanatingNozzle'
-import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
 import {
   SINGLE_CHANNEL_PIPETTE_WIDTH,
   SINGLE_CHANNEL_PIPETTE_HEIGHT,
   MULTI_CHANNEL_PIPETTE_WIDTH,
   MULTI_CHANNEL_PIPETTE_HEIGHT,
 } from '../constants'
-
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { EightEmanatingNozzles } from '../EightEmanatingNozzles'
+import { EmanatingNozzle } from '../EmanatingNozzle'
+import { PipetteRender } from '../PipetteRender'
 
 jest.mock('../../Deck/RobotCoordsForeignDiv')
 jest.mock('../EmanatingNozzle')

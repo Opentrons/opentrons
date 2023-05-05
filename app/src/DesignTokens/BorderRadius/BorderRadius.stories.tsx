@@ -9,7 +9,6 @@ import {
   ALIGN_FLEX_START,
   BORDERS,
 } from '@opentrons/components'
-
 import type { Story, Meta } from '@storybook/react'
 
 import { StyledText } from '../../atoms/text'

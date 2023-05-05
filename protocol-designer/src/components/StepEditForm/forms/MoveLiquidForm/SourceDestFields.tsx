@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { i18n } from '../../../../localization'
 
+import { FormData } from '../../../../form-types'
+import { i18n } from '../../../../localization'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -11,15 +13,12 @@ import {
   WellOrderField,
 } from '../../fields'
 import { MixFields } from '../../fields/MixFields'
+import styles from '../../StepEditForm.css'
+import { FieldPropsByName } from '../../types'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../../utils'
-
-import { FormData } from '../../../../form-types'
-import { StepFieldName } from '../../../../steplist/fieldLevel'
-import { FieldPropsByName } from '../../types'
-import styles from '../../StepEditForm.css'
 
 interface SourceDestFieldsProps {
   className?: string | null
