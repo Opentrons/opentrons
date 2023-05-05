@@ -192,8 +192,8 @@ export function ConnectViaWifi(): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
       >
         {renderScreen()}
       </Flex>

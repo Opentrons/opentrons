@@ -38,7 +38,7 @@ export function RobotSystemVersionModal({
   const history = useHistory()
 
   return (
-    <Flex padding={SPACING.spacingXXL}>
+    <Flex padding={SPACING.spacing40}>
       <Modal
         title={t('robot_system_version_available', {
           releaseVersion: version,

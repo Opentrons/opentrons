@@ -66,7 +66,7 @@ export function TouchScreenSleep({
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText>{t('sleep_settings_description')}</StyledText>
       </Flex>
       <Flex

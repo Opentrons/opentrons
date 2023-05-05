@@ -44,7 +44,7 @@ export function LegacySettings({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacingXXL}
+      marginTop={SPACING.spacing40}
     >
       <Box width="70%">
         <StyledText

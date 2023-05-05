@@ -49,8 +49,8 @@ export function NetworkSetupMenu(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={1} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
@@ -70,7 +70,7 @@ export function NetworkSetupMenu(): JSX.Element {
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           <StyledText
             fontSize="1.375rem"

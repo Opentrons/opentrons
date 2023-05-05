@@ -301,7 +301,7 @@ function PrepareToRun({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -434,7 +434,7 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />

@@ -139,7 +139,7 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         <Flex
           ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (

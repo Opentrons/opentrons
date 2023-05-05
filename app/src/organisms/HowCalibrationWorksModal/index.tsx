@@ -98,7 +98,7 @@ export function HowCalibrationWorksModal({
             ]}
           />
           <Divider
-            marginTop={SPACING.spacingXXL}
+            marginTop={SPACING.spacing40}
             marginBottom={SPACING.spacing16}
           />
           <PrimaryButton

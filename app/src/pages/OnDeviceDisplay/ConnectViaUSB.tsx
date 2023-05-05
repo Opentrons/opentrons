@@ -33,8 +33,8 @@ export function ConnectViaUSB(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
@@ -42,7 +42,7 @@ export function ConnectViaUSB(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_RELATIVE}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           {/* this path is temporary and it will be update soon */}
           <Btn
@@ -88,7 +88,7 @@ export function ConnectViaUSB(): JSX.Element {
           />
           <StyledText
             marginTop={SPACING.spacing32}
-            marginX={SPACING.spacingXXL}
+            marginX={SPACING.spacing40}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('connect_via_usb_description')}
@@ -122,7 +122,7 @@ const ConnectedViaDesktopApp = ({
     >
       <Icon name="ot-check" size="4.375rem" color={COLORS.successEnabled} />
       <StyledText
-        marginTop={SPACING.spacingXXL}
+        marginTop={SPACING.spacing40}
         textAlign={TYPOGRAPHY.textAlignCenter}
         color={COLORS.black}
         fontSize="1.625rem"

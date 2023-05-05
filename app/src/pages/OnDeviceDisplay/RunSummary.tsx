@@ -100,8 +100,8 @@ export function RunSummary(): JSX.Element {
             alignItems={ALIGN_CENTER}
             position={POSITION_ABSOLUTE}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingXXL}
-            padding={SPACING.spacingXXL}
+            gridGap={SPACING.spacing40}
+            padding={SPACING.spacing40}
             backgroundColor={isRunSucceeded ? COLORS.green_two : COLORS.red_two}
           >
             <SplashFrame>
@@ -124,7 +124,7 @@ export function RunSummary(): JSX.Element {
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING.spacingXXL}
+            padding={SPACING.spacing40}
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -247,7 +247,7 @@ const SplashFrame = styled(Flex)`
   align-items: ${ALIGN_CENTER};
   border: ${BORDERS.size_two} solid ${COLORS.white}${COLORS.opacity20HexCode};
   border-radius: ${BORDERS.size_three};
-  grid-gap: ${SPACING.spacingXXL};
+  grid-gap: ${SPACING.spacing40};
 `
 
 const ProtocolName = styled.h4`

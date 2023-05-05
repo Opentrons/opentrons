@@ -200,7 +200,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           {showConfirmDeleteUnavailRobots ? (
             <Portal level="top">
@@ -270,7 +270,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
@@ -406,7 +406,7 @@ export function AdvancedSettings(): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Box>
             <StyledText

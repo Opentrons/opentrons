@@ -242,7 +242,10 @@ export function RobotSettingsNetworking({
             )}
           </Flex>
           {isOT3 ? null : (
-            <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing16}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginTop={SPACING.spacing16}
+            >
               <ExternalLink href={HELP_CENTER_URL} id="WiredUSB_description">
                 {t('wired_usb_description')}
               </ExternalLink>

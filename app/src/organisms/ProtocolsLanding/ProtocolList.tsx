@@ -221,7 +221,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       <Flex
         flexDirection="column"
         gridGap={SPACING.spacing8}
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         {sortedStoredProtocols.map(storedProtocol => (
           <ProtocolCard

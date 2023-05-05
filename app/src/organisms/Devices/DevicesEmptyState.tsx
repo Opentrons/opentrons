@@ -61,7 +61,7 @@ export function DevicesEmptyState(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom={SPACING.spacingXXL}
+        bottom={SPACING.spacing40}
         left="0"
         right="0"
         marginLeft={SPACING.spacingAuto}

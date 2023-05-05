@@ -133,7 +133,7 @@ export function CurrentRunningProtocolCommand({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       height="29.5rem"
     >
       <Flex

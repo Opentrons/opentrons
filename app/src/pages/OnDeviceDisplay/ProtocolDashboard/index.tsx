@@ -128,7 +128,7 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
-      paddingX={SPACING.spacingXXL}
+      paddingX={SPACING.spacing40}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (

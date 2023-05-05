@@ -107,11 +107,11 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">

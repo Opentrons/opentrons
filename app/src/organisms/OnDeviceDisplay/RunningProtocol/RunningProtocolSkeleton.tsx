@@ -58,7 +58,7 @@ export function RunningProtocolSkeleton({
             gridGap={SPACING.spacing32}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
-            marginBottom={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing40}
           >
             <StopButton />
             <PlayPauseButton />
@@ -74,7 +74,7 @@ export function RunningProtocolSkeleton({
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing40}
           >
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Skeleton

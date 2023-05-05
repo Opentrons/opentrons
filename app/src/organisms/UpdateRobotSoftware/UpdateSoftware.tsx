@@ -61,7 +61,7 @@ export function UpdateSoftware({
         fontSize="1.5rem"
         lineHeight="2.0625rem"
         fontWeight="400"
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         {renderText()}
       </StyledText>

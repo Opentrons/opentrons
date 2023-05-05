@@ -24,7 +24,7 @@ export function NoUpdateFound(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.successBackgroundMed}
         height="26.625rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >

@@ -44,7 +44,7 @@ export function ErrorUpdateSoftware({
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.errorBackgroundMed}
         height="26.625rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >

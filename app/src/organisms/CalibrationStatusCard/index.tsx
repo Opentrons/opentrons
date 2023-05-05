@@ -67,7 +67,7 @@ export function CalibrationStatusCard({
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
         gridGap={SPACING.spacing8}
-        marginRight={SPACING.spacingXXL}
+        marginRight={SPACING.spacing40}
       >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <StyledText css={TYPOGRAPHY.h2SemiBold}>

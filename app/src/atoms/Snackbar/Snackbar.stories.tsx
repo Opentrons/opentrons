@@ -43,7 +43,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           position="absolute"
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
           <Snackbar {...args} onClose={() => setIsShowSnackbar(false)} />

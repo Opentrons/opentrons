@@ -113,7 +113,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           data-testid="labwareDetails_slideout_close_button"
         >
-          <Icon name="close" height={SPACING.spacing24} css={CLOSE_ICON_STYLE} />
+          <Icon
+            name="close"
+            height={SPACING.spacing24}
+            css={CLOSE_ICON_STYLE}
+          />
         </Link>
       </Flex>
       {!isCustomDefinition && (

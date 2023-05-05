@@ -151,7 +151,10 @@ export function Instructions(props: Props): JSX.Element {
                               />
                             ),
                             block: (
-                              <StyledText as="p" marginTop={SPACING.spacing16} />
+                              <StyledText
+                                as="p"
+                                marginTop={SPACING.spacing16}
+                              />
                             ),
                           }}
                         />

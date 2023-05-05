@@ -103,7 +103,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         </Flex>
       ) : (
         <Flex
-          padding={`0 ${SPACING.spacingXXL}`}
+          padding={`0 ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           <Navigation routes={onDeviceDisplayRoutes} />
@@ -199,7 +199,7 @@ export function RobotSettingsDashboard(): JSX.Element {
 
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        padding={SPACING.spacingXXL}
+        padding={SPACING.spacing40}
         width="fit-content"
       >
         <Link to="menu">

@@ -111,7 +111,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           position="absolute"
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
           <Snackbar

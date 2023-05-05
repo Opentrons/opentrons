@@ -114,7 +114,7 @@ const DisplayConnectionStatus = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing24)} ${String(SPACING.spacingXXL)}`}
+      padding={`${String(SPACING.spacing24)} ${String(SPACING.spacing40)}`}
       backgroundColor={
         connected ? COLORS.successBackgroundMed : COLORS.light_two
       }

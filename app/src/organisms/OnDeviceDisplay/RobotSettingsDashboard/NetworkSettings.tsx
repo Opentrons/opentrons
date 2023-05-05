@@ -102,7 +102,7 @@ export function NetworkSettings({
       default:
         return (
           <Flex
-            paddingX={SPACING.spacingXXL}
+            paddingX={SPACING.spacing40}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
@@ -152,7 +152,7 @@ export function NetworkSettings({
   return (
     <>
       <Flex
-        padding={`${SPACING.spacing32} ${SPACING.spacingXXL}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_START}
       >

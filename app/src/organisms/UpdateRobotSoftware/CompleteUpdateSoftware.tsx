@@ -28,7 +28,7 @@ export function CompleteUpdateSoftware({
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.darkGreyDisabled}
         height="33rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >

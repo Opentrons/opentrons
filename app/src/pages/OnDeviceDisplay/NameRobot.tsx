@@ -42,8 +42,8 @@ import type { State, Dispatch } from '../../redux/types'
 // Need to update the InputField for the ODD app
 // That will be done in another PR
 const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacingXXL};
-  padding-bottom: ${SPACING.spacingXXL};
+  padding-top: ${SPACING.spacing40};
+  padding-bottom: ${SPACING.spacing40};
   font-size: 2.5rem;
   line-height: 3.25rem;
   text-align: center;
@@ -148,7 +148,7 @@ export function NameRobot(): JSX.Element {
       ) : (
         <>
           <StepMeter totalSteps={5} currentStep={4} OnDevice />
-          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
+          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacing40}>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}

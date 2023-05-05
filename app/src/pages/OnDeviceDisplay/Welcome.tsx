@@ -49,7 +49,7 @@ export function Welcome(): JSX.Element {
           {t('welcome_description')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacingXXL}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing40}>
         <SmallButton
           buttonType="primary"
           buttonText={t('shared:get_started')}

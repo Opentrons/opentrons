@@ -73,8 +73,8 @@ export function SelectAuthenticationType({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       padding={`${String(SPACING.spacing32)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+        SPACING.spacing40
+      )} ${String(SPACING.spacing40)}`}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -131,7 +131,9 @@ export function SelectAuthenticationType({
             backgroundColor={
               selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
             }
-            padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing32)}`}
+            padding={`${String(SPACING.spacing16)} ${String(
+              SPACING.spacing32
+            )}`}
             borderRadius="3.5625rem"
             onClick={() => {
               setSelectedAuthType('wpa-psk')
@@ -149,7 +151,9 @@ export function SelectAuthenticationType({
           <Btn
             backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
-            padding={`${String(SPACING.spacing16)} ${String(SPACING.spacing32)}`}
+            padding={`${String(SPACING.spacing16)} ${String(
+              SPACING.spacing32
+            )}`}
             onClick={() => {
               setSelectedAuthType('none')
             }}

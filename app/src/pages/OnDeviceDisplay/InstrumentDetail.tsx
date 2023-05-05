@@ -15,8 +15,8 @@ export const InstrumentDetail = (): JSX.Element => {
   return (
     <Flex
       padding={`${String(SPACING.spacing32)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+        SPACING.spacing40
+      )} ${String(SPACING.spacing40)}`}
       flexDirection={DIRECTION_COLUMN}
       height="100%"
     >

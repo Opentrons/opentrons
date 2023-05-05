@@ -78,7 +78,7 @@ export function UpdateChannel({
           {t('app_settings:update_channel')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}

@@ -62,7 +62,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans

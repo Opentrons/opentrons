@@ -32,7 +32,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       backgroundColor={COLORS.darkGreyDisabled}
       padding={SPACING.spacing16}
     >

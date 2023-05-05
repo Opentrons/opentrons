@@ -33,8 +33,8 @@ export function ConfirmRobotName({
       <StepMeter totalSteps={5} currentStep={5} OnDevice />
       <Flex
         padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+          SPACING.spacing40
+        )} ${String(SPACING.spacing40)}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
@@ -60,7 +60,7 @@ export function ConfirmRobotName({
               height="236px"
             />
             <StyledText
-              marginTop={SPACING.spacingXXL}
+              marginTop={SPACING.spacing40}
               fontSize="1.625rem"
               lineHeight="2.1875rem"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -68,7 +68,7 @@ export function ConfirmRobotName({
               {t('your_robot_is_ready_to_go')}
             </StyledText>
             <PrimaryButton
-              marginTop={SPACING.spacingXXL}
+              marginTop={SPACING.spacing40}
               onClick={() => history.push('/dashboard')}
               width="100%"
               height="4.375rem"

@@ -64,7 +64,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           </Box>
 
           <Flex
-            marginLeft={SPACING.spacingXXL}
+            marginLeft={SPACING.spacing40}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
@@ -145,7 +145,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             />
           </Box>
           <Flex
-            marginLeft={SPACING.spacingXXL}
+            marginLeft={SPACING.spacing40}
             marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >

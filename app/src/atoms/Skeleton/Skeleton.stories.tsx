@@ -28,7 +28,7 @@ const Template: Story<React.ComponentProps<typeof Skeleton>> = args => {
           paddingX={SPACING.spacing32}
           paddingTop={SPACING.spacing32}
           marginBottom={SPACING.spacing48}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Flex
             flexDirection={DIRECTION_COLUMN}

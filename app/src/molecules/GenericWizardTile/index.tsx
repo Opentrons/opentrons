@@ -109,7 +109,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       height={isOnDevice ? '30rem' : '24.625rem'}
       padding={SPACING.spacing32}
     >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"

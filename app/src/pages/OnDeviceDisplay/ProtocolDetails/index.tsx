@@ -67,7 +67,7 @@ const ProtocolHeader = (props: {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       margin={SPACING.spacing16}
-      marginBottom={SPACING.spacingXXL}
+      marginBottom={SPACING.spacing40}
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -103,7 +103,7 @@ const ProtocolHeader = (props: {
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
-        marginLeft={SPACING.spacingXXL}
+        marginLeft={SPACING.spacing40}
         maxHeight="3.75rem"
         minWidth="15.6875rem"
       >
