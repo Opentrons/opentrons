@@ -1,12 +1,9 @@
-import * as React from 'react'
-import { ProtocolEditor } from './ProtocolEditor'
-
+import React, { useState } from 'react'
 import '../css/reset.css'
+import { selectPageForms } from './FlexProtocolEditor/constant'
+import { selectRobotPage } from './LandingPage'
 
 export function App(): JSX.Element {
-  return (
-    <div className="container">
-      <ProtocolEditor />
-    </div>
-  )
+  const [page, setPage] = useState(selectPageForms.defaultLandingPage)
+  return <div className="container">{selectRobotPage(page, setPage)}</div>
 }

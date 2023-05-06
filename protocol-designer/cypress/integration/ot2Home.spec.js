@@ -1,6 +1,7 @@
-describe('The Home Page', () => {
+describe('The OT-2 Home Page', () => {
   beforeEach(() => {
     cy.visit('/')
+    cy.get('button').contains('Create new OT-2 protocol').click()
     cy.closeAnnouncementModal()
   })
 
