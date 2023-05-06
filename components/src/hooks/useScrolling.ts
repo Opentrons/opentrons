@@ -14,7 +14,7 @@ export const useScrolling = (ref: RefObject<HTMLElement>): boolean => {
       const handleScroll = (): void => {
         setIsScrolling(true)
         clearTimeout(scrollingTimeout)
-        scrollingTimeout = setTimeout(() => handleScrollEnd, 1000)
+        scrollingTimeout = setTimeout(() => handleScrollEnd, 100)
       }
 
       window.addEventListener('scroll', handleScroll)
