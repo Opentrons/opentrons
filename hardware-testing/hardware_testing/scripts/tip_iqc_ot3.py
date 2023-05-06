@@ -163,7 +163,7 @@ async def _main(is_simulating: bool, volume: float) -> None:
 
         print("raise tip")
         await helpers_ot3.move_to_arched_ot3(
-            api, mount, tip_pos, safe_height=tip_pos.z + 30
+            api, mount, tip_pos, safe_height=tip_pos.z + 20
         )
 
         # FIND FIXTURE
@@ -175,7 +175,7 @@ async def _main(is_simulating: bool, volume: float) -> None:
         print("testing pressure while HOVERED")
         await _read_and_store_pressure_data(report, tip, "hovered", fixture)
         await helpers_ot3.move_to_arched_ot3(
-            api, mount, fixture_actual, safe_height=fixture_actual.z + 10
+            api, mount, fixture_actual, safe_height=fixture_actual.z + 30
         )
         print("testing pressure while SUBMERGED")
         await api.move_to(mount, fixture_actual + Point(z=-fixture.depth))
