@@ -39,7 +39,7 @@ async def _find_position(api: OT3API, mount: OT3Mount, nominal: Point) -> Point:
     if api.is_simulator:
         return nominal + Point()
     else:
-        await api.move_to(mount, nominal + Point(z=10))
+        await api.move_to(mount, nominal + Point(z=30))
         await helpers_ot3.jog_mount_ot3(api, mount)
         return await api.gantry_position(mount)
 
