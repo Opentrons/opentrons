@@ -161,6 +161,11 @@ async def _main(is_simulating: bool, volume: float) -> None:
         )
         await api.pick_up_tip(mount, tip_length)
 
+        print("raise tip")
+        await helpers_ot3.move_to_arched_ot3(
+            api, mount, tip_pos, safe_height=tip_pos.z + 30
+        )
+
         # FIND FIXTURE
         if fixture_actual is None:
             print("find position of pressure fixture")
