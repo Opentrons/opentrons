@@ -71,7 +71,7 @@ export function NameRobot(): JSX.Element {
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
-  const isInitialSetup = unfinishedUnboxingFlowRoute !== '/dashboard'
+  const isInitialSetup = unfinishedUnboxingFlowRoute !== null
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>

@@ -21,6 +21,8 @@ import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 
+import type { OnDeviceDisplaySettings } from '../../redux/config/types'
+
 jest.mock('../../pages/OnDeviceDisplay/Welcome')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
@@ -41,7 +43,7 @@ const mockSettings = {
   brightness: 4,
   textSize: 1,
   unfinishedUnboxingFlowRoute: '/welcome',
-}
+} as OnDeviceDisplaySettings
 
 const mockWelcome = Welcome as jest.MockedFunction<typeof Welcome>
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
@@ -178,7 +180,7 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock NameRobot')
   })
 
-  it('renders Dashboard component after the initial setup', () => {
+  it('renders Dashboard component after finish the initial setup', () => {
     mockSettings.unfinishedUnboxingFlowRoute = null
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings as any)
     const [{ getByText }] = render('/')
