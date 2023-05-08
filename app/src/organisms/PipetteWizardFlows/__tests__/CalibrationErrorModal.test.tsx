@@ -1,0 +1,38 @@
+import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
+import { CalibrationErrorModal } from '../CalibrationErrorModal'
+
+const render = (props: React.ComponentProps<typeof CalibrationErrorModal>) => {
+  return renderWithProviders(<CalibrationErrorModal {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
+
+describe('CalibrationErrorModal', () => {
+  let props: React.ComponentProps<typeof CalibrationErrorModal>
+  it('returns the correct information for cal modal error and pressing proceed calls props', () => {
+    props = {
+      proceed: jest.fn(),
+      errorMessage: 'error shmerror',
+      isOnDevice: false,
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Error encountered when calibrating pipette')
+    getByText('error shmerror')
+    getByRole('button', { name: 'Next' }).click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the on device button with correct text', () => {
+    props = {
+      proceed: jest.fn(),
+      errorMessage: 'error shmerror',
+      isOnDevice: true,
+    }
+    const { getByText, getByLabelText } = render(props)
+    getByText('Error encountered when calibrating pipette')
+    getByText('error shmerror')
+    getByLabelText('SmallButton_primary').click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
+})

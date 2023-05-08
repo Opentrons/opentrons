@@ -18,6 +18,7 @@
   "cancel_attachment": "cancel attachment",
   "choose_pipette": "Choose a pipette to attach",
   "complete_cal": "Complete calibration",
+  "exit_cal": "Exit calibration",
   "connect_96_channel": "connect and attach 96-channel pipette",
   "connect_and_secure_pipette": "connect and secure pipette",
   "continue": "Continue",
@@ -74,5 +75,6 @@
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
   "unscrew_at_top": "<block>Loosen the captive screw on the top right of the  carriage. This releases the right pipette mount, which should then freely move up and down.</block>",
   "unscrew_carriage": "unscrew z-axis carriage",
-  "z_axis_still_attached": "z-axis screw still secure"
+  "z_axis_still_attached": "z-axis screw still secure",
+  "error_calibrating_pipette": "Error encountered when calibrating pipette"
 }
