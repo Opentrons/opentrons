@@ -5,7 +5,7 @@ from datetime import datetime
 from math import pi
 from subprocess import run
 from time import time
-from typing import List, Optional, Dict, Tuple, Union
+from typing import List, Optional, Dict, Tuple, Union, Set, Callable, cast
 
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -33,6 +33,15 @@ from .types import (
     Point,
     CriticalPoint,
 )
+
+from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    TipStatusQueryRequest,
+    PushTipPresenceNotification,
+)
+
 
 # TODO: use values from shared data, so we don't need to update here again
 TIP_LENGTH_OVERLAP = 10.5
@@ -893,3 +902,51 @@ def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
     assert pip.ul_per_mm(pip.working_volume, "aspirate") == pip_nominal_ul_per_mm
     assert pip.ul_per_mm(1, "dispense") == pip_nominal_ul_per_mm
     assert pip.ul_per_mm(pip.working_volume, "dispense") == pip_nominal_ul_per_mm
+
+
+def get_tip_status(can_messenger: CanMessenger, mount: OT3Mount) -> bool:
+    # class Listener:
+    #     def __call__(self, node: NodeId, event: asyncio.Event, response: Dict[NodeId, int],
+    #                     message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+    def _create_listener(node: NodeId, event: asyncio.Event, response: Dict[NodeId, int]) -> Callable[[MessageDefinition, ArbitrationId], None]:
+        def _listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+            try:
+                originator = NodeId(arbitration_id.parts.originating_node_id)
+            except ValueError:
+                #     "unknown node id on network: "
+                return
+            if originator != node:
+                #     "got response from unexpected node id on network: "
+                return
+            if message.message_id == MessageId.error_message:
+                #      log.error(f"recieved an error {str(message)}")
+                return
+            elif message.message_id != MessageId.tip_presence_notification:
+                #      log.warning(f"unexpected message id: 0x{message.message_id:x}")
+                return
+            response[originator] = cast(
+                PushTipPresenceNotification, message
+            ).payload.ejector_flag_status.value
+            event.set()
+
+        return _listener
+
+
+    """Get the tip status for each node."""
+    subsystem = mount_to_subsystem(mount)
+    node = sub_system_to_node_id(subsystem)
+    event = asyncio.Event()
+    response: Dict[NodeId, int] = dict()
+    listener = _create_listener(node, event, response) # Listener(node, event, response)
+    can_messenger.add_listener(listener)
+    await can_messenger.send(
+        node_id=node,
+        message=TipStatusQueryRequest(),
+    )
+    try:
+        await asyncio.wait_for(event.wait(), 1.0)
+    except asyncio.TimeoutError:
+        print("tip status request timed out before expected nodes responded\n")
+    finally:
+        can_messenger.remove_listener(listener
+    return {bool(val) for node, val in response.items()}
