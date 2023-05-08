@@ -318,7 +318,9 @@ export const PipetteWizardFlows = (
     <WizardHeader
       exitDisabled={isRobotMoving || isFetchingPipettes}
       title={wizardTitle}
-      currentStep={progressBarForCalError ? 1 : currentStepIndex}
+      currentStep={
+        progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
+      }
       totalSteps={totalStepCount}
       onExit={exitWizardButton}
     />
