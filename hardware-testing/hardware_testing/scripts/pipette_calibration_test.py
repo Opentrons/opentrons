@@ -336,14 +336,14 @@ class Pipette_Calibration_Test:
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     self.slot_center = self.nominal_center
                     await self._home(self.api, self.mount)
-                    await self._read_position(self.api, self.mount, "Start")
+                    # await self._read_position(self.api, self.mount, "Start")
                     await self._calibrate_slot(self.api, self.mount, self.slot)
                     # await self._calibrate_probe(self.api, self.mount, self.slot, self.nominal_center)
-                    await self._read_position(self.api, self.mount, "End")
+                    # await self._read_position(self.api, self.mount, "End")
                     if len(self.gauges) > 0:
                         await self._measure_gauges(self.api, self.mount)
                     await self._record_data(cycle)
-                    await self._reset(self.api, self.mount)
+                    # await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
             raise e
