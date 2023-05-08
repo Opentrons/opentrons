@@ -342,7 +342,6 @@ def test_move_labware(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_move_labware_on_non_connected_module(
     decoy: Decoy,
     subject: ProtocolCore,
@@ -459,7 +458,6 @@ def test_load_labware_on_module(
     assert subject.get_labware_on_module(module_core) is result
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_load_labware_on_non_connected_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,

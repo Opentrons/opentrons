@@ -43,6 +43,7 @@ from .module_core import (
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
     NonConnectedModuleCore,
+    MagneticBlockCore,
 )
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
@@ -291,8 +292,8 @@ class ProtocolCore(
 
     def _create_non_connected_module_core(
         self, load_module_result: LoadModuleResult
-    ) -> NonConnectedModuleCore:
-        return NonConnectedModuleCore(
+    ) -> MagneticBlockCore:
+        return MagneticBlockCore(
             module_id=load_module_result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,

@@ -81,4 +81,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Smaller fun features
 - Turn on display idle in the display settings for a fun surprise
 - The lights work (don't do anything yet though)
+- Updated python api version to 2.15
+- Added load Magnetic block as a module in python api and in PE.
 
