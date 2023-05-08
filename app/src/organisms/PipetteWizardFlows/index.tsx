@@ -43,19 +43,13 @@ interface PipetteWizardFlowsProps {
   mount: PipetteMount
   selectedPipette: SelectablePipettes
   closeFlow: () => void
-  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
+  onComplete?: () => void
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const {
-    flowType,
-    mount,
-    closeFlow,
-    selectedPipette,
-    setSelectedPipette,
-  } = props
+  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
@@ -104,7 +98,6 @@ export const PipetteWizardFlows = (
     null
   )
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
@@ -117,6 +110,7 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
+    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
@@ -124,7 +118,6 @@ export const PipetteWizardFlows = (
   })
 
   const handleCleanUpAndClose = (): void => {
-    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {

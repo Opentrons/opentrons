@@ -181,7 +181,9 @@ export function OverflowMenu({
           mount={mount}
           closeFlow={() => setShowPipetteWizardFlows(false)}
           selectedPipette={selectedPipette}
-          setSelectedPipette={setSelectedPipette}
+          onComplete={() => {
+            setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+          }}
         />
       ) : null}
       {showOverflowMenu ? (
