@@ -12,6 +12,7 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
+import { SleepScreen } from '../atoms/SleepScreen'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
