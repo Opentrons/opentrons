@@ -241,7 +241,7 @@ async def test_deck_not_found(
     override_cal_config: None,
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (-3,)
+    mock_capacitive_probe.side_effect = (-25,)
     with pytest.raises(CalibrationStructureNotFoundError):
         await find_calibration_structure_height(
             ot3_hardware,
