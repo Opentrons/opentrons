@@ -2,11 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-} from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { StepMeter } from '../../atoms/StepMeter'
 import * as Networking from '../../redux/networking'
