@@ -27,14 +27,17 @@ import {
 import { getIsGantryEmpty } from './utils'
 import type { AxiosError } from 'axios'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { MaintenanceRun } from '@opentrons/api-client'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
     AxiosError<any>,
-    void,
+    CreateMaintenanceRunData,
     unknown
   >
   isCreateLoading: boolean
@@ -58,7 +61,7 @@ export const BeforeBeginning = (
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   React.useEffect(() => {
-    createMaintenanceRun()
+    createMaintenanceRun({})
   }, [])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
@@ -117,6 +120,7 @@ export const BeforeBeginning = (
           mount: mount,
         },
       },
+      { commandType: 'home' as const, params: {} },
       {
         // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -136,6 +140,7 @@ export const BeforeBeginning = (
   }
 
   const SingleMountAttachCommand: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -146,6 +151,7 @@ export const BeforeBeginning = (
   ]
 
   const NinetySixChannelAttachCommand: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,

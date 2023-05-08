@@ -972,7 +972,8 @@
         "magneticModuleV2",
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
-        "heaterShakerModuleV1"
+        "heaterShakerModuleV1",
+        "magneticBlockV1"
       ],
       "type": "string"
     },

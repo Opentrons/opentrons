@@ -6,6 +6,7 @@ import logging
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
+    AsyncGenerator,
     cast,
     Callable,
     Dict,
@@ -190,6 +191,7 @@ class OT3API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        self._instrument_cache_lock = asyncio.Lock()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -602,8 +604,12 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        await self._cache_instruments(require)
-        await self._configure_instruments()
+        if self._instrument_cache_lock.locked():
+            self._log.info("Instrument cache is locked, not refreshing")
+            return
+        async with self.instrument_cache_lock():
+            await self._cache_instruments(require)
+            await self._configure_instruments()
 
     async def _cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -1474,19 +1480,38 @@ class OT3API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+    async def blow_out(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        volume: Optional[float] = None,
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
         realmount = OT3Mount.from_mount(mount)
-        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
+
+        max_blowout_pos = instrument.plunger_positions.blow_out
+        # start at the bottom position and move additional distance
+        # determined by plan_check_blow_out
+        blowout_distance = (
+            instrument.plunger_positions.bottom + blowout_spec.plunger_distance
+        )
+        if blowout_distance > max_blowout_pos:
+            raise ValueError(
+                f"Blow out distance exceeds plunger position limit: blowout dist = {blowout_distance}, "
+                f"max blowout distance = {max_blowout_pos}"
+            )
+
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
         )
+
         target_pos = target_position_from_plunger(
             realmount,
-            blowout_spec.plunger_distance,
+            blowout_distance,
             self._current_position,
         )
 
@@ -2121,7 +2146,10 @@ class OT3API(
         # await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
-
+    @contextlib.asynccontextmanager
+    async def instrument_cache_lock(self) -> AsyncGenerator[None, None]:
+        async with self._instrument_cache_lock:
+            yield
 
 
     async def capacitive_sweep(

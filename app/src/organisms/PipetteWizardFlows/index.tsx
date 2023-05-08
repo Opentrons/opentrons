@@ -21,10 +21,7 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
-import {
-  useAttachedPipetteCalibrations,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -79,8 +76,8 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
-  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
+  const hasCalData =
+    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
@@ -131,7 +128,12 @@ export const PipetteWizardFlows = (
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      deleteMaintenanceRun(maintenanceRunId)
+      chainRunCommands(
+        [{ commandType: 'home' as const, params: {} }],
+        true
+      ).then(() => {
+        deleteMaintenanceRun(maintenanceRunId)
+      })
     }
   }
   const {
@@ -164,6 +166,7 @@ export const PipetteWizardFlows = (
   }
   const exitModal = (
     <ExitModal
+      isRobotMoving={isRobotMoving}
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}
