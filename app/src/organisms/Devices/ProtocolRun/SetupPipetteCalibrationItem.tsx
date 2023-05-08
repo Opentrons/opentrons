@@ -18,12 +18,16 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-
+import {
+  NINETY_SIX_CHANNEL,
+  SINGLE_MOUNT_PIPETTES,
+} from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Banner } from '../../../atoms/Banner'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
+import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { useDeckCalibrationData, useIsOT3 } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
@@ -48,7 +52,9 @@ export function SetupPipetteCalibrationItem({
 }: SetupPipetteCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const deviceDetailsUrl = `/devices/${robotName}`
-  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState(false)
+  const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState<boolean>(
+    false
+  )
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
@@ -97,7 +103,7 @@ export function SetupPipetteCalibrationItem({
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
     if (isOT3) {
-      flowType = 'ATTACH'
+      flowType = FLOWS.ATTACH
       button = (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <TertiaryButton
@@ -122,7 +128,7 @@ export function SetupPipetteCalibrationItem({
       )
     }
   } else {
-    flowType = 'CALIBRATE'
+    flowType = FLOWS.CALIBRATE
     button = (
       <>
         <Flex
@@ -178,8 +184,8 @@ export function SetupPipetteCalibrationItem({
           closeFlow={() => setShowFlexPipetteFlow(false)}
           selectedPipette={
             pipetteInfo.pipetteSpecs.channels === 96
-              ? '96-Channel'
-              : 'Single-Channel_and_8-Channel'
+              ? NINETY_SIX_CHANNEL
+              : SINGLE_MOUNT_PIPETTES
           }
           pipetteInfo={mostRecentAnalysis?.pipettes}
         />

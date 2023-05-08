@@ -387,7 +387,7 @@ const ProtocolPipetteFlowWizardHeaderText = (
   } else if (mountPipette != null && attachedPipettes[mount] != null) {
     return t('replace_pipette', { mount: mount })
   }
-  return 'unknwn page'
+  return 'unknown page'
 }
 
 const PipetteFlowWizardHeaderText = (

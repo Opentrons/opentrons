@@ -63,7 +63,7 @@ describe('ProtocolInstrumentMountItem', () => {
       attachedCalibrationData: null,
       speccedName: 'p1000_multi_gen3',
     }
-    mockPipetteWizardFlows.mockReturnValue('pipette wizard flow' as any)
+    mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)
   })
 
   it('renders the correct information when there is no pipette attached', () => {

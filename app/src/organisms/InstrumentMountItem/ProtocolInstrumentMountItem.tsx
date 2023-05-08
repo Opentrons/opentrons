@@ -23,6 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
+import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 
 import type {
@@ -65,19 +66,20 @@ export function ProtocolInstrumentMountItem(
   const { t, i18n } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
 
-  const [showPipetteWizardFlow, setShowPipetteWizardFlow] = React.useState(
-    false
-  )
-  const [flowType, setFlowType] = React.useState('ATTACH')
+  const [
+    showPipetteWizardFlow,
+    setShowPipetteWizardFlow,
+  ] = React.useState<boolean>(false)
+  const [flowType, setFlowType] = React.useState<string>(FLOWS.ATTACH)
   const selectedPipette =
     speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: React.MouseEventHandler = () => {
-    setFlowType('CALIBRATE')
+    setFlowType(FLOWS.CALIBRATE)
     setShowPipetteWizardFlow(true)
   }
   const handleAttach: React.MouseEventHandler = () => {
-    setFlowType('ATTACH')
+    setFlowType(FLOWS.ATTACH)
     setShowPipetteWizardFlow(true)
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
