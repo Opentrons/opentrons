@@ -191,6 +191,7 @@ class OT3MountType(str, enum.Enum):
 class DeckSlotName(enum.Enum):
     """Deck slot identifiers."""
 
+    # OT-2:
     SLOT_1 = "1"
     SLOT_2 = "2"
     SLOT_3 = "3"
@@ -204,6 +205,7 @@ class DeckSlotName(enum.Enum):
     SLOT_11 = "11"
     FIXED_TRASH = "12"
 
+    # OT-3:
     SLOT_A1 = "A1"
     SLOT_A2 = "A2"
     SLOT_A3 = "A3"
@@ -222,16 +224,37 @@ class DeckSlotName(enum.Enum):
         str_val = str(value).upper()
         return cls(str_val)
 
+    # TODO(mm, 2023-05-08):
+    # Some callers use this method to do arithmetic on deck slots,
+    # and some use it to look up the slot definition by its list index in the deck definition.
+    # Those uses will break down when the OT-3's deck definition includes deck slots that don't
+    # have a direct OT-2 equivalent, like the staging area slots.
     def as_int(self) -> int:
         return int(self.to_ot2_equivalent().value)
 
-    def to_ot3_equivalent(self) -> DeckSlotName:
-        return _ot2_to_ot3.get(self, self)
-
     def to_ot2_equivalent(self) -> DeckSlotName:
+        """Return the OT-2 deck slot that's in the same place as this one.
+
+        For example, `SLOT_C2.to_ot3_equivalent()` is `SLOT_5`.
+
+        If this is already an OT-2 deck slot, returns itself.
+        """
         return _ot3_to_ot2.get(self, self)
 
+    def to_ot3_equivalent(self) -> DeckSlotName:
+        """Return the OT-3 deck slot that's in the same place as this one.
+
+        For example, `SLOT_5.to_ot3_equivalent()` is `SLOT_C2`.
+
+        If this is already an OT-3 deck slot, returns itself.
+        """
+        return _ot2_to_ot3.get(self, self)
+
     def to_equivalent_for_robot_type(self, robot_type: RobotType) -> DeckSlotName:
+        """Return the deck slot, for the given robot type, that's in the same place as this one.
+
+        See `to_ot2_equivalent()` and `to_ot3_equivalent()`.
+        """
         if robot_type == "OT-2 Standard":
             return self.to_ot2_equivalent()
         elif robot_type == "OT-3 Standard":
