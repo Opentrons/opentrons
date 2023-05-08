@@ -1,9 +1,13 @@
 // sets up the main window ui
 import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
+import { robotServerServiceStatus } from '@opentrons/app/src/redux/shell'
 import { getConfig } from './config'
 import { createLogger } from './log'
 import systemd from './systemd'
+
+import type { RobotServerServiceStatus } from '@opentrons/app/src/redux/shell/robot-system/types'
+import type { Dispatch } from './types'
 
 const config = getConfig('ui')
 const log = createLogger('ui')
@@ -38,14 +42,17 @@ const WINDOW_OPTS = {
   ),
 }
 
-export function createUi(): BrowserWindow {
+export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
+  console.log('starting main window')
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
     'ready-to-show',
     () => {
       log.debug('Main window ready to show')
-      waitForRobotServerAndShowMainWIndow(mainWindow)
+      console.log('Main window ready to show')
+      mainWindow.show()
+      waitForRobotServerAndShowMainWIndow(dispatch)
     }
   )
 
@@ -64,22 +71,21 @@ export function createUi(): BrowserWindow {
   return mainWindow
 }
 
-function waitForRobotServerAndShowMainWIndow(mainWindow: BrowserWindow): void {
+function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
   setTimeout(function () {
     systemd
-      .getIsRobotServerUp()
-      .then(isUp => {
-        console.log({ isUp })
-        if (isUp) {
-          console.log('Robot server is up, showing main window')
-          mainWindow.show()
-        } else {
-          waitForRobotServerAndShowMainWIndow(mainWindow)
+      .getRobotServerStatus()
+      .then((status: RobotServerServiceStatus) => {
+        console.log('sending status to browser layer: ', status)
+        dispatch(robotServerServiceStatus(status))
+        if (status !== 'active') {
+          waitForRobotServerAndShowMainWIndow(dispatch)
         }
+        return status
       })
       .catch(e => {
         log.debug('Could not get status of robot server service', { e })
-        waitForRobotServerAndShowMainWIndow(mainWindow)
+        waitForRobotServerAndShowMainWIndow(dispatch)
       })
   }, 1500)
 }

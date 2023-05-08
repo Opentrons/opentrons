@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 
 import { robotLogsReducer } from './robot-logs/reducer'
+import { robotSystemReducer } from './robot-system/reducer'
 
 import type { Action } from '../types'
 import type { ShellUpdateState } from './types'
@@ -48,4 +49,5 @@ export function shellUpdateReducer(
 export const shellReducer = combineReducers<any, Action>({
   update: shellUpdateReducer,
   robotLogs: robotLogsReducer,
+  robotSystem: robotSystemReducer,
 })
