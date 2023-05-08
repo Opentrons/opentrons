@@ -32,6 +32,10 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Pipette pressure sensing both for liquid-level sensing purposes and for clog-detection purposes
 - Labware pick up failure with gripper
 
+## Big New Things
+### Robot Control
+- All python protocol API functions that take deck slot names (like load_labware) now support deck slot "coordinates", e.g. specifying a deck slot as "A1" rather than 1. This feature requires a Python protocol to request API version 2.15.
+
 ## Reasonably Sized New Things
 ### ODD
 - Protocol result screens! No more do you have to stare at those big buttons forever
@@ -39,6 +43,8 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ### Robot Control
 - Rerunning a protocol should no longer result in being on step ?
 - DVT gripper sets its force more accurately now
+- Fixed a couple more bugs with pipette calibration; it should no longer fail during the Z height calibration
+- Fixed a problem where the change-pipette process would crash after removing a pipette because it tried to home the now-not-present pipette
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
@@ -62,6 +68,5 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Smaller Known Issues
 
 ## Smaller fun features
-- Turn on display idle in the display settings for a fun surprise
 - The lights work (don't do anything yet though)
 
