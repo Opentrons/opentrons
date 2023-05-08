@@ -3,6 +3,7 @@ import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
 import { getConfig } from './config'
 import { createLogger } from './log'
+import systemd from './systemd'
 
 const config = getConfig('ui')
 const log = createLogger('ui')
@@ -44,7 +45,7 @@ export function createUi(): BrowserWindow {
     'ready-to-show',
     () => {
       log.debug('Main window ready to show')
-      mainWindow.show()
+      waitForRobotServerAndShowMainWIndow(mainWindow)
     }
   )
 
@@ -61,4 +62,24 @@ export function createUi(): BrowserWindow {
   })
 
   return mainWindow
+}
+
+function waitForRobotServerAndShowMainWIndow(mainWindow: BrowserWindow): void {
+  setTimeout(function () {
+    systemd
+      .getIsRobotServerUp()
+      .then(isUp => {
+        console.log({ isUp })
+        if (isUp) {
+          console.log('Robot server is up, showing main window')
+          mainWindow.show()
+        } else {
+          waitForRobotServerAndShowMainWIndow(mainWindow)
+        }
+      })
+      .catch(e => {
+        log.debug('Could not get status of robot server service', { e })
+        waitForRobotServerAndShowMainWIndow(mainWindow)
+      })
+  }, 1500)
 }
