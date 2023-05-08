@@ -292,7 +292,7 @@ class ProtocolCore(
 
     def _create_non_connected_module_core(
         self, load_module_result: LoadModuleResult
-    ) -> MagneticBlockCore:
+    ) -> NonConnectedModuleCore:
         return MagneticBlockCore(
             module_id=load_module_result.moduleId,
             engine_client=self._engine_client,
