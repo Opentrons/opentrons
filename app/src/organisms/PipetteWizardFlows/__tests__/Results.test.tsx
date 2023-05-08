@@ -35,7 +35,9 @@ describe('Results', () => {
       mount: LEFT,
       goBack: jest.fn(),
       proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve()),
       isRobotMoving: false,
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
@@ -85,7 +87,23 @@ describe('Results', () => {
     getByText('Calibrate pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: ['leftPlunger'],
+          },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: 'left',
+          },
+        },
+      ],
+      true
+    )
   })
   it('renders the correct information when pipette wizard is a fail for attach flow', async () => {
     props = {
@@ -231,7 +249,7 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully recalibrated')
-    getByRole('button', { name: 'SmallButton_default' }).click()
+    getByRole('button', { name: 'SmallButton_primary' }).click()
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a fail for attach flow on ODD', async () => {
@@ -246,7 +264,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    getByRole('button', { name: 'SmallButton_default' }).click()
+    getByRole('button', { name: 'SmallButton_primary' }).click()
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })

@@ -110,7 +110,7 @@ describe('RobotDashboard', () => {
     getByText('yay mock protocol')
     getByLabelText('icon_Ready to run')
     const recentRunCard = getByLabelText('RecentRunCard')
-    expect(recentRunCard).toHaveStyle(`background-color: ${COLORS.green_three}`)
+    expect(recentRunCard).toHaveStyle(`background-color: ${COLORS.green3}`)
     fireEvent.click(recentRunCard)
     expect(mockPush).toHaveBeenCalledWith('protocols/mockProtocol1')
   })
@@ -145,7 +145,7 @@ describe('RobotDashboard', () => {
     getByText('Missing 2 modules')
     getByLabelText('icon_Missing 2 modules')
     expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.yellow_three}`
+      `background-color: ${COLORS.yellow3}`
     )
   })
   it('should render a recent protocol with required pipette', () => {
@@ -173,7 +173,7 @@ describe('RobotDashboard', () => {
     getByText('Missing 1 pipette')
     getByLabelText('icon_Missing 1 pipette')
     expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.yellow_three}`
+      `background-color: ${COLORS.yellow3}`
     )
   })
   it('should render a recent protocol with required pipette and modules', () => {
@@ -207,7 +207,7 @@ describe('RobotDashboard', () => {
     getByText('Missing hardware')
     getByLabelText('icon_Missing hardware')
     expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.yellow_three}`
+      `background-color: ${COLORS.yellow3}`
     )
   })
 })

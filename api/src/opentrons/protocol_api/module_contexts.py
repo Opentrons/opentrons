@@ -214,7 +214,7 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 14)
     def parent(self) -> str:
         """The name of the slot the module is on."""
-        return self._core.get_deck_slot().value
+        return self._core.get_deck_slot_id()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -237,7 +237,7 @@ class ModuleContext(CommandPublisher):
 
         class_name = self.__class__.__name__
         display_name = self._core.get_display_name()
-        location = self._core.get_deck_slot().value
+        location = self._core.get_deck_slot().id
 
         return f"{class_name} at {display_name} on {location} lw {self.labware}"
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { PrimaryButton } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 
 interface CheckPipetteButtonProps {
   proceedButtonText: string
@@ -31,7 +31,7 @@ export const CheckPipetteButton = (
     <SmallButton
       disabled={isFetching}
       buttonText={proceedButtonText}
-      buttonType="default"
+      buttonType="primary"
       onClick={() => {
         setFetching(true)
         refetch()

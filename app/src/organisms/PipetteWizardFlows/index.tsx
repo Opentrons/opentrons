@@ -21,10 +21,7 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
-import {
-  useAttachedPipetteCalibrations,
-  useAttachedPipettesFromInstrumentsQuery,
-} from '../Devices/hooks'
+import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -46,19 +43,13 @@ interface PipetteWizardFlowsProps {
   mount: PipetteMount
   selectedPipette: SelectablePipettes
   closeFlow: () => void
-  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
+  onComplete?: () => void
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const {
-    flowType,
-    mount,
-    closeFlow,
-    selectedPipette,
-    setSelectedPipette,
-  } = props
+  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
@@ -79,8 +70,8 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const pipCalibrationsByMount = useAttachedPipetteCalibrations()
-  const hasCalData = pipCalibrationsByMount[mount].offset?.lastModified != null
+  const hasCalData =
+    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
@@ -107,7 +98,6 @@ export const PipetteWizardFlows = (
     null
   )
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
@@ -120,6 +110,7 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
+    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
@@ -127,11 +118,15 @@ export const PipetteWizardFlows = (
   })
 
   const handleCleanUpAndClose = (): void => {
-    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      deleteMaintenanceRun(maintenanceRunId)
+      chainRunCommands(
+        [{ commandType: 'home' as const, params: {} }],
+        true
+      ).then(() => {
+        deleteMaintenanceRun(maintenanceRunId)
+      })
     }
   }
   const {
@@ -164,6 +159,7 @@ export const PipetteWizardFlows = (
   }
   const exitModal = (
     <ExitModal
+      isRobotMoving={isRobotMoving}
       goBack={cancelExit}
       proceed={handleCleanUpAndClose}
       flowType={flowType}

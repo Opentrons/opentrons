@@ -801,8 +801,7 @@
     "DeckSlotName": {
       "title": "DeckSlotName",
       "description": "Deck slot identifiers.",
-      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-      "type": "string"
+      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
     },
     "DeckSlotLocation": {
       "title": "DeckSlotLocation",
@@ -973,7 +972,8 @@
         "magneticModuleV2",
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
-        "heaterShakerModuleV1"
+        "heaterShakerModuleV1",
+        "magneticBlockV1"
       ],
       "type": "string"
     },

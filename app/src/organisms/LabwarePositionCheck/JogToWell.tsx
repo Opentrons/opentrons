@@ -32,7 +32,7 @@ import { getIsOnDevice } from '../../redux/config'
 import { Portal } from '../../App/portal'
 import { ModalShell } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'
 import { LiveOffsetValue } from './LiveOffsetValue'
@@ -81,7 +81,14 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     //  if a user reaches the "confirm exit" modal (unmounting this component)
     //  and clicks "go back" we are able so initialize the live offset to whatever
     //  distance they had already jogged before clicking exit.
-    handleJog('x', 1, 0, setJoggedPosition)
+    // the `mounted` variable prevents a possible memory leak (see https://legacy.reactjs.org/docs/hooks-effect.html#example-using-hooks-1)
+    let mounted = true
+    if (mounted) {
+      handleJog('x', 1, 0, setJoggedPosition)
+    }
+    return () => {
+      mounted = false
+    }
   }, [])
 
   let wellsToHighlight: string[] = []
@@ -160,14 +167,14 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           />
           <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
             <SmallButton
-              buttonType="alt"
+              buttonType="secondary"
               buttonText={t('move_pipette')}
               onClick={() => {
                 setShowFullJogControls(true)
               }}
             />
             <SmallButton
-              buttonType="default"
+              buttonType="primary"
               buttonText={t('shared:confirm_position')}
               onClick={handleConfirmPosition}
             />
@@ -197,7 +204,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   <SmallButton
                     width="100%"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonType="default"
+                    buttonType="primary"
                     buttonText={t('shared:close')}
                     onClick={() => {
                       setShowFullJogControls(false)
