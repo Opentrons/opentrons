@@ -7,7 +7,7 @@ import {
   BORDERS,
   Flex,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
+import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { StyleProps } from '@opentrons/components'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TabbedButton } from '.'
+import { TabbedButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {

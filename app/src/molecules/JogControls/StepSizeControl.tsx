@@ -16,7 +16,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 

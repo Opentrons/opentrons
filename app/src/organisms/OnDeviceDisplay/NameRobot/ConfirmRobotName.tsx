@@ -17,8 +17,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { updateConfigValue } from '../../../redux/config'
-
-import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
+import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
 
 import type { Dispatch } from '../../../redux/types'
 
@@ -37,7 +36,10 @@ export function ConfirmRobotName({
 
   const handleClick = (): void => {
     dispatch(
-      updateConfigValue('onDeviceDisplaySettings.targetPath', '/dashboard')
+      updateConfigValue(
+        'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+        null
+      )
     )
     history.push('/dashboard')
   }

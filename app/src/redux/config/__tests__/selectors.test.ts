@@ -203,22 +203,22 @@ describe('shell selectors', () => {
   })
 
   describe('getOnDeviceDisplaySettings', () => {
-    it('should return OnDeviceDisplaySettings, if the initial setup', () => {
+    it('should return the initial settings OnDeviceDisplaySettings, when starting the unbox flow', () => {
       const state: State = {
         config: {
           onDeviceDisplaySettings: {
-            sleepMs: 180000,
-            brightness: 1,
-            textSize: 2,
-            targetPath: '/robot-settings/rename-robot',
+            sleepMs: 25200000,
+            brightness: 4,
+            textSize: 1,
+            unfinishedUnboxingFlowRoute: '/welcome',
           },
         },
       } as any
       expect(Selectors.getOnDeviceDisplaySettings(state)).toEqual({
-        sleepMs: 180000,
-        brightness: 1,
-        textSize: 2,
-        targetPath: '/robot-settings/rename-robot',
+        sleepMs: 25200000,
+        brightness: 4,
+        textSize: 1,
+        unfinishedUnboxingFlowRoute: '/welcome',
       })
     })
   })

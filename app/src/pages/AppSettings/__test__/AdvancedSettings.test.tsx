@@ -258,10 +258,12 @@ describe('AdvancedSettings', () => {
 
   it('does not render the allow sending all protocols to ot-3 section when feature flag is off', () => {
     const [{ queryByText, queryByRole }] = render()
-    expect(queryByText('Allow Sending All Protocols to OT-3')).toBeNull()
+    expect(
+      queryByText('Allow Sending All Protocols to Opentrons Flex')
+    ).toBeNull()
     expect(
       queryByText(
-        'Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+        'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
       )
     ).toBeNull()
     expect(
@@ -274,9 +276,9 @@ describe('AdvancedSettings', () => {
       .calledWith('enableExtendedHardware')
       .mockReturnValue(true)
     const [{ getByText, getByRole }] = render()
-    getByText('Allow Sending All Protocols to OT-3')
+    getByText('Allow Sending All Protocols to Opentrons Flex')
     getByText(
-      'Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+      'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the Opentrons Flex.'
     )
     getByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
   })

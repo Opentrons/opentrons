@@ -24,7 +24,7 @@ export interface OnDeviceDisplaySettings {
   sleepMs: number
   brightness: number
   textSize: number
-  targetPath: string
+  unfinishedUnboxingFlowRoute: string | null
 }
 
 export interface ConfigV0 {
@@ -203,7 +203,7 @@ export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
 export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
   version: 16
   onDeviceDisplaySettings: ConfigV15['onDeviceDisplaySettings'] & {
-    targetPath: string
+    unfinishedUnboxingFlowRoute: string | null
   }
 }
 

@@ -71,9 +71,10 @@ export function NameRobot(): JSX.Element {
   ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const dispatch = useDispatch<Dispatch>()
-  const history = useHistory()
-  const { targetPath } = useSelector(getOnDeviceDisplaySettings)
-  const isInitialSetup = targetPath !== '/dashboard'
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const isInitialSetup = unfinishedUnboxingFlowRoute !== null
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>

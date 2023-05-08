@@ -21,7 +21,7 @@ export const InstrumentDetail = (): JSX.Element => {
       height="100%"
     >
       <BackButton>{instrument?.instrumentModel}</BackButton>
-      {instrument != null ? <InstrumentInfo instrument={instrument} /> : null}
+      <InstrumentInfo instrument={instrument} />
     </Flex>
   )
 }

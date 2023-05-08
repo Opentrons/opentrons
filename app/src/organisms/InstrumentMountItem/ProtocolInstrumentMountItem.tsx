@@ -14,14 +14,17 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import {
+  CompletedProtocolAnalysis,
   getGripperDisplayName,
   getPipetteNameSpecs,
+  NINETY_SIX_CHANNEL,
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
+import { SmallButton } from '../../atoms/buttons'
+import { FLOWS } from '../PipetteWizardFlows/constants'
+import { PipetteWizardFlows } from '../PipetteWizardFlows'
 
 import type {
   InstrumentData,
@@ -30,7 +33,6 @@ import type {
 } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
-import type { SelectablePipettes } from '../PipetteWizardFlows/types'
 
 export const MountItem = styled.div<{ isReady: boolean }>`
   display: flex;
@@ -50,6 +52,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
 `
 interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
+  mostRecentAnalysis?: CompletedProtocolAnalysis | null
   attachedInstrument: InstrumentData | null
   attachedCalibrationData:
     | PipetteOffsetCalibration
@@ -61,34 +64,27 @@ export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const { mount, attachedInstrument, speccedName } = props
+  const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
 
-  const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
-    false
-  )
   const [
-    selectedPipette,
-    setSelectedPipette,
-  ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
+    showPipetteWizardFlow,
+    setShowPipetteWizardFlow,
+  ] = React.useState<boolean>(false)
+  const [flowType, setFlowType] = React.useState<string>(FLOWS.ATTACH)
+  const selectedPipette =
+    speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: React.MouseEventHandler = () => {
-    console.log(
-      'TODO: handle calibrate wizard after maintenance runs are real',
-      mount,
-      attachedInstrument
-    )
+    setFlowType(FLOWS.CALIBRATE)
+    setShowPipetteWizardFlow(true)
   }
   const handleAttach: React.MouseEventHandler = () => {
-    console.log(
-      'TODO: handle attach wizard after maintenance runs are real',
-      mount,
-      attachedInstrument
-    )
+    setFlowType(FLOWS.ATTACH)
+    setShowPipetteWizardFlow(true)
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
-  // TODO: check for presence of calibration data once instruments endpoint
-  // returns calibration data for pipettes
-  const isAttachedWithCal = attachedInstrument != null
+  const isAttachedWithCal =
+    attachedInstrument?.data?.calibratedOffset?.last_modified != null
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
@@ -150,17 +146,13 @@ export function ProtocolInstrumentMountItem(
           </Flex>
         </Flex>
       </MountItem>
-      {showChoosePipetteModal ? (
-        <ChoosePipette
-          proceed={() => {
-            setShowChoosePipetteModal(false)
-          }}
-          setSelectedPipette={setSelectedPipette}
+      {showPipetteWizardFlow ? (
+        <PipetteWizardFlows
+          flowType={flowType}
+          closeFlow={() => setShowPipetteWizardFlow(false)}
           selectedPipette={selectedPipette}
-          exit={() => {
-            setShowChoosePipetteModal(false)
-          }}
           mount={mount as Mount}
+          pipetteInfo={mostRecentAnalysis?.pipettes}
         />
       ) : null}
     </>

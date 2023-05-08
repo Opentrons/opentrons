@@ -44,7 +44,9 @@ export function UpdateRobot(): JSX.Element {
     error: null,
   }
   const dispatch = useDispatch<Dispatch>()
-  const { targetPath } = useSelector(getOnDeviceDisplaySettings)
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
 
   const softwareUpdateProcess = (): JSX.Element => {
     // Display Error screen
@@ -74,10 +76,10 @@ export function UpdateRobot(): JSX.Element {
           updateType = 'validating'
         } else {
           updateType = 'installing'
-          if (targetPath === '/welcome') {
+          if (unfinishedUnboxingFlowRoute === '/welcome') {
             dispatch(
               updateConfigValue(
-                'onDeviceDisplaySettings.targetPath',
+                'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
                 '/robot-settings/rename-robot'
               )
             )

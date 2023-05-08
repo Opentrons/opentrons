@@ -17,6 +17,8 @@ import {
 
 import { NameRobot } from '../NameRobot'
 
+import type { OnDeviceDisplaySettings } from '../../../redux/config/types'
+
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/analytics')
@@ -25,8 +27,8 @@ const mockSettings = {
   sleepMs: 0,
   brightness: 1,
   textSize: 1,
-  targetPath: '/robot-settings/rename-robot',
-} as any
+  unfinishedUnboxingFlowRoute: '/robot-settings/rename-robot',
+} as OnDeviceDisplaySettings
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -138,7 +140,7 @@ describe('NameRobot', () => {
   })
 
   it('should render text and button when coming from robot settings', () => {
-    mockSettings.targetPath = '/dashboard'
+    mockSettings.unfinishedUnboxingFlowRoute = null
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
     const [{ getByText, queryByText }] = render()
     getByText('Rename robot')

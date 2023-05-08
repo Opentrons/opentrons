@@ -20,7 +20,7 @@ import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
