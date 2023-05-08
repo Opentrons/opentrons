@@ -71,10 +71,13 @@ export function AttachedInstrumentMountItem(
                   : (mount as Mount),
               flowType: FLOWS.ATTACH,
               selectedPipette,
-              setSelectedPipette,
               closeFlow: () => {
                 setWizardProps(null)
+                setSelectedPipette(SINGLE_MOUNT_PIPETTES)
                 setShowChoosePipetteModal(false)
+              },
+              onComplete: () => {
+                history.push(`/instruments/${mount}`)
               },
             })
             setShowChoosePipetteModal(false)

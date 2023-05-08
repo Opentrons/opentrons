@@ -6,7 +6,7 @@ export interface GripperData {
     calibratedOffset: {
       offset: { x: number; y: number; z: number }
       source: string
-      last_modified: string
+      last_modified?: string
     }
   }
   instrumentModel: string
@@ -22,7 +22,7 @@ export interface PipetteData {
     calibratedOffset: {
       offset: { x: number; y: number; z: number }
       source: string
-      last_modified: string
+      last_modified?: string
     }
   }
   instrumentName: string

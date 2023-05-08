@@ -84,7 +84,7 @@ describe('PipetteWizardFlows', () => {
       flowType: FLOWS.CALIBRATE,
       mount: LEFT,
       closeFlow: jest.fn(),
-      setSelectedPipette: jest.fn(),
+      onComplete: jest.fn(),
     }
     mockCreateMaintenanceRun = jest.fn()
     mockDeleteMaintenanceRun = jest.fn()
