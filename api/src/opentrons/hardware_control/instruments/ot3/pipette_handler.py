@@ -589,7 +589,7 @@ class PipetteHandlerProvider:
         )
 
     def plan_check_blow_out(
-        self, mount: OT3Mount, volume: Optional[float]
+        self, mount: OT3Mount, volume: Optional[float] = None
     ) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
