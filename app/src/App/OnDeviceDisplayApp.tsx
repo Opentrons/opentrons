@@ -181,7 +181,13 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 const TURN_OFF_BACKLIGHT = 7
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const { sleepMs, brightness } = useSelector(getOnDeviceDisplaySettings)
+  const { sleepMs, unfinishedUnboxingFlowRoute, brightness } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const targetPath =
+    unfinishedUnboxingFlowRoute != null
+      ? unfinishedUnboxingFlowRoute
+      : '/dashboard'
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
     events: onDeviceDisplayEvents,
@@ -210,29 +216,33 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%" css="user-select: none;">
-        <ToasterOven>
-          <Switch>
-            {onDeviceDisplayRoutes.map(
-              ({ Component, exact, path }: RouteProps) => {
-                return (
-                  <Route key={path} exact={exact} path={path}>
-                    <Box
-                      position={POSITION_RELATIVE}
-                      width="100%"
-                      height="100%"
-                      backgroundColor={COLORS.white}
-                      overflow={OVERFLOW_SCROLL}
-                    >
-                      <ModalPortalRoot />
-                      <Component />
-                    </Box>
-                  </Route>
-                )
-              }
-            )}
-            <Redirect exact from="/" to="/dashboard" />
-          </Switch>
-        </ToasterOven>
+        {Boolean(isIdle) ? (
+          <SleepScreen />
+        ) : (
+          <ToasterOven>
+            <Switch>
+              {onDeviceDisplayRoutes.map(
+                ({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.white}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                }
+              )}
+              <Redirect exact from="/" to={targetPath} />
+            </Switch>
+          </ToasterOven>
+        )}
       </Box>
     </ApiHostProvider>
   )

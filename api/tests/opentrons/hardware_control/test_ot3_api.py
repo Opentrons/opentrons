@@ -242,6 +242,19 @@ async def mock_instrument_handlers(
         yield mock_gripper_handler, mock_pipette_handler
 
 
+@pytest.fixture
+async def gripper_present(ot3_hardware: ThreadManager[OT3API]) -> None:
+    # attach a gripper if we're testing the gripper mount
+    gripper_config = gc.load(GripperModel.v1)
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    ot3_hardware._backend._attached_instruments[OT3Mount.GRIPPER] = {
+        "model": GripperModel.v1,
+        "id": "test",
+    }
+    ot3_hardware._backend._present_nodes.add(NodeId.gripper)
+    await ot3_hardware.cache_gripper(instr_data)
+
+
 @pytest.mark.parametrize(
     "load_configs,load",
     (
@@ -499,6 +512,7 @@ async def test_move_to_without_homing_first(
     homed_axis: List[OT3Axis],
 ) -> None:
     """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
+    await ot3_hardware.cache_instruments()
     if mount == OT3Mount.GRIPPER:
         # attach a gripper if we're testing the gripper mount
         gripper_config = gc.load(GripperModel.v1)
@@ -513,7 +527,6 @@ async def test_move_to_without_homing_first(
         Point(0.001, 0.001, 0.001),
     )
     mock_home.assert_called_once()
-    assert ot3_hardware._backend.check_motor_status(homed_axis)
 
 
 @pytest.mark.parametrize(
@@ -807,10 +820,8 @@ async def test_gripper_capacitive_sweep(
     ot3_hardware: ThreadManager[OT3API],
     mock_move_to: AsyncMock,
     mock_backend_capacitive_pass: AsyncMock,
+    gripper_present: None,
 ) -> None:
-    gripper_config = gc.load(GripperModel.v1)
-    instr_data = AttachedGripper(config=gripper_config, id="g12345")
-    await ot3_hardware.cache_gripper(instr_data)
     await ot3_hardware.home()
     await ot3_hardware.grip(5)
     ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 5
@@ -872,11 +883,10 @@ async def test_has_gripper(
     assert ot3_hardware.has_gripper() is True
 
 
-async def test_gripper_action(
+async def test_gripper_action_fails_with_no_gripper(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,
     mock_ungrip: AsyncMock,
-    mock_hold_jaw_width: AsyncMock,
 ) -> None:
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
@@ -890,9 +900,21 @@ async def test_gripper_action(
         await ot3_hardware.ungrip()
     mock_ungrip.assert_not_called()
 
-    # cache gripper
+
+async def test_gripper_action_works_with_gripper(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_grip: AsyncMock,
+    mock_ungrip: AsyncMock,
+    mock_hold_jaw_width: AsyncMock,
+    gripper_present: None,
+) -> None:
+
     gripper_config = gc.load(GripperModel.v1)
-    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    ot3_hardware._backend._attached_instruments[OT3Mount.GRIPPER] = {
+        "model": GripperModel.v1,
+        "id": "test",
+    }
     await ot3_hardware.cache_gripper(instr_data)
 
     with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):

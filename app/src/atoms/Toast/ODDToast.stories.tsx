@@ -8,8 +8,8 @@ import {
   PrimaryButton,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
-import { Toast } from '..'
+import { StyledText } from '../text'
+import { Toast } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {

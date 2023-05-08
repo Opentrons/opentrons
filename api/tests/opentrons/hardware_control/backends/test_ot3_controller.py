@@ -514,34 +514,6 @@ async def test_get_attached_instruments_handles_unknown_model(
             await controller.get_attached_instruments({})
 
 
-def test_nodeid_replace_head():
-    assert OT3Controller._replace_head_node(set([NodeId.head, NodeId.gantry_x])) == set(
-        [NodeId.head_l, NodeId.head_r, NodeId.gantry_x]
-    )
-    assert OT3Controller._replace_head_node(set([NodeId.gantry_x])) == set(
-        [NodeId.gantry_x]
-    )
-    assert OT3Controller._replace_head_node(set([NodeId.head_l])) == set(
-        [NodeId.head_l]
-    )
-
-
-def test_nodeid_replace_gripper():
-    assert OT3Controller._replace_gripper_node(
-        set([NodeId.gripper, NodeId.head])
-    ) == set([NodeId.gripper_g, NodeId.gripper_z, NodeId.head])
-    assert OT3Controller._replace_gripper_node(set([NodeId.head])) == set([NodeId.head])
-    assert OT3Controller._replace_gripper_node(set([NodeId.gripper_g])) == set(
-        [NodeId.gripper_g]
-    )
-
-
-def test_nodeid_filter_probed_core():
-    assert OT3Controller._filter_probed_core_nodes(
-        set([NodeId.gantry_x, NodeId.pipette_left]), set([NodeId.gantry_y])
-    ) == set([NodeId.gantry_y, NodeId.pipette_left])
-
-
 async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
     await controller.gripper_home_jaw(25)
     for call in mock_move_group_run.call_args_list:

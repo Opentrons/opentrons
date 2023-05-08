@@ -72,7 +72,7 @@ export class URLDeck extends React.Component<{}> {
         deckDef={DECK_DEF}
         deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         viewBox={`-35 -35 ${488} ${390}`} // TODO: put these in variables
-        className={styles.url_deck}
+        margin="0 4rem"
       >
         {({ deckSlotsById }): Array<JSX.Element | null> =>
           Object.keys(deckSlotsById).map((slotId): JSX.Element | null => {
