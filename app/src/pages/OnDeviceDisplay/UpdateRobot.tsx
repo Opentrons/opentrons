@@ -79,7 +79,7 @@ export function UpdateRobot(): JSX.Element {
           if (unfinishedUnboxingFlowRoute === '/welcome') {
             dispatch(
               updateConfigValue(
-                'onDeviceDisplaySettings.targetPath',
+                'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
                 '/robot-settings/rename-robot'
               )
             )
