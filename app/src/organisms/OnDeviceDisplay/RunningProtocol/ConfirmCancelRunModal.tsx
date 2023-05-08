@@ -20,6 +20,7 @@ import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
+import { useCloseCurrentRun } from '../../ProtocolUpload/hooks'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 
@@ -42,6 +43,7 @@ export function ConfirmCancelRunModal({
     dismissCurrentRun,
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -54,6 +56,7 @@ export function ConfirmCancelRunModal({
   }
 
   const handleCancelRun = (): void => {
+    setIsCanceling(true)
     stopRun(runId, {
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
@@ -61,14 +64,16 @@ export function ConfirmCancelRunModal({
         if (isActiveRun) {
           history.push(`/protocols/${runId}/summary`)
         } else {
-          if (protocolId != null) {
-            history.push(`/protocols/${protocolId}`)
-          } else {
-            history.push(`/protocols`)
-          }
+          history.push('/dashboard')
         }
       },
       onError: () => {
+        closeCurrentRun()
+        if (isActiveRun) {
+          history.push(`/protocols/${runId}/summary`)
+        } else {
+          history.push('/dashboard')
+        }
         setIsCanceling(false)
       },
     })
@@ -118,7 +123,7 @@ export function ConfirmCancelRunModal({
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
-            disabled={isCanceling || isDismissing}
+            disabled={isCanceling || isDismissing || isClosingCurrentRun}
           />
         </Flex>
       </Flex>
