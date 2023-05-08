@@ -472,7 +472,7 @@ def test_load_module_with_configuration(subject: ProtocolContext) -> None:
         )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
     """It should raise an APIVersionError if loading a magnetic block."""
     with pytest.raises(APIVersionError):
