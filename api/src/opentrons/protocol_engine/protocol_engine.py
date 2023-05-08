@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
-from . import commands
+from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
     LabwareOffset,
@@ -283,24 +283,17 @@ class ProtocolEngine:
 
         To retrieve offsets later, see `.state_view.labware`.
         """
-        normalized_request = request.copy(
-            update={
-                "location": request.location.copy(
-                    update={
-                        "slotName": request.location.slotName.to_equivalent_for_robot_type(
-                            self.state_view.config.robot_type
-                        )
-                    }
-                )
-            }
+        request = slot_standardization.standardize_labware_offset(
+            request, self.state_view.config.robot_type
         )
+
         labware_offset_id = self._model_utils.generate_id()
         created_at = self._model_utils.get_timestamp()
         self._action_dispatcher.dispatch(
             AddLabwareOffsetAction(
                 labware_offset_id=labware_offset_id,
                 created_at=created_at,
-                request=normalized_request,
+                request=request,
             )
         )
         return self.state_view.labware.get_labware_offset(

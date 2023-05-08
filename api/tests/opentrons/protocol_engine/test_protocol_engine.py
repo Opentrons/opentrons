@@ -1,17 +1,20 @@
 """Tests for the ProtocolEngine class."""
+import inspect
 from datetime import datetime
 from typing import Any
 
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import ProtocolEngine, commands
+
+from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
 from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetCreate,
@@ -28,7 +31,7 @@ from opentrons.protocol_engine.execution import (
     DoorWatcher,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state import Config, StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
 from opentrons.protocol_engine.actions import (
@@ -101,6 +104,15 @@ def door_watcher(decoy: Decoy) -> DoorWatcher:
 def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     """Get a mock ModuleDataProvider."""
     return decoy.mock(cls=ModuleDataProvider)
+
+
+@pytest.fixture(autouse=True)
+def _mock_slot_standardization_module(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out opentrons.protocol_engine.slot_standardization functions."""
+    for name, func in inspect.getmembers(slot_standardization, inspect.isfunction):
+        monkeypatch.setattr(slot_standardization, name, decoy.mock(func=func))
 
 
 @pytest.fixture(autouse=True)
@@ -559,6 +571,11 @@ def test_add_labware_offset(
         location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
+    standardized_request = LabwareOffsetCreate(
+        definitionUri="standardized-definition-uri",
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_2),
+        vector=LabwareOffsetVector(x=2, y=3, z=4),
+    )
 
     id = "labware-offset-id"
     created_at = datetime(year=2021, month=11, day=15)
@@ -566,11 +583,16 @@ def test_add_labware_offset(
     expected_result = LabwareOffset(
         id=id,
         createdAt=created_at,
-        definitionUri=request.definitionUri,
-        location=request.location,
-        vector=request.vector,
+        definitionUri=standardized_request.definitionUri,
+        location=standardized_request.location,
+        vector=standardized_request.vector,
     )
 
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(Config(robot_type=robot_type))
+    decoy.when(
+        slot_standardization.standardize_labware_offset(request, robot_type)
+    ).then_return(standardized_request)
     decoy.when(model_utils.generate_id()).then_return(id)
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
     decoy.when(
@@ -592,7 +614,7 @@ def test_add_labware_offset(
             AddLabwareOffsetAction(
                 labware_offset_id=id,
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
             )
         )
     )
