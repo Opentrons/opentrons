@@ -271,6 +271,9 @@ class PipetteHandlerProvider:
                     "aspirate",
                 )
             }
+            result[
+                "default_blow_out_volume"
+            ] = instr.active_tip_settings.default_blowout_volume
         return cast(PipetteDict, result)
 
     @property
@@ -374,7 +377,7 @@ class PipetteHandlerProvider:
             )
         if blow_out:
             this_pipette.blow_out_flow_rate = self.plunger_flowrate(
-                this_pipette, blow_out, "dispense"
+                this_pipette, blow_out, "blowout"
             )
 
     def instrument_max_height(
@@ -585,18 +588,24 @@ class PipetteHandlerProvider:
             current=instrument.plunger_motor_current.run,
         )
 
-    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec:
+    def plan_check_blow_out(
+        self, mount: OT3Mount, volume: Optional[float]
+    ) -> LiquidActionSpec:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
-        speed = self.plunger_speed(
-            instrument, instrument.blow_out_flow_rate, "dispense"
-        )
+        speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
+        if volume is None:
+            ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
+        else:
+            ul = volume
+
+        distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
 
         return LiquidActionSpec(
             axis=OT3Axis.of_main_tool_actuator(mount),
             volume=0,
-            plunger_distance=instrument.plunger_positions.blow_out,
+            plunger_distance=distance_mm,
             speed=speed,
             instr=instrument,
             current=instrument.plunger_motor_current.run,
