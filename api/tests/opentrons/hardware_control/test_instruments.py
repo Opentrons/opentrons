@@ -650,7 +650,7 @@ async def test_blowout_flow_rate(sim_and_instr):
         await hw_api.blow_out(mount)
         assert_move_called(
             mock_move,
-            get_plunger_speed(hw_api)(pip, pip.blow_out_flow_rate, "blowout"),
+            get_plunger_speed(hw_api)(pip, pip.blow_out_flow_rate, "dispense"),
         )
 
     hw_api.set_flow_rate(mount, blow_out=2)
@@ -660,7 +660,7 @@ async def test_blowout_flow_rate(sim_and_instr):
         await hw_api.blow_out(types.Mount.LEFT)
         assert_move_called(
             mock_move,
-            get_plunger_speed(hw_api)(pip, 2, "blowout"),
+            get_plunger_speed(hw_api)(pip, 2, "dispense"),
         )
 
     hw_api.set_pipette_speed(mount, blow_out=15)

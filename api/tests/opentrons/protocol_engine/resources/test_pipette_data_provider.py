@@ -80,7 +80,6 @@ def test_get_pipette_static_config() -> None:
         "fw_update_required": False,
         "fw_current_version": 1,
         "fw_next_version": None,
-        "default_blow_out_volume": 10,
     }
 
     result = subject.get_pipette_static_config(pipette_dict)

@@ -962,27 +962,16 @@ class API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(
-        self, mount: top_types.Mount, volume: Optional[float] = None
-    ) -> None:
+    async def blow_out(self, mount: top_types.Mount) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        blowout_spec = self.plan_check_blow_out(mount, volume)
-
-        instrument = self.get_pipette(mount)
-        max_blowout_pos = instrument.config.blow_out
-        # start at the bottom position and move additional distance det. by plan_check_blow_out
-        blowout_distance = instrument.config.bottom - blowout_spec.plunger_distance
-
-        if blowout_distance < max_blowout_pos:
-            raise ValueError("Blow out distance exceeds plunger position limit")
-
+        blowout_spec = self.plan_check_blow_out(mount)
         self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
         target_pos = target_position_from_plunger(
             mount,
-            blowout_distance,
+            blowout_spec.plunger_distance,
             self._current_position,
         )
 
