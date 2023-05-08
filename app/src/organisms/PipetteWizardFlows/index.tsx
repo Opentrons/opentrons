@@ -8,12 +8,14 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
   RIGHT,
+  LoadedPipette,
 } from '@opentrons/shared-data'
 import {
   useHost,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
+import type { Mount } from '../../redux/pipettes/types'
 
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
@@ -23,6 +25,7 @@ import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
+import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
@@ -36,6 +39,7 @@ import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteWizardFlowsProps {
@@ -44,6 +48,7 @@ interface PipetteWizardFlowsProps {
   selectedPipette: SelectablePipettes
   closeFlow: () => void
   onComplete?: () => void
+  pipetteInfo?: LoadedPipette[]
 }
 
 export const PipetteWizardFlows = (
@@ -55,13 +60,20 @@ export const PipetteWizardFlows = (
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
-  const pipetteWizardSteps = getPipetteWizardSteps(
-    flowType,
-    mount,
-    selectedPipette,
-    isGantryEmpty,
-    attachedPipettes
-  )
+  const pipetteWizardSteps =
+    props.pipetteInfo == null
+      ? getPipetteWizardSteps(
+          flowType,
+          mount,
+          selectedPipette,
+          isGantryEmpty,
+          attachedPipettes
+        )
+      : getPipetteWizardStepsForProtocol(
+          attachedPipettes,
+          props.pipetteInfo,
+          mount
+        )
   const host = useHost()
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -268,43 +280,21 @@ export const PipetteWizardFlows = (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
-  let wizardTitle: string = 'unknown page'
-  switch (flowType) {
-    case FLOWS.CALIBRATE: {
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(
-          t(hasCalData ? 'recalibrate_pipette' : 'calibrate_pipette', {
-            mount: mount,
-          })
+  const wizardTitle =
+    props.pipetteInfo == null
+      ? PipetteFlowWizardHeaderText(
+          flowType,
+          mount,
+          selectedPipette,
+          hasCalData,
+          isGantryEmpty,
+          attachedPipettes
         )
-      } else {
-        wizardTitle = t('calibrate_96_channel')
-      }
-      break
-    }
-    case FLOWS.ATTACH: {
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(t('attach_pipette', { mount: mount }))
-      } else {
-        wizardTitle = isGantryEmpty
-          ? t('attach_96_channel')
-          : t('attach_96_channel_plus_detach', {
-              pipetteName:
-                attachedPipettes[LEFT]?.displayName ??
-                attachedPipettes[RIGHT]?.displayName,
-            })
-      }
-      break
-    }
-    case FLOWS.DETACH: {
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(t('detach_pipette', { mount: mount }))
-      } else {
-        wizardTitle = t('detach_96_channel')
-      }
-      break
-    }
-  }
+      : ProtocolPipetteFlowWizardHeaderText(
+          attachedPipettes,
+          props.pipetteInfo,
+          mount
+        )
 
   const is96ChannelUnskippableStep =
     currentStep.section === SECTIONS.CARRIAGE ||
@@ -357,4 +347,96 @@ export const PipetteWizardFlows = (
       )}
     </Portal>
   )
+}
+
+const ProtocolPipetteFlowWizardHeaderText = (
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery,
+  pipetteInfo: LoadedPipette[],
+  mount: Mount
+): string => {
+  const { t } = useTranslation('pipette_wizard_flows')
+  const leftPipette = pipetteInfo.find(pipette => pipette.mount === 'left')
+  const mountPipette = pipetteInfo.find(pipette => pipette.mount === mount)
+  if (mountPipette?.pipetteName === attachedPipettes[mount]?.instrumentName) {
+    return t('calibrate_pipette', {
+      mount: mount,
+    })
+  } else if (
+    attachedPipettes[LEFT]?.data.channels === 96 &&
+    mountPipette?.pipetteName !== 'p1000_96'
+  ) {
+    return t('detach_96_attach_mount', { mount: mount })
+  } else if (leftPipette?.pipetteName === 'p1000_96') {
+    if (attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null) {
+      return t('attach_96_channel')
+    } else if (
+      attachedPipettes[LEFT] != null &&
+      attachedPipettes[RIGHT] == null
+    ) {
+      return t('detach_mount_attach_96', { mount: RIGHT })
+    } else if (
+      attachedPipettes[LEFT] == null &&
+      attachedPipettes[RIGHT] != null
+    ) {
+      return t('detach_mount_attach_96', { mount: LEFT })
+    } else {
+      return t('detach_pipettes_attach_96')
+    }
+  } else if (mountPipette != null && attachedPipettes[mount] == null) {
+    return t('attach_pipette', { mount: mount })
+  } else if (mountPipette != null && attachedPipettes[mount] != null) {
+    return t('replace_pipette', { mount: mount })
+  }
+  return 'unknwn page'
+}
+
+const PipetteFlowWizardHeaderText = (
+  flowType: PipetteWizardFlow,
+  mount: PipetteMount,
+  selectedPipette: SelectablePipettes,
+  hasCalData: boolean,
+  isGantryEmpty: boolean,
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery
+): string => {
+  const { t } = useTranslation('pipette_wizard_flows')
+
+  let wizardTitle: string = 'unknown page'
+  switch (flowType) {
+    case FLOWS.CALIBRATE: {
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = startCase(
+          t(hasCalData ? 'recalibrate_pipette' : 'calibrate_pipette', {
+            mount: mount,
+          })
+        )
+      } else {
+        wizardTitle = t('calibrate_96_channel')
+      }
+      break
+    }
+    case FLOWS.ATTACH: {
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = startCase(t('attach_pipette', { mount: mount }))
+      } else {
+        wizardTitle = isGantryEmpty
+          ? t('attach_96_channel')
+          : t('attach_96_channel_plus_detach', {
+              pipetteName:
+                attachedPipettes[LEFT]?.displayName ??
+                attachedPipettes[RIGHT]?.displayName,
+            })
+      }
+      break
+    }
+    case FLOWS.DETACH: {
+      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
+        wizardTitle = startCase(t('detach_pipette', { mount: mount }))
+      } else {
+        wizardTitle = t('detach_96_channel')
+      }
+      break
+    }
+  }
+
+  return wizardTitle
 }
