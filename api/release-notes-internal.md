@@ -15,6 +15,12 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - Updated python api version to 2.15
 - Added load Magnetic block as a module in python api and in PE. You can now load a magnetic block using `protocol_context.load_module("magneticBlockV1", <slot_name>)` with `apiLevel` of 2.15.
 
+For more details about this release, please see the full [technical change log][]. 
+
+[technical change log]: https://github.com/Opentrons/opentrons/releases
+
+---
+
 # Internal Release 0.6.0
 
 This is internal release 0.6.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
@@ -51,8 +57,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ### ODD
 - Protocol result screens! No more do you have to stare at those big buttons forever
 
-# Internal Release 0.5.0
-
 ### Robot Control
 - Python API `load_labware`, `load_module` and `move_labware` can accept location as deck coordinates (e.g. "A1", "D3") in addition to slot numbers
 - The `.parent` property for Module and Labware objects (loaded on the deck) will return a coordinate style deck location (e.g. "B2", "C3") for protocols with robotType "OT-3 Standard" instead of the slot number
@@ -84,4 +88,3 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## Smaller fun features
 - The lights work (don't do anything yet though)
-
