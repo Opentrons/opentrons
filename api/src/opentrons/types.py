@@ -185,27 +185,6 @@ class OT3MountType(str, enum.Enum):
     GRIPPER = "gripper"
 
 
-DECK_COORDINATE_TO_SLOT_NAME = {
-    "D1": "1",
-    "D2": "2",
-    "D3": "3",
-    "C1": "4",
-    "C2": "5",
-    "C3": "6",
-    "B1": "7",
-    "B2": "8",
-    "B3": "9",
-    "A1": "10",
-    "A2": "11",
-    "A3": "12",
-}
-
-DECK_SLOT_NAME_TO_COORDINATE = {
-    slot_name: coordinate
-    for coordinate, slot_name in DECK_COORDINATE_TO_SLOT_NAME.items()
-}
-
-
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
@@ -241,8 +220,6 @@ class DeckSlotName(enum.Enum):
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         str_val = str(value).upper()
-        if str_val in DECK_COORDINATE_TO_SLOT_NAME:
-            str_val = DECK_COORDINATE_TO_SLOT_NAME[str_val]
         return cls(str_val)
 
     def as_int(self) -> int:
@@ -259,9 +236,6 @@ class DeckSlotName(enum.Enum):
             return self.to_ot2_equivalent()
         elif robot_type == "OT-3 Standard":
             return self.to_ot3_equivalent()
-
-    def as_coordinate(self) -> str:
-        return DECK_SLOT_NAME_TO_COORDINATE[self.value]
 
     @property
     def id(self) -> str:
