@@ -40,7 +40,7 @@ const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
   brightness: 4,
   textSize: 1,
-  targetPath: '/welcome',
+  unfinishedUnboxingFlowRoute: '/welcome',
 }
 
 const mockWelcome = Welcome as jest.MockedFunction<typeof Welcome>
@@ -172,14 +172,14 @@ describe('OnDeviceDisplayApp', () => {
     getByText('Mock Welcome')
   })
   it('renders Rename component after update the software during the initial setup', () => {
-    mockSettings.targetPath = '/robot-settings/rename-robot'
+    mockSettings.unfinishedUnboxingFlowRoute = '/robot-settings/rename-robot'
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings as any)
     const [{ getByText }] = render('/')
     getByText('Mock NameRobot')
   })
 
   it('renders Dashboard component after the initial setup', () => {
-    mockSettings.targetPath = '/dashboard'
+    mockSettings.unfinishedUnboxingFlowRoute = null
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings as any)
     const [{ getByText }] = render('/')
     getByText('Mock RobotDashboard')
