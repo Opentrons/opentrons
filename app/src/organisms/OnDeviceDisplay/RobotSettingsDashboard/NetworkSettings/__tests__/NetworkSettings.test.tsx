@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 import { getLocalRobot } from '../../../../../redux/discovery'
-import { getWifiList } from '../../../../../redux/networking'
+import { useWifiList } from '../../../../../resources/networking/hooks'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 import { NetworkSettings } from '..'
@@ -13,14 +13,14 @@ import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
 import type { WifiNetwork } from '../../../../../redux/networking/types'
 
 jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../redux/networking')
+jest.mock('../../../../../resources/networking/hooks')
 jest.mock('../WifiConnectionDetails')
 jest.mock('../EthernetConnectionDetails')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
-const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
 const mockWifiSettings = WifiConnectionDetails as jest.MockedFunction<
   typeof WifiConnectionDetails
 >
@@ -52,7 +52,7 @@ describe('NetworkSettings', () => {
     mockGetLocalRobot.mockReturnValue({
       name: 'Otie',
     } as DiscoveredRobot)
-    mockGetWifiList.mockReturnValue([
+    mockUseWifiList.mockReturnValue([
       {
         ssid: 'Mock WiFi Network',
         active: true,

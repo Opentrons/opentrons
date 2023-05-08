@@ -123,4 +123,6 @@ describe('NameRobot', () => {
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalled()
   })
+
+  it.todo('add test for targetPath in a following PR')
 })

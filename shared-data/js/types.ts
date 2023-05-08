@@ -334,7 +334,7 @@ export interface SlotTransforms {
 
 export type ModuleOrientation = 'left' | 'right'
 
-export type PipetteChannels = 1 | 8
+export type PipetteChannels = 1 | 8 | 96
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
 

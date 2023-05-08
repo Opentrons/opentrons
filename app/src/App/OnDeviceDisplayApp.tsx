@@ -180,7 +180,13 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 ]
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
+  const { sleepMs, unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const targetPath =
+    unfinishedUnboxingFlowRoute != null
+      ? unfinishedUnboxingFlowRoute
+      : '/dashboard'
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
     events: onDeviceDisplayEvents,
@@ -235,7 +241,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   )
                 }
               )}
-              <Redirect exact from="/" to="/dashboard" />
+              <Redirect exact from="/" to={targetPath} />
             </Switch>
           </ToasterOven>
         )}

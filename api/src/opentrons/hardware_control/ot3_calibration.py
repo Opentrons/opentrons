@@ -252,17 +252,17 @@ async def find_slot_center_binary(
     LOG.info(f"Found +x edge at {plus_x_edge.x}mm")
     estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
 
-    minus_x_edge = await find_edge_binary(
-        hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, 1, raise_verify_error
-    )
-    LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
-    estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
-
     plus_y_edge = await find_edge_binary(
         hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, -1, raise_verify_error
     )
     LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
+
+    minus_x_edge = await find_edge_binary(
+        hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, 1, raise_verify_error
+    )
+    LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
+    estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
 
     minus_y_edge = await find_edge_binary(
         hcapi,
