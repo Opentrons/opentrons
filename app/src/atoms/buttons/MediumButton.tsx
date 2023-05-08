@@ -9,8 +9,9 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
-import { StyledText } from '../../text'
+import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -137,7 +138,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       disabled={disabled}
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
-      display="flex"
+      display={DISPLAY_FLEX}
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacingSM}

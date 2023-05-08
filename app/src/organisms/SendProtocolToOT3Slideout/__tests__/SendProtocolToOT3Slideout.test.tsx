@@ -146,7 +146,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    getByText('Send protocol to an OT-3')
+    getByText('Send protocol to Opentrons Flex')
     getByRole('button', { name: 'Send' })
   })
 

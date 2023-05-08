@@ -26,10 +26,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
-import {
-  FloatingActionButton,
-  SmallButton,
-} from '../../atoms/buttons/OnDeviceDisplay'
+import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { Modal } from '../../molecules/Modal'

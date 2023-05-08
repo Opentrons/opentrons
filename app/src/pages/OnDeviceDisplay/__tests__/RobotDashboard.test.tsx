@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useAllRunsQuery,
@@ -10,6 +9,7 @@ import {
 
 import { i18n } from '../../../i18n'
 import { EmptyRecentRun } from '../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
+import { RecentRunProtocolCarousel } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
 import { RobotDashboard } from '../RobotDashboard'
@@ -27,6 +27,9 @@ jest.mock('react-router-dom', () => {
 })
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
+jest.mock(
+  '../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
+)
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 jest.mock('../../Protocols/hooks')
 
@@ -42,6 +45,9 @@ const mockEmptyRecentRun = EmptyRecentRun as jest.MockedFunction<
 >
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
+>
+const mockRecentRunProtocolCarousel = RecentRunProtocolCarousel as jest.MockedFunction<
+  typeof RecentRunProtocolCarousel
 >
 const render = () => {
   return renderWithProviders(
@@ -83,6 +89,9 @@ describe('RobotDashboard', () => {
     mockUseAllProtocolsQuery.mockReturnValue({} as any)
     mockUseAllRunsQuery.mockReturnValue({} as any)
     mockUseMissingProtocolHardware.mockReturnValue([])
+    mockRecentRunProtocolCarousel.mockReturnValue(
+      <div>mock RecentRunProtocolCarousel</div>
+    )
   })
 
   afterEach(() => {
@@ -94,7 +103,7 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('mock EmptyRecentRun')
   })
-  it('should render a recent protocol with all the required info to run, clicking card goes to run history', () => {
+  it('should render a recent run protocol carousel', () => {
     mockUseAllProtocolsQuery.mockReturnValue({
       data: {
         data: [mockProtocol],
@@ -103,111 +112,9 @@ describe('RobotDashboard', () => {
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
-    const [{ getByText, getByLabelText }] = render()
-    getByText('mock Navigation')
-    getByText('Ready to run')
-    getByText('Run again')
-    getByText('yay mock protocol')
-    getByLabelText('icon_Ready to run')
-    const recentRunCard = getByLabelText('RecentRunCard')
-    expect(recentRunCard).toHaveStyle(`background-color: ${COLORS.green3}`)
-    fireEvent.click(recentRunCard)
-    expect(mockPush).toHaveBeenCalledWith('protocols/mockProtocol1')
-  })
-  it('should render a recent protocol with required modules', () => {
-    mockUseAllProtocolsQuery.mockReturnValue({
-      data: {
-        data: [mockProtocol],
-      },
-    } as any)
-    mockUseAllRunsQuery.mockReturnValue({
-      data: { data: [mockRunData] },
-    } as any)
-    mockUseMissingProtocolHardware.mockReturnValue([
-      {
-        hardwareType: 'module',
-        slot: '1',
-        connected: false,
-        moduleModel: 'heaterShakerModuleV1',
-      },
-      {
-        hardwareType: 'module',
-        slot: '3',
-        connected: false,
-        moduleModel: 'magneticModuleV1',
-      },
-    ])
-
-    const [{ getByText, getByLabelText }] = render()
+    const [{ getByText }] = render()
     getByText('mock Navigation')
     getByText('Run again')
-    getByText('yay mock protocol')
-    getByText('Missing 2 modules')
-    getByLabelText('icon_Missing 2 modules')
-    expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.yellow3}`
-    )
-  })
-  it('should render a recent protocol with required pipette', () => {
-    mockUseAllProtocolsQuery.mockReturnValue({
-      data: {
-        data: [mockProtocol],
-      },
-    } as any)
-    mockUseAllRunsQuery.mockReturnValue({
-      data: { data: [mockRunData] },
-    } as any)
-    mockUseMissingProtocolHardware.mockReturnValue([
-      {
-        hardwareType: 'pipette',
-        connected: false,
-        mount: 'left',
-        pipetteName: 'p1000_multi_gen3',
-      },
-    ])
-
-    const [{ getByText, getByLabelText }] = render()
-    getByText('mock Navigation')
-    getByText('Run again')
-    getByText('yay mock protocol')
-    getByText('Missing 1 pipette')
-    getByLabelText('icon_Missing 1 pipette')
-    expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.yellow3}`
-    )
-  })
-  it('should render a recent protocol with required pipette and modules', () => {
-    mockUseAllProtocolsQuery.mockReturnValue({
-      data: {
-        data: [mockProtocol],
-      },
-    } as any)
-    mockUseAllRunsQuery.mockReturnValue({
-      data: { data: [mockRunData] },
-    } as any)
-    mockUseMissingProtocolHardware.mockReturnValue([
-      {
-        hardwareType: 'pipette',
-        connected: false,
-        mount: 'left',
-        pipetteName: 'p1000_multi_gen3',
-      },
-      {
-        hardwareType: 'module',
-        slot: '3',
-        connected: false,
-        moduleModel: 'magneticModuleV1',
-      },
-    ])
-
-    const [{ getByText, getByLabelText }] = render()
-    getByText('mock Navigation')
-    getByText('Run again')
-    getByText('yay mock protocol')
-    getByText('Missing hardware')
-    getByLabelText('icon_Missing hardware')
-    expect(getByLabelText('RecentRunCard')).toHaveStyle(
-      `background-color: ${COLORS.yellow3}`
-    )
+    getByText('mock RecentRunProtocolCarousel')
   })
 })

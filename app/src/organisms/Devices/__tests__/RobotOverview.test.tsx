@@ -176,7 +176,7 @@ describe('RobotOverview', () => {
   it('renders an OT-3 image', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue('OT-3')
+      .mockReturnValue('Opentrons Flex')
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
     expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)

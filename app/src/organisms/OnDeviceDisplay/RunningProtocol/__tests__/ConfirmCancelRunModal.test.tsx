@@ -4,7 +4,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders, COLORS } from '@opentrons/components'
-import { useStopRunMutation } from '@opentrons/react-api-client'
+import {
+  useStopRunMutation,
+  useDismissCurrentRunMutation,
+} from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
@@ -18,6 +21,7 @@ jest.mock('../../../../redux/analytics')
 
 const mockPush = jest.fn()
 let mockStopRun: jest.Mock
+let mockDismissCurrentRun: jest.Mock
 let mockTrackEvent: jest.Mock
 let mockTrackProtocolRunEvent: jest.Mock
 
@@ -37,6 +41,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 >
 const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
   typeof useStopRunMutation
+>
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
@@ -58,16 +65,21 @@ describe('ConfirmCancelRunModal', () => {
 
   beforeEach(() => {
     props = {
-      isActiveRun: false,
+      isActiveRun: true,
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
     }
     mockTrackEvent = jest.fn()
     mockStopRun = jest.fn((_runId, opts) => opts.onSuccess())
+    mockDismissCurrentRun = jest.fn()
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
+    mockUseDismissCurrentRunMutation.mockReturnValue({
+      dismissCurrentRun: mockDismissCurrentRun,
+      isLoading: false,
+    } as any)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -113,7 +125,23 @@ describe('ConfirmCancelRunModal', () => {
     const button = getByText('Cancel run')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/dashboard')
+    expect(mockPush).toHaveBeenCalledWith(`/protocols/${RUN_ID}/summary`)
+  })
+
+  it('when tapping cancel run the modal - in prepare to run', () => {
+    props = {
+      ...props,
+      isActiveRun: false,
+      protocolId: 'mockProtocolId',
+    }
+    const [{ getByText }] = render(props)
+    const button = getByText('Cancel run')
+    fireEvent.click(button)
+    expect(mockStopRun).toHaveBeenCalled()
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
+    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocolId')
   })
 })

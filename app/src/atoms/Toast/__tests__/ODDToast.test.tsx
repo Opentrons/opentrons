@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { Toast } from '../..'
+import { Toast } from '..'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
   return renderWithProviders(<Toast {...props} displayType="odd" />)[0]
