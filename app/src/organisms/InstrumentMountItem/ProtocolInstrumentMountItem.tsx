@@ -68,20 +68,21 @@ export function ProtocolInstrumentMountItem(
   const [showPipetteWizardFlow, setShowPipetteWizardFlow] = React.useState(
     false
   )
-  const [flowType, setFlowType] = React.useState('attach')
+  const [flowType, setFlowType] = React.useState('ATTACH')
   const selectedPipette =
     speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: React.MouseEventHandler = () => {
-    setFlowType('calibrate')
+    setFlowType('CALIBRATE')
     setShowPipetteWizardFlow(true)
   }
   const handleAttach: React.MouseEventHandler = () => {
-    setFlowType('attach')
+    setFlowType('ATTACH')
     setShowPipetteWizardFlow(true)
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
-  const isAttachedWithCal = attachedInstrument?.data?.calibratedOffset != null
+  const isAttachedWithCal =
+    attachedInstrument?.data?.calibratedOffset?.last_modified != null
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>

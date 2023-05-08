@@ -109,7 +109,6 @@ export function SetupPipetteCalibrationItem({
         </Flex>
       )
     } else {
-      flowType = 'CALIBRATE'
       button = (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <TertiaryButton
@@ -123,6 +122,7 @@ export function SetupPipetteCalibrationItem({
       )
     }
   } else {
+    flowType = 'CALIBRATE'
     button = (
       <>
         <Flex
@@ -167,7 +167,6 @@ export function SetupPipetteCalibrationItem({
     )
   }
 
-  // temporarily present valid pipette calibration for OT-3
   const attachedCalibratedDate = pipetteInfo.pipetteCalDate
 
   return (
