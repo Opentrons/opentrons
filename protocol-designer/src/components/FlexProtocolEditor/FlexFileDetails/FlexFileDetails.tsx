@@ -11,7 +11,6 @@ import {
   SPACING,
   NewPrimaryBtn,
 } from '@opentrons/components'
-import { ConnectedNav } from '../../../containers/ConnectedNav'
 import { FileMetadataFields } from '../../../file-data'
 import { i18n } from '../../../localization'
 import { ModulesForEditModulesCard } from '../../../step-forms'
@@ -50,7 +49,6 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
       {!Boolean(props.formValues.protocolName) ? (
         <>
           <div className={flexStyles.wrapper}>
-            <ConnectedNav />
             <div className={styles.container}>
               <div className={styles.pd_file_tab_header}>
                 <StyledText as="h2">
@@ -73,7 +71,6 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
       ) : (
         <>
           <div className={flexStyles.wrapper}>
-            <ConnectedNav />
             <div className={flexStyles.main_page_wrapper}>
               <Formik
                 enableReinitialize
