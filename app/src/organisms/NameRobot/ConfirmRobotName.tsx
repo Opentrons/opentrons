@@ -36,7 +36,10 @@ export function ConfirmRobotName({
 
   const handleClick = (): void => {
     dispatch(
-      updateConfigValue('onDeviceDisplaySettings.targetPath', '/dashboard')
+      updateConfigValue(
+        'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+        null
+      )
     )
     history.push('/dashboard')
   }
