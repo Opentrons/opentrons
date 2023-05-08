@@ -44,6 +44,7 @@ class Plot:
 
     def import_file(self, file):
         df = pd.read_csv(file)
+        df = df[(df["Cycle"] > 0) & (df["Cycle"] < 50)]
         self.total_cycles = df["Cycle"].max()
         self.slot = df["Slot"].iloc[0]
         if "X" in self.axes:
@@ -192,12 +193,18 @@ class Plot:
         y_end = df[y_axis].iloc[-1]
         x_avg = df[x_axis].mean()
         y_avg = df[y_axis].mean()
+        x_min = df[x_axis].min()
+        y_min = df[y_axis].min()
+        x_max = df[x_axis].max()
+        y_max = df[y_axis].max()
         x_off = 0.10
         y_off = 0.10
-        x_precision = round(abs(abs(df[x_axis].max()) - abs(df[x_axis].min())), 3)
-        y_precision = round(abs(abs(df[y_axis].max()) - abs(df[y_axis].min())), 3)
-        print(f"X-Axis Center Precision: {x_avg} mm ±{x_precision} mm")
-        print(f"Y-Axis Center Precision: {y_avg} mm ±{y_precision} mm")
+        x_range = (x_max - x_min) / 2
+        y_range = (y_max - y_min) / 2
+        x_range = round(x_range, 3)
+        y_range = round(y_range, 3)
+        print(f"X-Axis Center Precision: {x_avg} mm ± {x_range} mm")
+        print(f"Y-Axis Center Precision: {y_avg} mm ± {y_range} mm")
         fig1 = px.scatter(df, x=x_axis, y=[y_axis], color_discrete_sequence=["green"])
         fig2 = px.line(x=[-self.LIMIT, self.LIMIT], y=[[y_avg, y_avg]], line_dash_sequence=["dash"], color_discrete_sequence=["blue"])
         fig3 = px.line(x=[x_avg, x_avg], y=[[-self.LIMIT, self.LIMIT]], line_dash_sequence=["dash"], color_discrete_sequence=["red"])
@@ -303,7 +310,7 @@ class Plot:
         y_max_text = f"{axis} Max = {y_max}mm"
 
         y_avg = df[y_axis].mean()
-        y_range = y_max - y_min
+        y_range = (y_max - y_min) / 2
         if zero:
             print(f"{axis} Avg = {round(y_avg, 4)}mm ± {round(y_range, 4)}mm")
 
