@@ -61,7 +61,7 @@ class LoadModuleParams(BaseModel):
         return self.copy(
             update={
                 "location": DeckSlotLocation.construct(
-                    slotName=self.location.slotName.to_equivalent_by_robot_type(
+                    slotName=self.location.slotName.to_equivalent_for_robot_type(
                         robot_type
                     )
                 )

@@ -287,7 +287,7 @@ class ProtocolEngine:
             update={
                 "location": request.location.copy(
                     update={
-                        "slotName": request.location.slotName.to_equivalent_by_robot_type(
+                        "slotName": request.location.slotName.to_equivalent_for_robot_type(
                             self.state_view.config.robot_type
                         )
                     }

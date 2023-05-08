@@ -22,7 +22,7 @@ def canonicalize_location(
 ) -> LabwareLocation:
     if isinstance(location, DeckSlotLocation):
         return DeckSlotLocation.construct(
-            slotName=location.slotName.to_equivalent_by_robot_type(robot_type)
+            slotName=location.slotName.to_equivalent_for_robot_type(robot_type)
         )
     else:
         return location

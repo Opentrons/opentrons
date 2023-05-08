@@ -254,7 +254,7 @@ class DeckSlotName(enum.Enum):
     def to_ot2_equivalent(self) -> DeckSlotName:
         return _ot3_to_ot2.get(self, self)
 
-    def to_equivalent_by_robot_type(self, robot_type: RobotType) -> DeckSlotName:
+    def to_equivalent_for_robot_type(self, robot_type: RobotType) -> DeckSlotName:
         if robot_type == "OT-2 Standard":
             return self.to_ot2_equivalent()
         elif robot_type == "OT-3 Standard":
