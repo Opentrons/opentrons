@@ -1,11 +1,15 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
+import {
+  useCanDisconnect,
+  useWifiList,
+} from '../../../../resources/networking/hooks'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { useIsOT3, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
@@ -14,6 +18,7 @@ import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 import type { State } from '../../../../redux/types'
 
 jest.mock('../../../../redux/networking')
+jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../hooks')
 jest.mock('../ConnectNetwork/DisconnectModal')
@@ -23,15 +28,9 @@ const mockUpdateRobotStatus = jest.fn()
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
-const mockFetchWifiList = Networking.fetchWifiList as jest.MockedFunction<
-  typeof Networking.fetchWifiList
->
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
-  typeof Networking.getWifiList
->
-
-const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<
-  typeof Networking.getCanDisconnect
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
+const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
+  typeof useCanDisconnect
 >
 
 const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
@@ -88,23 +87,23 @@ describe('RobotSettingsNetworking', () => {
         ethernet: initialMockEthernet,
       })
 
-    when(mockGetWifiList)
-      .calledWith({} as State, ROBOT_NAME)
+    when(mockUseWifiList)
+      .calledWith(ROBOT_NAME, 10000)
       .mockReturnValue(mockWifiList)
 
     when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(false)
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue(false)
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(false)
     mockDisconnectModal.mockReturnValue(<div>mock disconnect modal</div>)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render title and description', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     const [{ getByText, getByTestId, queryByRole, queryByText }] = render()
     getByText('Wi-Fi - foo')
     getByText('Wired USB')
@@ -120,6 +119,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render title and description for OT-3', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ getByText, queryByText }] = render()
     getByText('Wi-Fi - foo')
@@ -131,6 +131,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi mock data and ethernet mock data', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
     getByText('Wired USB')
@@ -157,6 +158,7 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi mock data and ethernet info not rendered', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     const mockWiFi = {
       ipAddress: '1.2.3.4',
       subnetMask: '255.255.255.123',
@@ -200,9 +202,7 @@ describe('RobotSettingsNetworking', () => {
         wifi: null,
         ethernet: mockWiredUSB,
       })
-    when(mockGetWifiList)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue([])
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     const [{ getByText, getByTestId, queryAllByTestId }] = render()
 
     getByText('Wired USB')
@@ -212,7 +212,7 @@ describe('RobotSettingsNetworking', () => {
     getByText('5.6.7.8')
     getByText('255.255.255.124')
     getByText('00:00:00:00:00:00')
-    getByText('Wi-Fi')
+    getByText('Wi-Fi - foo')
     expect(
       getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
@@ -229,9 +229,7 @@ describe('RobotSettingsNetworking', () => {
         wifi: null,
         ethernet: null,
       })
-    when(mockGetWifiList)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue([])
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     const [{ getByText, queryByText, queryAllByTestId }] = render()
 
     expect(queryByText('Wireless IP')).not.toBeInTheDocument()
@@ -243,12 +241,13 @@ describe('RobotSettingsNetworking', () => {
     expect(
       queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(0)
-    getByText('Wi-Fi')
+    getByText('Wi-Fi - foo')
     getByText('Wired USB')
     getByText('Not connected via wired USB')
   })
 
   it('should render the right links to external resource and internal resource', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     const usbExternalLink =
       'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
     const usbInternalLink = '/app-settings/advanced'
@@ -260,9 +259,8 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Disconnect from Wi-Fi button when robot can disconnect and is not busy', () => {
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue(true)
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ getByRole, getByText, queryByText }] = render()
 
     expect(queryByText('mock disconnect modal')).toBeNull()
@@ -271,22 +269,11 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should not render Disconnect from Wi-Fi button when robot is busy', () => {
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue(true)
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(true)
     const [{ queryByRole }] = render()
 
     expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
-  })
-
-  it('dispatches fetchWifiList on mount and on an interval', () => {
-    render()
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(1, ROBOT_NAME)
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(20000)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(2, ROBOT_NAME)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(3, ROBOT_NAME)
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(3)
   })
 })
