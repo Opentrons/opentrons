@@ -36,7 +36,7 @@ import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
 
@@ -60,6 +60,7 @@ interface FormikErrors {
 
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
+  const history = useHistory()
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
   const previousName = localRobot?.name != null ? localRobot.name : null
