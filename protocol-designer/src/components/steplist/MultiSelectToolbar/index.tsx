@@ -11,7 +11,6 @@ import {
   Icon,
   ALIGN_CENTER,
   SIZE_2,
-  SPACING_1,
   C_NEAR_WHITE,
   C_LIGHT_GRAY,
   C_DARK_GRAY,
