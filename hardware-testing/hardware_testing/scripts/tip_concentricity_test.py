@@ -138,7 +138,7 @@ async def jog(api, position, cp):
         print("\r", end="")
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     await api.home_plunger(mount)
@@ -149,20 +149,22 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     AXIS = OT3Axis.Z_L
     COLUMNS = 12
     GAUGES = 5
+    DIAMETERS = [1.4, 1.9, 2.4, 2.9, 3.4]
+    CURRENT = 1.5
 
     test_pip = api.get_attached_instrument(mount)
-    print("mount.id:{}".format(test_pip["pipette_id"]))
+    print(f"Attached pipette: {test_pip}\n")
     if(len(test_pip) == 0):
         print(f"No pipette recognized on {mount.name} mount\n")
         sys.exit()
-    # if('' in test_pip['name']):
-    #     tip_len = 85
-    tip_len = 85
+
+    if tip_len == 85:
+        tip_type = '1000uL'
 
     test_name = "tip-concentricity-test"
 
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag])
-    header = ['Trial', 'Test Robot', 'Pipette', 'Tip', 'Currrent', 'Diameter (mm)', 'Pass/Fail']
+    header = ['Test Robot', 'Pipette', 'Tip', 'Currrent (A)', 'Diameter (mm)', 'Column', 'Pass/Fail']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
@@ -172,7 +174,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE)
 
     for gauge in range(GAUGES):
-        print(f"Gauge: {gauge+1}\n")
+        print(f"Gauge: {gauge+1}, Diameter{DIAMETER[gauge]} mm\n")
         print("Move to tip rack...\n")
         await api.move_to(mount, tip_rack_position)
         if gauge > 0 and input("Reposition? (y/n)\n\t>> ").lower() == 'y':
@@ -194,15 +196,19 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                 await api.move_to(mount, machined_cut_out_position)
                 if input("Reposition? (y/n)\n\t>> ").lower() == 'y':
                     cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.TIP)
-                    tip_rack_position = await jog(api, cur_pos, CriticalPoint.TIP)
+                    machined_cut_out_position = await jog(api, cur_pos, CriticalPoint.TIP)
 
             result = input("Pass or fail?\n\t>> ")
             print("Moving up...\n")
             await api.move_rel(mount, delta=Point(z=50))
             input("Remove tips. Press '\enter\' to continue.\n\t>> ")
 
-            ### SAVE CSV DATA
+            cycle_data = [test_robot, test_pip, tip_type, CURRENT, DIAMETER[gauge], i+1, result]
+            cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+            data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
 
+            if result.lower() = 'fail':
+                sys.exit()
 
         if(gauge != 4):
             print("Refill tip rack and switch to next gauge...\n")
@@ -219,8 +225,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
+    parser.add_argument("--tip_length", type=int, default=85)
 
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
-    asyncio.run(_main(args.simulate, mount))
+    asyncio.run(_main(args.simulate, args.tip_length, mount))
