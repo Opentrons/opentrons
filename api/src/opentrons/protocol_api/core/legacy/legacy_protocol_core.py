@@ -74,7 +74,7 @@ class LegacyProtocolCore(
         self._deck_layout = Deck() if deck_layout is None else deck_layout
 
         self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
-            mount: None for mount in Mount
+            mount: None for mount in Mount.ot2_mounts()  # Legacy core works only on OT2
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}

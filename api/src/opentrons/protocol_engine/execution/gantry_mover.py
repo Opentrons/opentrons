@@ -187,6 +187,7 @@ class HardwareGantryMover(GantryMover):
             await self._hardware_api.home_plunger(Mount.RIGHT)
         else:
             hardware_axes = [_MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
+            # Hardware API will raise error if invalid axes are passed for the type of robot
             await self._hardware_api.home(axes=hardware_axes)
 
 

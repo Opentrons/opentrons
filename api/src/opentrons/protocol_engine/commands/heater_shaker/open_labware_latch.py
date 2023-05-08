@@ -71,6 +71,7 @@ class OpenLabwareLatchImpl(
                 [
                     MotorAxis.RIGHT_Z,
                     MotorAxis.LEFT_Z,
+                    MotorAxis.EXTENSION_Z,
                 ]
             )
 

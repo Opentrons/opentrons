@@ -57,6 +57,7 @@ class CloseLidImpl(AbstractCommandImpl[CloseLidParams, CloseLidResult]):
                 MotorAxis.Y,
                 MotorAxis.RIGHT_Z,
                 MotorAxis.LEFT_Z,
+                MotorAxis.EXTENSION_Z,
             ]
         )
 

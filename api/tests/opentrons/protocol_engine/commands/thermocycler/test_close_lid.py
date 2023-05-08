@@ -49,7 +49,7 @@ async def test_close_lid(
 
     decoy.verify(
         await movement.home(
-            [MotorAxis.X, MotorAxis.Y, MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z]
+            [MotorAxis.X, MotorAxis.Y, MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z, MotorAxis.EXTENSION_Z]
         ),
         await tc_hardware.close(),
         times=1,

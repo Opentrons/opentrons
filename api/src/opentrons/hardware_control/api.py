@@ -571,7 +571,14 @@ class API(
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home the entire robot and initialize current position."""
-
+        # Should we assert/ raise an error or just remove non-ot2 axes and log warning?
+        # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
+        # can still explicitly specify an OT3 axis even when working on an OT2.
+        # Adding this check in order to prevent misuse of axes types.
+        if axes:
+            assert all(
+                axis in Axis.ot2_axes() for axis in axes
+            ), "Received a non-OT2 axis for homing."
         self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]

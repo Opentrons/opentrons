@@ -78,6 +78,7 @@ class SetAndWaitForShakeSpeedImpl(
                 [
                     MotorAxis.RIGHT_Z,
                     MotorAxis.LEFT_Z,
+                    MotorAxis.EXTENSION_Z,
                 ]
             )
 

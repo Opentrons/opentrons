@@ -118,6 +118,11 @@ class ProtocolContext(CommandPublisher):
         self._core = core
         self._core_map = core_map or LoadedCoreMap()
         self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
+
+        # With the introduction of Extension mount type, this dict initializes to include
+        # the extension mount, for both ot2 & 3. While it doesn't seem like it would
+        # create an issue in the current PAPI context, it would be much safer to
+        # only use mounts available on the robot.
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
@@ -592,6 +597,8 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        # TODO (spp): ensure that the specified mount is valid for the robot type specified.
+        #  So 'extension' mount should error out on ot2.
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         is_96_channel = instrument_name == "p1000_96"
         if is_96_channel and isinstance(self._core, ProtocolEngineCore):
