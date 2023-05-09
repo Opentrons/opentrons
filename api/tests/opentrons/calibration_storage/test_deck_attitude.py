@@ -31,7 +31,7 @@ def reload_module(robot_model: "RobotModel") -> None:
 
 
 @pytest.fixture
-def starting_ot2_calibration_data() -> None:
+def starting_ot2_calibration_data(ot_config_tempdir: Any) -> None:
     """Starting OT-2 deck calibration data fixture."""
     save_robot_deck_attitude(
         [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
@@ -41,7 +41,7 @@ def starting_ot2_calibration_data() -> None:
 
 
 @pytest.fixture
-def starting_ot3_calibration_data() -> None:
+def starting_ot3_calibration_data(ot_config_tempdir: Any) -> None:
     """Starting OT-3 belt calibration data fixture."""
     save_robot_belt_attitude(
         [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
@@ -49,7 +49,7 @@ def starting_ot3_calibration_data() -> None:
     )
 
 
-def test_save_ot2_deck_attitude() -> None:
+def test_save_ot2_deck_attitude(ot_config_tempdir: Any) -> None:
     """Test saving an OT-2 deck attitude calibration."""
     assert get_robot_deck_attitude() is None
     save_robot_deck_attitude(
@@ -60,7 +60,7 @@ def test_save_ot2_deck_attitude() -> None:
     assert get_robot_deck_attitude() != {}
 
 
-def test_save_ot3_deck_attitude() -> None:
+def test_save_ot3_deck_attitude(ot_config_tempdir: Any) -> None:
     """Test saving an OT-3 belt attitude calibration."""
     assert get_robot_belt_attitude() is None
     save_robot_belt_attitude(
