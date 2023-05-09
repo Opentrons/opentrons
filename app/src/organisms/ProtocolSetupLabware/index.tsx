@@ -30,7 +30,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
@@ -261,7 +261,7 @@ export function ProtocolSetupLabware({
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -332,7 +332,7 @@ function LabwareLatch({
       borderRadius={BORDERS.size_three}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
-          ? `${COLORS.darkBlack_hundred}${COLORS.opacity60HexCode}`
+          ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
           : COLORS.darkBlackEnabled
       }
       flexDirection={DIRECTION_COLUMN}
@@ -396,7 +396,7 @@ function RowLabware({
       : null
   const moduleInstructions = (
     <StyledText
-      color={COLORS.darkBlack_seventy}
+      color={COLORS.darkBlack70}
       fontSize={TYPOGRAPHY.fontSize20}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       lineHeight={TYPOGRAPHY.lineHeight24}
@@ -444,7 +444,7 @@ function RowLabware({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light_one}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_three}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
@@ -473,7 +473,7 @@ function RowLabware({
           {getLabwareDisplayName(definition)}
         </StyledText>
         <StyledText
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}

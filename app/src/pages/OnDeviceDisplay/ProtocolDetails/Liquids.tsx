@@ -34,7 +34,7 @@ const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
   padding: 0 ${SPACING.spacing24} ${SPACING.spacing8} ${SPACING.spacing24};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `
 
 const TableRow = styled('tr')`
@@ -43,7 +43,7 @@ const TableRow = styled('tr')`
 
 const TableDatum = styled('td')`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  background-color: ${COLORS.light_one};
+  background-color: ${COLORS.light1};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
@@ -114,10 +114,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     <StyledText lineHeight="1.75rem">
                       {liquid.displayName}
                     </StyledText>
-                    <StyledText
-                      lineHeight="1.75rem"
-                      color={COLORS.darkBlack_seventy}
-                    >
+                    <StyledText lineHeight="1.75rem" color={COLORS.darkBlack70}>
                       {liquid.description}
                     </StyledText>
                   </Flex>
@@ -126,7 +123,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
 
               <TableDatum>
                 <Flex
-                  backgroundColor={COLORS.darkBlack_twenty}
+                  backgroundColor={COLORS.darkBlack20}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
                   padding={`${SPACING.spacing8} 0.75rem`}

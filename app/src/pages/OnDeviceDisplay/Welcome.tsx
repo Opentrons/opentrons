@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 
 import screenImage from '../../assets/images/on-device-display/welcome_background.png'
 
@@ -44,7 +44,7 @@ export function Welcome(): JSX.Element {
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
         >
           {t('welcome_description')}
         </StyledText>

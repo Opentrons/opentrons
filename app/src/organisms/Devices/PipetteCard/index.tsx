@@ -137,8 +137,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               ? LEFT
               : (mount as PipetteMount)
           }
-          setSelectedPipette={setSelectedPipette}
-          closeFlow={() => setPipetteWizardFlow(null)}
+          closeFlow={() => {
+            setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+            setPipetteWizardFlow(null)
+          }}
           selectedPipette={
             pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
           }

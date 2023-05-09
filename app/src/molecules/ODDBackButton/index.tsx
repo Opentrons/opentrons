@@ -25,7 +25,7 @@ export function ODDBackButton(
     >
       <Btn onClick={onClick}>
         <Icon
-          color={COLORS.darkBlack_hundred}
+          color={COLORS.darkBlack100}
           data-testid="back_icon"
           name="back"
           width="2.5rem"

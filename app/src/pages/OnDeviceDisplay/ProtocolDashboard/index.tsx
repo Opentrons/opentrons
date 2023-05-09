@@ -20,7 +20,7 @@ import {
   useAllProtocolsQuery,
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
@@ -235,7 +235,7 @@ export function ProtocolDashboard(): JSX.Element {
           {pinnedProtocols.length === 0 && (
             <Flex
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.darkBlack_twenty}
+              backgroundColor={COLORS.darkBlack20}
               flexDirection={DIRECTION_COLUMN}
               height="27.25rem"
               justifyContent={JUSTIFY_CENTER}
@@ -287,7 +287,7 @@ export function ProtocolCard(props: {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light_one}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_four}
       fontSize={TYPOGRAPHY.fontSize22}
       lineHeight={TYPOGRAPHY.lineHeight28}

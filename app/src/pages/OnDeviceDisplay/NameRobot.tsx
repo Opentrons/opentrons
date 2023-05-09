@@ -18,6 +18,8 @@ import {
   TYPOGRAPHY,
   Icon,
 } from '@opentrons/components'
+import { getOnDeviceDisplaySettings } from '../../redux/config'
+
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
 import {
@@ -66,6 +68,10 @@ export function NameRobot(): JSX.Element {
   ] = React.useState<boolean>(false)
   const keyboardRef = React.useRef(null)
   const dispatch = useDispatch<Dispatch>()
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const isInitialSetup = unfinishedUnboxingFlowRoute !== null
 
   // check for robot name
   const connectableRobots = useSelector((state: State) =>
@@ -143,7 +149,7 @@ export function NameRobot(): JSX.Element {
 
   return (
     <>
-      {isShowConfirmRobotName ? (
+      {isShowConfirmRobotName && isInitialSetup ? (
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>

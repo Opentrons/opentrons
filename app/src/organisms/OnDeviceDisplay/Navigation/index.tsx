@@ -18,7 +18,7 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
@@ -61,7 +61,7 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
             name="overflow-btn-touchscreen"
             height="60px"
             width="48px"
-            color={COLORS.darkBlack_seventy}
+            color={COLORS.darkBlack70}
           />
         </IconButton>
       </Flex>
@@ -84,7 +84,7 @@ const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
 
 const TouchNavLink = styled(NavLink)`
   ${TYPOGRAPHY.level3HeaderSemiBold}
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
   height: 3.5rem;
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
@@ -93,7 +93,7 @@ const TouchNavLink = styled(NavLink)`
     color: ${COLORS.black};
   }
   &.active > div {
-    background-color: ${COLORS.highlightPurple_one};
+    background-color: ${COLORS.highlightPurple1};
   }
 `
 
@@ -103,15 +103,15 @@ const IconButton = styled('button')`
   background-color: ${COLORS.white};
 
   &:hover {
-    background-color: ${COLORS.darkBlack_twenty};
+    background-color: ${COLORS.darkBlack20};
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.darkBlack_twenty};
+    background-color: ${COLORS.darkBlack20};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack_twenty};
+    background-color: ${COLORS.darkBlack20};
   }
   &:disabled {
     background-color: transparent;

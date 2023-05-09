@@ -14,7 +14,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
@@ -34,6 +34,7 @@ interface RunFailedModalProps {
   errors?: RunError[]
 }
 
+// ToDo (kj:05/03/2023) This component is needed to refactor to handle error messages
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
@@ -107,7 +108,7 @@ export function RunFailedModal({
         </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.light_one}
+          backgroundColor={COLORS.light1}
           borderRadius={BORDERS.size_three}
           gridGap={SPACING.spacing8}
           padding={SPACING.spacing16}

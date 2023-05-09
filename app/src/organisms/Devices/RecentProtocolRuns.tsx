@@ -15,6 +15,7 @@ import {
   SIZE_4,
   SPACING,
   TYPOGRAPHY,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -146,7 +147,7 @@ export function RecentProtocolRuns({
             as="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.errorDisabled}
-            display="flex"
+            display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_offline"
           >
@@ -157,7 +158,7 @@ export function RecentProtocolRuns({
           <StyledText
             as="p"
             alignItems={ALIGN_CENTER}
-            display="flex"
+            display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_no_runs"
           >

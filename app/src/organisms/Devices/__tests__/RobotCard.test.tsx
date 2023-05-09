@@ -158,7 +158,7 @@ describe('RobotCard', () => {
     props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')
-      .mockReturnValue('OT-3')
+      .mockReturnValue('Opentrons Flex')
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
 

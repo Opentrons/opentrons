@@ -121,7 +121,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={COLORS.darkBlack_twenty}
+          backgroundColor={COLORS.darkBlack20}
           borderRadius={BORDERS.radiusSoftCorners}
           height="2.75rem"
           padding={`${SPACING.spacing8} 0.75rem`}
@@ -137,7 +137,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Box borderBottom={`3px solid ${COLORS.darkBlack_twenty}`} />
+          <Box borderBottom={`3px solid ${COLORS.darkBlack20}`} />
           <Flex
             padding={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
@@ -158,14 +158,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.darkBlack_seventy}
+                    color={COLORS.darkBlack70}
                   >
                     {well.wellName}
                   </StyledText>
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.darkBlack_seventy}
+                    color={COLORS.darkBlack70}
                   >
                     {well.volume} {MICRO_LITERS}
                   </StyledText>

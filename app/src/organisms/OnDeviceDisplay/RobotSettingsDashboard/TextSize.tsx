@@ -30,7 +30,7 @@ const TextSizeTile = styled(Box)`
   height: 6.25rem;
   border-radius: ${BORDERS.size_two};
   background: ${(props: RectProps) =>
-    props.isActive ? COLORS.highlightPurple_one : COLORS.highlightPurple_two};
+    props.isActive ? COLORS.highlightPurple1 : COLORS.highlightPurple2};
 `
 
 interface TextSizeProps {
@@ -62,7 +62,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}

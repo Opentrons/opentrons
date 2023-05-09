@@ -82,6 +82,17 @@ async def clear_eeprom(
         start += write_len
         await messenger.ensure_send(node, write_msg, expected_nodes=[node])
 
+    await messenger.send(
+        node,
+        message_definitions.FirmwareUpdateInitiate(payload=payloads.EmptyPayload()),
+    )
+    # give it a second to jump to the boot loader and start it's can task
+    await asyncio.sleep(1)
+    await messenger.send(
+        node.bootloader_for(),
+        message_definitions.FirmwareUpdateStartApp(payload=payloads.EmptyPayload()),
+    )
+
 
 def main() -> None:
     """Entry point."""

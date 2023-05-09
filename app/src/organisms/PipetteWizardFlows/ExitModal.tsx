@@ -9,20 +9,22 @@ import {
   SecondaryButton,
   AlertPrimaryButton,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 
 interface ExitModalProps {
+  isRobotMoving?: boolean
   proceed: () => void
   goBack: () => void
   flowType: PipetteWizardFlow
-  isOnDevice: boolean | null
+  isOnDevice: boolean
 }
 
 export function ExitModal(props: ExitModalProps): JSX.Element {
-  const { goBack, proceed, flowType, isOnDevice } = props
+  const { goBack, proceed, flowType, isOnDevice, isRobotMoving } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   let flowTitle: string = t('pipette_calibration')
@@ -36,6 +38,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
+  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return (
     <SimpleWizardBody

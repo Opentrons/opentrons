@@ -162,3 +162,14 @@ def test_get_status(
     decoy.when(mock_sync_module_hardware.status).then_return(MagneticStatus.ENGAGED)
 
     assert subject.get_status() == MagneticStatus.ENGAGED
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

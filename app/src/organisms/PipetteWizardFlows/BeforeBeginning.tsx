@@ -120,6 +120,7 @@ export const BeforeBeginning = (
           mount: mount,
         },
       },
+      { commandType: 'home' as const, params: {} },
       {
         // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -139,6 +140,7 @@ export const BeforeBeginning = (
   }
 
   const SingleMountAttachCommand: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -149,6 +151,7 @@ export const BeforeBeginning = (
   ]
 
   const NinetySixChannelAttachCommand: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,

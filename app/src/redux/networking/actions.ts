@@ -33,34 +33,6 @@ export const fetchStatusFailure = (
   meta,
 })
 
-export const fetchWifiList = (
-  robotName: string
-): Types.FetchWifiListAction => ({
-  type: Constants.FETCH_WIFI_LIST,
-  payload: { robotName },
-  meta: {},
-})
-
-export const fetchWifiListSuccess = (
-  robotName: string,
-  wifiList: Types.WifiNetwork[],
-  meta: RobotApiRequestMeta
-): Types.FetchWifiListSuccessAction => ({
-  type: Constants.FETCH_WIFI_LIST_SUCCESS,
-  payload: { robotName, wifiList },
-  meta,
-})
-
-export const fetchWifiListFailure = (
-  robotName: string,
-  error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta
-): Types.FetchWifiListFailureAction => ({
-  type: Constants.FETCH_WIFI_LIST_FAILURE,
-  payload: { robotName, error },
-  meta,
-})
-
 export const postWifiConfigure = (
   robotName: string,
   options: Types.WifiConfigureRequest

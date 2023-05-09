@@ -28,7 +28,7 @@ import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.j
 import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../CalibrationPanels'
 

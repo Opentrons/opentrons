@@ -21,6 +21,7 @@ from opentrons.protocol_api import (
     ModuleContext,
     TemperatureModuleContext,
     MagneticModuleContext,
+    MagneticBlockContext,
     Labware,
     Deck,
     validation as mock_validation,
@@ -34,6 +35,7 @@ from opentrons.protocol_api.core.common import (
     ProtocolCore,
     TemperatureModuleCore,
     MagneticModuleCore,
+    MagneticBlockCore,
 )
 
 
@@ -470,6 +472,17 @@ def test_load_module_with_configuration(subject: ProtocolContext) -> None:
         )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
+    """It should raise an APIVersionError if loading a magnetic block."""
+    with pytest.raises(APIVersionError):
+        subject.load_module(
+            module_name="magneticBlockV1",
+            location=42,
+            configuration="semi",
+        )
+
+
 def test_loaded_modules(
     decoy: Decoy,
     mock_core_map: LoadedCoreMap,
@@ -479,18 +492,25 @@ def test_loaded_modules(
     """It should return a list of all loaded modules."""
     module_core_4 = decoy.mock(cls=TemperatureModuleCore)
     module_core_6 = decoy.mock(cls=MagneticModuleCore)
+    module_core_7 = decoy.mock(cls=MagneticBlockCore)
+
     module_4 = decoy.mock(cls=TemperatureModuleContext)
     module_6 = decoy.mock(cls=MagneticModuleContext)
+    module_7 = decoy.mock(cls=MagneticBlockContext)
 
-    decoy.when(mock_core.get_module_cores()).then_return([module_core_4, module_core_6])
+    decoy.when(mock_core.get_module_cores()).then_return(
+        [module_core_4, module_core_6, module_core_7]
+    )
     decoy.when(module_core_4.get_deck_slot()).then_return(DeckSlotName.SLOT_4)
     decoy.when(module_core_6.get_deck_slot()).then_return(DeckSlotName.SLOT_6)
+    decoy.when(module_core_7.get_deck_slot()).then_return(DeckSlotName.SLOT_7)
     decoy.when(mock_core_map.get(module_core_4)).then_return(module_4)
     decoy.when(mock_core_map.get(module_core_6)).then_return(module_6)
+    decoy.when(mock_core_map.get(module_core_7)).then_return(module_7)
 
     result = subject.loaded_modules
 
-    assert result == {4: module_4, 6: module_6}
+    assert result == {4: module_4, 6: module_6, 7: module_7}
 
 
 def test_home(

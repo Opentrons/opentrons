@@ -187,7 +187,7 @@ export function SelectAuthenticationType({
         </Flex>
         <Flex
           marginTop={SPACING.spacing24}
-          backgroundColor={COLORS.light_two}
+          backgroundColor={COLORS.light2}
           padding={SPACING.spacing24}
           width="100%"
           height="6.75rem"

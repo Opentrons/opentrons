@@ -20,7 +20,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
   const { title, hasExitIcon, iconName, iconColor, onClick, isError } = props
   return (
     <Flex
-      backgroundColor={isError ? COLORS.red_two : COLORS.white}
+      backgroundColor={isError ? COLORS.red2 : COLORS.white}
       color={isError ? COLORS.white : COLORS.black}
       height="6.25rem"
       width="100%"

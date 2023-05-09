@@ -25,10 +25,7 @@ import {
 } from '@opentrons/react-api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import {
-  MediumButton,
-  TabbedButton,
-} from '../../../atoms/buttons/OnDeviceDisplay'
+import { MediumButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
@@ -80,7 +77,7 @@ const ProtocolHeader = (props: {
           onClick={() => history.goBack()}
           width="2.5rem"
         >
-          <Icon name="back" width="2.5rem" color={COLORS.darkBlack_hundred} />
+          <Icon name="back" width="2.5rem" color={COLORS.darkBlack100} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -189,7 +186,7 @@ const Summary = (props: {
         {description}
       </StyledText>
       <Flex
-        backgroundColor={COLORS.darkBlack_twenty}
+        backgroundColor={COLORS.darkBlack20}
         borderRadius={BORDERS.size_one}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
