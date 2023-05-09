@@ -104,7 +104,6 @@ async def test_get_by_analysis_id_prefers_cache(
     # return the identity-same resource
     decoy.when(memcache.get("analysis-id")).then_return(resource)
     assert (await subject.get_by_id("analysis-id")) is resource
-    decoy.verify(memcache.get("analysis-id"))
 
 
 async def test_get_by_analysis_falls_back_to_sql(
