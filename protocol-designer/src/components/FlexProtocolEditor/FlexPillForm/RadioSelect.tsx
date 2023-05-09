@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import { RadioGroup } from '@opentrons/components'
-import { pipetteNameBlocklist } from '../constant'
+import { pipetteNameBlocklist, pipetteSlot } from '../constant'
 import { useFormikContext } from 'formik'
 import type { ActionMeta } from 'react-select'
 
@@ -57,23 +57,33 @@ export interface SelectOption {
 }
 
 export const RadioSelect = ({ pipetteName, pipetteType }: any): JSX.Element => {
-  const { handleChange } = useFormikContext<any>()
+  const { handleChange, handleBlur } = useFormikContext<any>()
   const allowlist = ({ value }: SelectOption): boolean => {
     return !pipetteNameBlocklist.some(n => n === value)
   }
   const gen3Options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
-  const groupedOptions = [
+  let groupedOptions = [
     ...(gen3Options.length > 0 ? gen3Options : []),
     ...(gen1Options.length > 0 ? gen1Options : []),
   ]
+
+  const emptyMount = [
+    { value: 'LEAVE_SECOND_EMPTY', name: 'Leave Second Empty' },
+  ]
+
+  const newGroupedOptions =
+    pipetteName.split('.')[1] === pipetteSlot.right
+      ? [...groupedOptions, ...emptyMount]
+      : groupedOptions
 
   return (
     <RadioGroup
       name={pipetteName}
       value={pipetteType}
-      options={groupedOptions}
+      options={newGroupedOptions}
       onChange={handleChange}
+      onBlur={handleBlur}
     />
   )
 }

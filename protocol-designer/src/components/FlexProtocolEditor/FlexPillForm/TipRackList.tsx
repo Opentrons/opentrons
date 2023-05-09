@@ -6,6 +6,7 @@ import {
   blockedTipRackListForFlex,
   customTiprackOption,
   fontSize14,
+  pipetteSlot,
 } from '../constant'
 import {
   CheckboxField,
@@ -21,6 +22,11 @@ import cx from 'classnames'
 import styles from '../FlexComponents.css'
 import { reduce } from 'lodash'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
+import { FormPipettesByMount } from '../FlexProtocolEditor'
+interface formikContextProps {
+  pipettesByMount: FormPipettesByMount
+  tiprack: any
+}
 
 export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const dispatch = useDispatch()
@@ -30,8 +36,9 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const [customTipRack, setCustomTipRack] = useState(false)
   const {
     values: { pipettesByMount },
+    errors,
     setFieldValue,
-  } = useFormikContext<any>()
+  } = useFormikContext<formikContextProps>()
 
   const customTiprackFilteredData = [...tiprackOptions].filter(
     (i: any) =>
@@ -85,8 +92,15 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
       {customTiprackFilteredData.length > 0 && (
         <ShowCustomTiprackList customTipRackProps={customTiprackFilteredData} />
       )}
-      {customTipRack &&
-        customFileUpload(customTipRack, customTiprackFilteredData, dispatch)}
+      <Flex>
+        {customTipRack &&
+          customFileUpload(customTipRack, customTiprackFilteredData, dispatch)}
+      </Flex>
+      {pipetteName === pipetteSlot.left && (
+        <StyledText as="label" className={styles.error_text}>
+          {errors.tiprack ? errors.tiprack : ''}
+        </StyledText>
+      )}
     </>
   )
 }
