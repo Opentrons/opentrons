@@ -7,11 +7,13 @@ import { renderHook } from '@testing-library/react-hooks'
 import { I18nextProvider } from 'react-i18next'
 
 import { i18n } from '../../../../i18n'
+import { useWifiList } from '../../../../resources/networking/hooks'
 import * as Networking from '../../../../redux/networking'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 
 import { useNetworkConnection } from '..'
 
+jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/networking/selectors')
 
 const mockRobotName = 'robot-name'
@@ -39,9 +41,7 @@ const mockEthernet = {
   type: Networking.INTERFACE_ETHERNET,
 }
 
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
-  typeof Networking.getWifiList
->
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
 const mockGetNetworkInterface = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
@@ -59,8 +59,8 @@ describe('useNetworkConnection', () => {
       </I18nextProvider>
     )
 
-    when(mockGetWifiList)
-      .calledWith(undefined as any, mockRobotName)
+    when(mockUseWifiList)
+      .calledWith(mockRobotName, 10000)
       .mockReturnValue(mockWifiList)
     when(mockGetNetworkInterface)
       .calledWith(undefined as any, mockRobotName)

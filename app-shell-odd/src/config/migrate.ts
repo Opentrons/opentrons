@@ -12,6 +12,8 @@ import type {
   ConfigV12,
   ConfigV13,
   ConfigV14,
+  ConfigV15,
+  ConfigV16,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -93,14 +95,47 @@ const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
   return nextConfig
 }
 
+// config version 15 migration and defaults
+const toVersion15 = (prevConfig: ConfigV14): ConfigV15 => {
+  // Note (kj:02/10/2023) default settings
+  // sleepMs: never(no sleep), brightness device default settings, textSize x1
+  const nextConfig = {
+    ...prevConfig,
+    version: 15 as const,
+    onDeviceDisplaySettings: {
+      sleepMs: 60 * 1000 * 60 * 24 * 7,
+      brightness: 4,
+      textSize: 1,
+    },
+  }
+  return nextConfig
+}
+
+// config version 16 migration and defaults
+const toVersion16 = (prevConfig: ConfigV15): ConfigV16 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 16 as const,
+    onDeviceDisplaySettings: {
+      ...prevConfig.onDeviceDisplaySettings,
+      unfinishedUnboxingFlowRoute: '/welcome',
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
-  (prevConfig: ConfigV13) => ConfigV14
-] = [toVersion13, toVersion14]
+  (prevConfig: ConfigV13) => ConfigV14,
+  (prevConfig: ConfigV14) => ConfigV15,
+  (prevConfig: ConfigV15) => ConfigV16
+] = [toVersion13, toVersion14, toVersion15, toVersion16]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
 
-export function migrate(prevConfig: ConfigV12 | ConfigV13 | ConfigV14): Config {
+export function migrate(
+  prevConfig: ConfigV12 | ConfigV13 | ConfigV14 | ConfigV15 | ConfigV16
+): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary
   // Note: the default version of app-shell-odd is version 12 (need to adjust the index range)

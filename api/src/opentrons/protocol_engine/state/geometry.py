@@ -1,8 +1,7 @@
 """Geometry state getters."""
-from dataclasses import dataclass
 from typing import Optional, List, Set, Tuple, Union
 
-from opentrons.types import Point, DeckSlotName, MountType
+from opentrons.types import Point, DeckSlotName
 
 from .. import errors
 from ..types import (
@@ -19,28 +18,12 @@ from ..types import (
     LabwareLocation,
     LabwareOffsetVector,
     DeckType,
+    CurrentWell,
+    TipGeometry,
 )
 from .labware import LabwareView
 from .modules import ModuleView
-from .pipettes import PipetteView, CurrentWell
-from . import move_types
-
-DEFAULT_TIP_DROP_HEIGHT_FACTOR = 0.5
-
-
-@dataclass(frozen=True)
-class TipGeometry:
-    """Tip geometry data.
-
-    Props:
-        effective_length: The working length (total length minus overlap) of a tip.
-        diameter: Nominal tip diameter.
-        volume: Nominal volume capacity.
-    """
-
-    effective_length: float
-    diameter: float
-    volume: int
+from .pipettes import PipetteView
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -210,32 +193,6 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         return well_def.depth
 
-    def get_touch_points(
-        self,
-        labware_id: str,
-        well_name: str,
-        well_location: WellLocation,
-        mount: MountType,
-        radius: float = 1.0,
-    ) -> List[Point]:
-        """Get a list of touch points for a touch tip operation."""
-        labware_slot = self.get_ancestor_slot_name(labware_id)
-        next_to_module = self._modules.is_edge_move_unsafe(mount, labware_slot)
-        edge_path_type = self._labware.get_edge_path_type(
-            labware_id, well_name, mount, labware_slot, next_to_module
-        )
-
-        center_point = self.get_well_position(
-            labware_id, well_name, well_location=well_location
-        )
-
-        x_offset, y_offset = self._labware.get_well_radial_offsets(
-            labware_id, well_name, radius
-        )
-        return move_types.get_edge_point_list(
-            center_point, x_offset, y_offset, edge_path_type
-        )
-
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)
         definition = self._labware.get_definition(lw_data.id)
@@ -292,7 +249,7 @@ class GeometryView:
             )
 
         return TipGeometry(
-            effective_length=effective_length,
+            length=effective_length,
             diameter=well_def.diameter,  # type: ignore[arg-type]
             # TODO(mc, 2020-11-12): WellDefinition type says totalLiquidVolume
             #  is a float, but hardware controller expects an int

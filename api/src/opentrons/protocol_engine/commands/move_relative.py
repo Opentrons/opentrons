@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import MovementAxis
+from ..types import MovementAxis, DeckPoint
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from .pipetting_common import DestinationPositionResult
 
@@ -45,13 +45,13 @@ class MoveRelativeImplementation(
 
     async def execute(self, params: MoveRelativeParams) -> MoveRelativeResult:
         """Move (jog) a given pipette a relative distance."""
-        result = await self._movement.move_relative(
+        x, y, z = await self._movement.move_relative(
             pipette_id=params.pipetteId,
             axis=params.axis,
             distance=params.distance,
         )
 
-        return MoveRelativeResult(position=result.position)
+        return MoveRelativeResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class MoveRelative(BaseCommand[MoveRelativeParams, MoveRelativeResult]):

@@ -349,12 +349,12 @@ class MoveScheduler:
             in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
             self._completion_queue.put_nowait((arbitration_id, message))
-            log.info(
+            log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
             if not self._moves[group_id]:
-                log.info(f"Move group {group_id+self._start_at_index} has completed.")
+                log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                 self._event.set()
         except KeyError:
             log.warning(
@@ -440,7 +440,7 @@ class MoveScheduler:
         ):
             self._event.clear()
 
-            log.info(f"Executing move group {group_id}.")
+            log.debug(f"Executing move group {group_id}.")
             self._current_group = group_id - self._start_at_index
             error = await can_messenger.ensure_send(
                 node_id=NodeId.broadcast,

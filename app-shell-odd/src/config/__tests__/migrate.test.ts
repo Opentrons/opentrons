@@ -3,6 +3,8 @@ import {
   MOCK_CONFIG_V12,
   MOCK_CONFIG_V13,
   MOCK_CONFIG_V14,
+  MOCK_CONFIG_V15,
+  MOCK_CONFIG_V16,
 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
@@ -11,23 +13,39 @@ describe('config migration', () => {
     const v12Config = MOCK_CONFIG_V12
     const result = migrate(v12Config)
 
-    expect(result.version).toBe(14)
-    expect(result).toEqual(MOCK_CONFIG_V14)
+    expect(result.version).toBe(16)
+    expect(result).toEqual(MOCK_CONFIG_V16)
   })
 
   it('should migrate version 13 to latest', () => {
     const v13Config = MOCK_CONFIG_V13
     const result = migrate(v13Config)
 
-    expect(result.version).toBe(14)
-    expect(result).toEqual(MOCK_CONFIG_V14)
+    expect(result.version).toBe(16)
+    expect(result).toEqual(MOCK_CONFIG_V16)
   })
 
-  it('4', () => {
+  it('should migrate version 14 to latest', () => {
     const v14Config = MOCK_CONFIG_V14
     const result = migrate(v14Config)
 
-    expect(result.version).toBe(14)
-    expect(result).toEqual(v14Config)
+    expect(result.version).toBe(16)
+    expect(result).toEqual(MOCK_CONFIG_V16)
+  })
+
+  it('should migrate version 15 to latest', () => {
+    const v15Config = MOCK_CONFIG_V15
+    const result = migrate(v15Config)
+
+    expect(result.version).toBe(16)
+    expect(result).toEqual(MOCK_CONFIG_V16)
+  })
+
+  it('should keep version 16', () => {
+    const v16Config = MOCK_CONFIG_V16
+    const result = migrate(v16Config)
+
+    expect(result.version).toBe(16)
+    expect(result).toEqual(v16Config)
   })
 })

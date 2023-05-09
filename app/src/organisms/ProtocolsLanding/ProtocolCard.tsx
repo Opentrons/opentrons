@@ -8,6 +8,7 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
+  OT3_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -47,19 +48,25 @@ import {
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 
-interface ProtocolCardProps extends StoredProtocolData {
-  handleRunProtocol: () => void
+interface ProtocolCardProps {
+  handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  storedProtocolData: StoredProtocolData
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
     handleRunProtocol,
+    handleSendProtocolToOT3,
+    storedProtocolData,
+  } = props
+  const {
     protocolKey,
     srcFileNames,
     mostRecentAnalysis,
     modified,
-  } = props
+  } = storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -93,9 +100,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
         right={SPACING.spacing2}
       >
         <ProtocolOverflowMenu
-          protocolDisplayName={protocolDisplayName}
-          protocolKey={protocolKey}
           handleRunProtocol={handleRunProtocol}
+          handleSendProtocolToOT3={handleSendProtocolToOT3}
+          storedProtocolData={storedProtocolData}
         />
       </Box>
     </Box>
@@ -187,7 +194,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
             <Flex gridGap={SPACING.spacing4}>
               <Flex
-                flex={`0 0 ${String(SIZE_2)}`}
+                flex={`0 0 ${
+                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                }`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing2}
               >

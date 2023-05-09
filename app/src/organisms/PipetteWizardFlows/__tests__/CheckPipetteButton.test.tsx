@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { usePipettesQuery } from '@opentrons/react-api-client'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
@@ -10,8 +9,8 @@ const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
 
 jest.mock('@opentrons/react-api-client')
 
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 
 describe('CheckPipetteButton', () => {
@@ -21,18 +20,15 @@ describe('CheckPipetteButton', () => {
     props = {
       proceed: jest.fn(),
       proceedButtonText: 'continue',
-      setPending: jest.fn(),
-      isDisabled: false,
+      setFetching: jest.fn(),
+      isOnDevice: false,
+      isFetching: false,
     }
-    when(mockUsePipettesQuery)
-      .calledWith()
-      .mockReturnValue({
-        status: 'idle',
-        refetch,
-      } as any)
+    mockUseInstrumentsQuery.mockReturnValue({
+      refetch,
+    } as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
     jest.resetAllMocks()
   })
   it('clicking on the button calls refetch', () => {
@@ -40,13 +36,16 @@ describe('CheckPipetteButton', () => {
     getByRole('button', { name: 'continue' }).click()
     expect(refetch).toHaveBeenCalled()
   })
-  it('renders button disabled when isDisabled is true', () => {
+  it('button is disabled when fetching is true', () => {
+    const { getByRole } = render({ ...props, isFetching: true })
+    expect(getByRole('button', { name: 'continue' })).toBeDisabled()
+  })
+  it('renders button for on device display', () => {
     props = {
       ...props,
-      isDisabled: true,
+      isOnDevice: true,
     }
-    const { getByRole } = render(props)
-    const proceedBtn = getByRole('button', { name: 'continue' })
-    expect(proceedBtn).toBeDisabled()
+    const { getByLabelText } = render(props)
+    getByLabelText('SmallButton_primary')
   })
 })

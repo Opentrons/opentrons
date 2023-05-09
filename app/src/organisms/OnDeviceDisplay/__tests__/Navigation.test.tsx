@@ -5,13 +5,18 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { NavigationMenu } from '../Navigation/NavigationMenu'
 import { Navigation } from '../Navigation'
 
 jest.mock('../../../redux/discovery')
+jest.mock('../Navigation/NavigationMenu')
+
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
-
+const mockNavigationMenu = NavigationMenu as jest.MockedFunction<
+  typeof NavigationMenu
+>
 const mockComponent = () => null
 
 const mockRoutes = [
@@ -32,8 +37,8 @@ const mockRoutes = [
     Component: mockComponent,
     exact: true,
     name: 'Instruments',
-    navLinkTo: '/attach-instruments',
-    path: '/attach-instruments',
+    navLinkTo: '/instruments',
+    path: '/instruments',
   },
   {
     Component: mockComponent,
@@ -62,6 +67,7 @@ describe('Navigation', () => {
       routes: mockRoutes,
     }
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
+    mockNavigationMenu.mockReturnValue(<div>mock NavigationMenu</div>)
   })
   it('should render text and they have attribute', () => {
     const [{ getByRole, queryByText }] = render(props)
@@ -70,13 +76,16 @@ describe('Navigation', () => {
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
     const instruments = getByRole('link', { name: 'Instruments' })
-    expect(instruments).toHaveAttribute('href', '/attach-instruments')
+    expect(instruments).toHaveAttribute('href', '/instruments')
 
     const settings = getByRole('link', { name: 'Settings' })
     expect(settings).toHaveAttribute('href', '/robot-settings')
 
     expect(queryByText('Get started')).not.toBeInTheDocument()
   })
-
-  // Note: kj 2023/01/23 overflow menu test case will be added in a following PR.
+  it('should render the overflow btn and clicking on it renders the menu', () => {
+    const [{ getByRole, getByText }] = render(props)
+    getByRole('button', { name: 'overflow menu button' }).click()
+    getByText('mock NavigationMenu')
+  })
 })

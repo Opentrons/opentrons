@@ -14,10 +14,11 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     LoadedPipette,
     DeckSlotLocation,
+    CurrentWell,
 )
 from opentrons.protocol_engine.state import PipetteLocationData, move_types
 from opentrons.protocol_engine.state.labware import LabwareView
-from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
+from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -499,3 +500,65 @@ def test_check_pipette_blocking_hs_shake(
     )
 
     assert result == expected_result
+
+
+def test_get_touch_tip_waypoints(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    mock_module_view: ModuleView,
+    geometry_view: GeometryView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+) -> None:
+    """It should be able to get the position of a well top in a labware."""
+    center_point = Point(1, 2, 3)
+
+    decoy.when(
+        labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
+    ).then_return(True)
+
+    decoy.when(pipette_view.get_mount("pipette-id")).then_return(MountType.LEFT)
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_4
+    )
+
+    decoy.when(
+        mock_module_view.is_edge_move_unsafe(MountType.LEFT, DeckSlotName.SLOT_4)
+    ).then_return(True)
+
+    decoy.when(
+        labware_view.get_edge_path_type(
+            "labware-id", "B2", MountType.LEFT, DeckSlotName.SLOT_4, True
+        )
+    ).then_return(move_types.EdgePathType.RIGHT)
+
+    decoy.when(
+        labware_view.get_well_radial_offsets("labware-id", "B2", 0.123)
+    ).then_return((1.2, 3.4))
+
+    decoy.when(
+        move_types.get_edge_point_list(
+            center=center_point,
+            x_radius=1.2,
+            y_radius=3.4,
+            edge_path_type=move_types.EdgePathType.RIGHT,
+        )
+    ).then_return([Point(x=11, y=22, z=33), Point(x=44, y=55, z=66)])
+
+    result = subject.get_touch_tip_waypoints(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="B2",
+        center_point=center_point,
+        radius=0.123,
+    )
+
+    assert result == [
+        motion_planning.Waypoint(
+            position=Point(x=11, y=22, z=33), critical_point=CriticalPoint.XY_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(x=44, y=55, z=66), critical_point=CriticalPoint.XY_CENTER
+        ),
+    ]

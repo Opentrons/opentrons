@@ -106,7 +106,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
         slot_name = _get_slot_name(slot)
-        return self._slot_definitions_by_name[slot_name.value]
+        return self._slot_definitions_by_name[slot_name.id]
 
     def get_slot_center(self, slot: DeckLocation) -> Point:
         """Get the absolute coordinates of a slot's center."""

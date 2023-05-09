@@ -123,6 +123,17 @@ def test_engage_height_from_home_raises_on_high_version(
         subject.engage(42.0)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_calibrate_raises_on_high_version(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should raise a deprecation error."""
+    with pytest.raises(APIVersionError):
+        subject.calibrate()
+
+
 def test_engage_height_from_base(
     decoy: Decoy,
     mock_broker: Broker,
@@ -175,3 +186,14 @@ def test_engage_offset_from_default_low_version(
         mock_core.engage_to_labware(offset=42.0, preserve_half_mm=True),
         times=1,
     )
+
+
+def test_serial_number(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should get the module's unique serial number."""
+    decoy.when(mock_core.get_serial_number()).then_return("abc-123")
+    result = subject.serial_number
+    assert result == "abc-123"

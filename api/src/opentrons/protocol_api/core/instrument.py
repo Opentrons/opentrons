@@ -7,7 +7,7 @@ from typing import Any, Generic, Optional, TypeVar
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import PlungerSpeeds, FlowRates
+from opentrons.protocols.api_support.util import FlowRates
 
 from .well import WellCoreType
 
@@ -171,6 +171,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_working_volume(self) -> float:
+        ...
+
+    @abstractmethod
     def get_current_volume(self) -> float:
         ...
 
@@ -196,10 +200,6 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def get_speed(self) -> PlungerSpeeds:
-        ...
-
-    @abstractmethod
     def get_flow_rate(self) -> FlowRates:
         ...
 
@@ -216,15 +216,6 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     def set_flow_rate(
-        self,
-        aspirate: Optional[float] = None,
-        dispense: Optional[float] = None,
-        blow_out: Optional[float] = None,
-    ) -> None:
-        ...
-
-    @abstractmethod
-    def set_pipette_speed(
         self,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,

@@ -1,31 +1,29 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  // useInterval,
-  SPACING,
-} from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { StepMeter } from '../../atoms/StepMeter'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
+import { useWifiList } from '../../resources/networking/hooks'
 import {
   CONNECT,
   JOIN_OTHER,
 } from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
-import { DisplayWifiList } from '../../organisms/SetupNetwork/DisplayWifiList'
-import { SetWifiSsid } from '../../organisms/SetupNetwork/SetWifiSsid'
-import { SelectAuthenticationType } from '../../organisms/SetupNetwork/SelectAuthenticationType'
-import { SetWifiCred } from '../../organisms/SetupNetwork/SetWifiCred'
-import { ConnectingNetwork } from '../../organisms/SetupNetwork/ConnectingNetwork'
-import { SucceededToConnect } from '../../organisms/SetupNetwork/SucceededToConnect'
-import { FailedToConnect } from '../../organisms/SetupNetwork/FailedToConnect'
+import {
+  ConnectingNetwork,
+  DisplayWifiList,
+  FailedToConnect,
+  SetWifiSsid,
+  SelectAuthenticationType,
+  SetWifiCred,
+  WifiConnectionDetails,
+} from '../../organisms/OnDeviceDisplay/SetupNetwork'
 
-import type { State, Dispatch } from '../../redux/types'
+import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
@@ -48,10 +46,7 @@ export function ConnectViaWifi(): JSX.Element {
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatch = useDispatch<Dispatch>()
-  const list = useSelector((state: State) =>
-    Networking.getWifiList(state, robotName)
-  )
+  const list = useWifiList(robotName)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -133,7 +128,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState.status === RobotApi.SUCCESS
     ) {
       return (
-        <SucceededToConnect
+        <WifiConnectionDetails
           ssid={changeState.ssid}
           authType={selectedAuthType}
         />
@@ -157,10 +152,6 @@ export function ConnectViaWifi(): JSX.Element {
       return null
     }
   }
-
-  React.useEffect(() => {
-    dispatch(Networking.fetchWifiList(robotName))
-  }, [dispatch, robotName])
 
   React.useEffect(() => {
     if (list != null && list.length > 0) {

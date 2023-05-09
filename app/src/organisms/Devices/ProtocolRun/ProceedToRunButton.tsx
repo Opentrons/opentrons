@@ -2,11 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { useHoverTooltip } from '@opentrons/components'
+import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
 
-import { PrimaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
@@ -60,7 +62,10 @@ export function ProceedToRunButton({
     <Link
       to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
       onClick={() => {
-        trackEvent({ name: 'proceedToRun', properties: { sourceLocation } })
+        trackEvent({
+          name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+          properties: { sourceLocation },
+        })
         protocolRunHeaderRef?.current?.scrollIntoView({
           behavior: 'smooth',
         })

@@ -201,4 +201,25 @@ describe('shell selectors', () => {
       expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
     })
   })
+
+  describe('getOnDeviceDisplaySettings', () => {
+    it('should return the initial settings OnDeviceDisplaySettings, when starting the unbox flow', () => {
+      const state: State = {
+        config: {
+          onDeviceDisplaySettings: {
+            sleepMs: 25200000,
+            brightness: 4,
+            textSize: 1,
+            unfinishedUnboxingFlowRoute: '/welcome',
+          },
+        },
+      } as any
+      expect(Selectors.getOnDeviceDisplaySettings(state)).toEqual({
+        sleepMs: 25200000,
+        brightness: 4,
+        textSize: 1,
+        unfinishedUnboxingFlowRoute: '/welcome',
+      })
+    })
+  })
 })

@@ -64,6 +64,9 @@ ONE_CHANNEL = Literal[1]
 
 class InstrumentDict(TypedDict):
     display_name: str
+    fw_update_required: bool
+    fw_current_version: int
+    fw_next_version: Optional[int]
 
 
 class PipetteDict(InstrumentDict):
@@ -94,6 +97,7 @@ class PipetteDict(InstrumentDict):
     default_blow_out_speeds: Dict[str, float]
     ready_to_aspirate: bool
     has_tip: bool
+    default_blow_out_volume: float
 
 
 class GripperDict(InstrumentDict):

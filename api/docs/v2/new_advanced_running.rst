@@ -1,3 +1,5 @@
+:og:description: How to control a robot outside of the Opentrons App, using Jupyter Notebook or the command line.
+
 .. _advanced-control:
 
 Advanced Control

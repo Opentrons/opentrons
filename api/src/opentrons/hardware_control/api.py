@@ -44,6 +44,7 @@ from .types import (
     HardwareAction,
     MotionChecks,
     PauseType,
+    StatusBarState,
 )
 from .errors import (
     MustHomeError,
@@ -326,7 +327,7 @@ class API(
         """Control the robot lights."""
         self._backend.set_lights(button, rails)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
@@ -344,6 +345,10 @@ class API(
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
+
+    async def set_status_bar_state(self, _: StatusBarState) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -957,16 +962,27 @@ class API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: top_types.Mount) -> None:
+    async def blow_out(
+        self, mount: top_types.Mount, volume: Optional[float] = None
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        blowout_spec = self.plan_check_blow_out(mount)
+        blowout_spec = self.plan_check_blow_out(mount, volume)
+
+        instrument = self.get_pipette(mount)
+        max_blowout_pos = instrument.config.blow_out
+        # start at the bottom position and move additional distance det. by plan_check_blow_out
+        blowout_distance = instrument.config.bottom - blowout_spec.plunger_distance
+
+        if blowout_distance < max_blowout_pos:
+            raise ValueError("Blow out distance exceeds plunger position limit")
+
         self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
         target_pos = target_position_from_plunger(
             mount,
-            blowout_spec.plunger_distance,
+            blowout_distance,
             self._current_position,
         )
 

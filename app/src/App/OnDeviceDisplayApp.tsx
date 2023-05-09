@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 import {
@@ -6,10 +7,13 @@ import {
   POSITION_RELATIVE,
   COLORS,
   OVERFLOW_SCROLL,
+  useIdle,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
+import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
+import { ToasterOven } from '../organisms/ToasterOven'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
@@ -21,10 +25,15 @@ import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
+import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
+import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
-import { AttachInstrumentsDashboard } from '../pages/OnDeviceDisplay/AttachInstrumentsDashboard'
+import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
+import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
+import { getOnDeviceDisplaySettings } from '../redux/config'
+import { SLEEP_NEVER_MS } from './constants'
 
 import type { RouteProps } from './types'
 
@@ -32,8 +41,8 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: Welcome,
     exact: true,
-    name: 'Get started',
-    path: '/get-started',
+    name: 'Welcome',
+    path: '/welcome',
   },
   {
     Component: TempODDMenu,
@@ -94,22 +103,29 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/setup',
   },
   {
-    Component: () => (
-      <>
-        <BackButton />
-        <Box>protocol run</Box>
-      </>
-    ),
+    Component: RunningProtocol,
     exact: true,
     name: 'Protocol Run',
     path: '/protocols/:runId/run',
   },
   {
-    Component: AttachInstrumentsDashboard,
+    Component: RunSummary,
+    exact: true,
+    name: 'Protocol Run Summary',
+    path: '/protocols/:runId/summary',
+  },
+  {
+    Component: InstrumentsDashboard,
     exact: true,
     name: 'Instruments',
-    navLinkTo: '/attach-instruments',
-    path: '/attach-instruments',
+    navLinkTo: '/instruments',
+    path: '/instruments',
+  },
+  {
+    Component: InstrumentDetail,
+    exact: true,
+    name: 'Instrument Detail',
+    path: '/instruments/:mount',
   },
   // insert attach instruments subroutes
   {
@@ -156,31 +172,57 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
   },
 ]
 
+const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
+  'mousedown',
+  'click',
+  'scroll',
+]
+
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const { sleepMs, unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const targetPath =
+    unfinishedUnboxingFlowRoute != null
+      ? unfinishedUnboxingFlowRoute
+      : '/dashboard'
+  const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
+  const options = {
+    events: onDeviceDisplayEvents,
+    initialState: false,
+  }
+  const isIdle = useIdle(sleepTime, options)
+
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%">
-        <Switch>
-          {onDeviceDisplayRoutes.map(
-            ({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.white}
-                    overflow={OVERFLOW_SCROLL}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            }
-          )}
-          <Redirect exact from="/" to="/dashboard" />
-        </Switch>
+      <Box width="100%" css="user-select: none;">
+        {Boolean(isIdle) ? (
+          <SleepScreen />
+        ) : (
+          <ToasterOven>
+            <Switch>
+              {onDeviceDisplayRoutes.map(
+                ({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.white}
+                        overflow={OVERFLOW_SCROLL}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                }
+              )}
+              <Redirect exact from="/" to={targetPath} />
+            </Switch>
+          </ToasterOven>
+        )}
       </Box>
     </ApiHostProvider>
   )

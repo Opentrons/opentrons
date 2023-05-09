@@ -49,17 +49,6 @@ export const FETCH_STATUS_SUCCESS: 'networking:FETCH_STATUS_SUCCESS' =
 export const FETCH_STATUS_FAILURE: 'networking:FETCH_STATUS_FAILURE' =
   'networking:FETCH_STATUS_FAILURE'
 
-// GET /wifi/list
-
-export const FETCH_WIFI_LIST: 'networking:FETCH_WIFI_LIST' =
-  'networking:FETCH_WIFI_LIST'
-
-export const FETCH_WIFI_LIST_SUCCESS: 'networking:FETCH_WIFI_LIST_SUCCESS' =
-  'networking:FETCH_WIFI_LIST_SUCCESS'
-
-export const FETCH_WIFI_LIST_FAILURE: 'networking:FETCH_WIFI_LIST_FAILURE' =
-  'networking:FETCH_WIFI_LIST_FAILURE'
-
 // POST /wifi/configure
 
 export const POST_WIFI_CONFIGURE: 'networking:POST_WIFI_CONFIGURE' =

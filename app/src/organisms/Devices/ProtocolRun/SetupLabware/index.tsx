@@ -5,10 +5,10 @@ import {
   JUSTIFY_CENTER,
   Flex,
   SPACING,
+  PrimaryButton,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
-import { PrimaryButton } from '../../../../atoms/buttons'
 import { getModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -19,7 +19,6 @@ import {
 import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
-import { LaunchLabwarePositionCheck } from './LaunchLabwarePositionCheck'
 
 import type { StepKey } from '../ProtocolRunSetup'
 
@@ -77,7 +76,6 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             robotName={robotName}
           />
         )}
-        <LaunchLabwarePositionCheck robotName={robotName} runId={runId} />
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing4}>
         {nextStep == null ? (

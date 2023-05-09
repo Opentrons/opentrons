@@ -2,7 +2,6 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Optional
 
-from random import uniform
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
@@ -121,6 +120,29 @@ class RadwagScale(RadwagScaleBase):
         data = radwag_response_parse(response.decode("utf-8"), command)
         return data
 
+    def _write_command_and_read_response(
+        self,
+        cmd: RadwagCommand,
+        append: str = "",
+        timeout: Optional[float] = None,
+        retries: int = 3,
+    ) -> RadwagResponse:
+        try:
+            if append:
+                self._write_command(f"{cmd} {append}")
+            else:
+                self._write_command(cmd)
+            return self._read_response(cmd, timeout)
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception as e:
+            if not retries:
+                raise TimeoutError(f"unable to read from scale, got error: {e}")
+            print(e)
+            return self._write_command_and_read_response(
+                cmd, append, timeout, retries - 1
+            )
+
     def connect(self) -> None:
         """Connect."""
         self._connection.open()
@@ -132,8 +154,7 @@ class RadwagScale(RadwagScaleBase):
     def read_serial_number(self) -> str:
         """Read serial number."""
         cmd = RadwagCommand.GET_SERIAL_NUMBER
-        self._write_command(cmd)
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd)
         assert (
             res.code == RadwagResponseCodes.IN_PROGRESS
         ), f"Unexpected response code: {res.code}"
@@ -143,8 +164,7 @@ class RadwagScale(RadwagScaleBase):
     def working_mode(self, mode: RadwagWorkingMode) -> None:
         """Set the working mode."""
         cmd = RadwagCommand.SET_WORKING_MODE
-        self._write_command(f"{cmd} {mode.value}")
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd, append=str(mode.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -152,8 +172,7 @@ class RadwagScale(RadwagScaleBase):
     def filter(self, f: RadwagFilter) -> None:
         """Set the filter type."""
         cmd = RadwagCommand.SET_FILTER
-        self._write_command(f"{cmd} {f.value}")
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd, append=str(f.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -161,8 +180,7 @@ class RadwagScale(RadwagScaleBase):
     def value_release(self, val_rel: RadwagValueRelease) -> None:
         """Set the value release type."""
         cmd = RadwagCommand.SET_VALUE_RELEASE
-        self._write_command(f"{cmd} {val_rel.value}")
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd, append=str(val_rel.value))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -173,8 +191,7 @@ class RadwagScale(RadwagScaleBase):
             cmd = RadwagCommand.ENABLE_CONTINUOUS_TRANS_BASIC_UNIT
         else:
             cmd = RadwagCommand.DISABLE_CONTINUOUS_TRANS_BASIC_UNIT
-        self._write_command(cmd)
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd)
         assert (
             res.code == RadwagResponseCodes.IN_PROGRESS
         ), f"Unexpected response code: {res.code}"
@@ -185,8 +202,7 @@ class RadwagScale(RadwagScaleBase):
             cmd = RadwagCommand.ENABLE_AUTO_INTERNAL_ADJUST
         else:
             cmd = RadwagCommand.DISABLE_AUTO_INTERNAL_ADJUST
-        self._write_command(cmd)
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd)
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -194,8 +210,7 @@ class RadwagScale(RadwagScaleBase):
     def internal_adjustment(self) -> None:
         """Run internal adjustment."""
         cmd = RadwagCommand.INTERNAL_ADJUST_PERFORMANCE
-        self._write_command(cmd)
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd)
         assert (
             res.code == RadwagResponseCodes.IN_PROGRESS
         ), f"Unexpected response code: {res.code}"
@@ -208,8 +223,7 @@ class RadwagScale(RadwagScaleBase):
         """Set the tare value."""
         assert tare >= 0, f"Radwag tare values cannot be negative (got {tare})"
         cmd = RadwagCommand.SET_TARE
-        self._write_command(f"{cmd} {round(tare, 5)}")
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd, append=str(round(tare, 5)))
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
@@ -217,14 +231,22 @@ class RadwagScale(RadwagScaleBase):
     def read_mass(self) -> Tuple[float, bool]:
         """Read the mass, in grams."""
         cmd = RadwagCommand.GET_MEASUREMENT_BASIC_UNIT
-        self._write_command(cmd)
-        res = self._read_response(cmd)
+        res = self._write_command_and_read_response(cmd)
         assert res.measurement is not None
         return res.measurement, res.stable
 
 
 class SimRadwagScale(RadwagScaleBase):
     """Simulating Radwag Scale Driver."""
+
+    def __init__(self) -> None:
+        """Constructor."""
+        self._mass: float = 0.0
+
+    @property
+    def sim_mass(self) -> float:
+        """Simulation mass."""
+        return self._mass
 
     def connect(self) -> None:
         """Connect."""
@@ -268,4 +290,8 @@ class SimRadwagScale(RadwagScaleBase):
 
     def read_mass(self) -> Tuple[float, bool]:
         """Read mass."""
-        return uniform(2.5, 2), True
+        return self._mass, True
+
+    def set_simulation_mass(self, mass: float) -> None:
+        """Set simulation mass."""
+        self._mass = mass

@@ -144,6 +144,9 @@
       "$ref": "#/definitions/CalibratePipetteCreate"
     },
     {
+      "$ref": "#/definitions/CalibrateModuleCreate"
+    },
+    {
       "$ref": "#/definitions/MoveToMaintenancePositionCreate"
     }
   ],
@@ -798,8 +801,7 @@
     "DeckSlotName": {
       "title": "DeckSlotName",
       "description": "Deck slot identifiers.",
-      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-      "type": "string"
+      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
     },
     "DeckSlotLocation": {
       "title": "DeckSlotLocation",
@@ -970,7 +972,8 @@
         "magneticModuleV2",
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
-        "heaterShakerModuleV1"
+        "heaterShakerModuleV1",
+        "magneticBlockV1"
       ],
       "type": "string"
     },
@@ -980,7 +983,7 @@
       "type": "object",
       "properties": {
         "model": {
-          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.",
+          "description": "The model name of the module to load.\n\nProtocol Engine will look for a connected module that either exactly matches this one, or is compatible.\n\n For example, if you request a `temperatureModuleV1` here, Protocol Engine might load a `temperatureModuleV1` or a `temperatureModuleV2`.\n\n The model that it finds connected will be available through `result.model`.",
           "allOf": [
             {
               "$ref": "#/definitions/ModuleModel"
@@ -2882,6 +2885,62 @@
         },
         "params": {
           "$ref": "#/definitions/CalibratePipetteParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "CalibrateModuleParams": {
+      "title": "CalibrateModuleParams",
+      "description": "Payload required to calibrate-module.",
+      "type": "object",
+      "properties": {
+        "moduleId": {
+          "title": "Moduleid",
+          "description": "The unique id of module to calibrate.",
+          "type": "string"
+        },
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The unique id of module calibration adapter labware.",
+          "type": "string"
+        },
+        "mount": {
+          "description": "The instrument mount used to calibrate the module.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MountType"
+            }
+          ]
+        }
+      },
+      "required": ["moduleId", "labwareId", "mount"]
+    },
+    "CalibrateModuleCreate": {
+      "title": "CalibrateModuleCreate",
+      "description": "Create calibrate-module command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "calibration/calibrateModule",
+          "enum": ["calibration/calibrateModule"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/CalibrateModuleParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

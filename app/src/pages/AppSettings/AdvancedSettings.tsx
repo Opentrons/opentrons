@@ -19,6 +19,7 @@ import {
   useConditionalConfirm,
   JUSTIFY_FLEX_END,
   Btn,
+  AlertPrimaryButton,
   DIRECTION_ROW,
 } from '@opentrons/components'
 
@@ -35,21 +36,22 @@ import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
-import { ERROR_TOAST, SUCCESS_TOAST, useToast } from '../../atoms/Toast'
-import { useTrackEvent } from '../../redux/analytics'
+import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
+import {
+  useTrackEvent,
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+} from '../../redux/analytics'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
   OUTDATED,
 } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
-import {
-  AlertPrimaryButton,
-  TertiaryButton,
-  ToggleButton,
-} from '../../atoms/buttons'
+import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
+import { useToaster } from '../../organisms/ToasterOven'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -86,7 +88,7 @@ export function AdvancedSettings(): JSX.Element {
   const enableExtendedHardware = Config.useFeatureFlag('enableExtendedHardware')
 
   const dispatch = useDispatch<Dispatch>()
-  const { makeToast } = useToast()
+  const { makeToast } = useToaster()
   const reachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
   )
@@ -164,7 +166,7 @@ export function AdvancedSettings(): JSX.Element {
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
     trackEvent({
-      name: 'changePathToPythonDirectory',
+      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
       properties: {},
     })
   }
@@ -316,7 +318,7 @@ export function AdvancedSettings(): JSX.Element {
               onClick={() => {
                 dispatch(CustomLabware.changeCustomLabwareDirectory())
                 trackEvent({
-                  name: 'changeCustomLabwareSourceFolder',
+                  name: ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
                   properties: {},
                 })
               }}
@@ -529,10 +531,10 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_showLink"
             >
-              {t('show_link_labware_data')}
+              {t('show_labware_offset_snippets')}
             </StyledText>
             <StyledText as="p">
-              {t('show_link_labware_data_description')}
+              {t('show_labware_offset_snippets_description')}
             </StyledText>
           </Box>
           <ToggleButton

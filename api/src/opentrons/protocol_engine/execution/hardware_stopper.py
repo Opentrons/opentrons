@@ -11,6 +11,7 @@ from ..types import MotorAxis
 from ..errors import HardwareNotSupportedError
 
 from .movement import MovementHandler
+from .gantry_mover import HardwareGantryMover
 from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
 
@@ -37,6 +38,10 @@ class HardwareStopper:
         self._movement_handler = movement or MovementHandler(
             hardware_api=hardware_api,
             state_store=state_store,
+            gantry_mover=HardwareGantryMover(
+                hardware_api=hardware_api,
+                state_view=state_store,
+            ),
         )
         self._tip_handler = tip_handler or HardwareTipHandler(
             hardware_api=hardware_api,
@@ -45,9 +50,9 @@ class HardwareStopper:
 
     async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
-        attached_tip_racks = self._state_store.pipettes.get_attached_tip_labware_by_id()
+        attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
-        if attached_tip_racks:
+        if attached_tips:
             await self._hardware_api.stop(home_after=False)
             # TODO: Update this once gripper MotorAxis is available in engine.
             try:
@@ -63,12 +68,9 @@ class HardwareStopper:
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
 
-        for pipette_id, tiprack_id in attached_tip_racks.items():
+        for pipette_id, tip in attached_tips:
             try:
-                await self._tip_handler.add_tip(
-                    pipette_id=pipette_id,
-                    labware_id=tiprack_id,
-                )
+                await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
                 # TODO: Add ability to drop tip onto custom trash as well.
                 await self._movement_handler.move_to_well(
                     pipette_id=pipette_id,

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   AlertModal,
   OutlineButton,
   SidePanel,
@@ -261,7 +261,7 @@ export function FileSidebar(props: Props): JSX.Element {
           </OutlineButton>
 
           <div className={styles.button}>
-            <PrimaryButton
+            <DeprecatedPrimaryButton
               onClick={() => {
                 if (hasWarning) {
                   resetScrollElements()
@@ -274,7 +274,7 @@ export function FileSidebar(props: Props): JSX.Element {
               disabled={!canDownload}
             >
               Export
-            </PrimaryButton>
+            </DeprecatedPrimaryButton>
           </div>
         </div>
       </SidePanel>

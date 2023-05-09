@@ -69,7 +69,7 @@ def test_engage_from_base(
 ) -> None:
     """Should verify a call to sync client engage method."""
     decoy.when(
-        mock_engine_client.state.modules.get_model(module_id="1234")
+        mock_engine_client.state.modules.get_connected_model(module_id="1234")
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
@@ -90,7 +90,7 @@ def test_engage_to_labware(
 ) -> None:
     """Should verify a call to sync client engage method."""
     decoy.when(
-        mock_engine_client.state.modules.get_model(module_id="1234")
+        mock_engine_client.state.modules.get_connected_model(module_id="1234")
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
@@ -162,3 +162,14 @@ def test_get_status(
     decoy.when(mock_sync_module_hardware.status).then_return(MagneticStatus.ENGAGED)
 
     assert subject.get_status() == MagneticStatus.ENGAGED
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

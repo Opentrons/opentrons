@@ -32,19 +32,15 @@ InstrumentType = Literal["pipette", "gripper"]
 class MountType(enum.Enum):
     """Available mount types."""
 
-    LEFT = enum.auto()
-    RIGHT = enum.auto()
-    EXTENSION = enum.auto()
+    LEFT = "left"
+    RIGHT = "right"
+    EXTENSION = "extension"
 
     @staticmethod
     def from_hw_mount(mount: Mount) -> MountType:
         """Convert from Mount to MountType."""
         mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
         return mount_map[mount]
-
-    def as_string(self) -> str:
-        """Get MountType as a string."""
-        return self.name.lower()
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
@@ -60,8 +56,8 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     data: InstrumentDataT
 
 
-class GripperCalibrationData(BaseModel):
-    """A gripper's calibration data."""
+class InstrumentCalibrationData(BaseModel):
+    """An instrument's calibration data."""
 
     offset: Vec3f
     source: SourceType
@@ -74,7 +70,7 @@ class GripperData(BaseModel):
     jawState: str = Field(..., description="Gripper Jaw state.")
     # TODO (spp, 2023-01-03): update calibration field as decided after
     #  spike https://opentrons.atlassian.net/browse/RSS-167
-    calibratedOffset: Optional[GripperCalibrationData] = Field(
+    calibratedOffset: Optional[InstrumentCalibrationData] = Field(
         None, description="Calibrated gripper offset."
     )
 
@@ -85,6 +81,10 @@ class PipetteData(BaseModel):
     channels: ChannelCount = Field(..., description="Number of pipette channels.")
     min_volume: float = Field(..., description="Minimum pipette volume.")
     max_volume: float = Field(..., description="Maximum pipette volume.")
+    calibratedOffset: Optional[InstrumentCalibrationData] = Field(
+        None, description="Calibrated pipette offset."
+    )
+
     # TODO (spp, 2022-12-20): update/ add fields according to client needs.
     #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 

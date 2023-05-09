@@ -247,6 +247,8 @@ def create_pick_up_tip_command(
     labware_id: str = "labware-id",
     well_name: str = "A1",
     tip_volume: float = 123.4,
+    tip_length: float = 567.8,
+    tip_diameter: float = 9.0,
     destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
 ) -> cmd.PickUpTip:
     """Get a completed PickUpTip command."""
@@ -256,7 +258,12 @@ def create_pick_up_tip_command(
         wellName=well_name,
     )
 
-    result = cmd.PickUpTipResult(tipVolume=tip_volume, position=destination)
+    result = cmd.PickUpTipResult(
+        tipVolume=tip_volume,
+        tipLength=tip_length,
+        tipDiameter=tip_diameter,
+        position=destination,
+    )
 
     return cmd.PickUpTip(
         id="command-id",

@@ -20,6 +20,13 @@ export type ProtocolsOnDeviceSortKey =
   | 'recentCreated'
   | 'oldCreated'
 
+export interface OnDeviceDisplaySettings {
+  sleepMs: number
+  brightness: number
+  textSize: number
+  unfinishedUnboxingFlowRoute: string | null
+}
+
 export interface ConfigV0 {
   version: 0
   devtools: boolean
@@ -184,4 +191,20 @@ export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
   }
 }
 
-export type Config = ConfigV14
+export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
+  version: 15
+  onDeviceDisplaySettings: {
+    sleepMs: number
+    brightness: number
+    textSize: number
+  }
+}
+
+export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
+  version: 16
+  onDeviceDisplaySettings: ConfigV15['onDeviceDisplaySettings'] & {
+    unfinishedUnboxingFlowRoute: string | null
+  }
+}
+
+export type Config = ConfigV16

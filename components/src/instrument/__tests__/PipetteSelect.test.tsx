@@ -6,7 +6,7 @@ import {
   getPipetteNameSpecs,
   GEN1,
   GEN2,
-  GEN3,
+  OT3_PIPETTES,
 } from '@opentrons/shared-data'
 import { PipetteSelect } from '../PipetteSelect'
 import { Select } from '../../forms'
@@ -49,14 +49,10 @@ describe('PipetteSelect', () => {
       .map(getPipetteNameSpecs)
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
-    const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const gen1Specs = pipetteSpecs.filter(s => s.displayCategory === GEN1)
 
     expect(wrapper.find(Select).prop('options')).toEqual([
-      {
-        options: gen3Specs.map(s => ({ value: s.name, label: s.displayName })),
-      },
       {
         options: gen2Specs.map(s => ({ value: s.name, label: s.displayName })),
       },
@@ -74,7 +70,6 @@ describe('PipetteSelect', () => {
       .map(getPipetteNameSpecs)
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
-    const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const nameBlocklist = pipetteSpecs
       .filter(s => s.displayCategory === GEN1)
@@ -89,10 +84,38 @@ describe('PipetteSelect', () => {
 
     expect(wrapper.find(Select).prop('options')).toEqual([
       {
-        options: gen3Specs.map(s => ({ value: s.name, label: s.displayName })),
+        options: gen2Specs.map(s => ({ value: s.name, label: s.displayName })),
       },
+    ])
+  })
+
+  it('excludes the gen3 pipette options', () => {
+    const pipetteSpecs: PipetteNameSpecs[] = getAllPipetteNames(
+      'maxVolume',
+      'channels'
+    )
+      .map(getPipetteNameSpecs)
+      .filter((specs): specs is PipetteNameSpecs => specs !== null)
+
+    const gen1Specs = pipetteSpecs.filter(
+      s => s.displayCategory === GEN1 && s.name !== 'p1000_96'
+    )
+    const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
+
+    const nameBlocklist = OT3_PIPETTES
+    const wrapper = shallow(
+      <PipetteSelect
+        onPipetteChange={jest.fn()}
+        nameBlocklist={nameBlocklist}
+      />
+    )
+
+    expect(wrapper.find(Select).prop('options')).toEqual([
       {
         options: gen2Specs.map(s => ({ value: s.name, label: s.displayName })),
+      },
+      {
+        options: gen1Specs.map(s => ({ value: s.name, label: s.displayName })),
       },
     ])
   })

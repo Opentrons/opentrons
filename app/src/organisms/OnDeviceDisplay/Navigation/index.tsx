@@ -4,8 +4,9 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
-  Flex,
   Icon,
+  Flex,
+  Box,
   COLORS,
   SPACING,
   DIRECTION_ROW,
@@ -13,75 +14,106 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
-  ALIGN_END,
+  TYPOGRAPHY,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import { getLocalRobot } from '../../../redux/discovery'
+import { NavigationMenu } from './NavigationMenu'
 
 import type { RouteProps } from '../../../App/types'
 
-const NavigationLink = styled(NavLink)`
-  color: ${COLORS.black};
-  display: flex;
-  grid-gap: 0.5rem;
-
-  &.active {
-    color: ${COLORS.blueEnabled};
-  }
-`
-
 export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
+  const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
 
   return (
-    <Flex
-      flexDirection={DIRECTION_ROW}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      paddingX={SPACING.spacing1}
-      paddingBottom="0.75rem"
-      height="7rem"
-    >
+    <>
       <Flex
         flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_FLEX_START}
-        justifyContent={JUSTIFY_CENTER}
-        gridGap="0.5rem"
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        height="124px"
       >
-        <NavigationLink to="/dashboard">
-          <StyledText
-            fontSize="1.625rem"
-            fontWeight="700"
-            lineHeight="1.9375rem"
-          >
-            {robotName}
-          </StyledText>
-        </NavigationLink>
-        <Icon name="wifi" size="2rem" />
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_FLEX_START}
+          justifyContent={JUSTIFY_CENTER}
+          gridGap={SPACING.spacing3}
+        >
+          <NavigationLink to="/dashboard" name={robotName} />
+        </Flex>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing6}>
+          {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
+            <NavigationLink key={name} to={navLinkTo as string} name={name} />
+          ))}
+        </Flex>
+        <IconButton
+          aria-label="overflow menu button"
+          onClick={() => setShowNavMenu(true)}
+        >
+          <Icon
+            name="overflow-btn-touchscreen"
+            height="60px"
+            width="48px"
+            color={COLORS.darkBlack70}
+          />
+        </IconButton>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW}>
-        {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
-          <NavigationLink key={name} to={navLinkTo as string}>
-            <StyledText
-              fontSize="1.625rem"
-              fontWeight="600"
-              lineHeight="1.9375rem"
-              marginRight="2.75rem"
-            >
-              {name}
-            </StyledText>
-          </NavigationLink>
-        ))}
-      </Flex>
-      <Flex alignItems={ALIGN_END}>
-        {/* This icon is temporary since the current design is mid-fi and the icon will be varied in hi-fi */}
-        <Icon name="radiobox-blank" size="3rem" />
-      </Flex>
-    </Flex>
+      {showNavMenu && (
+        <NavigationMenu
+          onClick={() => setShowNavMenu(false)}
+          robotName={robotName}
+        />
+      )}
+    </>
   )
 }
+
+const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
+  <TouchNavLink to={props.to}>
+    {props.name}
+    <Box width="2.5rem" height="5px" borderRadius="2px" />
+  </TouchNavLink>
+)
+
+const TouchNavLink = styled(NavLink)`
+  ${TYPOGRAPHY.level3HeaderSemiBold}
+  color: ${COLORS.darkBlack70};
+  height: 3.5rem;
+  display: flex;
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_CENTER};
+  &.active {
+    color: ${COLORS.black};
+  }
+  &.active > div {
+    background-color: ${COLORS.highlightPurple1};
+  }
+`
+
+const IconButton = styled('button')`
+  border-radius: ${SPACING.spacing2};
+  max-height: 100%;
+  background-color: ${COLORS.white};
+
+  &:hover {
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:active,
+  &:focus {
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.darkBlack20};
+  }
+  &:disabled {
+    background-color: transparent;
+  }
+`

@@ -2,13 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
-import { usePipettesQuery } from '@opentrons/react-api-client'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SmallButton } from '../../atoms/buttons'
+import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
@@ -16,6 +19,9 @@ interface ResultsProps extends PipetteWizardStepProps {
   handleCleanUpAndClose: () => void
   currentStepIndex: number
   totalStepCount: number
+  isFetching: boolean
+  setFetching: React.Dispatch<React.SetStateAction<boolean>>
+  hasCalData: boolean
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -25,37 +31,40 @@ export const Results = (props: ResultsProps): JSX.Element => {
     attachedPipettes,
     mount,
     handleCleanUpAndClose,
+    chainRunCommands,
     currentStepIndex,
     totalStepCount,
     selectedPipette,
+    isOnDevice,
+    isFetching,
+    setFetching,
+    hasCalData,
+    isRobotMoving,
   } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const {
-    status: pipetteQueryStatus,
-    refetch: refetchPipettes,
-  } = usePipettesQuery()
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
-  const isPending = pipetteQueryStatus === 'loading'
-
+  const pipetteName =
+    attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
-  let buttonText: string = t('shared:exit')
+  let buttonText: string = i18n.format(t('shared:exit'), 'capitalize')
   let subHeader
   switch (flowType) {
     case FLOWS.CALIBRATE: {
-      header = t('pip_cal_success')
+      header = t(hasCalData ? 'pip_recal_success' : 'pip_cal_success', {
+        pipetteName: pipetteName,
+      })
       break
     }
     case FLOWS.ATTACH: {
       // attachment flow success
       if (attachedPipettes[mount] != null) {
-        const pipetteName = attachedPipettes[mount]?.modelSpecs.displayName
         header = t('pipette_attached', { pipetteName: pipetteName })
         buttonText = t('cal_pipette')
         // attachment flow fail
       } else {
-        header = t('pipette_failed_to_attach')
+        header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
         iconColor = COLORS.errorEnabled
         isSuccess = false
       }
@@ -63,14 +72,16 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
-        header = t('pipette_failed_to_detach')
+        header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
         iconColor = COLORS.errorEnabled
         isSuccess = false
       } else {
-        header = t('pipette_detached')
+        header = i18n.format(t('pipette_detached'), 'capitalize')
         if (selectedPipette === NINETY_SIX_CHANNEL) {
           if (currentStepIndex === totalStepCount) {
-            header = t('ninety_six_detached_success')
+            header = t('ninety_six_detached_success', {
+              pipetteName: NINETY_SIX_CHANNEL,
+            })
           } else {
             header = t('all_pipette_detached')
             subHeader = t('gantry_empty_for_96_channel_success')
@@ -82,24 +93,49 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
   }
 
-  const handleTryAgain = (): void => {
-    refetchPipettes()
-      .then(() => {
-        setNumberOfTryAgains(numberOfTryAgains + 1)
-      })
-      .catch(() => {})
-  }
-
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
+    } else if (
+      isSuccess &&
+      flowType === FLOWS.ATTACH &&
+      currentStepIndex !== totalStepCount
+    ) {
+      const axis = mount === 'left' ? 'leftPlunger' : 'rightPlunger'
+      chainRunCommands(
+        [
+          {
+            commandType: 'home' as const,
+            params: {
+              axes: [axis],
+            },
+          },
+          {
+            // @ts-expect-error calibration type not yet supported
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: mount,
+            },
+          },
+        ],
+        true
+      ).then(() => {
+        proceed()
+      })
     } else {
       proceed()
     }
   }
-  let button: JSX.Element = (
+  let button: JSX.Element = isOnDevice ? (
+    <SmallButton
+      textTransform={TYPOGRAPHY.textTransformCapitalize}
+      onClick={handleProceed}
+      buttonText={buttonText}
+      buttonType="primary"
+    />
+  ) : (
     <PrimaryButton
-      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+      textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       aria-label="Results_exit"
     >
@@ -111,27 +147,29 @@ export const Results = (props: ResultsProps): JSX.Element => {
     subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
     button = (
       <>
-        <SecondaryButton
-          onClick={handleCleanUpAndClose}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          disabled={isPending}
-          aria-label="Results_errorExit"
-          marginRight={SPACING.spacing2}
-        >
-          {t('shared:exit')}
-        </SecondaryButton>
-        <PrimaryButton
-          onClick={handleTryAgain}
-          disabled={isPending}
-          aria-label="Results_tryAgain"
-        >
-          {t(
-            flowType === FLOWS.ATTACH ? 'detach_and_retry' : 'attach_and_retry'
-          )}
-        </PrimaryButton>
+        {isOnDevice ? null : (
+          <SecondaryButton
+            isDangerous
+            onClick={handleCleanUpAndClose}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            disabled={isFetching}
+            aria-label="Results_errorExit"
+            marginRight={SPACING.spacing2}
+          >
+            {i18n.format(t('cancel_attachment'), 'capitalize')}
+          </SecondaryButton>
+        )}
+        <CheckPipetteButton
+          proceed={() => setNumberOfTryAgains(numberOfTryAgains + 1)}
+          proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
+          setFetching={setFetching}
+          isFetching={isFetching}
+          isOnDevice={isOnDevice}
+        />
       </>
     )
   }
+  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return (
     <SimpleWizardBody
@@ -139,7 +177,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       header={header}
       isSuccess={isSuccess}
       subHeader={subHeader}
-      isPending={isPending}
+      isPending={isFetching}
     >
       {button}
     </SimpleWizardBody>

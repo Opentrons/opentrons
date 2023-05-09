@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Set, Union, cast, Tuple
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
@@ -89,6 +90,10 @@ class LegacyProtocolCore(
     def api_version(self) -> APIVersion:
         """Get the API version the protocol is adhering to."""
         return self._api_version
+
+    @property
+    def robot_type(self) -> RobotType:
+        return "OT-2 Standard"
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
@@ -183,6 +188,19 @@ class LegacyProtocolCore(
 
         self._labware_cores.append(labware_core)
         if isinstance(location, DeckSlotName):
+            # This assignment will raise if the new item conflicts with something else
+            # on the deck--for example, if something tall is placed next to a
+            # Heater-Shaker.
+            #
+            # It's a latent bug that we only do this conflict checking when loading
+            # directly into a deck slot. We should also do conflict checking when
+            # labware is loaded atop a module, because that affects the module's
+            # maximum height.
+            #
+            # In practice, I don't think this matters now (2023-02-22) because of the
+            # exact conflict checks that we perform. Wherever we have a constraint on
+            # maximum height, we also happen to have a constraint disallowing modules
+            # in the first place.
             self._deck_layout[location.value] = labware_core
 
         self._equipment_broker.publish(
@@ -223,7 +241,7 @@ class LegacyProtocolCore(
         """Load a module."""
         resolved_type = ModuleType.from_model(model)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, deck_slot
+            resolved_type, (None if deck_slot is None else deck_slot.id)
         )
 
         selected_hardware = None
@@ -303,8 +321,7 @@ class LegacyProtocolCore(
             InstrumentLoadInfo(
                 instrument_load_name=instrument_name.value,
                 mount=mount,
-                model=pipette_dict["model"],
-                serial_number=pipette_dict["pipette_id"],
+                pipette_dict=pipette_dict,
             )
         )
 
@@ -425,6 +442,6 @@ class LegacyProtocolCore(
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
-    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
+    ) -> Union[str, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"

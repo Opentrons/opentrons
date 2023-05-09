@@ -9,6 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
   ALIGN_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -19,7 +20,6 @@ import {
   SMALL_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'

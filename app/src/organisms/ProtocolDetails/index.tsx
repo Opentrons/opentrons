@@ -26,7 +26,9 @@ import {
   SIZE_1,
   SIZE_5,
   SPACING,
+  RoundTab,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -37,18 +39,20 @@ import {
 import { protocolHasLiquids } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
-import { PrimaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { Modal } from '../../molecules/Modal'
-import { RoundTab } from '../../molecules/RoundTab'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../redux/analytics'
 import {
   getIsProtocolAnalysisInProgress,
   analyzeProtocol,
 } from '../../redux/protocol-storage'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
+import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -181,7 +185,14 @@ export function ProtocolDetails(
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
-  const [showSlideout, setShowSlideout] = React.useState(false)
+  const [
+    showChooseRobotToRunProtocolSlideout,
+    setShowChooseRobotToRunProtocolSlideout,
+  ] = React.useState<boolean>(false)
+  const [
+    showSendProtocolToOT3Slideout,
+    setShowSendProtocolToOT3Slideout,
+  ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
 
   React.useEffect(() => {
@@ -313,10 +324,10 @@ export function ProtocolDetails(
 
   const handleRunProtocolButtonClick = (): void => {
     trackEvent({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsDetail' },
     })
-    setShowSlideout(true)
+    setShowChooseRobotToRunProtocolSlideout(true)
   }
 
   return (
@@ -337,8 +348,13 @@ export function ProtocolDetails(
         width="100%"
       >
         <ChooseRobotToRunProtocolSlideout
-          onCloseClick={() => setShowSlideout(false)}
-          showSlideout={showSlideout}
+          onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
+          showSlideout={showChooseRobotToRunProtocolSlideout}
+          storedProtocolData={props}
+        />
+        <SendProtocolToOT3Slideout
+          isExpanded={showSendProtocolToOT3Slideout}
+          onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
           storedProtocolData={props}
         />
         <Flex
@@ -424,7 +440,7 @@ export function ProtocolDetails(
                   data-testid="ProtocolDetails_runProtocol"
                   disabled={analysisStatus === 'loading'}
                 >
-                  {t('run_protocol')}
+                  {t('start_setup')}
                 </PrimaryButton>
               </Flex>
             </Flex>
@@ -470,9 +486,13 @@ export function ProtocolDetails(
             right={SPACING.spacing1}
           >
             <ProtocolOverflowMenu
-              handleRunProtocol={() => setShowSlideout(true)}
-              protocolDisplayName={protocolDisplayName}
-              protocolKey={protocolKey}
+              handleRunProtocol={() =>
+                setShowChooseRobotToRunProtocolSlideout(true)
+              }
+              handleSendProtocolToOT3={() =>
+                setShowSendProtocolToOT3Slideout(true)
+              }
+              storedProtocolData={props}
               data-testid="ProtocolDetails_overFlowMenu"
             />
           </Box>

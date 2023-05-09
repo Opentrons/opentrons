@@ -2,12 +2,17 @@
 import inspect
 
 import pytest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
 from opentrons.broker import Broker
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    FlowRates,
+    PlungerSpeeds,
+)
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     InstrumentContext,
@@ -18,6 +23,9 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocol_api.validation import WellTarget, PointTarget
 from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
+)
 from opentrons.types import Location, Mount, Point
 
 
@@ -45,6 +53,14 @@ def _mock_labware_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
 def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     """Get a mock instrument implementation core."""
     instrument_core = decoy.mock(cls=InstrumentCore)
+    decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
+    return instrument_core
+
+
+@pytest.fixture
+def mock_legacy_instrument_core(decoy: Decoy) -> LegacyInstrumentCore:
+    """Get a mock instrument implementation core."""
+    instrument_core = decoy.mock(cls=LegacyInstrumentCore)
     decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
     return instrument_core
 
@@ -802,3 +818,41 @@ def test_return_height(
     result = subject.return_height
 
     assert result == 0.123
+
+
+def test_flow_rate(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should return a FlowRates object."""
+    flow_rates = decoy.mock(cls=FlowRates)
+    decoy.when(mock_instrument_core.get_flow_rate()).then_return(flow_rates)
+
+    result = subject.flow_rate
+
+    assert result == flow_rates
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+@pytest.mark.parametrize(
+    "mock_instrument_core",
+    [lazy_fixture("mock_legacy_instrument_core")],
+)
+def test_plunger_speed(
+    decoy: Decoy,
+    mock_legacy_instrument_core: LegacyInstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should return a PlungerSpeeds object on PAPI <= v2.13."""
+    plunger_speeds = decoy.mock(cls=PlungerSpeeds)
+    decoy.when(mock_legacy_instrument_core.get_speed()).then_return(plunger_speeds)
+
+    result = subject.speed
+
+    assert result == plunger_speeds
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_plunger_speed_removed(subject: InstrumentContext) -> None:
+    """It should raise an error on PAPI >= v2.14."""
+    with pytest.raises(APIVersionError):
+        subject.speed

@@ -16,7 +16,6 @@ import {
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import { i18n } from '../../../localization'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { PipetteDiagram } from './PipetteDiagram'
@@ -83,26 +82,12 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const allLabware = useSelector(getLabwareDefsByURI)
 
-  const enableOT3Support = useSelector(featureFlagSelectors.getEnabledOT3)
-
-  // TODO(sh, 2022-09-29): remove this list of OT-3 tip racks when the feature flag is removed
-  const OT_3_TIP_RACKS = [
-    'opentrons_ot3_96_tiprack_200ul',
-    'opentrons_ot3_96_tiprack_1000ul',
-    'opentrons_ot3_96_tiprack_50ul',
-  ]
-
   type Values<T> = T[keyof T]
 
   const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc, def: Values<typeof allLabware>) => {
-      if (
-        (!enableOT3Support &&
-          OT_3_TIP_RACKS.includes(def.parameters.loadName)) ||
-        def.metadata.displayCategory !== 'tipRack'
-      )
-        return acc
+      if (def.metadata.displayCategory !== 'tipRack') return acc
       return [
         ...acc,
         {
@@ -117,14 +102,11 @@ export function PipetteFields(props: Props): JSX.Element {
   const initialTabIndex = props.initialTabIndex || 1
 
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
-    const { tabIndex, mount, nameBlocklist } = props
+    const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
-    const updatedNameBlockList =
-      nameBlocklist != null && !enableOT3Support
-        ? [...nameBlocklist, ...OT3_PIPETTES]
-        : nameBlocklist
     return (
       <PipetteSelect
+        nameBlocklist={OT3_PIPETTES}
         enableNoneOption
         tabIndex={tabIndex}
         pipetteName={pipetteName != null ? pipetteName : null}
@@ -137,7 +119,6 @@ export function PipetteFields(props: Props): JSX.Element {
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
-        nameBlocklist={updatedNameBlockList != null ? updatedNameBlockList : []}
         id={`PipetteSelect_${mount}`}
       />
     )

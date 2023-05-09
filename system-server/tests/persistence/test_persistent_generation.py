@@ -5,7 +5,7 @@ import os
 
 from system_server.persistence import (
     get_sql_engine,
-    get_uuid,
+    get_persistent_uuid,
 )
 from system_server.persistence.persistent_directory import create_persistent_directory
 
@@ -53,11 +53,11 @@ async def test_uuid_generation_on_init(tmpdir: Path) -> None:
     """Test that the UUID is only created if it doesn't exist."""
     app = FastAPI()
 
-    uuid = await get_uuid(app.state, Path(tmpdir))
+    uuid = await get_persistent_uuid(app.state, Path(tmpdir))
     expected = Path(tmpdir / "system_server_uuid")
     assert expected.exists()
 
     # Test that the old UUID is returned from app state
     os.remove(str(expected))
-    assert uuid == await get_uuid(app.state, Path(tmpdir))
+    assert uuid == await get_persistent_uuid(app.state, Path(tmpdir))
     assert not expected.exists()

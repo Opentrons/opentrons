@@ -6,7 +6,7 @@ from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_runner import ProtocolRunResult
+from opentrons.protocol_runner import RunResult
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -24,11 +24,10 @@ from opentrons.protocol_engine import (
 from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_models import Run
+from robot_server.runs.run_models import Run, RunNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
-    RunNotFoundError,
     CommandNotFoundError,
 )
 from robot_server.service.task_runner import TaskRunner
@@ -485,7 +484,7 @@ async def test_update_current(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(commands=[run_command], state_summary=engine_state_summary)
     )
 
     decoy.when(
@@ -593,7 +592,7 @@ async def test_create_archives_existing(
 
     decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(commands=[run_command], state_summary=engine_state_summary)
     )
 
     decoy.when(

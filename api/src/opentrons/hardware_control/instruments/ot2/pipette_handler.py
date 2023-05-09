@@ -270,7 +270,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         )
         instr.current_tiprack_diameter = tiprack_diameter
 
-    def set_working_volume(self, mount: MountType, tip_volume: int) -> None:
+    def set_working_volume(self, mount: MountType, tip_volume: float) -> None:
         instr = self.get_pipette(mount)
         if not instr:
             raise top_types.PipetteNotAttachedError(
@@ -609,25 +609,35 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
 
     @overload
-    def plan_check_blow_out(self, mount: top_types.Mount) -> LiquidActionSpec[Axis]:
+    def plan_check_blow_out(
+        self, mount: top_types.Mount, volume: Optional[float] = None
+    ) -> LiquidActionSpec[Axis]:
         ...
 
     @overload
-    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[OT3Axis]:
+    def plan_check_blow_out(
+        self, mount: OT3Mount, volume: Optional[float] = None
+    ) -> LiquidActionSpec[OT3Axis]:
         ...
 
-    def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
+    def plan_check_blow_out(self, mount, volume: Optional[float] = None):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
+        # TODO(cm, 04/23): change this to use schema v2 configs
+        if volume is not None:
+            distance_mm = instrument.ul_per_mm(volume, "dispense")
+        else:
+            distance_mm = instrument.config.blow_out
+
         if isinstance(mount, top_types.Mount):
             return LiquidActionSpec(
                 axis=Axis.of_plunger(mount),
                 volume=0,
-                plunger_distance=instrument.config.blow_out,
+                plunger_distance=distance_mm,
                 speed=speed,
                 instr=instrument,
                 current=instrument.config.plunger_current,
@@ -636,7 +646,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             return LiquidActionSpec(
                 axis=OT3Axis.of_main_tool_actuator(mount),
                 volume=0,
-                plunger_distance=instrument.config.blow_out,
+                plunger_distance=distance_mm,
                 speed=speed,
                 instr=instrument,
                 current=instrument.config.plunger_current,

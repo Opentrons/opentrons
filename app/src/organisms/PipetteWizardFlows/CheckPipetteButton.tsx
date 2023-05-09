@@ -1,35 +1,54 @@
 import * as React from 'react'
-import { PrimaryButton } from '../../atoms/buttons'
-import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { PrimaryButton } from '@opentrons/components'
+import { SmallButton } from '../../atoms/buttons'
 
 interface CheckPipetteButtonProps {
   proceedButtonText: string
-  setPending: React.Dispatch<React.SetStateAction<boolean>>
+  setFetching: React.Dispatch<React.SetStateAction<boolean>>
+  isFetching: boolean
   proceed: () => void
-  isDisabled: boolean
+  isOnDevice: boolean | null
 }
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
 ): JSX.Element => {
-  const { proceedButtonText, proceed, setPending, isDisabled } = props
-  const { status, refetch } = usePipettesQuery()
+  const {
+    proceedButtonText,
+    proceed,
+    setFetching,
+    isFetching,
+    isOnDevice,
+  } = props
+  const { refetch } = useInstrumentsQuery({
+    enabled: false,
+    onSettled: () => {
+      setFetching(false)
+    },
+  })
 
-  React.useEffect(() => {
-    //  if requestStatus is error then the error modal will be in the results page
-    if (status === 'success' || status === 'error') {
-      proceed()
-      setPending(false)
-    } else if (status === 'loading') {
-      setPending(true)
-    }
-  }, [proceed, status, setPending])
-
-  return (
+  return isOnDevice ? (
+    <SmallButton
+      disabled={isFetching}
+      buttonText={proceedButtonText}
+      buttonType="primary"
+      onClick={() => {
+        setFetching(true)
+        refetch()
+          .then(() => {
+            proceed()
+          })
+          .catch(() => {})
+      }}
+    />
+  ) : (
     <PrimaryButton
-      disabled={isDisabled}
+      disabled={isFetching}
       onClick={() => {
         refetch()
-          .then(() => {})
+          .then(() => {
+            proceed()
+          })
           .catch(() => {})
       }}
     >

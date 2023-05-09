@@ -175,6 +175,7 @@ async def test_extraction_from_json_protocol(
         main_file=json_protocol.path,
         metadata={},
         robot_type="OT-2 Standard",
+        content_hash="abc123",
     )
     result = await extract_labware_definitions(protocol_source)
     summarized_result = {
@@ -212,6 +213,7 @@ async def test_extraction_from_json_protocol_ignores_separate_labware_files() ->
         main_file=json_protocol.path,
         robot_type="OT-2 Standard",
         metadata={},
+        content_hash="abc123",
     )
 
     result = await extract_labware_definitions(protocol_source)
@@ -262,6 +264,7 @@ async def test_extraction_from_python_protocol() -> None:
         main_file=Path("/this/file/does/not/exist/and/should/not/matter"),
         robot_type="OT-2 Standard",
         metadata={},
+        content_hash="abc123",
     )
 
     result = await extract_labware_definitions(protocol_source)

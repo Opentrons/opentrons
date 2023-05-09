@@ -57,3 +57,4 @@ zipp = "==3.5.0"
 opentrons-hardware = { editable = true, path = "./../hardware" }
 sqlalchemy = "==1.4.32"
 aiosqlite = "==0.17.0"
+server-utils = {editable = true, path = "./../server-utils"}

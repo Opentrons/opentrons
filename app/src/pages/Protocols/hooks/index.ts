@@ -4,7 +4,14 @@ import {
   useAttachedModules,
   useAttachedPipettes,
 } from '../../../organisms/Devices/hooks'
-import type { ModuleModel, PipetteName } from '@opentrons/shared-data'
+import { getLabwareSetupItemGroups } from '../utils'
+
+import type {
+  CompletedProtocolAnalysis,
+  ModuleModel,
+  PipetteName,
+} from '@opentrons/shared-data'
+import type { LabwareSetupItem } from '../utils'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -25,6 +32,12 @@ interface ProtocolModule {
 
 export type ProtocolHardware = ProtocolPipette | ProtocolModule
 
+/**
+ * Returns an array of ProtocolHardware objects that are required by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required hardware is being retrieved.
+ * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID.
+ */
 export const useRequiredProtocolHardware = (
   protocolId: string
 ): ProtocolHardware[] => {
@@ -64,4 +77,38 @@ export const useRequiredProtocolHardware = (
   )
 
   return [...requiredPipettes, ...requiredModules]
+}
+
+/**
+ * Returns an array of LabwareSetupItem objects that are required by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required labware setup items are being retrieved.
+ * @returns {LabwareSetupItem[]} An array of LabwareSetupItem objects that are required by the given protocol ID.
+ */
+export const useRequiredProtocolLabware = (
+  protocolId: string
+): LabwareSetupItem[] => {
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+  const commands =
+    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+  const { onDeckItems, offDeckItems } = getLabwareSetupItemGroups(commands)
+  return [...onDeckItems, ...offDeckItems]
+}
+
+/**
+ * Returns an array of ProtocolHardware objects that are required by the given protocol ID,
+ * but not currently connected.
+ *
+ * @param {string} protocolId The ID of the protocol for which required but missing hardware is being retrieved.
+ * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID,
+ * but not currently connected.
+ */
+export const useMissingProtocolHardware = (
+  protocolId: string
+): ProtocolHardware[] => {
+  const requiredProtocolHardware = useRequiredProtocolHardware(protocolId)
+  return requiredProtocolHardware.filter(hardware => !hardware.connected)
 }

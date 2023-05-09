@@ -357,7 +357,7 @@ async def test_load_labware_on_module(
         state_store.labware.get_definition_by_uri(matchers.IsA(str))
     ).then_return(minimal_labware_def)
 
-    decoy.when(state_store.modules.get_model("module-id")).then_return(
+    decoy.when(state_store.modules.get_requested_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     decoy.when(state_store.modules.get_location("module-id")).then_return(
@@ -441,7 +441,7 @@ def test_find_offset_id_of_labware_on_module(
     subject: EquipmentHandler,
 ) -> None:
     """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.modules.get_model("input-module-id")).then_return(
+    decoy.when(state_store.modules.get_requested_model("input-module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     decoy.when(state_store.modules.get_location("input-module-id")).then_return(
@@ -496,17 +496,19 @@ async def test_load_pipette(
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
+    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
     decoy.when(state_store.pipettes.get_by_mount(MountType.RIGHT)).then_return(
         LoadedPipette.construct(pipetteName=PipetteNameType.P300_MULTI)  # type: ignore[call-arg]
     )
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+        pipette_dict
     )
 
     decoy.when(
-        pipette_data_provider.get_pipette_static_config(model="hello", serial_number="world")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -548,15 +550,15 @@ async def test_load_pipette_96_channels(
     subject: EquipmentHandler,
 ) -> None:
     """It should load pipette data, check attachment, and generate an ID."""
+    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(model_utils.generate_id()).then_return("unique-id")
-
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+        pipette_dict
     )
-
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(loaded_static_pipette_data)
 
     decoy.when(hardware_api.get_instrument_max_height(mount=HwMount.LEFT)).then_return(
@@ -592,13 +594,14 @@ async def test_load_pipette_uses_provided_id(
     subject: EquipmentHandler,
 ) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
+    pipette_dict = cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+
     decoy.when(state_store.config.use_virtual_pipettes).then_return(False)
     decoy.when(hardware_api.get_attached_instrument(mount=HwMount.LEFT)).then_return(
-        cast(PipetteDict, {"model": "hello", "pipette_id": "world"})
+        pipette_dict
     )
-
     decoy.when(
-        pipette_data_provider.get_pipette_static_config("hello", "world")  # type: ignore[arg-type]
+        pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(loaded_static_pipette_data)
 
     result = await subject.load_pipette(
@@ -783,6 +786,35 @@ async def test_load_module_using_virtual(
         module_id="module-id",
         serial_number="fake-serial-number-abc123",
         definition=tempdeck_v1_def,
+    )
+
+
+async def test_load_magnetic_block(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    hardware_api: HardwareControlAPI,
+    mag_block_v1_def: ModuleDefinition,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load a mag block, returning its ID & definition in result."""
+    decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_BLOCK_V1)
+    ).then_return(mag_block_v1_def)
+
+    result = await subject.load_magnetic_block(
+        model=ModuleModel.MAGNETIC_BLOCK_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        module_id="input-module-id",
+    )
+
+    assert result == LoadedModuleData(
+        module_id="module-id",
+        serial_number=None,
+        definition=mag_block_v1_def,
     )
 
 

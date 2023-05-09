@@ -79,9 +79,9 @@ ConfigUnit = Literal[
 
 Quirk = NewType("Quirk", str)
 
-ChannelCount = Literal[1, 8]
+ChannelCount = Literal[1, 8, 96]
 
-UlPerMmAction = Literal["aspirate", "dispense"]
+UlPerMmAction = Literal["aspirate", "dispense", "blowout"]
 
 
 class PipetteConfigElement(TypedDict):

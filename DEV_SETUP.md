@@ -153,7 +153,7 @@ eval "$(pyenv init -)"
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
 ```shell
-brew install jpeg
+brew install jpeg-turbo
 ```
 
 ### Windows

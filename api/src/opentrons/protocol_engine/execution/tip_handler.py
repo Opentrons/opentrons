@@ -2,11 +2,11 @@
 from typing import Optional
 from typing_extensions import Protocol as TypingProtocol
 
-
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..resources import LabwareDataProvider
-from ..state import StateView, TipGeometry
+from ..state import StateView
+from ..types import TipGeometry
 
 
 class TipHandler(TypingProtocol):
@@ -33,7 +33,7 @@ class TipHandler(TypingProtocol):
         Pipette should be in place over the destination prior to calling this method.
         """
 
-    async def add_tip(self, pipette_id: str, labware_id: str) -> None:
+    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
 
 
@@ -59,30 +59,40 @@ class HardwareTipHandler(TipHandler):
         """Pick up a tip at the current location using the Hardware API."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        tip_geometry = await self._get_calibrated_tip_geometry(
+        nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
         )
 
+        actual_tip_length = await self._labware_data_provider.get_calibrated_tip_length(
+            pipette_serial=self._state_view.pipettes.get_serial_number(pipette_id),
+            labware_definition=self._state_view.labware.get_definition(labware_id),
+            nominal_fallback=nominal_tip_geometry.length,
+        )
+
         await self._hardware_api.pick_up_tip(
             mount=hw_mount,
-            tip_length=tip_geometry.effective_length,
+            tip_length=actual_tip_length,
             presses=None,
             increment=None,
         )
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
-            tiprack_diameter=tip_geometry.diameter,
+            tiprack_diameter=nominal_tip_geometry.diameter,
         )
 
         self._hardware_api.set_working_volume(
             mount=hw_mount,
-            tip_volume=tip_geometry.volume,
+            tip_volume=nominal_tip_geometry.volume,
         )
 
-        return tip_geometry
+        return TipGeometry(
+            length=actual_tip_length,
+            diameter=nominal_tip_geometry.diameter,
+            volume=nominal_tip_geometry.volume,
+        )
 
     async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
         """Drop a tip at the current location using the Hardware API."""
@@ -93,51 +103,20 @@ class HardwareTipHandler(TipHandler):
             home_after=True if home_after is None else home_after,
         )
 
-    async def add_tip(self, pipette_id: str, labware_id: str) -> None:
+    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        tip_geometry = await self._get_calibrated_tip_geometry(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-        )
-
-        await self._hardware_api.add_tip(
-            mount=hw_mount, tip_length=tip_geometry.effective_length
-        )
+        await self._hardware_api.add_tip(mount=hw_mount, tip_length=tip.length)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
-            tiprack_diameter=tip_geometry.diameter,
+            tiprack_diameter=tip.diameter,
         )
 
         self._hardware_api.set_working_volume(
-            mount=hw_mount, tip_volume=tip_geometry.volume
-        )
-
-    async def _get_calibrated_tip_geometry(
-        self,
-        pipette_id: str,
-        labware_id: str,
-        well_name: Optional[str] = None,
-    ) -> TipGeometry:
-        """Retrieve data needed by the HardwareAPI for a tip pickup."""
-        nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-        )
-
-        tip_length = await self._labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=self._state_view.pipettes.get_serial_number(pipette_id),
-            labware_definition=self._state_view.labware.get_definition(labware_id),
-            nominal_fallback=nominal_tip_geometry.effective_length,
-        )
-
-        return TipGeometry(
-            effective_length=tip_length,
-            diameter=nominal_tip_geometry.diameter,
-            volume=nominal_tip_geometry.volume,
+            mount=hw_mount,
+            tip_volume=tip.volume,
         )
 
 
@@ -185,7 +164,7 @@ class VirtualTipHandler(TipHandler):
             expected_has_tip=True,
         )
 
-    async def add_tip(self, pipette_id: str, labware_id: str) -> None:
+    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Add a tip using a virtual pipette.
 
         This should not be called when using virtual pipettes.

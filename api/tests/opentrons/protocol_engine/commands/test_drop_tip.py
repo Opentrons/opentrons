@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, TipHandler
+from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.drop_tip import (
     DropTipParams,
@@ -100,7 +101,7 @@ async def test_drop_tip_implementation(
             well_name="A3",
             well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
         )
-    ).then_return(DeckPoint(x=111, y=222, z=333))
+    ).then_return(Point(x=111, y=222, z=333))
 
     result = await subject.execute(params)
 
