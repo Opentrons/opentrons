@@ -191,11 +191,7 @@ export function NameRobot(): JSX.Element {
                 </Btn>
               </Flex>
               <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
-                <StyledText
-                  fontSize={TYPOGRAPHY.fontSize38}
-                  fontWeight={TYPOGRAPHY.fontWeightBold}
-                  lineHeight={TYPOGRAPHY.lineHeight48}
-                >
+                <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
                   {isInitialSetup ? t('name_your_robot') : t('rename_robot')}
                 </StyledText>
               </Flex>
@@ -224,11 +220,9 @@ export function NameRobot(): JSX.Element {
             >
               {isInitialSetup ? (
                 <StyledText
-                  color={COLORS.black}
-                  fontSize="1.375rem"
-                  lineHeight="1.875rem"
+                  as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  // marginBottom="0.75rem"
+                  color={COLORS.darkBlack70}
                   marginBottom={SPACING.spacingXXL}
                 >
                   {t('name_your_robot_description')}
@@ -253,19 +247,17 @@ export function NameRobot(): JSX.Element {
                 />
               </Flex>
               <StyledText
-                color={COLORS.darkGreyEnabled}
-                fontSize="1.5rem"
-                lineHeight="2.0625rem"
-                fontWeight="500"
+                as="p"
+                color={COLORS.darkBlack70}
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {t('name_rule_description')}
               </StyledText>
               {formik.errors.newRobotName && (
                 <StyledText
-                  fontSize="1.375rem"
-                  lineHeight="1.875rem"
-                  fontWeight="500"
-                  color={COLORS.errorText}
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  color={COLORS.red2}
                 >
                   {formik.errors.newRobotName}
                 </StyledText>
