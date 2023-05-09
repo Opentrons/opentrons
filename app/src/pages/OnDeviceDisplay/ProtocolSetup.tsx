@@ -189,12 +189,13 @@ function PrepareToRun({
 
   const { play } = useRunControls(runId)
 
+  console.log('runId - ProtocolSetup: ', runId)
+
   const onPlay = (): void => {
     play()
     history.push(`/protocols/${runId}/run`)
   }
 
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
