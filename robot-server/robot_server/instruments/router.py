@@ -31,7 +31,7 @@ from .instrument_models import (
     Gripper,
     AttachedInstrument,
     GripperCalibrationData,
-    name_for_subsystem
+    name_for_subsystem,
 )
 
 instruments_router = APIRouter()
@@ -123,5 +123,3 @@ async def get_attached_instruments(
         ),
         status_code=status.HTTP_200_OK,
     )
-
-

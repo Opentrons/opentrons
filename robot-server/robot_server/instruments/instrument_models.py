@@ -69,13 +69,19 @@ class MountType(enum.Enum):
 
 MountTypesStr = Literal["left", "right", "extension"]
 SubSystemStr = Literal["pipette_left", "pipette_right", "gripper"]
-def name_for_subsystem(subsystem: Literal[SubSystem.pipette_right, SubSystem.pipette_left, SubSystem.gripper]) -> SubSystemStr:
+
+
+def name_for_subsystem(
+    subsystem: Literal[
+        SubSystem.pipette_right, SubSystem.pipette_left, SubSystem.gripper
+    ]
+) -> SubSystemStr:
     if subsystem is SubSystem.pipette_right:
-        return 'pipette_right'
+        return "pipette_right"
     if subsystem is SubSystem.pipette_left:
-        return 'pipette_left'
+        return "pipette_left"
     if subsystem is SubSystem.gripper:
-        return 'gripper'
+        return "gripper"
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):

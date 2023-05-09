@@ -10,7 +10,6 @@ from typing_extensions import Literal
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI, OT3API
-from opentrons.hardware_control.types import UpdateState, SubSystem
 
 from robot_server.hardware import get_hardware
 from robot_server.service.json_api import (
@@ -38,15 +37,20 @@ from .firmware_update_manager import (
     UpdateProcessSummary,
 )
 
-from ..errors import ErrorDetails, ErrorBody
-from ..errors.robot_errors import InstrumentNotFound, NotSupportedOnOT2
-from ..errors.global_errors import IDNotFound
+from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.robot_errors import InstrumentNotFound, NotSupportedOnOT2
+from robot_server.errors.global_errors import IDNotFound
 
-from ..service.dependencies import get_unique_id, get_current_time
-from ..service.task_runner import TaskRunner, get_task_runner
+from robot_server.service.dependencies import get_unique_id, get_current_time
+from robot_Server.service.task_runner import TaskRunner, get_task_runner
 
 
-from .models import PresentSubsystem, UpdateProgressData, UpdateCreate, UpdateProgressSummary
+from .models import (
+    UpdateProgressData,
+    UpdateCreate,
+    UpdateProgressSummary,
+    SubSystem,
+)
 
 subsystems_router = APIRouter()
 
@@ -56,7 +60,10 @@ _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
 
 UPDATE_CREATE_TIMEOUT_S: Final = 5
 
-async def get_ot3_hardware(hardware_api: HardwareControlAPI = Depends(get_hardware)) -> OT3API:
+
+async def get_ot3_hardware(
+    hardware_api: HardwareControlAPI = Depends(get_hardware),
+) -> OT3API:
     """Get a flex hardware controller."""
     try:
         return ensure_ot3_hardware(hardware_api=hardware_api)
@@ -64,6 +71,7 @@ async def get_ot3_hardware(hardware_api: HardwareControlAPI = Depends(get_hardwa
         raise NotSupportedOnOT2(detail=str(e)).as_error(
             status.HTTP_403_FORBIDDEN
         ) from e
+
 
 async def get_firmware_update_manager(
     app_state: AppState = Depends(get_app_state),
@@ -108,17 +116,20 @@ class FirmwareUpdateFailed(ErrorDetails):
     id: Literal["FirmwareUpdateFailed"] = "FirmwareUpdateFailed"
     title: str = "Firmware Update Failed"
 
+
 class SubsystemNotPresent(ErrorDetails):
     """An error if a subsystem that is not present is requested."""
 
     id: Literal["SubsystemNotPresent"] = "SubsystemNotPresent"
     title: str = "Subsystem Not Present"
 
+
 class InvalidSubsystem(ErrorDetails):
     """An error if a subsystem name is invalid."""
 
     id: Literal["InvalidSubsystem"] = "InvalidSubsystem"
     title: str = "Invalid Subsystem"
+
 
 class NoOngoingUpdate(ErrorDetails):
     """An error if there is no ongoing update for a subsystem."""
@@ -137,14 +148,19 @@ def validate_subsystem(name: str) -> SubSystem:
     except KeyError:
         raise InvalidSubsystem(detail=name).as_error(status.HTTP_404_NOT_FOUND)
 
+
 @subsystems_router.get(
     "/subsystems/status",
     summary="Get attached subsystems.",
     description="Get a list of subsystems currently attached to the robot.",
-    response={status.HTTP_200_OK: {"model": SimpleMultiBody[PresentSubsystem]},
-              status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]}})
+    response={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[PresentSubsystem]},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
+    },
+)
 async def get_attached_subsystems(
-        hardware: OT3API = Depends(get_ot3_hardware)) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
+    hardware: OT3API = Depends(get_ot3_hardware),
+) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
     data = [
         PresentSubsystem.construct(
             name=subsystem_id.name(),
@@ -152,26 +168,27 @@ async def get_attached_subsystems(
             current_fw_version=subsystem_details.current_fw_verison,
             next_fw_version=subsystem_details.next_fw_version,
             fw_update_needed=subsystem_details.fw_update_needed,
-            revision=subsystem_Details.revision
-        ) for subsystem_id, subsystem_details in hardware.attached_subsystems.items()
+            revision=subsystem_Details.revision,
+        )
+        for subsystem_id, subsystem_details in hardware.attached_subsystems.items()
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
-            data=data,
-            meta= meta
-        )
+        content=SimpleMultiBody.construct(data=data, meta=meta)
     )
+
 
 @subsystems_router.get(
     "/subsystems/status/{subsystem}",
-    response={status.HTTP_200_OK: {"model": SimpleBody[PresentSubsystem]},
-              status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
-              status.HTTP_404_NOT_FOUND: {"model": SimpleBody[SubsystemNotPresent]}}
+    response={
+        status.HTTP_200_OK: {"model": SimpleBody[PresentSubsystem]},
+        status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
+        status.HTTP_404_NOT_FOUND: {"model": SimpleBody[SubsystemNotPresent]},
+    },
 )
 async def get_attached_subsystem(
-        subsystem: str,
-        hardware: OT3API = Depends(get_ot3_hardware)) -> PydanticResponse[SimpleBody[PresentSubsystem]]:
+    subsystem: str, hardware: OT3API = Depends(get_ot3_hardware)
+) -> PydanticResponse[SimpleBody[PresentSubsystem]]:
     """Return the status of a single attached subsystem.
 
     Response: A subsystem status, if the subsystem is present. Otherwise, an appropriate error.
@@ -179,7 +196,9 @@ async def get_attached_subsystem(
     system_element = validate_subsystem(subsystem)
     subsystem_status = hardware.attached_subsystems.get(system_element, None)
     if not subsystem_status:
-        raise SubsystemNotPresent(detail=system_element.name).as_error(status.HTTP_404_NOT_FOUND)
+        raise SubsystemNotPresent(detail=system_element.name).as_error(
+            status.HTTP_404_NOT_FOUND
+        )
     return await PydanticResponse.create(
         content=SimpleBody.construct(
             PresentSubsystem.construct(
@@ -188,53 +207,58 @@ async def get_attached_subsystem(
                 current_fw_version=subsystem_status.current_fw_version,
                 next_fw_version=subsystem_status.next_fw_version,
                 fw_update_needed=subsystem_status.fw_update_needed,
-                revision=subsystem_status.revision
+                revision=subsystem_status.revision,
             )
         )
     )
+
 
 @subsystems_router.get(
     "/subsystems/updates/current",
     summary="Get a list of currently-ongoing subsystem updates.",
     description="Get a list of currently-running subsystem firmware updates. This is a good snapshot of what, if anything, is currently being updated and may block other robot work. To guarantee data about an update you were previously interested in, get its id using /subsystems/updates/all.",
-    response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressSummary]}}
+    response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressSummary]}},
 )
 async def get_subsystem_updates(
-        update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager)
+    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
-    data = [UpdateProgressSummary.construct(
-        id=handle.details.update_id,
-        subsystem=handle.details.subsystem,
-        updateStatus=handle.progress.state,
-    )
-            for handle in update_manager.all_ongoing_processes()
-
+    data = [
+        UpdateProgressSummary.construct(
+            id=handle.details.update_id,
+            subsystem=handle.details.subsystem,
+            updateStatus=handle.progress.state,
+        )
+        for handle in update_manager.all_ongoing_processes()
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
-            data=data,
-            meta=meta
-        )
+        content=SimpleMultiBody.construct(data=data, meta=meta)
     )
+
 
 @subsystems_router.get(
     "/subsystems/updates/current/{subsystem}",
     summary="Get any currently-ongoing update for a specific subsystem.",
-    description="As /subsystems/updates/current but filtered by the route parameter."
+    description="As /subsystems/updates/current but filtered by the route parameter.",
 )
 async def get_subsystem_update(
-        subsystem: str,
-        update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
-        response={status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]},
-                  status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoOngoingUpdate]}}
+    subsystem: str,
+    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    response={
+        status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoOngoingUpdate]},
+    },
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
     subsystem_data = validate_subsystem(subsystem)
 
     try:
-        handle = update_manager.get_ongoing_update_process_handle_by_subsystem(subsystem_data)
+        handle = update_manager.get_ongoing_update_process_handle_by_subsystem(
+            subsystem_data
+        )
     except _NoOngoingUpdate as e:
-        raise NoOngoingUpdate(detail=subsystem_str).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise NoOngoingUpdate(detail=subsystem_str).as_error(
+            status.HTTP_404_NOT_FOUND
+        ) from e
     return await PydanticResponse.create(
         content=SimpleBody.construct(
             UpdateProgressData(
@@ -242,44 +266,46 @@ async def get_subsystem_update(
                 createdAt=handle.details.created_at,
                 subsystem=handle.details.subsystem,
                 updateStatus=handle.progress.state,
-                updateProgress=handle.progress.progress
+                updateProgress=handle.progress.progress,
             )
         )
     )
+
 
 @subsystems_router.get(
     "/subsystems/updates/all",
     summary="Get a list of all updates by id.",
     description="Get a list of all updates, including both current and concluded ones, by their update id. This is a list of all previous updates since the machine booted, including their final status and whether they succeeded or failed. While an update might complete while you're not polling and therefore disappear from /subsystems/updates/running, you can always pull a previous update by id from here.",
-    response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}}
+    response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}},
 )
 async def get_update_processes(
-        update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
-        response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressSummary]}}
+    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    response={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressSummary]}},
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
     data = [
         UpdateProgressSummary(
             id=update.details.id,
             subsystem=update.details.subsystem,
-            updateStatus=handle.progress.state)
-        for update in update_manager.all_update_processes()]
+            updateStatus=handle.progress.state,
+        )
+        for update in update_manager.all_update_processes()
+    ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
-            data=data,
-            meta=meta
-        )
+        content=SimpleMultiBody.construct(data=data, meta=meta)
     )
+
 
 @subsystems_router.get(
     "/subsystems/updates/all/{id}",
     summary="Get the details of a specific update id.",
     description="As /subsystems/updates/all but filtered by the route parameter.",
-    response={status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]}}
+    response={status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]}},
 )
 async def get_update_process(
-        id: str,
-        update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager)) -> PydanticResponse[SimpleBody[UpdateProgress]]:
+    id: str,
+    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+) -> PydanticResponse[SimpleBody[UpdateProgress]]:
     try:
         handle = update_manager.get_update_process_handle_by_id(id)
     except _UpdateIdNotFound as e:
@@ -296,23 +322,27 @@ async def get_update_process(
         )
     )
 
+
 @subsystems_router.post(
     "/subsystems/updates/{subsystem}",
     summary="Start an update for a subsystem.",
     description="Begin a firmware update for a given subsystem.",
-    response={status.HTTP_201_CREATED: {"model": SimpleBody[UpdateProgressData]},
-              status.HTTP_303_SEE_OTHER: {"model": SimpleBody[UpdateProgressData]},
-              status.HTTP_404_NOT_FOUND: {"model": ErrorBody[SubsystemNotFound]},
-              status.HTTP_412_PRECONDITION_FAILED: {"model": ErrorBody[NoUpdateAvailable]},
-              status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorBody[FirmwareUpdateFailed]},
-
-              },
+    response={
+        status.HTTP_201_CREATED: {"model": SimpleBody[UpdateProgressData]},
+        status.HTTP_303_SEE_OTHER: {"model": SimpleBody[UpdateProgressData]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[SubsystemNotFound]},
+        status.HTTP_412_PRECONDITION_FAILED: {"model": ErrorBody[NoUpdateAvailable]},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ErrorBody[FirmwareUpdateFailed]
+        },
+    },
 )
 async def begin_subsystem_update(
-        subsystem: str,
-        update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
-        update_process_id: str = Depends(get_unique_id),
-        created_at: datetime = Depends(get_current_time)) -> PydanticResponse:
+    subsystem: str,
+    update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
+    update_process_id: str = Depends(get_unique_id),
+    created_at: datetime = Depends(get_current_time),
+) -> PydanticResponse:
     """Update the firmware of the OT3 instrument on the specified mount.
 
     Arguments:
@@ -368,4 +398,3 @@ async def begin_subsystem_update(
         ),
         status_code=status.HTTP_201_CREATED,
     )
-

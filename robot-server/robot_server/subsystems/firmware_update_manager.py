@@ -1,6 +1,16 @@
 """Class to monitor firmware update status."""
 from datetime import datetime
-from typing import Dict, Union, TYPE_CHECKING, Iterable, Iterator, Optional, Any, Callable, Awaitable
+from typing import (
+    Dict,
+    Union,
+    TYPE_CHECKING,
+    Iterable,
+    Iterator,
+    Optional,
+    Any,
+    Callable,
+    Awaitable,
+)
 from typing_extensions import Literal
 
 # TODO: Remove when on py 3.11 when this isn't a different class anymore
@@ -12,11 +22,12 @@ from enum import Enum, auto
 import logging
 
 from opentrons.hardware_control.types import (
-    UpdateState,
-    SubSystem,
+    UpdateState as HWUpdateState,
+    SubSystem as HWSubSystem,
 )
 from opentrons.hardware_control.errors import UpdateOngoingError
 from robot_server.service.task_runner import TaskRunner
+from .models import SubSystem, UpdateState
 
 
 log = logging.getLogger(__name__)
@@ -33,6 +44,14 @@ class UpdateFailed(RuntimeError):
     """Error raised when the information from hardware controller points to a failed update."""
 
 
+class UpdateIdNotFound(KeyError):
+    """This update ID was not found."""
+
+
+class UpdateIdExists(ValueError):
+    """There is already an entry for this update key."""
+
+
 class UncontrolledUpdateInProgress(RuntimeError):
     """An update process started by something other than the server is running."""
 
@@ -41,34 +60,38 @@ class UncontrolledUpdateInProgress(RuntimeError):
         self.subsystem = subsystem
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}: subsystem={self.subsystem}>'
+        return f"<{self.__class__.__name__}: subsystem={self.subsystem}>"
 
     def __str__(self) -> str:
-        return ''
+        return ""
+
 
 class UpdateInProgress(RuntimeError):
     """Error raised when an update is already ongoing on the same device."""
+
     def __init__(self, subsystem: SubSystem) -> None:
         super().__init__()
         self.subsystem = subsystem
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}: {self.subsystem}>'
+        return f"<{self.__class__.__name__}: {self.subsystem}>"
 
     def __str__(self) -> str:
-        return f'Update for {self.subsystem} already in progress'
+        return f"Update for {self.subsystem} already in progress"
+
 
 class SubsystemNotFound(KeyError):
     """Requested subsystem not attached."""
+
     def __init__(self, subsystem: SubSystem) -> None:
         super().__init__()
         self.subsystem = subsystem
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}: {self.subsystem}>'
+        return f"<{self.__class__.__name__}: {self.subsystem}>"
 
     def __str__(self) -> str:
-        return f'Subsystem {self.subsystem} is not attached'
+        return f"Subsystem {self.subsystem} is not attached"
 
 
 class _UpdatePacketType(Enum):
@@ -80,7 +103,7 @@ class _UpdatePacketType(Enum):
 @dataclass
 class _UpdateProgressPacket:
     progress: int
-    status: UpdateState
+    status: HWUpdateState
     packet_type: Literal[_UpdatePacketType.progress] = _UpdatePacketType.progress
 
 
@@ -103,14 +126,18 @@ class _UpdateProcess:
 
     _status_queue: "Queue[_UpdatePacket]"
     _hw_handle: "OT3API"
-    _subsystem: SubSystem
+    _subsystem: HWSubSystem
     _status_cache: Optional[_UpdatePacket]
     _created_at: datetime
     _update_id: str
     _complete_callback: Callable[[], Awaitable[None]]
 
     def __init__(
-            self, hw_handle: "OT3API", subsystem: SubSystem, created_at: datetime, complete_callback: Callable[[], Awaitable[None]]
+        self,
+        hw_handle: "OT3API",
+        subsystem: SubSystem,
+        created_at: datetime,
+        complete_callback: Callable[[], Awaitable[None]],
     ) -> None:
         self._status_queue = Queue()
         self._hw_handle = hw_handle
@@ -118,8 +145,9 @@ class _UpdateProcess:
         self._status_cache = None
         self._status_cache_lock = Lock()
         self._created_at = created_at
-        self._complete_callback = complete_callback
-
+        # mypy thinks this is assignment to a method, which it is not. that means
+        # it's ok to assign this and it's also okay to not take a self argument
+        self._complete_callback = complete_callback  # type: ignore[assignment,misc]
 
     @property
     def status_cache(self) -> _UpdatePacket:
@@ -134,8 +162,8 @@ class _UpdateProcess:
         return self._created_at
 
     @property
-    def mount(self) -> OT3Mount:
-        return self._mount
+    def subsystem(self) -> SubSystem:
+        return self._subsystem
 
     @property
     def update_id(self) -> str:
@@ -304,16 +332,16 @@ class FirmwareUpdateManager:
                 try:
                     self._running_updates_by_subsystem.pop(subsystem)
                 except KeyError:
-                    log.exception(f'Double pop for update on {subsystem}')
+                    log.exception(f"Double pop for update on {subsystem}")
 
         self._all_updates_by_id[update_id] = _UpdateProcess(
             self._hardware_handle, mount, creation_time, update_id, complete
-
         )
-        self._running_updates_by_subsystem[subsystem] = self._all_updates_by_id[update_id]
+        self._running_updates_by_subsystem[subsystem] = self._all_updates_by_id[
+            update_id
+        ]
         self._task_runner.run(self._all_updates_by_id[update_id]._update_task)
         return self._all_updates_by_id[update_id]
-
 
     def get_update_process_handle_by_id(self, update_id: str) -> UpdateProcessHandle:
         """Get a handle for a process by its update id.
@@ -329,7 +357,9 @@ class FirmwareUpdateManager:
         except KeyError as ke:
             raise UpdateIdNotFound() from ke
 
-    def get_ongoing_update_process_handle_by_subsystem(self, subsystem: SubSystem) -> UpdateProcessHandle:
+    def get_ongoing_update_process_handle_by_subsystem(
+        self, subsystem: SubSystem
+    ) -> UpdateProcessHandle:
         """Get a handle for a process by its subsystem.
 
         This is the way to get access to a running process - the process object itself should
@@ -346,9 +376,7 @@ class FirmwareUpdateManager:
         """Return handles for all ongoing updates."""
         return list(self._running_updates_by_subsystem.values())
 
-    async def all_update_processes(
-            self
-    ) -> List[UpdateProcessHandle]:
+    async def all_update_processes(self) -> List[UpdateProcessHandle]:
         """Return handles for all historical updates."""
         return list(self._all_updates_by_id.values())
 
