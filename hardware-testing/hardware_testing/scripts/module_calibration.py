@@ -1,7 +1,8 @@
 """OT-3 Module Calibration Script."""
 import argparse
+from time import sleep
 from traceback import print_exc
-from typing import Optional
+from typing import Optional, List
 import requests
 
 
@@ -35,69 +36,85 @@ BASE_URL = "http://{}:31950"
 PARAMS = {"waitUntilComplete": "true"}
 
 
-def _home_z(ip_addr: str) -> None:
+def _home(ip_addr: str, axes: Optional[List[str]] = None) -> None:
     """Home the z axis for the instrument."""
-    # Home the instrument axis so we are at a known state
-    print("Homing z axis")
-    home_z = {"data": {"commandType": "home", "params": {"axes": ["leftZ", "rightZ"]}}}
+    axes = axes or list()
+    print(f"Homing {axes} axes")
+    home = {"data": {"commandType": "home", "params": {"axes": axes}}}
     url = f"{BASE_URL.format(ip_addr)}/commands"
-    requests.post(headers=HEADERS, url=url, json=home_z, params=PARAMS)
+    requests.post(headers=HEADERS, url=url, json=home, params=PARAMS)
+
+
+def _get_current_run(ip_addr: str) -> Optional[str]:
+    url = f"{BASE_URL.format(ip_addr)}/runs"
+    res = requests.get(headers=HEADERS, url=url)
+    runs = res.json()["data"]
+    active_run = None
+    for run in runs:
+        if run["current"]:
+            active_run = run["id"]
+            break
+    return active_run
 
 
 def _create_run(ip_addr: str) -> Optional[str]:
     """Create an empty run."""
-    print("Creating new run.")
     url = f"{BASE_URL.format(ip_addr)}/runs"
     res = requests.post(headers=HEADERS, url=url)
     if res.status_code != 201:
         return None
     # get the run id
-    return res.json()["data"]["id"]
+    return res.json()["data"].get("id")
 
 
-def _cancel_run(ip_addr: str, run_id: str) -> bool:
-    """Cancel the run."""
-    print(f"Canceling run {run_id}")
+def _cancel_run(ip_addr: str, run_id: Optional[str] = None) -> bool:
+    run_id = run_id or _get_current_run(ip_addr)
+    print(f"Finishing run {run_id}")
     stop = {"data": {"actionType": "stop"}}
     url = f"{BASE_URL.format(ip_addr)}/runs/{run_id}/actions"
     res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=stop)
-    return res.status_code == 201
+    sleep(1)  # give some time to cancel the run
+    # delete the run
+    url = f"{BASE_URL.format(ip_addr)}/runs/{run_id}"
+    res = requests.delete(headers=HEADERS, params=PARAMS, url=url)
+    return _get_current_run(ip_addr) is None
 
 
 def _main(args: argparse.Namespace) -> None:
     base_url = f"{BASE_URL.format(args.host)}"
-
-    # Collect all runs
-    res = requests.get(headers=HEADERS, url=f"{base_url}/runs")
-    runs = res.json()["data"]
-    active_run = None
-    for run in runs:
-        if run["current"]:
-            active_run = run
-            break
-
-    if active_run:
-        choice = input("There is a run in progress, do you want to cancel it? y/n\n")
+    # check if there is an active run
+    run_id = _get_current_run(args.host)
+    if run_id:
+        choice = input(
+            f"{run_id} There is a run in progress, do you want to cancel it? y/n\n"
+        )
         if choice.lower() in "no":
             print("Not canceling existing run, exiting.\n")
             exit(1)
-
         # Cancel the run
-        run_id = active_run["id"]
         if not _cancel_run(args.host, run_id):
-            print("Could not cancel run.")
-            exit(1)
+            raise RuntimeError("Could not cancel run.")
 
     # Create a new run
     run_id = _create_run(args.host)
     if not run_id:
-        print("Could not create run.")
-        exit(1)
+        raise RuntimeError("Could not create run.")
 
     url = f"{base_url}/runs/{run_id}/commands"
 
-    # Home the instrument axis so we are at a known state
-    _home_z(args.host)
+    # Home all axes so we are at a known state
+    _home(args.host, ["leftZ"])
+
+    # Make sure the module is attached
+    res = requests.get(headers=HEADERS, params=PARAMS, url=f"{base_url}/modules")
+    if res.status_code != 200:
+        raise RuntimeError("Error fetching modules attached.")
+    modules = res.json().get("data", [])
+    for module in modules:
+        if module.get("moduleModel") == args.model:
+            break
+    else:
+        raise RuntimeError(f"Module {args.model} was not detected.")
 
     # load the module based on the model
     print(f"Loading the module {args.model} at slot {args.slot}")
@@ -108,10 +125,13 @@ def _main(args: argparse.Namespace) -> None:
         }
     }
     res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=load_module)
-    if res.status_code != 201:
-        print("Error loading module")
-        exit(1)
-    module_id = res.json()["data"]["result"]["moduleId"]
+    data = res.json().get("data")
+    error = data.get("error")
+    if res.status_code != 201 or error:
+        error_type = error.get("errorType")
+        error_details = error.get("detail")
+        raise RuntimeErrorf("Error loading module: {error_type} - {error_details}")
+    module_id = data["result"]["moduleId"]
 
     # load the calibration labware for the specific module
     print(f"Loading the calibration adapter at slot {args.slot}")
@@ -127,10 +147,14 @@ def _main(args: argparse.Namespace) -> None:
         }
     }
     res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=load_labware)
-    if res.status_code != 201:
-        print("Error loading labware")
-        exit(1)
-    labware_id = res.json()["data"]["result"]["labwareId"]
+    data = res.json().get("data")
+    error = data.get("error")
+    if res.status_code != 201 or error:
+        error_type = error.get("errorType")
+        error_details = error.get("detail")
+        msg = f"Error loading labware: {error_type} - {error_details}"
+        raise RuntimeError(msg)
+    labware_id = data["result"]["labwareId"]
 
     # calibrate the module
     print(f"Calibrating {args.model} at slot {args.slot} with mount {args.mount}")
@@ -146,13 +170,16 @@ def _main(args: argparse.Namespace) -> None:
     }
 
     res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=calibrate_module)
-    if res.status_code != 201 or not res.json()["data"].get("result"):
-        error = res.json()["data"]["error"]
+    data = res.json().get("data")
+    error = data.get("error")
+    if res.status_code != 201 or error:
         error_type = error.get("errorType")
         error_details = error.get("detail")
-        print(f"Failed to calibrate module {args.model} {error_type} - {error_details}")
-        return
+        msg = f"Failed to calibrate module {args.model}: {error_type} - {error_details}"
+        raise RuntimeError(msg)
 
+    # Finish and print result
+    _cancel_run(args.host, run_id)
     calibration_offset = res.json()["data"]["result"]["moduleOffset"]
     print(f"Calibration result {calibration_offset}")
 
@@ -185,7 +212,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     try:
         _main(args)
-    except Exception:
-        print("Unhandled exception")
-        print_exc()
-        _home_z(args.host)
+    except Exception as e:
+        print(e)
+        _cancel_run(args.host)
+    finally:
+        # home the gantry
+        _home(args.host, ["leftZ", "rightZ"])

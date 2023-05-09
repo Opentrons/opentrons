@@ -630,6 +630,15 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
+    def get_raw_module_offset(self, module_id: str) -> ModuleOffsetVector:
+        """Get the stored module calibration offset without transforms."""
+        module_serial = self.get(module_id).serialNumber
+        if module_serial is not None:
+            offset = self._state.module_offset_by_serial.get(module_serial)
+            if offset:
+                return offset
+        return ModuleOffsetVector(x=0, y=0, z=0)
+
     def get_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
@@ -656,19 +665,11 @@ class ModuleView(HasState[ModuleState]):
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
 
         # add the calibrated module offset if there is one
-        module = self.get(module_id)
-        if module.serialNumber is None:
-            raise errors.ModuleNotConnectedError(
-                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected to the robot and can provide the robot with a serial number."
-            )
-        offset = self._state.module_offset_by_serial.get(module.serialNumber)
-        if offset is not None:
-            module_offset = array((offset.x, offset.y, offset.z, 1))
-            xformed = add(xformed, module_offset)
+        module_offset = self.get_raw_module_offset(module_id)
         return LabwareOffsetVector(
-            x=xformed[0],
-            y=xformed[1],
-            z=xformed[2],
+            x=xformed[0] + module_offset.x,
+            y=xformed[1] + module_offset.y,
+            z=xformed[2] + module_offset.z,
         )
 
     def get_overall_height(self, module_id: str) -> float:

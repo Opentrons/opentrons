@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
-from opentrons.types import MountType
+from opentrons.types import MountType, Point
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
@@ -69,12 +69,21 @@ class CalibrateModuleImplementation(
         ot3_mount = OT3Mount.from_mount(params.mount)
         slot = self._state_view.modules.get_location(params.moduleId).slotName.as_int()
         module_serial = self._state_view.modules.get_serial_number(params.moduleId)
+
         # NOTE (ba, 2023-03-31): There are two wells for calibration labware definitions
         # well A1 represents the location calibration square center relative to the adapters bottom-left corner
         # well B1 represents the location of the calibration square probe point relative to the adapters bottom-left corner.
-        nominal_position = self._state_view.geometry.get_well_position(
+        calibration_position = self._state_view.geometry.get_well_position(
             labware_id=params.labwareId, well_name="B1"
         )
+        # Subtract the module offset included in get_well_position for new calibration
+        current_offset = self._state_view.modules.get_raw_module_offset(params.moduleId)
+        nominal_position = Point(
+            x=calibration_position.x - current_offset.x,
+            y=calibration_position.y - current_offset.y,
+            z=calibration_position.z - current_offset.z,
+        )
+
         # start the calibration
         module_offset = await calibration.calibrate_module(
             ot3_api, ot3_mount, slot, module_serial, nominal_position
