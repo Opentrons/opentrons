@@ -19,7 +19,8 @@ export function Gallery(props: GalleryProps): JSX.Element {
     <RobotWorkSpace
       key="center"
       viewBox={`0 0 ${dims.xDimension} ${dims.yDimension}`}
-      className={styles.robot_workspace}
+      width="100%"
+      height="100%"
     >
       {() => <LabwareRender definition={definition} />}
     </RobotWorkSpace>

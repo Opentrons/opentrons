@@ -75,15 +75,4 @@ describe('OverflowBtn', () => {
       }
     )
   })
-
-  it('renders a clickable button for odd with the correct icon', () => {
-    const handleClick = jest.fn()
-    const { getByRole, getByLabelText } = render({
-      onClick: handleClick,
-      isOnDevice: true,
-    })
-    getByLabelText('OverflowBtn_OnDeviceDisplay_icon')
-    getByRole('button').click()
-    expect(handleClick).toHaveBeenCalledTimes(1)
-  })
 })

@@ -92,9 +92,8 @@ describe('networking wifiConfigureEpic', () => {
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
-      expectObservable(output$).toBe('--(ab)', {
-        a: Actions.fetchWifiList(mocks.robot.name),
-        b: Discovery.startDiscovery(),
+      expectObservable(output$).toBe('--(a)', {
+        a: Discovery.startDiscovery(),
       })
     })
   })

@@ -32,18 +32,20 @@ export function RobotDashboard(): JSX.Element {
   const runData = runs.data?.data != null ? runs.data?.data : []
 
   /** Currently the max number of displaying recent run protocol is 8 */
-  const sortedProtocols = sortProtocols(SORT_KEY, protocolsData, runData).slice(
-    0,
-    MAXIMUM_RECENT_RUN_PROTOCOLS
-  )
+  const sortedProtocols =
+    protocolsData.length > 0
+      ? sortProtocols(SORT_KEY, protocolsData, runData).slice(
+          0,
+          MAXIMUM_RECENT_RUN_PROTOCOLS
+        )
+      : []
+
   return (
-    <Flex padding={`0 ${SPACING.spacingXXL}`} flexDirection={DIRECTION_COLUMN}>
+    <Flex paddingX={SPACING.spacingXXL} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {sortedProtocols.length === 0 ? (
-          <>
-            <EmptyRecentRun />
-          </>
+          <EmptyRecentRun />
         ) : (
           <>
             <StyledText

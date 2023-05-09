@@ -81,7 +81,7 @@ class LiquidHandler(
         """
         ...
 
-    async def blow_out(self, mount: Mount) -> None:
+    async def blow_out(self, mount: Mount, volume: Optional[float] = None) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette

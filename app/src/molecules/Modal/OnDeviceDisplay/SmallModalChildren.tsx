@@ -32,14 +32,14 @@ export function SmallModalChildren(
         <StyledText
           color={COLORS.darkBlackEnabled}
           fontSize={TYPOGRAPHY.fontSize28}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight36}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {header}
         </StyledText>
         <StyledText
-          color={COLORS.darkBlack_ninety}
+          color={COLORS.darkBlack90}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}

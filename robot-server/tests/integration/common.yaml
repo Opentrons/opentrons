@@ -6,3 +6,4 @@ variables:
   # These must match the session_server_host and session_server_port fixtures in conftest.py.
   host: http://localhost
   port: 31950
+  port_ot3: 31960

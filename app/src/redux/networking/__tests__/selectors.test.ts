@@ -1,5 +1,4 @@
 import noop from 'lodash/noop'
-import * as Discovery from '../../discovery'
 import * as Selectors from '../selectors'
 import * as Constants from '../constants'
 import * as Fixtures from '../__fixtures__'
@@ -8,10 +7,6 @@ import type { State } from '../../types'
 
 jest.mock('../../config/selectors')
 jest.mock('../../discovery/selectors')
-
-const getRobotApiVersionByName = Discovery.getRobotApiVersionByName as jest.MockedFunction<
-  typeof Discovery.getRobotApiVersionByName
->
 
 interface SelectorSpec {
   name: string
@@ -137,82 +132,6 @@ describe('robot settings selectors', () => {
       },
     },
     {
-      name: 'getWifiList returns [] if unavailable',
-      selector: Selectors.getWifiList,
-      state: {
-        networking: {},
-      } as any,
-      args: ['robotName'],
-      expected: [],
-    },
-    {
-      name: 'getWifiList returns wifiList from state',
-      selector: Selectors.getWifiList,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [Fixtures.mockWifiNetwork],
-          },
-        },
-      } as any,
-      args: ['robotName'],
-      expected: [Fixtures.mockWifiNetwork],
-    },
-    {
-      name: 'getWifiList dedupes duplicate SSIDs',
-      selector: Selectors.getWifiList,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [Fixtures.mockWifiNetwork, Fixtures.mockWifiNetwork],
-          },
-        },
-      } as any,
-      args: ['robotName'],
-      expected: [Fixtures.mockWifiNetwork],
-    },
-    {
-      name: 'getWifiList sorts by active then ssid',
-      selector: Selectors.getWifiList,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [
-              { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
-              { ...Fixtures.mockWifiNetwork, ssid: 'aaa' },
-              { ...Fixtures.mockWifiNetwork, active: true, ssid: 'zzz' },
-            ],
-          },
-        },
-      } as any,
-      args: ['robotName'],
-      expected: [
-        { ...Fixtures.mockWifiNetwork, active: true, ssid: 'zzz' },
-        { ...Fixtures.mockWifiNetwork, ssid: 'aaa' },
-        { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
-      ],
-    },
-    {
-      name: 'getWifiList sorts by active then ssid then dedupes',
-      selector: Selectors.getWifiList,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [
-              { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
-              { ...Fixtures.mockWifiNetwork, ssid: 'aaa' },
-              { ...Fixtures.mockWifiNetwork, active: true, ssid: 'aaa' },
-            ],
-          },
-        },
-      } as any,
-      args: ['robotName'],
-      expected: [
-        { ...Fixtures.mockWifiNetwork, active: true, ssid: 'aaa' },
-        { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
-      ],
-    },
-    {
       name: 'getWifiKeys returns [] if unavailable',
       selector: Selectors.getWifiKeys,
       state: {
@@ -296,86 +215,6 @@ describe('robot settings selectors', () => {
       } as any,
       args: ['robotName'],
       expected: [Fixtures.mockEapOption],
-    },
-    {
-      name: 'getCanDisconnect returns true if active network, robot >= 3.17',
-      selector: Selectors.getCanDisconnect,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
-          },
-        },
-      } as any,
-      args: ['robotName'],
-      before: ({ state: mockState }) => {
-        getRobotApiVersionByName.mockImplementation((state, robotName) => {
-          expect(state).toEqual(mockState)
-          expect(robotName).toEqual('robotName')
-          return '3.17.0'
-        })
-      },
-      expected: true,
-    },
-    {
-      name: 'getCanDisconnect returns false if no list in state',
-      selector: Selectors.getCanDisconnect,
-      state: {
-        networking: {},
-      },
-      args: ['robotName'],
-      before: ({ state: mockState }) => {
-        getRobotApiVersionByName.mockReturnValue('3.17.0')
-      },
-      expected: false,
-    },
-    {
-      name: 'getCanDisconnect returns false if no active network',
-      selector: Selectors.getCanDisconnect,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [{ ...Fixtures.mockWifiNetwork, active: false }],
-          },
-        },
-      },
-      args: ['robotName'],
-      before: ({ state: mockState }) => {
-        getRobotApiVersionByName.mockReturnValue('3.17.0')
-      },
-      expected: false,
-    },
-    {
-      name: 'getCanDisconnect returns false if less than 3.17.0',
-      selector: Selectors.getCanDisconnect,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
-          },
-        },
-      },
-      args: ['robotName'],
-      before: ({ state: mockState }) => {
-        getRobotApiVersionByName.mockReturnValue('3.16.999')
-      },
-      expected: false,
-    },
-    {
-      name: 'getCanDisconnect returns false if robot API version not found',
-      selector: Selectors.getCanDisconnect,
-      state: {
-        networking: {
-          robotName: {
-            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
-          },
-        },
-      },
-      args: ['robotName'],
-      before: ({ state: mockState }) => {
-        getRobotApiVersionByName.mockReturnValue(null)
-      },
-      expected: false,
     },
   ]
 

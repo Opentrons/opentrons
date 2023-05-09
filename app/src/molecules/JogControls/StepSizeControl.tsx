@@ -16,7 +16,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 
@@ -172,7 +172,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack_forty}`}
+      border={`1px solid ${COLORS.darkBlack40}`}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing4}
       gridGap={SPACING.spacing3}

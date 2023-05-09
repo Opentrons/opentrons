@@ -139,3 +139,14 @@ def test_get_current_temperature(
     decoy.when(mock_sync_module_hardware.temperature).then_return(36.5)
 
     assert subject.get_current_temperature() == 36.5
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: TemperatureModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

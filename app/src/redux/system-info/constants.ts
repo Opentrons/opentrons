@@ -23,11 +23,6 @@ export const USB_DEVICE_REMOVED: 'systemInfo:USB_DEVICE_REMOVED' =
 export const NETWORK_INTERFACES_CHANGED: 'systemInfo:NETWORK_INTERFACES_CHANGED' =
   'systemInfo:NETWORK_INTERFACES_CHANGED'
 
-// analytics events
-
-export const EVENT_U2E_DRIVER_ALERT_DISMISSED = 'u2eDriverAlertDismissed'
-export const EVENT_U2E_DRIVER_LINK_CLICKED = 'u2eDriverLinkClicked'
-
 // copy
 // TODO(mc, 2020-05-11): i18n
 export const U2E_DRIVER_OUTDATED_MESSAGE =

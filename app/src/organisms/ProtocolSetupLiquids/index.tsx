@@ -16,8 +16,8 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
-import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
@@ -41,11 +41,10 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <Flex>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('liquids')}
-        </BackButton>
-      </Flex>
+      <ODDBackButton
+        label={t('liquids')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing3}
@@ -78,7 +77,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.light_one}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_four}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
@@ -121,7 +120,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={COLORS.darkBlack_twenty}
+            backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
             padding={`${SPACING.spacing3} 0.75rem`}
