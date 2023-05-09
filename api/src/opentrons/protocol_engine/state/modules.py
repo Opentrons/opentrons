@@ -275,8 +275,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
         elif ModuleModel.is_magnetic_block(actual_model):
             self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
-                module_id=MagneticBlockId(module_id),
-                model=actual_model,
+                module_id=MagneticBlockId(module_id)
             )
 
     def _update_module_calibration(

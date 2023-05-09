@@ -3,9 +3,6 @@
 from dataclasses import dataclass
 from typing import NewType
 
-from opentrons.protocol_engine.types import MagneticBlockModel
-
-
 MagneticBlockId = NewType("MagneticBlockId", str)
 
 
@@ -13,9 +10,8 @@ MagneticBlockId = NewType("MagneticBlockId", str)
 class MagneticBlockSubState:
     """Magnetic Module specific state.
 
-    Provides calculations and read-only state access
+    Provides a read-only state access
     for an individual loaded Magnetic Block.
     """
 
     module_id: MagneticBlockId
-    model: MagneticBlockModel
