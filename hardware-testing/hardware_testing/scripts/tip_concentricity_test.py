@@ -149,7 +149,7 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
     AXIS = OT3Axis.Z_L
     COLUMNS = 12
     GAUGES = 5
-    DIAMETERS = [1.4, 1.9, 2.4, 2.9, 3.4]
+    DIAMETER = [1.4, 1.9, 2.4, 2.9, 3.4]
     CURRENT = 1.5
 
     test_pip = api.get_attached_instrument(mount)
@@ -163,7 +163,7 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
 
     test_name = "tip-concentricity-test"
 
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag])
+    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
     header = ['Test Robot', 'Pipette', 'Tip', 'Currrent (A)', 'Diameter (mm)', 'Column', 'Pass/Fail']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
@@ -174,9 +174,9 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
     tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE)
 
     for gauge in range(GAUGES):
-        print(f"Gauge: {gauge+1}, Diameter{DIAMETER[gauge]} mm\n")
+        print(f"Gauge: {gauge+1}, Diameter: {DIAMETER[gauge]} mm\n")
         print("Move to tip rack...\n")
-        await api.move_to(mount, tip_rack_position)
+        await api.move_to(mount, Point(tip_rack_position[OT3Axis.X], tip_rack_position[OT3Axis.Y], tip_rack_position[AXIS]))
         if gauge > 0 and input("Reposition? (y/n)\n\t>> ").lower() == 'y':
             cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
             tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE)
@@ -193,7 +193,7 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
             else:
                 cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.TIP)
                 await api.move_to(mount, Point(machined_cut_out_position[OT3Axis.X], machined_cut_out_position[OT3Axis.Y], cur_pos[AXIS]))
-                await api.move_to(mount, machined_cut_out_position)
+                await api.move_to(mount, Point(machined_cut_out_position[OT3Axis.X], machined_cut_out_position[OT3Axis.Y], machined_cut_out_position[AXIS]))
                 if input("Reposition? (y/n)\n\t>> ").lower() == 'y':
                     cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.TIP)
                     machined_cut_out_position = await jog(api, cur_pos, CriticalPoint.TIP)
@@ -201,13 +201,13 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
             result = input("Pass or fail?\n\t>> ")
             print("Moving up...\n")
             await api.move_rel(mount, delta=Point(z=50))
-            input("Remove tips. Press '\enter\' to continue.\n\t>> ")
+            input("Remove tips. Press \'enter\' to continue.\n\t>> ")
 
             cycle_data = [test_robot, test_pip, tip_type, CURRENT, DIAMETER[gauge], i+1, result]
             cycle_data_str = data.convert_list_to_csv_line(cycle_data)
             data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
 
-            if result.lower() = 'fail':
+            if result.lower() == 'fail':
                 sys.exit()
 
         if(gauge != 4):
