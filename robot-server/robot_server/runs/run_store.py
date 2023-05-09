@@ -204,13 +204,17 @@ class RunStore:
         return _convert_row_to_run(run_row, action_rows)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def get_all(self) -> List[RunResource]:
+    def get_all(self, length: int) -> List[RunResource]:
         """Get all known run resources.
 
         Returns:
             All stored run entries.
         """
-        select_runs = sqlalchemy.select(_run_columns)
+        select_runs = (
+            sqlalchemy.select(_run_columns)
+            .limit(length)
+            .order_by(run_table.c.created_at.desc())
+        )
         select_actions = sqlalchemy.select(action_table)
         actions_by_run_id = defaultdict(list)
 

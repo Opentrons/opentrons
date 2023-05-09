@@ -148,7 +148,7 @@ class RunDataManager:
 
         return _build_run(run_resource, state_summary, current)
 
-    def get_all(self) -> List[Run]:
+    def get_all(self, length: int) -> List[Run]:
         """Get current and stored run resources.
 
         Returns:
@@ -160,7 +160,7 @@ class RunDataManager:
                 state_summary=self._get_state_summary(run_resource.run_id),
                 current=run_resource.run_id == self._engine_store.current_run_id,
             )
-            for run_resource in self._run_store.get_all()
+            for run_resource in self._run_store.get_all(length)
         ]
 
     async def delete(self, run_id: str) -> None:

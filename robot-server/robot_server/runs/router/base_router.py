@@ -6,9 +6,9 @@ import logging
 from datetime import datetime
 from textwrap import dedent
 from typing import Optional, Union
-from typing_extensions import Literal
+from typing_extensions import Literal, Final
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -41,6 +41,8 @@ from ..dependencies import get_run_data_manager, get_run_auto_deleter
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
+
+_DEFAULT_RUNS_LIST_LENGTH: Final = 20
 
 
 class RunNotFound(ErrorDetails):
@@ -185,14 +187,19 @@ async def create_run(
     },
 )
 async def get_runs(
+    pageLength: int = Query(
+        _DEFAULT_RUNS_LIST_LENGTH,
+        description="The maximum number of commands in the list to return.",
+    ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
     """Get all runs.
 
     Args:
+        pageLength: Maximum number of items to return.
         run_data_manager: Current and historical run data management.
     """
-    data = run_data_manager.get_all()
+    data = run_data_manager.get_all(length=pageLength)
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
