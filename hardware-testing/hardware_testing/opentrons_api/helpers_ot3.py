@@ -652,40 +652,12 @@ class SensorResponseBad(Exception):
     pass
 
 
-async def get_capacitance_ot3(
-    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
-) -> float:
-    """Get the capacitance reading from the pipette."""
-    if api.is_simulator:
-        return 0.0
-    node_id = sensor_node_for_mount(mount)
-    if not channel or channel == "rear":
-        capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
-    elif channel == "front":
-        capacitive = sensor_types.CapacitiveSensor.build(SensorId.S1, node_id)
-    else:
-        raise ValueError(f"unexpected channel for capacitance sensor: {channel}")
-    s_driver = sensor_driver.SensorDriver()
-    data = await s_driver.read(
-        api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
-    )
-    if data is None:
-        raise SensorResponseBad("no response from sensor")
-    return data.to_float()  # type: ignore[union-attr]
-
-
 async def _get_temp_humidity(
     messenger: CanMessenger,
     mount: OT3Mount,
-    channel: Optional[str] = None,
+    sensor_id: Optional[SensorId] = SensorId.S0,
 ) -> Tuple[float, float]:
     node_id = sensor_node_for_mount(mount)
-    if not channel or channel == "rear":
-        sensor_id = SensorId.S0
-    elif channel == "front":
-        sensor_id = SensorId.S1
-    else:
-        raise ValueError(f"unexpected channel for pressure sensor: {channel}")
     environment = sensor_types.EnvironmentSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
@@ -699,19 +671,19 @@ async def _get_temp_humidity(
 async def get_temperature_humidity_ot3(
     api: OT3API,
     mount: OT3Mount,
-    channel: Optional[str] = None,
+    sensor_id: Optional[SensorId] = SensorId.S0,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
     messenger = api._backend._messenger  # type: ignore[union-attr]
-    return await _get_temp_humidity(messenger, mount, channel)
+    return await _get_temp_humidity(messenger, mount, sensor_id)
 
 
 def get_temperature_humidity_outside_api_ot3(
     mount: OT3Mount,
     is_simulating: bool = False,
-    channel: Optional[str] = None,
+    sensor_id: Optional[SensorId] = SensorId.S0,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette outside of a protocol."""
     settings = DriverSettings(
@@ -728,7 +700,7 @@ def get_temperature_humidity_outside_api_ot3(
         async with build.driver(settings) as driver:
             messenger = CanMessenger(driver=driver)
             messenger.start()
-            ret = await _get_temp_humidity(messenger, mount, channel)
+            ret = await _get_temp_humidity(messenger, mount, sensor_id)
             await messenger.stop()
             return ret
 
@@ -738,19 +710,31 @@ def get_temperature_humidity_outside_api_ot3(
     return task.result()
 
 
+async def get_capacitance_ot3(
+    api: OT3API, mount: OT3Mount, sensor_id: Optional[SensorId] = SensorId.S0
+) -> float:
+    """Get the capacitance reading from the pipette."""
+    if api.is_simulator:
+        return 0.0
+    node_id = sensor_node_for_mount(mount)
+    capacitive = sensor_types.CapacitiveSensor.build(sensor_id, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise SensorResponseBad("no response from sensor")
+    return data.to_float()  # type: ignore[union-attr]
+
+
 async def get_pressure_ot3(
-    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
+    api: OT3API, mount: OT3Mount, sensor_id: Optional[SensorId] = SensorId.S0
 ) -> float:
     """Get the pressure reading from the pipette."""
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
-    if not channel or channel == "rear":
-        pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
-    elif channel == "front":
-        pressure = sensor_types.PressureSensor.build(SensorId.S1, node_id)
-    else:
-        raise ValueError(f"unexpected channel for pressure sensor: {channel}")
+    pressure = sensor_types.PressureSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
         api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]

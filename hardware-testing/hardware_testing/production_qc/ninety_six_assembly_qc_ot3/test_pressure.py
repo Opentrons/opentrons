@@ -20,6 +20,8 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 
+SECONDS_BETWEEN_READINGS = 0.25
+NUM_PRESSURE_READINGS = 10
 TIP_VOLUME = 50
 ASPIRATE_VOLUME = 300
 PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
@@ -60,7 +62,7 @@ async def _read_from_sensor(
     api: OT3API,
     driver: sensor_driver.SensorDriver,
     sensor: sensor_types.PressureSensor,
-    num_readings: int = 10,
+    num_readings: int,
 ) -> float:
     readings: List[float] = []
     sequential_failures = 0
@@ -71,7 +73,7 @@ async def _read_from_sensor(
             readings.append(r)
             print(f"\t{r}")
             if not api.is_simulator:
-                await sleep(0.2)
+                await sleep(SECONDS_BETWEEN_READINGS)
         except helpers_ot3.SensorResponseBad as e:
             sequential_failures += 1
             if sequential_failures == 3:
@@ -96,7 +98,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         open_pa = 0.0
         if not api.is_simulator:
             try:
-                open_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+                open_pa = await _read_from_sensor(api, s_driver, pressure_sensor, NUM_PRESSURE_READINGS)
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 continue
@@ -112,7 +114,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
             ui.get_user_ready("SEAL tip using your FINGER")
             try:
-                sealed_pa = await _read_from_sensor(api, s_driver, pressure_sensor, 10)
+                sealed_pa = await _read_from_sensor(api, s_driver, pressure_sensor, NUM_PRESSURE_READINGS)
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
