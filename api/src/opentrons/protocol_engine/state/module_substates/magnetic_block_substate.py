@@ -1,4 +1,4 @@
-"""Magnetic module sub-state."""
+"""Magnetic block sub-state."""
 
 from dataclasses import dataclass
 from typing import NewType
