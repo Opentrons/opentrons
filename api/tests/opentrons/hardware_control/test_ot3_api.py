@@ -472,7 +472,13 @@ async def test_blow_out_position(
 
 @pytest.mark.parametrize("load_configs", load_blowout_configs)
 @given(blowout_volume=strategies.floats(min_value=0, max_value=300))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
+@settings(
+    suppress_health_check=[
+        HealthCheck.function_scoped_fixture,
+        HealthCheck.filter_too_much,
+    ],
+    max_examples=20,
+)
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
     load_configs: List[Dict[str, Any]],
