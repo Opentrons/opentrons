@@ -23,6 +23,7 @@ from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import (
     HardwareControlAPI,
     OT2HardwareControlAPI,
+    API,
     CriticalPoint,
     Pipette,
 )
@@ -88,7 +89,7 @@ def tuplefy_cal_point_dicts(
 
 class DeckCalibrationUserFlow:
     def __init__(self, hardware: HardwareControlAPI):
-        if not isinstance(hardware, OT2HardwareControlAPI):
+        if not isinstance(hardware, API):
             raise HardwareNotSupportedError("This command is supported by OT-2 only.")
         self._hardware = cast(OT2HardwareControlAPI, hardware)
         self._hw_pipette, self._mount = self._select_target_pipette()
