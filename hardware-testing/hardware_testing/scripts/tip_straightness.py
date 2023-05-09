@@ -44,6 +44,62 @@ from opentrons.config.types import (
     CapacitivePassSettings,
 )
 
+
+def plate_definition(target_hole):
+    starting_hole_mm_x = 14.33
+    starting_hole_mm_y = 11.2
+    columns = 12
+    rows = 4
+    x_spacing = 9
+    y_spacing = 18
+    lookup_holes = {'1':(0,0),
+                    '2':(0,1),
+                    '3':(0,2),
+                    '4':(0,3),
+                    '5':(0,4),
+                    '6':(0,5),
+                    '7':(0,6),
+                    '8':(0,7),
+                    '9':(0,8),
+                    '10':(0,9),
+                    '11':(0,10),
+                    '12':(0,11),
+                    '13':(1,0),
+                    '14':(1,1),
+                    '15':(1,2),
+                    '16':(1,3),
+                    '17':(1,4),
+                    '18':(1,5),
+                    '19':(1,6),
+                    '20':(1,7),
+                    '21':(1,8),
+                    '22':(1,9),
+                    '23':(1,10),
+                    '24':(1,11),
+                    '25':(2,0),
+                    '26':(2,1),
+                    '27':(2,2),
+                    '28':(2,3),
+                    '29':(2,4),
+                    '30':(2,5),
+                    '31':(2,6),
+                    '32':(2,7),
+                    '33':(2,8),
+                    '34':(2,9),
+                    '35':(2,10),
+                    '36':(2,11),
+                    '37':(3,0),
+                    '39':(3,2),
+                    '41':(3,4),
+                    '43':(3,6),
+                    '45':(3,8),
+                    '47':(3,10),
+                    }
+
+    calculate_x_distance = lookup_holes[str(target_hole)][1]*x_spacing + starting_hole_mm_x
+    calculate_y_distance = lookup_holes[str(target_hole)][0]*y_spacing + starting_hole_mm_y
+    return Point(calculate_x_distance, calculate_y_distance, 0)
+
 def getch():
     """
     fd: file descriptor stdout, stdin, stderr
@@ -81,7 +137,7 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
                     """
-    print(information_str)
+    # print(information_str)
     while True:
         input = getch()
         if input == "a":
@@ -195,7 +251,7 @@ async def z_calibrate_gage_block(api, mount, probe_axis, cp, capacitive_settings
             mount = mount,
             moving_axis = probe_axis,
             target_pos = gage_block['Z'] - gage_block['offset'],
-            direction = 1.0,
+            direction = -1.0,
             pass_settings = capacitive_settings
     )
     z_measured_gage_location = await api.encoder_current_position_ot3(mount, cp)
@@ -243,7 +299,7 @@ async def xy_calibrate_gage_block(api, mount, probe_axis, cp, capacitive_setting
             mount = mount,
             moving_axis = probe_axis,
             target_pos = gage_block[probe_axis.name] - gage_block['offset'],
-            direction = -1.0,
+            direction = 1.0,
             pass_settings = capacitive_settings
     )
     measured_gage_location_1 = await api.encoder_current_position_ot3(mount, cp)
@@ -284,7 +340,7 @@ async def xy_calibrate_gage_block(api, mount, probe_axis, cp, capacitive_setting
             mount = mount,
             moving_axis = probe_axis,
             target_pos = gage_block[probe_axis.name] + gage_block['offset'],
-            direction = 1.0,
+            direction = -1.0,
             pass_settings = capacitive_settings
     )
 
@@ -311,6 +367,8 @@ async def xy_calibrate_gage_block(api, mount, probe_axis, cp, capacitive_setting
     await api.move_to(mount, coordinates)
 
     return measured_gage_location_1[probe_axis], measured_gage_location_2[probe_axis]
+
+
 
 async def _main() -> None:
     today = datetime.date.today()
@@ -348,6 +406,7 @@ async def _main() -> None:
                 "pipette_model": None}
     # m_current = float(input("motor_current in amps: "))
     # pick_up_speed = float(input("pick up tip speed in mm/s: "))
+    pick_up_speed = 10
     # details = [pipette_model, m_current]
     await home_ot3(hw_api, [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.X, OT3Axis.Y])
     await hw_api.home_plunger(mount)
@@ -363,72 +422,32 @@ async def _main() -> None:
     elif args.tip_size == "T50":
         home_with_tip_position = 192.1  # T50
 
-    if args.tiprack:
-        await hw_api.move_to(
-            mount,
-            Point(
-                slot_loc["B2"][0],
-                slot_loc["B2"][1],
-                home_position[OT3Axis.by_mount(mount)],
-            ),
-        )
-        cp = CriticalPoint.NOZZLE
-        print("Move to Tiprack")
-        current_position = await hw_api.current_position_ot3(mount)
-        tiprack_loc = await jog(hw_api, current_position, cp)
-        # Start recording the encoder
-        init_tip_loc = await hw_api.encoder_current_position_ot3(
-            mount, CriticalPoint.NOZZLE
-        )
-        print(f"Start encoder: {init_tip_loc}")
-        init_tip_loc = init_tip_loc[OT3Axis.by_mount(mount)]
-        encoder_position = init_tip_loc
-        init_tip_loc = await hw_api.encoder_current_position_ot3(
-            mount, CriticalPoint.NOZZLE
-        )
-        await update_pick_up_current(hw_api, mount, m_current)
-        await update_pickup_tip_speed(hw_api, mount, pick_up_speed)
-        # Move pipette to Force Gauge press location
-        final_tip_loc = await hw_api.pick_up_tip(
-            mount, tip_length=tip_length[args.tip_size]
-        )
-        await home_ot3(hw_api, [OT3Axis.by_mount(mount)])
-        home_with_tip_position = await hw_api.current_position_ot3(mount, critical_point= CriticalPoint.TIP)
-        await hw_api.move_to(
-            mount,
-            Point(
-                current_position[OT3Axis.X],
-                current_position[OT3Axis.Y],
-                home_with_tip_position[OT3Axis.by_mount(mount)],
-            ),
-            critical_point=CriticalPoint.TIP,
-        )
-
-        encoder_end = final_tip_loc[OT3Axis.by_mount(mount)]
-        # final_tip_loc = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
-        print(f"End Encoder: {final_tip_loc}")
-        final_tip_loc = final_tip_loc[OT3Axis.by_mount(mount)]
-        location = "Tiprack"
-        tip_count = 1
-        test_details = [start_time, m_current, location, init_tip_loc, final_tip_loc, tip_count]
-        tiprack_loc = [
-            tiprack_loc[OT3Axis.X],
-            tiprack_loc[OT3Axis.Y],
-            tiprack_loc[OT3Axis.by_mount(mount)],
-        ]
-
     xy_probe_settings = CapacitivePassSettings(
-        prep_distance_mm= 0.5,
+        prep_distance_mm= 0.6,
         max_overrun_distance_mm= args.max_overrun_distance_mm, # 8
         speed_mm_per_s= args.probe_speed,
-        sensor_threshold_pf= args.sensor_threshold_pf,
+        sensor_threshold_pf= args.probe_threshold_pf,
         )
     z_probe_settings = CapacitivePassSettings(
-        prep_distance_mm = 0.5,
+        prep_distance_mm = 0.6,
         max_overrun_distance_mm = args.max_overrun_distance_mm,
         speed_mm_per_s = args.probe_speed,
-        sensor_threshold_pf = args.sensor_threshold_pf
+        sensor_threshold_pf = args.probe_threshold_pf
     )
+
+    xy_nozzle_settings = CapacitivePassSettings(
+        prep_distance_mm= 0.6,
+        max_overrun_distance_mm= args.max_overrun_distance_mm, # 8
+        speed_mm_per_s= args.probe_speed,
+        sensor_threshold_pf= args.nozzle_threshold_pf,
+        )
+    z_nozzle_settings = CapacitivePassSettings(
+        prep_distance_mm = 0.6,
+        max_overrun_distance_mm = args.max_overrun_distance_mm,
+        speed_mm_per_s = args.probe_speed,
+        sensor_threshold_pf = args.nozzle_threshold_pf
+    )
+
     nominal_center = get_calibration_square_position_in_slot(8)
     print(f"Nominal Center: {nominal_center}")
     # Retract distance
@@ -438,119 +457,224 @@ async def _main() -> None:
     x_offset = 0
     y_offset = 0
     try:
-        await hw_api.move_to(
-            mount,
-            Point(
-                nominal_center.x,
-                nominal_center.y,
-                home_position[OT3Axis.by_mount(mount)],
-            ),
-        )
-        cp = CriticalPoint.NOZZLE
-        print("Move to left edge of the gage block.")
-        current_position = await hw_api.current_position_ot3(mount)
-        x_gage_block_mm = 9.2
-        nozzle_nominal_diameter = 5.15
-        tolerance = 2
-        x_offset_from_center = x_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
-        gage_block_settings = {'X': nominal_center.x,
-                        'Y': nominal_center.y,
-                        'Z': nominal_center.z,
-                        'offset': x_offset_from_center}
-        # Find the X edges of the gage block
-        x_minus, x_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.X, cp, xy_probe_settings, gage_block_settings)
-        x_measured_gage = (x_plus - nozzle_nominal_diameter/2) - (x_minus + nozzle_nominal_diameter/2)
-        print("Measured Gage: ", x_measured_gage)
-        tolerance = 2
-        y_gage_block_mm = 3.32
-        y_offset_from_center = y_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
-        gage_block_settings = {'X': nominal_center.x,
-                        'Y': nominal_center.y,
-                        'Z': nominal_center.z,
-                        'offset': y_offset_from_center}
-        # find the y edges of the gage block
-        y_minus, y_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.Y, cp, xy_probe_settings, gage_block_settings)
-        y_measured_gage = (y_plus - nozzle_nominal_diameter/2) - (y_minus + nozzle_nominal_diameter/2)
-        print("Measured Gage: ", y_measured_gage)
-
-        current_position = await hw_api.current_position_ot3(mount)
-        await hw_api.move_to(mount,
-                                Point( current_position[OT3Axis.X],
-                                        current_position[OT3Axis.Y],
-                                        current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
-        center_x = (x_plus - nozzle_nominal_diameter/2) - x_measured_gage/2
-        center_y = (y_plus - nozzle_nominal_diameter/2) - y_measured_gage/2
-        await hw_api.move_to(mount,
-                                Point( center_x,
-                                        center_y,
-                                        current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
-        tolerance = 2
-        z_offset_from_center = z_retract_mm + tolerance
-        calibrated_height = 50
-        gage_block_settings = {'X': center_x,
-                        'Y': center_y,
-                        'Z': calibrated_height,
-                        'offset': z_offset_from_center}
-
-        z_measured_gage = await z_calibrate_gage_block(hw_api, mount,
-                            OT3Axis.by_mount(mount),
-                            cp, z_probe_settings, gage_block_settings)
-
-        await hw_api.home_z(mount)
-        input("Insert the Probe Attachment")
-        # ------------------------------Probe attachment-----------------------
-        x_gage_block_mm = 9.2
-        nozzle_nominal_diameter = 4.0
-        tolerance = 3
-        x_offset_from_center = x_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
-        gage_block_settings = {'X': nominal_center.x,
-                        'Y': nominal_center.y,
-                        'Z': nominal_center.z,
-                        'offset': x_offset_from_center}
-        # Find the X edges of the gage block
-        x_minus, x_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.X, cp, xy_probe_settings, gage_block_settings)
-        measured_gage = (x_plus - nozzle_nominal_diameter/2) - (x_minus + nozzle_nominal_diameter/2)
-        print("Measured Gage probe: ", measured_gage)
-        tolerance = 2
-        y_gage_block_mm = 3.32
-        y_offset_from_center = y_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
-        gage_block_settings = {'X': nominal_center.x,
-                        'Y': nominal_center.y,
-                        'Z': nominal_center.z,
-                        'offset': y_offset_from_center}
-        # find the y edges of the gage block
-        y_minus, y_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.Y, cp, xy_probe_settings, gage_block_settings)
-        measured_gage = (y_plus - nozzle_nominal_diameter/2) - (y_minus + nozzle_nominal_diameter/2)
-        print("Measured Gage probe: ", measured_gage)
-
-        current_position = await hw_api.current_position_ot3(mount)
-        await hw_api.move_to(mount,
-                                Point( current_position[OT3Axis.X],
-                                        current_position[OT3Axis.Y],
-                                        current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
-        center_x = (x_plus - nozzle_nominal_diameter/2) - x_measured_gage/2
-        center_y = (y_plus - nozzle_nominal_diameter/2) - y_measured_gage/2
-        await hw_api.move_to(mount,
-                                Point( center_x,
-                                        center_y,
-                                        current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
-        tolerance = 2
-        z_offset_from_center = z_retract_mm + tolerance
-        calibrated_height = 50
-        gage_block_settings = {'X': center_x,
-                        'Y': center_y,
-                        'Z': calibrated_height,
-                        'offset': z_offset_from_center}
-
-        z_measured_gage = await z_calibrate_gage_block(hw_api, mount,
-                            OT3Axis.by_mount(mount),
-                            cp, z_probe_settings, gage_block_settings)
-
+        # await hw_api.move_to(
+        #     mount,
+        #     Point(
+        #         nominal_center.x,
+        #         nominal_center.y,
+        #         home_position[OT3Axis.by_mount(mount)],
+        #     ),
+        # )
+        # cp = CriticalPoint.NOZZLE
+        # print("Move to left edge of the gage block.")
+        # current_position = await hw_api.current_position_ot3(mount)
+        # x_gage_block_mm = 9.2
+        # nozzle_nominal_diameter = 5.15
+        # tolerance = 2
+        # x_offset_from_center = x_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
+        # gage_block_settings = {'X': nominal_center.x,
+        #                 'Y': nominal_center.y,
+        #                 'Z': nominal_center.z,
+        #                 'offset': x_offset_from_center}
+        # # Find the X edges of the gage block
+        # x_minus, x_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.X, cp, xy_nozzle_settings, gage_block_settings)
+        # x_measured_gage = (x_plus - nozzle_nominal_diameter/2) - (x_minus + nozzle_nominal_diameter/2)
+        # print("X-Measured Gage: ", x_measured_gage)
+        # center_x = (x_plus - nozzle_nominal_diameter/2) - x_measured_gage/2
+        # current_position = await hw_api.current_position_ot3(mount)
+        # await hw_api.move_to(mount,
+        #                         Point(  center_x,
+        #                                 current_position[OT3Axis.Y],
+        #                                 current_position[OT3Axis.by_mount(mount)]))
+        # tolerance = 2
+        # y_gage_block_mm = 3.32
+        # y_offset_from_center = y_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
+        # gage_block_settings = {'X': nominal_center.x,
+        #                 'Y': nominal_center.y,
+        #                 'Z': nominal_center.z,
+        #                 'offset': y_offset_from_center}
+        # # find the y edges of the gage block
+        # y_minus, y_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.Y, cp, xy_nozzle_settings, gage_block_settings)
+        # y_measured_gage = (y_plus - nozzle_nominal_diameter/2) - (y_minus + nozzle_nominal_diameter/2)
+        # print("Y-Measured Gage: ", y_measured_gage)
+        # current_position = await hw_api.current_position_ot3(mount)
+        # await hw_api.move_to(mount,
+        #                         Point( current_position[OT3Axis.X],
+        #                                 current_position[OT3Axis.Y],
+        #                                 current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
+        # center_x = (x_plus - nozzle_nominal_diameter/2) - x_measured_gage/2
+        # center_y = (y_plus - nozzle_nominal_diameter/2) - y_measured_gage/2
+        # await hw_api.move_to(mount,
+        #                         Point( center_x,
+        #                                 center_y,
+        #                                 current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
+        # tolerance = 2
+        # z_offset_from_center = z_retract_mm + tolerance
+        # calibrated_height = 50
+        # gage_block_settings = {'X': center_x,
+        #                 'Y': center_y,
+        #                 'Z': calibrated_height,
+        #                 'offset': z_offset_from_center}
+        #
+        # z_measured_gage = await z_calibrate_gage_block(hw_api, mount,
+        #                     OT3Axis.by_mount(mount),
+        #                     cp, z_nozzle_settings, gage_block_settings)
+        # print("Z measured gage: ", z_measured_gage)
+        # await hw_api.home_z(mount)
+        # input("Insert the Probe Attachment")
+        # # ------------------------------Probe attachment-----------------------
+        # x_gage_block_mm = 9.2
+        # nozzle_nominal_diameter = 4.0
+        # tolerance = 3
+        # x_offset_from_center = x_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
+        # gage_block_settings = {'X': nominal_center.x,
+        #                 'Y': nominal_center.y,
+        #                 'Z': nominal_center.z,
+        #                 'offset': x_offset_from_center}
+        # # Find the X edges of the gage block
+        # x_minus, x_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.X, cp, xy_probe_settings, gage_block_settings)
+        # probe_x_measured_gage = (x_plus - nozzle_nominal_diameter/2) - (x_minus + nozzle_nominal_diameter/2)
+        # print("X-Measured Gage probe: ", probe_x_measured_gage)
+        # probe_x_center =  (x_plus - nozzle_nominal_diameter/2) - probe_x_measured_gage/2
+        # current_position = await hw_api.current_position_ot3(mount)
+        # await hw_api.move_to(mount,
+        #                         Point(  probe_x_center,
+        #                                 current_position[OT3Axis.Y],
+        #                                 current_position[OT3Axis.by_mount(mount)]))
+        # await hw_api.move_to(mount,
+        #                         Point(  probe_x_center,
+        #                                 current_position[OT3Axis.Y] - 10,
+        #                                 current_position[OT3Axis.by_mount(mount)]))
+        # tolerance = 2
+        # y_gage_block_mm = 3.32
+        # y_offset_from_center = y_gage_block_mm/2 + nozzle_nominal_diameter/2 + tolerance
+        # gage_block_settings = {'X': nominal_center.x,
+        #                 'Y': nominal_center.y,
+        #                 'Z': nominal_center.z,
+        #                 'offset': y_offset_from_center}
+        # # find the y edges of the gage block
+        # y_minus, y_plus = await xy_calibrate_gage_block(hw_api, mount, OT3Axis.Y, cp, xy_probe_settings, gage_block_settings)
+        # probe_y_measured_gage = (y_plus - nozzle_nominal_diameter/2) - (y_minus + nozzle_nominal_diameter/2)
+        # print("Y-Measured Gage probe: ", probe_y_measured_gage)
+        # probe_y_center = (y_plus - nozzle_nominal_diameter/2) - probe_y_measured_gage/2
+        # current_position = await hw_api.current_position_ot3(mount)
+        # await hw_api.move_to(mount,
+        #                         Point( current_position[OT3Axis.X],
+        #                                 current_position[OT3Axis.Y],
+        #                                 current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
+        # center_x = (x_plus - nozzle_nominal_diameter/2) - x_measured_gage/2
+        # center_y = (y_plus - nozzle_nominal_diameter/2) - y_measured_gage/2
+        # await hw_api.move_to(mount,
+        #                         Point( center_x,
+        #                                 center_y,
+        #                                 current_position[OT3Axis.by_mount(mount)] + z_retract_mm))
+        # tolerance = 2
+        # z_offset_from_center = z_retract_mm + tolerance
+        # calibrated_height = 50
+        # gage_block_settings = {'X': center_x,
+        #                 'Y': center_y,
+        #                 'Z': calibrated_height,
+        #                 'offset': z_offset_from_center}
+        #
+        # z_measured_gage = await z_calibrate_gage_block(hw_api, mount,
+        #                     OT3Axis.by_mount(mount),
+        #                     cp, z_probe_settings, gage_block_settings)
+        # print("Z-Measured Gage", z_measured_gage)
         # --------------------------Deck Slot Calibration -------------------------
-        input("Press Enter to find the deck slot center")
         expected = get_calibration_square_position_in_slot(slot=5)  # or any other slot
+        print(expected)
+        expected = Point(expected.x, expected.y, expected.z + 44.5)
         found_z= await find_calibration_structure_height(hw_api, mount, expected)
         found_xyz = await find_slot_center_binary(hw_api, mount, expected._replace(z=found_z))
+        print(found_xyz)
+        await hw_api.home_z(mount)
+        input("remove probe attachment")
+        if args.tiprack:
+            await hw_api.move_to(
+                mount,
+                Point(
+                    slot_loc["B1"][0],
+                    slot_loc["B1"][1],
+                    home_position[OT3Axis.by_mount(mount)],
+                ),
+            )
+            cp = CriticalPoint.NOZZLE
+            print("Move to Tiprack")
+            current_position = await hw_api.current_position_ot3(mount)
+            tiprack_loc = await jog(hw_api, current_position, cp)
+            # Start recording the encoder
+            init_tip_loc = await hw_api.encoder_current_position_ot3(
+                mount, CriticalPoint.NOZZLE
+            )
+            print(f"Start encoder: {init_tip_loc}")
+            init_tip_loc = init_tip_loc[OT3Axis.by_mount(mount)]
+            encoder_position = init_tip_loc
+            init_tip_loc = await hw_api.encoder_current_position_ot3(
+                mount, CriticalPoint.NOZZLE
+            )
+            # await update_pick_up_current(hw_api, mount, m_current)
+            await update_pickup_tip_speed(hw_api, mount, pick_up_speed)
+            # pick up tip
+            final_tip_loc = await hw_api.pick_up_tip(
+                mount, tip_length=tip_length[args.tip_size]
+            )
+            await home_ot3(hw_api, [OT3Axis.by_mount(mount)])
+            home_with_tip_position = await hw_api.current_position_ot3(mount, critical_point= CriticalPoint.TIP)
+            home_with_tip_position = home_with_tip_position[OT3Axis.by_mount(mount)]
+            await hw_api.move_to(
+                mount,
+                Point(
+                    current_position[OT3Axis.X],
+                    current_position[OT3Axis.Y],
+                    home_with_tip_position,
+                ),
+                critical_point=CriticalPoint.TIP,
+            )
+
+            encoder_end = final_tip_loc[OT3Axis.by_mount(mount)]
+            final_tip_loc = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
+            print(f"End Encoder: {final_tip_loc}")
+            final_tip_loc = final_tip_loc[OT3Axis.by_mount(mount)]
+            location = "Tiprack"
+            tip_count = 1
+            # test_details = [start_time, m_current, location, init_tip_loc, final_tip_loc, tip_count]
+            tiprack_loc = [
+                tiprack_loc[OT3Axis.X],
+                tiprack_loc[OT3Axis.Y],
+                tiprack_loc[OT3Axis.by_mount(mount)],
+            ]
+        cp = CriticalPoint.TIP
+        current_position = await hw_api.current_position_ot3(mount, cp)
+        hole_location = plate_definition(16)
+        plate_tolerance = 1
+        plate_thickness = 3.0 + plate_tolerance
+        dimensions_plate = Point(127.75, 85.5, tip_length[args.tip_size] + plate_thickness)
+        edge_location = Point(found_xyz.x - dimensions_plate.x/2,
+                        found_xyz.y + dimensions_plate.y/2,
+                        found_xyz.z + dimensions_plate.z)
+        await hw_api.move_to(mount, Point(
+                                    edge_location.x,
+                                    edge_location.y,
+                                    current_position[OT3Axis.by_mount(mount)]
+                                    ),
+                                    critical_point = cp)
+
+        await hw_api.move_to(mount, Point(edge_location.x,
+                                    edge_location.y,
+                                    home_with_tip_position - edge_location.z),
+                                    critical_point = cp)
+        while True:
+            hole_val = input("Which hole: ")
+            hole_location = plate_definition(hole_val)
+            hole = Point(hole_location.x,
+                        hole_location.y,
+                        home_with_tip_position - edge_location.z)
+            await hw_api.move_to(mount, Point(
+                        edge_location.x + hole.x,
+                        edge_location.y - hole.y,
+                        hole.z))
+            current_position = await hw_api.current_position_ot3(mount, cp)
+            await jog(hw_api, current_position, cp)
 
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     except KeyboardInterrupt:
@@ -580,11 +704,12 @@ if __name__ == "__main__":
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=2)
-    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
     parser.add_argument("--prep_distance_mm", type = float, default = 5, help="Prep Probe Distance")
     parser.add_argument("--max_overrun_distance_mm", type = float, default = 6, help = "Max Probe Distance")
     parser.add_argument("--probe_speed", type = int, default = 0.3, help = "Probe Speed")
-    parser.add_argument("--sensor_threshold_pf", type = float, default = 0.9, help = "capacitive sensor threshold")
+    parser.add_argument("--probe_threshold_pf", type = float, default = 3.0, help = "capacitive probe threshold")
+    parser.add_argument("--nozzle_threshold_pf", type = float, default = 0.6, help = "capacitive Nozzle threshold")
 
     args = parser.parse_args()
     if args.mount == "left":
