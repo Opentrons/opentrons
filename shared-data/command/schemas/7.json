@@ -30,6 +30,9 @@
       "$ref": "#/definitions/DropTipCreate"
     },
     {
+      "$ref": "#/definitions/DropTipInPlaceCreate"
+    },
+    {
       "$ref": "#/definitions/HomeCreate"
     },
     {
@@ -731,6 +734,54 @@
         },
         "params": {
           "$ref": "#/definitions/DropTipParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "DropTipInPlaceParams": {
+      "title": "DropTipInPlaceParams",
+      "description": "Payload required to drop a tip in place.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "homeAfter": {
+          "title": "Homeafter",
+          "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
+          "type": "boolean"
+        }
+      },
+      "required": ["pipetteId"]
+    },
+    "DropTipInPlaceCreate": {
+      "title": "DropTipInPlaceCreate",
+      "description": "Drop tip in place command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "dropTipInPlace",
+          "enum": ["dropTipInPlace"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/DropTipInPlaceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
