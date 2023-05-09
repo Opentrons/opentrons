@@ -88,7 +88,7 @@ describe('DisplayWifiList', () => {
   })
 
   it('should call mock functions when back', () => {
-    const [{ getByRole, getByTestId }] = render(props)
+    const [{ getByTestId }] = render(props)
     const button = getByTestId('back-button')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
