@@ -1,30 +1,35 @@
+/**
+ * A custom hook that detects whether an HTMLElement is being scrolled.
+ *
+ * @param {RefObject<HTMLElement>} ref - A ref object containing the HTMLElement to monitor for scrolling.
+ * @returns {boolean} - A boolean indicating whether the HTMLElement is being scrolled.
+ */
 import { useState, useEffect, RefObject } from 'react'
 
-export const useScrolling = (ref: RefObject<HTMLElement>): boolean => {
+export function useScrolling(ref: RefObject<HTMLElement>): boolean {
   const [isScrolling, setIsScrolling] = useState<boolean>(false)
 
   useEffect(() => {
-    const element = ref.current
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null
+    const currentRef = ref.current // Copy ref.current to a variable
 
-    if (element != null) {
-      let scrollingTimeout: ReturnType<typeof setTimeout>
-
-      const handleScrollEnd = (): void => {
-        setIsScrolling(false)
-      }
-
-      const handleScroll = (): void => {
+    if (currentRef != null) {
+      currentRef.addEventListener('scroll', () => {
+        if (scrollTimeout !== null) clearTimeout(scrollTimeout)
         setIsScrolling(true)
-        clearTimeout(scrollingTimeout)
-        scrollingTimeout = setTimeout(handleScrollEnd, 200)
-      }
+        scrollTimeout = setTimeout(function () {
+          setIsScrolling(false)
+        }, 100)
+      })
+    }
 
-      element.addEventListener('scroll', handleScroll)
-      return () => {
-        element.removeEventListener('scroll', handleScroll)
+    return () => {
+      if (currentRef != null) {
+        currentRef.removeEventListener('scroll', e => {
+          setIsScrolling(false)
+        })
       }
     }
-    return () => {}
   }, [ref])
 
   return isScrolling
