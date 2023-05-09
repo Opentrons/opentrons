@@ -40,7 +40,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
       top="2.6rem"
-      right={`calc(50% + ${String(SPACING.spacing4)})`}
+      right={`calc(50% + ${SPACING.spacing4})`}
       flexDirection={DIRECTION_COLUMN}
       width="max-content"
     >

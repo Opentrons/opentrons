@@ -22,8 +22,8 @@ describe('Divider', () => {
       `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
     )
     expect(divider).toHaveStyle('width: 80%')
-    expect(divider).toHaveStyle(`margin-top: ${String(SPACING.spacing4)}`)
-    expect(divider).toHaveStyle(`margin-bottom: ${String(SPACING.spacing4)}`)
+    expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing4}`)
+    expect(divider).toHaveStyle(`margin-bottom: ${SPACING.spacing4}`)
   })
 
   it('renders divider with additional props', () => {

@@ -194,7 +194,7 @@ export function Toast(props: ToastProps): JSX.Element {
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
-          ? `${String(SPACING.spacing16)} ${String(SPACING.spacing24)}`
+          ? `${SPACING.spacing16} ${SPACING.spacing24}`
           : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
               SPACING.spacing8
             } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} 0.75rem`

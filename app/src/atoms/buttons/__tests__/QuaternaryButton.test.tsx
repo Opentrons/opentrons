@@ -32,9 +32,7 @@ describe('QuaternaryButton', () => {
     expect(button).toHaveStyle('box-shadow: none')
     expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing8)} ${String(
-        SPACING.spacing16
-      )} ${String(SPACING.spacing8)} ${String(SPACING.spacing16)}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(
       `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`

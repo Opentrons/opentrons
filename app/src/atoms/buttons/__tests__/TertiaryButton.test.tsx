@@ -28,9 +28,7 @@ describe('TertiaryButton', () => {
       `background-color: ${String(COLORS.blueEnabled)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing8)} ${String(
-        SPACING.spacing16
-      )} ${String(SPACING.spacing8)} ${String(SPACING.spacing16)}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeLabel)}`)
     expect(button).toHaveStyle(
