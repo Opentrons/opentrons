@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, cast
 from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
@@ -32,12 +32,6 @@ from robot_server.instruments.router import get_attached_instruments
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
-
-
-@pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mock hardware control API."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 def get_sample_pipette_dict(

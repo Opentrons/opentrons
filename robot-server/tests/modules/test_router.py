@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 from typing_extensions import Final
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control.modules import MagDeck, ModuleType, MagneticStatus
 
@@ -20,12 +20,6 @@ from robot_server.modules.module_models import (
 
 
 _HTTP_API_VERSION: Final = 3
-
-
-@pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mock hardware control API."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture()

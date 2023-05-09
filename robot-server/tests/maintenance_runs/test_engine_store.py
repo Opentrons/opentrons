@@ -7,7 +7,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import OT2HardwareControlAPI
+from opentrons.hardware_control import API
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import LiveRunner, RunResult
 
@@ -22,7 +22,7 @@ def subject(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a MaintenanceEngineStore test subject."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=OT2HardwareControlAPI)
+    hardware_api = decoy.mock(cls=API)
     return MaintenanceEngineStore(
         hardware_api=hardware_api,
         # Arbitrary choice of robot_type. Tests where robot_type matters should
@@ -50,7 +50,7 @@ async def test_create_engine_uses_robot_type(
     """It should create ProtocolEngines with the given robot type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=OT2HardwareControlAPI)
+    hardware_api = decoy.mock(cls=API)
     subject = MaintenanceEngineStore(hardware_api=hardware_api, robot_type=robot_type)
 
     await subject.create(

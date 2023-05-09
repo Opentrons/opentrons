@@ -13,6 +13,7 @@ from mock import MagicMock
 from pathlib import Path
 from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
+from decoy import Decoy
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -51,6 +52,14 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
+
+
+@pytest.fixture()
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Return a mock in the shape of a HardwareControlAPI."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    return decoy.mock(cls=API)
 
 
 @pytest.fixture(autouse=True)
