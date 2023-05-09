@@ -174,14 +174,12 @@ class CompletedAnalysisStore:
         # using an async method, if this method is called reentrantly then inserting those
         # newly-fetched resources into the memcache could race and eject resources we just
         # added and were about to return. To prevent this, we'll make a second memcache just
-        # for this coroutine - the cache class itself is light, python is pass-by-reference,
-        # so we shouldn't incur much extra memory, and since we're using an unlimited cache
-        # that bypasses the size checks we should be pretty cheap timewise also.
-        local_memcache = MemoryCache(
-            max(len(ordered_analyses_for_protocol), 1), str, CompletedAnalysisResource
-        )
+        # for this coroutine - since we don't care about size limitations we can just use a
+        # dict.
+        local_memcache: Dict[str, CompletedAnalysisResource] = {}
+
         for key in cached_analyses:
-            local_memcache.insert(key, self._memcache.get(key))
+            local_memcache[key] = self._memcache.get(key)
 
         if uncached_analyses:
             statement = (
@@ -195,12 +193,13 @@ class CompletedAnalysisStore:
                 resource = await CompletedAnalysisResource.from_sql_row(
                     r, self._current_analyzer_version
                 )
-                local_memcache.insert(resource.id, resource)
+                local_memcache[resource.id] = resource
                 self._memcache.insert(resource.id, resource)
 
+        # note: we want to iterate through ordered_analyseS_for_protocol rather than
+        # just the local_memcache dict to preserve total ordering
         return [
-            local_memcache.get(analysis_id)
-            for analysis_id in ordered_analyses_for_protocol
+            local_memcache[analysis_id] for analysis_id in ordered_analyses_for_protocol
         ]
 
     def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
