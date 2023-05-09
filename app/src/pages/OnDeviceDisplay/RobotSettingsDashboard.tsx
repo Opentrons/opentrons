@@ -118,13 +118,15 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
 
           {/* Robot Name */}
-          <RobotSettingButton
-            settingName={t('robot_name')}
-            settingInfo={robotName}
-            currentOption="RobotName"
-            setCurrentOption={setCurrentOption}
-            iconName="flex-robot"
-          />
+          <Link to="/robot-settings/rename-robot">
+            <RobotSettingButton
+              settingName={t('robot_name')}
+              settingInfo={robotName}
+              currentOption="RobotName"
+              setCurrentOption={setCurrentOption}
+              iconName="flex-robot"
+            />
+          </Link>
 
           {/* Robot System Version */}
           <RobotSettingButton
@@ -233,10 +235,13 @@ const RobotSettingButton = ({
 }: RobotSettingButtonProps): JSX.Element => {
   const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  // const history = useHistory()
 
   const handleClick = (): void => {
     if (currentOption != null && setCurrentOption != null) {
-      setCurrentOption(currentOption)
+      if (currentOption !== 'RobotName') {
+        setCurrentOption(currentOption)
+      }
     } else {
       dispatch(toggleDevtools())
     }
@@ -270,7 +275,7 @@ const RobotSettingButton = ({
                 color={COLORS.darkGreyEnabled}
                 fontSize="1.375rem"
                 lineHeight="1.875rem"
-                fontWeight="400"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {settingInfo}
               </StyledText>

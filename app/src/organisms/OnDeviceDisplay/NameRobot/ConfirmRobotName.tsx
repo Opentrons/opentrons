@@ -14,12 +14,12 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { StepMeter } from '../../atoms/StepMeter'
-import { updateConfigValue } from '../../redux/config'
-import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
+import { StyledText } from '../../../atoms/text'
+import { StepMeter } from '../../../atoms/StepMeter'
+import { updateConfigValue } from '../../../redux/config'
+import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
 
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch } from '../../../redux/types'
 
 const IMAGE_ALT = 'finish setting up a robot'
 

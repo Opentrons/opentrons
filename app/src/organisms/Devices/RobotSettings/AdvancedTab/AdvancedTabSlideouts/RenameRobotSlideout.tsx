@@ -88,14 +88,14 @@ export function RenameRobotSlideout({
       const errors: FormikErrors = {}
       const newName = values.newRobotName
       if (!regexPattern.test(newName)) {
-        errors.newRobotName = t('rename_robot_input_error')
+        errors.newRobotName = t('name_rule_error_name_length')
       }
       if (
         [...connectableRobots, ...reachableRobots].some(
           robot => newName === robot.name
         )
       ) {
-        errors.newRobotName = t('robot_name_already_exists')
+        errors.newRobotName = t('name_rule_error_exist')
       }
       return errors
     },
