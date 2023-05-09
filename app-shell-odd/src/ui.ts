@@ -44,13 +44,11 @@ const WINDOW_OPTS = {
 
 export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
-  console.log('starting main window')
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
     'ready-to-show',
     () => {
       log.debug('Main window ready to show')
-      console.log('Main window ready to show')
       mainWindow.show()
       waitForRobotServerAndShowMainWIndow(dispatch)
     }
@@ -76,7 +74,6 @@ function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
     systemd
       .getRobotServerStatus()
       .then((status: RobotServerServiceStatus) => {
-        console.log('sending status to browser layer: ', status)
         dispatch(robotServerServiceStatus(status))
         if (status !== 'active') {
           waitForRobotServerAndShowMainWIndow(dispatch)
