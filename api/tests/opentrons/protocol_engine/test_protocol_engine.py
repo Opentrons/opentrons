@@ -166,7 +166,6 @@ def test_add_command(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add a command to the state from a request."""
@@ -230,7 +229,6 @@ async def test_add_and_execute_command(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     subject: ProtocolEngine,
 ) -> None:
     """It should add and execute a command from a request."""
@@ -308,7 +306,6 @@ def test_play(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
 ) -> None:
@@ -337,7 +334,6 @@ def test_play_blocked_by_door(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
 ) -> None:
@@ -392,7 +388,6 @@ async def test_finish(
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
     drop_tips_and_home: bool,
@@ -423,9 +418,6 @@ async def test_finish(
 async def test_finish_with_defaults(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
-    plugin_starter: PluginStarter,
-    queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
 ) -> None:
@@ -442,7 +434,6 @@ async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     model_utils: ModelUtils,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
@@ -477,7 +468,6 @@ async def test_finish_with_error(
 async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy: Decoy,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
     door_watcher: DoorWatcher,
     action_dispatcher: ActionDispatcher,
@@ -524,7 +514,6 @@ async def test_stop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
-    hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
     state_store: StateStore,
     subject: ProtocolEngine,
@@ -648,7 +637,6 @@ def test_add_labware_definition(
 def test_add_liquid(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
-    state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
     """It should dispatch an AddLiquidAction action."""
