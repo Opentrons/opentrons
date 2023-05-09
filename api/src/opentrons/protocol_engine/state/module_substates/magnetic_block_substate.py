@@ -8,7 +8,7 @@ MagneticBlockId = NewType("MagneticBlockId", str)
 
 @dataclass(frozen=True)
 class MagneticBlockSubState:
-    """Magnetic Module specific state.
+    """Magnetic Block specific state.
 
     Provides a read-only state access
     for an individual loaded Magnetic Block.
