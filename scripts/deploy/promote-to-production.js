@@ -17,7 +17,7 @@ const dryrun = !flags.includes('--deploy')
 
 assert(projectDomain, USAGE)
 
-const s3 = new AWS.S3({ apiVersion: '2006-03-01', region: 'us-east-2' })
+const s3 = new AWS.S3({ apiVersion: '2006-03-01', region: 'us-east-1' })
 
 const stagingBucket = `staging.${projectDomain}`
 const productionBucket = projectDomain
