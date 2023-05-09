@@ -12,7 +12,7 @@
   "before_you_begin": "Before you begin",
   "begin_calibration": "Begin calibration",
   "cal_pipette": "Calibrate pipette",
-  "calibrate_96_channel": "Calibrate 96-Channel pipette",
+  "calibrate_96_channel": "Calibrate 96-Channel Pipette",
   "calibrate_pipette": "calibrate {{mount}} pipette",
   "calibration_probe_touching": "The calibration probe will touch the sides of the calibration square in slot {{slotNumber}} to determine its exact position",
   "cancel_attachment": "cancel attachment",
