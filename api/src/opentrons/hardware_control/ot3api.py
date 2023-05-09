@@ -1495,7 +1495,6 @@ class OT3API(
         the current location of pipette
         """
         realmount = OT3Mount.from_mount(mount)
-
         instrument = self._pipette_handler.get_pipette(realmount)
         blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
 
@@ -1514,6 +1513,7 @@ class OT3API(
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
         )
+
         target_pos = target_position_from_plunger(
             realmount,
             blowout_distance,

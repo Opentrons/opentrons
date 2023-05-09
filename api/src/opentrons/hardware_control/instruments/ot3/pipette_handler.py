@@ -601,7 +601,6 @@ class PipetteHandlerProvider:
             ul = volume
 
         distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
-
         return LiquidActionSpec(
             axis=OT3Axis.of_main_tool_actuator(mount),
             volume=0,
