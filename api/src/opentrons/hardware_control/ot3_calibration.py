@@ -30,9 +30,10 @@ from opentrons.calibration_storage import types
 from opentrons.calibration_storage.ot3.deck_attitude import (
     save_robot_belt_attitude,
     get_robot_belt_attitude,
+    delete_robot_belt_attitude,
 )
 from opentrons.config.robot_configs import (
-    default_deck_calibration,
+    default_ot3_deck_calibration,
     defaults_ot3,
 )
 from .util import DeckTransformState
@@ -813,7 +814,7 @@ async def calibrate_module(
 async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
-    pip_id: str,
+    pipette_id: str,
 ) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
@@ -833,7 +834,8 @@ async def calibrate_belts(
         try:
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
             belt_attitude = await _determine_transform_matrix(hcapi, mount)
-            save_belt_attitude_matrix(belt_attitude, pip_id)
+            delete_robot_belt_attitude()
+            save_robot_belt_attitude(belt_attitude, pipette_id)
             return belt_attitude
         finally:
             await hcapi.remove_tip(mount)
@@ -842,21 +844,22 @@ async def calibrate_belts(
 def apply_machine_transform(
     belt_attitude: types.AttitudeMatrix,
 ) -> types.AttitudeMatrix:
+    """
+    This converts belt attitude matrix to machine attitude matrix, which is inverted, by applying a negative identity matrix
+
+    Param
+    -----
+    belt_attitude: attitude matrix with regards to belt coordinate system
+
+    Returns
+    -------
+    Attitude matrix with regards to machine coordinate system
+    """
     belt_attitude_arr = np.array(belt_attitude)
     machine_transform_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
     deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)  # type: ignore[no-untyped-call]
     deck_attitude = deck_attitude_arr.round(4).tolist()
     return deck_attitude  # type: ignore[no-any-return]
-
-
-def save_belt_attitude_matrix(
-    belt_attitude: types.AttitudeMatrix,
-    pipette_id: str,
-) -> None:
-    save_robot_belt_attitude(
-        belt_attitude,
-        pipette_id,
-    )
 
 
 def load_attitude_matrix() -> DeckCalibration:
@@ -874,10 +877,10 @@ def load_attitude_matrix() -> DeckCalibration:
     else:
         # load default if calibration data does not exist
         return DeckCalibration(
-            attitude=apply_machine_transform(default_deck_calibration()),
+            attitude=apply_machine_transform(default_ot3_deck_calibration()),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
-            belt_attitude=default_deck_calibration(),
+            belt_attitude=default_ot3_deck_calibration(),
         )
 
 
@@ -888,8 +891,8 @@ def validate_attitude_deck_calibration(
     This function determines whether the deck calibration is valid
     or not based on the following use-cases:
 
-    TODO(lc, 8/10/2020): Expand on this method, or create
-    another method to diagnose bad instrument offset data
+    TODO(pm, 5/9/2023): As with the OT2, expand on this method,
+    or create another method to diagnose bad instrument offset data
     """
     curr_cal = np.array(deck_cal.attitude)
     row, _ = curr_cal.shape
@@ -905,14 +908,18 @@ def validate_attitude_deck_calibration(
         return DeckTransformState.OK
 
 
-def load() -> DeckCalibration:
-    return load_attitude_matrix()
-
-
 class OT3RobotCalibrationProvider:
+    """This class provides the following robot calibration data:
+    deck calibration: transform matrix to account for stretch of x and y belts
+    carriage offset:
+    left mount offset: offset of left pipette from its nominal center
+    right mount offset: offset of right pipette from its nominal center
+    gripper mount offset: offset of gripper from its nominal center
+    """
+
     def __init__(self, config: OT3Config) -> None:
         self._robot_calibration = OT3Transforms(
-            deck_calibration=load(),
+            deck_calibration=load_attitude_matrix(),
             carriage_offset=Point(*config.carriage_offset),
             left_mount_offset=Point(*config.left_mount_offset),
             right_mount_offset=Point(*config.right_mount_offset),
@@ -932,7 +939,7 @@ class OT3RobotCalibrationProvider:
     def reset_robot_calibration(self) -> None:
         self._validate.cache_clear()
         self._robot_calibration = OT3Transforms(
-            deck_calibration=load(),
+            deck_calibration=load_attitude_matrix(),
             carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
             left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
             right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),
@@ -959,7 +966,7 @@ class OT3RobotCalibrationProvider:
         calibration
         """
         return OT3Transforms(
-            deck_calibration=load(),
+            deck_calibration=load_attitude_matrix(),
             carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
             left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
             right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),

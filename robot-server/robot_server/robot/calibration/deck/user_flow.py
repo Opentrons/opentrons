@@ -59,6 +59,7 @@ from .state_machine import DeckCalibrationStateMachine
 from .dev_types import SavedPoints, ExpectedPoints
 from ..errors import CalibrationError
 from ..helper_classes import RequiredLabware, AttachedPipette, SupportedCommands
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -87,6 +88,8 @@ def tuplefy_cal_point_dicts(
 
 class DeckCalibrationUserFlow:
     def __init__(self, hardware: HardwareControlAPI):
+        if not isinstance(hardware, OT2HardwareControlAPI):
+            raise HardwareNotSupportedError("This command is supported by OT-2 only.")
         self._hardware = cast(OT2HardwareControlAPI, hardware)
         self._hw_pipette, self._mount = self._select_target_pipette()
         self._default_tipracks = self._get_default_tipracks()
@@ -117,8 +120,8 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.exit: self.exit_session,
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
-        self._hardware.set_robot_calibration(
-            self._hardware.build_temporary_identity_calibration()
+        self.hardware.set_robot_calibration(
+            self.hardware.build_temporary_identity_calibration()
         )
         self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._supported_commands = SupportedCommands(namespace="calibration")

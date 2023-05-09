@@ -9,7 +9,7 @@ from opentrons import config
 
 from opentrons.config.robot_configs import (
     get_legacy_gantry_calibration,
-    default_deck_calibration,
+    default_ot2_deck_calibration,
 )
 from opentrons.calibration_storage import (
     types,
@@ -46,7 +46,7 @@ def validate_attitude_deck_calibration(
     This function determines whether the deck calibration is valid
     or not based on the following use-cases:
 
-    TODO(lc, 8/10/2020): Expand on this method, or create
+    TODO(lc, 8/10/2020): As with the OT2, expand on this method, or create
     another method to diagnose bad instrument offset data
     """
     curr_cal = np.array(deck_cal.attitude)
@@ -161,7 +161,7 @@ def load_attitude_matrix() -> DeckCalibration:
     else:
         # load default if deck calibration data do not exist
         return DeckCalibration(
-            attitude=default_deck_calibration(),
+            attitude=default_ot2_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
@@ -210,7 +210,7 @@ class RobotCalibrationProvider:
         """
         return RobotCalibration(
             deck_calibration=DeckCalibration(
-                attitude=default_deck_calibration(),
+                attitude=default_ot2_deck_calibration(),
                 source=types.SourceType.default,
                 status=types.CalibrationStatus(),
             )
