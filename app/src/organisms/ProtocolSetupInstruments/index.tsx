@@ -83,6 +83,7 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
+            mostRecentAnalysis={mostRecentAnalysis}
             attachedCalibrationData={
               attachedPipetteMatch != null
                 ? allPipettesCalibrationData?.data.find(

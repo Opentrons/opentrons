@@ -7,7 +7,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
 import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
-import { getIs96ChannelPipetteAttached } from '../../../organisms/Devices/utils'
+import { formatTimestamp } from '../../../organisms/Devices/utils'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '../InstrumentsDashboard'
@@ -16,7 +16,6 @@ import { InstrumentDetail } from '../InstrumentDetail'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows')
-jest.mock('../../../organisms/Devices/utils')
 jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 
@@ -29,9 +28,6 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 >
 const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
   typeof PipetteWizardFlows
->
-const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.MockedFunction<
-  typeof getIs96ChannelPipetteAttached
 >
 const mockChoosePipette = ChoosePipette as jest.MockedFunction<
   typeof ChoosePipette
@@ -58,27 +54,44 @@ const mockGripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: 'ghi789',
-  data: {},
+  data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: '2023-05-04T13:38:26.649Z',
+    },
+  },
 }
 const mockRightPipetteData = {
   instrumentModel: 'p300_single_v2',
   instrumentType: 'p300',
   mount: 'right',
   serialNumber: 'abc123',
-  data: {},
+  data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: '2022-05-04T13:38:26.649Z',
+    },
+  },
 }
 const mockLeftPipetteData = {
   instrumentModel: 'p1000_single_v2',
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
-  data: {},
+  data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: '2023-05-04T13:38:26.649Z',
+    },
+  },
 }
 describe('InstrumentsDashboard', () => {
   beforeEach(() => {
     mockNavigation.mockReturnValue(<div>mock Navigation</div>)
     mockChoosePipette.mockReturnValue(<div>mock choose pipette</div>)
-    mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
     mockUseInstrumentsQuery.mockReturnValue({
       data: {
         data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
@@ -104,14 +117,18 @@ describe('InstrumentsDashboard', () => {
     await getByText('left Mount').click()
     getByText('serial number')
     getByText(mockLeftPipetteData.serialNumber)
-    getByText('no calibration data')
+    getByText(
+      formatTimestamp(mockLeftPipetteData.data.calibratedOffset.last_modified)
+    )
   })
   it('should route to right mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()
     await getByText('right Mount').click()
     getByText('serial number')
     getByText(mockRightPipetteData.serialNumber)
-    getByText('no calibration data')
+    getByText(
+      formatTimestamp(mockRightPipetteData.data.calibratedOffset.last_modified)
+    )
   })
   it('should route to extension mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()

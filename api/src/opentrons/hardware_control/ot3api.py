@@ -1252,7 +1252,12 @@ class OT3API(
             checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
 
-        home_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
+        home_seq = [
+            ax
+            for ax in OT3Axis.home_order()
+            if (ax in checked_axes and self._backend.axis_is_present(ax))
+        ]
+        self._log.info(f"home was called with {axes} generating sequence {home_seq}")
         await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
