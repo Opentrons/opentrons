@@ -53,7 +53,7 @@ const provideExports = (): SystemD => {
       setRemoteDevToolsEnabled: enabled =>
         new Promise<string>(resolve => resolve(`dev tools set to ${enabled}`)),
       getRobotServerStatus: () =>
-        new Promise<RobotServerServiceStatus>(resolve => resolve('inactive')),
+        new Promise<RobotServerServiceStatus>(resolve => resolve('active')),
     }
   }
 }
