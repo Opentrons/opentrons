@@ -18,3 +18,9 @@ def standardize_labware_offset(
             )
         }
     )
+
+
+def standardize_command(
+    original: CommandCreate, robot_type: RobotType
+) -> CommandCreate:
+    return original.normalize(robot_type)

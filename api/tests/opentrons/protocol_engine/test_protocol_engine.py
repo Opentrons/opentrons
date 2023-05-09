@@ -170,21 +170,30 @@ def test_add_command(
 ) -> None:
     """It should add a command to the state from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    params = commands.HomeParams()
-    request = commands.HomeCreate(params=params)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(params=commands.HomeParams())
     queued = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
-        params=params,
+        params=commands.HomeParams(),
     )
+
+    robot_type = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(Config(robot_type=robot_type))
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
     decoy.when(state_store.commands.get_latest_command_hash()).then_return("abc")
     decoy.when(
-        commands.hash_command_params(create=request, last_hash="abc")
+        commands.hash_command_params(create=standardized_request, last_hash="abc")
     ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
@@ -195,7 +204,7 @@ def test_add_command(
             QueueCommandAction(
                 command_id="command-id",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash="123",
             )
         )
@@ -203,7 +212,7 @@ def test_add_command(
         QueueCommandAction(
             command_id="command-id-validated",
             created_at=created_at,
-            request=request,
+            request=standardized_request,
             request_hash="456",
         )
     )
@@ -213,13 +222,13 @@ def test_add_command(
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash="456",
             )
         ),
     ).then_do(_stub_queued)
 
-    result = subject.add_command(request)
+    result = subject.add_command(original_request)
 
     assert result == queued
 
@@ -233,22 +242,31 @@ async def test_add_and_execute_command(
 ) -> None:
     """It should add and execute a command from a request."""
     created_at = datetime(year=2021, month=1, day=1)
-    params = commands.HomeParams()
-    request = commands.HomeCreate(params=params)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(params=commands.HomeParams())
     queued = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.QUEUED,
         createdAt=created_at,
-        params=params,
+        params=commands.HomeParams(),
     )
     completed = commands.Home(
         id="command-id",
         key="command-key",
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=created_at,
-        params=params,
+        params=commands.HomeParams(),
     )
+
+    robot_type = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(Config(robot_type=robot_type))
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
@@ -265,7 +283,7 @@ async def test_add_and_execute_command(
             QueueCommandAction(
                 command_id="command-id",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash=None,
             )
         )
@@ -273,7 +291,7 @@ async def test_add_and_execute_command(
         QueueCommandAction(
             command_id="command-id-validated",
             created_at=created_at,
-            request=request,
+            request=standardized_request,
             request_hash=None,
         )
     )
@@ -283,7 +301,7 @@ async def test_add_and_execute_command(
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
-                request=request,
+                request=standardized_request,
                 request_hash=None,
             )
         )
@@ -296,7 +314,7 @@ async def test_add_and_execute_command(
         ),
     ).then_do(_stub_completed)
 
-    result = await subject.add_and_execute_command(request)
+    result = await subject.add_and_execute_command(original_request)
 
     assert result == completed
 
