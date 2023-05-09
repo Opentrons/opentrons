@@ -19,7 +19,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     print("Check tip presence function...\n")
-    tip_status_result = await helpers_ot3.get_tip_status(mount)
+    tip_status_result = await helpers_ot3.get_tip_status(api, mount)
+    print(f"Tip status result: {tip_status_result}")
+    input("Raise tip ejector...\n")
+    tip_status_result = await helpers_ot3.get_tip_status(api, mount)
     print(f"Tip status result: {tip_status_result}")
 
 
