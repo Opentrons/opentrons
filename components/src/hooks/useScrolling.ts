@@ -4,8 +4,10 @@ export const useScrolling = (ref: RefObject<HTMLElement>): boolean => {
   const [isScrolling, setIsScrolling] = useState<boolean>(false)
 
   useEffect(() => {
-    if (ref.current != null) {
-      let scrollingTimeout: NodeJS.Timeout
+    const element = ref.current
+
+    if (element != null) {
+      let scrollingTimeout: ReturnType<typeof setTimeout>
 
       const handleScrollEnd = (): void => {
         setIsScrolling(false)
@@ -17,9 +19,9 @@ export const useScrolling = (ref: RefObject<HTMLElement>): boolean => {
         scrollingTimeout = setTimeout(handleScrollEnd, 200)
       }
 
-      window.addEventListener('scroll', handleScroll)
+      element.addEventListener('scroll', handleScroll)
       return () => {
-        window.removeEventListener('scroll', handleScroll)
+        element.removeEventListener('scroll', handleScroll)
       }
     }
     return () => {}

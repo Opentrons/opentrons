@@ -196,8 +196,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const scrollRef = React.useRef(null)
   const isScrolling = useScrolling(scrollRef)
 
-  console.log('scroll', isScrolling)
-
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
     width: 100%;
@@ -223,7 +221,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%" css="user-select: none;" ref={scrollRef}>
+      <Box width="100%">
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (
@@ -233,7 +231,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 ({ Component, exact, path }: RouteProps) => {
                   return (
                     <Route key={path} exact={exact} path={path}>
-                      <Box css={TOUCH_SCREEN_STYLE}>
+                      <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
                         <ModalPortalRoot />
                         <Component />
                       </Box>
