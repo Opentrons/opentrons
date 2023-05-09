@@ -1,7 +1,7 @@
 from typing import Dict
 
 import mock
-from opentrons.hardware_control.backends import OT3Controller
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from opentrons_hardware.firmware_update.utils import FirmwareUpdateType, UpdateInfo
