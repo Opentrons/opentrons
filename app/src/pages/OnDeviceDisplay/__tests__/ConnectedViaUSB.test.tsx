@@ -35,7 +35,7 @@ describe('ConnectViaUSB', () => {
     getByText('Connect via USB')
     getByRole('button', { name: 'Back' })
     getByText(
-      "If you haven't already, download and launch the Opentrons App on your computer. Then connect to your OT-3 with the provided USB cable."
+      "If you haven't already, download and launch the Opentrons App on your computer. Then connect to your Opentrons Flex with the provided USB cable."
     )
     const image = getByRole('img')
     expect(image.getAttribute('src')).toEqual(PNG_FILE_NAME)

@@ -30,7 +30,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'

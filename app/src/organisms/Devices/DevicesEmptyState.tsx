@@ -16,6 +16,7 @@ import {
   SPACING,
   PrimaryButton,
   POSITION_ABSOLUTE,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
@@ -72,7 +73,7 @@ export function DevicesEmptyState(): JSX.Element {
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-          display="flex"
+          display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >

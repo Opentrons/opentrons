@@ -236,3 +236,14 @@ def test_get_status_version_low(subject: TemperatureModuleContext) -> None:
     """It should reject if API version is lower than 2.3."""
     with pytest.raises(APIVersionError):
         subject.status
+
+
+def test_serial_number(
+    decoy: Decoy,
+    mock_core: TemperatureModuleCore,
+    subject: TemperatureModuleContext,
+) -> None:
+    """It should get the module's unique serial number."""
+    decoy.when(mock_core.get_serial_number()).then_return("abc-123")
+    result = subject.serial_number
+    assert result == "abc-123"

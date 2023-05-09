@@ -20,6 +20,7 @@ from .core.common import (
     MagneticModuleCore,
     ThermocyclerCore,
     HeaterShakerCore,
+    MagneticBlockCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -77,12 +78,6 @@ class ModuleContext(CommandPublisher):
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
         return cast(ModuleType, self._core.MODULE_TYPE.value)
-
-    @property  # type: ignore[misc]
-    @requires_version(2, 14)
-    def serial_number(self) -> str:
-        """Get the module's unique hardware serial number."""
-        return self._core.get_serial_number()
 
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
@@ -214,7 +209,7 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 14)
     def parent(self) -> str:
         """The name of the slot the module is on."""
-        return self._core.get_deck_slot().value
+        return self._core.get_deck_slot_id()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -253,6 +248,12 @@ class TemperatureModuleContext(ModuleContext):
     """
 
     _core: TemperatureModuleCore
+
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -332,6 +333,12 @@ class MagneticModuleContext(ModuleContext):
     """
 
     _core: MagneticModuleCore
+
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -433,6 +440,12 @@ class ThermocyclerContext(ModuleContext):
     """
 
     _core: ThermocyclerCore
+
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
@@ -675,6 +688,12 @@ class HeaterShakerContext(ModuleContext):
     _core: HeaterShakerCore
 
     @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
         """The target temperature of the Heater-Shaker's plate in °C.
@@ -854,3 +873,15 @@ class HeaterShakerContext(ModuleContext):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
+
+
+class MagneticBlockContext(ModuleContext):
+    """An object representing a Magnetic Block.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.15
+    """
+
+    _core: MagneticBlockCore
