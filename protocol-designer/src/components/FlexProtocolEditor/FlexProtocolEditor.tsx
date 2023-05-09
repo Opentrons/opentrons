@@ -167,9 +167,9 @@ function FlexProtocolEditor(): JSX.Element {
     tiprack?: string
   }
 
-  const validateFields = (values: InitialValues) => {
-    const { pipettesByMount, fields } = values
-    let errors: FormikErrors = {}
+  const validateFields = (values: InitialValues): FormikErrors => {
+    const { pipettesByMount } = values
+    const errors: FormikErrors = {}
 
     if (!pipettesByMount.left.pipetteName) {
       errors.pipette = `${i18n.t('flex.errors.first_pipette_not_selected')}`

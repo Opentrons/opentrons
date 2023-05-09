@@ -22,9 +22,9 @@ import cx from 'classnames'
 import styles from '../FlexComponents.css'
 import { reduce } from 'lodash'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
-import { FormPipettesByMount } from '../FlexProtocolEditor'
+
 interface formikContextProps {
-  pipettesByMount: FormPipettesByMount
+  pipettesByMount: any
   tiprack: any
 }
 
@@ -35,7 +35,7 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const [selected, setSelected] = useState<string[]>([])
   const [customTipRack, setCustomTipRack] = useState(false)
   const {
-    values: { pipettesByMount },
+    values,
     errors,
     setFieldValue,
   } = useFormikContext<formikContextProps>()
@@ -52,7 +52,7 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const handleNameChange = (selected: string[]): any => {
     setFieldValue(`pipettesByMount.${pipetteName}.tipRackList`, selected)
   }
-  const latestTipRackList = pipettesByMount[pipetteName].tipRackList
+  const latestTipRackList = values.pipettesByMount[pipetteName].tipRackList
   useEffect(() => {
     setSelected(latestTipRackList)
   }, [latestTipRackList])

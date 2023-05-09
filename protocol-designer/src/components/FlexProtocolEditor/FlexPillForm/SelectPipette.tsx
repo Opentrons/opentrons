@@ -8,7 +8,6 @@ import { i18n } from '../../../localization'
 import styles from '../FlexComponents.css'
 import { useFormikContext } from 'formik'
 import { TipRackOptions } from './TipRackList'
-import { FormPipettesByMount } from '../FlexProtocolEditor'
 
 interface SelectPipetteOptionProps {
   pipetteName: string

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, OutlineButton } from '@opentrons/components'
+import { OutlineButton } from '@opentrons/components'
 import { i18n } from '../localization'
 import { CreateFlexFileForm } from './FlexProtocolEditor'
 import styles from './FlexProtocolEditor/FlexComponents.css'

@@ -63,7 +63,7 @@ export const RadioSelect = ({ pipetteName, pipetteType }: any): JSX.Element => {
   }
   const gen3Options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
-  let groupedOptions = [
+  const groupedOptions = [
     ...(gen3Options.length > 0 ? gen3Options : []),
     ...(gen1Options.length > 0 ? gen1Options : []),
   ]
