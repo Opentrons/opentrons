@@ -3,8 +3,9 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../../i18n'
-import * as Fixtures from '../../../../redux/networking/__fixtures__'
+import { i18n } from '../../../i18n'
+import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
 const mockPush = jest.fn()
@@ -20,8 +21,9 @@ const mockWifiList = [
   },
 ]
 
-jest.mock('../../../../redux/networking/selectors')
-jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../redux/networking/selectors')
+jest.mock('../../../redux/discovery/selectors')
+jest.mock('../DisplaySearchNetwork')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -29,6 +31,10 @@ jest.mock('react-router-dom', () => {
     useHistory: () => ({ push: mockPush } as any),
   }
 })
+
+const mockDisplaySearchNetwork = DisplaySearchNetwork as jest.MockedFunction<
+  typeof DisplaySearchNetwork
+>
 
 const render = (props: React.ComponentProps<typeof DisplayWifiList>) => {
   return renderWithProviders(<DisplayWifiList {...props} />, {
@@ -46,20 +52,33 @@ describe('DisplayWifiList', () => {
       setChangeState: mockSetChangeState,
       setSelectedSsid: mockSetSelectedSsid,
     }
+    mockDisplaySearchNetwork.mockReturnValue(
+      <div>mock DisplaySearchNetwork</div>
+    )
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('should render a wifi list, button and spinner', () => {
-    const [{ getByText, getByRole, getByTestId }] = render(props)
-    getByText('Connect via Wi-Fi')
+  it('should render text and display search network mock when looking for wifi ssids', () => {
+    props.list = []
+    const [{ getByText, getByTestId }] = render(props)
+    getByText('Select a network')
+    getByTestId('back-button')
+    expect(getByTestId('wifi_list_search_spinner')).toBeInTheDocument()
+    getByText('mock DisplaySearchNetwork')
+  })
+
+  it('should render wifi list and button', () => {
+    props = { ...props, isSearching: false }
+    const [{ getByText, getByTestId, queryByTestId }] = render(props)
+    getByText('Choose a network')
     getByText('foo')
     getByText('bar')
     getByText('baz')
-    getByRole('button', { name: 'Back' })
-    expect(getByTestId('wifi_list_search_spinner')).toBeInTheDocument()
+    getByTestId('back-button')
+    expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
   })
 
   it('should not render a spinner', () => {
@@ -69,8 +88,8 @@ describe('DisplayWifiList', () => {
   })
 
   it('should call mock functions when back', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Back' })
+    const [{ getByRole, getByTestId }] = render(props)
+    const button = getByTestId('back-button')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })

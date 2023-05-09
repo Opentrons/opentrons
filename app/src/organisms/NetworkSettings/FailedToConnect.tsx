@@ -15,14 +15,14 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { DISCONNECT } from '../../Devices/RobotSettings/ConnectNetwork/constants'
+import { StyledText } from '../../atoms/text'
+import { DISCONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
 
-import type { RequestState } from '../../../redux/robot-api/types'
+import type { RequestState } from '../../redux/robot-api/types'
 import type {
   NetworkChangeType,
   NetworkChangeState,
-} from '../../Devices/RobotSettings/ConnectNetwork/types'
+} from '../Devices/RobotSettings/ConnectNetwork/types'
 
 interface FailedToConnectProps {
   ssid: string

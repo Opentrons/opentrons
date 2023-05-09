@@ -8,20 +8,20 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
+  COLORS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 
-export function SearchNetwork(): JSX.Element {
+export function DisplaySearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   return (
     <Flex
-      height="22rem"
-      backgroundColor="#D6D6D6"
+      height="17.5rem"
+      backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.size_three}
       width="100%"
+      data-testid="Display-Search-Network-text"
     >
       <Flex
         justifyContent={JUSTIFY_CENTER}
@@ -29,9 +29,8 @@ export function SearchNetwork(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
       >
         <StyledText
-          fontSize="2rem"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight="2.72375rem"
           marginTop={SPACING.spacingXXL}
         >
           {t('searching_for_networks')}

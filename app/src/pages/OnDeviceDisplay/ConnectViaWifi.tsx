@@ -21,7 +21,7 @@ import {
   SelectAuthenticationType,
   SetWifiCred,
   WifiConnectionDetails,
-} from '../../organisms/OnDeviceDisplay/SetupNetwork'
+} from '../../organisms/NetworkSettings'
 
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
