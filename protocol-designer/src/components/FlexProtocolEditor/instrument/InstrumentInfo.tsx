@@ -5,7 +5,6 @@ import { InfoItem } from './InfoItem'
 import { InstrumentDiagram } from './InstrumentDiagram'
 import styles from './instrument.css'
 
-
 import type { InstrumentDiagramProps } from './InstrumentDiagram'
 import { Mount } from '@opentrons/components/src/robot-types'
 import { Card } from '@opentrons/components'
@@ -38,30 +37,30 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
     { [styles.disabled]: props.isDisabled },
     props.className
   )
-
   return (
-    <div style={{marginBottom:10}}>
-    <Card>
-    <div className={className}>
-    {props.pipetteSpecs && (
-        <InstrumentDiagram
-          pipetteSpecs={props.pipetteSpecs}
-          className={styles.pipette_icon}
-          mount={props.mount}
-        />
-      )}
-      <div className={cx(styles.pipette_info, props.infoClassName)}>
-        <InfoItem
-          title={props.showMountLabel ? `${props.mount} pipette` : `${props.mount} pipette`}
-          value={props.description}
-        />
-        {props.tiprackModel && (
-          <InfoItem title={'tip rack'} value={props.tiprackModel} />
-        )}
-        {props.children}
-      </div>
-    </div>
-    </Card>
+    <div style={{ marginBottom: 10 }}>
+      <Card>
+        <div className={className}>
+          <InstrumentDiagram
+            pipetteSpecs={props.pipetteSpecs}
+            className={styles.pipette_icon}
+            mount={props.mount}
+          />
+
+          <div className={cx(styles.pipette_info, props.infoClassName)}>
+            <InfoItem
+              title={
+                props.showMountLabel ? `${props.mount} pipette` : `pipette`
+              }
+              value={props.description}
+            />
+            {props.tiprackModel && (
+              <InfoItem title={'tip rack'} value={props.tiprackModel} />
+            )}
+            {props.children}
+          </div>
+        </div>
+      </Card>
     </div>
   )
 }

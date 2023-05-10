@@ -33,9 +33,6 @@ const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 export function FlexFileDetailsComponent(props: any): JSX.Element {
-  console.log('props.formValues', props.formValues)
-  console.log('props.formValues', props.formValues.protocolName)
-
   function getModuleData(modules: any): any {
     const moduleData = []
     for (const obj in modules) {
@@ -180,14 +177,16 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         </div>
 
                         <Flex className={styles.right_buttons}>
-                          <SecondaryButton
-                            onClick={e => {
-                              e.preventDefault()
-                              props.swapPipettes()
-                            }}
-                          >
-                            {i18n.t('flex.file_tab.swap_pipette')}
-                          </SecondaryButton>
+                          {Object.keys(props.instruments).length !== 1 && (
+                            <SecondaryButton
+                              onClick={e => {
+                                e.preventDefault()
+                                props.swapPipettes()
+                              }}
+                            >
+                              {i18n.t('flex.file_tab.swap_pipette')}
+                            </SecondaryButton>
+                          )}
                           <Link to={'/ot-flex/1'} style={{ marginLeft: 10 }}>
                             {i18n.t('flex.file_tab.edit')}
                           </Link>

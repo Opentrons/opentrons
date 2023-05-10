@@ -42,5 +42,25 @@
   "errors": {
     "first_pipette_not_selected": "You must select a pipette before proceeding.",
     "tiprack_not_selected": "You must select a tip rack before proceeding."
+  },
+  "file_tab": {
+    "heading": "Protocol Information",
+    "subheading": "Opentrons Flex Protocol",
+    "export": "Export Protocol",
+    "close_export": "Close Protocol",
+    "name_desc_title": "Name and Description",
+    "name": "Name : ",
+    "author": "Author : ",
+    "description": "Description : ",
+    "date_created": "Date Created : ",
+    "last_exported": "Last Exported : ",
+    "pipette": "Pipettes",
+    "swap_pipette": "Swap Pipette",
+    "additional_items": "Additional Items?",
+    "add_items": "Add Items",
+    "edit": "Edit",
+    "left": "Left mount -",
+    "right": "Right mount -",
+    "add_pipette": "Add Pipette"
   }
 }
