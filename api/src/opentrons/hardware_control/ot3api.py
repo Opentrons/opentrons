@@ -1952,10 +1952,10 @@ class OT3API(
         if z_distance_traveled < probe_settings.min_z_distance:
             min_z_travel_pos = final_position
             min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
-            raise EarlyLiquidSenseTrigger(
-                triggered_at=final_position,
-                min_z_pos=min_z_travel_pos,
-            )
+            # raise EarlyLiquidSenseTrigger(
+            #     triggered_at=final_position,
+            #     min_z_pos=min_z_travel_pos,
+            # )
         elif z_distance_traveled >= probe_settings.max_z_distance:
             max_z_travel_pos = final_position
             max_z_travel_pos[mount_axis] = probe_settings.max_z_distance

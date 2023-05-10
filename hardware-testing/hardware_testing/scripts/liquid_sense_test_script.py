@@ -34,7 +34,7 @@ def rename_file(path, target_file):
             shutil.copyfile( source,
                              path +'liquid_sense/pressure_data_{}.csv'.format(time.time()))
 
-def file_setup(test_data, details, pipette_model):
+def file_setup(test_data, details):
     today = datetime.date.today()
     test_name = "{}-LSD-Z-{}-P-{}-Threshold-{}".format( details[0], # Pipette model
                                             details[1], # mount_speed
@@ -192,7 +192,7 @@ async def _main() -> None:
     today = datetime.date.today()
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
                                     use_defaults=True)
-    pipette_model = hw_api._pipette_handler.hardware_instruments[args.mount].name
+    pipette_model = hw_api._pipette_handler.hardware_instruments[mount].name
     if args.dial_indicator:
         test_data ={
                     "Time_D": None,
@@ -242,6 +242,8 @@ async def _main() -> None:
                                                 expected_liquid_height = args.expected_liquid_height,
                                                 log_pressure = args.log_pressure,
                                                 aspirate_while_sensing = lp_method,
+                                                auto_zero_sensor = False,
+                                                num_baseline_reads = 10,
                                                 data_file = lp_file_name,
                                                 )
     try:
@@ -303,6 +305,7 @@ async def _main() -> None:
                     tiprack_loc = await _jog_axis(hw_api, current_position)
                     # Pick up tip
                     await hw_api.pick_up_tip(mount, tip_length)
+                    await hw_api.home_z(mount)
                     current_position = await hw_api.current_position_ot3(mount, refresh=True)
                     tip_home_pos = current_position
                     await hw_api.move_to(mount, Point(current_position[OT3Axis.X],
@@ -326,6 +329,7 @@ async def _main() -> None:
                                                         tiprack_loc[OT3Axis.Y] + y_offset,
                                                         tiprack_loc[OT3Axis.by_mount(mount)]))
                     await hw_api.pick_up_tip(mount, tip_length)
+                    await hw_api.home_z(mount)
                     tip_home_pos = await hw_api.current_position_ot3(mount,
                                                                     refresh=True,
                                                                     critical_point = CriticalPoint.TIP)
@@ -497,15 +501,15 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="right")
     parser.add_argument("--lp_method", type=str, choices=["push_air", "pull_air"], default="push_air")
-    parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
-    parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
-    parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
+    parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="C2")
+    parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="D2")
+    parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="C3")
     parser.add_argument("--tips", type=int, default = 40)
     parser.add_argument("--max_z_distance", type=float, default = 40)
     parser.add_argument("--min_z_distance", type=float, default = 5)
-    parser.add_argument("--mount_speed", type=float, default = 10)
-    parser.add_argument("--plunger_speed", type=float, default = 20)
-    parser.add_argument("--sensor_threshold", type=float, default = 180, help = "Threshold in Pascals")
+    parser.add_argument("--mount_speed", type=float, default =11.3)
+    parser.add_argument("--plunger_speed", type=float, default = 21.3)
+    parser.add_argument("--sensor_threshold", type=float, default = 110, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
     parser.add_argument("--log_pressure", action="store_true")
     parser.add_argument(
