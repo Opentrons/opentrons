@@ -189,6 +189,9 @@ class RobotCalibrationProvider:
         self._validate.cache_clear()
         self._robot_calibration = load()
 
+    def load_robot_calibration(self) -> None:
+        self._robot_calibration = load()
+
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
         self._validate.cache_clear()
         self._robot_calibration = robot_calibration
