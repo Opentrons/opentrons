@@ -38,7 +38,7 @@ class TipLengthCalibrationHandlerProvider(Generic[RobotType]):
         return None
 
 
-class InstrumentCalibrationHandlerProvider():
+class InstrumentCalibrationHandlerProvider(Generic[RobotType]):
     def __init__(self):
         return None
     
@@ -52,7 +52,7 @@ class InstrumentCalibrationHandlerProvider():
         return None
 
     def get_pipette_offset():
-		return None
+        return None
 
 
 
