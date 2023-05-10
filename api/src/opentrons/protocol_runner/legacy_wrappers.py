@@ -146,8 +146,8 @@ class LegacyContextCreator:
             hardware_api=self._hardware_api,
             # FIXME(mm, 2022-12-02): deck_type, like hardware_api, needs to match the
             # robot type that the protocol declares itself to run on.
-            # Guessing like this will often be wrong in analysis that's running in the
-            # Opentrons App.
+            # Guessing like this is wrong in in-app analysis.
+            # https://opentrons.atlassian.net/browse/RSS-156
             deck_type=guess_deck_type_from_global_config(),
             protocol_engine=self._protocol_engine,
             protocol_engine_loop=asyncio.get_running_loop(),
