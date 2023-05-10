@@ -9,6 +9,7 @@ from opentrons.protocol_engine import (
     CommandIntent,
     DeckSlotLocation,
     LabwareLocation,
+    LabwareMovementStrategy,
     LabwareOffsetCreate,
     LabwareOffsetLocation,
     LabwareOffsetVector,
@@ -117,6 +118,77 @@ def test_standardize_load_labware_command(
             version=123,
             labwareId="labwareId",
             displayName="displayName",
+        ),
+    )
+    assert subject.standardize_command(original, robot_type) == expected
+
+
+@pytest.mark.parametrize(
+    ("original_location", "robot_type", "expected_location"),
+    [
+        # DeckSlotLocations should have their slotName standardized.
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            "OT-2 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            "OT-3 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+            "OT-2 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+            "OT-3 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        ),
+        # ModuleLocations and OFF_DECK_LOCATIONs should be left alone.
+        (
+            ModuleLocation(moduleId="module-id"),
+            "OT-3 Standard",
+            ModuleLocation(moduleId="module-id"),
+        ),
+        (
+            OFF_DECK_LOCATION,
+            "OT-3 Standard",
+            OFF_DECK_LOCATION,
+        ),
+    ],
+)
+def test_standardize_move_labware_command(
+    original_location: LabwareLocation,
+    robot_type: RobotType,
+    expected_location: LabwareLocation,
+) -> None:
+    original = commands.MoveLabwareCreate(
+        intent=CommandIntent.SETUP,
+        key="key",
+        params=commands.MoveLabwareParams(
+            newLocation=original_location,
+            labwareId="labwareId",
+            strategy=LabwareMovementStrategy.USING_GRIPPER,
+            usePickUpLocationLpcOffset=True,
+            useDropLocationLpcOFfset=True,
+            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+            dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
+        ),
+    )
+    expected = commands.MoveLabwareCreate(
+        intent=CommandIntent.SETUP,
+        key="key",
+        params=commands.MoveLabwareParams(
+            newLocation=expected_location,
+            labwareId="labwareId",
+            strategy=LabwareMovementStrategy.USING_GRIPPER,
+            usePickUpLocationLpcOffset=True,
+            useDropLocationLpcOFfset=True,
+            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+            dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
         ),
     )
     assert subject.standardize_command(original, robot_type) == expected
