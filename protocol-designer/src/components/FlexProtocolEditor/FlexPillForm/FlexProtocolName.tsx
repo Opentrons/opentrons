@@ -18,6 +18,8 @@ function FlexProtocolNameComponent(): JSX.Element {
     touched,
     handleChange,
     handleBlur,
+    errors,
+    touched,
   } = useFormikContext<flexProtocolName>()
 
   return (

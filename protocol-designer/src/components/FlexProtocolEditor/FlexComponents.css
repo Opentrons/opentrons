@@ -30,7 +30,6 @@
 
 .flex_header {
   position: relative;
-  width: 919px;
   margin: 1.5rem auto auto;
 }
 
@@ -180,6 +179,14 @@
   width: 100%;
 }
 
-.error_message {
-  color: #ff0000;
+.error_text {
+  color: var(--c-red);
+}
+
+.ptb_10 {
+  padding: 5px 0;
+}
+
+.pb_10 {
+  padding-bottom: 10px;
 }

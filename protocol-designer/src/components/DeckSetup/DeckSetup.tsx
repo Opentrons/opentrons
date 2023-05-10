@@ -382,7 +382,8 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
             viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-            className={styles.robot_workspace}
+            width="100%"
+            height="100%"
           >
             {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
               <>
@@ -414,7 +415,8 @@ export const NullDeckState = (): JSX.Element => {
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
           deckDef={deckDef}
           viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
-          className={styles.robot_workspace}
+          width="100%"
+          height="100%"
         >
           {() => (
             <>

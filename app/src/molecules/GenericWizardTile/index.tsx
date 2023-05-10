@@ -21,7 +21,7 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {

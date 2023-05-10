@@ -25,10 +25,7 @@ import {
 } from '@opentrons/react-api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import {
-  MediumButton,
-  TabbedButton,
-} from '../../../atoms/buttons/OnDeviceDisplay'
+import { MediumButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'

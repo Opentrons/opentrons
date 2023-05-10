@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, OutlineButton } from '@opentrons/components'
+import { OutlineButton } from '@opentrons/components'
 import { i18n } from '../localization'
 import { CreateFlexFileForm } from './FlexProtocolEditor'
 import styles from './FlexProtocolEditor/FlexComponents.css'
@@ -15,7 +15,10 @@ function LandingPageComponent(props: PageProps): JSX.Element {
   return (
     <div className={styles.pd_landing_page}>
       <StyledText as="h1">{i18n.t('flex.landing_page.welcome')}</StyledText>
-      <Icon name={'ot-logo'} className={styles.ot_flex_logo} />
+      <img
+        className={styles.ot_flex_logo}
+        src={require('../images/ot_logo.png')}
+      />
       <div className={styles.flex_landing_buttons_wrapper}>
         <OutlineButton
           className={styles.flex_landing_button}
@@ -50,7 +53,11 @@ export const selectRobotPage = (
 ): JSX.Element | null => {
   switch (page) {
     case selectPageForms.newFlexFileForm:
-      return <CreateFlexFileForm setPageProps={setPage} />
+      return (
+        <ProtocolEditor>
+          <CreateFlexFileForm setPageProps={setPage} />
+        </ProtocolEditor>
+      )
     case selectPageForms.protocolEditor:
       return <ProtocolEditor />
     case selectPageForms.defaultLandingPage:
