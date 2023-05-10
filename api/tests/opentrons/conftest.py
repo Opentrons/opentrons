@@ -35,7 +35,6 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
 from opentrons_shared_data.deck import (
     load as load_deck,
-    DefinitionName as DeckDefinitionName,
     DEFAULT_DECK_DEFINITION_VERSION,
 )
 
@@ -55,6 +54,7 @@ from opentrons.protocol_api import (
     create_protocol_context,
 )
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocols.api_support import default_deck_type
 from opentrons.types import Location, Point
 
 
@@ -238,18 +238,18 @@ async def robot_model(
 
 
 @pytest.fixture
-def deck_definition_name(robot_model: RobotModel) -> DeckDefinitionName:
+def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
-        return DeckDefinitionName.OT3_STANDARD
+        return default_deck_type.STANDARD_OT3_DECK
     elif robot_model == "OT-2 Standard":
         # There are two OT-2 deck definitions (standard and short-trash),
         # but RobotModel does not draw such a distinction. We assume here that it's
         # sufficient to run OT-2 tests with the standard deck definition only.
-        return DeckDefinitionName.OT2_STANDARD
+        return default_deck_type.STANDARD_OT2_DECK
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: DeckDefinitionName) -> DeckDefinitionV3:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
 
 
@@ -275,7 +275,7 @@ async def hardware(
 
 @pytest.fixture()
 def ctx(
-    hardware: ThreadManagedHardware, deck_definition_name: DeckDefinitionName
+    hardware: ThreadManagedHardware, deck_definition_name: str
 ) -> Generator[ProtocolContext, None, None]:
     c = create_protocol_context(
         api_version=MAX_SUPPORTED_VERSION,

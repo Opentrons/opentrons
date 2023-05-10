@@ -4,9 +4,11 @@ from typing import Any
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
-
 from opentrons.hardware_control.modules import ModuleType
+from opentrons.protocols.api_support.default_deck_type import (
+    SHORT_TRASH_DECK,
+    STANDARD_OT2_DECK,
+)
 from opentrons.protocols.geometry import deck_conflict
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -20,14 +22,12 @@ def mock_deck_conflict_check(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.setattr(deck_conflict, "check", mock_check)
 
 
-@pytest.fixture(
-    # Test with all deck definitions by iterating over the DeckDefinitionName enum.
-    params=DeckDefinitionName
-)
+# This Deck class is only used by Python Protocol API versions earlier than 2.13,
+# which only support the OT-2, not the OT-3.
+@pytest.fixture(params=[STANDARD_OT2_DECK, SHORT_TRASH_DECK])
 def subject(request) -> Deck:
     """Get a Deck test subject."""
-    deck_definition_name: DeckDefinitionName = request.param
-    return Deck(deck_type=deck_definition_name)
+    return Deck(deck_type=request.param)
 
 
 @pytest.mark.parametrize("slot_number", range(1, 12))

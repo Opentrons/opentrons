@@ -20,11 +20,11 @@ from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
 )
 
+from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.geometry.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
 )
 
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
@@ -56,7 +56,7 @@ def ctx_with_tempdeck(
     return papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=mock_hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
     )
 
 
@@ -72,7 +72,7 @@ def ctx_with_magdeck(
     return papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=mock_hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
     )
 
 
@@ -88,7 +88,7 @@ async def ctx_with_thermocycler(
     return papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=mock_hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
     )
 
 
@@ -106,7 +106,7 @@ def ctx_with_heater_shaker(
     ctx = papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=mock_hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
     )
     ctx.location_cache = mock_pipette_location
     return ctx

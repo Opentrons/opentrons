@@ -5,12 +5,12 @@ import mock
 from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
+from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
 
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
@@ -529,7 +529,6 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
     ) as fake_move, mock.patch.object(
         ctx._implementation.get_hardware()._obj_to_adapt, "dispense"
     ) as fake_hw_dispense:
-
         instr.dispense(2.0, lw.wells()[0].bottom())
         assert "dispensing" in ",".join([cmd.lower() for cmd in ctx.commands()])
         fake_hw_dispense.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
@@ -546,7 +545,6 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
     ) as fake_move, mock.patch.object(
         ctx._implementation.get_hardware()._obj_to_adapt, "dispense"
     ) as fake_hw_dispense:
-
         instr.well_bottom_clearance.dispense = 2.0
         instr.dispense(2.0, lw.wells()[0])
         dest_point, dest_lw = lw.wells()[0].bottom()
@@ -560,7 +558,6 @@ def test_dispense(ctx, get_labware_def, monkeypatch):
     ) as fake_move, mock.patch.object(
         ctx._implementation.get_hardware()._obj_to_adapt, "dispense"
     ) as fake_hw_dispense:
-
         instr.well_bottom_clearance.dispense = 2.0
         instr.dispense(2.0, lw.wells()[0])
         dest_point, dest_lw = lw.wells()[0].bottom()
@@ -973,7 +970,7 @@ def test_order_of_module_load():
     ctx1 = protocol_api.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=fake_hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
     )
 
     temp1 = ctx1.load_module("tempdeck", 4)
@@ -991,7 +988,7 @@ def test_order_of_module_load():
     ctx2 = protocol_api.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=fake_hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
     )
 
     ctx2.load_module("thermocycler")
@@ -1061,7 +1058,7 @@ def test_bundled_labware(get_labware_fixture, hardware):
     ctx = papi.create_protocol_context(
         api_version=papi.MAX_SUPPORTED_VERSION,
         hardware_api=hardware,
-        deck_type=DeckDefinitionName.OT2_STANDARD,
+        deck_type=STANDARD_OT2_DECK,
         bundled_labware=bundled_labware,
     )
 
@@ -1078,7 +1075,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         ctx = papi.create_protocol_context(
             api_version=papi.MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
-            deck_type=DeckDefinitionName.OT2_STANDARD,
+            deck_type=STANDARD_OT2_DECK,
             bundled_labware=bundled_labware,
         )
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
@@ -1091,7 +1088,7 @@ def test_bundled_labware_missing(get_labware_fixture, hardware):
         ctx = papi.create_protocol_context(
             api_version=papi.MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
-            deck_type=DeckDefinitionName.OT2_STANDARD,
+            deck_type=STANDARD_OT2_DECK,
             bundled_labware={},
             extra_labware=bundled_labware,
         )

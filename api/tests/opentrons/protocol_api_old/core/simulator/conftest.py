@@ -21,14 +21,13 @@ from opentrons.protocol_api.core.simulator.protocol_context import (
     ProtocolContextSimulation,
 )
 
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
 def protocol_context(
-    hardware: ThreadManagedHardware, deck_definition_name: DeckDefinitionName
+    hardware: ThreadManagedHardware, deck_definition_name: str
 ) -> ProtocolContextImplementation:
     """Protocol context implementation fixture."""
     return ProtocolContextImplementation(
@@ -42,7 +41,7 @@ def protocol_context(
 @pytest.fixture
 def simulating_protocol_context(
     hardware: ThreadManagedHardware,
-    deck_definition_name: DeckDefinitionName,
+    deck_definition_name: str,
 ) -> ProtocolContextSimulation:
     """Protocol context simulation fixture."""
     return ProtocolContextSimulation(

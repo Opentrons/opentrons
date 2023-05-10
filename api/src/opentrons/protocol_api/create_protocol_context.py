@@ -2,7 +2,6 @@
 import asyncio
 from typing import Any, Dict, Optional, Union
 
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.broker import Broker
@@ -36,7 +35,7 @@ def create_protocol_context(
     api_version: APIVersion,
     *,
     hardware_api: Union[HardwareControlAPI, ThreadManager[HardwareControlAPI]],
-    deck_type: DeckDefinitionName,
+    deck_type: str,
     protocol_engine: Optional[ProtocolEngine] = None,
     protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
     broker: Optional[Broker] = None,

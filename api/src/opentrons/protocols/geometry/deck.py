@@ -6,7 +6,6 @@ from typing import Optional, List
 
 from opentrons_shared_data.deck import (
     load as load_deck,
-    DefinitionName as DeckDefinitionName,
     DEFAULT_DECK_DEFINITION_VERSION,
 )
 from opentrons_shared_data.deck.dev_types import SlotDefV3
@@ -42,7 +41,7 @@ class CalibrationPosition:
 
 
 class Deck(UserDict):
-    def __init__(self, deck_type: DeckDefinitionName) -> None:
+    def __init__(self, deck_type: str) -> None:
         super().__init__()
         self._definition = load_deck(
             name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION

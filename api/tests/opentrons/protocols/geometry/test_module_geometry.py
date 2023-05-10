@@ -8,6 +8,7 @@ from opentrons.types import Location, Point
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 
+from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.geometry.module_geometry import (
     create_geometry_for_ot2_deck,
     ModuleGeometry,
@@ -16,7 +17,6 @@ from opentrons.protocols.geometry.module_geometry import (
 )
 from opentrons.protocols.geometry.deck import Deck
 
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons_shared_data.module.dev_types import (
     ModuleDefinitionV3,
     ModuleDefinitionV1,
@@ -87,9 +87,7 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
 @pytest.fixture
 def heater_shaker_geometry() -> HeaterShakerGeometry:
     """Get a Heater-Shaker Geometry fixture."""
-    heater_shaker_slot_location = Deck(
-        deck_type=DeckDefinitionName.OT2_STANDARD
-    ).position_for(5)
+    heater_shaker_slot_location = Deck(deck_type=STANDARD_OT2_DECK).position_for(5)
     return HeaterShakerGeometry(
         display_name="A new shiny module!",
         model=HeaterShakerModuleModel.HEATER_SHAKER_V1,

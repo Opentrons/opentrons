@@ -1,8 +1,12 @@
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
 from opentrons.config import feature_flags
 
 
-def guess_from_global_config() -> DeckDefinitionName:
+SHORT_TRASH_DECK = "ot2_short_trash"
+STANDARD_OT2_DECK = "ot2_standard"
+STANDARD_OT3_DECK = "ot3_standard"
+
+
+def guess_from_global_config() -> str:
     """Return a default deck type based on global environment configuration.
 
     Deprecated:
@@ -15,8 +19,8 @@ def guess_from_global_config() -> DeckDefinitionName:
             permanently configured for any single specific deck type.
     """
     if feature_flags.enable_ot3_hardware_controller():
-        return DeckDefinitionName.OT3_STANDARD
+        return STANDARD_OT3_DECK
     elif feature_flags.short_fixed_trash():
-        return DeckDefinitionName.OT2_SHORT_TRASH
+        return SHORT_TRASH_DECK
     else:
-        return DeckDefinitionName.OT2_STANDARD
+        return STANDARD_OT2_DECK

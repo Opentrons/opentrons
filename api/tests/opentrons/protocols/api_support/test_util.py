@@ -1,12 +1,11 @@
 import pytest
 
-from opentrons_shared_data.deck import DefinitionName as DeckDefinitionName
-
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -64,7 +63,7 @@ def test_build_edges():
         api_version=MAX_SUPPORTED_VERSION,
     )
     off = Point(0, 0, 1.0)
-    deck = Deck(deck_type=DeckDefinitionName.OT2_STANDARD)
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     old_correct_edges = [
         test_lw["A1"].from_center_cartesian(x=1.0, y=0, z=1) + off,
         test_lw["A1"].from_center_cartesian(x=-1.0, y=0, z=1) + off,
