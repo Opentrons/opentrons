@@ -57,19 +57,19 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
         instrument.mount === 'extension'
           ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
           : {
-            closeFlow: () => {
-              setWizardProps(null)
-            },
-            onComplete: () => {
-              history.goBack()
-            },
-            mount: instrument.mount as PipetteMount,
-            selectedPipette:
-              instrument.instrumentModel === 'p1000_96'
-                ? NINETY_SIX_CHANNEL
-                : SINGLE_MOUNT_PIPETTES,
-            flowType: FLOWS.DETACH,
-          }
+              closeFlow: () => {
+                setWizardProps(null)
+              },
+              onComplete: () => {
+                history.goBack()
+              },
+              mount: instrument.mount as PipetteMount,
+              selectedPipette:
+                instrument.instrumentModel === 'p1000_96'
+                  ? NINETY_SIX_CHANNEL
+                  : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.DETACH,
+            }
       )
     }
   }
@@ -78,20 +78,20 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(
         instrument.mount === 'extension'
           ? {
-            ...sharedGripperWizardProps,
-            flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
-          }
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+            }
           : {
-            closeFlow: () => {
-              setWizardProps(null)
-            },
-            mount: instrument.mount as PipetteMount,
-            selectedPipette:
-              instrument.instrumentModel === 'p1000_96'
-                ? NINETY_SIX_CHANNEL
-                : SINGLE_MOUNT_PIPETTES,
-            flowType: FLOWS.CALIBRATE,
-          }
+              closeFlow: () => {
+                setWizardProps(null)
+              },
+              mount: instrument.mount as PipetteMount,
+              selectedPipette:
+                instrument.instrumentModel === 'p1000_96'
+                  ? NINETY_SIX_CHANNEL
+                  : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.CALIBRATE,
+            }
       )
     }
   }
@@ -113,8 +113,8 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
             value={
               instrument.data.calibratedOffset?.last_modified != null
                 ? formatTimestamp(
-                  instrument.data.calibratedOffset?.last_modified
-                )
+                    instrument.data.calibratedOffset?.last_modified
+                  )
                 : t('no_cal_data')
             }
           />
