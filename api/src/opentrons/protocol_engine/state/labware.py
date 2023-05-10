@@ -400,7 +400,7 @@ class LabwareView(HasState[LabwareState]):
 
         left_path_criteria = mount is MountType.RIGHT and well_name in left_column
         right_path_criteria = mount is MountType.LEFT and well_name in right_column
-        labware_right_side = labware_slot in [
+        labware_right_side = labware_slot.to_ot2_equivalent() in [
             DeckSlotName.SLOT_3,
             DeckSlotName.SLOT_6,
             DeckSlotName.SLOT_9,
