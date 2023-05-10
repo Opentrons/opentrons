@@ -77,18 +77,16 @@ export function RecentRunProtocolCarousel({
             protocol.metadata.protocolName ?? protocol.files[0].name
 
           return (
-            <>
+            <React.Fragment key={protocolId}>
               {run ? (
-                <React.Fragment key={protocolId}>
-                  <RecentRunProtocolCard
-                    lastRun={run?.createdAt}
-                    protocolId={protocolId}
-                    protocolName={protocolName}
-                    runId={run?.id}
-                  />
-                </React.Fragment>
+                <RecentRunProtocolCard
+                  lastRun={run?.createdAt}
+                  protocolId={protocolId}
+                  protocolName={protocolName}
+                  runId={run?.id}
+                />
               ) : null}
-            </>
+            </React.Fragment>
           )
         })}
       </Flex>

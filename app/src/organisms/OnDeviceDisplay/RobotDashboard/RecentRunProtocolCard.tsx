@@ -46,9 +46,7 @@ export function RecentRunProtocolCard({
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (createRunResponse: Run): void =>
-    runId != null
-      ? history.push(`protocols/${createRunResponse.data.id}/setup`)
-      : history.push(`protocols`)
+    history.push(`protocols/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runId, onResetSuccess)
 
   const PROTOCOL_CARD_STYLE = css`
