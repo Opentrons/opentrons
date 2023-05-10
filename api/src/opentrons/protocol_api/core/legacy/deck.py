@@ -7,8 +7,8 @@ from typing import Dict, Optional, List, Union
 from typing_extensions import Protocol
 
 from opentrons_shared_data.deck import (
-    load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
+    load as load_deck,
 )
 from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
