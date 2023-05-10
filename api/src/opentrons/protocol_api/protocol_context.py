@@ -597,8 +597,6 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
-        # TODO (spp): ensure that the specified mount is valid for the robot type specified.
-        #  So 'extension' mount should error out on ot2.
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         is_96_channel = instrument_name == "p1000_96"
         if is_96_channel and isinstance(self._core, ProtocolEngineCore):

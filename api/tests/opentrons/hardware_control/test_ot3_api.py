@@ -53,7 +53,7 @@ from opentrons.hardware_control.backends.ot3utils import (
     axis_to_node,
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.types import Point, Mount
+from opentrons.types import Point, Mount, MountType
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -390,12 +390,14 @@ def mock_backend_capacitive_pass(
         (OT3Mount.RIGHT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R]),
         (OT3Mount.LEFT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]),
         (OT3Mount.GRIPPER, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
+        (Mount.EXTENSION, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
+        (MountType.EXTENSION, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
     ],
 )
 async def test_move_to_without_homing_first(
     ot3_hardware: ThreadManager[OT3API],
     mock_home: AsyncMock,
-    mount: OT3Mount,
+    mount: Union[Mount, MountType, OT3Mount],
     homed_axis: List[OT3Axis],
 ) -> None:
     """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
@@ -892,6 +894,12 @@ async def test_gripper_move_to(
             OT3Axis.Y,
             OT3Axis.Z_G,
         ]
+
+
+async def test_move_gripper_mount_without_gripper_attached(
+    ot3_hardware: ThreadManager[OT3API], mock_backend_move: AsyncMock
+) -> None:
+    """It should move the empty gripper mount to specified position."""
 
 
 @pytest.mark.parametrize("enable_stalls", [True, False])

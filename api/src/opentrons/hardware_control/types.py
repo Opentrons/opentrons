@@ -98,11 +98,13 @@ class OT3Mount(enum.Enum):
             top_types.Mount, top_types.MountType, top_types.OT3MountType, "OT3Mount"
         ],
     ) -> "OT3Mount":
+        if mount == top_types.Mount.EXTENSION or mount == top_types.MountType.EXTENSION:
+            return OT3Mount.GRIPPER
         return cls[mount.name]
 
     def to_mount(self) -> top_types.Mount:
         if self.value == self.GRIPPER.value:
-            raise KeyError("Gripper mount is not representable")
+            return top_types.Mount.EXTENSION
         return top_types.Mount[self.name]
 
 

@@ -55,7 +55,9 @@ async def test_open_labware_latch(
     result = await subject.execute(data)
     decoy.verify(
         hs_module_substate.raise_if_shaking(),
-        await movement.home([MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z, MotorAxis.EXTENSION_Z]),
+        await movement.home(
+            [MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z, MotorAxis.EXTENSION_Z]
+        ),
         await hs_hardware.open_labware_latch(),
     )
     assert result == heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True)
