@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory, Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -13,25 +13,18 @@ import {
   COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   JUSTIFY_CENTER,
   PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { TertiaryButton } from '../../../atoms/buttons'
-import {
-  getNetworkInterfaces,
-  fetchStatus,
-  fetchWifiList,
-} from '../../../redux/networking'
+import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
   SimpleInterfaceStatus,
-  WifiNetwork,
   WifiSecurityType,
 } from '../../../redux/networking/types'
 
@@ -40,7 +33,6 @@ interface WifiConnectionDetailsProps {
   authType?: WifiSecurityType
   showHeader?: boolean
   showWifiListButton?: boolean
-  wifiList?: WifiNetwork[]
 }
 
 export function WifiConnectionDetails({
@@ -48,7 +40,6 @@ export function WifiConnectionDetails({
   authType,
   showHeader = true,
   showWifiListButton = false,
-  wifiList,
 }: WifiConnectionDetailsProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -59,7 +50,6 @@ export function WifiConnectionDetails({
 
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
   }, [robotName, dispatch])
 
   return (
@@ -72,15 +62,6 @@ export function WifiConnectionDetails({
         authType={authType ?? 'none'}
       />
       <DisplayButtons showWifiListButton={showWifiListButton} />
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
     </Flex>
   )
 }
@@ -115,9 +96,7 @@ const DisplayConnectionStatus = ({
     <Flex
       flexDirection={DIRECTION_ROW}
       padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
-      backgroundColor={
-        connected ? COLORS.successBackgroundMed : COLORS.light_two
-      }
+      backgroundColor={connected ? COLORS.successBackgroundMed : COLORS.light2}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       borderRadius={BORDERS.size_three}
@@ -125,7 +104,7 @@ const DisplayConnectionStatus = ({
       <Icon
         name="ot-check"
         size="2.5rem"
-        color={connected ? COLORS.successEnabled : COLORS.light_two}
+        color={connected ? COLORS.successEnabled : COLORS.light2}
       />
       <StyledText
         marginLeft={SPACING.spacing5}

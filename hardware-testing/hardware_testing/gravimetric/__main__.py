@@ -15,7 +15,8 @@ from hardware_testing.protocols import (
 )
 
 from . import execute, helpers, workarounds
-from .config import GravimetricConfig
+from .config import GravimetricConfig, GANTRY_MAX_SPEED
+from .measurement import DELAY_FOR_MEASUREMENT
 
 LABWARE_OFFSETS: List[dict] = []
 
@@ -46,13 +47,14 @@ def run(
     pipette_channels: int,
     tip_volume: int,
     trials: int,
-    starting_tip: str,
     increment: bool,
     return_tip: bool,
     blank: bool,
     mix: bool,
     inspect: bool,
     user_volumes: bool,
+    gantry_speed: int,
+    scale_delay: int,
 ) -> None:
     """Run."""
     protocol_cfg = PROTOCOL_CFG[pipette_volume][pipette_channels][tip_volume]
@@ -65,9 +67,9 @@ def run(
             pipette_channels=pipette_channels,
             tip_volume=tip_volume,
             trials=trials,
-            starting_tip=starting_tip,
             labware_offsets=LABWARE_OFFSETS,
-            slot_vial=protocol_cfg.SLOT_VIAL,  # type: ignore[attr-defined]
+            labware_on_scale=protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
+            slot_scale=protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
             slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
             increment=increment,
             return_tip=return_tip,
@@ -75,6 +77,8 @@ def run(
             mix=mix,
             inspect=inspect,
             user_volumes=user_volumes,
+            gantry_speed=gantry_speed,
+            scale_delay=scale_delay,
         ),
     )
 
@@ -86,12 +90,6 @@ if __name__ == "__main__":
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
-    starting_tip_choices = [
-        f"{row}{col + 1}" for row in "ABCDEFGH" for col in list(range(12))
-    ]
-    parser.add_argument(
-        "--starting-tip", type=str, choices=starting_tip_choices, required=True
-    )
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
@@ -99,6 +97,8 @@ if __name__ == "__main__":
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
+    parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
+    parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -123,11 +123,12 @@ if __name__ == "__main__":
         args.channels,
         args.tip,
         args.trials,
-        args.starting_tip,
         args.increment,
         args.return_tip,
         args.blank,
         args.mix,
         args.inspect,
         args.user_volumes,
+        args.gantry_speed,
+        args.scale_delay,
     )
