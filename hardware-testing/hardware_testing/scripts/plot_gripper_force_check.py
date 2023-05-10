@@ -15,7 +15,7 @@ class Plot:
         self.PLOT_HEIGHT = 800
         self.PLOT_WIDTH = 1000
         self.PLOT_FONT = 16
-        self.PLOT_PATH = "plot_force_check/"
+        self.PLOT_PATH = "plot_gripper_force_check/"
         self.PLOT_FORMAT = ".png"
         self.plot_param = {
             "figure":None,
