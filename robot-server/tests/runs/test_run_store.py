@@ -247,38 +247,43 @@ def test_get_run_missing(subject: RunStore) -> None:
         subject.get(run_id="run-id")
 
 
-def test_get_all_runs(subject: RunStore) -> None:
-    """It can get all created runs."""
-    subject.insert(
-        run_id="run-id-1",
-        protocol_id=None,
-        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-    )
-    subject.insert(
-        run_id="run-id-2",
-        protocol_id=None,
-        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-    )
-
-    result = subject.get_all(length=20)
-
-    assert result == [
-        RunResource(
-            run_id="run-id-1",
-            protocol_id=None,
-            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            actions=[],
+@pytest.mark.parametrize(
+    "length, expected_result",
+    [
+        (0, []),
+        (
+            1,
+            [
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+                    actions=[],
+                )
+            ],
         ),
-        RunResource(
-            run_id="run-id-2",
-            protocol_id=None,
-            created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-            actions=[],
+        (
+            20,
+            [
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+                RunResource(
+                    run_id="run-id-1",
+                    protocol_id=None,
+                    created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+            ],
         ),
-    ]
-
-
-def test_get_all_runs_length_0(subject: RunStore) -> None:
+    ],
+)
+def test_get_all_runs(
+    subject: RunStore, length: int, expected_result: List[RunResource]
+) -> None:
     """It gets the number of created runs supplied in length."""
     subject.insert(
         run_id="run-id-1",
@@ -291,9 +296,9 @@ def test_get_all_runs_length_0(subject: RunStore) -> None:
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
     )
 
-    result = subject.get_all(length=0)
+    result = subject.get_all(length=length)
 
-    assert result == []
+    assert result == expected_result
 
 
 def test_remove_run(subject: RunStore) -> None:
