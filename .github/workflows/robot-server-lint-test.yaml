@@ -11,6 +11,7 @@ on:
       - 'hardware/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
+      - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
       - 'notify-server/**/*'
@@ -30,6 +31,7 @@ on:
       - 'hardware/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
+      - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
       - 'notify-server/**/*'
@@ -57,6 +59,8 @@ jobs:
         with-ot-hardware: ['true', 'false']
     steps:
       - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
@@ -72,7 +76,11 @@ jobs:
         run: make -C robot-server setup-ot2
       - name: Lint
         run: make -C robot-server lint
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: make -C robot-server test-cov test_opts="-m 'not ot3_only'"
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C robot-server test-cov
       - name: Ensure assets build
         run: make -C robot-server sdist wheel

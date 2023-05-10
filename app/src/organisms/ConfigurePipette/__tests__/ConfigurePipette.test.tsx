@@ -76,6 +76,6 @@ describe('ConfigurePipette', () => {
     const { getAllByRole } = render(props)
 
     const inputs = getAllByRole('textbox')
-    expect(inputs.length).toBe(9)
+    expect(inputs.length).toBe(13)
   })
 })

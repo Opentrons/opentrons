@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { getAdapterName } from '@opentrons/shared-data'
 import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -18,10 +17,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   useHoverTooltip,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -37,7 +38,7 @@ export const HeaterShakerWizard = (
   const { onCloseClick, moduleFromProtocol, attachedModule } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   let isPrimaryCTAEnabled: boolean = true

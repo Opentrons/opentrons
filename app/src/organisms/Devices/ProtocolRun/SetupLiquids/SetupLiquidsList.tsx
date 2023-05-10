@@ -23,7 +23,12 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import {
+  useTrackEvent,
+  ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
+  ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+} from '../../../../redux/analytics'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -46,7 +51,8 @@ const HIDE_SCROLLBAR = css`
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
   const { runId } = props
-  const protocolData = useProtocolDetailsForRun(runId).protocolData
+  const protocolData = useMostRecentCompletedAnalysis(runId)
+
   const liquidsInLoadOrder = parseLiquidsInLoadOrder(
     protocolData?.liquids ?? [],
     protocolData?.commands ?? []
@@ -90,8 +96,10 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
     string | null
   >(null)
-  const commands = useProtocolDetailsForRun(runId).protocolData?.commands
+  const commands = useMostRecentCompletedAnalysis(runId)?.commands
+
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands ?? [])
+  const trackEvent = useTrackEvent()
 
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
@@ -108,12 +116,15 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       ${BORDERS.cardOutlineBorder}
     }
   `
-
+  const handleSetOpenItem = (): void => {
+    setOpenItem(!openItem)
+    trackEvent({ name: ANALYTICS_EXPAND_LIQUID_SETUP_ROW, properties: {} })
+  }
   return (
     <Box
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing4}
-      onClick={() => setOpenItem(!openItem)}
+      onClick={handleSetOpenItem}
       backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
@@ -171,6 +182,13 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               labware.labwareId,
               commands
             )
+            const handleLiquidDetailsLabwareId = (): void => {
+              setLiquidDetailsLabwareId(labware.labwareId)
+              trackEvent({
+                name: ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+                properties: {},
+              })
+            }
             return (
               <Box
                 css={LIQUID_CARD_ITEM_STYLE}
@@ -179,8 +197,8 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 marginBottom={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
-                data-testid={`LiquidsListItem_slotRow_${index}`}
-                onClick={() => setLiquidDetailsLabwareId(labware.labwareId)}
+                data-testid={`LiquidsListItem_slotRow_${String(index)}`}
+                onClick={handleLiquidDetailsLabwareId}
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}

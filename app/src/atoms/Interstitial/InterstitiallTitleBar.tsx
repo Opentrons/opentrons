@@ -59,7 +59,7 @@ export function InterstitialTitleBar(
           {title}
         </Flex>
       </Flex>
-      {exit && (
+      {exit != null && (
         <Flex
           paddingRight={TYPOGRAPHY.fontSizeH6}
           data-testid={`titlebar_${exit.title}`}

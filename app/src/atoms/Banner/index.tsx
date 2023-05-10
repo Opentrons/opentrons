@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -12,8 +13,8 @@ import {
   BORDERS,
   Btn,
   SIZE_1,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import type { StyleProps } from '@opentrons/components'
 
 export type BannerType =
@@ -29,7 +30,7 @@ export interface BannerProps extends StyleProps {
   /** Banner contents */
   children?: React.ReactNode
   /** optional handler to show close button/clear alert  */
-  onCloseClick?: (() => unknown) | React.MouseEventHandler<HTMLButtonElement>
+  onCloseClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
   /** Override the default Alert Icon */
   icon?: IconProps
   /** some banner onCloseClicks fire events, this allows a spinner after click but before event finishes */
@@ -79,7 +80,7 @@ export function Banner(props: BannerProps): JSX.Element {
     onCloseClick,
     icon,
     children,
-    isCloseActionLoading,
+    isCloseActionLoading = false,
     padding,
     closeButton,
     iconMarginLeft,
@@ -88,7 +89,6 @@ export function Banner(props: BannerProps): JSX.Element {
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
-
   const iconProps = {
     ...(icon ?? bannerProps.icon),
     size: size ?? SIZE_1,
@@ -96,13 +96,26 @@ export function Banner(props: BannerProps): JSX.Element {
     marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
+  const BANNER_STYLE = css`
+    border: ${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)}
+      ${BANNER_PROPS_BY_TYPE[type].color};
+    font-size: ${TYPOGRAPHY.fontSizeP};
+    font-weight: ${TYPOGRAPHY.fontWeightRegular};
+    border-radius: ${SPACING.spacing2};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: 1.25rem;
+      font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+      border: none;
+      background-color: ${COLORS.yellow3};
+      border-radius: ${BORDERS.size_three};
+      line-height: 1.5rem;
+    }
+  `
   return (
     <Flex
-      fontSize={TYPOGRAPHY.fontSizeP}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
-      borderRadius={SPACING.spacing2}
       backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color}`}
+      css={BANNER_STYLE}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
@@ -119,7 +132,7 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex flex="1" alignItems={ALIGN_CENTER}>
         {props.children}
       </Flex>
-      {onCloseClick && !(isCloseActionLoading ?? false) ? (
+      {onCloseClick != null && !(isCloseActionLoading ?? false) ? (
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
@@ -132,7 +145,7 @@ export function Banner(props: BannerProps): JSX.Element {
           )}
         </Btn>
       ) : null}
-      {isCloseActionLoading && (
+      {(isCloseActionLoading ?? false) && (
         <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
       )}
     </Flex>

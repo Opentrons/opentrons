@@ -48,13 +48,6 @@ export const PipetteOverflowMenu = (
     pipetteSpecs?.displayName != null ? pipetteSpecs.displayName : t('empty')
   const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
 
-  const calibratePipetteText = isOT3PipetteAttached
-    ? 'calibrate_pipette'
-    : 'calibrate_pipette_offset'
-  const recalibratePipetteText = isOT3PipetteAttached
-    ? 'recalibrate_pipette'
-    : 'recalibrate_pipette_offset'
-
   return (
     <Flex position={POSITION_RELATIVE}>
       <Flex
@@ -65,54 +58,62 @@ export const PipetteOverflowMenu = (
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
         top="2.6rem"
-        right={`calc(50% + ${SPACING.spacing2})`}
+        right={`calc(50% + ${String(SPACING.spacing2)})`}
         flexDirection={DIRECTION_COLUMN}
       >
         {pipetteDisplayName === 'Empty' ? (
           <MenuItem
-            key={`${pipetteDisplayName}_${mount}_attach_pipette`}
+            key={`${String(pipetteDisplayName)}_${mount}_attach_pipette`}
             onClick={() => handleChangePipette()}
-            data-testid={`pipetteOverflowMenu_attach_pipette_btn_${pipetteDisplayName}_${mount}`}
+            data-testid={`pipetteOverflowMenu_attach_pipette_btn_${String(
+              pipetteDisplayName
+            )}_${mount}`}
           >
             {t('attach_pipette')}
           </MenuItem>
         ) : (
           <>
+            {isOT3PipetteAttached && (
+              <MenuItem
+                key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
+                onClick={() => handleCalibrate()}
+                data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
+              >
+                {t(
+                  isPipetteCalibrated
+                    ? 'recalibrate_pipette'
+                    : 'calibrate_pipette'
+                )}
+              </MenuItem>
+            )}
             <MenuItem
-              key={`${pipetteDisplayName}_${mount}_calibrate_offset`}
-              onClick={() => handleCalibrate()}
-              data-testid={`pipetteOverflowMenu_calibrate_offset_btn_${pipetteDisplayName}_${mount}`}
-            >
-              {t(
-                isPipetteCalibrated
-                  ? recalibratePipetteText
-                  : calibratePipetteText
-              )}
-            </MenuItem>
-            <MenuItem
-              key={`${pipetteDisplayName}_${mount}_detach`}
+              key={`${String(pipetteDisplayName)}_${mount}_detach`}
               onClick={() => handleChangePipette()}
-              data-testid={`pipetteOverflowMenu_detach_pipette_btn_${pipetteDisplayName}_${mount}`}
+              data-testid={`pipetteOverflowMenu_detach_pipette_btn_${String(
+                pipetteDisplayName
+              )}_${mount}`}
             >
               {t('detach_pipette')}
             </MenuItem>
             <MenuItem
-              key={`${pipetteDisplayName}_${mount}_about_pipette`}
+              key={`${String(pipetteDisplayName)}_${mount}_about_pipette`}
               onClick={() => handleAboutSlideout()}
               data-testid={`pipetteOverflowMenu_about_pipette_slideout_btn_${pipetteDisplayName}_${mount}`}
             >
               {t('about_pipette')}
             </MenuItem>
             <Divider marginY="0" />
-            {!isOT3PipetteAttached && (
+            {!isOT3PipetteAttached ? (
               <MenuItem
-                key={`${pipetteDisplayName}_${mount}_view_settings`}
+                key={`${String(pipetteDisplayName)}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}
-                data-testid={`pipetteOverflowMenu_view_settings_btn_${pipetteDisplayName}_${mount}`}
+                data-testid={`pipetteOverflowMenu_view_settings_btn_${String(
+                  pipetteDisplayName
+                )}_${mount}`}
               >
                 {t('view_pipette_setting')}
               </MenuItem>
-            )}
+            ) : null}
           </>
         )}
       </Flex>

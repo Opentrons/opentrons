@@ -5,13 +5,13 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   SPACING,
+  PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../molecules/Modal'
-import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 
@@ -54,7 +54,7 @@ export function ProtocolAnalysisErrorModal({
             role="button"
             aria-label="close_analysis_error_modal"
             marginTop={SPACING.spacing4}
-            padding={`${SPACING.spacing3} ${SPACING.spacing7}`}
+            padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing7)}`}
             onClick={onClose}
           >
             <StyledText

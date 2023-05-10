@@ -42,12 +42,12 @@ class RobotServerSettings(BaseSettings):
     """
 
     simulator_configuration_file_path: typing.Optional[str] = Field(
-        None,
+        default=None,
         description="Path to a json file that describes the hardware simulator.",
     )
 
     notification_server_subscriber_address: str = Field(
-        "tcp://localhost:5555",
+        default="tcp://localhost:5555",
         description="The endpoint to subscribe to notification server topics.",
     )
 
@@ -62,7 +62,7 @@ class RobotServerSettings(BaseSettings):
         # and it's difficult to override this settings object for our unit tests.
         # Making this non-defaultable breaks tests that hit code with deep calls to
         # get_settings().
-        "automatically_make_temporary",
+        default="automatically_make_temporary",
         description=(
             "A directory for the server to store things persistently across boots."
             " If this directory doesn't already exist, the server will create it."
@@ -72,6 +72,25 @@ class RobotServerSettings(BaseSettings):
             "\n\n"
             "Note that the `opentrons` library is also responsible for persisting"
             " certain things, and it has its own configuration."
+        ),
+    )
+
+    maximum_runs: int = Field(
+        default=20,
+        gt=0,
+        description=(
+            "The maximum number of runs to allow HTTP clients to create before"
+            " auto-deleting old ones."
+        ),
+    )
+
+    maximum_unused_protocols: int = Field(
+        default=5,
+        gt=0,
+        description=(
+            'The maximum number of "unused protocols" to allow before auto-deleting'
+            ' old ones. A protocol is "unused" if it isn\'t used by any run that'
+            " currently exists."
         ),
     )
 

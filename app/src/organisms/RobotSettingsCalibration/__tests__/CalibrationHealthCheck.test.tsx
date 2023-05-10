@@ -4,7 +4,10 @@ import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../../redux/analytics'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -67,7 +70,6 @@ const RUN_STATUSES = {
 }
 
 let mockTrackEvent: jest.Mock
-const mockUpdateRobotStatus = jest.fn()
 const mockDispatchRequests = jest.fn()
 
 const render = (
@@ -79,7 +81,6 @@ const render = (
       dispatchRequests={mockDispatchRequests}
       isPending={false}
       robotName="otie"
-      updateRobotStatus={mockUpdateRobotStatus}
       {...props}
     />,
     {
@@ -114,7 +115,7 @@ describe('CalibrationHealthCheck', () => {
     expect(button).not.toBeDisabled()
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'calibrationHealthCheckButtonClicked',
+      name: ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
       properties: {},
     })
   })

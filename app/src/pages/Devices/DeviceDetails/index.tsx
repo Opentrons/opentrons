@@ -19,10 +19,10 @@ import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRun
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { getScanning } from '../../../redux/discovery'
 
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 
 export function DeviceDetails(): JSX.Element | null {
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
 
@@ -43,7 +43,7 @@ export function DeviceDetails(): JSX.Element | null {
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.white}
-          border={`1px solid ${COLORS.medGreyEnabled}`}
+          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING.spacing4}

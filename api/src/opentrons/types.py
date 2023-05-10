@@ -7,7 +7,8 @@ from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
-    from .protocols.geometry.module_geometry import ModuleGeometry
+    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
+    from .protocol_api.module_contexts import ModuleContext
 
 
 class PipetteNotAttachedError(KeyError):
@@ -62,7 +63,9 @@ class Point(NamedTuple):
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
-LocationLabware = Union["Labware", "Well", str, "ModuleGeometry", LabwareLike, None]
+LocationLabware = Union[
+    "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"
+]
 
 
 class Location:
@@ -174,10 +177,37 @@ class MountType(str, enum.Enum):
         return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
 
 
+class OT3MountType(str, enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    GRIPPER = "gripper"
+
+
+DECK_COORDINATE_TO_SLOT_NAME = {
+    "D1": "1",
+    "D2": "2",
+    "D3": "3",
+    "C1": "4",
+    "C2": "5",
+    "C3": "6",
+    "B1": "7",
+    "B2": "8",
+    "B3": "9",
+    "A1": "10",
+    "A2": "11",
+    "A3": "12",
+}
+
+DECK_SLOT_NAME_TO_COORDINATE = {
+    slot_name: coordinate
+    for coordinate, slot_name in DECK_COORDINATE_TO_SLOT_NAME.items()
+}
+
+
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
-class DeckSlotName(str, enum.Enum):
+class DeckSlotName(enum.Enum):
     """Deck slot identifiers."""
 
     SLOT_1 = "1"
@@ -195,12 +225,33 @@ class DeckSlotName(str, enum.Enum):
 
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
-        str_val = str(value)
+        str_val = str(value).upper()
+        if str_val in DECK_COORDINATE_TO_SLOT_NAME:
+            str_val = DECK_COORDINATE_TO_SLOT_NAME[str_val]
         return cls(str_val)
 
+    def as_int(self) -> int:
+        return int(self.value)
+
+    def as_coordinate(self) -> str:
+        return DECK_SLOT_NAME_TO_COORDINATE[self.value]
+
+    @property
+    def id(self) -> str:
+        """This slot's unique ID, as it appears in the deck definition.
+
+        This can be used to look up slot details in the deck definition.
+
+        This is preferred over `.value` or `.__str__()` for explicitness.
+        """
+        return self.value
+
     def __str__(self) -> str:
-        """Stringify to a simple integer string."""
-        return str(self.value)
+        """Stringify to the unique ID.
+
+        For explicitness, prefer using `.id` instead.
+        """
+        return self.id
 
 
 class TransferTipPolicy(enum.Enum):

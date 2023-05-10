@@ -19,13 +19,15 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
-import { useFeatureFlag } from '../../redux/config'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -36,6 +38,7 @@ import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -65,7 +68,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
         style={{ width: '6rem' }}
-        id={`RobotCard_${robotName}_robotImage`}
+        id={`RobotCard_${String(robotName)}_robotImage`}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -111,7 +114,6 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
-  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
   return attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
@@ -123,37 +125,35 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         {t('modules')}
       </StyledText>
       <Flex>
-        {attachedModules.map((module, i) =>
-          //  TODO(jr, 9/28/22): remove this logic when we remove enableThermocyclerGen2 FF
-          enableThermocyclerGen2 ||
-          (!enableThermocyclerGen2 &&
-            module.moduleModel !== 'thermocyclerModuleV2') ? (
-            <ModuleIcon
-              key={`${module.moduleModel}_${i}_${robotName}`}
-              tooltipText={t('this_robot_has_connected_and_power_on_module', {
-                moduleName: getModuleDisplayName(module.moduleModel),
-              })}
-              module={module}
-            />
-          ) : null
-        )}
+        {attachedModules.map((module, i) => (
+          <ModuleIcon
+            key={`${String(module.moduleModel)}_${i}_${robotName}`}
+            tooltipText={t('this_robot_has_connected_and_power_on_module', {
+              moduleName: getModuleDisplayName(module.moduleModel),
+            })}
+            module={module}
+          />
+        ))}
       </Flex>
     </Flex>
   ) : null
 }
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
-  const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
+  const isOT3 = useIsOT3(props.robotName)
+  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
 
   const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
   const rightPipetteDisplayName =
     attachedPipettes?.right?.modelSpecs.displayName
-
-  const isOT3 = useIsOT3(robotName)
-
-  // TODO(bh, 2022-11-1): insert actual gripper data
-  const extensionMountDisplayName = isOT3 ? 'Gripper GEN1' : null
+  const extensionMountDisplayName =
+    extensionInstrument != null &&
+    extensionInstrument.instrumentModel === 'gripperV1'
+      ? getGripperDisplayName(extensionInstrument.instrumentModel)
+      : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
   // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
@@ -173,26 +173,16 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
         {leftAndRightMountsPipetteDisplayName != null ? (
           <InstrumentContainer
             displayName={leftAndRightMountsPipetteDisplayName}
-            id={`RobotCard_${robotName}_leftAndRightMountsPipette`}
           />
         ) : null}
         {leftPipetteDisplayName != null ? (
-          <InstrumentContainer
-            displayName={leftPipetteDisplayName}
-            id={`RobotCard_${robotName}_leftMountPipette`}
-          />
+          <InstrumentContainer displayName={leftPipetteDisplayName} />
         ) : null}
         {rightPipetteDisplayName != null ? (
-          <InstrumentContainer
-            displayName={rightPipetteDisplayName}
-            id={`RobotCard_${robotName}_rightMountPipette`}
-          />
+          <InstrumentContainer displayName={rightPipetteDisplayName} />
         ) : null}
         {extensionMountDisplayName != null ? (
-          <InstrumentContainer
-            displayName={extensionMountDisplayName}
-            id={`RobotCard_${robotName}_extensionMount`}
-          />
+          <InstrumentContainer displayName={extensionMountDisplayName} />
         ) : null}
       </Flex>
     </Flex>

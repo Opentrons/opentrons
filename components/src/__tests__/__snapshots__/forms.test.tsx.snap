@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CheckboxField renders correctly when checked 1`] = `
+exports[`DeprecatedCheckboxField renders correctly when checked 1`] = `
 .c0 {
   width: 100%;
 }
@@ -47,7 +47,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
 </label>
 `;
 
-exports[`CheckboxField renders correctly when unchecked 1`] = `
+exports[`DeprecatedCheckboxField renders correctly when unchecked 1`] = `
 .c0 {
   width: 100%;
 }

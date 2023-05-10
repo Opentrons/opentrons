@@ -200,7 +200,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "sensors.log",
+            "filename": "/var/log/sensors.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

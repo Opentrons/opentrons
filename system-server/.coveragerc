@@ -1,0 +1,8 @@
+[run]
+source =
+    system_server
+
+[report]
+exclude_lines =
+    @overload
+    if TYPE_CHECKING:

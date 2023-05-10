@@ -8,7 +8,14 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from . import commands
 from .resources import ModelUtils, ModuleDataProvider
-from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel, Liquid
+from .types import (
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareUri,
+    ModuleModel,
+    Liquid,
+    HexColor,
+)
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -80,7 +87,8 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
-            hardware_api=hardware_api, state_store=state_store
+            hardware_api=hardware_api,
+            state_store=state_store,
         )
         self._door_watcher = door_watcher or DoorWatcher(
             state_store=state_store,
@@ -158,9 +166,12 @@ class ProtocolEngine:
         return self._state_store.commands.get(command_id)
 
     async def wait_for_command(self, command_id: str) -> None:
-        """Wait for a command to be completed."""
+        """Wait for a command to be completed.
+
+        Will also return if the engine was stopped before it reached the command.
+        """
         await self._state_store.wait_for(
-            self._state_store.commands.get_is_complete,
+            self._state_store.commands.get_command_is_final,
             command_id=command_id,
         )
 
@@ -177,7 +188,9 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The completed command, whether it succeeded or failed.
+            The command. If the command completed, it will be succeeded or failed.
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
         command = self.add_command(request)
         await self.wait_for_command(command.id)
@@ -203,7 +216,7 @@ class ProtocolEngine:
             CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
-            condition=self._state_store.commands.get_all_complete
+            condition=self._state_store.commands.get_all_commands_final
         )
 
     async def finish(
@@ -288,17 +301,37 @@ class ProtocolEngine:
         )
         return self._state_store.labware.get_uri_from_definition(definition)
 
-    def add_liquid(self, liquid: Liquid) -> None:
+    def add_liquid(
+        self,
+        name: str,
+        color: Optional[HexColor],
+        description: Optional[str],
+        id: Optional[str] = None,
+    ) -> Liquid:
         """Add a liquid to the state for subsequent liquid loads."""
+        if id is None:
+            id = self._model_utils.generate_id()
+
+        liquid = Liquid(
+            id=id,
+            displayName=name,
+            description=(description or ""),
+            displayColor=color,
+        )
+
         self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
+        return liquid
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
+        # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
+        # tip rack?
         self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
 
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
     # as a quick hack to support Python protocols. We should consider making this a
     # command, or adding speed parameters to existing commands.
+    # https://opentrons.atlassian.net/browse/RCORE-373
     def set_pipette_movement_speed(
         self, pipette_id: str, speed: Optional[float]
     ) -> None:

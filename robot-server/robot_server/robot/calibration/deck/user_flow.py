@@ -21,10 +21,10 @@ from opentrons.calibration_storage import (
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.protocol_api import labware
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.default_deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
 
@@ -330,9 +330,7 @@ class DeckCalibrationUserFlow:
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
         a = tuplefy_cal_point_dicts(self._saved_points)
-        tiprack_hash = helpers.hash_labware_def(
-            self._tip_rack._implementation.get_definition()
-        )
+        tiprack_hash = helpers.hash_labware_def(self._tip_rack._core.get_definition())
         pip_id = self._hw_pipette.pipette_id
         assert pip_id
         robot_cal.save_attitude_matrix(
@@ -345,7 +343,7 @@ class DeckCalibrationUserFlow:
         try:
             return load_tip_length_calibration(
                 pip_id,
-                self._tip_rack._implementation.get_definition(),
+                self._tip_rack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)
@@ -379,6 +377,6 @@ class DeckCalibrationUserFlow:
         if self._current_state != State.preparingPipette:
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await uf.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
         await self.move_to_tip_rack()

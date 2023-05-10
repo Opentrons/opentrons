@@ -10,6 +10,7 @@ from opentrons.protocols.api_support.definitions import (
 )
 
 from .protocol_context import ProtocolContext
+from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
 from .module_contexts import (
@@ -18,21 +19,31 @@ from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 )
+from ._liquid import Liquid
 
-from .create_protocol_context import create_protocol_context
+from .create_protocol_context import (
+    create_protocol_context,
+    ProtocolEngineCoreRequiredError,
+)
 
 __all__ = [
     "MAX_SUPPORTED_VERSION",
     "MIN_SUPPORTED_VERSION",
     "ProtocolContext",
+    "Deck",
     "ModuleContext",
     "InstrumentContext",
     "TemperatureModuleContext",
     "MagneticModuleContext",
     "ThermocyclerContext",
     "HeaterShakerContext",
+    "MagneticBlockContext",
     "Labware",
     "Well",
+    "Liquid",
+    # For internal Opentrons use only:
     "create_protocol_context",
+    "ProtocolEngineCoreRequiredError",
 ]

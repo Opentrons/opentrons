@@ -268,10 +268,9 @@ class ThreadManager(Generic[WrappedObj]):
                 # so cancelled tasks can have a chance to complete.
                 async def clean_and_notify() -> None:
                     await wrapped_cleanup()
-                    # this sleep allows the wrapped loop to spin a couple
-                    # times to clean up the tasks we just cancelled. My kingdom
-                    # for an asyncio.spin_once()
-                    await asyncio.sleep(0.1)
+                    # this sleep allows the wrapped loop to spin to clean up the
+                    # tasks we just cancelled.
+                    await asyncio.sleep(0)
 
                 fut = asyncio.run_coroutine_threadsafe(clean_and_notify(), wrapped_loop)
                 fut.result()

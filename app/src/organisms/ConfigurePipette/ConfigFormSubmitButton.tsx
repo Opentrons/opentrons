@@ -5,8 +5,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean
   formId: string

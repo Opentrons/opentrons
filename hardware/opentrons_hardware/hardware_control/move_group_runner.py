@@ -2,11 +2,17 @@
 import asyncio
 from collections import defaultdict
 import logging
-from typing import List, Set, Tuple, Iterator, Union
+from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    ErrorCode,
+    MotorPositionFlags,
+    ErrorSeverity,
+    GearMotorId,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -20,6 +26,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddBrushedLinearMoveRequest,
     TipActionRequest,
     TipActionResponse,
+    Acknowledgement,
+    ErrorMessage,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -27,8 +35,13 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     HomeRequestPayload,
     GripperMoveRequestPayload,
     TipActionRequestPayload,
+    EmptyPayload,
 )
-from .constants import interrupts_per_sec, brushed_motor_interrupts_per_sec
+from .constants import (
+    interrupts_per_sec,
+    tip_interrupts_per_sec,
+    brushed_motor_interrupts_per_sec,
+)
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -44,6 +57,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
+    MoveStopConditionField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
@@ -96,7 +110,7 @@ class MoveGroupRunner:
 
     async def execute(
         self, can_messenger: CanMessenger
-    ) -> NodeDict[Tuple[float, float]]:
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
         prep() and execute() can be used to replace a single call to run() to
@@ -108,10 +122,16 @@ class MoveGroupRunner:
             return {}
         if not self._is_prepped:
             raise RuntimeError("A group must be prepped before it can be executed.")
-        move_completion_data = await self._move(can_messenger, self._start_at_index)
+        try:
+            move_completion_data = await self._move(can_messenger, self._start_at_index)
+        except RuntimeError:
+            log.error("raising error from Move group runner")
+            raise
         return self._accumulate_move_completions(move_completion_data)
 
-    async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
+    async def run(
+        self, can_messenger: CanMessenger
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
         """Run the move group.
 
         Args:
@@ -135,11 +155,13 @@ class MoveGroupRunner:
     @staticmethod
     def _accumulate_move_completions(
         completions: _Completions,
-    ) -> NodeDict[Tuple[float, float]]:
-        position: NodeDict[List[Tuple[Tuple[int, int], float, float]]] = defaultdict(
-            list
-        )
+    ) -> NodeDict[Tuple[float, float, bool, bool]]:
+        position: NodeDict[
+            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+        ] = defaultdict(list)
         for arbid, completion in completions:
+            if isinstance(completion, TipActionResponse):
+                continue
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
@@ -148,6 +170,14 @@ class MoveGroupRunner:
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
                     float(completion.payload.encoder_position_um.value) / 1000.0,
+                    bool(
+                        completion.payload.position_flags.value
+                        & MotorPositionFlags.stepper_position_ok.value
+                    ),
+                    bool(
+                        completion.payload.position_flags.value
+                        & MotorPositionFlags.encoder_position_ok.value
+                    ),
                 )
             )
         # for each node, pull the position from the completion with the largest
@@ -157,7 +187,7 @@ class MoveGroupRunner:
                 reversed(
                     sorted(poslist, key=lambda position_element: position_element[0])
                 )
-            )[1:3]
+            )[1:]
             for node, poslist in position.items()
         }
 
@@ -169,7 +199,7 @@ class MoveGroupRunner:
         """
         await can_messenger.send(
             node_id=NodeId.broadcast,
-            message=ClearAllMoveGroupsRequest(),
+            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
         )
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
@@ -234,7 +264,7 @@ class MoveGroupRunner:
             return HomeRequest(payload=home_payload)
         else:
             linear_payload = AddLinearMoveRequestPayload(
-                request_stop_condition=UInt8Field(step.stop_condition),
+                request_stop_condition=MoveStopConditionField(step.stop_condition),
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
@@ -260,10 +290,12 @@ class MoveGroupRunner:
         tip_action_payload = TipActionRequestPayload(
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
-            duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-            velocity=self._convert_velocity(step.velocity_mm_sec, interrupts_per_sec),
+            duration=UInt32Field(int(step.duration_sec * tip_interrupts_per_sec)),
+            velocity=self._convert_velocity(
+                step.velocity_mm_sec, tip_interrupts_per_sec
+            ),
             action=PipetteTipActionTypeField(step.action),
-            request_stop_condition=UInt8Field(step.stop_condition),
+            request_stop_condition=MoveStopConditionField(step.stop_condition),
         )
         return TipActionRequest(payload=tip_action_payload)
 
@@ -290,12 +322,20 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
         self._start_at_index = start_at_index
+        self._expected_tip_action_motors = []
+
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
             for seq_id, move in enumerate(move_group):
+                movesteps = list(move.values())
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
-                duration += float(list(move.values())[0].duration_sec)
+                duration += float(movesteps[0].duration_sec)
+                if any(isinstance(g, MoveGroupTipActionStep) for g in movesteps):
+                    self._expected_tip_action_motors = [
+                        GearMotorId.left,
+                        GearMotorId.right,
+                    ]
                 for step in move_group[seq_id]:
                     self._stop_condition.append(move_group[seq_id][step].stop_condition)
 
@@ -304,6 +344,8 @@ class MoveScheduler:
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
+        self._error: Optional[ErrorMessage] = None
+        self._current_group: Optional[int] = None
 
     def _remove_move_group(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
@@ -315,10 +357,13 @@ class MoveScheduler:
             in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
             self._completion_queue.put_nowait((arbitration_id, message))
-            log.info(
+            log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
+            if not self._moves[group_id]:
+                log.debug(f"Move group {group_id+self._start_at_index} has completed.")
+                self._event.set()
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
@@ -329,11 +374,33 @@ class MoveScheduler:
             # moves from a group we don't own
             return
 
-        if not self._moves[group_id]:
-            log.info(f"Move group {group_id+self._start_at_index} has completed.")
-            self._event.set()
+    def _handle_acknowledge(self, message: Acknowledgement) -> None:
+        log.debug("recieved ack")
 
-    def _handle_move_completed(self, message: MoveCompleted) -> None:
+    def _handle_error(
+        self, message: ErrorMessage, arbitration_id: ArbitrationId
+    ) -> None:
+        self._error = message
+        node_id = arbitration_id.parts.originating_node_id
+
+        if self._current_group is None:
+            # Without the _current_group variable, we have no idea what group
+            # to clear. Just have to flag the event and bail.
+            self._event.set()
+        else:
+            for move in self._moves[self._current_group].copy():
+                if move[0] == node_id:
+                    self._moves[self._current_group].discard(move)
+
+            if len(self._moves[self._current_group]) == 0:
+                # Only raise _event if this is the last active axis
+                self._event.set()
+        log.warning(f"Error during move group: {message}")
+        if message.payload.severity == ErrorSeverity.unrecoverable:
+            self._event.set()
+            raise RuntimeError("Firmware Error Received", message)
+
+    def _handle_move_completed(self, message: _AcceptableMoves) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
         try:
@@ -349,26 +416,6 @@ class MoveScheduler:
             # pick up groups they don't care about, and need to not fail.
             pass
 
-    def _handle_tip_action(self, message: TipActionResponse) -> None:
-        group_id = message.payload.group_id.value - self._start_at_index
-        ack_id = message.payload.ack_id.value
-        try:
-            limit_switch = bool(
-                self._stop_condition[group_id] == MoveStopCondition.limit_switch
-            )
-        except IndexError:
-            return
-        success = message.payload.success.value
-        # TODO need to add tip action type to the response message.
-        if limit_switch and limit_switch != ack_id and not success:
-            condition = "Tip still detected."
-            log.warning(f"Drop tip failed. Condition {condition}")
-            raise MoveConditionNotMet()
-        elif not limit_switch and not success:
-            condition = "Tip not detected."
-            log.warning(f"Pick up tip failed. Condition {condition}")
-            raise MoveConditionNotMet()
-
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
@@ -377,8 +424,22 @@ class MoveScheduler:
             self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message)
         elif isinstance(message, TipActionResponse):
-            self._remove_move_group(message, arbitration_id)
-            self._handle_tip_action(message)
+            gear_id = GearMotorId(message.payload.gear_motor_id.value)
+            self._expected_tip_action_motors.remove(gear_id)
+            if len(self._expected_tip_action_motors) == 0:
+                self._remove_move_group(message, arbitration_id)
+            self._handle_move_completed(message)
+        elif isinstance(message, ErrorMessage):
+            self._handle_error(message, arbitration_id)
+        elif isinstance(message, Acknowledgement):
+            self._handle_acknowledge(message)
+
+    def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
+        nodes = []
+        for (node_id, seq_id) in self._moves[group_id - self._start_at_index]:
+            if node_id not in nodes:
+                nodes.append(NodeId(node_id))
+        return nodes
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
@@ -387,8 +448,9 @@ class MoveScheduler:
         ):
             self._event.clear()
 
-            log.info(f"Executing move group {group_id}.")
-            await can_messenger.send(
+            log.debug(f"Executing move group {group_id}.")
+            self._current_group = group_id - self._start_at_index
+            error = await can_messenger.ensure_send(
                 node_id=NodeId.broadcast,
                 message=ExecuteMoveGroupRequest(
                     payload=ExecuteMoveGroupRequestPayload(
@@ -399,7 +461,10 @@ class MoveScheduler:
                         cancel_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=self._get_nodes_in_move_group(group_id),
             )
+            if error != ErrorCode.ok:
+                log.error(f"recieved error trying to execute move group {str(error)}")
 
             try:
                 # TODO: The max here can be removed once can_driver.send() no longer
@@ -411,8 +476,18 @@ class MoveScheduler:
                     self._event.wait(),
                     max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
+                if self._error is not None:
+                    raise RuntimeError(f"Error during move group: {self._error}")
             except asyncio.TimeoutError:
-                log.warning("Move set timed out")
+                log.warning(
+                    f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
+                )
+                log.warning(
+                    f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
+                )
+            except RuntimeError as e:
+                log.error("canceling move group scheduler")
+                raise e
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():

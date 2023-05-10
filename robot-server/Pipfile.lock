@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7cfbb8c11903f5d75d78c622b2ce1770aee8daa027007139f559048f792e0e6e"
+            "sha256": "dff9b5c0c0a442a884ac96695c64e24d61436e1b470c008871d531a9c01f2be9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -344,6 +344,10 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==19.0.2"
+        },
+        "server-utils": {
+            "editable": true,
+            "path": "./../server-utils"
         },
         "six": {
             "hashes": [

@@ -5,17 +5,23 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { InvalidationWarning } from '../InvalidationWarning'
 
-const render = () => {
-  return renderWithProviders(<InvalidationWarning />, {
-    i18nInstance: i18n,
-  })[0]
+const render = (sessionType: 'tipLengthCalibration' | 'deckCalibration') => {
+  return renderWithProviders(
+    <InvalidationWarning sessionType={sessionType} />,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('InvalidationWarning', () => {
-  it('renders correct text', () => {
-    const { getByText } = render()
-    getByText(
-      'This tip was used to calibrate this pipette’s offset. Recalibrating this tip’s length will invalidate this pipette’s offset. If you recalibrate this tip length, you will need to recalibrate this pipette offset afterwards.You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.'
-    )
+  it('renders correct text - deck calibration', () => {
+    const { getByText } = render('deckCalibration')
+    getByText('Recalibrating the deck clears pipette offset data')
+    getByText('Pipette offsets for both mounts will have to be recalibrated.')
+  })
+  it('renders correct text - tip length calibration', () => {
+    const { getByText } = render('tipLengthCalibration')
+    getByText('Recalibrating tip length will clear pipette offset data.')
   })
 })

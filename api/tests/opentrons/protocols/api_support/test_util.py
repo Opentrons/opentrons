@@ -1,16 +1,16 @@
 import pytest
 
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     build_edges,
-    _find_value_for_api_version,
+    find_value_for_api_version,
 )
 from opentrons.hardware_control.types import Axis
 
@@ -59,8 +59,10 @@ def test_max_speeds_userdict():
 def test_build_edges():
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
     test_lw = Labware(
-        implementation=LabwareImplementation(lw_def, Location(Point(0, 0, 0), None)),
+        core=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
         api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
     )
     off = Point(0, 0, 1.0)
     deck = Deck(deck_type=STANDARD_OT2_DECK)
@@ -84,6 +86,13 @@ def test_build_edges():
     assert res2 == new_correct_edges
 
 
+# TODO(mm, 2023-04-28): The build_edges() function is used both by ProtocolContexts
+# that are backed by Protocol Engine, and those that aren't. But this test is only runnable
+# with a non-Protocol-Engine ProtocolContext because it relies on the internal ctx._core.get_deck()
+# property.
+#
+# Find a different way to test this so that both paths are covered.
+@pytest.mark.apiv2_non_pe_only
 def test_build_edges_left_pipette(ctx):
     test_lw = ctx.load_labware("corning_96_wellplate_360ul_flat", "2")
     test_lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", "6")
@@ -101,7 +110,7 @@ def test_build_edges_left_pipette(ctx):
         test_lw["A12"],
         1.0,
         Mount.LEFT,
-        ctx._implementation.get_deck(),
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res == left_pip_edges
@@ -117,12 +126,14 @@ def test_build_edges_left_pipette(ctx):
         test_lw2["A12"],
         1.0,
         Mount.LEFT,
-        ctx._implementation.get_deck(),
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res2 == left_pip_edges
 
 
+# TODO(mm, 2023-04-28): See note on test_build_edges_left_pipette().
+@pytest.mark.apiv2_non_pe_only
 def test_build_edges_right_pipette(ctx):
     test_lw = ctx.load_labware("corning_96_wellplate_360ul_flat", "2")
     test_lw2 = ctx.load_labware("corning_96_wellplate_360ul_flat", "6")
@@ -140,7 +151,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw["A1"],
         1.0,
         Mount.RIGHT,
-        ctx._implementation._deck_layout,
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res == right_pip_edges
@@ -157,7 +168,7 @@ def test_build_edges_right_pipette(ctx):
         test_lw2["A12"],
         1.0,
         Mount.RIGHT,
-        ctx._implementation.get_deck(),
+        ctx._core.get_deck(),
         version=APIVersion(2, 4),
     )
     assert res2 == right_pip_edges
@@ -175,4 +186,4 @@ def test_build_edges_right_pipette(ctx):
     ],
 )
 def test_find_value_for_api_version(data, level, desired):
-    assert _find_value_for_api_version(level, data) == desired
+    assert find_value_for_api_version(level, data) == desired

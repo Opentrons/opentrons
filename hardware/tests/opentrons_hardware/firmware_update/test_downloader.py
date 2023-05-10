@@ -109,7 +109,10 @@ async def test_messaging(
 
     mock_hex_processor.process.return_value = iter(chunks)
 
-    await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
+    async for progress in subject.run(
+        NodeId.gantry_y_bootloader, mock_hex_processor, 10
+    ):
+        pass
 
     # When the downloader runs it creates unique message indecies for each
     # message, this is a little hack to get the next index it would use
@@ -179,7 +182,10 @@ async def test_messaging_data_error_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(ErrorResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
+        async for progress in subject.run(
+            NodeId.gantry_y_bootloader, mock_hex_processor, 10
+        ):
+            pass
 
 
 async def test_messaging_complete_error_response(
@@ -232,7 +238,10 @@ async def test_messaging_complete_error_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(ErrorResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 10)
+        async for progress in subject.run(
+            NodeId.gantry_y_bootloader, mock_hex_processor, 10
+        ):
+            pass
 
 
 async def test_messaging_data_no_response(
@@ -246,7 +255,10 @@ async def test_messaging_data_no_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(TimeoutResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 0.5)
+        async for progress in subject.run(
+            NodeId.gantry_y_bootloader, mock_hex_processor, 0.5
+        ):
+            pass
 
 
 async def test_messaging_complete_no_response(
@@ -283,4 +295,7 @@ async def test_messaging_complete_no_response(
     mock_hex_processor.process.return_value = iter(chunks)
 
     with pytest.raises(TimeoutResponse):
-        await subject.run(NodeId.gantry_y_bootloader, mock_hex_processor, 0.5)
+        async for progress in subject.run(
+            NodeId.gantry_y_bootloader, mock_hex_processor, 0.5
+        ):
+            pass

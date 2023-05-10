@@ -102,7 +102,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "can_mon.log",
+            "filename": "/var/log/can_mon.log",
             "maxBytes": 5000000,
             "level": logging.WARNING,
             "backupCount": 3,

@@ -4,7 +4,7 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    project: './tsconfig-eslint.json',
+    project: require('path').join(__dirname, 'tsconfig-eslint.json'),
   },
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
@@ -88,7 +88,7 @@ module.exports = {
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
-
+        'node/handle-callback-err': 'off',
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',

@@ -85,7 +85,7 @@ describe('TemperatureModuleData', () => {
       currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     const { getByText } = render(props)
-    getByText(`Target: ${props.targetTemp} °C`)
+    getByText(`Target: ${String(props.targetTemp)} °C`)
     getByText(`Current: ${props.currentTemp} °C`)
   })
 })

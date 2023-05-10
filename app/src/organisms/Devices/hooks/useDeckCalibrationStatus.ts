@@ -1,29 +1,15 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-
-import {
-  fetchCalibrationStatus,
-  getDeckCalibrationStatus,
-} from '../../../redux/calibration'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-
+import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
+import { useRobot } from './useRobot'
 import type { DeckCalibrationStatus } from '../../../redux/calibration/types'
-import type { State } from '../../../redux/types'
 
 export function useDeckCalibrationStatus(
   robotName: string | null = null
 ): DeckCalibrationStatus | null {
-  const [dispatchRequest] = useDispatchApiRequest()
-
-  const deckCalibrationStatus = useSelector((state: State) =>
-    getDeckCalibrationStatus(state, robotName)
+  const robot = useRobot(robotName)
+  return (
+    useCalibrationStatusQuery(
+      {},
+      robot?.ip != null ? { hostname: robot.ip } : null
+    )?.data?.deckCalibration?.status ?? null
   )
-
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchCalibrationStatus(robotName))
-    }
-  }, [dispatchRequest, robotName])
-
-  return deckCalibrationStatus
 }

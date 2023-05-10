@@ -14,38 +14,61 @@ import {
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
+
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName } from '../../redux/discovery'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
+import { RobotBusyStatusAction } from '.'
+
+import type { Robot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
 
 interface AvailableRobotOptionProps {
-  robotName: string
-  local: boolean | null
+  robot: Robot
   onClick: () => void
   isSelected: boolean
   isOnDifferentSoftwareVersion: boolean
+  registerRobotBusyStatus: React.Dispatch<RobotBusyStatusAction>
   isError?: boolean
+  showIdleOnly?: boolean
 }
 
 export function AvailableRobotOption(
   props: AvailableRobotOptionProps
-): JSX.Element {
+): JSX.Element | null {
   const {
-    robotName,
-    local,
+    robot,
     onClick,
     isSelected,
     isError = false,
     isOnDifferentSoftwareVersion,
+    showIdleOnly = false,
+    registerRobotBusyStatus,
   } = props
+  const { ip, local, name: robotName } = robot ?? {}
   const { t } = useTranslation('protocol_list')
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
-  return (
+
+  const { data: runsData } = useAllRunsQuery(
+    {
+      onSuccess: data => {
+        if (data?.links?.current != null)
+          registerRobotBusyStatus({ type: 'robotIsBusy', robotName })
+        else {
+          registerRobotBusyStatus({ type: 'robotIsIdle', robotName })
+        }
+      },
+    },
+    { hostname: ip }
+  )
+  const robotHasCurrentRun = runsData?.links?.current != null
+
+  return showIdleOnly && robotHasCurrentRun ? null : (
     <>
       <MiniCard
         onClick={onClick}
@@ -65,7 +88,9 @@ export function AvailableRobotOption(
           marginTop={SPACING.spacing3}
           marginBottom={SPACING.spacing4}
         >
-          <StyledText as="h6">{robotModel}</StyledText>
+          <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {robotModel}
+          </StyledText>
           <Box maxWidth="9.5rem">
             <StyledText
               as="p"

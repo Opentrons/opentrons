@@ -265,7 +265,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "can_comm.log",
+            "filename": "/var/log/can_comm.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

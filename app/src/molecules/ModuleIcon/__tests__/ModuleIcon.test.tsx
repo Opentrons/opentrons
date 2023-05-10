@@ -54,14 +54,18 @@ describe('ModuleIcon', () => {
   it('renders SharedIcon with correct style', () => {
     const { getByTestId } = render(props)
     const module = getByTestId('ModuleIcon_ot-temperature-v2')
-    expect(module).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
-    expect(module).toHaveStyle(`height: ${SPACING.spacing4}`)
-    expect(module).toHaveStyle(`width: ${SPACING.spacing4}`)
-    expect(module).toHaveStyle(`margin-left: ${SPACING.spacing1}`)
-    expect(module).toHaveStyle(`margin-right: ${SPACING.spacing1}`)
-    expect(module).toHaveStyleRule('color', `${COLORS.darkBlackEnabled}`, {
-      modifier: ':hover',
-    })
+    expect(module).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(module).toHaveStyle(`height: ${String(SPACING.spacing4)}`)
+    expect(module).toHaveStyle(`width: ${String(SPACING.spacing4)}`)
+    expect(module).toHaveStyle(`margin-left: ${String(SPACING.spacing1)}`)
+    expect(module).toHaveStyle(`margin-right: ${String(SPACING.spacing1)}`)
+    expect(module).toHaveStyleRule(
+      'color',
+      `${String(COLORS.darkBlackEnabled)}`,
+      {
+        modifier: ':hover',
+      }
+    )
   })
 
   it('renders magnetic module icon', () => {

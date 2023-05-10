@@ -12,8 +12,10 @@ from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
 from ..errors import ProtocolEngineError, RunStoppedError, UnexpectedProtocolError
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
+from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler
 from .pipetting import PipettingHandler
+from .tip_handler import TipHandler
 from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
 
@@ -35,8 +37,10 @@ class CommandExecutor:
         action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
         movement: MovementHandler,
+        gantry_mover: GantryMover,
         labware_movement: LabwareMovementHandler,
         pipetting: PipettingHandler,
+        tip_handler: TipHandler,
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
         model_utils: Optional[ModelUtils] = None,
@@ -47,8 +51,10 @@ class CommandExecutor:
         self._action_dispatcher = action_dispatcher
         self._equipment = equipment
         self._movement = movement
+        self._gantry_mover = gantry_mover
         self._labware_movement = labware_movement
         self._pipetting = pipetting
+        self._tip_handler = tip_handler
         self._run_control = run_control
         self._rail_lights = rail_lights
         self._model_utils = model_utils or ModelUtils()
@@ -66,8 +72,10 @@ class CommandExecutor:
             hardware_api=self._hardware_api,
             equipment=self._equipment,
             movement=self._movement,
+            gantry_mover=self._gantry_mover,
             labware_movement=self._labware_movement,
             pipetting=self._pipetting,
+            tip_handler=self._tip_handler,
             run_control=self._run_control,
             rail_lights=self._rail_lights,
         )

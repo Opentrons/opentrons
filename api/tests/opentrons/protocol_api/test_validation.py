@@ -1,10 +1,11 @@
 """Tests for Protocol API input validation."""
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 
+from decoy import Decoy
 import pytest
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -13,7 +14,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocol_api import validation as subject
+from opentrons.protocol_api import validation as subject, Well, Labware
 
 
 @pytest.mark.parametrize(
@@ -65,8 +66,12 @@ def test_ensure_pipette_input_invalid() -> None:
     [
         ("1", DeckSlotName.SLOT_1),
         (1, DeckSlotName.SLOT_1),
+        ("d1", DeckSlotName.SLOT_1),
+        ("D1", DeckSlotName.SLOT_1),
         (12, DeckSlotName.FIXED_TRASH),
         ("12", DeckSlotName.FIXED_TRASH),
+        ("a3", DeckSlotName.FIXED_TRASH),
+        ("A3", DeckSlotName.FIXED_TRASH),
     ],
 )
 def test_ensure_deck_slot(input_value: Union[str, int], expected: DeckSlotName) -> None:
@@ -77,7 +82,7 @@ def test_ensure_deck_slot(input_value: Union[str, int], expected: DeckSlotName) 
 
 def test_ensure_deck_slot_invalid() -> None:
     """It should raise a ValueError if given an invalid name."""
-    input_values: List[Union[str, int]] = ["0", 0, "13", 13]
+    input_values: List[Union[str, int]] = ["0", 0, "13", 13, "b7", "B7"]
 
     for input_value in input_values:
         with pytest.raises(ValueError, match="not a valid deck slot"):
@@ -238,3 +243,132 @@ def test_ensure_thermocycler_profile_steps_invalid(
     """It should raise a ValueError when given invalid thermocycler profile steps."""
     with pytest.raises(ValueError):
         subject.ensure_thermocycler_profile_steps(steps)
+
+
+@pytest.mark.parametrize("offset", [{}, [1, 2, 3], 1, {"a", "b", "c"}, "abc"])
+def test_ensure_valid_labware_offset_vector(offset: Dict[str, float]) -> None:
+    """It should raise ValueError when given offset is invalid."""
+    assert subject.ensure_valid_labware_offset_vector({"x": 1.1, "y": 2, "z": 3.3}) == (
+        1.1,
+        2,
+        3.3,
+    )
+    with pytest.raises(TypeError):
+        subject.ensure_valid_labware_offset_vector(offset)
+
+
+def test_validate_well_no_location(decoy: Decoy) -> None:
+    """Should return a WellTarget with no location."""
+    input_location = decoy.mock(cls=Well)
+    expected_result = subject.WellTarget(
+        well=input_location, location=None, in_place=False
+    )
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == expected_result
+
+
+def test_validate_coordinates(decoy: Decoy) -> None:
+    """Should return a WellTarget with no location."""
+    input_location = Location(point=Point(x=1, y=1, z=2), labware=None)
+    expected_result = subject.PointTarget(location=input_location, in_place=False)
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == expected_result
+
+
+def test_validate_in_place(decoy: Decoy) -> None:
+    """Should return an `in_place` PointTarget."""
+    input_last_location = Location(point=Point(x=1, y=1, z=2), labware=None)
+    expected_result = subject.PointTarget(location=input_last_location, in_place=True)
+
+    result = subject.validate_location(location=None, last_location=input_last_location)
+
+    assert result == expected_result
+
+
+def test_validate_location_with_well(decoy: Decoy) -> None:
+    """Should return a WellTarget with location."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    expected_result = subject.WellTarget(
+        well=mock_well, location=input_location, in_place=False
+    )
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == expected_result
+
+
+def test_validate_last_location(decoy: Decoy) -> None:
+    """Should return a WellTarget with location."""
+    mock_well = decoy.mock(cls=Well)
+    input_last_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    expected_result = subject.WellTarget(
+        well=mock_well, location=input_last_location, in_place=True
+    )
+
+    result = subject.validate_location(location=None, last_location=input_last_location)
+
+    assert result == expected_result
+
+
+def test_validate_location_matches_last_location(decoy: Decoy) -> None:
+    """Should return an in_place WellTarget."""
+    mock_well = decoy.mock(cls=Well)
+    input_last_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    input_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
+    expected_result = subject.WellTarget(
+        well=mock_well, location=input_last_location, in_place=True
+    )
+
+    result = subject.validate_location(
+        location=input_location, last_location=input_last_location
+    )
+
+    assert result == expected_result
+
+
+def test_validate_with_wrong_location_with_last_location() -> None:
+    """Should raise a LocationTypeError."""
+    with pytest.raises(subject.LocationTypeError):
+        subject.validate_location(
+            location=42,  # type: ignore[arg-type]
+            last_location=Location(point=Point(x=1, y=1, z=1), labware=None),
+        )
+
+
+def test_validate_with_wrong_location() -> None:
+    """Should raise a LocationTypeError."""
+    with pytest.raises(subject.LocationTypeError):
+        subject.validate_location(
+            location=42, last_location=None  # type: ignore[arg-type]
+        )
+
+
+def test_validate_raises_no_location_error() -> None:
+    """Should raise a NoLocationError."""
+    with pytest.raises(subject.NoLocationError):
+        subject.validate_location(location=None, last_location=None)
+
+
+def test_validate_with_labware(decoy: Decoy) -> None:
+    """Should return a PointTarget for a non-Well Location."""
+    mock_labware = decoy.mock(cls=Labware)
+    input_location = Location(point=Point(1, 1, 1), labware=mock_labware)
+
+    result = subject.validate_location(location=input_location, last_location=None)
+
+    assert result == subject.PointTarget(location=input_location, in_place=False)
+
+
+def test_validate_last_location_with_labware(decoy: Decoy) -> None:
+    """Should return a PointTarget for non-Well previous Location."""
+    mock_labware = decoy.mock(cls=Labware)
+    input_last_location = Location(point=Point(1, 1, 1), labware=mock_labware)
+
+    result = subject.validate_location(location=None, last_location=input_last_location)
+
+    assert result == subject.PointTarget(location=input_last_location, in_place=True)

@@ -37,6 +37,13 @@
   padding-right: 19.294%;
 }
 
+.modules_diagrams_color_enhancements {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6%;
+}
+
 .thermocycler_diagram_row {
   display: flex;
   justify-content: center;

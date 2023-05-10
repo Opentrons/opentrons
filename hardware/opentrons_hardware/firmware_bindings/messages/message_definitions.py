@@ -1,12 +1,13 @@
 """Definition of CAN messages."""
 from dataclasses import dataclass
 from typing import Type, Any
-
+import threading
 from typing_extensions import Literal
 
-from ..constants import MessageId
+from ..constants import MessageId, ErrorCode, ErrorSeverity
 from . import payloads
 from .. import utils
+from logging import Logger
 
 
 class SingletonMessageIndexGenerator(object):
@@ -18,10 +19,16 @@ class SingletonMessageIndexGenerator(object):
             cls.instance = super(SingletonMessageIndexGenerator, cls).__new__(cls)
         return cls.instance
 
+    def __init__(self) -> None:
+        """Initalize the lock."""
+        self._lock = threading.Lock()
+
     def get_next_index(self) -> int:
         """Return the next index."""
         # increment before returning so we never return 0 as a value
+        self._lock.acquire(timeout=1)
         self.__current_index += 1
+        self._lock.release()
         return self.__current_index
 
     __current_index = 0
@@ -63,6 +70,21 @@ class ErrorMessage(BaseMessage):  # noqa: D101
     payload: payloads.ErrorMessagePayload
     payload_type: Type[payloads.ErrorMessagePayload] = payloads.ErrorMessagePayload
     message_id: Literal[MessageId.error_message] = MessageId.error_message
+
+    def log_error(self, log: Logger) -> None:
+        """Log an error message with the correct log level."""
+        error_name = ""
+        if self.payload.error_code.value in [err.value for err in ErrorCode]:
+            error_name = str(ErrorCode(self.payload.error_code.value).name)
+        else:
+            error_name = "UNKNOWN ERROR"
+
+        if self.payload.severity == ErrorSeverity.warning:
+            log.warning(f"recived a firmware warning {error_name}")
+        elif self.payload.severity == ErrorSeverity.recoverable:
+            log.error(f"recived a firmware recoverable error {error_name}")
+        elif self.payload.severity == ErrorSeverity.unrecoverable:
+            log.critical(f"recived a firmware critical error {error_name}")
 
 
 @dataclass
@@ -232,6 +254,22 @@ class MotorPositionResponse(BaseMessage):  # noqa: D101
     message_id: Literal[
         MessageId.motor_position_response
     ] = MessageId.motor_position_response
+
+
+@dataclass
+class UpdateMotorPositionEstimationRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_request
+    ] = MessageId.update_motor_position_estimation_request
+
+
+@dataclass
+class UpdateMotorPositionEstimationResponse(BaseMessage):  # noqa: D101
+    payload: payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_response
+    ] = MessageId.update_motor_position_estimation_response
 
 
 @dataclass
@@ -470,6 +508,17 @@ class BaselineSensorRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class BaselineSensorResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BaselineSensorResponsePayload
+    payload_type: Type[
+        payloads.BaselineSensorResponsePayload
+    ] = payloads.BaselineSensorResponsePayload
+    message_id: Literal[
+        MessageId.baseline_sensor_response
+    ] = MessageId.baseline_sensor_response
+
+
+@dataclass
 class ReadFromSensorResponse(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorResponsePayload
     payload_type: Type[
@@ -556,6 +605,24 @@ class SetBrushedMotorPwmRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class BrushedMotorConfRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.brushed_motor_conf_request
+    ] = MessageId.brushed_motor_conf_request
+
+
+@dataclass
+class BrushedMotorConfResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BrushedMotorConfPayload
+    payload_type: Type[
+        payloads.BrushedMotorConfPayload
+    ] = payloads.BrushedMotorConfPayload
+    message_id: Literal[
+        MessageId.brushed_motor_conf_response
+    ] = MessageId.brushed_motor_conf_response
+
+
+@dataclass
 class GripperGripRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[
@@ -618,6 +685,20 @@ class GripperInfoResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class GearEnableMotorRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gear_enable_motor_request
+    ] = MessageId.gear_enable_motor_request
+
+
+@dataclass
+class GearDisableMotorRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gear_disable_motor_request
+    ] = MessageId.gear_disable_motor_request
+
+
+@dataclass
 class TipActionRequest(BaseMessage):  # noqa: D101
     payload: payloads.TipActionRequestPayload
     payload_type: Type[
@@ -637,6 +718,37 @@ class TipActionResponse(BaseMessage):  # noqa: D101
     message_id: Literal[
         MessageId.do_self_contained_tip_action_response
     ] = MessageId.do_self_contained_tip_action_response
+
+
+@dataclass
+class GearWriteMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorDriverRegisterDataPayload
+    payload_type: Type[
+        payloads.MotorDriverRegisterPayload
+    ] = payloads.MotorDriverRegisterDataPayload
+    message_id: Literal[
+        MessageId.gear_write_motor_driver_request
+    ] = MessageId.gear_write_motor_driver_request
+
+
+@dataclass
+class GearReadMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorDriverRegisterPayload
+    payload_type: Type[
+        payloads.MotorDriverRegisterPayload
+    ] = payloads.MotorDriverRegisterPayload
+    message_id: Literal[
+        MessageId.gear_read_motor_driver_request
+    ] = MessageId.gear_read_motor_driver_request
+
+
+@dataclass
+class GearWriteMotorCurrentRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorCurrentPayload
+    payload_type: Type[payloads.MotorCurrentPayload] = payloads.MotorCurrentPayload
+    message_id: Literal[
+        MessageId.gear_set_current_request
+    ] = MessageId.gear_set_current_request
 
 
 @dataclass
@@ -677,3 +789,65 @@ class InstrumentInfoRequest(EmptyPayloadMessage):
     message_id: Literal[
         MessageId.instrument_info_request
     ] = MessageId.instrument_info_request
+
+
+@dataclass
+class SetGripperErrorTolerance(BaseMessage):  # noqa: D101
+    payload: payloads.GripperErrorTolerancePayload
+    payload_type: Type[
+        payloads.GripperErrorTolerancePayload
+    ] = payloads.GripperErrorTolerancePayload
+    message_id: Literal[
+        MessageId.set_gripper_error_tolerance
+    ] = MessageId.set_gripper_error_tolerance
+
+
+@dataclass
+class TipStatusQueryRequest(EmptyPayloadMessage):
+    """Request to query the tip presence pin.
+
+    The response should be a PushTipPresenceNotification.
+    """
+
+    message_id: Literal[
+        MessageId.get_tip_status_request
+    ] = MessageId.get_tip_status_request
+
+
+@dataclass
+class PushTipPresenceNotification(BaseMessage):
+    """Hardware triggered notification of ejector flag status.
+
+    The response should be a boolean of the ejector flag
+    either being occluded or not.
+    """
+
+    payload: payloads.PushTipPresenceNotificationPayload
+    payload_type: Type[
+        payloads.PushTipPresenceNotificationPayload
+    ] = payloads.PushTipPresenceNotificationPayload
+    message_id: Literal[
+        MessageId.tip_presence_notification
+    ] = MessageId.tip_presence_notification
+
+
+@dataclass
+class GetMotorUsageRequest(EmptyPayloadMessage):
+    """Prompt a motor to send it's total lifetime usage."""
+
+    message_id: Literal[
+        MessageId.get_motor_usage_request
+    ] = MessageId.get_motor_usage_request
+
+
+@dataclass
+class GetMotorUsageResponse(BaseMessage):
+    """Motor response with total lifetime usage."""
+
+    payload: payloads.GetMotorUsageResponsePayload
+    payload_type: Type[
+        payloads.GetMotorUsageResponsePayload
+    ] = payloads.GetMotorUsageResponsePayload
+    message_id: Literal[
+        MessageId.get_motor_usage_response
+    ] = MessageId.get_motor_usage_response

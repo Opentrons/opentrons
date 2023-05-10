@@ -10,19 +10,22 @@ from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
 from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
 )
-from opentrons.protocols.geometry.module_geometry import ThermocyclerGeometry
-
-from opentrons.protocol_api.labware import Labware, Well
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.module_geometry import (
+    ThermocyclerGeometry,
 )
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
+
+from opentrons.protocol_api.labware import Labware
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
+)
+from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyThermocyclerCore,
     create_module_core,
 )
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
 )
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -36,9 +39,9 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 @pytest.fixture
 def mock_protocol_core(
     decoy: Decoy, mock_sync_hardware_api: SyncHardwareAPI
-) -> ProtocolContextImplementation:
+) -> LegacyProtocolCore:
     """Get a mock protocol core."""
-    mock_protocol_core = decoy.mock(cls=ProtocolContextImplementation)
+    mock_protocol_core = decoy.mock(cls=LegacyProtocolCore)
     decoy.when(mock_protocol_core.get_hardware()).then_return(mock_sync_hardware_api)
     return mock_protocol_core
 
@@ -56,9 +59,9 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncThermocyclerHardware:
 
 
 @pytest.fixture
-def mock_instrument_core(decoy: Decoy) -> InstrumentContextImplementation:
+def mock_instrument_core(decoy: Decoy) -> LegacyInstrumentCore:
     """Get a mock instrument core."""
-    return decoy.mock(cls=InstrumentContextImplementation)
+    return decoy.mock(cls=LegacyInstrumentCore)
 
 
 @pytest.fixture
@@ -68,15 +71,15 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
-def mock_well(decoy: Decoy) -> Well:
-    """Get a mock well."""
-    return decoy.mock(cls=Well)
+def mock_trash_well_core(decoy: Decoy) -> LegacyWellCore:
+    """Get a mock well implementation for the trash."""
+    return decoy.mock(cls=LegacyWellCore)
 
 
 @pytest.fixture
 def subject(
     mock_geometry: ThermocyclerGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
     mock_sync_module_hardware: SyncThermocyclerHardware,
 ) -> LegacyThermocyclerCore:
     """Get a legacy module implementation core with mocked out dependencies."""
@@ -91,7 +94,7 @@ def subject(
 def test_create(
     decoy: Decoy,
     mock_geometry: ThermocyclerGeometry,
-    mock_protocol_core: ProtocolContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
 ) -> None:
     """It should be able to create a thermocycler module core."""
     mock_module_hardware_api = decoy.mock(cls=Thermocycler)
@@ -256,11 +259,10 @@ def test_open_lid(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
-    mock_instrument_core: InstrumentContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
+    mock_instrument_core: LegacyInstrumentCore,
     mock_geometry: ThermocyclerGeometry,
-    mock_labware: Labware,
-    mock_well: Well,
+    mock_trash_well_core: LegacyWellCore,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should open the lid with the hardware."""
@@ -271,10 +273,11 @@ def test_open_lid(
     decoy.when(mock_sync_hardware_api.current_position(Mount.RIGHT)).then_return(
         {Axis.A: 4}
     )
-    decoy.when(subject._get_fixed_trash()).then_return(mock_labware)
-    decoy.when(mock_labware.wells()).then_return([mock_well])
-    decoy.when(mock_well.top()).then_return(
-        Location(point=Point(x=1, y=2, z=3), labware=mock_well)
+    decoy.when(mock_protocol_core.fixed_trash.get_well_core("A1")).then_return(
+        mock_trash_well_core
+    )
+    decoy.when(mock_trash_well_core.get_top(z_offset=0)).then_return(
+        Point(x=1, y=2, z=3)
     )
 
     decoy.when(mock_sync_module_hardware.open()).then_return("open")
@@ -299,11 +302,10 @@ def test_close_lid(
     decoy: Decoy,
     mock_sync_module_hardware: SyncThermocyclerHardware,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_protocol_core: ProtocolContextImplementation,
-    mock_instrument_core: InstrumentContextImplementation,
+    mock_protocol_core: LegacyProtocolCore,
+    mock_instrument_core: LegacyInstrumentCore,
     mock_geometry: ThermocyclerGeometry,
-    mock_labware: Labware,
-    mock_well: Well,
+    mock_trash_well_core: LegacyWellCore,
     subject: LegacyThermocyclerCore,
 ) -> None:
     """It should close the lid with the hardware."""
@@ -314,10 +316,11 @@ def test_close_lid(
     decoy.when(mock_sync_hardware_api.current_position(Mount.LEFT)).then_return(
         {Axis.Z: 4}
     )
-    decoy.when(subject._get_fixed_trash()).then_return(mock_labware)
-    decoy.when(mock_labware.wells()).then_return([mock_well])
-    decoy.when(mock_well.top()).then_return(
-        Location(point=Point(x=1, y=2, z=3), labware=mock_well)
+    decoy.when(mock_protocol_core.fixed_trash.get_well_core("A1")).then_return(
+        mock_trash_well_core
+    )
+    decoy.when(mock_trash_well_core.get_top(z_offset=0)).then_return(
+        Point(x=1, y=2, z=3)
     )
 
     decoy.when(mock_sync_module_hardware.close()).then_return("closed")

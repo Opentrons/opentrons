@@ -13,6 +13,7 @@ from opentrons.protocols.parse import (
     API_VERSION_FOR_JSON_V5_AND_BELOW,
     MAX_SUPPORTED_JSON_SCHEMA_VERSION,
     version_from_static_python_info,
+    JSONSchemaVersionTooNewError,
 )
 from opentrons.protocols.types import (
     JsonProtocol,
@@ -344,12 +345,7 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     # valid data that has no schema should fail
     with pytest.raises(RuntimeError, match="deprecated"):
         validate_json({"protocol-schema": "1.0.0"})
-    with pytest.raises(
-        RuntimeError,
-        match="Please update your OT-2 App"
-        + " "
-        + "and robot server to the latest version and try again",
-    ):
+    with pytest.raises(JSONSchemaVersionTooNewError):
         validate_json({"schemaVersion": str(MAX_SUPPORTED_JSON_SCHEMA_VERSION + 1)})
     labware = get_labware_fixture("fixture_12_trough_v2")
     with pytest.raises(RuntimeError, match="labware"):

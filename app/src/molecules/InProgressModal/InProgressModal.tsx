@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { css } from 'styled-components'
+import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -7,8 +9,11 @@ import {
   SPACING,
   Flex,
   Icon,
+  RESPONSIVENESS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { getIsOnDevice } from '../../redux/config'
 
 interface Props {
   //  optional override of the spinner
@@ -17,32 +22,46 @@ interface Props {
   children?: JSX.Element
 }
 
+const DESCRIPTION_STYLE = css`
+  ${TYPOGRAPHY.h1Default}
+  margin-top: ${SPACING.spacing5};
+  margin-bottom: ${SPACING.spacing3};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightBold};
+    font-size: ${TYPOGRAPHY.fontSize32};
+    margin-top: ${SPACING.spacing6};
+    margin-bottom: ${SPACING.spacing2};
+    margin-left: 4.5rem;
+    margin-right: 4.5rem;
+    text-align: ${TYPOGRAPHY.textAlignCenter};
+    line-height: ${TYPOGRAPHY.lineHeight42};
+  }
+`
 export function InProgressModal(props: Props): JSX.Element {
   const { alternativeSpinner, children, description } = props
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
-      marginY="8rem"
+      justifyContent={JUSTIFY_CENTER}
+      height={isOnDevice ? '31.5625rem' : '24.625rem'}
+      padding={SPACING.spacing6}
     >
       {alternativeSpinner ?? (
         <Icon
           name="ot-spinner"
-          size="5.125rem"
-          color={COLORS.darkGreyEnabled}
           aria-label="spinner"
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
+          color={isOnDevice ? COLORS.darkBlackEnabled : COLORS.darkGreyEnabled}
+          opacity={isOnDevice ? '70%' : '100%'}
           spin
         />
       )}
       {description != null && (
-        <StyledText
-          css={TYPOGRAPHY.h1Default}
-          marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing3}
-        >
-          {description}
-        </StyledText>
+        <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
       )}
       {children}
     </Flex>

@@ -9,6 +9,7 @@ from ..constants import MessageId
 
 MessageDefinition = Union[
     defs.Acknowledgement,
+    defs.ErrorMessage,
     defs.HeartbeatRequest,
     defs.HeartbeatResponse,
     defs.DeviceInfoRequest,
@@ -32,6 +33,8 @@ MessageDefinition = Union[
     defs.MoveCompleted,
     defs.MotorPositionRequest,
     defs.MotorPositionResponse,
+    defs.UpdateMotorPositionEstimationRequest,
+    defs.UpdateMotorPositionEstimationResponse,
     defs.SetMotionConstraints,
     defs.GetMotionConstraintsRequest,
     defs.GetMotionConstraintsResponse,
@@ -63,6 +66,7 @@ MessageDefinition = Union[
     defs.ReadFromSensorRequest,
     defs.WriteToSensorRequest,
     defs.BaselineSensorRequest,
+    defs.BaselineSensorResponse,
     defs.SetSensorThresholdRequest,
     defs.ReadFromSensorResponse,
     defs.SensorThresholdResponse,
@@ -74,10 +78,22 @@ MessageDefinition = Union[
     defs.BindSensorOutputRequest,
     defs.TipActionRequest,
     defs.TipActionResponse,
+    defs.GearDisableMotorRequest,
+    defs.GearEnableMotorRequest,
+    defs.GearReadMotorDriverRegisterRequest,
+    defs.GearWriteMotorDriverRegisterRequest,
+    defs.GearWriteMotorCurrentRequest,
     defs.PeripheralStatusRequest,
     defs.PeripheralStatusResponse,
     defs.SetSerialNumber,
     defs.InstrumentInfoRequest,
+    defs.BrushedMotorConfRequest,
+    defs.BrushedMotorConfResponse,
+    defs.SetGripperErrorTolerance,
+    defs.PushTipPresenceNotification,
+    defs.TipStatusQueryRequest,
+    defs.GetMotorUsageRequest,
+    defs.GetMotorUsageResponse,
 ]
 
 

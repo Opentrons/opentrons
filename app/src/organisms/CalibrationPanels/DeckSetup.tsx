@@ -9,12 +9,12 @@ import {
   ALIGN_CENTER,
   ALIGN_STRETCH,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from './NeedHelpLink'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
@@ -111,11 +111,14 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                   let labwareDef = null
                   if (String(tipRack?.slot) === slotId) {
                     labwareDef = tipRack?.definition
-                  } else if (calBlock && String(calBlock?.slot) === slotId) {
+                  } else if (
+                    calBlock != null &&
+                    String(calBlock?.slot) === slotId
+                  ) {
                     labwareDef = calBlock?.definition
                   }
 
-                  return labwareDef ? (
+                  return labwareDef != null ? (
                     <CalibrationLabwareRender
                       key={slotId}
                       slotDef={slot}

@@ -223,10 +223,14 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
         {step}
       </StyledText>
       <Flex
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGreyEnabled}`}
+        border={`${String(SPACING.spacingXXS)} solid ${String(
+          COLORS.medGreyEnabled
+        )}`}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}
+        padding={`${String(SPACING.spacing4)} ${String(
+          SPACING.spacingM
+        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
         width="100%"
         marginBottom={SPACING.spacing4}
       >

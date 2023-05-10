@@ -7,13 +7,13 @@ import functools
 
 from dataclasses import dataclass
 
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.commands import types
 from opentrons.protocols.api_support.default_deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
 
 

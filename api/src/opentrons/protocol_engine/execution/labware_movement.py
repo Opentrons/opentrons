@@ -1,6 +1,7 @@
 """Labware movement command handling."""
-from typing import Optional, Union, List
+from __future__ import annotations
 
+from typing import Optional, Union, List, TYPE_CHECKING
 from opentrons_shared_data.gripper.constants import (
     LABWARE_GRIP_FORCE,
     IDLE_STATE_GRIP_FORCE,
@@ -9,12 +10,12 @@ from opentrons_shared_data.gripper.constants import (
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
-from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
+from .thermocycler_plate_lifter import ThermocyclerPlateLifter
 
 from ..errors import (
     GripperNotAttachedError,
@@ -28,7 +29,11 @@ from ..types import (
     ModuleLocation,
     LabwareLocation,
     LabwareOffsetVector,
+    ExperimentalOffsetData,
 )
+
+if TYPE_CHECKING:
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
@@ -38,20 +43,30 @@ class LabwareMovementHandler:
 
     _hardware_api: HardwareControlAPI
     _state_store: StateStore
-    _model_utils: ModelUtils
+    _movement: MovementHandler
+    _equipment: EquipmentHandler
 
     def __init__(
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        model_utils: Optional[ModelUtils] = None,
+        equipment: EquipmentHandler,
+        movement: MovementHandler,
+        thermocycler_plate_lifter: Optional[ThermocyclerPlateLifter] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
         heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a LabwareMovementHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
-        self._model_utils = model_utils or ModelUtils()
+        self._thermocycler_plate_lifter = (
+            thermocycler_plate_lifter
+            or ThermocyclerPlateLifter(
+                state_store=self._state_store,
+                equipment=equipment,
+                movement=movement,
+            )
+        )
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
@@ -70,6 +85,7 @@ class LabwareMovementHandler:
         labware_id: str,
         current_location: Union[DeckSlotLocation, ModuleLocation],
         new_location: Union[DeckSlotLocation, ModuleLocation],
+        experimental_offset_data: ExperimentalOffsetData,
         new_offset_id: Optional[str],
     ) -> None:
         """Move a loaded labware from one location to another."""
@@ -90,16 +106,24 @@ class LabwareMovementHandler:
 
         # Retract all mounts
         await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
-
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
+
+        await self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
+            labware_location=current_location
+        )
+        labware_pickup_offset = self.get_experimental_labware_movement_offset_vector(
+            use_current_offset=experimental_offset_data.usePickUpLocationLpcOffset,
+            current_offset_vector=self._state_store.labware.get_labware_offset_vector(
+                labware_id
+            ),
+            additional_offset_vector=experimental_offset_data.pickUpOffset,
+        )
         waypoints_to_labware = self._get_gripper_movement_waypoints(
             labware_id=labware_id,
             location=current_location,
             current_position=await ot3api.gantry_position(mount=gripper_mount),
             gripper_home_z=gripper_homed_position.z,
-            labware_offset_vector=self._state_store.labware.get_labware_offset_vector(
-                labware_id
-            ),
+            labware_offset_vector=labware_pickup_offset,
         )
 
         for waypoint in waypoints_to_labware:
@@ -113,10 +137,36 @@ class LabwareMovementHandler:
 
         await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
 
+        if isinstance(current_location, ModuleLocation):
+            # TODO: This is a nasty hard-coded implementation to add a wiggle
+            # to dislodge plates from *all* modules. This should be changed to
+            # check configuration values on a per-module basis for 1) whether
+            # to wiggle at all 2) how much to wiggle.
+            # See https://opentrons.atlassian.net/browse/RCORE-749
+            WIGGLE_Z_LIFT = 0.5
+            WIGGLE_MAG = 0.5
+            # Lift the gripper a tiny bit in the Z axis
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(z=WIGGLE_Z_LIFT))
+
+            # Shake in the Y axis
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(y=WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(y=-2 * WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(y=WIGGLE_MAG))
+
+            # Shake in the X axis
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(x=WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(x=-2 * WIGGLE_MAG))
+            await ot3api.move_rel(mount=gripper_mount, delta=Point(x=WIGGLE_MAG))
+
         new_labware_offset = (
             self._state_store.labware.get_labware_offset(new_offset_id).vector
             if new_offset_id
             else None
+        )
+        labware_drop_offset = self.get_experimental_labware_movement_offset_vector(
+            use_current_offset=experimental_offset_data.useDropLocationLpcOffset,
+            current_offset_vector=new_labware_offset,
+            additional_offset_vector=experimental_offset_data.dropOffset,
         )
 
         # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
@@ -127,7 +177,7 @@ class LabwareMovementHandler:
             location=new_location,
             current_position=waypoints_to_labware[-1],
             gripper_home_z=gripper_homed_position.z,
-            labware_offset_vector=new_labware_offset,
+            labware_offset_vector=labware_drop_offset,
         )
 
         for waypoint in waypoints_to_new_location:
@@ -149,14 +199,11 @@ class LabwareMovementHandler:
         location: Union[DeckSlotLocation, ModuleLocation],
         current_position: Point,
         gripper_home_z: float,
-        labware_offset_vector: Optional[LabwareOffsetVector],
+        labware_offset_vector: LabwareOffsetVector,
     ) -> List[Point]:
         """Get waypoints for gripper to move to a specified location."""
         labware_center = self._state_store.geometry.get_labware_center(
             labware_id=labware_id, location=location
-        )
-        labware_offset_vector = labware_offset_vector or LabwareOffsetVector(
-            x=0, y=0, z=0
         )
         waypoints: List[Point] = [
             Point(current_position.x, current_position.y, gripper_home_z),
@@ -172,6 +219,29 @@ class LabwareMovementHandler:
             ),
         ]
         return waypoints
+
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+    @staticmethod
+    def get_experimental_labware_movement_offset_vector(
+        use_current_offset: bool,
+        current_offset_vector: Optional[LabwareOffsetVector],
+        additional_offset_vector: Optional[LabwareOffsetVector],
+    ) -> LabwareOffsetVector:
+        """Calculate the final labware offset vector to use in labware movement."""
+        _current_offset_vector = current_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
+        _additional_offset_vector = additional_offset_vector or LabwareOffsetVector(
+            x=0, y=0, z=0
+        )
+        if not use_current_offset:
+            return _additional_offset_vector
+        else:
+            return LabwareOffsetVector(
+                x=_current_offset_vector.x + _additional_offset_vector.x,
+                y=_current_offset_vector.y + _additional_offset_vector.y,
+                z=_current_offset_vector.z + _additional_offset_vector.z,
+            )
 
     # TODO (spp, 2022-10-20): move to labware view
     @staticmethod
@@ -210,5 +280,5 @@ class LabwareMovementHandler:
             except HeaterShakerLabwareLatchNotOpenError:
                 raise LabwareMovementNotAllowedError(
                     "Cannot move labware from/to a heater-shaker"
-                    " with its labware latch open."
+                    " with its labware latch closed."
                 )

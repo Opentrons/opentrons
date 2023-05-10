@@ -9,6 +9,7 @@ import { isOT3Pipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
 
+jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
@@ -49,7 +50,6 @@ describe('PipetteOverflowMenu', () => {
 
   it('renders information with a pipette attached', () => {
     const { getByRole } = render(props)
-    const calibrate = getByRole('button', { name: 'Calibrate pipette offset' })
     const detach = getByRole('button', { name: 'Detach pipette' })
     const settings = getByRole('button', { name: 'Pipette Settings' })
     const about = getByRole('button', { name: 'About pipette' })
@@ -59,8 +59,6 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleSettingsSlideout).toHaveBeenCalled()
     fireEvent.click(about)
     expect(props.handleAboutSlideout).toHaveBeenCalled()
-    fireEvent.click(calibrate)
-    expect(props.handleCalibrate).toHaveBeenCalled()
   })
   it('renders information with no pipette attached', () => {
     props = {
@@ -76,23 +74,6 @@ describe('PipetteOverflowMenu', () => {
     const btn = getByRole('button', { name: 'Attach pipette' })
     fireEvent.click(btn)
     expect(props.handleChangePipette).toHaveBeenCalled()
-  })
-  it('renders recalibrate pipette offset text', () => {
-    props = {
-      pipetteSpecs: mockLeftProtoPipette.modelSpecs,
-      mount: LEFT,
-      handleChangePipette: jest.fn(),
-      handleCalibrate: jest.fn(),
-      handleAboutSlideout: jest.fn(),
-      handleSettingsSlideout: jest.fn(),
-      isPipetteCalibrated: true,
-    }
-    const { getByRole } = render(props)
-    const recalibrate = getByRole('button', {
-      name: 'Recalibrate pipette offset',
-    })
-    fireEvent.click(recalibrate)
-    expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
   it('renders recalibrate pipette text for OT-3 pipette', () => {
@@ -113,6 +94,20 @@ describe('PipetteOverflowMenu', () => {
     })
     fireEvent.click(recalibrate)
     expect(props.handleCalibrate).toHaveBeenCalled()
+  })
+
+  it('should render recalibrate pipette text for OT-3 pipette', () => {
+    mockIsOT3Pipette.mockReturnValue(true)
+    props = {
+      ...props,
+      isPipetteCalibrated: true,
+    }
+    const { queryByRole } = render(props)
+    expect(
+      queryByRole('button', {
+        name: 'Recalibrate pipette',
+      })
+    ).toBeInTheDocument()
   })
 
   it('renders only the about pipette button if OT-3/GEN3 pipette is attached', () => {

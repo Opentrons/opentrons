@@ -17,7 +17,7 @@ export interface LoadPipetteRunTimeCommand
   params: LoadPipetteParams & {
     pipetteName: PipetteName
   }
-  result: LoadPipetteResult
+  result?: LoadPipetteResult
 }
 export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadLabware'
@@ -26,7 +26,7 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
 export interface LoadLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     LoadLabwareCreateCommand {
-  result: LoadLabwareResult
+  result?: LoadLabwareResult
 }
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveLabware'
@@ -35,7 +35,7 @@ export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
 export interface MoveLabwareRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveLabwareCreateCommand {
-  result: MoveLabwareResult
+  result?: MoveLabwareResult
 }
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadModule'
@@ -47,7 +47,7 @@ export interface LoadModuleRunTimeCommand
   params: LoadModuleParams & {
     model: ModuleModel
   }
-  result: LoadModuleResult
+  result?: LoadModuleResult
 }
 export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadLiquid'
@@ -56,7 +56,7 @@ export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
 export interface LoadLiquidRunTimeCommand
   extends CommonCommandRunTimeInfo,
     LoadLiquidCreateCommand {
-  result: LoadLiquidResult
+  result?: LoadLiquidResult
 }
 
 export type SetupRunTimeCommand =

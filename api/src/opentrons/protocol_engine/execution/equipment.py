@@ -3,9 +3,10 @@ from dataclasses import dataclass
 from typing import Optional, overload, Union
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
@@ -21,17 +22,24 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleId,
 )
+from ..actions import ActionDispatcher, AddPipetteConfigAction
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
 )
-from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
+from ..resources import (
+    LabwareDataProvider,
+    ModuleDataProvider,
+    ModelUtils,
+    pipette_data_provider,
+)
 from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
     DeckSlotLocation,
     ModuleLocation,
+    LabwareOffset,
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
@@ -59,7 +67,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
 
     module_id: str
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
@@ -76,6 +84,7 @@ class EquipmentHandler:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
+        action_dispatcher: ActionDispatcher,
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
@@ -83,6 +92,7 @@ class EquipmentHandler:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
+        self._action_dispatcher = action_dispatcher
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()
@@ -159,34 +169,105 @@ class EquipmentHandler:
         Returns:
             A LoadedPipetteData object.
         """
-        other_mount = mount.other_mount()
-        other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
-        cache_request = {
-            mount.to_hw_mount(): pipette_name.value
+        pipette_name_value = (
+            pipette_name.value
             if isinstance(pipette_name, PipetteNameType)
             else pipette_name
-        }
-        if other_pipette is not None:
-            # TODO (tz, 11-23-22): remove 96 channel assignment when refactoring load_pipette for 96 channels.
-            # https://opentrons.atlassian.net/browse/RLIQ-255
-            cache_request[other_mount.to_hw_mount()] = (
-                other_pipette.pipetteName.value
-                if isinstance(other_pipette.pipetteName, PipetteNameType)
-                else "p1000_96"
-            )
-
-        # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
-        # behavior of protocol_context.load_instrument, and is used here as a
-        # pipette existence check
-        try:
-            await self._hardware_api.cache_instruments(cache_request)
-        except RuntimeError as e:
-            raise FailedToLoadPipetteError(str(e)) from e
+        )
 
         pipette_id = pipette_id or self._model_utils.generate_id()
 
+        if not use_virtual_pipettes:
+            cache_request = {mount.to_hw_mount(): pipette_name_value}
+
+            # TODO(mc, 2022-12-09): putting the other pipette in the cache request
+            # is only to support protocol analysis, since the hardware simulator
+            # does not cache requested virtual instruments. Remove per
+            # https://opentrons.atlassian.net/browse/RLIQ-258
+            other_mount = mount.other_mount()
+            other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
+            if other_pipette is not None:
+                cache_request[other_mount.to_hw_mount()] = (
+                    other_pipette.pipetteName.value
+                    if isinstance(other_pipette.pipetteName, PipetteNameType)
+                    else other_pipette.pipetteName
+                )
+
+            # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
+            # behavior of protocol_context.load_instrument, and is used here as a
+            # pipette existence check
+            try:
+                await self._hardware_api.cache_instruments(cache_request)
+            except RuntimeError as e:
+                raise FailedToLoadPipetteError(str(e)) from e
+
+            pipette_dict = self._hardware_api.get_attached_instrument(
+                mount.to_hw_mount()
+            )
+
+            serial_number = pipette_dict["pipette_id"]
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_dict
+            )
+
+        else:
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
+            static_pipette_config = (
+                pipette_data_provider.get_virtual_pipette_static_config(
+                    pipette_name_value
+                )
+            )
+
+        # TODO(mc, 2023-02-22): rather than dispatch from inside the load command
+        # see if additional config data like this can be returned from the command impl
+        # alongside, but outside of, the command result.
+        # this pattern could potentially improve `loadLabware` and `loadModule`, too
+        self._action_dispatcher.dispatch(
+            AddPipetteConfigAction(
+                pipette_id=pipette_id,
+                serial_number=serial_number,
+                config=static_pipette_config,
+            )
+        )
+
         return LoadedPipetteData(pipette_id=pipette_id)
+
+    async def load_magnetic_block(
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        module_id: Optional[str],
+    ) -> LoadedModuleData:
+        """Ensure the required magnetic block is attached.
+
+        Args:
+            model: The model name of the module.
+            location: The deck location of the module
+            module_id: Optional ID assigned to the module.
+                       If None, an ID will be generated.
+
+        Returns:
+            A LoadedModuleData object.
+
+        Raises:
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
+        """
+        assert ModuleModel.is_magnetic_block(
+            model
+        ), f"Expected Magnetic block and got {model.name}"
+        definition = self._module_data_provider.get_definition(model)
+        # when loading a hardware module select_hardware_module_to_load
+        # will ensure a module of a different type is not loaded at the same slot.
+        # this is for non-connected modules.
+        self._state_store.modules.raise_if_module_in_location(location=location)
+        return LoadedModuleData(
+            module_id=self._model_utils.ensure_id(module_id),
+            serial_number=None,
+            definition=definition,
+        )
 
     async def load_module(
         self,
@@ -304,16 +385,57 @@ class EquipmentHandler:
             or None if no labware offset will apply.
         """
         if isinstance(labware_location, DeckSlotLocation):
-            slot_name = labware_location.slotName
-            module_model = None
+            offset = self._state_store.labware.find_applicable_labware_offset(
+                definition_uri=labware_definition_uri,
+                location=LabwareOffsetLocation(
+                    slotName=labware_location.slotName,
+                    moduleModel=None,
+                ),
+            )
+            return self._get_id_from_offset(offset)
+
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
             # Allow ModuleNotLoadedError to propagate.
-            module_model = self._state_store.modules.get_model(module_id=module_id)
+            # Note also that we match based on the module's requested model, not its
+            # actual model, to implement robot-server's documented HTTP API semantics.
+            module_model = self._state_store.modules.get_requested_model(
+                module_id=module_id
+            )
+
+            # If `module_model is None`, it probably means that this module was added by
+            # `ProtocolEngine.use_attached_modules()`, instead of an explicit
+            # `loadModule` command.
+            #
+            # This assert should never raise in practice because:
+            #   1. `ProtocolEngine.use_attached_modules()` is only used by
+            #      robot-server's "stateless command" endpoints, under `/commands`.
+            #   2. Those endpoints don't support loading labware, so this code will
+            #      never run.
+            #
+            # Nevertheless, if it does happen somehow, we do NOT want to pass the
+            # `None` value along to `LabwareView.find_applicable_labware_offset()`.
+            # `None` means something different there, which will cause us to return
+            # wrong results.
+            assert module_model is not None, (
+                "Can't find offsets for labware"
+                " that are loaded on modules"
+                " that were loaded with ProtocolEngine.use_attached_modules()."
+            )
+
             module_location = self._state_store.modules.get_location(
                 module_id=module_id
             )
             slot_name = module_location.slotName
+            offset = self._state_store.labware.find_applicable_labware_offset(
+                definition_uri=labware_definition_uri,
+                location=LabwareOffsetLocation(
+                    slotName=slot_name,
+                    moduleModel=module_model,
+                ),
+            )
+            return self._get_id_from_offset(offset)
+
         else:
             # No offset for off-deck location.
             # Returning None instead of raising an exception allows loading a labware
@@ -321,12 +443,6 @@ class EquipmentHandler:
             # Also allows using `moveLabware` with 'offDeck' location.
             return None
 
-        offset = self._state_store.labware.find_applicable_labware_offset(
-            definition_uri=labware_definition_uri,
-            location=LabwareOffsetLocation(
-                slotName=slot_name,
-                moduleModel=module_model,
-            ),
-        )
-
-        return None if offset is None else offset.id
+    @staticmethod
+    def _get_id_from_offset(labware_offset: Optional[LabwareOffset]) -> Optional[str]:
+        return None if labware_offset is None else labware_offset.id

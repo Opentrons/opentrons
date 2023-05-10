@@ -6,14 +6,13 @@ import { i18n } from '../../localization'
 import { swatchColors } from '../swatchColors'
 import {
   Card,
-  CheckboxField,
+  DeprecatedCheckboxField,
   FormGroup,
   InputField,
   OutlineButton,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
@@ -51,9 +50,6 @@ export const liquidEditFormSchema: Yup.Schema<
 
 export function LiquidEditForm(props: Props): JSX.Element {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
-  const enableLiquidColorEnhancements = useSelector(
-    featureFlagSelectors.getEnabledLiquidColorEnhancements
-  )
   const selectedLiquid = useSelector(selectors.getSelectedLiquidGroupState)
   const nextGroupId = useSelector(selectors.getNextLiquidGroupId)
   const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
@@ -118,18 +114,16 @@ export function LiquidEditForm(props: Props): JSX.Element {
                     onChange={handleChange}
                   />
                 </FormGroup>
-                {enableLiquidColorEnhancements ? (
-                  <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
-                    <Field
-                      name="displayColor"
-                      component={ColorPicker}
-                      value={values.displayColor}
-                      onChange={(color: ColorResult['hex']) => {
-                        setFieldValue('displayColor', color)
-                      }}
-                    />
-                  </FormGroup>
-                ) : null}
+                <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
+                  <Field
+                    name="displayColor"
+                    component={ColorPicker}
+                    value={values.displayColor}
+                    onChange={(color: ColorResult['hex']) => {
+                      setFieldValue('displayColor', color)
+                    }}
+                  />
+                </FormGroup>
               </div>
             </section>
 
@@ -140,7 +134,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <p className={styles.info_text}>
                 {i18n.t('form.liquid_edit.serialize_explanation')}
               </p>
-              <CheckboxField
+              <DeprecatedCheckboxField
                 name="serialize"
                 label={i18n.t('form.liquid_edit.serialize')}
                 value={values.serialize}
@@ -152,12 +146,15 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <OutlineButton onClick={deleteLiquidGroup} disabled={!canDelete}>
                 {i18n.t('button.delete')}
               </OutlineButton>
-              <PrimaryButton onClick={cancelForm}>
+              <DeprecatedPrimaryButton onClick={cancelForm}>
                 {i18n.t('button.cancel')}
-              </PrimaryButton>
-              <PrimaryButton disabled={!dirty} type="submit">
+              </DeprecatedPrimaryButton>
+              <DeprecatedPrimaryButton
+                disabled={!dirty || errors.name != null}
+                type="submit"
+              >
                 {i18n.t('button.save')}
-              </PrimaryButton>
+              </DeprecatedPrimaryButton>
             </div>
           </form>
         </Card>

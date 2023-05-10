@@ -31,15 +31,23 @@ describe('SubmitPrimaryButton', () => {
   it('renders submit primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
+      `background-color: ${String(COLORS.blueEnabled)}`
     )
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
-    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
-    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
+    expect(button).toHaveStyle(
+      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
+    )
+    expect(button).toHaveStyle(
+      `padding: ${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`
+    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
+    expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
+    expect(button).toHaveStyle(
+      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    )
+    expect(button).toHaveStyle(
+      `line-height: ${String(TYPOGRAPHY.lineHeight20)}`
+    )
     expect(button).toHaveStyle('width: 100%')
     expect(button).toHaveStyle('border: none')
     expect(button).toHaveAttribute('form', 'mockForm')
@@ -54,8 +62,10 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${COLORS.darkGreyDisabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.successDisabled}`)
+    expect(button).toHaveStyle(
+      `background-color: ${String(COLORS.darkGreyDisabled)}`
+    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.successDisabled)}`)
   })
 
   it('calls mock function when clicking the button', () => {
@@ -68,9 +78,13 @@ describe('SubmitPrimaryButton', () => {
   it('applies the correct states to the button - hover', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
-    expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
-      modifier: ':hover',
-    })
+    expect(button).toHaveStyleRule(
+      'background-color',
+      `${String(COLORS.blueHover)}`,
+      {
+        modifier: ':hover',
+      }
+    )
     expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
       modifier: ':hover',
     })
@@ -81,7 +95,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${COLORS.bluePressed}`,
+      `${String(COLORS.bluePressed)}`,
       {
         modifier: ':active',
       }
@@ -93,7 +107,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${COLORS.warningEnabled}`,
+      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }

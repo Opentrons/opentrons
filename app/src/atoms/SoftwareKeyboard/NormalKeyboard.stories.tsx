@@ -12,7 +12,7 @@ import '../../styles.global.css'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/SoftwareKeyboard/NormalKeyboard',
+  title: 'Odd/Atoms/SoftwareKeyboard/NormalKeyboard',
   component: NormalKeyboard,
 } as Meta
 

@@ -1,6 +1,8 @@
 from opentrons.config import feature_flags
 
 
+# TODO(mm, 2023-05-10): Deduplicate these constants with
+# opentrons.protocol_engine.types.DeckType and consider moving to shared-data.
 SHORT_TRASH_DECK = "ot2_short_trash"
 STANDARD_OT2_DECK = "ot2_standard"
 STANDARD_OT3_DECK = "ot3_standard"

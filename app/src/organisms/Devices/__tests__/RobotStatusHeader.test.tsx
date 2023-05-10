@@ -84,9 +84,9 @@ describe('RobotStatusHeader', () => {
 
   it('renders the model of robot and robot name - OT-3', () => {
     props.name = 'buzz'
-    props.robotModel = 'OT-3'
+    props.robotModel = 'Opentrons Flex'
     const [{ getByText }] = render(props)
-    getByText('OT-3')
+    getByText('Opentrons Flex')
     getByText('buzz')
   })
 
@@ -109,7 +109,7 @@ describe('RobotStatusHeader', () => {
 
     const runLink = getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
-      '/devices/otie/protocol-runs/fakeRunId/run-log'
+      '/devices/otie/protocol-runs/fakeRunId/run-preview'
     )
   })
 })

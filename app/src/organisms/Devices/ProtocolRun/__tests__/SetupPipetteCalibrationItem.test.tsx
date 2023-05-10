@@ -4,32 +4,14 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useCalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
-import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { getHasCalibrationBlock } from '../../../../redux/config'
 import { mockPipetteInfo } from '../../../../redux/pipettes/__fixtures__'
 import { useDeckCalibrationData } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
+import { MemoryRouter } from 'react-router-dom'
 
-jest.mock(
-  '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
-)
-jest.mock(
-  '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-)
-jest.mock('../../../../redux/config')
 jest.mock('../../hooks')
 
-const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
-  typeof getHasCalibrationBlock
->
-const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
-  typeof useCalibratePipetteOffset
->
-const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
-  typeof AskForCalibrationBlockModal
->
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
@@ -48,28 +30,22 @@ describe('SetupPipetteCalibrationItem', () => {
     React.ComponentProps<typeof SetupPipetteCalibrationItem>
   > = {}) => {
     return renderWithProviders(
-      <SetupPipetteCalibrationItem
-        {...{
-          pipetteInfo,
-          index,
-          mount,
-          robotName,
-          runId,
-        }}
-      />,
+      <MemoryRouter>
+        <SetupPipetteCalibrationItem
+          {...{
+            pipetteInfo,
+            index,
+            mount,
+            robotName,
+            runId,
+          }}
+        />
+      </MemoryRouter>,
       { i18nInstance: i18n }
     )[0]
   }
 
-  let startWizard: any
-
   beforeEach(() => {
-    startWizard = jest.fn()
-    when(mockUseCalibratePipetteOffset).mockReturnValue([startWizard, null])
-    when(mockGetHasCalibrationBlock).mockReturnValue(null)
-    when(mockAskForCalibrationBlockModal).mockReturnValue(
-      <div>Mock AskForCalibrationBlockModal</div>
-    )
     when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
@@ -85,7 +61,7 @@ describe('SetupPipetteCalibrationItem', () => {
     getByText(mockPipetteInfo.pipetteSpecs.displayName)
   })
 
-  it('renders the calibrate now button if pipette attached but not calibrated', () => {
+  it('renders a link to the calibration dashboard if pipette attached but not calibrated', () => {
     const { getByText, getByRole } = render({
       pipetteInfo: {
         ...mockPipetteInfo,
@@ -96,9 +72,11 @@ describe('SetupPipetteCalibrationItem', () => {
     })
 
     getByText('Not calibrated yet')
-    const calibrateNowButton = getByRole('button', { name: 'Calibrate Now' })
-    calibrateNowButton.click()
-    getByText('Mock AskForCalibrationBlockModal')
+    expect(
+      getByRole('link', {
+        name: 'Calibrate Now',
+      }).getAttribute('href')
+    ).toBe('/devices/otie/robot-settings/calibration/dashboard')
   })
   it('renders the pipette mismatch info if pipette calibrated but an inexact match', () => {
     const { getByText, getByRole } = render({

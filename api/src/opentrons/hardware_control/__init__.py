@@ -15,17 +15,20 @@ from .pause_manager import PauseManager
 from .backends import Controller, Simulator
 from .types import (
     CriticalPoint,
-    NoTipAttachedError,
-    TipAttachedError,
     ExecutionState,
-    ExecutionCancelledError,
 )
+from .errors import ExecutionCancelledError, NoTipAttachedError, TipAttachedError
 from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
-from .instruments import AbstractInstrument, Pipette, Gripper
+from .instruments import AbstractInstrument, Gripper
+
+# TODO (lc 12-05-2022) We should 1. figure out if we need
+# to globally export a class that is strictly used in the hardware controller
+# and 2. how to properly export an ot2 and ot3 pipette.
+from .instruments.ot2.pipette import Pipette
 
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]

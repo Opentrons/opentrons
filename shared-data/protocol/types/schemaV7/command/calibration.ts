@@ -1,58 +1,63 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { PipetteMount, LabwareOffset } from '../../../../js/types'
+import type {
+  PipetteMount,
+  LabwareOffset,
+  Coordinates,
+} from '../../../../js/types'
 // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
 export interface CalibratePipetteCreateCommand extends CommonCommandCreateInfo {
   commandType: 'calibration/calibratePipette'
   params: CalibratePipetteParams
 }
-
-export interface MoveToLocationCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'calibration/moveToLocation'
-  params: MoveToLocationParams
+export interface CalibrateGripperCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'calibration/calibrateGripper'
+  params: CalibrateGripperParams
+}
+export interface MoveToMaintenancePositionCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'calibration/moveToMaintenancePosition'
+  params: MoveToMaintenancePositionParams
 }
 
 export interface CalibratePipetteRunTimeCommand
   extends CommonCommandRunTimeInfo,
     CalibratePipetteCreateCommand {
-  result: CalibratePipetteResult
+  result?: CalibratePipetteResult
 }
-
-export interface MoveToLocationRunTimeCommand
-  extends MoveToLocationCreateCommand {
-  result: MoveToLocationResult
+export interface CalibrateGripperRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    CalibrateGripperCreateCommand {
+  result?: CalibrateGripperResult
+}
+export interface MoveToMaintenancePositionRunTimeCommand
+  extends MoveToMaintenancePositionCreateCommand {
+  result?: {}
 }
 
 export type CalibrationRunTimeCommand =
   | CalibratePipetteRunTimeCommand
-  | MoveToLocationRunTimeCommand
+  | CalibrateGripperRunTimeCommand
+  | MoveToMaintenancePositionRunTimeCommand
 
 export type CalibrationCreateCommand =
   | CalibratePipetteCreateCommand
-  | MoveToLocationCreateCommand
-
-export const ATTACH_OR_DETACH = 'attachOrDetach'
-export const PROBE_POSITION = 'probePosition'
-export type CalibrationPosition =
-  | typeof ATTACH_OR_DETACH
-  | typeof PROBE_POSITION
+  | CalibrateGripperCreateCommand
+  | MoveToMaintenancePositionCreateCommand
 
 interface CalibratePipetteParams {
   mount: PipetteMount
+}
+interface CalibrateGripperParams {
+  jaw: 'front' | 'rear'
+  otherJawOffset?: Coordinates
 }
 
 interface CalibratePipetteResult {
   pipetteOffset: LabwareOffset
 }
-
-interface MoveToLocationParams {
-  pipetteId: string
-  location: CalibrationPosition
+interface CalibrateGripperResult {
+  jawOffset: Coordinates
 }
-
-interface MoveToLocationResult {
-  deckPoint: {
-    x: number
-    y: number
-    z: number
-  }
+interface MoveToMaintenancePositionParams {
+  mount: PipetteMount
 }

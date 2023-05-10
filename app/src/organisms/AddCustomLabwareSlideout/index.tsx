@@ -15,15 +15,16 @@ import {
 } from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_ADD_CUSTOM_LABWARE,
+} from '../../redux/analytics'
 import { UploadInput } from '../../molecules/UploadInput'
 import type { Dispatch } from '../../redux/types'
 
 export interface AddCustomLabwareSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
-  onSuccess: () => void
-  onFailure: () => void
 }
 
 export function AddCustomLabwareSlideout(
@@ -51,7 +52,7 @@ export function AddCustomLabwareSlideout(
           onClick={() => {
             dispatch(addCustomLabware())
             trackEvent({
-              name: 'addCustomLabware',
+              name: ANALYTICS_ADD_CUSTOM_LABWARE,
               properties: {},
             })
           }}

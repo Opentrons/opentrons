@@ -9,6 +9,8 @@ const { baseConfig } = require('@opentrons/webpack-config')
 // const {baseConfig, DEV_MODE} = require('@opentrons/webpack-config')
 const pkg = require('./package.json')
 
+const { versionForProject } = require('../scripts/git-version')
+
 const JS_ENTRY = path.join(__dirname, 'src/index.tsx')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
 const OUT_PATH = path.join(__dirname, 'dist')
@@ -19,16 +21,6 @@ const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(LABWARE_LIBRARY_ENV_VAR_PREFIX))
   .concat(['NODE_ENV', 'CYPRESS'])
 
-const envVarsWithDefaults = {
-  OT_LL_VERSION: pkg.version,
-  OT_LL_BUILD_DATE: new Date().toUTCString(),
-}
-
-const envVars = passThruEnvVars.reduce(
-  (acc, envVar) => ({ [envVar]: '', ...acc }),
-  { ...envVarsWithDefaults }
-)
-
 const testAliases =
   process.env.CYPRESS === '1'
     ? {
@@ -36,28 +28,40 @@ const testAliases =
       }
     : {}
 
-module.exports = merge(baseConfig, {
-  entry: JS_ENTRY,
+module.exports = async () => {
+  const envVarsWithDefaults = {
+    OT_LL_VERSION: await versionForProject('labware-library'),
+    OT_LL_BUILD_DATE: new Date().toUTCString(),
+  }
 
-  output: {
-    path: OUT_PATH,
-    publicPath: '/',
-  },
+  const envVars = passThruEnvVars.reduce(
+    (acc, envVar) => ({ [envVar]: '', ...acc }),
+    { ...envVarsWithDefaults }
+  )
 
-  plugins: [
-    new webpack.EnvironmentPlugin(envVars),
+  return merge(baseConfig, {
+    entry: JS_ENTRY,
 
-    new HtmlWebpackPlugin({
-      template: HTML_ENTRY,
-      title: pkg.productName,
-      description: pkg.description,
-      author: pkg.author.name,
-      gtmId: process.env.GTM_ID,
-      favicon: './src/images/favicon.ico',
-    }),
-  ],
+    output: {
+      path: OUT_PATH,
+      publicPath: '/',
+    },
 
-  resolve: {
-    alias: testAliases,
-  },
-})
+    plugins: [
+      new webpack.EnvironmentPlugin(envVars),
+
+      new HtmlWebpackPlugin({
+        template: HTML_ENTRY,
+        title: pkg.productName,
+        description: pkg.description,
+        author: pkg.author.name,
+        gtmId: process.env.GTM_ID,
+        favicon: './src/images/favicon.ico',
+      }),
+    ],
+
+    resolve: {
+      alias: testAliases,
+    },
+  })
+}

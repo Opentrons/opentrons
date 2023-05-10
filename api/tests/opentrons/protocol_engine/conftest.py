@@ -16,8 +16,23 @@ from opentrons.protocols.api_support.default_deck_type import (
 )
 from opentrons.protocol_engine.types import ModuleDefinition
 
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.api import API
+
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mocked out HardwareControlAPI of unspecified robot type."""
+    return decoy.mock(cls=HardwareControlAPI)
+
+
+@pytest.fixture
+def ot2_hardware_api(decoy: Decoy) -> API:
+    """Get a mocked out OT-2 hardware API."""
+    return decoy.mock(cls=API)
 
 
 @pytest.mark.ot3_only
@@ -143,4 +158,11 @@ def thermocycler_v2_def() -> ModuleDefinition:
 def heater_shaker_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 heater-shaker."""
     definition = load_shared_data("module/definitions/3/heaterShakerModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def mag_block_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 Mag Block."""
+    definition = load_shared_data("module/definitions/3/magneticBlockV1.json")
     return ModuleDefinition.parse_raw(definition)

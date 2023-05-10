@@ -1,0 +1,92 @@
+@hostname = 192.168.50.89
+@port = 31950
+@host = http://{{hostname}}:{{port}}
+@contentType = application/json
+@createdAt = {{$datetime iso8601}}
+@modifiedBy = {{$processEnv USERNAME}}
+@header = opentrons-version: *
+@runId = fd0983a4-5d5c-4f88-9925-7ea5422140ee
+@binary = true
+
+GET {{host}}/health
+opentrons-version: *
+
+###
+GET {{host}}/modules
+opentrons-version: *
+
+###
+GET {{host}}/logs/serial.log
+opentrons-version: *
+###
+GET {{host}}/logs/api.log
+opentrons-version: *
+###
+GET {{host}}/logs/server.log
+opentrons-version: *
+###
+POST {{host}}/robot/lights
+opentrons-version: *
+
+{"on": "{{binary}}" }
+
+
+###
+GET {{host}}/runs
+opentrons-version: *
+Content-Type: {{contentType}}
+
+###
+# Create a run
+POST {{host}}/runs
+opentrons-version: *
+Content-Type: application/json
+
+{
+  "data": {}
+}
+
+###
+GET {{host}}/runs/{{runId}}/commands
+opentrons-version: *
+
+###
+
+POST {{host}}/runs/{{runId}}/commands
+opentrons-version: *
+Content-Type: application/json
+
+{
+    "data": {
+        "commandType": "setRailLights",
+        "params": {
+            "on": true
+        }
+    }
+}
+
+
+###
+
+POST {{host}}/runs/{{runId}}/commands
+opentrons-version: *
+Content-Type: application/json
+
+{
+    "data": {
+        "commandType": "loadModule",
+        "params": {
+            "model": "magneticModuleV1",
+            "location": {
+                "slotName": "3"
+            }
+        }
+    }
+}
+###
+GET {{host}}/commands
+opentrons-version: *
+
+###
+GET {{host}}/protocols
+opentrons-version: *

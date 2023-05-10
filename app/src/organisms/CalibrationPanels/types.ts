@@ -31,4 +31,5 @@ export interface CalibrationPanelProps {
   robotName?: string | null
   supportedCommands?: SessionCommandString[] | null
   defaultTipracks?: LabwareDefinition2[] | null
+  calInvalidationHandler?: () => void
 }

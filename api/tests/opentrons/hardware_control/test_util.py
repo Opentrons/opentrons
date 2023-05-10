@@ -4,9 +4,9 @@ from opentrons.hardware_control.util import plan_arc, check_motion_bounds
 from opentrons.hardware_control.types import (
     CriticalPoint,
     MotionChecks,
-    OutOfBoundsMove,
     Axis,
 )
+from opentrons.hardware_control.errors import OutOfBoundsMove
 from opentrons.types import Point
 
 

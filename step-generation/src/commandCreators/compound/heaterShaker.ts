@@ -11,7 +11,6 @@ import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerCloseLatch } from '../atomic/heaterShakerCloseLatch'
 import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHeater'
 import { setTemperature } from '../atomic/setTemperature'
-import { waitForTemperature } from '../atomic'
 import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
 import { heaterShakerSetTargetShakeSpeed } from '../atomic/heaterShakerSetTargetShakeSpeed'
 
@@ -61,14 +60,6 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
         module: args.module,
         targetTemperature: args.targetTemperature,
         commandCreatorFnName: 'setTemperature',
-      })
-    )
-
-    commandCreators.push(
-      curryCommandCreator(waitForTemperature, {
-        module: args.module,
-        temperature: args.targetTemperature,
-        commandCreatorFnName: 'waitForTemperature',
       })
     )
   }

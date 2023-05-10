@@ -8,7 +8,7 @@ import atexit
 import sys
 from datetime import datetime
 from logging.config import dictConfig
-from typing import List, TextIO
+from typing import List, TextIO, cast
 
 from opentrons_hardware.drivers.can_bus import (
     build,
@@ -18,6 +18,10 @@ from opentrons_hardware.drivers.can_bus import (
 from opentrons_hardware.firmware_bindings.constants import (
     MessageId,
     NodeId,
+    ErrorSeverity,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    ErrorMessage,
 )
 
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -85,8 +89,15 @@ async def task(
     """
     writer = Writer(write_to)
     label_style = "\033[0;37;40m"
-    header_style = "\033[0;36;40m"
-    data_style = "\033[1;36;40m"
+
+    info_header_style = "\033[0;36;40m"
+    info_data_style = "\033[1;36;40m"
+
+    warn_header_style = "\033[0;33;40m"
+    warn_data_style = "\033[1;33;40m"
+
+    err_header_style = "\033[0;31;40m"
+    err_data_style = "\033[1;31;40m"
 
     with WaitableCallback(messenger) as cb:
         async for message, arbitration_id in cb:
@@ -97,6 +108,22 @@ async def task(
                 arb_id_str = f"{msg_name} ({from_node}->{to_node})"
             except ValueError:
                 arb_id_str = f"0x{arbitration_id.id:x}"
+
+            if arbitration_id.parts.message_id == MessageId.error_message:
+                err_msg = err_msg = cast(ErrorMessage, message)
+                if (
+                    ErrorSeverity(err_msg.payload.severity.value)
+                    == ErrorSeverity.warning
+                ):
+                    header_style = warn_header_style
+                    data_style = warn_data_style
+                else:
+                    header_style = err_header_style
+                    data_style = err_data_style
+            else:
+                header_style = info_header_style
+                data_style = info_data_style
+
             writer.write(
                 [
                     StyledOutput(style=header_style, content=str(datetime.now())),
@@ -140,7 +167,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "can_mon.log",
+            "filename": "/var/log/can_mon.log",
             "maxBytes": 5000000,
             "level": logging.WARNING,
             "backupCount": 3,

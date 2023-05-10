@@ -15,7 +15,6 @@ const unselectedOptionStyles = css`
   border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3};
-  margin-bottom: ${SPACING.spacing3};
   width: 100%;
   cursor: pointer;
 

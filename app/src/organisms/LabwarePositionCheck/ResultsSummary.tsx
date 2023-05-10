@@ -1,8 +1,8 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
+import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
-import { PrimaryButton } from '../../atoms/buttons'
+import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import {
   CompletedProtocolAnalysis,
@@ -22,10 +22,13 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   COLORS,
-  JUSTIFY_FLEX_END,
+  PrimaryButton,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
+import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
 
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
@@ -33,6 +36,7 @@ import type {
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import { getDisplayLocation } from './utils/getDisplayLocation'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -56,6 +60,9 @@ export const ResultsSummary = (
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )
+  const isLabwareOffsetCodeSnippetsOn = useSelector(
+    getIsLabwareOffsetCodeSnippetsOn
+  )
 
   const offsetsToApply = React.useMemo(() => {
     return workingOffsets.map<LabwareOffsetCreateData>(
@@ -71,7 +78,9 @@ export const ResultsSummary = (
           throw new Error(
             `cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(
               location
-            )}, with initial position ${initialPosition}, and final position ${finalPosition}`
+            )}, with initial position ${String(
+              initialPosition
+            )}, and final position ${String(finalPosition)}`
           )
         }
 
@@ -90,6 +99,31 @@ export const ResultsSummary = (
     )
   }, [workingOffsets])
 
+  const TableComponent = (
+    <OffsetTable
+      offsets={offsetsToApply}
+      labwareDefinitions={labwareDefinitions}
+    />
+  )
+  const JupyterSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={offsetsToApply}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
+    />
+  )
+  const CommandLineSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={offsetsToApply}
+      commands={protocolData?.commands ?? []}
+      labware={protocolData?.labware ?? []}
+      modules={protocolData?.modules ?? []}
+    />
+  )
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -98,15 +132,29 @@ export const ResultsSummary = (
       minHeight="25rem"
     >
       <StyledText as="h1">{t('new_labware_offset_data')}</StyledText>
-      <OffsetTable
-        offsets={offsetsToApply}
-        labwareDefinitions={labwareDefinitions}
-      />
+      {isLabwareOffsetCodeSnippetsOn ? (
+        <LabwareOffsetTabs
+          TableComponent={TableComponent}
+          JupyterComponent={JupyterSnippet}
+          CommandLineComponent={CommandLineSnippet}
+          marginTop={SPACING.spacing4}
+        />
+      ) : (
+        <OffsetTable
+          offsets={offsetsToApply}
+          labwareDefinitions={labwareDefinitions}
+        />
+      )}
       <Flex
         width="100%"
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
+        css={css`
+          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+            margin-top: 0;
+          }
+        `}
       >
         <NeedHelpLink href={LPC_HELP_LINK_URL} />
         <PrimaryButton onClick={() => handleApplyOffsets(offsetsToApply)}>
@@ -184,12 +232,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 {isEqual(vector, IDENTITY_VECTOR) ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
-                  <Flex justifyContent={JUSTIFY_FLEX_END}>
+                  <Flex>
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <React.Fragment key={index}>
                         <StyledText
                           as="p"
-                          marginLeft={SPACING.spacing3}
+                          marginLeft={index > 0 ? SPACING.spacing3 : 0}
                           marginRight={SPACING.spacing2}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >

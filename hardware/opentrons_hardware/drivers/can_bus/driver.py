@@ -4,6 +4,7 @@ import logging
 import asyncio
 import platform
 from typing import Optional, Union, Dict, Any
+import concurrent.futures
 
 from can import Notifier, Bus, AsyncBufferedReader, Message
 
@@ -49,6 +50,7 @@ class CanDriver(AbstractCanDriver):
         self._loop = loop
         self._reader = AsyncBufferedReader(loop=loop)
         self._notifier = Notifier(bus=self._bus, listeners=[self._reader], loop=loop)
+        self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
 
     @classmethod
     async def build(
@@ -113,7 +115,7 @@ class CanDriver(AbstractCanDriver):
             is_fd=True,
             data=message.data,
         )
-        await self._loop.run_in_executor(None, self._bus.send, m)
+        await self._loop.run_in_executor(self._executor, self._bus.send, m)
 
     async def read(self) -> CanMessage:
         """Read a message.

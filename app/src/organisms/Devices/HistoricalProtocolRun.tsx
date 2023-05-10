@@ -86,7 +86,7 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="25%"
-          data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
+          data-testid={`RecentProtocolRuns_Run_${String(protocolKey)}`}
           onClick={() =>
             history.push(
               `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
@@ -102,7 +102,7 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
+            data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
             marginRight={SPACING.spacing4}
@@ -113,7 +113,7 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
+            data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             overflowWrap="anywhere"
             marginRight={SPACING.spacing4}
           >
@@ -124,7 +124,7 @@ export function HistoricalProtocolRun(
           as="p"
           width="20%"
           textTransform="capitalize"
-          data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
+          data-testid={`RecentProtocolRuns_Status_${String(protocolKey)}`}
         >
           {runStatus === 'running' && (
             <Icon
@@ -135,7 +135,7 @@ export function HistoricalProtocolRun(
               marginBottom={SPACING.spacing2}
             />
           )}
-          {runStatus != null ? t(`status_${runStatus}`) : ''}
+          {runStatus != null ? t(`status_${String(runStatus)}`) : ''}
         </StyledText>
         <StyledText
           as="p"

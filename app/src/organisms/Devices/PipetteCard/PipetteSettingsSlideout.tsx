@@ -49,6 +49,7 @@ export const PipetteSettingsSlideout = (
   )
   const FORM_ID = `configurePipetteForm_${pipetteId}`
 
+  // TODO(bc, 2023-02-10): replace this with the usePipetteSettingsQuery for poll and data access in the child components
   useInterval(
     () => {
       dispatch(fetchPipetteSettings(robotName))

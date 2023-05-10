@@ -5,6 +5,7 @@ by default. Please do not unconditionally import things outside the python stand
 library.
 """
 from enum import Enum, unique
+from typing import Union
 
 
 @unique
@@ -29,6 +30,46 @@ class NodeId(int, Enum):
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
+
+    def is_bootloader(self) -> bool:
+        """Whether this node ID is a bootloader."""
+        return bool(self.value & 0xF == 0xF)
+
+    def bootloader_for(self) -> "NodeId":
+        """The associated bootloader node ID for the node.
+
+        This is safe to call on any node id, including ones that are already bootloaders.
+        """
+        return NodeId(self.value | 0xF)
+
+    def application_for(self) -> "NodeId":
+        """The associated core node ID for the node (i.e. head, not head_l).
+
+        This is safe to call on any node ID, including non-core application node IDs like
+        head_l. It will always give the code node ID.
+        """
+        # in c this would be & ~0xf but in python that gives 0x10 for some reason
+        # so let's write out the whole byte
+        return NodeId(self.value & 0xF0)
+
+
+# make these negative numbers so there is no chance they overlap with NodeId
+@unique
+class USBTarget(int, Enum):
+    """List of firmware targets connected over usb."""
+
+    rear_panel = -1
+
+    def is_bootloader(self) -> bool:
+        """Whether this is a bootloader id (always false)."""
+        return False
+
+    def application_for(self) -> "USBTarget":
+        """The corresponding application id."""
+        return self
+
+
+FirmwareTarget = Union[NodeId, USBTarget]
 
 
 @unique
@@ -60,6 +101,8 @@ class MessageId(int, Enum):
     pipette_info_response = 0x307
     gripper_info_response = 0x308
     set_serial_number = 0x30A
+    get_motor_usage_request = 0x30B
+    get_motor_usage_response = 0x30C
 
     stop_request = 0x00
 
@@ -87,6 +130,8 @@ class MessageId(int, Enum):
 
     motor_position_request = 0x12
     motor_position_response = 0x14
+    update_motor_position_estimation_request = 0x21
+    update_motor_position_estimation_response = 0x22
 
     set_motion_constraints = 0x101
     get_motion_constraints_request = 0x102
@@ -104,6 +149,9 @@ class MessageId(int, Enum):
     gripper_grip_request = 0x42
     gripper_home_request = 0x43
     add_brushed_linear_move_request = 0x44
+    brushed_motor_conf_request = 0x45
+    brushed_motor_conf_response = 0x46
+    set_gripper_error_tolerance = 0x47
 
     acknowledgement = 0x50
 
@@ -112,6 +160,8 @@ class MessageId(int, Enum):
 
     attached_tools_request = 0x700
     tools_detected_notification = 0x701
+    tip_presence_notification = 0x702
+    get_tip_status_request = 0x703
 
     fw_update_initiate = 0x60
     fw_update_data = 0x61
@@ -129,6 +179,11 @@ class MessageId(int, Enum):
 
     do_self_contained_tip_action_request = 0x501
     do_self_contained_tip_action_response = 0x502
+    gear_enable_motor_request = 0x503
+    gear_disable_motor_request = 0x504
+    gear_set_current_request = 0x505
+    gear_write_motor_driver_request = 0x506
+    gear_read_motor_driver_request = 0x507
 
     read_sensor_request = 0x82
     write_sensor_request = 0x83
@@ -142,15 +197,16 @@ class MessageId(int, Enum):
     bind_sensor_output_response = 0x8B
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
+    baseline_sensor_response = 0x8E
 
 
 @unique
 class ErrorSeverity(int, Enum):
     """Error Severity levels."""
 
-    WARNING = 0x1
-    RECOVERABLE = 0x2
-    UNRECOVERABLE = 0x3
+    warning = 0x1
+    recoverable = 0x2
+    unrecoverable = 0x3
 
 
 @unique
@@ -163,6 +219,13 @@ class ErrorCode(int, Enum):
     invalid_byte_count = 0x03
     invalid_input = 0x04
     hardware = 0x05
+    timeout = 0x06
+    estop_detected = 0x07
+    collision_detected = 0x08
+    labware_dropped = 0x09
+    estop_released = 0x0A
+    motor_busy = 0x0B
+    stop_requested = 0x0C
 
 
 @unique
@@ -202,7 +265,7 @@ class SensorId(int, Enum):
 
 @unique
 class PipetteName(int, Enum):
-    """High-level type of pipette."""
+    """High-level name of pipette."""
 
     p1000_single = 0x00
     p1000_multi = 0x01
@@ -211,6 +274,15 @@ class PipetteName(int, Enum):
     p1000_96 = 0x04
     p50_96 = 0x05
     unknown = 0xFFFF
+
+
+@unique
+class PipetteType(int, Enum):
+    """High-level type of pipette."""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
 
 
 @unique
@@ -231,11 +303,19 @@ class SensorThresholdMode(int, Enum):
 
 
 @unique
+class GearMotorId(int, Enum):
+    """Tip action types."""
+
+    left = 0x0
+    right = 0x01
+
+
+@unique
 class PipetteTipActionType(int, Enum):
     """Tip action types."""
 
-    pick_up = 0x0
-    drop = 0x01
+    clamp = 0x0
+    home = 0x01
 
 
 @unique
@@ -248,3 +328,26 @@ class MotorPositionFlags(Enum):
     # Referring to the closed-loop encoder on the relevant axis.
     # Generally only unset if the motor board has not homed since power-on.
     encoder_position_ok = 0x2
+
+
+@unique
+class MoveStopCondition(int, Enum):
+    """Move Stop Condition."""
+
+    none = 0x0
+    limit_switch = 0x1
+    sync_line = 0x2
+    encoder_position = 0x4
+    gripper_force = 0x8
+    stall = 0x10
+
+
+@unique
+class MotorUsageValueType(int, Enum):
+    """Type of motor Usage value types."""
+
+    linear_motor_distance = 0x0
+    left_gear_motor_distance = 0x1
+    right_gear_motor_distance = 0x2
+    force_application_time = 0x3
+    total_error_count = 0x4

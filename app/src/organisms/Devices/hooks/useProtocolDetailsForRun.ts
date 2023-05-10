@@ -1,9 +1,6 @@
 import * as React from 'react'
 import last from 'lodash/last'
-import {
-  getRobotTypeFromLoadedLabware,
-  schemaV6Adapter,
-} from '@opentrons/shared-data'
+import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 import {
   useProtocolQuery,
   useProtocolAnalysesQuery,
@@ -12,12 +9,13 @@ import {
 
 import type {
   RobotType,
-  LegacySchemaAdapterOutput,
+  CompletedProtocolAnalysis,
+  PendingProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 export interface ProtocolDetails {
   displayName: string | null
-  protocolData: LegacySchemaAdapterOutput | null
+  protocolData: CompletedProtocolAnalysis | PendingProtocolAnalysis | null
   protocolKey: string | null
   isProtocolAnalyzing?: boolean
   robotType: RobotType
@@ -61,8 +59,7 @@ export function useProtocolDetailsForRun(
 
   return {
     displayName: displayName ?? null,
-    protocolData:
-      mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
+    protocolData: mostRecentAnalysis ?? null,
     protocolKey: protocolRecord?.data.key ?? null,
     isProtocolAnalyzing:
       mostRecentAnalysis != null && mostRecentAnalysis?.status === 'pending',

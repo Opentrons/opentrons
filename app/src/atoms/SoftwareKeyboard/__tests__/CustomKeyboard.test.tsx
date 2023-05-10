@@ -45,7 +45,7 @@ describe('CustomKeyboard', () => {
     getByRole('button', { name: 'l' })
 
     // third row
-    getByRole('button', { name: '⇧' })
+    getByRole('button', { name: 'shift' })
     getByRole('button', { name: 'z' })
     getByRole('button', { name: 'x' })
     getByRole('button', { name: 'c' })
@@ -53,14 +53,14 @@ describe('CustomKeyboard', () => {
     getByRole('button', { name: 'b' })
     getByRole('button', { name: 'n' })
     getByRole('button', { name: 'm' })
-    getByRole('button', { name: '⌫' })
+    getByRole('button', { name: 'del' })
 
     // fourth row
     getByRole('button', { name: '123' }) // numbers
   })
   it('should render the custom keyboards upper case, when clicking shift key', () => {
     const { getByRole } = render(props)
-    const shiftKey = getByRole('button', { name: '⇧' })
+    const shiftKey = getByRole('button', { name: 'shift' })
     fireEvent.click(shiftKey)
 
     // first row
@@ -86,7 +86,7 @@ describe('CustomKeyboard', () => {
     getByRole('button', { name: 'L' })
 
     // third row
-    getByRole('button', { name: '⇧' })
+    getByRole('button', { name: 'shift' })
     getByRole('button', { name: 'Z' })
     getByRole('button', { name: 'X' })
     getByRole('button', { name: 'C' })
@@ -113,7 +113,7 @@ describe('CustomKeyboard', () => {
     getByRole('button', { name: '9' })
     getByRole('button', { name: '0' })
     getByRole('button', { name: 'ABC' })
-    getByRole('button', { name: '⌫' })
+    getByRole('button', { name: 'del' })
   })
 
   it('should render the custom keyboards lower case, when clicking number key then abc key', () => {

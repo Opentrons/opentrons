@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocol_api.core.protocol_api.well import WellImplementation
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 
 
 @pytest.fixture
@@ -11,10 +11,10 @@ def well_ordering() -> List[List[str]]:
 
 
 @pytest.fixture
-def wells_by_column(well_ordering: List[List[str]]) -> List[List[WellImplementation]]:
+def wells_by_column(well_ordering: List[List[str]]) -> List[List[LegacyWellCore]]:
     return [
         [
-            WellImplementation(
+            LegacyWellCore(
                 well_geometry=None,  # type: ignore[arg-type]
                 display_name=well_name,
                 has_tip=True,
@@ -27,7 +27,7 @@ def wells_by_column(well_ordering: List[List[str]]) -> List[List[WellImplementat
 
 
 @pytest.fixture
-def wells(wells_by_column) -> List[WellImplementation]:
+def wells(wells_by_column) -> List[LegacyWellCore]:
     return [well_impl for column in wells_by_column for well_impl in column]
 
 

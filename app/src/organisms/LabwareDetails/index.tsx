@@ -203,7 +203,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             const wellLabel = getWellLabel(wellProps, definition)
             const groupDisplaySuffix =
               groupMetadata.displayName != null
-                ? ` - ${groupMetadata.displayName}`
+                ? ` - ${String(groupMetadata.displayName)}`
                 : ''
 
             return (

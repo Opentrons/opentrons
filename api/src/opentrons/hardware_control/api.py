@@ -37,7 +37,6 @@ from .module_control import AttachedModulesControl
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
@@ -45,6 +44,10 @@ from .types import (
     HardwareAction,
     MotionChecks,
     PauseType,
+    StatusBarState,
+)
+from .errors import (
+    MustHomeError,
 )
 from . import modules
 from .robot_calibration import (
@@ -324,7 +327,7 @@ class API(
         """Control the robot lights."""
         self._backend.set_lights(button, rails)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
@@ -342,6 +345,10 @@ class API(
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
+
+    async def set_status_bar_state(self, _: StatusBarState) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -955,7 +962,9 @@ class API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: top_types.Mount) -> None:
+    async def blow_out(
+        self, mount: top_types.Mount, volume: Optional[float] = None
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette

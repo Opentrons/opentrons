@@ -1,67 +1,41 @@
 import { useSelector } from 'react-redux'
 import {
-  parseAllRequiredModuleModelsById,
+  parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
-import {
-  schemaV6Adapter,
-  getLoadedLabwareDefinitionsByUri,
-} from '@opentrons/shared-data'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
-import type {
-  LoadedLabwareEntity,
-  ModuleModelsById,
-  PipetteNamesById,
-} from '@opentrons/api-client'
-import type {
-  ProtocolAnalysisOutput,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-
-// TODO(bc, 2022-09-26): StoredProtocolAnalysis can be wholesale replaced by ProtocolAnalysisOutput,
-// instead of just extending it, as soon as we remove the need for the schemaV6adapter
-export interface StoredProtocolAnalysis
-  extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
-  pipettes: PipetteNamesById[]
-  modules: ModuleModelsById
-  labware: LoadedLabwareEntity[]
-  labwareDefinitions: { [defUri: string]: LabwareDefinition2 }
-}
 
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
-): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parsePipetteEntity(
+): ProtocolAnalysisOutput | null => {
+  const pipetteEntity = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const moduleModelsById = parseAllRequiredModuleModelsById(
+  const moduleEntity = parseRequiredModulesEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareById = parseInitialLoadedLabwareEntity(
-    storedProtocolAnalysis?.commands ?? []
-  )
-  const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
+  const labwareEntity = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
-        pipettes: pipettesNamesById,
-        modules: moduleModelsById,
-        labware: labwareById,
-        labwareDefinitions: labwareDefinitionsByUri,
+        pipettes: storedProtocolAnalysis.pipettes ?? pipetteEntity,
+        labware: storedProtocolAnalysis.labware ?? labwareEntity,
+        modules: storedProtocolAnalysis.modules ?? moduleEntity,
       }
     : null
 }
 
 export function useStoredProtocolAnalysis(
   runId: string | null
-): StoredProtocolAnalysis | null {
+): ProtocolAnalysisOutput | null {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
 
@@ -75,7 +49,7 @@ export function useStoredProtocolAnalysis(
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
 
-  return storedProtocolAnalysis != null && 'modules' in storedProtocolAnalysis
-    ? schemaV6Adapter(storedProtocolAnalysis)
-    : parseProtocolAnalysisOutput(storedProtocolAnalysis)
+  return storedProtocolAnalysis != null
+    ? parseProtocolAnalysisOutput(storedProtocolAnalysis)
+    : null
 }

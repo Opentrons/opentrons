@@ -11,9 +11,10 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { MultipleModulesModal } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-import { UnMatchedModuleWarning } from '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
+import { MultipleModulesModal } from '../MultipleModulesModal'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import {
+  useIsOT3,
   useModuleRenderInfoForProtocolById,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
@@ -24,13 +25,10 @@ import { SetupModulesList } from '../SetupModulesList'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('../../../hooks')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/UnMatchedModuleWarning'
-)
+jest.mock('../UnMatchedModuleWarning')
 jest.mock('../../../HeaterShakerWizard')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/ModuleSetup/MultipleModulesModal'
-)
+jest.mock('../MultipleModulesModal')
+const mockUseIsOt3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
@@ -165,7 +163,7 @@ describe('SetupModulesList', () => {
     })
   })
 
-  it('should render a thermocycler module that is connected', () => {
+  it('should render a thermocycler module that is connected, OT2', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -186,6 +184,36 @@ describe('SetupModulesList', () => {
         attachedModuleMatch: mockThermocycler,
       },
     } as any)
+    mockUseIsOt3.mockReturnValue(false)
+
+    const { getByText } = render(props)
+    getByText('Thermocycler Module')
+    getByText('Slot 7,8,10,11')
+    getByText('Connected')
+  })
+
+  it('should render a thermocycler module that is connected, OT3', () => {
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        missingModuleIds: [],
+        remainingAttachedModules: [],
+      })
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({
+      [mockTCModule.moduleId]: {
+        moduleId: mockTCModule.moduleId,
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
+        moduleDef: mockTCModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        slotName: '7',
+        attachedModuleMatch: mockThermocycler,
+      },
+    } as any)
+    mockUseIsOt3.mockReturnValue(true)
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')

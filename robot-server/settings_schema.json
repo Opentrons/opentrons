@@ -39,6 +39,26 @@
           "format": "path"
         }
       ]
+    },
+    "maximum_runs": {
+      "title": "Maximum Runs",
+      "description": "The maximum number of runs to allow HTTP clients to create before auto-deleting old ones.",
+      "default": 20,
+      "exclusiveMinimum": 0,
+      "env_names": [
+        "ot_robot_server_maximum_runs"
+      ],
+      "type": "integer"
+    },
+    "maximum_unused_protocols": {
+      "title": "Maximum Unused Protocols",
+      "description": "The maximum number of \"unused protocols\" to allow before auto-deleting old ones. A protocol is \"unused\" if it isn't used by any run that currently exists.",
+      "default": 5,
+      "exclusiveMinimum": 0,
+      "env_names": [
+        "ot_robot_server_maximum_unused_protocols"
+      ],
+      "type": "integer"
     }
   },
   "additionalProperties": false

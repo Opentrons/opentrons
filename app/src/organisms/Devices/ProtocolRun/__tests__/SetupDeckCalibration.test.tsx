@@ -45,7 +45,7 @@ describe('SetupDeckCalibration', () => {
     getByText('Deck Calibration')
     queryByText('Last calibrated:')
   })
-  it('renders a link to robot settings calibration tab if deck is not calibrated', () => {
+  it('renders a link to the calibration dashboard if deck is not calibrated', () => {
     when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
       deckCalibrationData: null,
       isDeckCalibrated: false,
@@ -57,6 +57,6 @@ describe('SetupDeckCalibration', () => {
       getByRole('link', {
         name: 'Calibrate Now',
       }).getAttribute('href')
-    ).toBe('/devices/otie/robot-settings/calibration')
+    ).toBe('/devices/otie/robot-settings/calibration/dashboard')
   })
 })

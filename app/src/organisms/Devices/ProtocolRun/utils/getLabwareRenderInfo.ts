@@ -1,4 +1,5 @@
 import {
+  CompletedProtocolAnalysis,
   DeckDefinition,
   getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
@@ -6,7 +7,6 @@ import {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { StoredProtocolAnalysis } from '../../hooks'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -21,7 +21,9 @@ const getSlotPosition = (
 
   if (slotPosition == null) {
     console.error(
-      `expected to find a slot position for slot ${slotName} in ${deckDef.metadata.displayName}, but could not`
+      `expected to find a slot position for slot ${slotName} in ${String(
+        deckDef.metadata.displayName
+      )}, but could not`
     )
   } else {
     x = slotPosition[0]
@@ -45,8 +47,8 @@ export interface LabwareRenderInfoById {
 export const getLabwareRenderInfo = (
   protocolData:
     | ProtocolAnalysisFile<{}>
-    | ProtocolAnalysisOutput
-    | StoredProtocolAnalysis,
+    | CompletedProtocolAnalysis
+    | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands
@@ -65,7 +67,9 @@ export const getLabwareRenderInfo = (
       }
       if (labwareDef == null) {
         throw new Error(
-          `expected to find labware def for labware id ${labwareId} but could not`
+          `expected to find labware def for labware id ${String(
+            labwareId
+          )} but could not`
         )
       }
       const slotName = location.slotName.toString()

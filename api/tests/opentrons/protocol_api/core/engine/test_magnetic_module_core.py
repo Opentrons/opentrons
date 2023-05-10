@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck
-from opentrons.hardware_control.modules.types import MagneticStatus
+from opentrons.hardware_control.modules.types import MagneticStatus, ModuleType
 
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import ModuleModel
@@ -47,12 +47,21 @@ def subject(
     )
 
 
-def test_engage_from_home_raises_exception(
-    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+def test_create(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_module_hardware: MagDeckHardware,
 ) -> None:
-    """Should raise a not implemented error."""
-    with pytest.raises(NotImplementedError):
-        subject.engage(height_from_home=7.0)
+    """It should be able to create a magnetic module core."""
+    result = MagneticModuleCore(
+        module_id="1234",
+        engine_client=mock_engine_client,
+        api_version=MAX_SUPPORTED_VERSION,
+        sync_module_hardware=mock_sync_module_hardware,
+    )
+
+    assert result.module_id == "1234"
+    assert result.MODULE_TYPE == ModuleType.MAGNETIC
 
 
 def test_engage_from_base(
@@ -60,7 +69,7 @@ def test_engage_from_base(
 ) -> None:
     """Should verify a call to sync client engage method."""
     decoy.when(
-        mock_engine_client.state.modules.get_model(module_id="1234")
+        mock_engine_client.state.modules.get_connected_model(module_id="1234")
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
@@ -81,7 +90,7 @@ def test_engage_to_labware(
 ) -> None:
     """Should verify a call to sync client engage method."""
     decoy.when(
-        mock_engine_client.state.modules.get_model(module_id="1234")
+        mock_engine_client.state.modules.get_connected_model(module_id="1234")
     ).then_return(ModuleModel.MAGNETIC_MODULE_V1)
 
     decoy.when(
@@ -153,3 +162,14 @@ def test_get_status(
     decoy.when(mock_sync_module_hardware.status).then_return(MagneticStatus.ENGAGED)
 
     assert subject.get_status() == MagneticStatus.ENGAGED
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: MagneticModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

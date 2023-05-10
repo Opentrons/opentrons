@@ -12,12 +12,12 @@ import {
   COLORS,
   Icon,
   Link,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
 import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
@@ -101,7 +101,7 @@ export function ConnectRobotSlideout({
           marginBottom={SPACING.spacing4}
           justifyContent={ALIGN_FLEX_END}
         >
-          {isScanning ? (
+          {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
@@ -119,11 +119,11 @@ export function ConnectRobotSlideout({
                   <StyledText
                     as="p"
                     color={COLORS.darkGreyEnabled}
-                    margin={`0 ${SPACING.spacing2}`}
+                    marginX={SPACING.spacing2}
                   >
                     {t('discovery_timeout')}
                   </StyledText>
-                  {displayLinkButton(t('try_again'))}
+                  {displayLinkButton(t('shared:try_again'))}
                 </>
               ) : (
                 displayLinkButton(t('shared:refresh'))

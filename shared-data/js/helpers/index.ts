@@ -10,7 +10,6 @@ import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
 export { wellIsRect } from './wellIsRect'
-export { schemaV6Adapter, LegacySchemaAdapterOutput } from './schemaV6Adapter'
 
 export * from './parseProtocolData'
 export * from './volume'
@@ -19,6 +18,7 @@ export * from './getModuleVizDims'
 export * from './getVectorDifference'
 export * from './getVectorSum'
 export * from './getLoadedLabwareDefinitionsByUri'
+export * from './getOccludedSlotCountForModule'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

@@ -40,7 +40,9 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
-        border={`${BORDERS.styleSolid} ${SPACING.spacingXXS} ${COLORS.lightGreyHover}`}
+        border={`${String(BORDERS.styleSolid)} ${String(
+          SPACING.spacingXXS
+        )} ${String(COLORS.lightGreyHover)}`}
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing3}
         {...styleProps}

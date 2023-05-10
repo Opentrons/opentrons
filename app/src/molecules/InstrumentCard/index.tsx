@@ -14,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import flexGripper from '../../assets/images/flex_gripper.svg'
 
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -31,6 +32,7 @@ interface InstrumentCardProps extends StyleProps {
   instrumentDiagramProps?: InstrumentDiagramProps
   // special casing the gripper at least for now
   isGripperAttached?: boolean
+  banner?: React.ReactNode
 }
 
 /**
@@ -45,6 +47,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     isGripperAttached = false,
     label,
     menuOverlayItems,
+    banner,
     ...styleProps
   } = props
 
@@ -66,21 +69,13 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       {...styleProps}
     >
       {isGripperAttached ? (
-        // TODO(bh, 2022-10-26): temp "greyed-out" pipette image, update with gripper image when available
         <Flex
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={COLORS.lightGreyHover}
           width="3.75rem"
           height="3.75rem"
         >
-          <InstrumentDiagram
-            pipetteSpecs={{ displayCategory: 'GEN1', channels: 1 }}
-            mount="left"
-            opacity="0.17"
-            transform="scale(0.3)"
-            size="3.125rem"
-            transformOrigin="20% -10%"
-          />
+          <img src={flexGripper} />
         </Flex>
       ) : null}
       {instrumentDiagramProps?.pipetteSpecs != null ? (
@@ -98,6 +93,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         gridGap={SPACING.spacing1}
         paddingRight={SPACING.spacing5}
       >
+        {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}

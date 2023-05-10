@@ -1,14 +1,15 @@
 import * as React from 'react'
-import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
-import { useSelector } from 'react-redux'
+import {
+  DeprecatedCheckboxField,
+  DropdownField,
+  FormGroup,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
-  MODELS_FOR_MODULE_TYPE_NO_FF,
 } from '../../../constants'
 import { FormModulesByType } from '../../../step-forms'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -67,10 +68,6 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     touched,
   } = props
 
-  const enableThermocyclerGen2 = useSelector(
-    featureFlagSelectors.getEnabledThermocyclerGen2
-  )
-
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values)
   const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
@@ -96,7 +93,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
         const selectedModel = values[moduleType].model
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
-            <CheckboxField
+            <DeprecatedCheckboxField
               label={label}
               name={`${moduleTypeAccessor}.onDeck`}
               value={values[moduleType].onDeck}
@@ -130,11 +127,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
                     }
                     tabIndex={i}
                     name={`${moduleTypeAccessor}.model`}
-                    options={
-                      enableThermocyclerGen2
-                        ? MODELS_FOR_MODULE_TYPE[moduleType]
-                        : MODELS_FOR_MODULE_TYPE_NO_FF[moduleType]
-                    }
+                    options={MODELS_FOR_MODULE_TYPE[moduleType]}
                     value={selectedModel}
                     onChange={onFieldChange}
                     onBlur={onBlur}

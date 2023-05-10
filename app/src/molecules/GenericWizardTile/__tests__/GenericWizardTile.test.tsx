@@ -2,7 +2,14 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { getIsOnDevice } from '../../../redux/config'
 import { GenericWizardTile } from '..'
+
+jest.mock('../../../redux/config')
+
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
+>
 
 const render = (props: React.ComponentProps<typeof GenericWizardTile>) => {
   return renderWithProviders(<GenericWizardTile {...props} />, {
@@ -18,10 +25,11 @@ describe('GenericWizardTile', () => {
       rightHandBody: <div>right hand body</div>,
       bodyText: 'body',
       proceed: jest.fn(),
-      proceedButtonText: 'Continue',
+      proceedButtonText: <div>Continue</div>,
       header: 'header',
       getHelp: 'getHelpUrl',
     }
+    mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders correct generic tile information with a help link', () => {
     const { getByText } = render(props)
@@ -33,7 +41,14 @@ describe('GenericWizardTile', () => {
     getByText('Need help?')
     expect(screen.queryByText('Go back')).not.toBeInTheDocument()
   })
-
+  it('renders correct generic tile information for on device display', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByLabelText } = render(props)
+    getByText('body')
+    getByText('header')
+    getByLabelText('SmallButton_primary').click()
+    expect(props.proceed).toHaveBeenCalled()
+  })
   it('renders correct generic tile information with a back button', () => {
     props = {
       ...props,
@@ -43,5 +58,16 @@ describe('GenericWizardTile', () => {
     const btn = getByText('Go back')
     fireEvent.click(btn)
     expect(props.back).toHaveBeenCalled()
+  })
+  it('renders correct generic tile information with back button disabled', () => {
+    props = {
+      ...props,
+      back: jest.fn(),
+      backIsDisabled: true,
+    }
+    const { getByLabelText } = render(props)
+    const btn = getByLabelText('back')
+    fireEvent.click(btn)
+    expect(btn).toBeDisabled()
   })
 })

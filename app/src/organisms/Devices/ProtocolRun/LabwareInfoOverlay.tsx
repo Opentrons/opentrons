@@ -19,9 +19,9 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
-import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string

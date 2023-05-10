@@ -2,8 +2,9 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from . import message_definitions
+from typing import Iterator, List
 
 from .fields import (
     FirmwareShortSHADataField,
@@ -23,6 +24,10 @@ from .fields import (
     SensorThresholdModeField,
     PipetteTipActionTypeField,
     MotorPositionFlagsField,
+    MoveStopConditionField,
+    GearMotorIdField,
+    OptionalRevisionField,
+    MotorUsageTypeField,
 )
 from .. import utils
 
@@ -61,12 +66,48 @@ class ErrorMessagePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
-class DeviceInfoResponsePayload(EmptyPayload):
-    """Device info response."""
-
+class _DeviceInfoResponsePayloadBase(EmptyPayload):
     version: utils.UInt32Field
     flags: VersionFlagsField
     shortsha: FirmwareShortSHADataField
+
+
+@dataclass(eq=False)
+class DeviceInfoResponsePayload(_DeviceInfoResponsePayloadBase):
+    """Device info response."""
+
+    @classmethod
+    def build(cls, data: bytes) -> "DeviceInfoResponsePayload":
+        """Build a response payload from incoming bytes.
+
+        This override is required to handle optionally-present revision data.
+        """
+        consumed_by_super = _DeviceInfoResponsePayloadBase.get_size()
+        superdict = asdict(_DeviceInfoResponsePayloadBase.build(data))
+        message_index = superdict.pop("message_index")
+
+        # we want to parse this by adding extra 0s that may not be necessary,
+        # which is annoying and complex, so let's wrap it in an iterator
+        def _data_for_optionals(consumed: int, buf: bytes) -> Iterator[bytes]:
+            extended = buf + b"\x00\x00\x00\x00"
+            yield extended[consumed:]
+            consumed += 4
+            extended = extended + b"\x00"
+            yield extended[consumed : consumed + 1]
+
+        optionals_yielder = _data_for_optionals(consumed_by_super, data)
+        inst = cls(
+            **superdict,
+            revision=OptionalRevisionField.build(next(optionals_yielder)),
+            subidentifier=utils.UInt8Field.build(
+                int.from_bytes(next(optionals_yielder), "big")
+            ),
+        )
+        inst.message_index = message_index
+        return inst
+
+    revision: OptionalRevisionField
+    subidentifier: utils.UInt8Field
 
 
 @dataclass(eq=False)
@@ -145,7 +186,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 
     acceleration: utils.Int32Field
     velocity: utils.Int32Field
-    request_stop_condition: utils.UInt8Field
+    request_stop_condition: MoveStopConditionField
 
 
 @dataclass(eq=False)
@@ -372,9 +413,16 @@ class WriteToSensorRequestPayload(SensorPayload):
 
 @dataclass(eq=False)
 class BaselineSensorRequestPayload(SensorPayload):
-    """Take a specified amount of readings from a sensor request payload."""
+    """Provide a specified amount of readings to take the average of the current sensor."""
 
-    sample_rate: utils.UInt16Field
+    number_of_reads: utils.UInt16Field
+
+
+@dataclass(eq=False)
+class BaselineSensorResponsePayload(SensorPayload):
+    """A response containing an averaged offset reading from a sensor."""
+
+    offset_average: utils.Int32Field
 
 
 @dataclass(eq=False)
@@ -453,6 +501,14 @@ class BrushedMotorPwmPayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class BrushedMotorConfPayload(EmptyPayload):
+    """A response carrying data about a brushed motor driver."""
+
+    v_ref: utils.UInt32Field
+    duty_cycle: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached gripper."""
 
@@ -469,12 +525,27 @@ class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
 
 
 @dataclass(eq=False)
+class GripperErrorTolerancePayload(EmptyPayload):
+    """A request to update the position error tolerance of the gripper."""
+
+    max_pos_error_mm: utils.UInt32Field
+    max_unwanted_movement_mm: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class PushTipPresenceNotificationPayload(EmptyPayload):
+    """A notification that the ejector flag status has changed."""
+
+    ejector_flag_status: utils.UInt8Field
+
+
+@dataclass(eq=False)
 class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
     action: PipetteTipActionTypeField
-    request_stop_condition: utils.UInt8Field
+    request_stop_condition: MoveStopConditionField
 
 
 @dataclass(eq=False)
@@ -483,6 +554,7 @@ class TipActionResponsePayload(MoveCompletedPayload):
 
     action: PipetteTipActionTypeField
     success: utils.UInt8Field
+    gear_motor_id: GearMotorIdField
 
 
 @dataclass(eq=False)
@@ -497,3 +569,40 @@ class SerialNumberPayload(EmptyPayload):
     """A payload with a serial number."""
 
     serial: SerialField
+
+
+@dataclass(eq=False)
+class _GetMotorUsageResponsePayloadBase(EmptyPayload):
+    num_elements: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
+    """A payload with motor lifetime usage."""
+
+    @classmethod
+    def build(cls, data: bytes) -> "GetMotorUsageResponsePayload":
+        """Build a response payload from incoming bytes.
+
+        This override is required to handle responses with multiple values.
+        """
+        consumed = _GetMotorUsageResponsePayloadBase.get_size()
+        superdict = asdict(_GetMotorUsageResponsePayloadBase.build(data))
+        num_elements = superdict["num_elements"]
+        message_index = superdict.pop("message_index")
+
+        usage_values: List[MotorUsageTypeField] = []
+
+        for i in range(num_elements.value):
+            usage_values.append(
+                MotorUsageTypeField.build(
+                    data[consumed : consumed + MotorUsageTypeField.NUM_BYTES]
+                )
+            )
+            consumed = consumed + MotorUsageTypeField.NUM_BYTES
+
+        inst = cls(**superdict, usage_elements=usage_values)
+        inst.message_index = message_index
+        return inst
+
+    usage_elements: List[MotorUsageTypeField]

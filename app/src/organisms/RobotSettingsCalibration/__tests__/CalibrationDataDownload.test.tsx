@@ -5,7 +5,10 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+} from '../../../redux/analytics'
 import { mockDeckCalData } from '../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
@@ -20,6 +23,7 @@ import {
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
+  useIsOT3,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -44,6 +48,7 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 let mockTrackEvent: jest.Mock
 const mockSetShowHowCalibrationWorksModal = jest.fn()
@@ -83,8 +88,9 @@ describe('CalibrationDataDownload', () => {
         deckCalibrationData: mockDeckCalData,
         isDeckCalibrated: true,
       })
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     when(mockUsePipetteOffsetCalibrations)
-      .calledWith(mockConnectableRobot.name)
+      .calledWith()
       .mockReturnValue([
         mockPipetteOffsetCalibration1,
         mockPipetteOffsetCalibration2,
@@ -92,7 +98,7 @@ describe('CalibrationDataDownload', () => {
       ])
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
     when(mockUseTipLengthCalibrations)
-      .calledWith(mockConnectableRobot.name)
+      .calledWith()
       .mockReturnValue([
         mockTipLengthCalibration1,
         mockTipLengthCalibration2,
@@ -105,11 +111,20 @@ describe('CalibrationDataDownload', () => {
     resetAllWhenMocks()
   })
 
-  it('renders a title and description - About Calibration', () => {
+  it('renders a title and description for OT2', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     const [{ getByText }] = render()
-    getByText('About Calibration')
-    getByText(
-      'For the robot to move accurately and precisely, you need to calibrate it. Positional calibration happens in three parts: deck calibration, pipette offset calibration and tip length calibration.'
+    getByText('Download Calibration Data')
+  })
+
+  it('renders an OT-3 title and description - About Calibration', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    queryByText(
+      `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
+    )
+    queryByText(
+      `After calibration is complete, you can save the calibration data to your computer as a JSON file.`
     )
   })
 
@@ -119,14 +134,85 @@ describe('CalibrationDataDownload', () => {
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'calibrationDataDownloaded',
+      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: {},
     })
   })
 
   it('renders a See how robot calibration works link', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
     const [{ getByRole }] = render()
-    getByRole('button', { name: 'See how robot calibration works' }).click()
-    expect(mockSetShowHowCalibrationWorksModal).toHaveBeenCalled()
+    const SUPPORT_LINK = 'https://support.opentrons.com'
+    expect(
+      getByRole('link', {
+        name: 'See how robot calibration works',
+      }).getAttribute('href')
+    ).toBe(SUPPORT_LINK)
+  })
+
+  it('renders correct title and description', () => {
+    const [{ getByText }] = render()
+    getByText('Download Calibration Data')
+    getByText('Save all three types of calibration data as a JSON file.')
+
+    const downloadButton = getByText('Download calibration data')
+    expect(downloadButton).toBeEnabled()
+  })
+
+  // TODO: RAUT-94 Verify the logic for these three test conditions holds for the new calibration flow
+
+  it('renders disabled button when deck is not calibrated', () => {
+    when(mockUseDeckCalibrationData)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue({
+        deckCalibrationData: mockDeckCalData,
+        isDeckCalibrated: false,
+      })
+    const [{ getByRole, getByText }] = render()
+    getByText('No calibration data available.')
+
+    const downloadButton = getByRole('button', {
+      name: 'Download calibration data',
+    })
+    expect(downloadButton).toBeDisabled()
+  })
+
+  it('renders disabled button when pipettes are not calibrated', () => {
+    when(mockUsePipetteOffsetCalibrations).calledWith().mockReturnValue([])
+    const [{ getByRole, getByText }] = render()
+    getByText('No calibration data available.')
+
+    const downloadButton = getByRole('button', {
+      name: 'Download calibration data',
+    })
+    expect(downloadButton).toBeDisabled()
+  })
+
+  it('renders disabled button for OT-3 when pipettes are not calibrated', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUsePipetteOffsetCalibrations).calledWith().mockReturnValue([])
+    const [{ getByRole, queryByText }] = render()
+    queryByText(
+      `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
+    )
+    queryByText(
+      `After calibration is complete, you can save the calibration data to your computer as a JSON file.`
+    )
+
+    const downloadButton = getByRole('button', {
+      name: 'Download calibration data',
+    })
+    expect(downloadButton).toBeDisabled()
+  })
+
+  it('renders disabled button when tip lengths are not calibrated', () => {
+    when(mockUseTipLengthCalibrations).calledWith().mockReturnValue([])
+    const [{ getByRole, getByText }] = render()
+    getByText('No calibration data available.')
+
+    const downloadButton = getByRole('button', {
+      name: 'Download calibration data',
+    })
+    expect(downloadButton).toBeDisabled()
   })
 })

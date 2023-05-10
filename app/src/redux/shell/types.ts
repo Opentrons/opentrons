@@ -13,7 +13,7 @@ interface File {
 export interface UpdateInfo {
   version: string
   files: File[]
-  releaseDate: string
+  releaseDate?: string
   releaseNotes?: string
 }
 

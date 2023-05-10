@@ -48,7 +48,7 @@ jobs:
           node-version: '16'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6.1.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -87,3 +87,5 @@ jobs:
       - name: 'lint css'
         if: always() && steps.setup-js.outcome == 'success'
         run: make lint-css
+      - name: 'test scripts'
+        run: yarn jest scripts

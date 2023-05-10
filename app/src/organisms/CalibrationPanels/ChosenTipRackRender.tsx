@@ -40,7 +40,7 @@ export function ChosenTipRackRender(
           max-height: 3.7rem;
         `}
         src={imageSrc}
-        alt={`${displayName} image`}
+        alt={`${String(displayName)} image`}
       />
       <Box>
         <StyledText as="p" marginLeft={SPACING.spacing4}>

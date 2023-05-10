@@ -1,16 +1,73 @@
 For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
-[technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+[technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
 
-# Opentrons App Changes in 6.1.0
+## Opentrons App Changes in 6.3.0
+
+Welcome to the v6.3.0 release of the Opentrons App!
+
+### New Features
+
+- Liquid Setup
+  - See a summary of the initial locations of liquids in a list or deck map view.
+  - Drill down to view exact volumes for individual wells when setting up a protocol run.
+  - Works for all protocols created with Protocol Designer, and for Python protocols that use the liquid setup methods introduced in v2.14 of the Python API.
+  - Supports custom liquid colors set in Protocol Designer or the Python API.
+- Calibration Dashboard: Manage your robot's Deck Calibration, Pipette Offset Calibrations, and Tip Length Calibrations all in one place.
+- Run Progress Monitor: The run log has been redesigned to give you a better sense of the progress of your protocol and to make way for future improvements.
+
+### Improved Features
+
+- The pipette attachment and calibration wizards have been redesigned to better match the rest of the app.
+- Labware Position Check can now check a single piece of labware that will occupy multiple deck slots over the course of a protocol.
+- Labware Offset data is now available in more places, including when choosing which robot to run a protocol on.
+- The Protocols page will remember your sorting preference when you navigate away from the page.
+- Renamed some buttons and menu commands to "Start setup" to make it clearer that the robot will not immediately start moving when you click on them.
+
+### Bug Fixes
+
+- Loading the module controls before starting a protocol no longer resets the state of the Heater-Shaker.
+
+### Known Issues
+
+- When a protocol reaches a pause step, the Run Preview may incorrectly highlight the following step as the current step.
+
+---
+
+## Opentrons App Changes in 6.2.1
+
+Welcome to the v6.2.1 release of the Opentrons App!
+
+## Bug Fixes
+
+- Fixed a problem where certain kinds of robot errors would block you from accessing the robot's settings.
+
+## Improved Features
+
+- The device details page now loads faster.
+
+---
+
+## Opentrons App Changes in 6.2.0
+
+Welcome to the v6.2.0 release of the Opentrons App! This release focuses on adding support for the Thermocycler Module GEN2.
+
+### New Features
+
+- Thermocycler GEN2 support: analyze, upload, and run protocols that include the Thermocycler GEN2
+- Added a privacy preference for sharing anonymous robot logs with Opentrons.
+
+---
+
+## Opentrons App Changes in 6.1.0
 
 Welcome to the v6.1.0 release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
 
-## New Features
+### New Features
 
 - Heater-Shaker support
   - Access guided setup instructions for attaching the Heater-Shaker to the deck
@@ -19,12 +76,12 @@ Welcome to the v6.1.0 release of the Opentrons App! This release focuses on addi
   - Update the Heater-Shaker's firmware from the module card
 - Module cards now show if a Heater-Shaker or Thermocycler has an error
 
-## Improved Features
+### Improved Features
 
 - Improvements to the run log, including properly listing labware that is on top of a module
 - Clarification of what data is deleted when performing a factory reset of protocol run history
 
-## Bug Fixes
+### Bug Fixes
 
 - Labware Position Check now suggests the most recent Labware Offset data
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached

@@ -15,7 +15,7 @@ import type { StyleProps } from '@opentrons/components'
 
 export interface MenuOverlayItemProps {
   label: React.ReactNode
-  onClick: (e: React.MouseEvent) => unknown
+  onClick: React.MouseEventHandler<HTMLButtonElement>
   disabled?: boolean
 }
 

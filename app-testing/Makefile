@@ -1,28 +1,38 @@
 .PHONY: black
 black:
-	pipenv run python -m black locators.py conftest.py src/ tests/
+	pipenv run python -m black .
 
-.PHONY: flake8
-flake8:
-	pipenv run python -m flake8 locators.py conftest.py src/ tests/
+.PHONY: black-check
+black-check:
+	pipenv run python -m black . --check
+
+.PHONY: ruff
+ruff:
+	pipenv run python -m ruff . --fix
+
+.PHONY: ruff-check
+ruff-check:
+	pipenv run python -m ruff .
 
 .PHONY: mypy
 mypy:
-	pipenv run python -m mypy locators.py conftest.py src/ tests/
+	pipenv run python -m mypy conftest.py automation tests
 
 .PHONY: lint
 lint:
-	$(MAKE) black
+	$(MAKE) black-check
+	$(MAKE) ruff-check
 	$(MAKE) mypy
-	$(MAKE) flake8
 
 .PHONY: format
 format:
 	$(MAKE) black
+	$(MAKE) ruff
+	$(MAKE) format-readme
 
-.PHONY: test
-test:
-	pipenv run python -m pytest
+.PHONY: test-ci
+test-ci:
+	pipenv run python -m pytest -m "emulated_alpha"
 
 .PHONY: setup
 setup:
@@ -31,3 +41,11 @@ setup:
 .PHONY: teardown
 teardown:
 	pipenv --rm
+
+.PHONY: format-readme
+format-readme:
+	yarn prettier --ignore-path .eslintignore --write app-testing/**/*.md
+
+.PHONY: print-protocols
+print-protocols:
+	pipenv run python print_protocols.py

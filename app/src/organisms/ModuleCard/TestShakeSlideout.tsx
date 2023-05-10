@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Flex,
   TYPOGRAPHY,
@@ -19,6 +16,7 @@ import {
   useHoverTooltip,
   ALIGN_CENTER,
   useConditionalConfirm,
+  PrimaryButton,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
@@ -30,16 +28,14 @@ import {
 } from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useRunStatuses } from '../Devices/hooks'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
@@ -52,40 +48,28 @@ interface TestShakeSlideoutProps {
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  isLoadedInRun: boolean
-  currentRunId?: string
 }
 
 export const TestShakeSlideout = (
   props: TestShakeSlideoutProps
 ): JSX.Element | null => {
-  const {
-    module,
-    onCloseClick,
-    isExpanded,
-    isLoadedInRun,
-    currentRunId,
-  } = props
+  const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation(['heater_shaker', 'device_details', 'shared'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { isRunIdle, isRunTerminal } = useRunStatuses()
-  const { createCommand } = useCreateCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'left',
   })
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
-  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = React.useState<number | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
-  const moduleId = isRunIdle ? moduleIdFromRun : module.id
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId,
+      moduleId: module.id,
       rpm: shakeValue !== null ? shakeValue : 0,
     },
   }
@@ -93,14 +77,14 @@ export const TestShakeSlideout = (
   const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
     commandType: 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId,
+      moduleId: module.id,
     },
   }
 
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId,
+      moduleId: module.id,
     },
   }
 
@@ -111,24 +95,15 @@ export const TestShakeSlideout = (
 
     for (const command of commands) {
       // await each promise to make sure the server receives requests in the right order
-      if (isRunIdle && currentRunId != null && isLoadedInRun) {
-        await createCommand({
-          runId: currentRunId,
-          command,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${command.commandType}: ${e.message}`
-          )
-        })
-      } else if (isRunTerminal || currentRunId == null) {
-        await createLiveCommand({
-          command,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${command.commandType}: ${e.message}`
-          )
-        })
-      }
+      await createLiveCommand({
+        command,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${String(
+            command.commandType
+          )}: ${e.message}`
+        )
+      })
     }
 
     setShakeValue(null)
@@ -171,7 +146,7 @@ export const TestShakeSlideout = (
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           width="100%"
           onClick={onCloseClick}
-          data-testid={`Temp_Slideout_set_temp_btn_${name}`}
+          data-testid={`Temp_Slideout_set_temp_btn_${String(name)}`}
         >
           {t('shared:close')}
         </PrimaryButton>
@@ -213,7 +188,9 @@ export const TestShakeSlideout = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}
+        padding={`${String(SPACING.spacing4)} ${String(
+          SPACING.spacingM
+        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
         width="100%"
       >
         <Flex

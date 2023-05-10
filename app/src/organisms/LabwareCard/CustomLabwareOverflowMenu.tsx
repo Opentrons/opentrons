@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
+} from '../../redux/analytics'
 import {
   Flex,
   Icon,
@@ -9,6 +12,7 @@ import {
   SPACING,
   COLORS,
   POSITION_ABSOLUTE,
+  AlertPrimaryButton,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
@@ -21,7 +25,6 @@ import {
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Modal } from '../../molecules/Modal'
@@ -81,7 +84,7 @@ export function CustomLabwareOverflowMenu(
     e.preventDefault()
     e.stopPropagation()
     trackEvent({
-      name: 'openLabwareCreatorFromLabwareOverflowMenu',
+      name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
       properties: {},
     })
     setShowOverflowMenu(false)

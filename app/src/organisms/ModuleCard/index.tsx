@@ -40,13 +40,13 @@ import {
   SUCCESS,
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
-import { Toast } from '../../atoms/Toast'
+import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -92,14 +92,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   })
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
-  const [showSuccessToast, setShowSuccessToast] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
-  const currentRunId = useCurrentRunId()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
   const runStatus = useCurrentRunStatus({
     onSettled: data => {
@@ -121,14 +119,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     robotName &&
       dispatchApiRequest(updateModule(robotName, module.serialNumber))
   }
+  const { makeToast } = useToaster()
   React.useEffect(() => {
     if (
       module.hasAvailableUpdate === false &&
       latestRequest?.status === SUCCESS
     ) {
-      setShowSuccessToast(true)
+      makeToast(t('firmware_update_installation_successful'), SUCCESS_TOAST)
     }
-  }, [module.hasAvailableUpdate, latestRequest?.status])
+  }, [module.hasAvailableUpdate, latestRequest?.status, makeToast, t])
 
   const isPending = latestRequest?.status === PENDING
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }
@@ -226,11 +225,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       {showSlideout && (
         <ModuleSlideout
           module={module}
-          runId={currentRunId != null ? currentRunId : undefined}
           isSecondary={hasSecondary}
           showSlideout={showSlideout}
           onCloseClick={() => setShowSlideout(false)}
-          isLoadedInRun={isLoadedInRun}
         />
       )}
       {showAboutModule && (
@@ -246,11 +243,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
           onCloseClick={() => setShowTestShake(false)}
-          isLoadedInRun={isLoadedInRun}
-          currentRunId={currentRunId != null ? currentRunId : undefined}
         />
       )}
-      <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
+      <Box
+        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
+        width="100%"
+      >
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
@@ -266,13 +264,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             paddingLeft={SPACING.spacing3}
           >
             <ErrorInfo attachedModule={module} />
-            {showSuccessToast && (
-              <Toast
-                message={t('firmware_update_installation_successful')}
-                type="success"
-                onClose={() => setShowSuccessToast(false)}
-              />
-            )}
             {latestRequest != null && latestRequest.status === FAILURE && (
               <FirmwareUpdateFailedModal
                 module={module}
@@ -416,10 +407,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               module={module}
               robotName={robotName}
               runId={runId}
+              isLoadedInRun={isLoadedInRun}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
-              isLoadedInRun={isLoadedInRun}
             />
           </Box>
           {menuOverlay}
@@ -431,62 +422,45 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
 interface ModuleSlideoutProps {
   module: AttachedModule
-  runId?: string
   isSecondary: boolean
   showSlideout: boolean
-  isLoadedInRun: boolean
   onCloseClick: () => unknown
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const {
-    module,
-    runId,
-    isSecondary,
-    showSlideout,
-    onCloseClick,
-    isLoadedInRun,
-  } = props
+  const { module, isSecondary, showSlideout, onCloseClick } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSecondaryTemp={isSecondary}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === MAGNETIC_MODULE_TYPE) {
     return (
       <MagneticModuleSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   } else {
     return (
       <HeaterShakerSlideout
         module={module}
-        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isLoadedInRun={isLoadedInRun}
       />
     )
   }

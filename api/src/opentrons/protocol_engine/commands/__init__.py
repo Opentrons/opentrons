@@ -20,6 +20,7 @@ from . import thermocycler
 from . import calibration
 
 from .hash_command_params import hash_command_params
+from .generate_command_schema import generate_command_schema
 
 from .command import (
     AbstractCommandImpl,
@@ -43,6 +44,22 @@ from .aspirate import (
     AspirateCreate,
     AspirateResult,
     AspirateCommandType,
+)
+
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
 )
 
 from .custom import (
@@ -75,6 +92,14 @@ from .drop_tip import (
     DropTipCreate,
     DropTipResult,
     DropTipCommandType,
+)
+
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
 )
 
 from .home import (
@@ -206,6 +231,14 @@ from .blow_out import (
     BlowOut,
 )
 
+from .blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlaceResult,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceImplementation,
+    BlowOutInPlace,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -221,12 +254,26 @@ __all__ = [
     "CommandIntent",
     # command parameter hashing
     "hash_command_params",
+    # command schema generation
+    "generate_command_schema",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate in place command models
+    "AspirateInPlace",
+    "AspirateInPlaceCreate",
+    "AspirateInPlaceParams",
+    "AspirateInPlaceResult",
+    "AspirateInPlaceCommandType",
+    # comment command models
+    "Comment",
+    "CommentParams",
+    "CommentCreate",
+    "CommentResult",
+    "CommentCommandType",
     # custom command models
     "Custom",
     "CustomCreate",
@@ -251,6 +298,12 @@ __all__ = [
     "DropTipParams",
     "DropTipResult",
     "DropTipCommandType",
+    # drop tip in place command models
+    "DropTipInPlace",
+    "DropTipInPlaceCreate",
+    "DropTipInPlaceParams",
+    "DropTipInPlaceResult",
+    "DropTipInPlaceCommandType",
     # home command models
     "Home",
     "HomeParams",
@@ -341,6 +394,12 @@ __all__ = [
     "BlowOutImplementation",
     "BlowOutParams",
     "BlowOut",
+    # blow out in place command models
+    "BlowOutInPlaceParams",
+    "BlowOutInPlaceResult",
+    "BlowOutInPlaceCreate",
+    "BlowOutInPlaceImplementation",
+    "BlowOutInPlace",
     # load liquid command models
     "LoadLiquid",
     "LoadLiquidCreate",

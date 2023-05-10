@@ -3,18 +3,18 @@ import { useSelector } from 'react-redux'
 import { hash } from '../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
-import { useProtocolMetadata } from '../../ProtocolSetup/hooks'
+import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
 import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-import type { StoredProtocolAnalysis } from './'
 
 export const parseProtocolRunAnalyticsData = (
-  protocolAnalysis: StoredProtocolAnalysis | null,
+  protocolAnalysis: ProtocolAnalysisOutput | null,
   storedProtocol: StoredProtocolData | null,
   startedAt: string | null
 ) => () => {
@@ -45,6 +45,8 @@ export const parseProtocolRunAnalyticsData = (
         .join(','),
       protocolAuthor: protocolAuthor !== '' ? protocolAuthor : '',
       protocolText: protocolText !== '' ? protocolText : '',
+      robotType:
+        protocolAnalysis?.robotType != null ? protocolAnalysis?.robotType : '',
     },
     runTime:
       startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,
@@ -90,7 +92,7 @@ export function useProtocolRunAnalyticsData(
   const { startedAt } = useRunTimestamps(runId)
 
   const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
-    protocolAnalysis as StoredProtocolAnalysis | null,
+    protocolAnalysis as ProtocolAnalysisOutput | null,
     storedProtocol,
     startedAt
   )

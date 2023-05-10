@@ -16,6 +16,7 @@ import {
   Link,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -65,7 +66,10 @@ export function DevicesLanding(): JSX.Element {
     ].length === 0
 
   return (
-    <Box minWidth={SIZE_6} padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
+    <Box
+      minWidth={SIZE_6}
+      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+    >
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
@@ -156,7 +160,7 @@ function DevicesLoadingState(): JSX.Element {
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-          display="flex"
+          display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >

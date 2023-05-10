@@ -1,35 +1,63 @@
 """opentrons_shared_data.gripper: functions and types for gripper config."""
 from typing import cast, Any
+from typing_extensions import Literal
 import json
 from pathlib import Path
 
 from .. import load_shared_data
-from .dev_types import (
-    GripperDefinitionV1,
+from .gripper_definition import (
+    GripperDefinition,
     GripperSchema,
-    GripperModel,
     GripperSchemaVersion,
-    InvalidGripperDefinition,
+    GripForceProfile,
+    GripperModel,
+    Geometry,
 )
 
 
-def load_schema(version: GripperSchemaVersion) -> GripperSchema:
+class InvalidGripperDefinition(Exception):
+    """Incorrect gripper definition."""
+
+    pass
+
+
+def generate_schema() -> str:
+    """Create schema."""
+    raw_json_schema = GripperDefinition.schema_json()
+    schema_as_dict = json.loads(raw_json_schema)
+    return json.dumps(schema_as_dict, indent=2)
+
+
+def load_schema(version: Literal[1]) -> GripperSchema:
     """Load gripper schema."""
     path = Path("gripper") / "schemas" / f"{version}.json"
     return cast(GripperSchema, json.loads(load_shared_data(path)))
 
 
 def _load_definition_data(path: Path) -> Any:
-    return json.loads(load_shared_data(path))
+    return
 
 
 def load_definition(
-    version: GripperSchemaVersion,
     model: GripperModel,
-) -> GripperDefinitionV1:
+    version: GripperSchemaVersion = 1,
+) -> GripperDefinition:
     """Load gripper definition based on schema version and gripper model."""
-    if version == GripperSchemaVersion.V1:
-        path = Path("gripper") / "definitions" / f"{version}" / f"{model}.json"
-        data = _load_definition_data(path)
-        return GripperDefinitionV1.from_dict(data)
-    raise InvalidGripperDefinition(f"Gripper definition for {version} does not exist.")
+    try:
+        path = Path("gripper") / "definitions" / f"{version}" / f"{model.value}.json"
+        return GripperDefinition.parse_obj(json.loads(load_shared_data(path)))
+    except FileNotFoundError:
+        raise InvalidGripperDefinition(
+            f"Gripper model {model} definition in schema version {version} does not exist."
+        )
+
+
+__all__ = [
+    "GripperDefinition",
+    "GripperSchema",
+    "GripperSchemaVersion",
+    "GripForceProfile",
+    "GripperModel",
+    "Geometry",
+    "generate_schema",
+]

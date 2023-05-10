@@ -82,7 +82,7 @@ const renderSignalIcon = (signal: number): JSX.Element => {
   } else if (signal <= SIGNAL_LEVEL_HIGH) {
     iconName = 'ot-wifi-2'
   } else {
-    iconName = 'ot-wifi-3'
+    iconName = 'wifi'
   }
 
   return <StyledIcon name={iconName} />

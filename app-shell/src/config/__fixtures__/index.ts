@@ -1,3 +1,7 @@
+import {
+  OT2_MANIFEST_URL,
+  OT3_MANIFEST_URL,
+} from '@opentrons/app/src/redux/config'
 import type {
   ConfigV0,
   ConfigV1,
@@ -10,6 +14,12 @@ import type {
   ConfigV8,
   ConfigV9,
   ConfigV10,
+  ConfigV11,
+  ConfigV12,
+  ConfigV13,
+  ConfigV14,
+  ConfigV15,
+  ConfigV16,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -154,4 +164,64 @@ export const MOCK_CONFIG_V10: ConfigV10 = {
   ...MOCK_CONFIG_V9,
   version: 10,
   protocols: { sendAllProtocolsToOT3: false },
+}
+
+export const MOCK_CONFIG_V11: ConfigV11 = {
+  ...MOCK_CONFIG_V10,
+  version: 11,
+  protocols: {
+    ...MOCK_CONFIG_V10.protocols,
+    protocolsStoredSortKey: null,
+  },
+}
+
+export const MOCK_CONFIG_V12: ConfigV12 = (() => {
+  const { buildroot, ...restOfV11Config } = { ...MOCK_CONFIG_V11 } as ConfigV11
+  return {
+    ...restOfV11Config,
+    version: 12 as const,
+    robotSystemUpdate: {
+      manifestUrls: {
+        OT2: OT2_MANIFEST_URL,
+        OT3: OT3_MANIFEST_URL,
+      },
+    },
+  }
+})()
+
+export const MOCK_CONFIG_V13: ConfigV13 = {
+  ...MOCK_CONFIG_V12,
+  version: 13,
+  protocols: {
+    ...MOCK_CONFIG_V12.protocols,
+    protocolsOnDeviceSortKey: null,
+  },
+}
+
+export const MOCK_CONFIG_V14: ConfigV14 = {
+  ...MOCK_CONFIG_V13,
+  version: 14,
+  protocols: {
+    ...MOCK_CONFIG_V13.protocols,
+    pinnedProtocolIds: [],
+  },
+}
+
+export const MOCK_CONFIG_V15: ConfigV15 = {
+  ...MOCK_CONFIG_V14,
+  version: 15,
+  onDeviceDisplaySettings: {
+    sleepMs: 60 * 1000 * 60 * 24 * 7,
+    brightness: 4,
+    textSize: 1,
+  },
+}
+
+export const MOCK_CONFIG_V16: ConfigV16 = {
+  ...MOCK_CONFIG_V15,
+  version: 16,
+  onDeviceDisplaySettings: {
+    ...MOCK_CONFIG_V15.onDeviceDisplaySettings,
+    unfinishedUnboxingFlowRoute: '/welcome',
+  },
 }

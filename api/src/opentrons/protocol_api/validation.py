@@ -1,17 +1,35 @@
-from typing import Any, Dict, List, Optional, Sequence, Union
+from __future__ import annotations
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Union,
+    Tuple,
+    Mapping,
+    NamedTuple,
+    TYPE_CHECKING,
+)
+
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
     ThermocyclerStep,
 )
+
+if TYPE_CHECKING:
+    from .labware import Well
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -54,9 +72,17 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
-        return DeckSlotName(str(deck_slot))
+        # TODO(jbl 2023-04-25) this should raise an error when below version 2.15 and using deck coordinates
+        return DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+
+def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+    if robot_type == "OT-2 Standard":
+        return str(slot_name)
+    else:
+        return slot_name.as_coordinate()
 
 
 def ensure_lowercase_name(name: str) -> str:
@@ -88,6 +114,7 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
     "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
+    "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
 }
 
 
@@ -161,3 +188,88 @@ def is_all_integers(items: Sequence[Any]) -> TypeGuard[Sequence[int]]:
 def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
     """Check that every item in a list is a string."""
     return all(isinstance(i, str) for i in items)
+
+
+def ensure_valid_labware_offset_vector(
+    offset: Mapping[str, float]
+) -> Tuple[float, float, float]:
+    if not isinstance(offset, dict):
+        raise TypeError("Labware offset must be a dictionary.")
+
+    try:
+        offsets = (offset["x"], offset["y"], offset["z"])
+    except KeyError:
+        raise TypeError(
+            "Labware offset vector is expected to be a dictionary with"
+            " with floating point offset values for all 3 axes."
+            " For example: {'x': 1.1, 'y': 2.2, 'z': 3.3}"
+        )
+    if not all(isinstance(v, (float, int)) for v in offsets):
+        raise TypeError("Offset values should be a number (int or float).")
+    return offsets
+
+
+class WellTarget(NamedTuple):
+    """A movement target that is a well."""
+
+    well: Well
+    location: Optional[Location]
+    in_place: bool
+
+
+class PointTarget(NamedTuple):
+    """A movement to coordinates"""
+
+    location: Location
+    in_place: bool
+
+
+class NoLocationError(ValueError):
+    """Error representing that no location was supplied."""
+
+
+class LocationTypeError(TypeError):
+    """Error representing that the location supplied is of different expected type."""
+
+
+def validate_location(
+    location: Union[Location, Well, None], last_location: Optional[Location]
+) -> Union[WellTarget, PointTarget]:
+    """Validate a given location for a liquid handling command.
+
+    Args:
+        location: The input location.
+        last_location: The last location accessed by the pipette.
+
+    Returns:
+        A `WellTarget` if the input location represents a well.
+        A `PointTarget` if the input location is an x, y, z coordinate.
+
+    Raises:
+        NoLocationError: The is no input location and no cached loaction.
+        LocationTypeError: The location supplied is of unexpected type.
+    """
+    from .labware import Well
+
+    target_location = location or last_location
+
+    if target_location is None:
+        raise NoLocationError()
+
+    if not isinstance(target_location, (Location, Well)):
+        raise LocationTypeError(
+            f"location should be a Well or Location, but it is {location}"
+        )
+
+    in_place = target_location == last_location
+
+    if isinstance(target_location, Well):
+        return WellTarget(well=target_location, location=None, in_place=in_place)
+
+    _, well = target_location.labware.get_parent_labware_and_well()
+
+    return (
+        WellTarget(well=well, location=target_location, in_place=in_place)
+        if well is not None
+        else PointTarget(location=target_location, in_place=in_place)
+    )

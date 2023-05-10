@@ -110,7 +110,7 @@ def test_simulate_extra_labware(
         simulate.simulate(protocol.filelike, "custom_labware.py")
     no_lw = simulate.get_protocol_api("2.0")
     # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
-    assert not no_lw._implementation._extra_labware  # type: ignore[attr-defined]
+    assert not no_lw._core._extra_labware  # type: ignore[attr-defined]
     protocol.filelike.seek(0)
     monkeypatch.setattr(simulate, "IS_ROBOT", True)
     monkeypatch.setattr(simulate, "JUPYTER_NOTEBOOK_LABWARE_DIR", fixturedir)
@@ -121,9 +121,9 @@ def test_simulate_extra_labware(
     # make sure the extra labware loaded by default is right
     ctx = simulate.get_protocol_api("2.0")
     # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
-    assert len(
-        ctx._implementation._extra_labware.keys()  # type: ignore[attr-defined]
-    ) == len(os.listdir(fixturedir))
+    assert len(ctx._core._extra_labware.keys()) == len(  # type: ignore[attr-defined]
+        os.listdir(fixturedir)
+    )
 
     assert ctx.load_labware("fixture_12_trough", 1, namespace="fixture")
 

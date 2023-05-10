@@ -9,7 +9,7 @@ on:
     paths:
       - 'Makefile'
       - 'hardware-testing/**'
-      - '.github/workflows/hardware-testing-lint-test.yaml'
+      - '.github/workflows/hardware-testing.yaml'
       - '.github/actions/python/**'
     branches:
       - 'edge'
@@ -20,7 +20,7 @@ on:
     paths:
       - 'Makefile'
       - 'hardware-testing/**'
-      - '.github/workflows/hardware-testing-lint-test.yaml'
+      - '.github/workflows/hardware-testing.yaml'
       - '.github/actions/python/**'
 
   workflow_dispatch:
@@ -41,6 +41,8 @@ jobs:
     steps:
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: 'actions/setup-node@v3'

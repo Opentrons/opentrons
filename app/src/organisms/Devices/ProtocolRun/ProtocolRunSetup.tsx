@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import size from 'lodash/size'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
@@ -11,33 +10,34 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useFeatureFlag } from '../../../redux/config'
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   useIsOT3,
-  useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
-
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { SetupLabware } from './SetupLabware'
+import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupModules } from './SetupModules'
 import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 const ROBOT_CALIBRATION_STEP_KEY = 'robot_calibration_step' as const
 const MODULE_SETUP_KEY = 'module_setup_step' as const
+const LPC_KEY = 'labware_position_check_step' as const
 const LABWARE_SETUP_KEY = 'labware_setup_step' as const
 const LIQUID_SETUP_KEY = 'liquid_setup_step' as const
 
 export type StepKey =
   | typeof ROBOT_CALIBRATION_STEP_KEY
   | typeof MODULE_SETUP_KEY
+  | typeof LPC_KEY
   | typeof LABWARE_SETUP_KEY
   | typeof LIQUID_SETUP_KEY
 
@@ -53,9 +53,7 @@ export function ProtocolRunSetup({
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
@@ -64,12 +62,12 @@ export function ProtocolRunSetup({
   const isOT3 = useIsOT3(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
-  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
   const [stepsKeysInOrder, setStepKeysInOrder] = React.useState<StepKey[]>([
     ROBOT_CALIBRATION_STEP_KEY,
+    LPC_KEY,
     LABWARE_SETUP_KEY,
   ])
 
@@ -77,15 +75,13 @@ export function ProtocolRunSetup({
     let nextStepKeysInOrder = stepsKeysInOrder
     const showModuleSetup = protocolData != null && modules.length > 0
     const showLiquidSetup =
-      liquidSetupEnabled &&
-      protocolData != null &&
-      'liquids' in protocolData &&
-      size(protocolData.liquids) > 0
+      protocolData != null && protocolData.liquids?.length > 0
 
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
         MODULE_SETUP_KEY,
+        LPC_KEY,
         LABWARE_SETUP_KEY,
         LIQUID_SETUP_KEY,
       ]
@@ -93,11 +89,13 @@ export function ProtocolRunSetup({
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
         MODULE_SETUP_KEY,
+        LPC_KEY,
         LABWARE_SETUP_KEY,
       ]
     } else if (showLiquidSetup) {
       nextStepKeysInOrder = [
         ROBOT_CALIBRATION_STEP_KEY,
+        LPC_KEY,
         LABWARE_SETUP_KEY,
         LIQUID_SETUP_KEY,
       ]
@@ -135,7 +133,7 @@ export function ProtocolRunSetup({
     [MODULE_SETUP_KEY]: {
       stepInternals: (
         <SetupModules
-          expandLabwareSetupStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+          expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
           robotName={robotName}
           runId={runId}
         />
@@ -143,6 +141,15 @@ export function ProtocolRunSetup({
       description: t(`${MODULE_SETUP_KEY}_description`, {
         count: modules.length,
       }),
+    },
+    [LPC_KEY]: {
+      stepInternals: (
+        <SetupLabwarePositionCheck
+          {...{ runId, robotName }}
+          expandLabwareStep={() => setExpandedStepKey(LABWARE_SETUP_KEY)}
+        />
+      ),
+      description: t('labware_position_check_step_description'),
     },
     [LABWARE_SETUP_KEY]: {
       stepInternals: (

@@ -17,32 +17,33 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.core.protocol_api.load_info import (
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocol_api.core.legacy.load_info import (
     LoadInfo,
     LabwareLoadInfo,
     InstrumentLoadInfo,
     ModuleLoadInfo,
 )
-from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
+from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     ProvidedLabwareOffset,
 )
-from opentrons.protocol_api.core.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
 )
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
-from opentrons.protocol_api.core.protocol_api.legacy_module_core import LegacyModuleCore
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_module_core import LegacyModuleCore
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
 )
 
-from opentrons.protocols.geometry import module_geometry as mock_module_geometry
-from opentrons.protocol_api.core.protocol_api import (
+from opentrons.protocol_api.core.legacy import (
     legacy_module_core as mock_legacy_module_core,
+    module_geometry as mock_module_geometry,
 )
 
 
@@ -64,7 +65,7 @@ def _mock_module_geometry_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) 
 def _mock_legacy_module_core_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Mock out opentrons.protocol_api.core.protocol_api.legacy_module_core functions."""
+    """Mock out opentrons.protocol_api.core.legacy.legacy_module_core functions."""
     for name, func in inspect.getmembers(mock_legacy_module_core, inspect.isfunction):
         monkeypatch.setattr(mock_legacy_module_core, name, decoy.mock(func=func))
 
@@ -87,6 +88,8 @@ def mock_deck(decoy: Decoy) -> Deck:
     setattr(
         deck, "resolve_module_location", decoy.mock(name="Deck.resolve_module_location")
     )
+    deck["12"] = decoy.mock(cls=LegacyLabwareCore)
+
     return cast(Deck, deck)
 
 
@@ -108,9 +111,9 @@ def subject(
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
     mock_deck: Deck,
-) -> ProtocolContextImplementation:
+) -> LegacyProtocolCore:
     """Get a legacy protocol implementation core with mocked out dependencies."""
-    return ProtocolContextImplementation(
+    return LegacyProtocolCore(
         api_version=MAX_SUPPORTED_VERSION,
         sync_hardware=mock_sync_hardware_api,
         labware_offset_provider=mock_labware_offset_provider,
@@ -123,12 +126,14 @@ def test_load_instrument(
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load an instrument core."""
     pipette_dict = cast(
         PipetteDict,
         {
+            "model": "cool-model",
+            "pipette_id": "cool-serial-number",
             "default_aspirate_flow_rates": {"1.1": 22},
             "default_dispense_flow_rates": {"3.3": 44},
             "default_blow_out_flow_rates": {"5.5": 66},
@@ -144,12 +149,16 @@ def test_load_instrument(
         instrument_name=PipetteNameType.P300_SINGLE, mount=Mount.RIGHT
     )
 
-    assert isinstance(result, InstrumentContextImplementation)
+    assert isinstance(result, LegacyInstrumentCore)
 
     decoy.verify(
         mock_sync_hardware_api.cache_instruments({Mount.RIGHT: "p300_single"}),
         mock_equipment_broker.publish(
-            InstrumentLoadInfo(instrument_load_name="p300_single", mount=Mount.RIGHT)
+            InstrumentLoadInfo(
+                instrument_load_name="p300_single",
+                mount=Mount.RIGHT,
+                pipette_dict=pipette_dict,
+            )
         ),
     )
 
@@ -159,7 +168,7 @@ def test_load_labware(
     mock_deck: Deck,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load a labware core."""
     labware_definition_dict = cast(
@@ -209,7 +218,7 @@ def test_load_labware(
         version=1337,
     )
 
-    assert isinstance(result, LabwareImplementation)
+    assert isinstance(result, LegacyLabwareCore)
     assert mock_deck["5"] is result
     assert result.get_definition() == labware_definition_dict
     assert result.get_user_display_name() == "cool label"
@@ -241,7 +250,7 @@ def test_load_labware_on_module(
     decoy: Decoy,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load a labware core."""
     mock_module_core = decoy.mock(cls=LegacyModuleCore)
@@ -297,7 +306,7 @@ def test_load_labware_on_module(
         version=1337,
     )
 
-    assert isinstance(result, LabwareImplementation)
+    assert isinstance(result, LegacyLabwareCore)
     assert result.get_calibrated_offset() == Point(
         x=(1 + 4 + 7),
         y=(2 + 5 + 8),
@@ -326,7 +335,7 @@ def test_load_module(
     mock_deck: Deck,
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
-    subject: ProtocolContextImplementation,
+    subject: LegacyProtocolCore,
 ) -> None:
     """It should load a module core.
 
@@ -349,7 +358,9 @@ def test_load_module(
     decoy.when(mock_hw_mod_2.model()).then_return("model-2")
 
     decoy.when(
-        mock_deck.resolve_module_location(ModuleType.TEMPERATURE, DeckSlotName.SLOT_1)
+        mock_deck.resolve_module_location(
+            ModuleType.TEMPERATURE, DeckSlotName.SLOT_1.id
+        )
     ).then_return(42)
 
     decoy.when(mock_deck.position_for(42)).then_return(Location(Point(1, 2, 3), None))

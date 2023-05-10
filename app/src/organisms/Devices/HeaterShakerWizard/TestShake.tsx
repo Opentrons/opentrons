@@ -86,7 +86,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         command,
       }).catch((e: Error) => {
         console.error(
-          `error setting module status with command type ${command.commandType}: ${e.message}`
+          `error setting module status with command type ${String(
+            command.commandType
+          )}: ${e.message}`
         )
       })
     }

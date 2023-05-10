@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
@@ -11,18 +11,24 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { Tooltip } from '../../atoms/Tooltip'
+import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
+import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -37,12 +43,30 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
+  const runId = useCurrentRunId()
+  const [
+    showChooseProtocolSlideout,
+    setShowChooseProtocolSlideout,
+  ] = React.useState<boolean>(false)
   const [
     showConnectionTroubleshootingModal,
     setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
 
+  const { autoUpdateAction } = useSelector((state: State) => {
+    return getBuildrootUpdateDisplayInfo(state, robot.name)
+  })
+  const isRobotOnWrongVersionOfSoftware =
+    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
+
+  const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowChooseProtocolSlideout(true)
+    setShowOverflowMenu(false)
+  }
   const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -51,13 +75,40 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   }
 
   let menuItems: React.ReactNode
-  if (robot.status === CONNECTABLE) {
+  if (robot.status === CONNECTABLE && runId == null) {
+    menuItems = (
+      <>
+        <MenuItem
+          {...targetProps}
+          onClick={handleClickRun}
+          disabled={isRobotOnWrongVersionOfSoftware}
+          data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+        >
+          {t('run_a_protocol')}
+        </MenuItem>
+        {isRobotOnWrongVersionOfSoftware && (
+          <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+            {t('shared:a_software_update_is_available')}
+          </Tooltip>
+        )}
+        <Divider marginY="0" />
+        <MenuItem
+          to={`/devices/${robot.name}/robot-settings`}
+          as={Link}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          id={`RobotOverflowMenu_${robot.name}_robotSettings`}
+        >
+          {t('robot_settings')}
+        </MenuItem>
+      </>
+    )
+  } else if (robot.status === CONNECTABLE && runId != null) {
     menuItems = (
       <MenuItem
         to={`/devices/${robot.name}/robot-settings`}
         as={Link}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        id={`RobotOverflowMenu_${robot.name}_robotSettings`}
+        id={`RobotOverflowMenu_${robot.name}_robotSettings_${runId}`}
       >
         {t('robot_settings')}
       </MenuItem>
@@ -67,13 +118,13 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       <>
         <MenuItem
           onClick={handleClickConnectionTroubleshooting}
-          id={`RobotOverflowMenu_${robot.name}_robotUnavailable`}
+          id={`RobotOverflowMenu_${String(robot.name)}_robotUnavailable`}
         >
           {t('why_is_this_robot_unavailable')}
         </MenuItem>
         <MenuItem
           onClick={() => dispatch(removeRobot(robot.name))}
-          id={`RobotOverflowMenu_${robot.name}_removeRobot`}
+          id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
         >
           {t('forget_unavailable_robot')}
         </MenuItem>
@@ -82,7 +133,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   }
   return (
     <Flex
-      data-testid={`RobotCard_${robot.name}_overflowMenu`}
+      data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       onClick={e => {
@@ -106,10 +157,19 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           top="2.25rem"
           right="0"
           flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${robot.name}_buttons`}
+          id={`RobotOverflowMenu_${String(robot.name)}_buttons`}
         >
           {menuItems}
         </Flex>
+      ) : null}
+      {robot.status === CONNECTABLE ? (
+        <ChooseProtocolSlideout
+          robot={robot}
+          showSlideout={showChooseProtocolSlideout}
+          onCloseClick={() => {
+            setShowChooseProtocolSlideout(false)
+          }}
+        />
       ) : null}
       <Portal level="top">
         {showOverflowMenu && menuOverlay}

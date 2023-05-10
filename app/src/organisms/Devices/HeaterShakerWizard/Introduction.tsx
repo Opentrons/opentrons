@@ -16,13 +16,13 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
-import flatBottom from '@opentrons/app/src/assets/images/flatbottom_thermal_adapter.png'
-import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.png'
-import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
-import universal from '@opentrons/app/src/assets/images/universal_thermal_adapter.png'
-import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
-import { StyledText } from '@opentrons/app/src/atoms/text/StyledText'
+import heaterShaker from '../../../assets/images/heater_shaker_empty.png'
+import flatBottom from '../../../assets/images/flatbottom_thermal_adapter.png'
+import deepwell from '../../../assets/images/deepwell_thermal_adapter.png'
+import pcr from '../../../assets/images/pcr_thermal_adapter.png'
+import universal from '../../../assets/images/universal_thermal_adapter.png'
+import screwdriver from '../../../assets/images/t10_torx_screwdriver.png'
+import { StyledText } from '../../../atoms/text'
 
 import type {
   LabwareDefinition2,
@@ -78,7 +78,9 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   return (
     <Flex
       marginTop={SPACING.spacing3}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+      border={`${String(SPACING.spacingXXS)} ${String(
+        BORDERS.styleSolid
+      )} ${String(COLORS.medGreyEnabled)}`}
       flexDirection={DIRECTION_ROW}
       width="21.5rem"
       paddingBottom={SPACING.spacing3}
@@ -166,7 +168,10 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                   height="4.313rem"
                   css={THERMAL_ADAPTER_TRANSFORM}
                 >
-                  <img src={adapterImage} alt={`${thermalAdapterName}`} />
+                  <img
+                    src={adapterImage}
+                    alt={`${String(thermalAdapterName)}`}
+                  />
                 </Flex>
               ) : undefined
             }

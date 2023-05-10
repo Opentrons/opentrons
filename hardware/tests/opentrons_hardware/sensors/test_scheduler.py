@@ -63,8 +63,10 @@ async def test_capture_output(
         ),
         mock_messenger,
     ) as output_queue:
-        mock_messenger.send.assert_called_with(
-            node_id=NodeId.pipette_left, message=stim_message
+        mock_messenger.ensure_send.assert_called_with(
+            node_id=NodeId.pipette_left,
+            message=stim_message,
+            expected_nodes=[NodeId.pipette_left],
         )
         for i in range(10):
             can_message_notifier.notify(
@@ -84,8 +86,10 @@ async def test_capture_output(
                     )
                 ),
             )
-    mock_messenger.send.assert_called_with(
-        node_id=NodeId.pipette_left, message=reset_message
+    mock_messenger.ensure_send.assert_called_with(
+        node_id=NodeId.pipette_left,
+        message=reset_message,
+        expected_nodes=[NodeId.pipette_left],
     )
 
     def _drain() -> Iterator[float]:

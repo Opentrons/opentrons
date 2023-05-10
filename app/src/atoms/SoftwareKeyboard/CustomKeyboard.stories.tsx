@@ -11,7 +11,7 @@ import { CustomKeyboard } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/SoftwareKeyboard/CustomKeyboard',
+  title: 'Odd/Atoms/SoftwareKeyboard/CustomKeyboard',
   component: CustomKeyboard,
 } as Meta
 

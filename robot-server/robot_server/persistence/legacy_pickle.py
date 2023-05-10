@@ -2,6 +2,7 @@
 
 
 from dataclasses import dataclass
+from functools import lru_cache
 from io import BytesIO
 from logging import getLogger
 from pickle import (  # noqa: F401
@@ -18,6 +19,59 @@ from typing import Dict, List
 
 
 _log = getLogger(__name__)
+
+
+class LegacyUnpickler(Unpickler):
+    """A custom unpickler to safely handle legacy Opentrons types.
+
+    The standard library's default unpickler is sensitive to import paths.
+    If you pickle an object, and then refactor your code to move or rename that object's
+    type, you'll get a "class not found" error when you try to unpickle it later.
+
+    This class lets us unpickle objects stored by older robot-server versions
+    even if we've moved or renamed their types.
+    """
+
+    def find_class(self, module: str, name: str) -> object:  # noqa: D102
+        try:
+            # We match purely on the type name, ignoring the name of the containing
+            # module. This is to avoid potential confusion and false negatives
+            # with types that could be imported through multiple paths.
+            return _get_types_by_original_name()[name]
+
+        except KeyError:
+            # The type of the object that we're unpickling doesn't appear to be an
+            # Opentrons-defined type. Is it something else that we know about?
+
+            if module == "" and name in {"int", "str"}:
+                known_type = True
+
+            elif module == "datetime":
+                # `datetime.datetime`s and their attributes, like `datetime.timezone`.
+                known_type = True
+
+            elif module == "numpy" or module.startswith("numpy."):
+                # `numpy.dtype` and `numpy.core.multiarray.scalar` (and possibly others)
+                # are present.
+                known_type = True
+
+            else:
+                known_type = False
+
+            if not known_type:
+                _log.warning(
+                    f'Unpickling unknown type "{name}" from module "{module}".'
+                    f" This may cause problems with reading records created by"
+                    f" older versions of this robot software."
+                    f" This should be reported to Opentrons and investigated."
+                )
+
+            return super().find_class(module, name)
+
+
+def loads(data: bytes) -> object:
+    """Drop-in replacement for `pickle.loads` that uses our custom unpickler."""
+    return LegacyUnpickler(BytesIO(data)).load()
 
 
 @dataclass
@@ -42,153 +96,118 @@ class _LegacyTypeInfo:
     """
 
 
-# fmt: off
+def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
+    """Return all legacy Opentrons types.
 
-_legacy_ot_types: List[_LegacyTypeInfo] = []
-"""All Opentrons-defined Python types that were pickled by older robot-server versions.
+    A "legacy Opentrons type," in this context, is any Opentrons-defined Python type
+    that was pickled by older robot-server versions and stored in the database.
 
-NOTE: After adding a type to this list, its `original_name` should never change.
-Even if the `current_type` gets renamed.
-"""
+    NOTE: After adding a type to this list, its `original_name` should never change.
+    Even if the `current_type` gets renamed.
 
-from robot_server.protocols.analysis_models import AnalysisResult  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="AnalysisResult", current_type=AnalysisResult)
-)
-
-from robot_server.protocols.analysis_models import AnalysisStatus  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="AnalysisStatus", current_type=AnalysisStatus)
-)
-
-from opentrons.protocol_engine.commands import CommandIntent  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="CommandIntent", current_type=CommandIntent)
-)
-
-from opentrons.protocol_engine.commands import CommandStatus  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="CommandStatus", current_type=CommandStatus)
-)
-
-from opentrons.types import DeckSlotName  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="DeckSlotName", current_type=DeckSlotName)
-)
-
-from opentrons_shared_data.labware.labware_definition import DisplayCategory  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="DisplayCategory", current_type=DisplayCategory)
-)
-
-from opentrons.protocol_engine import EngineStatus  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="EngineStatus", current_type=EngineStatus)
-)
-
-from opentrons.protocol_engine.types import LabwareMovementStrategy  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="LabwareMovementStrategy", current_type=LabwareMovementStrategy)
-)
-
-from opentrons.protocol_engine import ModuleModel  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="ModuleModel", current_type=ModuleModel)
-)
-
-from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="ModuleType", current_type=ModuleType)
-)
-
-from opentrons.protocol_engine.types import MotorAxis  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="MotorAxis", current_type=MotorAxis)
-)
-
-from opentrons.types import MountType  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="MountType", current_type=MountType)
-)
-
-from opentrons.protocol_engine.types import MovementAxis  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="MovementAxis", current_type=MovementAxis)
-)
-
-from opentrons_shared_data.pipette.dev_types import PipetteNameType  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="PipetteName", current_type=PipetteNameType)
-)
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="PipetteNameType", current_type=PipetteNameType)
-)
-
-from opentrons.protocol_engine import WellOrigin  # noqa: E402
-_legacy_ot_types.append(
-    _LegacyTypeInfo(original_name="WellOrigin", current_type=WellOrigin)
-)
-
-# fmt: on
-
-
-_current_types_by_legacy_name: Dict[str, type] = {}
-for legacy_type in _legacy_ot_types:
-    assert (
-        legacy_type.original_name not in _current_types_by_legacy_name
-    ), "LegacyUnpickler assumes the original names are unique."
-    _current_types_by_legacy_name[legacy_type.original_name] = legacy_type.current_type
-
-
-class LegacyUnpickler(Unpickler):
-    """A custom unpickler to safely handle legacy Opentrons types.
-
-    The standard library's default unpickler is sensitive to import paths.
-    If you pickle an object, and then refactor your code to move or rename that object's
-    type, you'll get a "class not found" error when you try to unpickle it later.
-
-    This class lets us unpickle objects stored by older robot-server versions
-    even if we've moved or renamed their types.
+    This is in a function with local imports to mitigate circular dependency problems.
+    This module will be imported by low-level database setup, so it can't immediately
+    import higher-level types, because they might try to import the low-level database
+    setup again.
     """
+    # fmt: off
+    _legacy_ot_types: List[_LegacyTypeInfo] = []
 
-    def find_class(self, module: str, name: str) -> object:  # noqa: D102
-        try:
-            # We match purely on the type name, ignoring the name of the containing
-            # module. This is to avoid potential confusion and false negatives
-            # with types that could be imported through multiple paths.
-            return _current_types_by_legacy_name[name]
+    from robot_server.protocols.analysis_models import AnalysisResult
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="AnalysisResult", current_type=AnalysisResult)
+    )
 
-        except KeyError:
-            # The type of the object that we're unpickling doesn't appear to be an
-            # Opentrons-defined type. Is it something else that we know about?
+    from robot_server.protocols.analysis_models import AnalysisStatus
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="AnalysisStatus", current_type=AnalysisStatus)
+    )
 
-            if module == "" and name in {"int", "str"}:
-                known_type = True
+    from opentrons.protocol_engine.commands import CommandIntent
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="CommandIntent", current_type=CommandIntent)
+    )
 
-            elif module == "datetime":
-                # `datetime.datetime`s and their attributes, like `datetime.timezone`.
-                known_type = True
+    from opentrons.protocol_engine.commands import CommandStatus
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="CommandStatus", current_type=CommandStatus)
+    )
 
-            elif module == "numpy" or module.startswith("numpy."):
-                # `numpy.dtype` and `numpy.core.multiarray.scalar` (and possibly others)
-                # are present.
-                known_type = True
+    from opentrons.types import DeckSlotName
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="DeckSlotName", current_type=DeckSlotName)
+    )
 
-            else:
-                known_type = False
+    from opentrons_shared_data.labware.labware_definition import DisplayCategory
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="DisplayCategory", current_type=DisplayCategory)
+    )
 
-            if not known_type:
-                raise NotImplementedError
-                _log.warning(
-                    f'Unpickling unknown type "{name}" from module "{module}".'
-                    f" This may cause problems with reading records created by"
-                    f" older versions of this robot software."
-                    f" This should be reported to Opentrons and investigated."
-                )
+    from opentrons.protocol_engine import DropTipWellOrigin
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="DropTipWellOrigin", current_type=DropTipWellOrigin)
+    )
 
-            return super().find_class(module, name)
+    from opentrons.protocol_engine import EngineStatus
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="EngineStatus", current_type=EngineStatus)
+    )
+
+    from opentrons.protocol_engine.types import LabwareMovementStrategy
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="LabwareMovementStrategy", current_type=LabwareMovementStrategy)
+    )
+
+    from opentrons.protocol_engine import ModuleModel
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="ModuleModel", current_type=ModuleModel)
+    )
+
+    from opentrons.hardware_control.modules.types import ModuleType
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="ModuleType", current_type=ModuleType)
+    )
+
+    from opentrons.protocol_engine.types import MotorAxis
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="MotorAxis", current_type=MotorAxis)
+    )
+
+    from opentrons.types import MountType
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="MountType", current_type=MountType)
+    )
+
+    from opentrons.protocol_engine.types import MovementAxis
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="MovementAxis", current_type=MovementAxis)
+    )
+
+    from opentrons_shared_data.pipette.dev_types import PipetteNameType
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="PipetteName", current_type=PipetteNameType)
+    )
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="PipetteNameType", current_type=PipetteNameType)
+    )
+
+    from opentrons.protocol_engine import WellOrigin
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="WellOrigin", current_type=WellOrigin)
+    )
+
+    return _legacy_ot_types
+    # fmt: on
 
 
-def loads(data: bytes) -> object:
-    """Drop-in replacement for `pickle.loads` that uses our custom unpickler."""
-    return LegacyUnpickler(BytesIO(data)).load()
+@lru_cache(maxsize=1)
+def _get_types_by_original_name() -> Dict[str, type]:
+    types_by_original_name: Dict[str, type] = {}
+
+    for legacy_type in _get_legacy_ot_types():
+        assert (
+            legacy_type.original_name not in types_by_original_name
+        ), "LegacyUnpickler assumes the original names are unique."
+        types_by_original_name[legacy_type.original_name] = legacy_type.current_type
+
+    return types_by_original_name

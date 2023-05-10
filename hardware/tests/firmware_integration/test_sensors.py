@@ -147,7 +147,7 @@ async def test_baseline_poll_environment(
         payload=BaselineSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
             sensor_id=SensorIdField(SensorId.S0),
-            sample_rate=UInt16Field(5),
+            number_of_reads=UInt16Field(5),
         )
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)
@@ -204,7 +204,7 @@ async def test_baseline_poll_capacitance(
         payload=BaselineSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
             sensor_id=SensorIdField(SensorId.S0),
-            sample_rate=UInt16Field(5),
+            number_of_reads=UInt16Field(5),
         )
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)
@@ -241,7 +241,7 @@ async def test_baseline_poll_pressure(
         payload=BaselineSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
             sensor_id=SensorIdField(SensorId.S0),
-            sample_rate=UInt16Field(5),
+            number_of_reads=UInt16Field(5),
         )
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)

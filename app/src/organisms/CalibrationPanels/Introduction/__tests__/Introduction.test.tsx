@@ -12,6 +12,7 @@ jest.mock('../../ChooseTipRack')
 const mockChooseTipRack = ChooseTipRack as jest.MockedFunction<
   typeof ChooseTipRack
 >
+const mockCalInvalidationHandler = jest.fn()
 
 describe('Introduction', () => {
   let render: (
@@ -79,5 +80,36 @@ describe('Introduction', () => {
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: 'calibration.loadLabware',
     })
+  })
+  it('displays the InvalidationWarning when necessary - Deck session', () => {
+    const [{ getByText }] = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+      calInvalidationHandler: mockCalInvalidationHandler,
+    })
+    getByText('Recalibrating the deck clears pipette offset data')
+    getByText('Pipette offsets for both mounts will have to be recalibrated.')
+  })
+  it('displays the InvalidationWarning when necessary - Tip Length session', () => {
+    const [{ getByText }] = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+      calInvalidationHandler: mockCalInvalidationHandler,
+    })
+    getByText('Recalibrating tip length will clear pipette offset data.')
+  })
+  it('calls the calInvalidationHandler when appropriate', () => {
+    const [{ getByRole }] = render({
+      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+      calInvalidationHandler: mockCalInvalidationHandler,
+    })
+    getByRole('button', { name: 'Get started' }).click()
+    expect(mockCalInvalidationHandler).toHaveBeenCalled()
+  })
+  it('does not call the calInvalidationHandler if not a deck or tip length session', () => {
+    const [{ getByRole }] = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+      calInvalidationHandler: mockCalInvalidationHandler,
+    })
+    getByRole('button', { name: 'Get started' }).click()
+    expect(mockCalInvalidationHandler).not.toHaveBeenCalled()
   })
 })

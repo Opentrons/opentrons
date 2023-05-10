@@ -1,0 +1,12 @@
+--- # FastAPI will only 2xx on this endpoint if the response is a valid OAS
+test_name: GET openapi.json
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Raw openapi.json endpoint is served and json is received
+    request:
+      url: "{host:s}:{port:d}/openapi.json"
+      method: GET
+    response:
+      status_code: 200

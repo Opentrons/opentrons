@@ -2,7 +2,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
-from ..types import WellLocation
+from ..types import WellLocation, DeckPoint
 
 
 class PipetteIdMixin(BaseModel):
@@ -89,4 +89,16 @@ class BaseLiquidHandlingResult(BaseModel):
         ...,
         description="Amount of liquid in uL handled in the operation.",
         gt=0,
+    )
+
+
+class DestinationPositionResult(BaseModel):
+    """Mixin for command results that move a pipette."""
+
+    position: DeckPoint = Field(
+        DeckPoint(x=0, y=0, z=0),
+        description=(
+            "The (x,y,z) coordinates of the pipette's critical point in deck space"
+            " after the move was completed."
+        ),
     )

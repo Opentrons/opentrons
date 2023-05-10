@@ -9,15 +9,20 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   FLEX_NONE,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
+
+import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 
 interface ProgressTrackerItemProps {
   activeIndex: [number, number] | null
@@ -56,7 +61,9 @@ function ProgressTrackerItem({
       marginTop="-0.75rem"
       // shorten connector length when subtasks are present
       marginBottom={
-        hasSubTasks ? `-${SPACING.spacing3}` : `-${SPACING.spacingM}`
+        hasSubTasks
+          ? `-${String(SPACING.spacing3)}`
+          : `-${String(SPACING.spacingM)}`
       }
       height="100%"
     />
@@ -110,13 +117,19 @@ function ProgressTrackerItem({
           {taskConnector}
           {subTasks.map((subTask, subTaskIndex) => {
             const isPastSubTask =
-              activeTaskIndex != null &&
-              activeSubTaskIndex != null &&
-              subTaskIndex < activeSubTaskIndex &&
-              taskIndex <= activeTaskIndex
+              (activeTaskIndex != null &&
+                activeSubTaskIndex != null &&
+                subTaskIndex <= activeSubTaskIndex &&
+                taskIndex < activeTaskIndex) ||
+              (activeTaskIndex != null &&
+                subTask.isComplete === true &&
+                taskIndex <= activeTaskIndex)
             const isFutureSubTask =
-              activeSubTaskIndex != null &&
-              (subTaskIndex > activeSubTaskIndex || isFutureTask)
+              (activeSubTaskIndex != null &&
+                activeTaskIndex != null &&
+                subTaskIndex > activeSubTaskIndex &&
+                taskIndex >= activeTaskIndex) ||
+              isFutureTask
             // last subtask of the parent task
             const isLastSubTask = subTaskIndex === subTasks.length - 1
             // last subtask of the last task of the entire list
@@ -134,7 +147,7 @@ function ProgressTrackerItem({
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : subTask.isComplete
+                      : subTask.isComplete === true
                       ? COLORS.medGreyHover
                       : 'initial'
                   }
@@ -152,23 +165,21 @@ function ProgressTrackerItem({
                 {/* subtask connector component */}
                 <Flex
                   flex="1"
-                  borderLeft={
+                  borderLeft={BORDERS.lineBorder}
+                  borderColor={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
-                      ? BORDERS.transparentLineBorder
-                      : BORDERS.lineBorder
-                  }
-                  borderColor={
-                    isTaskListComplete || isPastSubTask
+                      ? COLORS.transparent
+                      : isTaskListComplete || isPastSubTask
                       ? COLORS.blueEnabled
-                      : ''
+                      : COLORS.medGreyEnabled
                   }
-                  marginTop={`-${SPACING.spacing3}`}
+                  marginTop={`-${String(SPACING.spacing3)}`}
                   marginBottom={
                     // extend connector for last subtask
                     isLastSubTask
-                      ? `-${SPACING.spacingM}`
-                      : `-${SPACING.spacing3}`
+                      ? `-${String(SPACING.spacingM)}`
+                      : `-${String(SPACING.spacing3)}`
                   }
                   height="100%"
                 />
@@ -181,22 +192,6 @@ function ProgressTrackerItem({
   )
 }
 
-interface SubTaskCTA {
-  label: string
-  onClick: () => void
-}
-
-interface SubTaskProps {
-  activeIndex: [number, number] | null
-  description: string
-  subTaskIndex: number
-  taskIndex: number
-  title: string
-  cta?: SubTaskCTA
-  footer?: string
-  isComplete?: boolean
-}
-
 function SubTask({
   activeIndex,
   subTaskIndex,
@@ -205,7 +200,12 @@ function SubTask({
   description,
   cta,
   footer,
+  markedBad,
+  generalClickHandler,
+  generalTaskDisabledReason,
 }: SubTaskProps): JSX.Element {
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
   const isTaskListComplete = activeIndex == null
@@ -216,6 +216,7 @@ function SubTask({
     activeSubTaskIndex != null &&
     ((activeSubTaskIndex > subTaskIndex && activeTaskIndex === taskIndex) ||
       activeTaskIndex > taskIndex)
+  const isDisabled = generalTaskDisabledReason != null
 
   return (
     <Flex
@@ -234,30 +235,87 @@ function SubTask({
         gridGap={SPACING.spacing2}
       >
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {title}
+          <Flex
+            alignItems={ALIGN_CENTER}
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing3}
+          >
+            {title}
+          </Flex>
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
           <StyledText as="p" color={COLORS.darkGreyEnabled}>
-            {footer}
+            <Flex
+              alignItems={ALIGN_CENTER}
+              flexDirection={DIRECTION_ROW}
+              gridGap={SPACING.spacing3}
+            >
+              {markedBad === true && (
+                <Icon
+                  name="alert-circle"
+                  backgroundColor={COLORS.warningBackgroundLight}
+                  color={COLORS.warningEnabled}
+                  height="1rem"
+                  aria-label={`icon_warning`}
+                />
+              )}
+              {footer}
+            </Flex>
           </StyledText>
         ) : null}
       </Flex>
       {(isTaskListComplete || isPastSubTask) && cta != null ? (
-        <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} onClick={cta.onClick}>
-          {cta.label}
-        </Link>
+        <>
+          <Link
+            {...targetProps}
+            css={
+              isDisabled
+                ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+                : TYPOGRAPHY.darkLinkLabelSemiBold
+            }
+            onClick={() => {
+              if (isDisabled) {
+                return
+              }
+              if (generalClickHandler != null) {
+                generalClickHandler()
+              }
+              cta.onClick()
+            }}
+          >
+            {cta.label}
+          </Link>
+          {isDisabled ? (
+            <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+              {generalTaskDisabledReason}
+            </Tooltip>
+          ) : null}
+        </>
       ) : null}
       {isActiveSubTask && cta != null ? (
-        <TertiaryButton onClick={cta.onClick}>{cta.label}</TertiaryButton>
+        <>
+          <TertiaryButton
+            {...targetProps}
+            disabled={isDisabled}
+            onClick={() => {
+              if (generalClickHandler != null) {
+                generalClickHandler()
+              }
+              cta.onClick()
+            }}
+          >
+            {cta.label}
+          </TertiaryButton>
+          {isDisabled ? (
+            <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+              {generalTaskDisabledReason}
+            </Tooltip>
+          ) : null}
+        </>
       ) : null}
     </Flex>
   )
-}
-
-interface TaskProps extends Omit<SubTaskProps, 'subTaskIndex'> {
-  subTasks: SubTaskProps[]
-  taskListLength: number
 }
 
 function Task({
@@ -270,9 +328,11 @@ function Task({
   subTasks,
   taskListLength,
   isComplete,
+  markedBad,
+  generalClickHandler,
+  generalTaskDisabledReason,
 }: TaskProps): JSX.Element {
-  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(false)
-
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [activeTaskIndex] = activeIndex ?? []
 
   // TODO(bh, 2022-10-18): pass booleans to children as props
@@ -280,6 +340,15 @@ function Task({
   const isPastTask = activeTaskIndex != null && taskIndex < activeTaskIndex
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
+  const isDisabled = generalTaskDisabledReason != null
+
+  const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(
+    hasSubTasks && isActiveTask
+  )
+
+  React.useEffect(() => {
+    setIsTaskOpen(hasSubTasks && isActiveTask)
+  }, [isActiveTask, hasSubTasks])
 
   return (
     <Flex key={title}>
@@ -318,12 +387,33 @@ function Task({
             gridGap={SPACING.spacing2}
           >
             <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {title}
+              <Flex
+                alignItems={ALIGN_CENTER}
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing3}
+              >
+                {markedBad === true && (
+                  <Icon
+                    name="alert-circle"
+                    backgroundColor={COLORS.warningBackgroundLight}
+                    color={COLORS.warningEnabled}
+                    height="1rem"
+                    aria-label={`icon_warning`}
+                  />
+                )}
+                {title}
+              </Flex>
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
               <StyledText as="p" color={COLORS.darkGreyEnabled}>
-                {footer}
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  flexDirection={DIRECTION_ROW}
+                  gridGap={SPACING.spacing3}
+                >
+                  {footer}
+                </Flex>
               </StyledText>
             ) : null}
           </Flex>
@@ -334,12 +424,53 @@ function Task({
               height="15px"
             />
           ) : (isTaskListComplete || isPastTask) && cta != null ? (
-            <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} onClick={cta.onClick}>
-              {cta.label}
-            </Link>
+            <>
+              <Link
+                {...targetProps}
+                css={
+                  isDisabled
+                    ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+                    : TYPOGRAPHY.darkLinkLabelSemiBold
+                }
+                onClick={() => {
+                  if (isDisabled) {
+                    return
+                  }
+                  if (generalClickHandler != null) {
+                    generalClickHandler()
+                  }
+                  cta.onClick()
+                }}
+              >
+                {cta.label}
+              </Link>
+              {isDisabled ? (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {generalTaskDisabledReason}
+                </Tooltip>
+              ) : null}
+            </>
           ) : null}
           {isActiveTask && cta != null ? (
-            <TertiaryButton onClick={cta.onClick}>{cta.label}</TertiaryButton>
+            <>
+              <TertiaryButton
+                {...targetProps}
+                disabled={isDisabled}
+                onClick={() => {
+                  if (generalClickHandler != null) {
+                    generalClickHandler()
+                  }
+                  cta.onClick()
+                }}
+              >
+                {cta.label}
+              </TertiaryButton>
+              {isDisabled ? (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {generalTaskDisabledReason}
+                </Tooltip>
+              ) : null}
+            </>
           ) : null}
         </Flex>
         {isTaskOpen ? (
@@ -349,7 +480,10 @@ function Task({
             gridGap={SPACING.spacing3}
           >
             {subTasks.map(
-              ({ title, description, cta, footer }, subTaskIndex) => (
+              (
+                { title, description, cta, footer, markedBad },
+                subTaskIndex
+              ) => (
                 <SubTask
                   key={title}
                   title={title}
@@ -359,6 +493,9 @@ function Task({
                   activeIndex={activeIndex}
                   subTaskIndex={subTaskIndex}
                   taskIndex={taskIndex}
+                  markedBad={markedBad}
+                  generalClickHandler={generalClickHandler}
+                  generalTaskDisabledReason={generalTaskDisabledReason}
                 />
               )
             )}
@@ -369,22 +506,17 @@ function Task({
   )
 }
 
-interface TaskListProps {
-  // activeIndex: a tuple [i, j] indicating activeTaskIndex i and activeSubtaskIndex j
-  // null activeIndex: all tasks complete
-  activeIndex: [number, number] | null
-  taskList: TaskProps[]
-}
-
 export function TaskList({
   activeIndex,
   taskList,
+  generalTaskClickHandler,
+  generalTaskDisabledReason,
 }: TaskListProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
       {taskList.map(
         (
-          { title, description, cta, footer, subTasks, isComplete },
+          { title, description, cta, footer, subTasks, isComplete, markedBad },
           taskIndex
         ) => (
           <Task
@@ -398,6 +530,9 @@ export function TaskList({
             taskIndex={taskIndex}
             taskListLength={taskList.length}
             isComplete={isComplete}
+            markedBad={markedBad}
+            generalClickHandler={generalTaskClickHandler}
+            generalTaskDisabledReason={generalTaskDisabledReason}
           />
         )
       )}

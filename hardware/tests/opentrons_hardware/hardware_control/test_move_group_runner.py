@@ -1,11 +1,18 @@
 """Tests for the move scheduler."""
 import pytest
+import logging
 from typing import List, Any, Tuple
 from numpy import float64, float32, int32
-from mock import AsyncMock, call, MagicMock
+from mock import AsyncMock, call, MagicMock, patch
+import asyncio
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    ErrorCode,
+    ErrorSeverity,
+    PipetteTipActionType,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
 )
@@ -15,12 +22,22 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
+    EmptyPayload,
     AddLinearMoveRequestPayload,
     MoveCompletedPayload,
+    TipActionResponsePayload,
     ExecuteMoveGroupRequestPayload,
     HomeRequestPayload,
+    ErrorMessagePayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import MotorPositionFlagsField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MotorPositionFlagsField,
+    MoveStopConditionField,
+    ErrorSeverityField,
+    ErrorCodeField,
+    GearMotorIdField,
+    PipetteTipActionTypeField,
+)
 from opentrons_hardware.hardware_control.constants import (
     interrupts_per_sec,
 )
@@ -28,6 +45,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
     MoveGroupSingleGripperStep,
+    MoveGroupTipActionStep,
     MoveType,
     MoveStopCondition,
 )
@@ -83,7 +101,24 @@ def move_group_single() -> MoveGroups:
                 NodeId.head: MoveGroupSingleAxisStep(
                     distance_mm=float64(246),
                     velocity_mm_sec=float64(2),
-                    duration_sec=float64(123),
+                    duration_sec=float64(1),
+                )
+            }
+        ]
+    ]
+
+
+@pytest.fixture
+def move_group_tip_action() -> MoveGroups:
+    """Move group with one move."""
+    return [
+        [
+            {
+                NodeId.pipette_left: MoveGroupTipActionStep(
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    action=PipetteTipActionType.clamp,
+                    stop_condition=MoveStopCondition.none,
                 )
             }
         ]
@@ -272,7 +307,7 @@ async def test_single_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -297,7 +332,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -314,7 +349,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -330,7 +365,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -347,7 +382,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -363,7 +398,7 @@ async def test_multi_send_setup_commands(
             payload=AddLinearMoveRequestPayload(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
-                request_stop_condition=UInt8Field(0),
+                request_stop_condition=MoveStopConditionField(0),
                 velocity=Int32Field(calc_velocity(step)),
                 acceleration=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
@@ -409,23 +444,141 @@ class MockSendMoveCompleter:
         if isinstance(message, md.ExecuteMoveGroupRequest):
             # Iterate through each move in each sequence and send a move
             # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             for seq_id, moves in enumerate(
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
                 for node, move in moves.items():
-                    assert isinstance(move, MoveGroupSingleAxisStep)
-                    payload = MoveCompletedPayload(
-                        group_id=message.payload.group_id,
-                        seq_id=UInt8Field(seq_id),
-                        current_position_um=UInt32Field(int(move.distance_mm * 1000)),
-                        encoder_position_um=Int32Field(int(move.distance_mm * 4000)),
-                        position_flags=MotorPositionFlagsField(0),
-                        ack_id=UInt8Field(1),
-                    )
-                    arbitration_id = ArbitrationId(
-                        parts=ArbitrationIdParts(originating_node_id=node)
-                    )
-                    self._listener(md.MoveCompleted(payload=payload), arbitration_id)
+                    if isinstance(move, MoveGroupSingleAxisStep):
+                        payload = MoveCompletedPayload(
+                            group_id=message.payload.group_id,
+                            seq_id=UInt8Field(seq_id),
+                            current_position_um=UInt32Field(
+                                int(move.distance_mm * 1000)
+                            ),
+                            encoder_position_um=Int32Field(
+                                int(move.distance_mm * 4000)
+                            ),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(1),
+                        )
+                        arbitration_id = ArbitrationId(
+                            parts=ArbitrationIdParts(originating_node_id=node)
+                        )
+                        self._listener(
+                            md.MoveCompleted(payload=payload), arbitration_id
+                        )
+                    elif isinstance(move, MoveGroupTipActionStep):
+                        payload_1 = TipActionResponsePayload(
+                            group_id=message.payload.group_id,
+                            seq_id=UInt8Field(seq_id),
+                            current_position_um=UInt32Field(
+                                int(move.velocity_mm_sec * move.duration_sec * 1000)
+                            ),
+                            encoder_position_um=Int32Field(
+                                int(move.velocity_mm_sec * 0)
+                            ),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(1),
+                            action=PipetteTipActionTypeField(move.action.value),
+                            success=UInt8Field(1),
+                            gear_motor_id=GearMotorIdField(1),
+                        )
+                        arbitration_id = ArbitrationId(
+                            parts=ArbitrationIdParts(originating_node_id=node)
+                        )
+                        self._listener(
+                            md.TipActionResponse(payload=payload_1), arbitration_id
+                        )
+
+                        payload_2 = TipActionResponsePayload(
+                            group_id=message.payload.group_id,
+                            seq_id=UInt8Field(seq_id),
+                            current_position_um=UInt32Field(
+                                int(move.velocity_mm_sec * move.duration_sec * 1000)
+                            ),
+                            encoder_position_um=Int32Field(
+                                int(move.velocity_mm_sec * 0)
+                            ),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(1),
+                            action=PipetteTipActionTypeField(move.action.value),
+                            success=UInt8Field(1),
+                            gear_motor_id=GearMotorIdField(0),
+                        )
+
+                        self._listener(
+                            md.TipActionResponse(payload=payload_2), arbitration_id
+                        )
+
+    async def mock_send_failure(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+    ) -> None:
+        """Mock send function with incorrect number of responses."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            # Iterate through each move in each sequence and send a move
+            # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
+            for seq_id, moves in enumerate(
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
+            ):
+                for node, move in moves.items():
+                    if isinstance(move, MoveGroupTipActionStep):
+                        payload_1 = TipActionResponsePayload(
+                            group_id=message.payload.group_id,
+                            seq_id=UInt8Field(seq_id),
+                            current_position_um=UInt32Field(
+                                int(move.velocity_mm_sec * move.duration_sec * 1000)
+                            ),
+                            encoder_position_um=Int32Field(
+                                int(move.velocity_mm_sec * 0)
+                            ),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(1),
+                            action=PipetteTipActionTypeField(move.action.value),
+                            success=UInt8Field(1),
+                            gear_motor_id=GearMotorIdField(1),
+                        )
+                        arbitration_id = ArbitrationId(
+                            parts=ArbitrationIdParts(originating_node_id=node)
+                        )
+                        self._listener(
+                            md.TipActionResponse(payload=payload_1), arbitration_id
+                        )
+
+    async def mock_ensure_send_failure(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Mock ensure_send function."""
+        await self.mock_send_failure(node_id, message)
+        return ErrorCode.ok
+
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
+        return ErrorCode.ok
 
 
 class MockGripperSendMoveCompleter:
@@ -456,6 +609,12 @@ class MockGripperSendMoveCompleter:
         if isinstance(message, md.ExecuteMoveGroupRequest):
             # Iterate through each move in each sequence and send a move
             # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             for seq_id, moves in enumerate(
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
@@ -474,6 +633,17 @@ class MockGripperSendMoveCompleter:
                     )
                     self._listener(md.MoveCompleted(payload=payload), arbitration_id)
 
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
+        return ErrorCode.ok
+
 
 async def test_single_move(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
@@ -481,10 +651,13 @@ async def test_single_move(
     """It should send a start group command."""
     subject = MoveScheduler(move_groups=move_group_single)
     mock_sender = MockSendMoveCompleter(move_group_single, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     position = await subject.run(can_messenger=mock_can_messenger)
-
-    mock_can_messenger.send.assert_has_calls(
+    expected_nodes = []
+    for mgs in move_group_single[0]:
+        expected_nodes.extend([k for k in mgs.keys()])
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -495,11 +668,75 @@ async def test_single_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes,
             )
         ]
     )
     assert len(position) == 1
     assert position[0][1].payload.current_position_um.value == 246000
+
+
+async def test_tip_action_move_runner_receives_two_responses(
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
+) -> None:
+    """The magic call function should receive two responses for a tip action."""
+    with patch.object(MoveScheduler, "__call__") as mock_magic_call:
+        subject = MoveScheduler(move_groups=move_group_tip_action)
+        mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
+        mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+        mock_can_messenger.send.side_effect = mock_sender.mock_send
+        await subject.run(can_messenger=mock_can_messenger)
+
+        assert isinstance(mock_magic_call.call_args_list[0][0][0], md.Acknowledgement)
+        assert isinstance(mock_magic_call.call_args_list[1][0][0], md.TipActionResponse)
+
+        assert mock_magic_call.call_args_list[1][0][
+            0
+        ].payload.gear_motor_id == GearMotorIdField(1)
+        assert isinstance(mock_magic_call.call_args_list[2][0][0], md.TipActionResponse)
+
+        assert mock_magic_call.call_args_list[2][0][
+            0
+        ].payload.gear_motor_id == GearMotorIdField(0)
+
+
+async def test_tip_action_move_runner_position_updated(
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
+) -> None:
+    """Two responses from a tip action move are properly handled."""
+    subject = MoveScheduler(move_groups=move_group_tip_action)
+    mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    completion_message = await subject.run(can_messenger=mock_can_messenger)
+    assert len(completion_message) == 1
+    assert completion_message[0][1].payload.current_position_um.value == 2000
+
+
+async def test_tip_action_move_runner_fail_receives_one_response(
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, caplog: Any
+) -> None:
+    """Tip action move should fail if one or less responses received."""
+    subject = MoveScheduler(move_groups=move_group_tip_action)
+    mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
+    mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
+
+    expected_warnings = [
+        (
+            "opentrons_hardware.hardware_control.move_group_runner",
+            30,
+            "Move set 0 timed out, expected duration 1.1",
+        ),
+        (
+            "opentrons_hardware.hardware_control.move_group_runner",
+            30,
+            "Expected nodes in group 0: [<NodeId.pipette_left: 96>]",
+        ),
+    ]
+    with caplog.at_level(logging.WARN):
+        await subject.run(can_messenger=mock_can_messenger)
+        assert caplog.record_tuples == expected_warnings
 
 
 async def test_multi_group_move(
@@ -508,10 +745,29 @@ async def test_multi_group_move(
     """It should start next group once the prior has completed."""
     subject = MoveScheduler(move_groups=move_group_multiple)
     mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     position = await subject.run(can_messenger=mock_can_messenger)
+    expected_nodes_list: List[List[NodeId]] = []
 
-    mock_can_messenger.send.assert_has_calls(
+    # we have to do this weird list->set->list conversion to get the same
+    # order as the one move_group_runner uses since sets hash things
+    # in a way that doesn't preserve order
+    for movegroup in move_group_multiple:
+        expected_nodes = set()
+        for seq_id, mgs in enumerate(movegroup):
+            expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
+        expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
+
+    # remove duplicates from the expected nodes lists
+    for i, enl in enumerate(expected_nodes_list):
+        res = []
+        for n in enl:
+            if n not in res:
+                res.append(n)
+        expected_nodes_list[i] = res
+
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -522,6 +778,7 @@ async def test_multi_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[0],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -532,6 +789,7 @@ async def test_multi_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[1],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -542,6 +800,7 @@ async def test_multi_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[2],
             ),
         ]
     )
@@ -553,16 +812,50 @@ async def test_multi_group_move(
     assert position[4][1].payload.current_position_um.value == 12000
 
 
-async def test_multi_gripper_group_move(
-    mock_can_messenger: AsyncMock, move_group_gripper_multiple: MoveGroups
+async def test_multi_group_move_with_stale_complete(
+    mock_can_messenger: AsyncMock,
+    move_group_multiple: MoveGroups,
+    move_group_single: MoveGroups,
 ) -> None:
     """It should start next group once the prior has completed."""
-    subject = MoveScheduler(move_groups=move_group_gripper_multiple)
-    mock_sender = MockGripperSendMoveCompleter(move_group_gripper_multiple, subject)
+    subject = MoveScheduler(move_groups=move_group_multiple)
+    mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    position = await subject.run(can_messenger=mock_can_messenger)
 
-    mock_can_messenger.send.assert_has_calls(
+    # set up a stale move schedluer and set its listener to the subject
+    stale_subject = MoveScheduler(move_groups=move_group_single)
+    stale_mock_sender = MockSendMoveCompleter(move_group_single, subject)
+    stale_mock_can_messenger = AsyncMock()
+    stale_mock_can_messenger.ensure_send.side_effect = (
+        stale_mock_sender.mock_ensure_send
+    )
+    stale_mock_can_messenger.send.side_effect = stale_mock_sender.mock_send
+
+    position, stale = await asyncio.gather(
+        subject.run(can_messenger=mock_can_messenger),
+        stale_subject.run(can_messenger=stale_mock_can_messenger),
+    )
+    expected_nodes_list: List[List[NodeId]] = []
+
+    # we have to do this weird list->set->list conversion to get the same
+    # order as the one move_group_runner uses since sets hash things
+    # in a way that doesn't preserve order
+    for movegroup in move_group_multiple:
+        expected_nodes = set()
+        for seq_id, mgs in enumerate(movegroup):
+            expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
+        expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
+
+    # remove duplicates from the expected nodes lists
+    for i, enl in enumerate(expected_nodes_list):
+        res = []
+        for n in enl:
+            if n not in res:
+                res.append(n)
+        expected_nodes_list[i] = res
+
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -573,6 +866,7 @@ async def test_multi_gripper_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[0],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -583,6 +877,7 @@ async def test_multi_gripper_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[1],
             ),
             call(
                 node_id=NodeId.broadcast,
@@ -593,6 +888,64 @@ async def test_multi_gripper_group_move(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes_list[2],
+            ),
+        ]
+    )
+    assert len(position) == 5
+    assert position[0][1].payload.current_position_um.value == 229000
+    assert position[1][1].payload.current_position_um.value == 522000
+    assert position[2][1].payload.current_position_um.value == 25000
+    assert position[3][1].payload.current_position_um.value == 12000
+    assert position[4][1].payload.current_position_um.value == 12000
+
+    assert len(stale) == 0
+
+
+async def test_multi_gripper_group_move(
+    mock_can_messenger: AsyncMock, move_group_gripper_multiple: MoveGroups
+) -> None:
+    """It should start next group once the prior has completed."""
+    subject = MoveScheduler(move_groups=move_group_gripper_multiple)
+    mock_sender = MockGripperSendMoveCompleter(move_group_gripper_multiple, subject)
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    position = await subject.run(can_messenger=mock_can_messenger)
+
+    mock_can_messenger.ensure_send.assert_has_calls(
+        calls=[
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(0),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+                expected_nodes=[NodeId.gripper_g],
+            ),
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(1),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+                expected_nodes=[NodeId.gripper_g],
+            ),
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(2),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+                expected_nodes=[NodeId.gripper_g],
             ),
         ]
     )
@@ -649,7 +1002,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: (10, 40)},
+            {NodeId.gantry_x: (10, 40, False, False)},
         ),
         (
             # multiple axes with different numbers of completions
@@ -694,7 +1047,32 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {NodeId.gantry_x: (10, 40), NodeId.gantry_y: (30, 40)},
+            {
+                NodeId.gantry_x: (10, 40, False, False),
+                NodeId.gantry_y: (30, 40, False, False),
+            },
+        ),
+        (
+            # tip action response, should not update position
+            [
+                (
+                    _build_arb(NodeId.pipette_left),
+                    md.TipActionResponse(
+                        payload=TipActionResponsePayload(
+                            ack_id=UInt8Field(0),
+                            group_id=UInt8Field(2),
+                            seq_id=UInt8Field(2),
+                            current_position_um=UInt32Field(10000),
+                            encoder_position_um=Int32Field(0),
+                            position_flags=MotorPositionFlagsField(0),
+                            action=PipetteTipActionTypeField(0),
+                            success=UInt8Field(1),
+                            gear_motor_id=GearMotorIdField(1),
+                        )
+                    ),
+                ),
+            ],
+            {},
         ),
         (
             # empty base case
@@ -704,7 +1082,8 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
     ],
 )
 def test_accumulate_move_completions(
-    completions: List[_CompletionPacket], position_map: NodeMap[Tuple[float, float]]
+    completions: List[_CompletionPacket],
+    position_map: NodeMap[Tuple[float, float, bool, bool]],
 ) -> None:
     """Build correct move results."""
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
@@ -726,6 +1105,12 @@ class MockSendMoveCompleterWithUnknown(MockSendMoveCompleter):
     async def mock_send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Overrides the send method of the messenger."""
         if isinstance(message, md.ExecuteMoveGroupRequest):
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             groups = super().groups
             bad_id = len(groups)
             payload = MoveCompletedPayload(
@@ -751,6 +1136,7 @@ async def test_handles_unknown_group_ids(
     subject = MoveScheduler(move_group_single)
     mock_sender = MockSendMoveCompleterWithUnknown(move_group_single, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     # this should not throw
     await subject.run(can_messenger=mock_can_messenger)
 
@@ -762,9 +1148,13 @@ async def test_groups_from_nonzero_index(
     subject = MoveScheduler(move_group_single, 1)
     mock_sender = MockSendMoveCompleter(move_group_single, subject, 1)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    expected_nodes = []
+    for mgs in move_group_single[0]:
+        expected_nodes.extend([k for k in mgs.keys()])
     # this should not throw
     await subject.run(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_has_calls(
+    mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
             call(
                 node_id=NodeId.broadcast,
@@ -775,6 +1165,122 @@ async def test_groups_from_nonzero_index(
                         start_trigger=UInt8Field(0),
                     )
                 ),
+                expected_nodes=expected_nodes,
             )
         ]
     )
+
+
+class MockSendMoveErrorCompleter:
+    """Side effect mock of CanMessenger.send that immediately sends an error."""
+
+    def __init__(
+        self,
+        move_groups: MoveGroups,
+        listener: MessageListenerCallback,
+        start_at_index: int = 0,
+    ) -> None:
+        """Constructor."""
+        self._move_groups = move_groups
+        self._listener = listener
+        self._start_at_index = start_at_index
+        self.call_count = 0
+
+    @property
+    def groups(self) -> MoveGroups:
+        """Retrieve the groups, for instance from a child class."""
+        return self._move_groups
+
+    async def mock_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+    ) -> None:
+        """Mock send function."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            # Iterate through each move in each sequence and send a move
+            # completed for it.
+            payload = EmptyPayload()
+            payload.message_index = message.payload.message_index
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=node_id)
+            )
+            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
+            for seq_id, moves in enumerate(
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
+            ):
+                for node, move in moves.items():
+                    assert isinstance(move, MoveGroupSingleAxisStep)
+                    payload = ErrorMessagePayload(
+                        severity=ErrorSeverityField(ErrorSeverity.recoverable),
+                        error_code=ErrorCodeField(ErrorCode.collision_detected),
+                    )
+                    payload.message_index = message.payload.message_index
+                    arbitration_id = ArbitrationId(
+                        parts=ArbitrationIdParts(originating_node_id=node)
+                    )
+                    self.call_count += 1
+                    self._listener(md.ErrorMessage(payload=payload), arbitration_id)
+
+    async def mock_ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Mock ensure_send function."""
+        await self.mock_send(node_id, message)
+        return ErrorCode.ok
+
+
+async def test_single_move_error(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """It should send a start group command."""
+    subject = MoveScheduler(move_groups=move_group_single)
+    mock_sender = MockSendMoveErrorCompleter(move_group_single, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(RuntimeError):
+        await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 1
+
+
+@pytest.fixture
+def move_group_multiple_axes() -> MoveGroups:
+    """Move group with two moves."""
+    return [
+        # Group 0
+        [
+            {
+                NodeId.gantry_y: MoveGroupSingleAxisStep(
+                    distance_mm=float64(25),
+                    velocity_mm_sec=float64(23),
+                    duration_sec=float64(1),
+                    acceleration_mm_sec_sq=float64(1000),
+                ),
+            },
+            {
+                NodeId.gantry_x: MoveGroupSingleAxisStep(
+                    distance_mm=float64(25),
+                    velocity_mm_sec=float64(23),
+                    duration_sec=float64(1),
+                    acceleration_mm_sec_sq=float64(1000),
+                ),
+            },
+        ]
+    ]
+
+
+async def test_multiple_move_error(
+    mock_can_messenger: AsyncMock, move_group_multiple_axes: MoveGroups
+) -> None:
+    """It should receive all of the errors."""
+    subject = MoveScheduler(move_groups=move_group_multiple_axes)
+    mock_sender = MockSendMoveErrorCompleter(move_group_multiple_axes, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(RuntimeError):
+        await subject.run(can_messenger=mock_can_messenger)
+    assert mock_sender.call_count == 2

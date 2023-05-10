@@ -4,7 +4,8 @@ import logging
 from enum import Enum
 from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar
 
-from .types import CriticalPoint, MotionChecks, OutOfBoundsMove
+from .types import CriticalPoint, MotionChecks
+from .errors import OutOfBoundsMove
 from opentrons.types import Point
 
 mod_log = logging.getLogger(__name__)

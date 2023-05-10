@@ -49,10 +49,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v6_protocol_6_10": {
+    "export_v6_protocol_6_20": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "6.1 or higher",
+      "body2": "6.2 or higher",
       "body3": ". Please ensure your OT-2 is updated to the correct version."
     },
     "change_magnet_module_model": {
