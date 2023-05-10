@@ -75,7 +75,7 @@ export function SetupPipetteCalibrationItem({
 
   if (pipetteInfo == null) return null
   const pipetteCalDate = isOT3
-    ? attachedPipettesForFlex[mount]?.data?.calibratedOffset.last_modified
+    ? attachedPipettesForFlex[mount]?.data?.calibratedOffset?.last_modified
     : pipetteInfo.pipetteCalDate
 
   const attached =
@@ -149,7 +149,6 @@ export function SetupPipetteCalibrationItem({
           <Flex>{pipetteMismatchInfo}</Flex>
           {isOT3 ? (
             <TertiaryButton
-              disabled={!isDeckCalibrated}
               id="PipetteCalibration_calibratePipetteButton"
               {...targetProps}
               onClick={() => setShowFlexPipetteFlow(true)}
