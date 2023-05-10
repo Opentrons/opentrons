@@ -136,7 +136,7 @@ export function LabwareListItem(
                 <Icon
                   name="information"
                   size="0.75rem"
-                  marginTop={SPACING.spacingXS}
+                  marginTop={SPACING.spacing4}
                 />
                 <StyledText
                   marginLeft={SPACING.spacing4}

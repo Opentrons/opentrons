@@ -43,7 +43,7 @@ export function InterstitialTitleBar(
       css={TITLE_BAR}
       data-testid="titlebar"
     >
-      <Flex padding={SPACING.spacingXS} data-testid={`titlebar_${title}`}>
+      <Flex padding={SPACING.spacing4} data-testid={`titlebar_${title}`}>
         <Icon
           name="ot-logo"
           width={TYPOGRAPHY.lineHeight18}
@@ -52,7 +52,7 @@ export function InterstitialTitleBar(
           aria-label="ot-logo"
         />
         <Flex
-          paddingLeft={SPACING.spacingXS}
+          paddingLeft={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH3}
         >

@@ -72,7 +72,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       zIndex: 5,
       position: POSITION_ABSOLUTE,
-      top: SPACING.spacingXS,
+      top: SPACING.spacing4,
       paddingLeft: '0.375rem',
       fontSize: TYPOGRAPHY.fontSizeP,
     }),

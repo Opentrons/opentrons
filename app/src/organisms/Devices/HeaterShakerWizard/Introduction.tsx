@@ -87,7 +87,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
     >
       {props.image != null ? (
         <>
-          <Flex paddingLeft={SPACING.spacingXS} paddingTop={SPACING.spacing8}>
+          <Flex paddingLeft={SPACING.spacing4} paddingTop={SPACING.spacing8}>
             {props.image}
           </Flex>
           {multiText}

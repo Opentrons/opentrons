@@ -28,7 +28,7 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
           block: (
             <StyledText
               fontSize={TYPOGRAPHY.fontSizeP}
-              paddingBottom={SPACING.spacingXS}
+              paddingBottom={SPACING.spacing4}
             />
           ),
         }}
