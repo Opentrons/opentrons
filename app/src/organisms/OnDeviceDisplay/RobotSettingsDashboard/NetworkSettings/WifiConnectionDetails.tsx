@@ -19,11 +19,7 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 import { getLocalRobot } from '../../../../redux/discovery'
-import {
-  fetchStatus,
-  fetchWifiList,
-  getNetworkInterfaces,
-} from '../../../../redux/networking'
+import { fetchStatus, getNetworkInterfaces } from '../../../../redux/networking'
 
 import type { Dispatch, State } from '../../../../redux/types'
 
@@ -53,7 +49,6 @@ export function WifiConnectionDetails({
 
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
   }, [robotName, dispatch])
 
   return (

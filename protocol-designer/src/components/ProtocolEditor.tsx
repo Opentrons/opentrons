@@ -20,8 +20,11 @@ import styles from './ProtocolEditor.css'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+export interface Props {
+  children?: React.ReactNode
+}
 
-function ProtocolEditorComponent(): JSX.Element {
+function ProtocolEditorComponent(props: Props): JSX.Element {
   return (
     <div>
       <ComputingSpinner />
@@ -42,12 +45,18 @@ function ProtocolEditorComponent(): JSX.Element {
             )}
           >
             <AnnouncementModal />
-            <NewFileModal showProtocolFields />
-            <FileUploadMessageModal />
+            {props.children ? (
+              props.children
+            ) : (
+              <>
+                <NewFileModal showProtocolFields />
+                <FileUploadMessageModal />
 
-            <MainPageModalPortalRoot />
-            <LabwareUploadMessageModal />
-            <ConnectedMainPanel />
+                <MainPageModalPortalRoot />
+                <LabwareUploadMessageModal />
+                <ConnectedMainPanel />
+              </>
+            )}
           </div>
         </div>
       </div>

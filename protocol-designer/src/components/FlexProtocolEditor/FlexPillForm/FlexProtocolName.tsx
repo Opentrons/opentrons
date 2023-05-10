@@ -6,7 +6,11 @@ import styles from '../FlexComponents.css'
 import { useFormikContext } from 'formik'
 
 interface flexProtocolName {
-  fields: any
+  fields: {
+    name: string
+    author: string
+    description: string
+  }
   handleChange: () => void
   handleBlur: () => void
 }
@@ -16,6 +20,8 @@ function FlexProtocolNameComponent(): JSX.Element {
     values,
     handleChange,
     handleBlur,
+    errors,
+    touched,
   } = useFormikContext<flexProtocolName>()
 
   return (
@@ -42,8 +48,10 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.name}
           name="fields.name"
         />
-        <StyledText as="label">
-          {i18n.t('flex.name_and_description.supporting_error_text')}
+        <StyledText as="label" className={styles.error_text}>
+          {errors?.fields?.name && touched?.fields?.name
+            ? errors.fields.name
+            : null}
         </StyledText>
       </FormGroup>
 
@@ -65,9 +73,6 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.author}
           name="fields.author"
         />
-        <StyledText as="label">
-          {i18n.t('flex.name_and_description.supporting_error_text')}
-        </StyledText>
       </FormGroup>
 
       <FormGroup className={styles.form_group}>
@@ -83,9 +88,6 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.description}
           name="fields.description"
         />
-        <StyledText as="label">
-          {i18n.t('flex.name_and_description.supporting_error_text')}
-        </StyledText>
       </FormGroup>
     </>
   )

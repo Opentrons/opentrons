@@ -234,6 +234,67 @@ def _convert_to_node_id_dict(
     return target
 
 
+def replace_head_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
+    """Replace the head core node with its two sides.
+
+    The node ID for the head central controller is what shows up in a network probe,
+    but what we actually send commands to an overwhelming majority of the time is
+    the head_l and head_r synthetic node IDs, and those are what we want in the
+    network map.
+    """
+    if NodeId.head in targets:
+        targets.remove(NodeId.head)
+        targets.add(NodeId.head_r)
+        targets.add(NodeId.head_l)
+    return targets
+
+
+def replace_gripper_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
+    """Replace the gripper core node with its two axes.
+
+    The node ID for the gripper controller is what shows up in a network probe,
+    but what we actually send most commands to is the gripper_z and gripper_g
+    synthetic nodes, so we should have them in the network map instead.
+    """
+    if NodeId.gripper in targets:
+        targets.remove(NodeId.gripper)
+        targets.add(NodeId.gripper_z)
+        targets.add(NodeId.gripper_g)
+    return targets
+
+
+def filter_probed_core_nodes(
+    current_set: Set[FirmwareTarget], probed_set: Set[FirmwareTarget]
+) -> Set[FirmwareTarget]:
+    core_replaced: Set[FirmwareTarget] = {
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head,
+        USBTarget.rear_panel,
+    }
+    current_set -= core_replaced
+    current_set |= probed_set
+    return current_set
+
+
+def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
+    # do the replacement of head and gripper devices
+    motor_nodes = replace_gripper_node(devices)
+    motor_nodes = replace_head_node(motor_nodes)
+    bootloader_nodes = {
+        NodeId.pipette_left_bootloader,
+        NodeId.pipette_right_bootloader,
+        NodeId.gantry_x_bootloader,
+        NodeId.gantry_y_bootloader,
+        NodeId.head_bootloader,
+        NodeId.gripper_bootloader,
+    }
+    # remove any bootloader nodes
+    motor_nodes -= bootloader_nodes
+    # filter out usb nodes
+    return {NodeId(target) for target in motor_nodes if target in NodeId}
+
+
 def create_move_group(
     origin: Coordinates[OT3Axis, CoordinateValue],
     moves: List[Move[OT3Axis]],

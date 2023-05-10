@@ -21,7 +21,8 @@ import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
-import { getWifiList, postWifiDisconnect } from '../../../../redux/networking'
+import { postWifiDisconnect } from '../../../../redux/networking'
+import { useWifiList } from '../../../../resources/networking/hooks'
 import {
   dismissRequest,
   getRequestById,
@@ -44,7 +45,7 @@ export const DisconnectModal = ({
 }: DisconnectModalProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
 
-  const wifiList = useSelector((state: State) => getWifiList(state, robotName))
+  const wifiList = useWifiList(robotName)
 
   const activeNetwork = wifiList?.find(nw => nw.active)
   const ssid = activeNetwork?.ssid ?? null
