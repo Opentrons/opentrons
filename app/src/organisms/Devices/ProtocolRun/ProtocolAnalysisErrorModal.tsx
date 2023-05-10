@@ -54,7 +54,7 @@ export function ProtocolAnalysisErrorModal({
             role="button"
             aria-label="close_analysis_error_modal"
             marginTop={SPACING.spacing16}
-            padding={`${String(SPACING.spacing8)} ${String(SPACING.spacing48)}`}
+            padding={`${SPACING.spacing8} ${SPACING.spacing48}`}
             onClick={onClose}
           >
             <StyledText

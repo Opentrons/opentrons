@@ -37,8 +37,8 @@ describe('CheckboxField', () => {
     const checkBoxIcon = getByTestId('CheckboxField_icon')
 
     // INNER_STYLE_NO_VALUE
-    expect(checkBoxIcon).toHaveStyle(`width: ${String(SPACING.spacing20)}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacing20)}`)
+    expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
+    expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(
@@ -111,7 +111,7 @@ describe('CheckboxField', () => {
     )
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
     expect(checkBoxFieldBox).toHaveStyle(
-      `padding: ${String(SPACING.spacing8)} ${String(SPACING.spacing8)}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing8}`
     )
     expect(checkBoxFieldBox).toHaveStyleRule('padding', '0', {
       modifier: ':empty',
@@ -123,8 +123,8 @@ describe('CheckboxField', () => {
     props.value = true
     const { getByTestId } = render(props)
     const checkBoxIcon = getByTestId('CheckboxField_icon')
-    expect(checkBoxIcon).toHaveStyle(`width: ${String(SPACING.spacing20)}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacing20)}`)
+    expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
+    expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(
@@ -140,8 +140,8 @@ describe('CheckboxField', () => {
     props.value = undefined
     const { getByTestId } = render(props)
     const checkBoxIcon = getByTestId('CheckboxField_icon')
-    expect(checkBoxIcon).toHaveStyle(`width: ${String(SPACING.spacing20)}`)
-    expect(checkBoxIcon).toHaveStyle(`min-width: ${String(SPACING.spacing20)}`)
+    expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
+    expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(

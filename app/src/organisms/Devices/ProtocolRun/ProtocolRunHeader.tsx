@@ -534,7 +534,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        padding={`${SPACING.spacingSM} ${SPACING.spacing16}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
         disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"

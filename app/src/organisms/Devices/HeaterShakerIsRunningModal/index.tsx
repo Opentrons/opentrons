@@ -95,7 +95,7 @@ export const HeaterShakerIsRunningModal = (
         <SecondaryButton
           marginTop={SPACING.spacing24}
           marginRight={SPACING.spacing8}
-          padding={SPACING.spacingSM}
+          padding={SPACING.spacing12}
           onClick={handleStopShake}
           id="HeaterShakerIsRunningModal_stop_shaking"
         >
@@ -103,7 +103,7 @@ export const HeaterShakerIsRunningModal = (
         </SecondaryButton>
         <PrimaryButton
           marginTop={SPACING.spacing24}
-          padding={SPACING.spacingSM}
+          padding={SPACING.spacing12}
           onClick={handleContinueShaking}
           id="HeaterShakerIsRunningModal_keep_shaking"
         >

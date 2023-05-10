@@ -72,7 +72,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacingSM}
+        gridGap={SPACING.spacing12}
         justifyContent={JUSTIFY_FLEX_START}
         width="100%"
       >

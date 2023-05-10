@@ -47,9 +47,7 @@ export function ConfirmRobotName({
     <>
       <StepMeter totalSteps={5} currentStep={5} OnDevice />
       <Flex
-        padding={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacing40
-        )} ${String(SPACING.spacing40)}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">

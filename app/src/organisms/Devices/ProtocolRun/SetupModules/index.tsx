@@ -48,7 +48,7 @@ export const SetupModules = ({
           disabled={missingModuleIds.length > 0 || runHasStarted}
           onClick={expandLabwarePositionCheckStep}
           id="ModuleSetup_proceedToLabwarePositionCheck"
-          padding={`${String(SPACING.spacing8)} ${String(SPACING.spacing16)}`}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >
           {t('proceed_to_labware_position_check')}

@@ -189,14 +189,12 @@ export const TestShakeSlideout = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${String(SPACING.spacing16)} ${String(
-          SPACING.spacing20
-        )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
         width="100%"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginY={SPACING.spacingSM}
+          marginY={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>

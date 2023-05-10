@@ -114,9 +114,7 @@ export function UpdateRobot(): JSX.Element {
 
   return (
     <Flex
-      padding={`${String(SPACING.spacing24)} ${String(
-        SPACING.spacing40
-      )} ${String(SPACING.spacing40)}`}
+      padding={`${SPACING.spacing24} ${SPACING.spacing40} ${SPACING.spacing40}`}
     >
       {isShowCheckingUpdates ? (
         <CheckUpdates />

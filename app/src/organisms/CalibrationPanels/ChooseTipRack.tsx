@@ -203,7 +203,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           >
             {t('select_tip_rack')}
           </StyledText>
-          <Box marginBottom={SPACING.spacingSM}>
+          <Box marginBottom={SPACING.spacing12}>
             <Select
               isSearchable={false}
               options={groupOptions}

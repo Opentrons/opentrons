@@ -56,9 +56,7 @@ export function ConnectViaEthernet(): JSX.Element {
     <>
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
-        margin={`${String(SPACING.spacing32)} ${String(
-          SPACING.spacing40
-        )} ${String(SPACING.spacing40)}`}
+        margin={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
       >
@@ -152,7 +150,7 @@ const DisplayConnectionStatus = ({
       {isConnected ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          padding={`${String(SPACING.spacing24)} ${String(SPACING.spacing40)}`}
+          padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
           backgroundColor={COLORS.successBackgroundMed}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
@@ -239,7 +237,7 @@ const DisplayEthernetInfo = ({
   return (
     <Flex backgroundColor={COLORS.light2} flexDirection={DIRECTION_COLUMN}>
       <Flex
-        padding={`${String(SPACING.spacing24)} ${String(SPACING.spacing32)}}`}
+        padding={`${SPACING.spacing24} ${SPACING.spacing32}}`}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >

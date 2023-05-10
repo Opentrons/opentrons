@@ -71,7 +71,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
               paddingRight={SPACING.spacing16}
               paddingLeft={SPACING.spacing16}
               flexDirection={DIRECTION_ROW}
-              marginRight={SPACING.spacingSM}
+              marginRight={SPACING.spacing12}
               data-testid="attach_adapter_2a_body_text"
             >
               <Flex
@@ -97,7 +97,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
             </Flex>
             <TertiaryButton
               marginLeft={SIZE_AUTO}
-              marginRight={SPACING.spacingSM}
+              marginRight={SPACING.spacing12}
               marginY={SPACING.spacing16}
               onClick={toggleLatch}
               disabled={isShaking}
@@ -115,7 +115,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing16}
@@ -150,7 +150,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+      <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing16}
@@ -162,11 +162,9 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           border={`1px solid ${COLORS.medGreyEnabled}`}
           flexDirection={DIRECTION_COLUMN}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          padding={`${String(SPACING.spacing16)} ${String(
-            SPACING.spacing20
-          )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
+          padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
           width="100%"
-          marginBottom={SPACING.spacingSM}
+          marginBottom={SPACING.spacing12}
           data-testid="attach_adapter_check_alignment_instructions"
         >
           <StyledText>{t('check_alignment_instructions')}</StyledText>

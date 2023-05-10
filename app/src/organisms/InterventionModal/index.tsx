@@ -55,7 +55,7 @@ const HEADER_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${String(SPACING.spacing32)}`,
+  padding: `0px ${SPACING.spacing32}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
@@ -68,7 +68,7 @@ const CONTENT_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   gridGap: SPACING.spacing24,
-  padding: `${String(SPACING.spacing32)}`,
+  padding: `${SPACING.spacing32}`,
   borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
     BORDERS.radiusSoftCorners
   )}`,

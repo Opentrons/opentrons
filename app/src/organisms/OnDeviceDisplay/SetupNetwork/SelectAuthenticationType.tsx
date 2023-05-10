@@ -72,9 +72,7 @@ export function SelectAuthenticationType({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      padding={`${String(SPACING.spacing32)} ${String(
-        SPACING.spacing40
-      )} ${String(SPACING.spacing40)}`}
+      padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -131,9 +129,7 @@ export function SelectAuthenticationType({
             backgroundColor={
               selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
             }
-            padding={`${String(SPACING.spacing16)} ${String(
-              SPACING.spacing32
-            )}`}
+            padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
             borderRadius="3.5625rem"
             onClick={() => {
               setSelectedAuthType('wpa-psk')
@@ -151,9 +147,7 @@ export function SelectAuthenticationType({
           <Btn
             backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
-            padding={`${String(SPACING.spacing16)} ${String(
-              SPACING.spacing32
-            )}`}
+            padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
             onClick={() => {
               setSelectedAuthType('none')
             }}
@@ -204,8 +198,8 @@ export function SelectAuthenticationType({
             {t('switch_to_usb_description')}
           </StyledText>
           <Btn
-            marginLeft={SPACING.spacingSM}
-            padding={`0.75rem ${String(SPACING.spacing24)}`}
+            marginLeft={SPACING.spacing12}
+            padding={`0.75rem ${SPACING.spacing24}`}
             width="13.8125rem"
             onClick={() => history.push('/network-setup/usb')}
           >

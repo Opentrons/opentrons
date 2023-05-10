@@ -127,9 +127,9 @@ export function CustomLabwareOverflowMenu(
               {t('open_labware_creator')}
               <Icon
                 name="open-in-new"
-                height={SPACING.spacingSM}
+                height="10px"
                 marginLeft="0.375rem"
-              ></Icon>
+              />
             </StyledText>
           </MenuItem>
         </Flex>

@@ -213,10 +213,10 @@ export function InstrumentsAndModules({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingSM}
+            gridGap={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             minHeight={SIZE_3}
-            padding={SPACING.spacingSM}
+            padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText

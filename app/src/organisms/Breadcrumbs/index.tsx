@@ -123,9 +123,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
       borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing4)} 0 ${String(
-        SPACING.spacing4
-      )} ${String(SPACING.spacing8)}`}
+      padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1

@@ -214,7 +214,7 @@ interface AttachedModuleItemProps {
 function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
   const { step } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
       <StyledText
         color={COLORS.darkGrey}
         paddingRight={SPACING.spacing16}
@@ -226,9 +226,7 @@ function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
         border={`1px solid ${COLORS.medGreyEnabled}`}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${String(SPACING.spacing16)} ${String(
-          SPACING.spacing20
-        )} ${String(SPACING.spacing20)} ${String(SPACING.spacing16)}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
         width="100%"
         marginBottom={SPACING.spacing16}
       >

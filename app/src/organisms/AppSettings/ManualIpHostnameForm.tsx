@@ -103,7 +103,7 @@ export function ManualIpHostnameForm({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      margin={`${String(SPACING.spacing4)} 0`}
+      margin={`${SPACING.spacing4} 0`}
       height={SPACING.spacing32}
     >
       <FlexForm onSubmit={formik.handleSubmit}>

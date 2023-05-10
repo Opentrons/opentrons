@@ -176,7 +176,7 @@ export function ChooseRobotSlideout(
               <StyledText
                 as="p"
                 color={COLORS.darkGreyEnabled}
-                marginRight={SPACING.spacingSM}
+                marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
               </StyledText>

@@ -369,9 +369,7 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing16}
-            padding={`${String(SPACING.spacing16)} 0 ${String(
-              SPACING.spacing16
-            )} ${String(SPACING.spacing16)}`}
+            padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
             width="100%"
           >
             {analysisStatus !== 'loading' &&
@@ -587,9 +585,7 @@ export function ProtocolDetails(
               } ${String(BORDERS.radiusSoftCorners)} ${String(
                 BORDERS.radiusSoftCorners
               )} ${String(BORDERS.radiusSoftCorners)}`}
-              padding={`${String(SPACING.spacing16)} ${String(
-                SPACING.spacing16
-              )} 0 ${String(SPACING.spacing16)}`}
+              padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
             >
               {contentsByTabName[currentTab]}
             </Box>

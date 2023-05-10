@@ -120,7 +120,7 @@ export function DisplayWifiList({
         >
           <Icon name="plus" size="2.25rem" color={COLORS.darkGreyEnabled} />
           <StyledText
-            marginLeft={SPACING.spacingSM}
+            marginLeft={SPACING.spacing12}
             fontSize="1.5rem"
             lineHeight="1.8125rem"
             fontWeight="400"

@@ -44,7 +44,7 @@ export function ManufacturerDetails(
             links.map((href, index) => (
               <StyledText as="p" key={index}>
                 <Link href={href} external>
-                  website <Icon height={SPACING.spacingSM} name="open-in-new" />
+                  website <Icon height="10px" name="open-in-new" />
                 </Link>
               </StyledText>
             ))}

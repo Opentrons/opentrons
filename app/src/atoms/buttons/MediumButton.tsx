@@ -141,7 +141,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       display={DISPLAY_FLEX}
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacingSM}
+      gridGap={SPACING.spacing12}
       padding={
         iconName !== undefined
           ? `${SPACING.spacing20} ${SPACING.spacing24}`

@@ -61,9 +61,7 @@ export function HistoricalProtocolRunOffsetDrawer(
       <Box
         backgroundColor={COLORS.fundamentalsBackground}
         width="100%"
-        padding={`${String(SPACING.spacing16)} ${String(
-          SPACING.spacing8
-        )} ${String(SPACING.spacing16)} ${String(SPACING.spacing48)}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
       >
         <Box
           backgroundColor={COLORS.white}
@@ -78,17 +76,15 @@ export function HistoricalProtocolRunOffsetDrawer(
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
     new Date(lastModifiedDeckCal).getTime() >
-      new Date(
-        uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
-      ).getTime()
+    new Date(
+      uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
+    ).getTime()
 
   return (
     <Box
       backgroundColor={COLORS.fundamentalsBackground}
       width="100%"
-      padding={`${String(SPACING.spacing16)} ${String(
-        SPACING.spacing8
-      )} ${String(SPACING.spacing16)} ${String(SPACING.spacing48)}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
     >
       {isOutOfDate ? (
         <Banner type="warning" marginTop={SPACING.spacing8}>

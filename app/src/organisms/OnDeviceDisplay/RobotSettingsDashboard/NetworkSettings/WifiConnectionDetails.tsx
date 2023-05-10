@@ -113,7 +113,7 @@ export function WifiConnectionDetails({
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacingSM}
+                  gridGap={SPACING.spacing12}
                 >
                   <Icon
                     size="2.5rem"
