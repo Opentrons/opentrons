@@ -73,6 +73,7 @@
   "disconnecting_from_wifi_network": "Disconnecting from Wi-Fi network {{ssid}}",
   "display_brightness": "Display Brightness",
   "display_led_lights": "Display LED Lights",
+  "display_led_lights_description": "Turn on or off the strip of color lights on the front of the robot.",
   "display_sleep_settings": "Display Sleep Settings",
   "done": "Done",
   "download_calibration_data": "Download calibration data",

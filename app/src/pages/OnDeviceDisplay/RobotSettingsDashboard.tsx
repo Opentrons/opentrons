@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   ALIGN_FLEX_END,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -28,11 +29,11 @@ import { getBuildrootUpdateAvailable } from '../../redux/buildroot'
 import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import { useLights } from '../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from './hooks'
 import {
   DeviceReset,
-  DisplayLEDLights,
   TouchscreenBrightness,
   TouchScreenSleep,
   TextSize,
@@ -48,17 +49,15 @@ import type { Dispatch, State } from '../../redux/types'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
-  height: 6.875rem;
   margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.medGreyEnabled};
-  padding: 1.5rem;
+  padding: ${SPACING.spacingM} ${SPACING.spacing5};
   border-radius: ${BORDERS.size_four};
 `
 export type SettingOption =
   | 'NetworkSettings'
   | 'RobotName'
   | 'RobotSystemVersion'
-  | 'DisplayLEDLights'
   | 'TouchscreenSleep'
   | 'TouchscreenBrightness'
   | 'TextSize'
@@ -84,6 +83,7 @@ export function RobotSettingsDashboard(): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
+  const { lightsOn, toggleLights } = useLights()
 
   return (
     // This top level Flexbox only exists to position the temporary
@@ -144,9 +144,12 @@ export function RobotSettingsDashboard(): JSX.Element {
           {/* Display LED Lights */}
           <RobotSettingButton
             settingName={t('display_led_lights')}
-            currentOption="DisplayLEDLights"
+            settingInfo={t('display_led_lights_description')}
             setCurrentOption={setCurrentOption}
             iconName="light"
+            ledLights
+            lightsOn={Boolean(lightsOn)}
+            toggleLights={toggleLights}
           />
 
           {/* Touchscreen Sleep */}
@@ -220,6 +223,9 @@ interface RobotSettingButtonProps {
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
   devToolsOn?: boolean
+  ledLights?: boolean
+  lightsOn?: boolean
+  toggleLights?: () => void
 }
 
 const RobotSettingButton = ({
@@ -231,6 +237,9 @@ const RobotSettingButton = ({
   iconName,
   enabledDevTools,
   devToolsOn,
+  ledLights,
+  lightsOn,
+  toggleLights,
 }: RobotSettingButtonProps): JSX.Element => {
   const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -238,92 +247,99 @@ const RobotSettingButton = ({
   const handleClick = (): void => {
     if (currentOption != null && setCurrentOption != null) {
       setCurrentOption(currentOption)
-    } else {
+    } else if (Boolean(enabledDevTools)) {
       dispatch(toggleDevtools())
+    } else if (Boolean(ledLights)) {
+      if (toggleLights != null) toggleLights()
     }
   }
 
   return (
-    <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
+    <Btn
+      css={SETTING_BUTTON_STYLE}
+      onClick={handleClick}
+      display={DISPLAY_FLEX}
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacing24}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing24}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
-          <Icon name={iconName} size="3rem" />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing2}
-            alignItems={ALIGN_FLEX_START}
-            justifyContent={JUSTIFY_CENTER}
-          >
+        <Icon name={iconName} size="3rem" />
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing2}
+          alignItems={ALIGN_FLEX_START}
+          justifyContent={JUSTIFY_CENTER}
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {settingName}
+          </StyledText>
+          {settingInfo != null ? (
             <StyledText
-              fontSize="1.5rem"
-              lineHeight="1.875rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {settingName}
-            </StyledText>
-            {settingInfo != null ? (
-              <StyledText
-                color={COLORS.darkGreyEnabled}
-                fontSize="1.375rem"
-                lineHeight="1.875rem"
-                fontWeight="400"
-              >
-                {settingInfo}
-              </StyledText>
-            ) : null}
-          </Flex>
-        </Flex>
-        {isUpdateAvailable ?? false ? (
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap="0.75rem"
-            alignItems={ALIGN_CENTER}
-            backgroundColor={COLORS.warningBackgroundMed}
-            padding={`0.75rem ${SPACING.spacing16}`}
-            borderRadius={BORDERS.size_four}
-          >
-            <Icon
-              name="ot-alert"
-              size="1.75rem"
-              color={COLORS.warningEnabled}
-            />
-            <StyledText
-              fontSize="1.375rem"
-              lineHeight="1.625rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {t('update_available')}
-            </StyledText>
-          </Flex>
-        ) : null}
-
-        {enabledDevTools != null ? (
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap="0.75rem"
-            alignItems={ALIGN_CENTER}
-            backgroundColor={COLORS.transparent}
-            padding={`0.75rem ${SPACING.spacing16}`}
-            borderRadius={BORDERS.size_four}
-          >
-            <StyledText
-              fontSize="1.75rem"
-              lineHeight="2.25rem"
+              color={COLORS.darkGreyEnabled}
+              as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
+              textAlign={TYPOGRAPHY.textAlignLeft}
             >
-              {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
+              {settingInfo}
             </StyledText>
-          </Flex>
-        ) : null}
-        {enabledDevTools == null ? (
-          <Icon name="chevron-right" size="3rem" />
-        ) : null}
+          ) : null}
+        </Flex>
       </Flex>
+      {isUpdateAvailable ?? false ? (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap="0.75rem"
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.warningBackgroundMed}
+          padding={`0.75rem ${SPACING.spacing4}`}
+          borderRadius={BORDERS.size_four}
+        >
+          <Icon name="ot-alert" size="1.75rem" color={COLORS.warningEnabled} />
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('update_available')}
+          </StyledText>
+        </Flex>
+      ) : null}
+
+      {enabledDevTools != null ? (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap="0.75rem"
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.transparent}
+          padding={`0.75rem ${SPACING.spacing4}`}
+          borderRadius={BORDERS.size_four}
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
+          </StyledText>
+        </Flex>
+      ) : null}
+
+      {ledLights != null ? (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap="0.75rem"
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.transparent}
+          padding={`0.75rem ${SPACING.spacing4}`}
+          borderRadius={BORDERS.size_four}
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}
+          </StyledText>
+        </Flex>
+      ) : null}
+
+      {enabledDevTools == null && ledLights == null ? (
+        <Icon name="chevron-right" size="3rem" />
+      ) : null}
     </Btn>
   )
 }
@@ -364,8 +380,6 @@ function SettingsContent({
           setCurrentOption={setCurrentOption}
         />
       )
-    case 'DisplayLEDLights':
-      return <DisplayLEDLights setCurrentOption={setCurrentOption} />
     case 'TouchscreenSleep':
       return <TouchScreenSleep setCurrentOption={setCurrentOption} />
     case 'TouchscreenBrightness':
