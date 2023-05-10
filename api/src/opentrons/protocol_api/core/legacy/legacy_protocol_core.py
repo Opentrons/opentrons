@@ -266,7 +266,7 @@ class LegacyProtocolCore(
             raise RuntimeError(f"Could not find specified module: {model.value}")
 
         # Load geometry to match the hardware module that we found connected.
-        geometry = module_geometry.create_geometry_for_ot2_deck(
+        geometry = module_geometry.create_geometry(
             definition=selected_definition,
             parent=self._deck_layout.position_for(resolved_location),
             configuration=configuration,

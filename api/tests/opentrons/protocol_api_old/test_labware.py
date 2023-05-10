@@ -472,7 +472,7 @@ def test_return_tips(opentrons_96_tiprack_300ul) -> None:
 )
 def test_module_geometry_load(module_model) -> None:
     definition = module_geometry.load_definition(module_model)
-    geometry = module_geometry.create_geometry_for_ot2_deck(
+    geometry = module_geometry.create_geometry(
         definition=definition,
         parent=Location(Point(0, 0, 0), "3"),
         configuration=None,
@@ -506,7 +506,7 @@ def test_module_load_labware(module_name) -> None:
     labware_def = labware.get_labware_definition(labware_name)
     mod_model = validation.ensure_module_model(module_name)
     mod_definition = module_geometry.load_definition(mod_model)
-    mod = module_geometry.create_geometry_for_ot2_deck(
+    mod = module_geometry.create_geometry(
         mod_definition,
         Location(Point(0, 0, 0), "test"),
         None,

@@ -26,7 +26,7 @@ def trough(trough_definition):
 @pytest.fixture(scope="session")
 def module(trough):
     deck = Deck(deck_type=STANDARD_OT2_DECK)
-    mod = module_geometry.create_geometry_for_ot2_deck(
+    mod = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
         ),

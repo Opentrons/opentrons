@@ -385,7 +385,7 @@ def test_load_module(
     ).then_return(True)
 
     decoy.when(
-        mock_module_geometry.create_geometry_for_ot2_deck(
+        mock_module_geometry.create_geometry(
             definition=defn_2,
             parent=Location(Point(1, 2, 3), None),
             configuration=None,

@@ -153,7 +153,7 @@ def test_create_geometry(
     expected_repr: str,
 ) -> None:
     """It should load an API-version-specific module from its definition."""
-    load_result = create_geometry_for_ot2_deck(
+    load_result = create_geometry(
         definition=module_definition,
         parent=Location(point=Point(0, 0, 0), labware=expected_parent_location),
         configuration=None,
@@ -174,7 +174,7 @@ def test_create_geometry_raises(
     v1_mag_module_schema_v3_definition.update({"moduleType": "blahblahModuleType"})  # type: ignore[typeddict-item]
 
     with pytest.raises(ValueError):
-        create_geometry_for_ot2_deck(
+        create_geometry(
             definition=v1_mag_module_schema_v3_definition,
             parent=Location(point=Point(0, 0, 0), labware=None),
             configuration=None,

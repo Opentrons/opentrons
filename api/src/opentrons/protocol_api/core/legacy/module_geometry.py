@@ -421,7 +421,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         ) in get_east_west_slots(int(heater_shaker_slot))
 
 
-def create_geometry_for_ot2_deck(
+def create_geometry(
     definition: ModuleDefinitionV3,
     parent: Location,
     configuration: Optional[str],
@@ -448,8 +448,9 @@ def create_geometry_for_ot2_deck(
     else:
         par = str(parent.labware.object)
 
-    # Assume this is for an OT-2, so we can hard-code "ot2_standard".
-    # Also assume that "ot2_short_trash" has the same transforms as "ot2_standard."
+    # This ModuleGeometry class is only used in Python Protocol API versions <=2.13,
+    # which only support the OT-2, so we can ignore OT-3s and hard-code "ot2_standard."
+    # We also assume that "ot2_short_trash" has the same transforms as "ot2_standard."
     xforms_ser = (
         definition["slotTransforms"]
         .get("ot2_standard", {})

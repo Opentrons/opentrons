@@ -280,7 +280,7 @@ def test_direct_cp(deck):
 
 @pytest.mark.ot2_only  # Due to usage of create_geometry_for_ot2_deck().
 def test_gen2_module_transforms(deck):
-    tmod = module_geometry.create_geometry_for_ot2_deck(
+    tmod = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
         ),
@@ -288,7 +288,7 @@ def test_gen2_module_transforms(deck):
         configuration=None,
     )
     assert tmod.labware_offset == Point(-1.45, -0.15, 80.09)
-    tmod2 = module_geometry.create_geometry_for_ot2_deck(
+    tmod2 = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
         ),
@@ -297,13 +297,13 @@ def test_gen2_module_transforms(deck):
     )
     assert tmod2.labware_offset == Point(1.15, -0.15, 80.09)
 
-    mmod = module_geometry.create_geometry_for_ot2_deck(
+    mmod = module_geometry.create_geometry(
         definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
         parent=deck.position_for("1"),
         configuration=None,
     )
     assert mmod.labware_offset == Point(-1.175, -0.125, 82.25)
-    mmod2 = module_geometry.create_geometry_for_ot2_deck(
+    mmod2 = module_geometry.create_geometry(
         definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
         parent=deck.position_for("3"),
         configuration=None,
@@ -364,7 +364,7 @@ def test_should_dodge(deck):
     assert not should_dodge_thermocycler(
         deck, deck.position_for(4), deck.position_for(9)
     )
-    deck[7] = module_geometry.create_geometry_for_ot2_deck(
+    deck[7] = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             ThermocyclerModuleModel.THERMOCYCLER_V1
         ),
@@ -414,7 +414,7 @@ def test_thermocycler_present(deck) -> None:
     assert not deck.thermocycler_present
 
     # Add a thermocycler
-    deck[7] = module_geometry.create_geometry_for_ot2_deck(
+    deck[7] = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             ThermocyclerModuleModel.THERMOCYCLER_V1
         ),
