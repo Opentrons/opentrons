@@ -36,6 +36,7 @@ AXIS_FSTEP_CONVERT = {'X': (12.7*np.pi)/(200*AXIS_MICROSTEP['X']),
 
 TEST_LIST = {}
 
+ACCEL = 1000
 TEST_PARAMETERS = {
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
@@ -151,7 +152,7 @@ TEST_PARAMETERS = {
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
         max_speed=500,
-        acceleration=1000,
+        acceleration=ACCEL,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
@@ -159,7 +160,7 @@ SETTINGS = {
     ),
     OT3Axis.Y: GantryLoadSettings(
         max_speed=500,
-        acceleration=1000,
+        acceleration=ACCEL,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
@@ -418,6 +419,7 @@ async def _main(is_simulating: bool) -> None:
                     print(p)
                     SETTINGS[AXIS_MAP[test_axis]].run_current = p['CURRENT']
                     SETTINGS[AXIS_MAP[test_axis]].max_speed = p['SPEED']
+                    SETTINGS[AXIS_MAP[test_axis]].acceleration = ACCEL
 
                     #update the robot settings to use test speed/accel
                     await match_z_settings(test_axis,
@@ -467,13 +469,15 @@ def parameter_range(test_load, test_axis, p_type):
     stop = TEST_PARAMETERS[test_load][test_axis][p_type]['MAX'] + step
     return np.arange(start, stop, step)
 
+START_FREQ = 10
+FREQ_INC = 50
 def speed_range_from_freq(test_axis):
     # freq_range = np.arange(730*AXIS_MICROSTEP[test_axis],
     #                    750*AXIS_MICROSTEP[test_axis],
     #                    1*AXIS_MICROSTEP[test_axis])
-    freq_range = np.arange(730*AXIS_MICROSTEP[test_axis],
-                       750*AXIS_MICROSTEP[test_axis],
-                       1*AXIS_MICROSTEP[test_axis])
+    freq_range = np.arange(START_FREQ*AXIS_MICROSTEP[test_axis],
+                       10000*AXIS_MICROSTEP[test_axis],
+                       FREQ_INC*AXIS_MICROSTEP[test_axis])
 
     #ustep/s * mm/ustep
     return freq_range*AXIS_FSTEP_CONVERT[test_axis]
@@ -495,7 +499,6 @@ def make_test_list(test_axis, test_load):
 
     return complete_test_list
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
@@ -503,6 +506,9 @@ if __name__ == "__main__":
     parser.add_argument("--cycles", type=int, default=CYCLES)
     parser.add_argument("--load", type=str, default='LOW')
     parser.add_argument("--delay", type=int, default=0)
+    parser.add_argument("--start", type=int, default=START_FREQ)
+    parser.add_argument("--inc", type=int, default=FREQ_INC)
+    parser.add_argument("--accel", type=int, default=ACCEL)
 
     args = parser.parse_args()
     CYCLES = args.cycles
@@ -510,6 +516,9 @@ if __name__ == "__main__":
     AXIS = args.axis
     LOAD = GANTRY_LOAD_MAP[args.load]
     DELAY = args.delay
+    START_FREQ = args.start
+    FREQ_INC = args.inc
+    ACCEL = args.accel
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))

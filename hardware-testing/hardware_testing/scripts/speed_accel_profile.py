@@ -41,11 +41,11 @@ TEST_PARAMETERS = {
         'Y': {
             'SPEED': {
                 'MIN': 450,
-                'MAX': 800,
-                'INC': 100},
+                'MAX': 550,
+                'INC': 50},
             'ACCEL': {
                 'MIN': 800,
-                'MAX': 2200,
+                'MAX': 1400,
                 'INC': 400}},
         'L': {
             'SPEED': {
