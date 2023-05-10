@@ -64,6 +64,7 @@ class MoveToMaintenancePositionImplementation(
             offset=_INSTRUMENT_ATTACH_OFFSET
         )
 
+        # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
         await self._hardware_api.move_to(
             mount=hardware_mount,
             abs_position=calibration_coordinates,
