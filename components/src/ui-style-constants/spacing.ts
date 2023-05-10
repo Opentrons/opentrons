@@ -14,8 +14,6 @@ export const spacing120 = '7.5rem' as const// 120px
 export const spacingAuto = 'auto' as const // auto
 
 /**  @deprecated Use px numbered values from design system */
-export const spacingSS = '0.438rem' //  7px
-/**  @deprecated Use px numbered values from design system */
 export const spacingXS = '0.313rem' //  5px
 /**  @deprecated Use px numbered values from design system */
 export const spacingXXS = '1px' // 1px
@@ -37,7 +35,6 @@ export const SPACING: { [constant: string]: string } = {
   spacing80,
   spacing120,
   spacingAuto,
-  spacingSS,
   spacingXS,
   spacingXXS,
   spacingSM,

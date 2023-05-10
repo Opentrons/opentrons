@@ -121,7 +121,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      marginLeft: SPACING.spacingSS,
+      marginLeft: SPACING.spacing8,
       color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',

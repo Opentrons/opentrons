@@ -65,8 +65,8 @@ export function InterstitialTitleBar(
           data-testid={`titlebar_${exit.title}`}
         >
           <StyledText
-            paddingRight={SPACING.spacingSS}
-            paddingTop={SPACING.spacingXS}
+            paddingRight={SPACING.spacing8}
+            paddingTop={SPACING.spacing4}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH3}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
