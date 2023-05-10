@@ -94,7 +94,7 @@ export const ConfirmAttachmentModal = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacingXL}
+        paddingTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
         alignItems={ALIGN_CENTER}
       >

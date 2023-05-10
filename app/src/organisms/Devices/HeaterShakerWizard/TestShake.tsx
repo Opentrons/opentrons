@@ -243,7 +243,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Collapsible>
-      <Divider marginTop={SPACING.spacing16} marginBottom={SPACING.spacingXL} />
+      <Divider marginTop={SPACING.spacing16} marginBottom={SPACING.spacing32} />
     </Flex>
   )
 }
