@@ -22,7 +22,7 @@ import { StyledText } from '../../../atoms/text'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 import { getShellUpdateState } from '../../../redux/shell'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons'
 
