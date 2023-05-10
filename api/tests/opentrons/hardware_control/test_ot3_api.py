@@ -53,7 +53,7 @@ from opentrons.hardware_control.backends.ot3utils import (
     axis_to_node,
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.types import Point, Mount, MountType
+from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
@@ -391,17 +391,16 @@ def mock_backend_capacitive_pass(
         (OT3Mount.LEFT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]),
         (OT3Mount.GRIPPER, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
         (Mount.EXTENSION, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
-        (MountType.EXTENSION, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
     ],
 )
 async def test_move_to_without_homing_first(
     ot3_hardware: ThreadManager[OT3API],
     mock_home: AsyncMock,
-    mount: Union[Mount, MountType, OT3Mount],
+    mount: Union[Mount, OT3Mount],
     homed_axis: List[OT3Axis],
 ) -> None:
     """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
-    if mount == OT3Mount.GRIPPER:
+    if mount in (OT3Mount.GRIPPER, Mount.EXTENSION):
         # attach a gripper if we're testing the gripper mount
         gripper_config = gc.load(GripperModel.v1)
         instr_data = AttachedGripper(config=gripper_config, id="test")

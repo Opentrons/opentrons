@@ -153,6 +153,7 @@ class OT3Axis(enum.Enum):
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
+            top_types.Mount.EXTENSION: cls.Z_G,
             OT3Mount.LEFT: cls.Z_L,
             OT3Mount.RIGHT: cls.Z_R,
             OT3Mount.GRIPPER: cls.Z_G,

@@ -195,6 +195,7 @@ class MountType(str, enum.Enum):
         mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
         return mount_map[mount]
 
+
 class PipetteMountType(enum.Enum):
     LEFT = "left"
     RIGHT = "right"
