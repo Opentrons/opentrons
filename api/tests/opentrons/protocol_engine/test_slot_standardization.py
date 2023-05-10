@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
     ModuleLocation,
     ModuleModel,
+    OFF_DECK_LOCATION,
 )
 
 
@@ -76,11 +77,16 @@ def test_standardize_labware_offset(
             "OT-3 Standard",
             DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
         ),
-        # ModuleLocations should be left alone.
+        # ModuleLocations and OFF_DECK_LOCATIONs should be left alone.
         (
             ModuleLocation(moduleId="module-id"),
             "OT-3 Standard",
             ModuleLocation(moduleId="module-id"),
+        ),
+        (
+            OFF_DECK_LOCATION,
+            "OT-3 Standard",
+            OFF_DECK_LOCATION,
         ),
     ],
 )
