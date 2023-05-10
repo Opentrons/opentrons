@@ -1545,6 +1545,7 @@ class OT3API(
             )
             await asyncio.sleep(1)
             enc_pos = await self.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
+            print(enc_pos)
             await self._move(target_up)
         return enc_pos
 
@@ -1593,6 +1594,7 @@ class OT3API(
 
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
+            enc_pos = None
         else:
             enc_pos = await self._force_pick_up_tip(realmount, spec)
 
