@@ -623,6 +623,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
+
         if isinstance(mount, top_types.Mount):
             return LiquidActionSpec(
                 axis=Axis.of_plunger(mount),

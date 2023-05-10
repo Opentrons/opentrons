@@ -12,10 +12,17 @@ import {
   DIRECTION_COLUMN,
   BORDERS,
 } from '@opentrons/components'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
+import { useRunControls } from '../../RunTimeControl/hooks'
+import { useTrackEvent } from '../../../redux/analytics'
+import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
+
+import type { Run } from '@opentrons/api-client'
 
 interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
@@ -35,15 +42,25 @@ export function RecentRunProtocolCard({
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
+  const { data: allRuns } = useAllRunsQuery()
+  const runId =
+    allRuns?.data.find(run => run.protocolId === protocolId)?.id ?? null
+  const trackEvent = useTrackEvent()
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const onResetSuccess = (createRunResponse: Run): void =>
+    runId != null
+      ? history.push(`protocols/${runId}/setup`)
+      : history.push(`protocols/${createRunResponse.data.id}`)
+  const { reset } = useRunControls(runId, onResetSuccess)
 
-  const CARD_STYLE = css`
+  const PROTOCOL_CARD_STYLE = css`
     &:active {
       background-color: ${isReadyToBeReRun
-        ? COLORS.green_three_pressed
-        : COLORS.yellow_three_pressed};
+        ? COLORS.green3Pressed
+        : COLORS.yellow3Pressed};
     }
     &:focus-visible {
-      box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
+      box-shadow: ${ODD_FOCUS_VISIBLE};
     }
   `
 
@@ -99,20 +116,22 @@ export function RecentRunProtocolCard({
     chipText = t('missing_both')
   }
   const handleCardClick = (): void => {
-    history.push(`protocols/${protocolId}`)
+    reset()
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RecentRunProtocolCard' },
+    })
+    trackProtocolRunEvent({ name: 'runAgain' })
   }
 
-  console.log(protocolName)
   return (
     <Flex
-      aria-label="RecentRunCard"
-      css={CARD_STYLE}
+      aria-label="RecentRunProtocolCard"
+      css={PROTOCOL_CARD_STYLE}
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing5}
       gridGap={SPACING.spacing5}
-      backgroundColor={
-        isReadyToBeReRun ? COLORS.green_three : COLORS.yellow_three
-      }
+      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
       borderRadius={BORDERS.size_four}
       onClick={handleCardClick}
@@ -141,7 +160,7 @@ export function RecentRunProtocolCard({
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        color={COLORS.darkBlack_seventy}
+        color={COLORS.darkBlack70}
       >
         {i18n.format(t('last_run_time'), 'capitalize')}{' '}
         {lastRun != null

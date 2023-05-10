@@ -114,7 +114,7 @@ export function RobotSettings(): JSX.Element | null {
         minHeight="calc(100vh - 3.5rem)"
         width="100%"
       >
-        <Box padding={`0 ${String(SPACING.spacing4)}`}>
+        <Box paddingX={SPACING.spacing4}>
           <Box
             color={COLORS.black}
             css={TYPOGRAPHY.h1Default}

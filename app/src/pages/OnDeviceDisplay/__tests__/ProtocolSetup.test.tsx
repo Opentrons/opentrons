@@ -213,9 +213,7 @@ describe('ProtocolSetup', () => {
 
   it('should render text, image, and buttons', () => {
     const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
-    getByText('Prepare to Run')
-    getByText(`Run: ${CREATED_AT}`)
-    getByText(`Status: ${RUN_STATUS_IDLE}`)
+    getByText('Prepare to run')
     getByText('Instruments')
     getByText('Modules')
     getByText('Labware')

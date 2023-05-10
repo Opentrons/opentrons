@@ -14,6 +14,7 @@ from .dev_server import DevServer
 # Must match our Tavern config in common.yaml.
 _SESSION_SERVER_HOST = "http://localhost"
 _SESSION_SERVER_PORT = "31950"
+_OT3_SESSION_SERVER_PORT = "31960"
 
 _SESSION_SYSTEM_SERVER_PORT = "32950"
 
@@ -87,14 +88,62 @@ def run_server(
 
         while True:
             try:
-                request_session.get(
+                health_response = request_session.get(
                     f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/health"
                 )
             except ConnectionError:
+                # The server isn't up yet to accept requests. Keep polling.
                 pass
             else:
-                break
-            time.sleep(0.5)
+                if health_response.status_code == 503:
+                    # The server is accepting requests but reporting not ready. Keep polling.
+                    pass
+                else:
+                    # The server's replied with something other than a busy indicator. Stop polling.
+                    break
+
+            time.sleep(0.1)
+        request_session.headers.update({"authenticationBearer": get_auth_token()})
+        request_session.post(
+            f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
+            json={"target": "robot"},
+        )
+        yield
+
+
+@pytest.fixture(scope="session")
+def ot3_run_server(
+    request_session: requests.Session,
+    server_temp_directory: str,
+) -> Iterator[None]:
+    """Run the robot server in a background process."""
+    with DevServer(
+        port=_OT3_SESSION_SERVER_PORT,
+        is_ot3=True,
+        ot_api_config_dir=Path(server_temp_directory),
+    ) as dev_server:
+        dev_server.start()
+
+        # Wait for a bit to get started by polling /hcpealth
+        from requests.exceptions import ConnectionError
+
+        while True:
+            try:
+                health_response = request_session.get(
+                    f"{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}/health"
+                )
+            except ConnectionError:
+                # The server isn't up yet to accept requests. Keep polling.
+                pass
+            else:
+                if health_response.status_code == 503:
+                    # The server is accepting requests but reporting not ready. Keep polling.
+                    pass
+                else:
+                    # The server's replied with something other than a busy indicator. Stop polling.
+                    break
+
+            time.sleep(0.1)
         request_session.headers.update({"authenticationBearer": get_auth_token()})
         request_session.post(
             f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
@@ -127,7 +176,7 @@ def set_disable_fast_analysis(
     request_session: requests.Session,
 ) -> Iterator[None]:
     """For integration tests that need to set then clear the
-    enableHttpProtocolSessions feature flag"""
+    disableFastProtocolUpload feature flag"""
     url = "http://localhost:31950/settings"
     data = {"id": "disableFastProtocolUpload", "value": True}
     request_session.post(url, json=data)
