@@ -14,10 +14,7 @@ import {
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,
 } from '@opentrons/discovery-client'
-import {
-  fetchSerialPortList,
-  SerialPortHttpAgent,
-} from '@opentrons/usb-bridge/node-client'
+import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import {
@@ -35,8 +32,11 @@ import {
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
 import { getProtocolSrcFilePaths } from './protocol-storage'
-
-import type { Agent } from 'http'
+import {
+  createSerialPortHttpAgent,
+  destroyUsbHttpAgent,
+  getSerialPortHttpAgent,
+} from './usb'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type {
@@ -51,7 +51,6 @@ import type { Action, Dispatch } from './types'
 import type { Config } from './config'
 
 const log = createLogger('discovery')
-const usbLog = createLogger('usb')
 
 // TODO(mc, 2018-08-09): values picked arbitrarily and should be researched
 const FAST_POLL_INTERVAL_MS = 3000
@@ -168,8 +167,6 @@ export function registerDiscovery(
     client.stop()
   })
 
-  let usbHttpAgent: SerialPortHttpAgent
-
   async function usbListener(
     _event: IpcMainInvokeEvent,
     config: AxiosRequestConfig
@@ -201,6 +198,8 @@ export function registerDiscovery(
         data = formData
       }
 
+      const usbHttpAgent = getSerialPortHttpAgent()
+
       const response = await axios.request({
         httpAgent: usbHttpAgent,
         ...config,
@@ -210,7 +209,7 @@ export function registerDiscovery(
       return { data: response.data }
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      usbLog.debug(`usbListener error ${e?.message ?? 'unknown'}`)
+      log.debug(`usbListener error ${e?.message ?? 'unknown'}`)
     }
   }
 
@@ -222,7 +221,7 @@ export function registerDiscovery(
       )?.name
 
     if (cachedUsbRobotName != null) {
-      usbLog.debug(
+      log.debug(
         `deleting old opentrons-usb entry with name ${cachedUsbRobotName}`
       )
       client.removeRobot(cachedUsbRobotName)
@@ -240,25 +239,17 @@ export function registerDiscovery(
 
         // bail if no OT-3 found
         if (ot3UsbSerialPort == null) {
-          usbLog.debug('no OT-3 serial port found')
+          log.debug('no OT-3 serial port found')
           return
         }
 
-        const httpAgent = new SerialPortHttpAgent({
-          maxFreeSockets: 1,
-          maxSockets: 1,
-          maxTotalSockets: 1,
-          keepAlive: true,
-          keepAliveMsecs: 10000,
-          path: ot3UsbSerialPort?.path ?? '',
-          logger: usbLog,
-        })
-
-        usbHttpAgent = httpAgent
+        createSerialPortHttpAgent(ot3UsbSerialPort.path)
 
         ipcMain.handle('usb:request', usbListener)
 
         removeCachedUsbRobot()
+
+        const usbHttpAgent = getSerialPortHttpAgent()
 
         client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
@@ -272,7 +263,8 @@ export function registerDiscovery(
         })
       })
       .catch(e =>
-        usbLog.debug(`fetchSerialPortList error ${JSON.stringify(e)}`)
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        log.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
       )
   }
 
@@ -311,7 +303,7 @@ export function registerDiscovery(
         break
       case USB_DEVICE_REMOVED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          usbHttpAgent.destroy()
+          destroyUsbHttpAgent()
           ipcMain.removeHandler('usb:request')
           // TODO(bh, 2023-05-05): we actually still want this robot to show up in the not available list
           removeCachedUsbRobot()
