@@ -26,7 +26,11 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+} from '../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
 
@@ -131,10 +135,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
     reset()
     trackEvent({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'HistoricalProtocolRun' },
     })
-    trackProtocolRunEvent({ name: 'runAgain' })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {

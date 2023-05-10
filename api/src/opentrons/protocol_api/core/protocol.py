@@ -8,6 +8,7 @@ from typing import Generic, List, Optional, Union, Tuple
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
@@ -27,6 +28,11 @@ class AbstractProtocol(
     @abstractmethod
     def fixed_trash(self) -> LabwareCoreType:
         """Get the fixed trash labware core."""
+        ...
+
+    @property
+    @abstractmethod
+    def robot_type(self) -> RobotType:
         ...
 
     @abstractmethod
@@ -174,5 +180,5 @@ class AbstractProtocol(
     @abstractmethod
     def get_labware_location(
         self, labware_core: LabwareCoreType
-    ) -> Union[DeckSlotName, ModuleCoreType, None]:
+    ) -> Union[str, ModuleCoreType, None]:
         """Get labware parent location."""

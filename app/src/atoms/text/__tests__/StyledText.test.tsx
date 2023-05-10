@@ -189,13 +189,96 @@ describe('StyledText', () => {
     }
     const { getByText } = render(props)
     expect(getByText('labelSemiBold')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeLabel)}`
+      `fontSize: ${TYPOGRAPHY.fontSizeLabel}`
     )
     expect(getByText('labelSemiBold')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
     expect(getByText('labelSemiBold')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight12)}`
+      `lineHeight: ${TYPOGRAPHY.lineHeight12}`
+    )
+  })
+
+  it('should render header level 2 bold style', () => {
+    props = {
+      as: 'h2Bold',
+      children: 'h2Bold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('h2Bold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize38}`
+    )
+    expect(getByText('h2Bold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
+    )
+    expect(getByText('h2Bold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight48}`
+    )
+  })
+
+  it('should render header level 3 bold style', () => {
+    props = {
+      as: 'h3Bold',
+      children: 'h3Bold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('h3Bold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize32}`
+    )
+    expect(getByText('h3Bold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
+    )
+    expect(getByText('h3Bold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight42}`
+    )
+  })
+
+  it('should render header level 4 bold style', () => {
+    props = {
+      as: 'h4Bold',
+      children: 'h4Bold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('h4Bold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize28}`
+    )
+    expect(getByText('h4Bold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
+    )
+    expect(getByText('h4Bold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight36}`
+    )
+  })
+
+  it('should render p bold style - bodyText bold', () => {
+    props = {
+      as: 'pBold',
+      children: 'pBold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('pBold')).toHaveStyle(`fontSize: ${TYPOGRAPHY.fontSize22}`)
+    expect(getByText('pBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
+    )
+    expect(getByText('pBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight28}`
+    )
+  })
+
+  it('should render label bold style - smallBodyText bold', () => {
+    props = {
+      as: 'labelBold',
+      children: 'labelBold',
+    }
+    const { getByText } = render(props)
+    expect(getByText('labelBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize20}`
+    )
+    expect(getByText('labelBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
+    )
+    expect(getByText('labelBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight24}`
     )
   })
 })

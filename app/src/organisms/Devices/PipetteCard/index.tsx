@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Box,
   Flex,
@@ -40,12 +41,12 @@ import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
-import { PipetteOffsetCalibration } from '../../../redux/calibration/api-types'
+import { Banner } from '../../../atoms/Banner'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
   pipetteId?: AttachedPipette['id'] | null
-  pipetteOffsetCalibration: PipetteOffsetCalibration | null
+  isPipetteCalibrated: boolean
   mount: Mount
   robotName: string
   is96ChannelAttached: boolean
@@ -55,7 +56,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
   const {
     pipetteInfo,
-    pipetteOffsetCalibration,
+    isPipetteCalibrated,
     mount,
     robotName,
     pipetteId,
@@ -136,8 +137,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               ? LEFT
               : (mount as PipetteMount)
           }
-          setSelectedPipette={setSelectedPipette}
-          closeFlow={() => setPipetteWizardFlow(null)}
+          closeFlow={() => {
+            setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+            setPipetteWizardFlow(null)
+          }}
           selectedPipette={
             pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
           }
@@ -188,6 +191,27 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             flex="100%"
             paddingLeft={SPACING.spacing3}
           >
+            {isOT3PipetteAttached && !isPipetteCalibrated ? (
+              <Banner type="error" marginBottom={SPACING.spacing2}>
+                <Trans
+                  t={t}
+                  i18nKey="calibration_needed"
+                  components={{
+                    calLink: (
+                      <StyledText
+                        as="p"
+                        css={css`
+                          text-decoration: underline;
+                          cursor: pointer;
+                          margin-left: 0.5rem;
+                        `}
+                        onClick={handleCalibrate}
+                      />
+                    ),
+                  }}
+                />
+              </Banner>
+            ) : null}
             <StyledText
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
@@ -238,7 +262,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               handleCalibrate={handleCalibrate}
-              isPipetteCalibrated={pipetteOffsetCalibration != null}
+              isPipetteCalibrated={isPipetteCalibrated}
             />
           </Box>
           {menuOverlay}

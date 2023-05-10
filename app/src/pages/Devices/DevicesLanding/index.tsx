@@ -16,6 +16,7 @@ import {
   Link,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -172,7 +173,7 @@ function DevicesLoadingState(): JSX.Element {
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-          display="flex"
+          display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >

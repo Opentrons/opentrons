@@ -17,8 +17,8 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
-  ALIGN_FLEX_END,
   BORDERS,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -86,23 +86,27 @@ export function RobotSettingsDashboard(): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
 
   return (
+    // This top level Flexbox only exists to position the temporary
+    // "To ODD Menu" button on the bottom. When it goes, so can this.
     <Flex
-      padding={SPACING.spacingXXL}
       flexDirection={DIRECTION_COLUMN}
       columnGap={SPACING.spacing3}
+      paddingX={SPACING.spacingXXL}
     >
       {currentOption != null ? (
-        <SettingsContent
-          currentOption={currentOption}
-          setCurrentOption={setCurrentOption}
-          networkConnection={networkConnection}
-          robotName={robotName}
-          robotServerVersion={robotServerVersion ?? 'Unknown'}
-          isUpdateAvailable={isUpdateAvailable}
-          devToolsOn={devToolsOn}
-        />
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+          <SettingsContent
+            currentOption={currentOption}
+            setCurrentOption={setCurrentOption}
+            networkConnection={networkConnection}
+            robotName={robotName}
+            robotServerVersion={robotServerVersion ?? 'Unknown'}
+            isUpdateAvailable={isUpdateAvailable}
+            devToolsOn={devToolsOn}
+          />
+        </Flex>
       ) : (
-        <>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <Navigation routes={onDeviceDisplayRoutes} />
 
           {/* Network Settings */}
@@ -191,12 +195,11 @@ export function RobotSettingsDashboard(): JSX.Element {
             enabledDevTools
             devToolsOn={devToolsOn}
           />
-        </>
+        </Flex>
       )}
-
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        padding={SPACING.spacingXXL}
         width="fit-content"
       >
         <Link to="menu">
@@ -224,7 +227,6 @@ const RobotSettingButton = ({
   settingInfo,
   currentOption,
   setCurrentOption,
-  robotName,
   isUpdateAvailable,
   iconName,
   enabledDevTools,
@@ -335,7 +337,7 @@ interface SettingsContentProps {
   isUpdateAvailable: boolean
   devToolsOn: boolean
 }
-const SettingsContent = ({
+function SettingsContent({
   currentOption,
   setCurrentOption,
   networkConnection,
@@ -343,7 +345,7 @@ const SettingsContent = ({
   robotServerVersion,
   isUpdateAvailable,
   devToolsOn,
-}: SettingsContentProps): JSX.Element => {
+}: SettingsContentProps): JSX.Element {
   switch (currentOption) {
     case 'RobotName':
       return <RobotName setCurrentOption={setCurrentOption} />

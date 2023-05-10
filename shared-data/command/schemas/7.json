@@ -30,6 +30,9 @@
       "$ref": "#/definitions/DropTipCreate"
     },
     {
+      "$ref": "#/definitions/DropTipInPlaceCreate"
+    },
+    {
       "$ref": "#/definitions/HomeCreate"
     },
     {
@@ -748,6 +751,54 @@
       },
       "required": ["params"]
     },
+    "DropTipInPlaceParams": {
+      "title": "DropTipInPlaceParams",
+      "description": "Payload required to drop a tip in place.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "homeAfter": {
+          "title": "Homeafter",
+          "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
+          "type": "boolean"
+        }
+      },
+      "required": ["pipetteId"]
+    },
+    "DropTipInPlaceCreate": {
+      "title": "DropTipInPlaceCreate",
+      "description": "Drop tip in place command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "dropTipInPlace",
+          "enum": ["dropTipInPlace"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/DropTipInPlaceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "MotorAxis": {
       "title": "MotorAxis",
       "description": "Motor axis on which to issue a home command.",
@@ -801,8 +852,7 @@
     "DeckSlotName": {
       "title": "DeckSlotName",
       "description": "Deck slot identifiers.",
-      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-      "type": "string"
+      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
     },
     "DeckSlotLocation": {
       "title": "DeckSlotLocation",
@@ -973,7 +1023,8 @@
         "magneticModuleV2",
         "thermocyclerModuleV1",
         "thermocyclerModuleV2",
-        "heaterShakerModuleV1"
+        "heaterShakerModuleV1",
+        "magneticBlockV1"
       ],
       "type": "string"
     },
@@ -1056,7 +1107,8 @@
         "p1000_single",
         "p1000_single_gen2",
         "p1000_single_gen3",
-        "p1000_multi_gen3"
+        "p1000_multi_gen3",
+        "p1000_96"
       ],
       "type": "string"
     },

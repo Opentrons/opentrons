@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
+} from '../../redux/analytics'
 import {
   Flex,
   Icon,
@@ -81,7 +84,7 @@ export function CustomLabwareOverflowMenu(
     e.preventDefault()
     e.stopPropagation()
     trackEvent({
-      name: 'openLabwareCreatorFromLabwareOverflowMenu',
+      name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
       properties: {},
     })
     setShowOverflowMenu(false)

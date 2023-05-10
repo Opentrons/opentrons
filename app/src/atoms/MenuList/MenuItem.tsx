@@ -43,14 +43,13 @@ export const MenuItem = styled.button<ButtonProps>`
     &:hover,
     &:active {
       background-color: ${({ isAlert }) =>
-        isAlert ? COLORS.errorEnabled : COLORS.darkBlack_twenty};
+        isAlert ? COLORS.errorEnabled : COLORS.darkBlack20};
     }
 
     &:disabled {
       background-color: ${({ isAlert }) =>
         isAlert ? COLORS.errorEnabled : COLORS.transparent};
-      color: ${({ isAlert }) =>
-        isAlert ? COLORS.white : COLORS.darkBlack_sixty};
+      color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.darkBlack60)};
     }
   }
 `

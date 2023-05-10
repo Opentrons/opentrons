@@ -52,7 +52,7 @@ describe('NameRobot', () => {
   it('should render text, button and keyboard', () => {
     const [{ getByText, getByRole, queryByRole }] = render()
     getByText('Name your robot')
-    getByText('Don’t worry, you can always change this in your settings.')
+    getByText('Don’t worry, you can change this later in your settings.')
     getByText('Up to 17 characters using letters and numbers only.')
     getByRole('textbox')
     getByRole('button', { name: 'Confirm' })
@@ -123,4 +123,6 @@ describe('NameRobot', () => {
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalled()
   })
+
+  it.todo('add test for targetPath in a following PR')
 })

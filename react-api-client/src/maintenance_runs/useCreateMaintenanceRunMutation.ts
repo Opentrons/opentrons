@@ -2,6 +2,7 @@ import {
   HostConfig,
   MaintenanceRun,
   createMaintenanceRun,
+  CreateMaintenanceRunData,
 } from '@opentrons/api-client'
 import {
   UseMutationResult,
@@ -15,15 +16,19 @@ import type { AxiosError } from 'axios'
 export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
   MaintenanceRun,
   AxiosError,
-  void
+  CreateMaintenanceRunData
 > & {
-  createMaintenanceRun: UseMutateFunction<MaintenanceRun, AxiosError, void>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError,
+    CreateMaintenanceRunData
+  >
 }
 
 export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<
   MaintenanceRun,
   AxiosError,
-  void
+  CreateMaintenanceRunData
 >
 
 export function useCreateMaintenanceRunMutation(
@@ -33,10 +38,14 @@ export function useCreateMaintenanceRunMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const mutation = useMutation<MaintenanceRun, AxiosError>(
+  const mutation = useMutation<
+    MaintenanceRun,
+    AxiosError,
+    CreateMaintenanceRunData
+  >(
     [host, 'maintenance_runs'],
-    () =>
-      createMaintenanceRun(host as HostConfig)
+    (createMaintenanceRunData = {}) =>
+      createMaintenanceRun(host as HostConfig, createMaintenanceRunData)
         .then(response => response.data)
         .catch(e => {
           throw e

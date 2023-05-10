@@ -4,8 +4,9 @@ export interface GripperData {
   data: {
     jawState: string
     calibratedOffset: {
-      offset: [number, number, number]
+      offset: { x: number; y: number; z: number }
       source: string
+      last_modified?: string
     }
   }
   instrumentModel: string
@@ -18,6 +19,11 @@ export interface PipetteData {
     channels: number
     min_volume: number
     max_volume: number
+    calibratedOffset: {
+      offset: { x: number; y: number; z: number }
+      source: string
+      last_modified?: string
+    }
   }
   instrumentName: string
   instrumentModel: string

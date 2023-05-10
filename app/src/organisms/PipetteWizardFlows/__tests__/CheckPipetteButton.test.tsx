@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { CheckPipetteButton } from '../CheckPipetteButton'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
@@ -9,8 +9,8 @@ const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
 
 jest.mock('@opentrons/react-api-client')
 
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 
 describe('CheckPipetteButton', () => {
@@ -24,7 +24,7 @@ describe('CheckPipetteButton', () => {
       isOnDevice: false,
       isFetching: false,
     }
-    mockUsePipettesQuery.mockReturnValue({
+    mockUseInstrumentsQuery.mockReturnValue({
       refetch,
     } as any)
   })
@@ -46,6 +46,6 @@ describe('CheckPipetteButton', () => {
       isOnDevice: true,
     }
     const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_default')
+    getByLabelText('SmallButton_primary')
   })
 })

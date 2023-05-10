@@ -1,18 +1,20 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   Box,
   POSITION_RELATIVE,
   COLORS,
-  OVERFLOW_SCROLL,
+  OVERFLOW_AUTO,
   useIdle,
+  useScrolling,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { BackButton } from '../atoms/buttons'
-import { SleepScreen } from '../organisms/OnDeviceDisplay/SleepScreen'
+import { SleepScreen } from '../atoms/SleepScreen'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
@@ -26,22 +28,24 @@ import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDa
 import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
+import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { PortalRoot as ModalPortalRoot } from './portal'
-import { getOnDeviceDisplaySettings } from '../redux/config'
+import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
 
+import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
   {
     Component: Welcome,
     exact: true,
-    name: 'Get started',
-    path: '/get-started',
+    name: 'Welcome',
+    path: '/welcome',
   },
   {
     Component: TempODDMenu,
@@ -86,14 +90,13 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     navLinkTo: '/protocols',
     path: '/protocols',
   },
-  // insert protocol subroutes
+  // insert protocol sub-routes
   {
     Component: ProtocolDetails,
     exact: true,
     name: 'Protocol Details',
     path: '/protocols/:protocolId',
   },
-  // TODO(bh: 2022-12-5): these "protocol run" page are a rough guess based on existing designs and site map
   // expect to change or add additional route params
   {
     Component: ProtocolSetup,
@@ -108,6 +111,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/protocols/:runId/run',
   },
   {
+    Component: RunSummary,
+    exact: true,
+    name: 'Protocol Run Summary',
+    path: '/protocols/:runId/summary',
+  },
+  {
     Component: InstrumentsDashboard,
     exact: true,
     name: 'Instruments',
@@ -120,7 +129,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     name: 'Instrument Detail',
     path: '/instruments/:mount',
   },
-  // insert attach instruments subroutes
+  // insert attach instruments sub-routes
   {
     Component: RobotSettingsDashboard,
     exact: true,
@@ -128,7 +137,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     navLinkTo: '/robot-settings',
     path: '/robot-settings',
   },
-  // insert robot settings subroutes
+  // insert robot settings sub-routes
   {
     Component: () => (
       <>
@@ -171,18 +180,69 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
   'scroll',
 ]
 
+const TURN_OFF_BACKLIGHT = 7
+
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const { sleepMs } = useSelector(getOnDeviceDisplaySettings)
+  const { sleepMs, unfinishedUnboxingFlowRoute, brightness } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const targetPath =
+    unfinishedUnboxingFlowRoute != null
+      ? unfinishedUnboxingFlowRoute
+      : '/dashboard'
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
     events: onDeviceDisplayEvents,
     initialState: false,
   }
+  const [usersBrightness, setUsersBrightness] = React.useState(brightness)
+  const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
+  const scrollRef = React.useRef(null)
+  const isScrolling = useScrolling(scrollRef)
+
+  const TOUCH_SCREEN_STYLE = css`
+    position: ${POSITION_RELATIVE};
+    width: 100%;
+    height: 100%;
+    background-color: ${COLORS.white};
+    overflow-y: ${OVERFLOW_AUTO};
+
+    &::-webkit-scrollbar {
+      display: ${isScrolling ? undefined : 'none'};
+      width: 0.75rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      margin-top: 170px;
+      margin-bottom: 170px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${COLORS.darkBlack40};
+      border-radius: 11px;
+    }
+  `
+
+  React.useEffect(() => {
+    if (isIdle) {
+      setUsersBrightness(brightness)
+      dispatch(
+        updateConfigValue(
+          'onDeviceDisplaySettings.brightness',
+          TURN_OFF_BACKLIGHT
+        )
+      )
+    } else {
+      dispatch(
+        updateConfigValue('onDeviceDisplaySettings.brightness', usersBrightness)
+      )
+    }
+  }, [dispatch, isIdle, usersBrightness])
 
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%">
+      <Box width="100%" css="user-select: none;">
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (
@@ -192,13 +252,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 ({ Component, exact, path }: RouteProps) => {
                   return (
                     <Route key={path} exact={exact} path={path}>
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.white}
-                        overflow={OVERFLOW_SCROLL}
-                      >
+                      <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
                         <ModalPortalRoot />
                         <Component />
                       </Box>
@@ -206,7 +260,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   )
                 }
               )}
-              <Redirect exact from="/" to="/dashboard" />
+              <Redirect exact from="/" to={targetPath} />
             </Switch>
           </ToasterOven>
         )}
