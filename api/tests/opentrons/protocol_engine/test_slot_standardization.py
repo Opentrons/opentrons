@@ -116,6 +116,57 @@ def test_standardize_load_labware_command(
     assert subject.standardize_command(original, robot_type) == expected
 
 
+@pytest.mark.parametrize(
+    ("original_location", "robot_type", "expected_location"),
+    [
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            "OT-2 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            "OT-3 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+            "OT-2 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        ),
+        (
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+            "OT-3 Standard",
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        ),
+    ],
+)
+def test_standardize_load_module_command(
+    original_location: LabwareLocation,
+    robot_type: RobotType,
+    expected_location: LabwareLocation,
+) -> None:
+    original = commands.LoadModuleCreate(
+        intent=CommandIntent.SETUP,
+        key="key",
+        params=commands.LoadModuleParams(
+            location=original_location,
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            moduleId="moduleId",
+        ),
+    )
+    expected = commands.LoadModuleCreate(
+        intent=CommandIntent.SETUP,
+        key="key",
+        params=commands.LoadModuleParams(
+            location=expected_location,
+            model=ModuleModel.MAGNETIC_MODULE_V1,
+            moduleId="moduleId",
+        ),
+    )
+    assert subject.standardize_command(original, robot_type) == expected
+
+
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_standardize_other_commands(robot_type: RobotType) -> None:
     original = commands.HomeCreate(params=commands.HomeParams())
