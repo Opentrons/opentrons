@@ -77,7 +77,7 @@ class Gripper_Lifetime_Test:
             "Gripper":"None",
             "State":"None",
             "Jaw State":"None",
-            "Jaw Width":"None",
+            "Jaw Displacement":"None",
             "Encoder Position":"None",
         }
         self.states = {
@@ -135,9 +135,9 @@ class Gripper_Lifetime_Test:
         jaw_state = self.api._gripper_handler.gripper.state
         return jaw_state
 
-    def _get_jaw_width(self):
-        jaw_width = self.api._gripper_handler.gripper.current_jaw_displacement
-        return jaw_width
+    def _get_jaw_displacement(self):
+        jaw_displacement = self.api._gripper_handler.gripper.current_jaw_displacement
+        return jaw_displacement
 
     async def _record_data(self):
         elapsed_time = (time.time() - self.start_time)/60
@@ -145,7 +145,7 @@ class Gripper_Lifetime_Test:
         self.test_data["Cycle"] = str(self.cycle)
         self.test_data["State"] = str(self.current_state)
         self.test_data["Jaw State"] = str(self._get_jaw_state()).split('.')[1]
-        self.test_data["Jaw Width"] = str(self._get_jaw_width())
+        self.test_data["Jaw Displacement"] = str(self._get_jaw_displacement())
         # self.test_data["Encoder Position"] = str(await self._get_encoder())
         self.test_data["Encoder Position"] = "(0.0;0.0;0.0)"
         test_data = self.dict_values_to_line(self.test_data)
