@@ -158,7 +158,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             ) : (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                padding={SPACING.spacing40}
+                padding={SPACING.spacing32}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 height="29.5rem"
               >
