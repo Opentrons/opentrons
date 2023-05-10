@@ -333,7 +333,7 @@ def test_drop_tip(
     drop_tip_command: commands.DropTip,
     drop_tip_in_place_command: commands.DropTipInPlace,
 ) -> None:
-    """It should be able to reset tip tracking state."""
+    """It should be clear tip length when a tip is dropped."""
     subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
     subject.handle_action(
         actions.AddPipetteConfigAction(
