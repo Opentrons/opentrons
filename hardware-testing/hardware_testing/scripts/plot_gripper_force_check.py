@@ -117,10 +117,10 @@ class Plot:
 
         y_range = round(y_range, 3)
         y_avg = round(y_avg, 3)
-        y_avg_xpos = 1
+        y_avg_xpos = df[x_axis].mean()
         y_avg_text = f"Avg Force = {y_avg}N ± {y_range}N"
 
-        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=200, ay_pos=100)
+        annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=100)
 
         fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True)
         fig2 = px.line(df, x=x_axis, y=[y_axis2], line_dash_sequence=["dash"], color_discrete_sequence=["red"])
@@ -128,7 +128,7 @@ class Plot:
         subfig.add_traces(fig1.data + fig2.data)
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_force_check"
-        self.plot_param["title"] = "Gripper Force Check (Period = 1/8 Lifetime)"
+        self.plot_param["title"] = "Gripper Force Check (Period = 1/4 Lifetime)"
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Output Force (N)"
         self.plot_param["x_range"] = [1, 10]
