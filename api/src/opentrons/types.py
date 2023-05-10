@@ -189,7 +189,27 @@ class MountType(str, enum.Enum):
             MountType.EXTENSION: Mount.EXTENSION,
         }[self]
 
+    @staticmethod
+    def from_hw_mount(mount: Mount) -> MountType:
+        """Convert from Mount to MountType."""
+        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
+        return mount_map[mount]
 
+class PipetteMountType(enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    COMBINED = "combined"  # added for 96-channel. Remove if not required
+
+    def to_mount_type(self) -> MountType:
+        return {
+            PipetteMountType.LEFT: MountType.LEFT,
+            PipetteMountType.RIGHT: MountType.RIGHT,
+        }[self]
+
+
+# What is this used for? Can we consolidate this into MountType?
+# If not, can we change the 'GRIPPER' mount name to 'EXTENSION' so that it's
+# consistent with all user-facing mount names?
 class OT3MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
