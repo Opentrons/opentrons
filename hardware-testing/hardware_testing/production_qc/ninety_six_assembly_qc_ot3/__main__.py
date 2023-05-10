@@ -17,6 +17,7 @@ async def _main(cfg: TestConfig) -> None:
         is_simulating=cfg.simulate,
         pipette_left="p1000_96_v3.4",
     )
+    await api.home()
     mount = OT3Mount.LEFT
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     attach_pos += Point(z=200)
