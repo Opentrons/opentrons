@@ -351,7 +351,7 @@ class SubSystemState:
     fw_update_needed: bool
     current_fw_sha: str
     pcba_revision: str
-    update_state: Union[UpdateStatus, None]
+    update_state: Union[UpdateState, None]
 
 
 BCAxes = Union[Axis, OT3Axis]

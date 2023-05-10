@@ -11,7 +11,7 @@ from pydantic.generics import GenericModel
 
 from opentrons.types import Mount
 from opentrons.calibration_storage.types import SourceType
-from opentrons.hardware_control.types import OT3Mount, SubSystem
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.types import Vec3f
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
@@ -19,6 +19,7 @@ from opentrons_shared_data.pipette.dev_types import (
     ChannelCount,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
+from robot_server.subsystems.models import SubSystem
 
 InstrumentModelT = TypeVar(
     "InstrumentModelT", bound=Union[GripperModelStr, PipetteModel]
@@ -68,20 +69,6 @@ class MountType(enum.Enum):
 
 
 MountTypesStr = Literal["left", "right", "extension"]
-SubSystemStr = Literal["pipette_left", "pipette_right", "gripper"]
-
-
-def name_for_subsystem(
-    subsystem: Literal[
-        SubSystem.pipette_right, SubSystem.pipette_left, SubSystem.gripper
-    ]
-) -> SubSystemStr:
-    if subsystem is SubSystem.pipette_right:
-        return "pipette_right"
-    if subsystem is SubSystem.pipette_left:
-        return "pipette_left"
-    if subsystem is SubSystem.gripper:
-        return "gripper"
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
@@ -100,7 +87,7 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     firmwareUpdateRequired: Optional[bool] = Field(
         None, description="Whether the instrument requires a firmware update."
     )
-    subsystemName: Optional[SubSystemStr] = Field(
+    subsystem: Optional[SubSystem] = Field(
         None,
         description="The subsystem corresponding to this pipette.",
     )

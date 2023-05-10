@@ -19,7 +19,7 @@ from opentrons.types import Mount
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount, SubSystem
+from opentrons.hardware_control.types import OT3Mount, SubSystem as HWSubSystem
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
@@ -31,8 +31,9 @@ from .instrument_models import (
     Gripper,
     AttachedInstrument,
     GripperCalibrationData,
-    name_for_subsystem,
 )
+
+from robot_server.subsystems.models import SubSystem
 
 instruments_router = APIRouter()
 
@@ -45,9 +46,7 @@ def _pipette_dict_to_pipette_res(pipette_dict: PipetteDict, mount: Mount) -> Pip
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
             serialNumber=pipette_dict["pipette_id"],
-            currentFirmwareVersion=pipette_dict.get("fw_current_version"),
-            firmwareUpdateRequired=pipette_dict.get("fw_update_required"),
-            subsystemName=name_for_subsystem(SubSystem.of_mount(mount)),
+            subsystem=SubSystem.from_hw(HWSubSystem.of_mount(mount)),
             data=PipetteData(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
@@ -63,9 +62,7 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
-        currentFirmwareVersion=gripper_dict["fw_current_version"],
-        firmwareUpdateRequired=gripper_dict["fw_update_required"],
-        subsystemName=name_for_subsystem(SubSystem.of_mount(OT3Mount.GRIPPER)),
+        subsystem=SubSystem.from_hw(HWSubSystem.of_mount(OT3Mount.GRIPPER)),
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
             calibratedOffset=GripperCalibrationData.construct(

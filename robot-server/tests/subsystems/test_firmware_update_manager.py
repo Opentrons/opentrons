@@ -18,7 +18,7 @@ from opentrons.hardware_control.types import (
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 
 from robot_server.service.task_runner import TaskRunner
-from robot_server.instruments.firmware_update_manager import (
+from robot_server.subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
     InstrumentNotFound,
     UpdateIdNotFound,

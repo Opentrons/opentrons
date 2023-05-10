@@ -1,7 +1,6 @@
 """Request and response models for /subsystems endpoints."""
 
 import enum
-from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic, cast, Dict
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -65,20 +64,12 @@ class UpdateState(enum.Enum):
     queued = "queued"
     updating = "updating"
     done = "done"
+    failed = "failed"
 
     @classmethod
     def from_hw(cls, hw_update_state: HWUpdateState) -> "UpdateState":
         return _HW_UPDATE_STATE_TO_UPDATE_STATE[hw_update_state]
 
-    def to_hw(self) -> HWUpdateState:
-        return _UPDATE_STATE_TO_HW_UPDATE_STATE[self]
-
-
-_UPDATE_STATE_TO_HW_UPDATE_STATE: Dict[UpdateState, HWUpdateState] = {
-    UpdateState.queued: HWUpdateState.queued,
-    UpdateState.updating: HWUpdateState.updating,
-    UpdateState.done: HWUpdateState.done,
-}
 
 _HW_UPDATE_STATE_TO_UPDATE_STATE: Dict[HWUpdateState, UpdateState] = {
     HWUpdateState.queued: UpdateState.queued,
@@ -90,7 +81,7 @@ _HW_UPDATE_STATE_TO_UPDATE_STATE: Dict[HWUpdateState, UpdateState] = {
 class PresentSubsystem(BaseModel):
     """Model for the status of a subsystem."""
 
-    name: str = Field(..., description="The name of a connected subsystem.")
+    name: SubSystem = Field(..., description="The name of a connected subsystem.")
     ok: bool = Field(
         ...,
         description="Whether the subsystem is running, up to date, and in a normal state.",
@@ -115,12 +106,18 @@ class UpdateProgressData(BaseModel):
 
     id: str = Field(..., description="Unique ID for the update process.")
     createdAt: datetime = Field(..., description="When the update was posted.")
-    subsystem: str = Field(..., description="The subsystem that is being updated.")
+    subsystem: SubSystem = Field(
+        ..., description="The subsystem that is being updated."
+    )
     updateStatus: UpdateState = Field(
         ..., description="Whether an update is queued, in progress or completed. "
     )
     updateProgress: int = Field(
         ..., description="Progress of the update depicted as an integer from 0 to 100."
+    )
+    updateError: Optional[str] = Field(
+        ...,
+        description="If the process failed, this will contain a string description of the reason.",
     )
 
 
@@ -128,8 +125,10 @@ class UpdateProgressSummary(BaseModel):
     """Model for a quick summary of an update's progress."""
 
     id: str = Field(..., description="Unique ID for the update process.")
-    createdAt: str = Field(..., description="When the update was posted.")
-    subsystem: str = Field(..., descripiton="The subsystem that is being updated.")
+    createdAt: datetime = Field(..., description="When the update was posted.")
+    subsystem: SubSystem = Field(
+        ..., description="The subsystem that is being updated."
+    )
     updateStatus: UpdateState = Field(
         ..., description="Whether an update is queued, in progress or completed"
     )
