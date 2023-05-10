@@ -97,7 +97,7 @@ export function Banner(props: BannerProps): JSX.Element {
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
   const BANNER_STYLE = css`
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+    border: 1px ${BORDERS.styleSolid}
       ${BANNER_PROPS_BY_TYPE[type].color};
     font-size: ${TYPOGRAPHY.fontSizeP};
     font-weight: ${TYPOGRAPHY.fontWeightRegular};

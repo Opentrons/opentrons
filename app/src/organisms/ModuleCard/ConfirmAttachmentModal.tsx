@@ -85,7 +85,7 @@ export const ConfirmAttachmentModal = (
           value={isDismissed}
         />
         <StyledText
-          paddingTop={SPACING.spacingXXS}
+          paddingTop="1px"
           paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >

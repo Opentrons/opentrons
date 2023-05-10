@@ -34,17 +34,17 @@ const StyledInput = styled.input`
   margin: ${SPACING.spacing4} 0;
   background-color: ${COLORS.white};
   border-radius: ${SPACING.spacing4};
-  border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
 
   &:active {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+    border: 1px ${BORDERS.styleSolid}
       ${COLORS.darkGreyEnabled};
   }
 
   &:hover {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
   }
 
   &:focus-visible {
@@ -52,7 +52,7 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+    border: 1px ${BORDERS.styleSolid}
       ${COLORS.darkGreyDisabled};
   }
 `

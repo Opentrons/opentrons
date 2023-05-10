@@ -233,9 +233,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`${String(SPACING.spacingXXS)} ${String(
-          BORDERS.styleSolid
-        )} ${String(COLORS.medGreyEnabled)}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
           protocolRunDetailsTab === 'setup'

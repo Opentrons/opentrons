@@ -28,8 +28,8 @@ const INPUT_STYLE = css`
   position: absolute;
   overflow: hidden;
   clip: rect(0 0 0 0);
-  height: ${SPACING.spacingXXS};
-  width: ${SPACING.spacingXXS};
+  height: 1px;
+  width: 1px;
   margin: -1px;
   padding: 0;
   border: 0;
@@ -47,7 +47,7 @@ const INNER_STYLE_VALUE = css`
   min-width: ${SPACING.spacing20};
   color: ${COLORS.blueEnabled};
   display: flex;
-  border-radius: ${SPACING.spacingXXS};
+  border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 
@@ -73,7 +73,7 @@ const INNER_STYLE_NO_VALUE = css`
   min-width: ${SPACING.spacing20};
   color: ${COLORS.darkGreyEnabled};
   display: flex;
-  border-radius: ${SPACING.spacingXXS};
+  border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 

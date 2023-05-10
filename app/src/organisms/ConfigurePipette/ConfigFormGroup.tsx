@@ -140,7 +140,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
       </Field>
       <StyledText
         paddingLeft={SPACING.spacing8}
-        paddingTop={SPACING.spacingXXS}
+        paddingTop={SPACING.spacing2}
       >
         {displayName}
       </StyledText>

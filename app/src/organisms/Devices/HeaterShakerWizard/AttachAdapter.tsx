@@ -48,14 +48,10 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3a')}
         </StyledText>
         <Flex
-          border={`${String(SPACING.spacingXXS)} solid ${String(
-            COLORS.medGreyEnabled
-          )}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
         >
           <Flex
-            padding={`${String(SPACING.spacing4)} 5rem ${String(
-              SPACING.spacing16
-            )} ${String(SPACING.spacing48)}`}
+            padding={`${SPACING.spacing4} ${SPACING.spacing80} ${SPACING.spacing16} ${SPACING.spacing48}`}
             data-testid="attach_adapter_screw_in_adapter_image"
           >
             <img height="160px" src={screwInAdapter} alt="screw_in_adapter" />
@@ -128,9 +124,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3b')}
         </StyledText>
         <Flex
-          border={`${String(SPACING.spacingXXS)} solid ${String(
-            COLORS.medGreyEnabled
-          )}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           width="100%"
         >
           <Flex
@@ -165,9 +159,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           {t('3c')}
         </StyledText>
         <Flex
-          border={`${String(SPACING.spacingXXS)} solid ${String(
-            COLORS.medGreyEnabled
-          )}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           flexDirection={DIRECTION_COLUMN}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           padding={`${String(SPACING.spacing16)} ${String(

@@ -88,13 +88,12 @@ function Input(props: InputFieldProps): JSX.Element {
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+    border: 1px ${BORDERS.styleSolid}
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${COLORS.darkGreyEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
     }
 
     & input {
@@ -110,15 +109,14 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:hover {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      border: 1px ${BORDERS.styleSolid}
         ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
     }
     &:focus {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${COLORS.darkGreyDisabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {

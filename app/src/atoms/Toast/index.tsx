@@ -186,7 +186,7 @@ export function Toast(props: ToastProps): JSX.Element {
         showODDStyle ? BORDERS.size_three : BORDERS.radiusSoftCorners
       }
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.size_one : SPACING.spacingXXS}
+      borderWidth={showODDStyle ? BORDERS.size_one : '1px'}
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}

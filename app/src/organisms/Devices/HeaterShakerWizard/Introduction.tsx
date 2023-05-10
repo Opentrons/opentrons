@@ -78,9 +78,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   return (
     <Flex
       marginTop={SPACING.spacing8}
-      border={`${String(SPACING.spacingXXS)} ${String(
-        BORDERS.styleSolid
-      )} ${String(COLORS.medGreyEnabled)}`}
+      border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
       flexDirection={DIRECTION_ROW}
       width="21.5rem"
       paddingBottom={SPACING.spacing8}

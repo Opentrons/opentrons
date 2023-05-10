@@ -214,7 +214,7 @@ export const ModulesListItem = ({
     <Box
       border={BORDERS.styleSolid}
       borderColor={COLORS.medGreyEnabled}
-      borderWidth={SPACING.spacingXXS}
+      borderWidth="1px"
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing16}
       backgroundColor={COLORS.white}

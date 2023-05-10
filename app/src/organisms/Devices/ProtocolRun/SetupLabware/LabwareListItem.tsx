@@ -51,7 +51,7 @@ const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   border-style: ${BORDERS.styleSolid};
-  border-width: ${SPACING.spacingXXS};
+  border-width: 1px;
   border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing16};
