@@ -132,8 +132,8 @@ class Plot:
             print("-> {}-axis Average Standard Deviation = ± {:.3f} mm".format(axis, self.axes_data[axis]["Standard Deviation"].mean()))
             print("-> {}-axis Average Absolute Error = {:.3f} mm".format(axis, self.axes_data[axis]["Absolute Error"].mean()))
             print("-> {}-axis Average Relative Error = {:.3f} mm".format(axis, self.axes_data[axis]["Relative Error"].mean()))
-            print("-> {}-axis Average Percent Error = {:.2f}%".format(axis, self.axes_data[axis]["Percent Error"].mean()))
-            print("-> {}-axis Average Accuracy = {:.2f}%".format(axis, self.axes_data[axis]["Accuracy"].mean()))
+            print("-> {}-axis Average Percent Error = {:.3f}%".format(axis, self.axes_data[axis]["Percent Error"].mean()))
+            print("-> {}-axis Average Accuracy = {:.3f}%".format(axis, self.axes_data[axis]["Accuracy"].mean()))
         print("")
 
     def set_legend(self, figure, legend):
