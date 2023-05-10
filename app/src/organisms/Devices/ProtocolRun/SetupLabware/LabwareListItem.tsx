@@ -18,6 +18,7 @@ import {
   BORDERS,
   WELL_LABEL_OPTIONS,
   SIZE_AUTO,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -263,7 +264,7 @@ export function LabwareListItem(
                 disabled={!isCorrectHeaterShakerAttached || isLatchLoading}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}
-                display="flex"
+                display={DISPLAY_FLEX}
                 alignItems={ALIGN_CENTER}
               />
               <StyledText as="p" width="4rem">

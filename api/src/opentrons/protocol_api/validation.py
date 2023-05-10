@@ -24,6 +24,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
     ThermocyclerStep,
 )
 
@@ -113,6 +114,7 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
     "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
+    "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
 }
 
 

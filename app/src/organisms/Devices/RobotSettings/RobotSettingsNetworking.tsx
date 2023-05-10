@@ -16,17 +16,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import {
+  useCanDisconnect,
+  useWifiList,
+} from '../../../resources/networking/hooks'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 
-import {
-  fetchStatus,
-  fetchWifiList,
-  getCanDisconnect,
-  getNetworkInterfaces,
-  getWifiList,
-} from '../../../redux/networking'
+import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 
 import { useIsOT3, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
@@ -49,7 +47,7 @@ export function RobotSettingsNetworking({
   updateRobotStatus,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const wifiList = useSelector((state: State) => getWifiList(state, robotName))
+  const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
   const dispatch = useDispatch<Dispatch>()
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isOT3 = useIsOT3(robotName)
@@ -58,9 +56,7 @@ export function RobotSettingsNetworking({
     false
   )
 
-  const canDisconnect = useSelector((state: State) =>
-    getCanDisconnect(state, robotName)
-  )
+  const canDisconnect = useCanDisconnect(robotName)
 
   // TODO(bh, 2023-1-18): get the real OT-3 USB connection info
   const isOT3ConnectedViaUSB = false
@@ -73,7 +69,6 @@ export function RobotSettingsNetworking({
   const ssid = activeNetwork?.ssid ?? null
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
-  useInterval(() => dispatch(fetchWifiList(robotName)), LIST_REFRESH_MS, true)
 
   React.useEffect(() => {
     updateRobotStatus(isRobotBusy)

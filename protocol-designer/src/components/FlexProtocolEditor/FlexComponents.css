@@ -30,7 +30,6 @@
 
 .flex_header {
   position: relative;
-  width: 919px;
   margin: 1.5rem auto auto;
 }
 
@@ -178,4 +177,16 @@
   border-bottom: 1px solid var(--c-light-gray);
   margin: 32px 0 45px;
   width: 100%;
+}
+
+.error_text {
+  color: var(--c-red);
+}
+
+.ptb_10 {
+  padding: 5px 0;
+}
+
+.pb_10 {
+  padding-bottom: 10px;
 }

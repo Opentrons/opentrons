@@ -20,7 +20,7 @@ interface ExitModalProps {
   proceed: () => void
   goBack: () => void
   flowType: PipetteWizardFlow
-  isOnDevice: boolean | null
+  isOnDevice: boolean
 }
 
 export function ExitModal(props: ExitModalProps): JSX.Element {

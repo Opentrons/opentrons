@@ -19,6 +19,7 @@ from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 )
 from ._liquid import Liquid
 
@@ -38,6 +39,7 @@ __all__ = [
     "MagneticModuleContext",
     "ThermocyclerContext",
     "HeaterShakerContext",
+    "MagneticBlockContext",
     "Labware",
     "Well",
     "Liquid",

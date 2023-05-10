@@ -21,6 +21,7 @@ import {
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
+import * as Yup from 'yup'
 import { i18n } from '../../localization'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
@@ -155,6 +156,32 @@ function FlexProtocolEditor(): JSX.Element {
       ? i18n.t('flex.round_tabs.go_to_liquids_page')
       : i18n.t('flex.round_tabs.next')
 
+  const InitialFormSchema = Yup.object().shape({
+    fields: Yup.object().shape({
+      name: Yup.string().matches(/^[a-zA-Z0-9]*$/),
+    }),
+  })
+
+  interface FormikErrors {
+    pipette?: string
+    tiprack?: string
+  }
+
+  const validateFields = (values: InitialValues): FormikErrors => {
+    const { pipettesByMount } = values
+    const errors: FormikErrors = {}
+
+    if (!pipettesByMount.left.pipetteName) {
+      errors.pipette = `${i18n.t('flex.errors.first_pipette_not_selected')}`
+    }
+
+    if (!pipettesByMount.left.tipRackList.length) {
+      errors.tiprack = `${i18n.t('flex.errors.tiprack_not_selected')}`
+    }
+
+    return errors
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex>
@@ -171,12 +198,14 @@ function FlexProtocolEditor(): JSX.Element {
           <Formik
             enableReinitialize
             initialValues={getInitialValues}
-            validateOnChange={false}
+            validateOnChange={true}
+            validate={validateFields}
+            validationSchema={InitialFormSchema}
             onSubmit={(values, actions) => {
               console.log({ values })
             }}
           >
-            {(props: { handleSubmit: () => void }) => (
+            {(props: { errors: any; handleSubmit: () => void }) => (
               <form onSubmit={props.handleSubmit}>
                 <section className={styles.editor_form}>
                   {selectComponent(selectedTab)}

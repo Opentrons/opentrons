@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -14,8 +15,8 @@ import {
   SINGLE_MOUNT_PIPETTES,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
-import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import { PipetteWizardFlows } from '../PipetteWizardFlows'
+import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
@@ -27,49 +28,72 @@ import type { PipetteMount } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 
 interface InstrumentInfoProps {
-  instrument: InstrumentData
+  // NOTE: instrument will only be null while
+  // in the middle of detach wizard which occludes
+  // the main empty contents of this page
+  instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t } = useTranslation('instruments_dashboard')
   const { instrument } = props
+  const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
-  const sharedPipetteWizardProps = {
-    mount: instrument.mount as PipetteMount,
-    selectedPipette:
-      instrument.instrumentModel === 'p1000_96'
-        ? NINETY_SIX_CHANNEL
-        : SINGLE_MOUNT_PIPETTES,
-    setSelectedPipette: () => {},
-    closeFlow: () => {
-      setWizardProps(null)
-    },
-  }
-  const sharedGripperWizardProps = {
+  const sharedGripperWizardProps: Pick<
+    React.ComponentProps<typeof GripperWizardFlows>,
+    'attachedGripper' | 'closeFlow'
+  > = {
     attachedGripper: instrument,
     closeFlow: () => {
       setWizardProps(null)
     },
   }
   const handleDetach: React.MouseEventHandler = () => {
-    setWizardProps(
-      instrument.mount === 'extension'
-        ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
-        : { ...sharedPipetteWizardProps, flowType: FLOWS.DETACH }
-    )
+    if (instrument != null) {
+      setWizardProps(
+        instrument.mount === 'extension'
+          ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
+          : {
+              closeFlow: () => {
+                setWizardProps(null)
+              },
+              onComplete: () => {
+                history.goBack()
+              },
+              mount: instrument.mount as PipetteMount,
+              selectedPipette:
+                instrument.instrumentModel === 'p1000_96'
+                  ? NINETY_SIX_CHANNEL
+                  : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.DETACH,
+            }
+      )
+    }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
-    setWizardProps(
-      instrument.mount === 'extension'
-        ? {
-            ...sharedGripperWizardProps,
-            flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
-          }
-        : { ...sharedPipetteWizardProps, flowType: FLOWS.CALIBRATE }
-    )
+    if (instrument != null) {
+      setWizardProps(
+        instrument.mount === 'extension'
+          ? {
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+            }
+          : {
+              closeFlow: () => {
+                setWizardProps(null)
+              },
+              mount: instrument.mount as PipetteMount,
+              selectedPipette:
+                instrument.instrumentModel === 'p1000_96'
+                  ? NINETY_SIX_CHANNEL
+                  : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.CALIBRATE,
+            }
+      )
+    }
   }
 
   return (
@@ -78,21 +102,29 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing5}
-      >
-        <InfoItem
-          label={t('last_calibrated')}
-          value={
-            formatTimestamp(instrument.data.calibratedOffset?.last_modified) ??
-            t('no_cal_data')
-          }
-        />
-        <InfoItem label={t('firmware_version')} value="TODO" />
-        <InfoItem label={t('serial_number')} value={instrument.serialNumber} />
-      </Flex>
+      {instrument != null ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+          marginTop={SPACING.spacing5}
+        >
+          <InfoItem
+            label={t('last_calibrated')}
+            value={
+              instrument.data.calibratedOffset?.last_modified != null
+                ? formatTimestamp(
+                    instrument.data.calibratedOffset?.last_modified
+                  )
+                : t('no_cal_data')
+            }
+          />
+          <InfoItem label={t('firmware_version')} value="TODO" />
+          <InfoItem
+            label={t('serial_number')}
+            value={instrument.serialNumber}
+          />
+        </Flex>
+      ) : null}
       <Flex gridGap={SPACING.spacing3}>
         <MediumButton
           buttonType="secondary"

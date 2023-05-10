@@ -6,6 +6,7 @@ import {
   blockedTipRackListForFlex,
   customTiprackOption,
   fontSize14,
+  pipetteSlot,
 } from '../constant'
 import {
   CheckboxField,
@@ -22,6 +23,11 @@ import styles from '../FlexComponents.css'
 import { reduce } from 'lodash'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
+interface formikContextProps {
+  pipettesByMount: any
+  tiprack: any
+}
+
 export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
@@ -29,9 +35,10 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const [selected, setSelected] = useState<string[]>([])
   const [customTipRack, setCustomTipRack] = useState(false)
   const {
-    values: { pipettesByMount },
+    values,
+    errors,
     setFieldValue,
-  } = useFormikContext<any>()
+  } = useFormikContext<formikContextProps>()
 
   const customTiprackFilteredData = [...tiprackOptions].filter(
     (i: any) =>
@@ -45,7 +52,7 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const handleNameChange = (selected: string[]): any => {
     setFieldValue(`pipettesByMount.${pipetteName}.tipRackList`, selected)
   }
-  const latestTipRackList = pipettesByMount[pipetteName].tipRackList
+  const latestTipRackList = values.pipettesByMount[pipetteName].tipRackList
   useEffect(() => {
     setSelected(latestTipRackList)
   }, [latestTipRackList])
@@ -85,8 +92,15 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
       {customTiprackFilteredData.length > 0 && (
         <ShowCustomTiprackList customTipRackProps={customTiprackFilteredData} />
       )}
-      {customTipRack &&
-        customFileUpload(customTipRack, customTiprackFilteredData, dispatch)}
+      <Flex>
+        {customTipRack &&
+          customFileUpload(customTipRack, customTiprackFilteredData, dispatch)}
+      </Flex>
+      {pipetteName === pipetteSlot.left && (
+        <StyledText as="label" className={styles.error_text}>
+          {errors.tiprack ? errors.tiprack : ''}
+        </StyledText>
+      )}
     </>
   )
 }
