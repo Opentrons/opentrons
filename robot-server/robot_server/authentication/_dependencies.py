@@ -1,6 +1,6 @@
 from aiohttp.client import ClientSession
 from aiohttp.client_exceptions import ClientConnectionError
-from fastapi import Header, Depends, status
+from fastapi import Header, Depends, status, Request
 from typing import Union
 from typing_extensions import Literal
 
@@ -36,8 +36,15 @@ async def _get_system_server_address() -> str:
     """Dependency to get the system server address from the settings file."""
     return get_settings().system_server_address
 
+def _should_check_auth(request: Request) -> bool:
+    """Filters whether an auth token actually needs to be checked based on the endpoint."""
+    if request.method == 'GET':
+        return False
+    return True
+    
 
 async def check_auth_token_header(
+    request: Request,
     authenticationBearer: Union[str, None] = Header(
         None, description="Authentication token for the client."
     ),
@@ -45,6 +52,9 @@ async def check_auth_token_header(
 ) -> None:
     """Get the request's auth token header and verify authenticity."""
     if version < _AUTH_TOKEN_MIN_VERSION:
+        return
+    
+    if not _should_check_auth(request):
         return
 
     if authenticationBearer is None:
