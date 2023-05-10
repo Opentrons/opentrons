@@ -5,6 +5,7 @@ from typing_extensions import Literal
 from math import copysign
 import pytest
 from mock import AsyncMock, patch, Mock, call, PropertyMock
+from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
@@ -64,7 +65,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteVersionType,
 )
-from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 
 @pytest.fixture
@@ -471,8 +471,14 @@ async def test_blow_out_position(
 
 
 @pytest.mark.parametrize("load_configs", load_blowout_configs)
-@given(blowout_volume=strategies.floats(min_value=0, max_value=200))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
+@given(blowout_volume=strategies.floats(min_value=0, max_value=300))
+@settings(
+    suppress_health_check=[
+        HealthCheck.function_scoped_fixture,
+        HealthCheck.filter_too_much,
+    ],
+    max_examples=20,
+)
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
     load_configs: List[Dict[str, Any]],
