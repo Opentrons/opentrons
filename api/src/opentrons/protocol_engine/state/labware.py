@@ -572,10 +572,12 @@ class LabwareView(HasState[LabwareState]):
                 that is currently in use for the protocol run.
         """
         for labware in self._state.labware_by_id.values():
-            if (
-                isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == DeckSlotName.FIXED_TRASH
-            ):
+            if isinstance(
+                labware.location, DeckSlotLocation
+            ) and labware.location.slotName in {
+                DeckSlotName.FIXED_TRASH,
+                DeckSlotName.SLOT_A3,
+            }:
                 return labware.id
 
         raise errors.LabwareNotLoadedError(
