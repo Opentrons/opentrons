@@ -57,23 +57,28 @@ export const PipetteWizardFlows = (
   const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
+
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
-  const pipetteWizardSteps =
-    props.pipetteInfo == null
-      ? getPipetteWizardSteps(
-          flowType,
-          mount,
-          selectedPipette,
-          isGantryEmpty,
-          attachedPipettes
-        )
-      : getPipetteWizardStepsForProtocol(
-          attachedPipettes,
-          props.pipetteInfo,
-          mount
-        )
+  const pipetteWizardSteps = React.useMemo(
+    () =>
+      props.pipetteInfo == null
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            attachedPipettes
+          )
+        : getPipetteWizardStepsForProtocol(
+            attachedPipettes,
+            props.pipetteInfo,
+            mount
+          ),
+    []
+  )
+
   const host = useHost()
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -86,7 +91,7 @@ export const PipetteWizardFlows = (
     attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
+      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
   const {
@@ -113,7 +118,7 @@ export const PipetteWizardFlows = (
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
-        currentStepIndex !== pipetteWizardSteps.length - 1
+        currentStepIndex !== totalStepCount
           ? currentStepIndex + 1
           : currentStepIndex
       )
