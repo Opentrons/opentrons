@@ -40,7 +40,7 @@ interface IntroContainerProps {
 
 const IntroItem = (props: IntroContainerProps): JSX.Element => {
   let multiText: JSX.Element = <div></div>
-  const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing8
+  const leftPadding = props.image != null ? SPACING.spacing24 : SPACING.spacing8
 
   if (props.subtext != null) {
     multiText = (

@@ -169,7 +169,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
 
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginY={SPACING.spacingL}
+          marginY={SPACING.spacing24}
           alignItems={ALIGN_FLEX_START}
         >
           <Flex flexDirection={DIRECTION_COLUMN} maxWidth="6.25rem">

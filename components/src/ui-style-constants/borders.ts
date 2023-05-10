@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-import { spacingXXS } from './spacing'
 import {
   blueEnabled,
   medGreyEnabled,
@@ -25,12 +24,12 @@ export const tabBorder = css`
   border-bottom-color: ${blueEnabled};
 `
 
-export const activeLineBorder = `${spacingXXS} ${styleSolid} ${blueEnabled}`
-export const lineBorder = `${spacingXXS} ${styleSolid} ${medGreyEnabled}`
-export const transparentLineBorder = `${spacingXXS} ${styleSolid} ${transparent}`
+export const activeLineBorder = `1px ${styleSolid} ${blueEnabled}`
+export const lineBorder = `1px ${styleSolid} ${medGreyEnabled}`
+export const transparentLineBorder = `1px ${styleSolid} ${transparent}`
 export const cardOutlineBorder = css`
   border-style: ${styleSolid};
-  border-width: ${spacingXXS};
+  border-width: 1px;
   border-color: ${medGreyEnabled};
   border-radius: ${radiusSoftCorners};
   &:hover {

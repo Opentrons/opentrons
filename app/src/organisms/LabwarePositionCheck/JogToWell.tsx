@@ -115,7 +115,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <Flex gridGap={SPACING.spacingL}>
+      <Flex gridGap={SPACING.spacing24}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}

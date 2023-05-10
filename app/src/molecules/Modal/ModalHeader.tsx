@@ -28,8 +28,8 @@ const closeIconStyles = css`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   border-radius: 0.875rem;
-  width: ${SPACING.spacingL};
-  height: ${SPACING.spacingL};
+  width: 1.625rem;
+  height: 1.625rem;
   &:hover {
     background-color: ${COLORS.lightGreyHover};
   }

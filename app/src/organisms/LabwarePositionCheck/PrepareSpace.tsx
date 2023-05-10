@@ -187,7 +187,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
 
 const ResponsiveTwoUpPanel = styled.div`
   display: flex;
-  grid-gap: ${SPACING.spacingL};
+  grid-gap: ${SPACING.spacing24};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: 0;

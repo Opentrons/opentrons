@@ -36,7 +36,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
-      <Flex paddingBottom={SPACING.spacingL}>
+      <Flex paddingBottom="1.625rem">
         {t('step_3_of_4_attach_adapter')}
       </Flex>
       <Flex flexDirection={DIRECTION_ROW}>
@@ -146,7 +146,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacingL}
+            marginTop="1.625rem"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             marginRight="3rem"
             data-testid="attach_adapter_alignment_text"
