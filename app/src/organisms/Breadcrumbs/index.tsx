@@ -24,6 +24,7 @@ import {
 } from '../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocol } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 
@@ -155,7 +156,7 @@ export function Breadcrumbs(): JSX.Element | null {
   return (
     <ApiHostProvider
       hostname={robot?.ip ?? null}
-      requestor={robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
       <BreadcrumbsComponent />
     </ApiHostProvider>

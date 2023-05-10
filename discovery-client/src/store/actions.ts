@@ -7,9 +7,6 @@ export const SERVICE_FOUND: 'mdns:SERVICE_FOUND' = 'mdns:SERVICE_FOUND'
 
 export const HEALTH_POLLED: 'http:HEALTH_POLLED' = 'http:HEALTH_POLLED'
 
-export const SERIAL_PORTS_POLLED: 'serialport:SERIAL_PORTS_POLLED' =
-  'serialport:SERIAL_PORTS_POLLED'
-
 export const INITIALIZE_STATE: 'client:INITIALIZE_STATE' =
   'client:INITIALIZE_STATE'
 

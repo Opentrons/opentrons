@@ -16,7 +16,12 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 
-import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
+import {
+  CONNECTABLE,
+  UNREACHABLE,
+  REACHABLE,
+  OPENTRONS_USB,
+} from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
 import { getBuildrootSession } from '../../../redux/buildroot'
 import { getDevtoolsEnabled } from '../../../redux/config'
@@ -171,7 +176,7 @@ export function RobotSettings(): JSX.Element | null {
             hostname={robot?.ip ?? null}
             port={robot?.port ?? null}
             requestor={
-              robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined
+              robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
             }
           >
             {robotSettingsContent}

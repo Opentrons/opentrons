@@ -24,6 +24,7 @@ import {
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { Slideout } from '../../atoms/Slideout'
@@ -130,7 +131,7 @@ export function ChooseProtocolSlideoutComponent(
         <ApiHostProvider
           hostname={robot.ip}
           requestor={
-            robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined
+            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
           }
         >
           <ApplyHistoricOffsets

@@ -11,10 +11,12 @@ import path from 'path'
 import {
   createDiscoveryClient,
   DEFAULT_PORT,
+} from '@opentrons/discovery-client'
+import {
+  fetchSerialPortList,
   DEFAULT_PRODUCT_ID,
   DEFAULT_VENDOR_ID,
-} from '@opentrons/discovery-client'
-import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
+} from '@opentrons/usb-bridge/node-client'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import {
@@ -23,6 +25,7 @@ import {
   DISCOVERY_REMOVE,
   CLEAR_CACHE,
 } from '@opentrons/app/src/redux/discovery/actions'
+import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
 import {
   INITIALIZED as SYSTEM_INFO_INITIALIZED,
   USB_DEVICE_ADDED,
@@ -217,7 +220,7 @@ export function registerDiscovery(
     const cachedUsbRobotName = client
       .getRobots()
       .find(robot =>
-        robot.addresses.some(address => address.ip === 'opentrons-usb')
+        robot.addresses.some(address => address.ip === OPENTRONS_USB)
       )?.name
 
     if (cachedUsbRobotName != null) {
@@ -255,7 +258,7 @@ export function registerDiscovery(
           healthPollInterval: FAST_POLL_INTERVAL_MS,
           manualAddresses: [
             {
-              ip: 'opentrons-usb',
+              ip: OPENTRONS_USB,
               port: DEFAULT_PORT,
               agent: usbHttpAgent,
             },

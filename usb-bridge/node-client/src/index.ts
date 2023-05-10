@@ -6,6 +6,7 @@ import {
 } from './usb-agent'
 import type { PortInfo } from './usb-agent'
 
+export * from './constants'
 export {
   buildUSBAgent,
   createSerialPortListMonitor,

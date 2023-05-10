@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
 import omitBy from 'lodash/omitBy'
 
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
@@ -52,7 +53,7 @@ export function fetchRobotApi(
     options.body = reqForm
   }
 
-  return host.ip === 'opentrons-usb'
+  return host.ip === OPENTRONS_USB
     ? from(
         appShellRequestor({
           headers: options.headers,

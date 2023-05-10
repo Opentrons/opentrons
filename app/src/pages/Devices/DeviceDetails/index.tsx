@@ -17,7 +17,7 @@ import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
-import { getScanning } from '../../../redux/discovery'
+import { getScanning, OPENTRONS_USB } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
 
 import type { DesktopRouteParams } from '../../../App/types'
@@ -35,7 +35,7 @@ export function DeviceDetails(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
-      requestor={robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
       <Box
         minWidth="36rem"

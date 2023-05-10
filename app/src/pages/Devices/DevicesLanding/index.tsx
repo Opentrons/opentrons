@@ -24,6 +24,7 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
+  OPENTRONS_USB,
 } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
@@ -99,7 +100,7 @@ export function DevicesLanding(): JSX.Element {
                 key={robot.name}
                 hostname={robot.ip ?? null}
                 requestor={
-                  robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined
+                  robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
                 }
               >
                 <RobotCard robot={robot} />
@@ -110,7 +111,7 @@ export function DevicesLanding(): JSX.Element {
                 key={robot.name}
                 hostname={robot.ip ?? null}
                 requestor={
-                  robot?.ip === 'opentrons-usb' ? appShellRequestor : undefined
+                  robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
                 }
               >
                 <RobotCard robot={robot} />
