@@ -260,7 +260,7 @@ def test_get_all_runs(subject: RunStore) -> None:
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
     )
 
-    result = subject.get_all()
+    result = subject.get_all(length=20)
 
     assert result == [
         RunResource(
@@ -276,6 +276,24 @@ def test_get_all_runs(subject: RunStore) -> None:
             actions=[],
         ),
     ]
+
+
+def test_get_all_runs_length_0(subject: RunStore) -> None:
+    """It gets the number of created runs supplied in length."""
+    subject.insert(
+        run_id="run-id-1",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.insert(
+        run_id="run-id-2",
+        protocol_id=None,
+        created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+    )
+
+    result = subject.get_all(length=0)
+
+    assert result == []
 
 
 def test_remove_run(subject: RunStore) -> None:
@@ -294,7 +312,7 @@ def test_remove_run(subject: RunStore) -> None:
     subject.insert_action(run_id="run-id", action=action)
     subject.remove(run_id="run-id")
 
-    assert subject.get_all() == []
+    assert subject.get_all(length=20) == []
 
 
 def test_remove_run_missing_id(subject: RunStore) -> None:
