@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     LabwareOffsetCreate,
     LabwareOffsetLocation,
     LabwareOffsetVector,
+    ModuleLocation,
     ModuleModel,
 )
 
@@ -54,6 +55,7 @@ def test_standardize_labware_offset(
 @pytest.mark.parametrize(
     ("original_location", "robot_type", "expected_location"),
     [
+        # DeckSlotLocations should have their slotName standardized.
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             "OT-2 Standard",
@@ -73,6 +75,12 @@ def test_standardize_labware_offset(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
             "OT-3 Standard",
             DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        ),
+        # ModuleLocations should be left alone.
+        (
+            ModuleLocation(moduleId="module-id"),
+            "OT-3 Standard",
+            ModuleLocation(moduleId="module-id"),
         ),
     ],
 )
