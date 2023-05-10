@@ -34,11 +34,16 @@ async def test_runs_auto_delete(
             created_run_ids = await _create_runs(
                 robot_client=robot_client, num_runs=num_to_upload
             )
+            print(f"created_run_ids: {created_run_ids}")
 
             fetched_run_ids = await _get_run_ids(robot_client=robot_client)
 
-            # Last n elements of created_run_ids.
+            print(f"fetched_run_ids: {fetched_run_ids}")
+
+            # Last n elements of .
             run_ids_to_expect = created_run_ids[-num_to_expect:]
+
+            print(f"run_ids_to_expect: {run_ids_to_expect}")
 
             assert fetched_run_ids == run_ids_to_expect
 

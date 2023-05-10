@@ -279,10 +279,27 @@ def test_get_run_missing(subject: RunStore) -> None:
                 ),
             ],
         ),
+        (
+            None,
+            [
+                RunResource(
+                    run_id="run-id-1",
+                    protocol_id=None,
+                    created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+            ],
+        ),
     ],
 )
 def test_get_all_runs(
-    subject: RunStore, length: int, expected_result: List[RunResource]
+    subject: RunStore, length: Optional[int], expected_result: List[RunResource]
 ) -> None:
     """It gets the number of created runs supplied in length."""
     subject.insert(
