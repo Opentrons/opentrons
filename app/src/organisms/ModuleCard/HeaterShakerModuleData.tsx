@@ -106,10 +106,7 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex
-      flexWrap={WRAP}
-      gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}
-    >
+    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}

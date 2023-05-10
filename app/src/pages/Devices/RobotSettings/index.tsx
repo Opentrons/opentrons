@@ -163,9 +163,7 @@ export function RobotSettings(): JSX.Element | null {
           </Flex>
         </Box>
         <Line />
-        <Box
-          padding={`${SPACING.spacing24} ${SPACING.spacing16}`}
-        >
+        <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
           <ApiHostProvider
             hostname={robot?.ip ?? null}
             port={robot?.port ?? null}

@@ -125,11 +125,7 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickLabwareCreator}>
             <StyledText css={TYPOGRAPHY.linkPSemiBold}>
               {t('open_labware_creator')}
-              <Icon
-                name="open-in-new"
-                height="10px"
-                marginLeft="0.375rem"
-              />
+              <Icon name="open-in-new" height="10px" marginLeft="0.375rem" />
             </StyledText>
           </MenuItem>
         </Flex>

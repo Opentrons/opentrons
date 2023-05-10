@@ -39,8 +39,7 @@ const StyledInput = styled.input`
   font-size: ${TYPOGRAPHY.fontSizeP};
 
   &:active {
-    border: 1px ${BORDERS.styleSolid}
-      ${COLORS.darkGreyEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
   }
 
   &:hover {
@@ -52,8 +51,7 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: 1px ${BORDERS.styleSolid}
-      ${COLORS.darkGreyDisabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
   }
 `
 

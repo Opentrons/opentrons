@@ -36,9 +36,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
-      <Flex paddingBottom="1.625rem">
-        {t('step_3_of_4_attach_adapter')}
-      </Flex>
+      <Flex paddingBottom="1.625rem">{t('step_3_of_4_attach_adapter')}</Flex>
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           color={COLORS.darkGrey}
@@ -47,9 +45,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         >
           {t('3a')}
         </StyledText>
-        <Flex
-          border={`1px solid ${COLORS.medGreyEnabled}`}
-        >
+        <Flex border={`1px solid ${COLORS.medGreyEnabled}`}>
           <Flex
             padding={`${SPACING.spacing4} ${SPACING.spacing80} ${SPACING.spacing16} ${SPACING.spacing48}`}
             data-testid="attach_adapter_screw_in_adapter_image"
@@ -123,10 +119,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         >
           {t('3b')}
         </StyledText>
-        <Flex
-          border={`1px solid ${COLORS.medGreyEnabled}`}
-          width="100%"
-        >
+        <Flex border={`1px solid ${COLORS.medGreyEnabled}`} width="100%">
           <Flex
             padding={`${SPACING.spacing20} ${SPACING.spacing40} ${SPACING.spacing32} ${SPACING.spacing32}`}
             data-testid="attach_adapter_alignment_image"

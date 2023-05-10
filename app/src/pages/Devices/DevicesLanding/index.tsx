@@ -66,10 +66,7 @@ export function DevicesLanding(): JSX.Element {
     ].length === 0
 
   return (
-    <Box
-      minWidth={SIZE_6}
-      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-    >
+    <Box minWidth={SIZE_6} padding={`${SPACING.spacing8} ${SPACING.spacing16}`}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}

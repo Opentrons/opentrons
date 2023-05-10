@@ -76,9 +76,9 @@ export function HistoricalProtocolRunOffsetDrawer(
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
     new Date(lastModifiedDeckCal).getTime() >
-    new Date(
-      uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
-    ).getTime()
+      new Date(
+        uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
+      ).getTime()
 
   return (
     <Box

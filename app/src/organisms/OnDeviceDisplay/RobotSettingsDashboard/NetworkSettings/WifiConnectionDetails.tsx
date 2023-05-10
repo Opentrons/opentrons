@@ -63,12 +63,12 @@ export function WifiConnectionDetails({
           securityType={authType}
         />
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacingXXL}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
         {ssid != null ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing3}
-            marginBottom={SPACING.spacingXXL}
+            gridGap={SPACING.spacing8}
+            marginBottom={SPACING.spacing40}
           >
             <StyledText
               fontSize={TYPOGRAPHY.fontSize22}
@@ -81,14 +81,14 @@ export function WifiConnectionDetails({
             <Btn
               display={DISPLAY_FLEX}
               width="100%"
-              padding={SPACING.spacing5}
+              padding={SPACING.spacing24}
               backgroundColor={COLORS.green3}
               borderRadius={BORDERS.size_three}
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
             >
-              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
-                <Flex gridGap={SPACING.spacing3} width="34.8125rem">
+              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+                <Flex gridGap={SPACING.spacing8} width="34.8125rem">
                   <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
                     <Icon
                       name="wifi"
@@ -97,7 +97,7 @@ export function WifiConnectionDetails({
                     />
                     <Flex
                       flexDirection={DIRECTION_COLUMN}
-                      gridGap={SPACING.spacing1}
+                      gridGap={SPACING.spacing2}
                     >
                       <StyledText
                         fontSize={TYPOGRAPHY.fontSize28}

@@ -61,9 +61,7 @@ function ProgressTrackerItem({
       marginTop="-0.75rem"
       // shorten connector length when subtasks are present
       marginBottom={
-        hasSubTasks
-          ? `-${SPACING.spacing8}`
-          : `-${SPACING.spacing20}`
+        hasSubTasks ? `-${SPACING.spacing8}` : `-${SPACING.spacing20}`
       }
       height="100%"
     />

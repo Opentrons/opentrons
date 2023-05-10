@@ -199,7 +199,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       )}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        padding={SPACING.spacingXXL}
+        padding={SPACING.spacing40}
         width="fit-content"
       >
         <Link to="menu">

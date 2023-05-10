@@ -10,5 +10,5 @@ export const spacing40 = '2.5rem' as const // 40px
 export const spacing48 = '3rem' as const // 48px
 export const spacing68 = '4.25rem' as const // 68px
 export const spacing80 = '5rem' as const // 80px
-export const spacing120 = '7.5rem' as const// 120px
+export const spacing120 = '7.5rem' as const // 120px
 export const spacingAuto = 'auto' as const // auto
