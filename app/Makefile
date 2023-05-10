@@ -11,6 +11,7 @@ PORT ?= 8090
 
 # dependency directories for dev
 shell_dir := ../app-shell
+shell_odd_dir := ../app-shell-odd
 discovery_client_dir = ../discovery-client
 
 # standard targets
@@ -46,6 +47,14 @@ dev:
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-shell"
 
+.PHONY: dev-odd
+dev-odd: export NODE_ENV := development
+dev-odd: export PORT := $(PORT)
+dev-odd:
+	concurrently --no-color --kill-others --names "server,shell" \
+		"$(MAKE) dev-server" \
+		"$(MAKE) dev-shell-odd"
+
 .PHONY: dev-server
 dev-server:
 	webpack-dev-server --hot
@@ -55,3 +64,10 @@ dev-shell:
 	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_dir) dev
 
+
+.PHONY: dev-shell-odd
+dev-shell-odd: export OT_APP_IS_ON_DEVICE := 1
+dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := /dashboard
+dev-shell-odd:
+	wait-on http-get://localhost:$(PORT)
+	$(MAKE) -C $(shell_odd_dir) dev
