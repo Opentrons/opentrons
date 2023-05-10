@@ -61,7 +61,10 @@ export interface InitialValues {
 
 const validationSchema = Yup.object().shape({
   fields: Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+    name: Yup.string().matches(
+      /^[a-zA-Z0-9]*$/,
+      'Protocol name must contain only letters and numbers.'
+    ),
   }),
   mountSide: Yup.string().required('Mount side is required'),
   pipettesByMount: Yup.object().shape({

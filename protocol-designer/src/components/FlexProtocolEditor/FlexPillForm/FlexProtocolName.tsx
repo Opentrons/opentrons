@@ -18,8 +18,6 @@ function FlexProtocolNameComponent(): JSX.Element {
     touched,
     handleChange,
     handleBlur,
-    errors,
-    touched,
   } = useFormikContext<flexProtocolName>()
 
   return (
@@ -47,7 +45,7 @@ function FlexProtocolNameComponent(): JSX.Element {
           name="fields.name"
         />
         {Boolean(errors?.fields?.name) && touched?.fields?.name && (
-          <StyledText as="label" className={styles.error_message}>
+          <StyledText as="label" className={styles.error_text}>
             {errors?.fields?.name}
           </StyledText>
         )}
@@ -71,11 +69,6 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.author}
           name="fields.author"
         />
-        {Boolean(errors?.fields?.author) && touched?.fields?.author && (
-          <StyledText as="label" className={styles.error_message}>
-            {errors?.fields?.author}
-          </StyledText>
-        )}
       </FormGroup>
 
       <FormGroup className={styles.form_group}>
@@ -91,11 +84,6 @@ function FlexProtocolNameComponent(): JSX.Element {
           value={values.fields.description}
           name="fields.description"
         />
-        {Boolean(errors?.fields?.description) && touched?.fields?.description && (
-          <StyledText as="label" className={styles.error_message}>
-            {errors?.fields?.description}
-          </StyledText>
-        )}
       </FormGroup>
     </>
   )
