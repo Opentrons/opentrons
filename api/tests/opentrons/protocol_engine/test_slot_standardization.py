@@ -105,7 +105,7 @@ def test_standardize_load_labware_command(
         intent=CommandIntent.SETUP,
         key="key",
         params=commands.LoadLabwareParams(
-            location=original_location,
+            location=expected_location,
             loadName="loadName",
             namespace="namespace",
             version=123,
