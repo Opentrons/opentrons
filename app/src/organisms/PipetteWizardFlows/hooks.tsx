@@ -120,7 +120,7 @@ export function usePipetteFlowWizardHeaderText(
         'sentenceCase'
       )
     } else if (mountPipette != null && attachedPipettes[mount] != null) {
-      return t('replace_pipette', { mount: capitalizedMount })
+      return i18n.format(t('replace_pipette', { mount: mount }), 'sentenceCase')
     }
   }
   return wizardTitle

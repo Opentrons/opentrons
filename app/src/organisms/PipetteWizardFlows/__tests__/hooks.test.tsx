@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
-import { LEFT } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
+  LEFT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -14,6 +14,12 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import { FLOWS } from '../constants'
 import { usePipetteFlowWizardHeaderText } from '../hooks'
+
+const BASE_PROPS_FOR_RUN_SETUP = {
+  flowType: FLOWS.CALIBRATE,
+  selectedPipette: SINGLE_MOUNT_PIPETTES,
+  hasCalData: false,
+}
 
 describe('usePipetteFlowWizardHeaderText', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -45,6 +51,27 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual('Calibrate Left Pipette')
+  })
+  it('should return correct title for calibrating single mount for right pipette', () => {
+    const { result } = renderHook(
+      () =>
+        usePipetteFlowWizardHeaderText({
+          flowType: FLOWS.CALIBRATE,
+          mount: RIGHT,
+          selectedPipette: SINGLE_MOUNT_PIPETTES,
+          hasCalData: false,
+          isGantryEmpty: false,
+          attachedPipettes: {
+            left: null,
+            right: mockAttachedPipetteInformation,
+          },
+          pipetteInfo: null,
+        }),
+      {
+        wrapper,
+      }
+    )
+    expect(result.current).toEqual('Calibrate Right Pipette')
   })
   it('should return correct title for calibrating single mount with cal data', () => {
     const { result } = renderHook(
@@ -108,6 +135,27 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual('Attach Left Pipette')
+  })
+  it('should return correct title for attaching single mount for right pipette', () => {
+    const { result } = renderHook(
+      () =>
+        usePipetteFlowWizardHeaderText({
+          flowType: FLOWS.ATTACH,
+          mount: RIGHT,
+          selectedPipette: SINGLE_MOUNT_PIPETTES,
+          hasCalData: false,
+          isGantryEmpty: false,
+          attachedPipettes: {
+            left: null,
+            right: mockAttachedPipetteInformation,
+          },
+          pipetteInfo: null,
+        }),
+      {
+        wrapper,
+      }
+    )
+    expect(result.current).toEqual('Attach Right Pipette')
   })
   it('should return correct title for attaching 96 channel', () => {
     const { result } = renderHook(
@@ -199,10 +247,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: LEFT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: false,
           attachedPipettes: {
             left: mockAttachedPipetteInformation,
@@ -226,10 +272,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: LEFT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: false,
           attachedPipettes: {
             left: mock96ChannelAttachedPipetteInformation,
@@ -255,10 +299,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: LEFT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: true,
           attachedPipettes: {
             left: null,
@@ -282,10 +324,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: LEFT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: false,
           attachedPipettes: {
             left: mockAttachedPipetteInformation,
@@ -311,10 +351,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: RIGHT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: false,
           attachedPipettes: {
             left: null,
@@ -340,10 +378,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: RIGHT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: false,
           attachedPipettes: {
             left: mockAttachedPipetteInformation,
@@ -369,10 +405,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: LEFT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: false,
           attachedPipettes: {
             left: mockAttachedPipetteInformation,
@@ -396,10 +430,8 @@ describe('usePipetteFlowWizardHeaderText', () => {
     const { result } = renderHook(
       () =>
         usePipetteFlowWizardHeaderText({
-          flowType: FLOWS.CALIBRATE,
+          ...BASE_PROPS_FOR_RUN_SETUP,
           mount: LEFT,
-          selectedPipette: SINGLE_MOUNT_PIPETTES,
-          hasCalData: false,
           isGantryEmpty: true,
           attachedPipettes: {
             left: null,
