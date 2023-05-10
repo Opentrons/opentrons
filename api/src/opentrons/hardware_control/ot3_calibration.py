@@ -737,7 +737,7 @@ async def calibrate_pipette(
             offset = await _calibrate_mount(
                 hcapi, mount, slot, method, raise_verify_error
             )
-            await hcapi.save_instrument_offset(mount, offset)
+            # await hcapi.save_instrument_offset(mount, offset)
             return offset
         finally:
             await hcapi.remove_tip(mount)
