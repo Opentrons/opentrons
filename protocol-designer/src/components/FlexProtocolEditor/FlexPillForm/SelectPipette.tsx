@@ -21,10 +21,7 @@ interface formikContextProps {
 export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   pipetteName,
 }) => {
-  const {
-    values: { pipettesByMount = {}, mountSide },
-    errors = { pipettesByMount, mountSide },
-  } = useFormikContext<formikContextProps>()
+  const { values, errors } = useFormikContext<formikContextProps>()
 
   const is96ChannelSelected = checkSelectedPipette(
     values.pipettesByMount[pipetteName].pipetteName
@@ -57,40 +54,15 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
               {errors.pipette && errors.pipette}
             </StyledText>
           )}
-          {Boolean(errors?.pipettesByMount?.[pipetteName]?.pipetteName) && (
-            <StyledText as="label" className={styles.error_text}>
-              {errors?.pipettesByMount?.[pipetteName]?.pipetteName}
-            </StyledText>
-          )}
           {/* Pipette Mount Selection here */}
           <hr />
           <Flex className={cx(styles[className], styles.ptb_10)}>
             <SelectPipetteMount pipetteName={pipetteName} />
-            {Boolean(errors?.mountSide) && (
-              <StyledText as="label" className={styles.error_text}>
-                {errors?.mountSide}
-              </StyledText>
-            )}
           </Flex>
           <hr />
           {channel96SelectionNote(is96ChannelSelected)}
           <Flex className={styles.pb_10}>
             <TipRackOptions pipetteName={pipetteName} />
-            {Boolean(errors?.pipettesByMount?.[pipetteName]?.tipRackList) && (
-              <StyledText as="label" className={styles.error_text}>
-                {errors?.pipettesByMount?.[pipetteName]?.tipRackList}
-              </StyledText>
-            )}
-          </Flex>
-          <hr />
-          {channel96SelectionNote(is96ChannelSelected)}
-          <Flex className={styles.pb_10}>
-            <TipRackOptions pipetteName={pipetteName} />
-            {Boolean(errors?.pipettesByMount?.[pipetteName]?.tipRackList) && (
-              <StyledText as="label" className={styles.error_text}>
-                {errors?.pipettesByMount?.[pipetteName]?.tipRackList}
-              </StyledText>
-            )}
           </Flex>
         </>
       }
