@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   SPACING,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -40,6 +41,8 @@ import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { Snackbar } from '../../atoms/Snackbar'
 import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -52,7 +55,6 @@ import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -168,7 +170,7 @@ function PrepareToRun({
   runId,
   setSetupScreen,
 }: PrepareToRunProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
@@ -186,13 +188,9 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const [showSnackbar, setShowSnackbar] = React.useState<boolean>(false)
 
   const { play } = useRunControls(runId)
-
-  const onPlay = (): void => {
-    play()
-    history.push(`/protocols/${runId}/run`)
-  }
 
   // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
@@ -210,12 +208,13 @@ function PrepareToRun({
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
 
-  if (
+  const protocolAnalysisLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
     (protocolHasModules && attachedModules == null) ||
     allPipettesCalibrationData == null
-  ) {
+
+  if (protocolAnalysisLoading) {
     return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
   }
 
@@ -250,6 +249,15 @@ function PrepareToRun({
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
+
+  const onPlay = (): void => {
+    if (isReadyToRun) {
+      play()
+      history.push(`/protocols/${runId}/run`)
+    } else {
+      setShowSnackbar(true)
+    }
+  }
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
@@ -301,12 +309,16 @@ function PrepareToRun({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginBottom={SPACING.spacing40}
+        paddingBottom={SPACING.spacing40}
+        paddingTop={SPACING.spacing32}
+        position={POSITION_STICKY}
+        top={0}
+        backgroundColor={COLORS.white}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap="0.25rem"
+            gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
             <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
@@ -323,7 +335,7 @@ function PrepareToRun({
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
+            <PlayButton disabled={protocolAnalysisLoading} onPlay={onPlay} />
           </Flex>
         </Flex>
       </Flex>
@@ -364,14 +376,32 @@ function PrepareToRun({
           title={t('liquids')}
           status="general"
           detail={
-            liquidsInProtocol.length < 0
+            liquidsInProtocol.length > 0
               ? t('initial_liquids_num', {
-                  num: liquidsInProtocol.length,
+                  count: liquidsInProtocol.length,
                 })
               : t('liquids_not_in_setup')
           }
         />
       </Flex>
+      {showSnackbar && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position={POSITION_STICKY}
+          bottom={SPACING.spacing40}
+          zIndex={1000}
+        >
+          <Snackbar
+            message={i18n.format(
+              t('complete_setup_before_proceeding'),
+              'capitalize'
+            )}
+            onClose={() => setShowSnackbar(false)}
+          />
+        </Flex>
+      )}
       {LPCWizard}
       {showConfirmCancelModal ? (
         <ConfirmCancelRunModal
@@ -424,7 +454,12 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding="2rem 2.5rem">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      padding={
+        setupScreen === 'prepare to run' ? '0 2rem 2.5rem' : '2rem 2.5rem'
+      }
+    >
       {setupComponentByScreen[setupScreen]}
     </Flex>
   )
