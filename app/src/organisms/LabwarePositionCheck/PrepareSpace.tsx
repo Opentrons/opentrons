@@ -65,14 +65,14 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
       <ResponsiveTwoUpPanel>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <StyledText as="h1">{header}</StyledText>
           {body}
@@ -171,7 +171,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       ) : (
         <Flex
           width="100%"
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
         >
@@ -187,7 +187,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
 
 const ResponsiveTwoUpPanel = styled.div`
   display: flex;
-  grid-gap: ${SPACING.spacingL};
+  grid-gap: ${SPACING.spacing24};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     grid-gap: 0;

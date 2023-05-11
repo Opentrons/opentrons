@@ -48,9 +48,7 @@ export function NetworkSetupMenu(): JSX.Element {
     <>
       <StepMeter totalSteps={5} currentStep={1} OnDevice />
       <Flex
-        padding={`${String(SPACING.spacing6)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
@@ -70,7 +68,7 @@ export function NetworkSetupMenu(): JSX.Element {
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           <StyledText
             fontSize="1.375rem"
@@ -82,7 +80,7 @@ export function NetworkSetupMenu(): JSX.Element {
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
-          columnGap={SPACING.spacing3}
+          columnGap={SPACING.spacing8}
           height="17rem"
         >
           {NetworkSetupOptions.map(networkOption => (
@@ -97,7 +95,7 @@ export function NetworkSetupMenu(): JSX.Element {
         {/* temp button to robot dashboard until we can detect setup status */}
         <Flex
           alignSelf={ALIGN_FLEX_END}
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           width="fit-content"
         >
           <Link to="menu">

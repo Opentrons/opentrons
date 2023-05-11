@@ -29,11 +29,11 @@ export function ConfirmCrashRecovery(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="h1" marginBottom={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <StyledText as="h1" marginBottom={SPACING.spacing16}>
           {t('start_over_question')}
         </StyledText>
         <StyledText as="p">{t('starting_over_loses_progress')}</StyledText>
@@ -41,10 +41,10 @@ export function ConfirmCrashRecovery(
       </Flex>
       <Flex
         width="100%"
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_FLEX_END}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         <Link
           role="button"

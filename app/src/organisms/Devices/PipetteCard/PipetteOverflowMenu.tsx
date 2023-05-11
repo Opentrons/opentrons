@@ -58,7 +58,7 @@ export const PipetteOverflowMenu = (
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
         top="2.6rem"
-        right={`calc(50% + ${String(SPACING.spacing2)})`}
+        right={`calc(50% + ${SPACING.spacing4})`}
         flexDirection={DIRECTION_COLUMN}
       >
         {pipetteDisplayName === 'Empty' ? (

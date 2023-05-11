@@ -55,7 +55,7 @@ export function RobotServerVersion({
         </Portal>
       ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
-        <Box marginBottom={SPACING.spacing4} width="100%">
+        <Box marginBottom={SPACING.spacing16} width="100%">
           <UpdateRobotBanner robot={robot} />
         </Box>
       ) : null}
@@ -63,18 +63,18 @@ export function RobotServerVersion({
         <Box width="70%">
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
-            paddingBottom={SPACING.spacing2}
+            paddingBottom={SPACING.spacing4}
             id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_version')}
           </StyledText>
-          <StyledText as="p" paddingBottom={SPACING.spacing2}>
+          <StyledText as="p" paddingBottom={SPACING.spacing4}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')}
           </StyledText>
           {isOT3 ? (
-            <StyledText as="p" paddingBottom={SPACING.spacing2}>
+            <StyledText as="p" paddingBottom={SPACING.spacing4}>
               {t('robot_server_version_ot3_description')}
             </StyledText>
           ) : null}
@@ -93,7 +93,7 @@ export function RobotServerVersion({
             <StyledText
               as="label"
               color={COLORS.darkGreyEnabled}
-              paddingRight={SPACING.spacing4}
+              paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}
             </StyledText>

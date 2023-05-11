@@ -61,7 +61,7 @@ export const TemperatureModuleData = (
         flexDirection={DIRECTION_COLUMN}
         data-testid="temp_module_data"
       >
-        <StyledText marginBottom={SPACING.spacing1}>
+        <StyledText marginBottom={SPACING.spacing2}>
           {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}

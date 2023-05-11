@@ -53,11 +53,11 @@ export function RobotSettingsDashboard(): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      columnGap={SPACING.spacing3}
-      paddingX={SPACING.spacingXXL}
+      columnGap={SPACING.spacing8}
+      paddingX={SPACING.spacing40}
     >
       {currentOption != null ? (
-        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing8}>
           <RobotSettingsContent
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
@@ -150,7 +150,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       )}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        padding={SPACING.spacingXXL}
+        padding={SPACING.spacing40}
         width="fit-content"
       >
         <Link to="menu">
