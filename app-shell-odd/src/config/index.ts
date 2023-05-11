@@ -1,6 +1,5 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
-import { app } from 'electron'
 import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
