@@ -3,8 +3,7 @@ from asyncio import sleep
 from typing import List, Union, Tuple, Optional
 
 from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.sensors import sensor_driver, sensor_types
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
@@ -46,25 +45,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-async def _read_once(
-    api: OT3API,
-    driver: sensor_driver.SensorDriver,
-    sensor: sensor_types.CapacitiveSensor,
-    timeout: int = 1,
-) -> Optional[float]:
-    if api.is_simulator:
-        return 1.234
-    messenger = api._backend._messenger  # type: ignore[union-attr]
-    data = await driver.read(messenger, sensor, offset=False, timeout=timeout)
-    if isinstance(data, sensor_types.SensorDataType):
-        return data.to_float()
-    return None
-
-
 async def _read_from_sensor(
     api: OT3API,
-    driver: sensor_driver.SensorDriver,
-    sensor: sensor_types.CapacitiveSensor,
+    sensor_id: SensorId,
     num_readings: int = 10,
 ) -> Optional[float]:
     readings: List[float] = []
@@ -80,7 +63,7 @@ async def _read_from_sensor(
             sequential_failures = 0
 
     while len(readings) != num_readings:
-        r = await _read_once(api, driver, sensor)
+        r = await helpers_ot3.get_capacitance_ot3(api, OT3Mount.LEFT, sensor_id)
         _check_if_ok(r)  # raises error after 3x failures in a row
         readings.append(r)  # type: ignore[arg-type]
         print(f"\t{r}")
@@ -109,7 +92,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     p_ax = OT3Axis.P_L
     t_ax = OT3Axis.Q
 
-    s_driver = sensor_driver.SensorDriver()
     default_probe_cfg = api.config.calibration.z_offset.pass_settings
     await api.reset_instrument_offset(OT3Mount.LEFT)
 
@@ -117,12 +99,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         hover_pos, probe_pos = _get_hover_and_probe_pos(api, probe)
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Probe: {probe}")
-        cap_sensor = sensor_types.CapacitiveSensor.build(sensor_id, NodeId.pipette_left)
         print("homing...")
         await api.home([z_ax, p_ax, t_ax])
 
         # AIR-pF
-        air_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+        air_pf = await _read_from_sensor(api, sensor_id, 10)
         if not air_pf:
             ui.print_error(f"{probe} cap sensor not working, skipping")
             continue
@@ -134,7 +115,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator:
             ui.get_user_ready(f"ATTACH probe to {probe.name} channel")
         await api.add_tip(OT3Mount.LEFT, api.config.calibration.probe_length)
-        attached_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+        attached_pf = await _read_from_sensor(api, sensor_id, 10)
         if not attached_pf:
             ui.print_error(f"{probe} cap sensor not working, skipping")
             continue
@@ -194,7 +175,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             if not api.is_simulator:
                 ui.get_user_ready("about to PRESS into the DECK")
             await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=deck_mm))
-            deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
+            deck_pf = await _read_from_sensor(api, sensor_id, 10)
             if not deck_pf:
                 ui.print_error(f"{probe} cap sensor not working, skipping")
                 continue

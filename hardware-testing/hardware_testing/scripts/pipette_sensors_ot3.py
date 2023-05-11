@@ -16,10 +16,7 @@ READ_INTERVAL_SECONDS = 0.5
 
 
 async def _read_sensor(
-        api: OT3API,
-        mount: OT3Mount,
-        sensor_type: SensorType,
-        sensor_id: SensorId
+    api: OT3API, mount: OT3Mount, sensor_type: SensorType, sensor_id: SensorId
 ) -> List[float]:
     if sensor_type == SensorType.capacitive:
         vals = await helpers_ot3.get_capacitance_ot3(api, mount, sensor_id)
@@ -36,10 +33,10 @@ async def _read_sensor(
 
 
 async def _read_sensors_in_while_loop(
-        api: OT3API,
-        mount: OT3Mount,
-        sensors: Dict[SensorType, List[SensorId]],
-        tip_sensor: bool = False,
+    api: OT3API,
+    mount: OT3Mount,
+    sensors: Dict[SensorType, List[SensorId]],
+    tip_sensor: bool = False,
 ) -> None:
     while True:
         print("======================================================")

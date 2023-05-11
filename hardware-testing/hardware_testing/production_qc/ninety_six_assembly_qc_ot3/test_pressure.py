@@ -2,11 +2,9 @@
 from asyncio import sleep
 from typing import List, Union
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.sensors import sensor_driver, sensor_types
+from opentrons_hardware.firmware_bindings.constants import SensorId
 
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 from opentrons.hardware_control.types import InstrumentProbeType
 
@@ -42,33 +40,16 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     return lines
 
 
-async def _read_once(
-    api: OT3API,
-    driver: sensor_driver.SensorDriver,
-    sensor: sensor_types.PressureSensor,
-    timeout: int = 1,
-) -> float:
-    if not api.is_simulator and isinstance(api._backend, OT3Controller):
-        data = await driver.read(
-            api._backend._messenger, sensor, offset=False, timeout=timeout
-        )
-        if isinstance(data, sensor_types.SensorDataType):
-            return data.to_float()
-        raise helpers_ot3.SensorResponseBad("no response from sensor")
-    return 0.0
-
-
 async def _read_from_sensor(
     api: OT3API,
-    driver: sensor_driver.SensorDriver,
-    sensor: sensor_types.PressureSensor,
+    sensor_id: SensorId,
     num_readings: int,
 ) -> float:
     readings: List[float] = []
     sequential_failures = 0
     while len(readings) != num_readings:
         try:
-            r = await _read_once(api, driver, sensor)
+            r = await helpers_ot3.get_pressure_ot3(api, OT3Mount.LEFT, sensor_id)
             sequential_failures = 0
             readings.append(r)
             print(f"\t{r}")
@@ -85,20 +66,15 @@ async def _read_from_sensor(
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    s_driver = sensor_driver.SensorDriver()
-
     for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Sensor: {probe}")
-        pressure_sensor = sensor_types.PressureSensor.build(
-            sensor_id, NodeId.pipette_left
-        )
 
         # OPEN-Pa
         open_pa = 0.0
         if not api.is_simulator:
             try:
-                open_pa = await _read_from_sensor(api, s_driver, pressure_sensor, NUM_PRESSURE_READINGS)
+                open_pa = await _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS)
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 continue
@@ -114,7 +90,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
             ui.get_user_ready("SEAL tip using your FINGER")
             try:
-                sealed_pa = await _read_from_sensor(api, s_driver, pressure_sensor, NUM_PRESSURE_READINGS)
+                sealed_pa = await _read_from_sensor(
+                    api, sensor_id, NUM_PRESSURE_READINGS
+                )
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
                 break
@@ -128,7 +106,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator:
             try:
                 aspirate_pa = await _read_from_sensor(
-                    api, s_driver, pressure_sensor, 10
+                    api, sensor_id, NUM_PRESSURE_READINGS
                 )
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")
@@ -145,7 +123,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if not api.is_simulator:
             try:
                 dispense_pa = await _read_from_sensor(
-                    api, s_driver, pressure_sensor, 10
+                    api, sensor_id, NUM_PRESSURE_READINGS
                 )
             except helpers_ot3.SensorResponseBad:
                 ui.print_error(f"{probe} pressure sensor not working, skipping")

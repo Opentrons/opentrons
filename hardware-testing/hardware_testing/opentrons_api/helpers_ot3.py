@@ -661,7 +661,7 @@ async def _get_temp_humidity(
     environment = sensor_types.EnvironmentSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+        messenger, environment, offset=False, timeout=2  # type: ignore[union-attr]
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")
@@ -720,7 +720,7 @@ async def get_capacitance_ot3(
     capacitive = sensor_types.CapacitiveSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
+        api._backend._messenger, capacitive, offset=False, timeout=2  # type: ignore[union-attr]
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")
@@ -737,7 +737,7 @@ async def get_pressure_ot3(
     pressure = sensor_types.PressureSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]
+        api._backend._messenger, pressure, offset=False, timeout=2  # type: ignore[union-attr]
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")

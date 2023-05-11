@@ -4,6 +4,8 @@ from typing import List, Union
 
 from opentrons.hardware_control.ot3api import OT3API
 
+from opentrons_hardware.firmware_bindings.constants import SensorId
+
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount
@@ -21,8 +23,8 @@ INTER_SAMPLE_DELAY_SECONDS = 0.25
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     return [
-        CSVLine(f"environment-{channel}-celsius-humidity", [float, float])
-        for channel in ["rear", "front"]
+        CSVLine(f"environment-{sensor_id.name}-celsius-humidity", [float, float])
+        for sensor_id in [SensorId.S0, SensorId.S1]
     ]
 
 
@@ -33,15 +35,15 @@ def _remove_outliers_and_average(values: List[float]) -> float:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    for channel in ["rear", "front"]:
-        ui.print_header(channel.upper())
+    for sensor_id in [SensorId.S0, SensorId.S1]:
+        ui.print_header(sensor_id.name.upper())
         celsius_samples = []
         humidity_samples = []
         print(f"averaging {NUM_SAMPLES} samples:")
         print("\tc\th")
         for _ in range(NUM_SAMPLES):
             c, h = await helpers_ot3.get_temperature_humidity_ot3(
-                api, OT3Mount.LEFT, channel=channel
+                api, OT3Mount.LEFT, sensor_id
             )
             c = round(c, 2)
             h = round(h, 2)
@@ -52,6 +54,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 await sleep(INTER_SAMPLE_DELAY_SECONDS)
         celsius = _remove_outliers_and_average(celsius_samples)
         humidity = _remove_outliers_and_average(humidity_samples)
-        print(f"[{channel}] Celsius = {round(celsius, 2)} degrees")
-        print(f"[{channel}] Humidity = {round(humidity, 2)} percent")
-        report(section, f"environment-{channel}-celsius-humidity", [celsius, humidity])
+        print(f"[{sensor_id.name}] Celsius = {round(celsius, 2)} degrees")
+        print(f"[{sensor_id.name}] Humidity = {round(humidity, 2)} percent")
+        report(
+            section,
+            f"environment-{sensor_id.name}-celsius-humidity",
+            [celsius, humidity],
+        )
