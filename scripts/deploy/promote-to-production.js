@@ -39,7 +39,7 @@ const productionAssumeRole = () => {
 
 productionAssumeRole()
   .then(credentials => {
-    const stagingCredentials = new AWS.Credentials({
+    const productionCredentials = new AWS.Credentials({
       accessKeyId: credentials.AccessKeyId,
       secretAccessKey: credentials.SecretAccessKey,
       sessionToken: credentials.SessionToken,
@@ -48,7 +48,7 @@ productionAssumeRole()
     const s3 = new AWS.S3({
       apiVersion: '2006-03-01',
       region: 'us-east-1',
-      credentials: stagingCredentials,
+      credentials: productionCredentials,
     })
 
     const stagingBucket = `staging.${projectDomain}`
