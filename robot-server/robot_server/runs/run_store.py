@@ -12,7 +12,7 @@ from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import run_table, action_table
+from robot_server.persistence import run_table, action_table, sqlite_rowid
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
@@ -212,10 +212,10 @@ class RunStore:
         """
         select_runs = sqlalchemy.select(_run_columns)
         if length is not None:
-            select_runs = select_runs.limit(length).order_by(
-                run_table.c.created_at.desc()
+            select_runs = (
+                select_runs.limit(length).order_by(sqlite_rowid.desc()).limit(length)
             )
-        select_actions = sqlalchemy.select(action_table)
+        select_actions = sqlalchemy.select(action_table).order_by(sqlite_rowid.asc())
         actions_by_run_id = defaultdict(list)
 
         with self._sql_engine.begin() as transaction:
