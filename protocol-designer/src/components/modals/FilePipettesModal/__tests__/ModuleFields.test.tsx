@@ -84,7 +84,7 @@ describe('ModuleFields', () => {
   it('renders a module selection element for every module', () => {
     const wrapper = render(props)
 
-    expect(wrapper.find(DeprecatedCheckboxField)).toHaveLength(4)
+    expect(wrapper.find(DeprecatedCheckboxField)).toHaveLength(5)
   })
 
   it('adds module to protocol when checkbox is selected and resets the model field', () => {

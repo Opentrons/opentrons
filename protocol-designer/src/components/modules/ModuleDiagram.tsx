@@ -46,7 +46,7 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
     [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heatershaker.png'),
   },
   [MAGNETIC_BLOCK_TYPE]: {
-    [MAGNETIC_BLOCK_V1]: require('../../images/modules/magdeck_gen2.png'),
+    [MAGNETIC_BLOCK_V1]: require('../../images/modules/mag_block.png'),
   },
 }
 
