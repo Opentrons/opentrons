@@ -33,7 +33,7 @@ function ProtocolEditorComponent(props: Props): JSX.Element {
       <PrereleaseModeIndicator />
       <div className={styles.wrapper}>
         <ConnectedNav />
-        <ConnectedSidebar />
+        {!props.children && <ConnectedSidebar />}
         <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
 

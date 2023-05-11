@@ -382,6 +382,7 @@ export interface ProtocolMetadata {
   category?: string | null
   subcategory?: string | null
   tags?: string[]
+  deckId?: string | null
   [key: string]: unknown
 }
 export interface PendingProtocolAnalysis {

@@ -22,6 +22,7 @@ import {
 import { i18n } from '../../../localization'
 import { actions as navActions } from '../../../navigation'
 import {
+  InitialDeckSetup,
   ModulesForEditModulesCard,
   selectors as stepFormSelectors,
 } from '../../../step-forms'
@@ -32,6 +33,7 @@ import { StyledText } from '../StyledText'
 
 import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
+import { FilePage } from '../../FilePage'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -39,6 +41,14 @@ export interface Props {
   saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
   swapPipettes: () => unknown
   modules: ModulesForEditModulesCard
+}
+
+type PropsData = React.ComponentProps<typeof FilePage>
+interface SP {
+  instruments: PropsData['instruments']
+  formValues: PropsData['formValues']
+  _initialDeckSetup: InitialDeckSetup
+  modules: PropsData['modules']
 }
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
