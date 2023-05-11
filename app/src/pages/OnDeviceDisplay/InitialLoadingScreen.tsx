@@ -38,7 +38,7 @@ export function InitialLoadingScreen(): JSX.Element {
     <Flex
       backgroundColor={COLORS.darkBlack20}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
