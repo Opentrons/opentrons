@@ -1,4 +1,4 @@
-test_name: Alter the value of run status and current
+test_name: Create runs and get all runs with and without pageLength.
 
 marks:
   - usefixtures:
