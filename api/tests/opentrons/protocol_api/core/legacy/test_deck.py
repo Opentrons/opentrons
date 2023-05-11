@@ -114,7 +114,7 @@ def test_highest_z(decoy: Decoy, subject: Deck) -> None:
 
 def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
     """It should correctly call the deck conflict checker with fixed trash labware."""
-    subject = Deck(deck_type="ot2_standard")
+    subject = Deck(deck_type=STANDARD_OT2_DECK)
     decoy.verify(
         deck_conflict.check(
             existing_items={}, new_location=12, new_item=EXPECTED_FIXED_TRASH

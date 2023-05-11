@@ -1,6 +1,7 @@
 import pytest
 
 from opentrons.types import Location, Point
+from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.geometry.planning import (
     plan_moves,
     safe_height,
@@ -314,7 +315,7 @@ def test_gen2_module_transforms(deck):
 # todo(mm, 2023-05-11): This test is limited to just the OT-2 deck definition
 # because it depends on the details of the OT-2 trash height relative to troughs.
 # See if it can be rewritten to avoid that.
-@pytest.mark.parametrize("deck_definition_name", ["ot2_standard"])
+@pytest.mark.parametrize("deck_definition_name", [STANDARD_OT2_DECK])
 def test_instr_max_height(deck):
     fixed_trash = deck.get_fixed_trash()
     trough = labware.load(trough_name, deck.position_for(1))
