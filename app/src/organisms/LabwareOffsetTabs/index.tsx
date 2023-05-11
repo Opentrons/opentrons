@@ -72,7 +72,7 @@ export function LabwareOffsetTabs({
         } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
           BORDERS.radiusSoftCorners
         }`}
-        padding={`0 ${SPACING.spacing4}`}
+        paddingX={SPACING.spacing4}
       >
         {activeTabComponent[currentTab]}
       </Box>
