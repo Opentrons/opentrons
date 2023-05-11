@@ -240,9 +240,10 @@ export function registerDiscovery(
             port.vendorId === DEFAULT_VENDOR_ID
         )
 
-        // bail if no OT-3 found
+        // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition
         if (ot3UsbSerialPort == null) {
-          log.debug('no OT-3 serial port found')
+          log.debug('no OT-3 serial port found, retrying')
+          setTimeout(startUsbHttpRequests, 1000)
           return
         }
 
