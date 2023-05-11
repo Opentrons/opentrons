@@ -18,7 +18,7 @@ export function CalibrationErrorModal(
   return (
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
-      header={i18n.format(t('error_calibrating_pipette'), 'capitalize')}
+      header={i18n.format(t('pip_cal_failed'), 'capitalize')}
       subHeader={errorMessage}
       isSuccess={false}
     >

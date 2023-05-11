@@ -18,7 +18,7 @@ describe('CalibrationErrorModal', () => {
       isOnDevice: false,
     }
     const { getByText, getByRole } = render(props)
-    getByText('Error encountered when calibrating pipette')
+    getByText('Pipette calibration failed')
     getByText('error shmerror')
     getByRole('button', { name: 'Next' }).click()
     expect(props.proceed).toHaveBeenCalled()
@@ -30,7 +30,7 @@ describe('CalibrationErrorModal', () => {
       isOnDevice: true,
     }
     const { getByText, getByLabelText } = render(props)
-    getByText('Error encountered when calibrating pipette')
+    getByText('Pipette calibration failed')
     getByText('error shmerror')
     getByLabelText('SmallButton_primary').click()
     expect(props.proceed).toHaveBeenCalled()
