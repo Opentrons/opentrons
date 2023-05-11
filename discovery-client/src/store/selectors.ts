@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect'
+import isIp from 'is-ip'
 import unionBy from 'lodash/unionBy'
 import {
   HEALTH_STATUS_OK,
@@ -100,5 +101,10 @@ export function compareHostsByConnectability(
   const bIpPriority = IP_PRIORITY_MATCH.findIndex(re => re.test(b.ip))
   const ipSort = bIpPriority - aIpPriority
 
-  return ipSort
+  if (ipSort !== 0) return ipSort
+
+  // prefer ip hostname
+  const isIpSort = isIp(b.ip) ? 1 : -1
+
+  return isIpSort
 }
