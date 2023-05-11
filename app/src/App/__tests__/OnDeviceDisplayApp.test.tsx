@@ -21,7 +21,7 @@ import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
-import { getIsRobotServerActive } from '../../redux/shell'
+import { getIsShellReady } from '../../redux/shell'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
@@ -88,8 +88,8 @@ const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
 >
-const mockGetIsRobotServerActive = getIsRobotServerActive as jest.MockedFunction<
-  typeof getIsRobotServerActive
+const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
+  typeof getIsShellReady
 >
 
 const render = (path = '/') => {
@@ -120,7 +120,7 @@ describe('OnDeviceDisplayApp', () => {
     mockRunningProtocol.mockReturnValue(<div>Mock RunningProtocol</div>)
     mockRunSummary.mockReturnValue(<div>Mock RunSummary</div>)
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings as any)
-    mockGetIsRobotServerActive.mockReturnValue(false)
+    mockgetIsShellReady.mockReturnValue(false)
     mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
   })
@@ -183,7 +183,7 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('renders the loading screen on mount', () => {
     const [{ getByText }] = render('/')
-    mockGetIsRobotServerActive.mockReturnValue(true)
+    mockgetIsShellReady.mockReturnValue(true)
     getByText('Mock Loading')
   })
 })

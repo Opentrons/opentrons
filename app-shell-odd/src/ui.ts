@@ -1,12 +1,11 @@
 // sets up the main window ui
 import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
-import { robotServerServiceStatus } from '@opentrons/app/src/redux/shell'
+import { sendReadyStatus } from '@opentrons/app/src/redux/shell'
 import { getConfig } from './config'
 import { createLogger } from './log'
 import systemd from './systemd'
 
-import type { RobotServerServiceStatus } from '@opentrons/app/src/redux/shell/robot-system/types'
 import type { Dispatch } from './types'
 
 const config = getConfig('ui')
@@ -50,7 +49,8 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
     () => {
       log.debug('Main window ready to show')
       mainWindow.show()
-      waitForRobotServerAndShowMainWIndow(dispatch)
+      process.env.NODE_ENV !== 'development' &&
+        waitForRobotServerAndShowMainWIndow(dispatch)
     }
   )
 
@@ -72,13 +72,12 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
 function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
   setTimeout(function () {
     systemd
-      .getRobotServerStatus()
-      .then((status: RobotServerServiceStatus) => {
-        dispatch(robotServerServiceStatus(status))
-        if (status !== 'active') {
+      .getisRobotServerReady()
+      .then((isReady: boolean) => {
+        dispatch(sendReadyStatus(isReady))
+        if (isReady) {
           waitForRobotServerAndShowMainWIndow(dispatch)
         }
-        return status
       })
       .catch(e => {
         log.debug('Could not get status of robot server service', { e })

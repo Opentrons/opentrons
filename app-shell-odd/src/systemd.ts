@@ -1,6 +1,5 @@
 import { platform } from 'process'
 import { exec } from 'child_process'
-import type { RobotServerServiceStatus } from '@opentrons/app/src/redux/shell/robot-system/types'
 // Provide systemd when possible and a default mocked instance, used only during
 // dev workflows, when not.
 
@@ -24,7 +23,7 @@ interface SystemD {
   ready: () => Promise<string>
   sendStatus: (text: string) => Promise<string>
   setRemoteDevToolsEnabled: (enabled: boolean) => Promise<string>
-  getRobotServerStatus: () => Promise<RobotServerServiceStatus>
+  getisRobotServerReady: () => Promise<boolean>
 }
 
 const provideExports = (): SystemD => {
@@ -39,11 +38,11 @@ const provideExports = (): SystemD => {
             enabled
           )} opentrons-robot-app-devtools.socket`
         ),
-      getRobotServerStatus: () =>
+      getisRobotServerReady: () =>
         promisifyProcess(
           '/bin/systemctl is-active opentrons-robot-server'
           // trimming string because stdout returns a new line
-        ).then(state => state.trim() as RobotServerServiceStatus),
+        ).then(state => state.trim() === 'active'),
     }
   } else {
     return {
@@ -52,8 +51,8 @@ const provideExports = (): SystemD => {
         new Promise<string>(resolve => resolve(`fake status done for ${text}`)),
       setRemoteDevToolsEnabled: enabled =>
         new Promise<string>(resolve => resolve(`dev tools set to ${enabled}`)),
-      getRobotServerStatus: () =>
-        new Promise<RobotServerServiceStatus>(resolve => resolve('active')),
+      getisRobotServerReady: () =>
+        new Promise<boolean>(resolve => resolve(true)),
     }
   }
 }

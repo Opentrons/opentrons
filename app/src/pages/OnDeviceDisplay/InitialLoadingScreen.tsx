@@ -11,14 +11,14 @@ import {
   Icon,
 } from '@opentrons/components'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
-import { getIsRobotServerActive } from '../../redux/shell'
+import { getIsShellReady } from '../../redux/shell'
 
 const getTargetPath = (
-  isRobotServerReady: boolean,
+  isShellReady: boolean,
   unfinishedUnboxingFlowRoute: string | null
 ): string | null => {
-  console.log({ isRobotServerReady, unfinishedUnboxingFlowRoute })
-  if (!isRobotServerReady) {
+  console.log({ isShellReady, unfinishedUnboxingFlowRoute })
+  if (!isShellReady) {
     return null
   }
   if (unfinishedUnboxingFlowRoute != null) {
@@ -31,9 +31,9 @@ export function InitialLoadingScreen(): JSX.Element {
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
-  const isRobotServerReady = useSelector(getIsRobotServerActive)
+  const isShellReady = useSelector(getIsShellReady)
   const targetPath = getTargetPath(
-    isRobotServerReady,
+    isShellReady,
     unfinishedUnboxingFlowRoute
   )
 
