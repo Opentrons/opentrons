@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
-import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import {
   InstrumentGroup,
   SecondaryButton,
@@ -11,13 +11,21 @@ import {
   SPACING,
   NewPrimaryBtn,
 } from '@opentrons/components'
-import { FileMetadataFields } from '../../../file-data'
+import {
+  selectors as fileSelectors,
+  FileMetadataFields,
+} from '../../../file-data'
+
 import { i18n } from '../../../localization'
-import { ModulesForEditModulesCard } from '../../../step-forms'
+import {
+  ModulesForEditModulesCard,
+  selectors as stepFormSelectors,
+} from '../../../step-forms'
 import { ModuleDiagram } from '../../modules'
 import { StyledText } from '../StyledText'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import flexStyles from '../FlexComponents.css'
+import { BaseState } from '../../../types'
 
 export interface Props {
   formValues: FileMetadataFields
@@ -33,9 +41,6 @@ const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 export function FlexFileDetailsComponent(props: any): JSX.Element {
-  console.log('props.formValues', props.formValues)
-  console.log('props.formValues', props.formValues.protocolName)
-
   function getModuleData(modules: any): any {
     const moduleData = []
     for (const obj in modules) {
@@ -119,11 +124,11 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                           <StyledText as="h3" className={styles.margin_bottom}>
                             {i18n.t('flex.file_tab.name_desc_title')}
                           </StyledText>
-                          <div className={styles.right_buttons}>
+                          {/* <div className={styles.right_buttons}>
                             <Link to={'/ot-flex/0'}>
                               {i18n.t('flex.file_tab.edit')}
                             </Link>
-                          </div>
+                          </div> */}
                         </div>
                         <Flex className={styles.margin_bottom}>
                           <StyledText as="h4" className={styles.bold_text}>
@@ -188,9 +193,9 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                           >
                             {i18n.t('flex.file_tab.swap_pipette')}
                           </SecondaryButton>
-                          <Link to={'/ot-flex/1'} style={{ marginLeft: 10 }}>
+                          {/* <Link to={'/ot-flex/1'} style={{ marginLeft: 10 }}>
                             {i18n.t('flex.file_tab.edit')}
-                          </Link>
+                          </Link> */}
                         </Flex>
                       </div>
 
@@ -251,15 +256,15 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                           )}
                         </div>
                         <div className={styles.right_buttons}>
-                          <Link to={'/ot-flex/2'}>
+                          {/* <Link to={'/ot-flex/2'}>
                             {i18n.t('flex.file_tab.edit')}
-                          </Link>
+                          </Link> */}
                         </div>
                       </div>
                       <SecondaryButton>
-                        <Link to={'/ot-flex/2'}>
+                        {/* <Link to={'/ot-flex/2'}>
                           {i18n.t('flex.file_tab.add_items')}
-                        </Link>
+                        </Link> */}
                       </SecondaryButton>
                     </div>
                     <NewPrimaryBtn
@@ -280,4 +285,20 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   )
 }
 
-export const FlexFileDetails = FlexFileDetailsComponent
+const mapStateToProps = (state: BaseState): SP => {
+  return {
+    formValues: fileSelectors.getFileMetadata(state),
+    // instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
+    // modules: stepFormSelectors.getModulesForEditModulesCard(state),
+    // _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
+  }
+}
+
+export const FlexFileDetails = connect(
+  mapStateToProps,
+  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
+  null
+  // mergeProps
+)(FlexFileDetailsComponent)
+
+// export const FlexFileDetails = FlexFileDetailsComponent

@@ -49,7 +49,7 @@ const updateMetadataFields = (
   action: LoadFileAction
 ): FileMetadataFields => {
   const { file } = action.payload
-  return file.metadata
+  return { ...file.metadata, ...file.robot }
 }
 
 // track if a protocol has been created or loaded
