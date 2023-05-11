@@ -300,6 +300,7 @@ async def set_gantry_load_per_axis_settings_ot3(
     api: OT3API,
     settings: Dict[OT3Axis, GantryLoadSettings],
     load: Optional[GantryLoad] = None,
+    force_reload: Optional[bool] = True,
 ) -> None:
     """Set motion/current settings, per-axis, per-gantry-load."""
     if load is None:
@@ -317,7 +318,7 @@ async def set_gantry_load_per_axis_settings_ot3(
         await set_gantry_load_per_axis_current_settings_ot3(
             api, ax, load, hold_current=stg.hold_current, run_current=stg.run_current
         )
-    if load == api.gantry_load:
+    if load == api.gantry_load and force_reload:
         await api.set_gantry_load(gantry_load=load)
 
 

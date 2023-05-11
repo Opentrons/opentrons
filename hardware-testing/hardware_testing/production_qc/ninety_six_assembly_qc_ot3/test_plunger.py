@@ -85,7 +85,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 force_reload=False,
             )
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-                api, ax, default_max_speed=speed
+                api, ax, default_max_speed=speed, force_reload=False,
             )
             # MOVE DOWN
             print(f"moving down {blow_out} mm at {speed} mm/sec")
