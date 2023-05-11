@@ -916,12 +916,16 @@ class OT3RobotCalibrationProvider:
     """
 
     def __init__(self, config: OT3Config) -> None:
+        self._carriage_offset=Point(*config.carriage_offset)
+        self._left_mount_offset=Point(*config.left_mount_offset)
+        self._right_mount_offset=Point(*config.right_mount_offset)
+        self._gripper_mount_offset=Point(*config.gripper_mount_offset)
         self._robot_calibration = OT3Transforms(
             deck_calibration=load_attitude_matrix(to_default=False),
-            carriage_offset=Point(*config.carriage_offset),
-            left_mount_offset=Point(*config.left_mount_offset),
-            right_mount_offset=Point(*config.right_mount_offset),
-            gripper_mount_offset=Point(*config.gripper_mount_offset),
+            carriage_offset=self._carriage_offset,
+            left_mount_offset=self._left_mount_offset,
+            right_mount_offset=self._right_mount_offset,
+            gripper_mount_offset=self._gripper_mount_offset,
         )
 
     @lru_cache(1)
@@ -936,12 +940,22 @@ class OT3RobotCalibrationProvider:
 
     def reset_robot_calibration(self) -> None:
         # need to deal with other offsets?
-        self._robot_calibration.deck_calibration = load_attitude_matrix(to_default=True)
+        self._robot_calibration = OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=True),
+            carriage_offset=self._carriage_offset,
+            left_mount_offset=self._left_mount_offset,
+            right_mount_offset=self._right_mount_offset,
+            gripper_mount_offset=self._gripper_mount_offset,
+        )
 
     def load_robot_calibration(self) -> None:
         self._validate.cache_clear()
-        self._robot_calibration.deck_calibration = load_attitude_matrix(
-            to_default=False
+        self._robot_calibration = OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=False),
+            carriage_offset=self._carriage_offset,
+            left_mount_offset=self._left_mount_offset,
+            right_mount_offset=self._right_mount_offset,
+            gripper_mount_offset=self._gripper_mount_offset,
         )
 
     def set_robot_calibration(self, robot_calibration: OT3Transforms) -> None:
