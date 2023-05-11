@@ -1,7 +1,7 @@
 """A script to test the rear panel board"""
 import argparse
 import asyncio
-from hardware_testing.opentrons_api.rear_panel_helpers import RearPanelController
+#from hardware_testing.opentrons_api.rear_panel_helpers import RearPanelController
 
 from opentrons_hardware.drivers.binary_usb.build import (
     build_rear_panel_messenger,
@@ -10,7 +10,9 @@ from opentrons_hardware.drivers.binary_usb.build import (
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
     set_deck_light,
-    get_deck_light_state
+    get_deck_light_state,
+    set_ui_color,
+    get_all_pin_state,
 )
 
 ##START TEST PASSING CONDITIONS
@@ -89,6 +91,8 @@ pre_test = {"ESTOP_DETECT_1": 0,
 
 
 async def get_all_states(usb_messenger):
+    state = await get_all_pin_state(usb_messenger)
+    print(str(state))
     return 1
 
 async def check_all_states(usb_messenger):
@@ -99,11 +103,28 @@ async def run(args: argparse.Namespace) -> None:
     async with usb_driver() as driver:
         usb_messenger = build_rear_panel_messenger(driver)
         usb_messenger.start()
+        input("door open")
         door_test_result = await get_door_state(usb_messenger)
         print(door_test_result)
-
+        input("door closed")
+        door_test_result = await get_door_state(usb_messenger)
+        print(door_test_result)
+        input("turn deck light off")
         await set_deck_light(0, usb_messenger)
-        await usb_messenger.stop()
+        input("turn deck light on")
+        await set_deck_light(1, usb_messenger)
+        input("set ui red")
+        await set_ui_color(255,0,0,0, usb_messenger)
+        input("set ui blue")
+        await set_ui_color(0,255,0,0, usb_messenger)
+        input("set ui green")
+        await set_ui_color(0,0,255,0, usb_messenger)
+        input("set ui white")
+        await set_ui_color(0,0,0,255, usb_messenger)
+        input("print state")
+        await get_all_states(usb_messenger)
+        input("done")
+        #await usb_messenger.stop()
 
 def main() -> None:
     """Entry point."""
