@@ -20,7 +20,7 @@ import {
 import { SLEEP_NEVER_MS } from '../../../App/constants'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 

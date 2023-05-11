@@ -27,7 +27,7 @@ import {
 } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const BUTTON_STYLE = css`
   &:focus-visible {

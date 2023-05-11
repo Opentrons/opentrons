@@ -4,11 +4,11 @@ import { fireEvent } from '@testing-library/dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
-import { getLocalRobot } from '../../../redux/discovery'
-import { toggleDevtools } from '../../../redux/config'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { i18n } from '../../../../i18n'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { toggleDevtools } from '../../../../redux/config'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { Navigation } from '../../../../organisms/OnDeviceDisplay/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -17,36 +17,38 @@ import {
   RobotSystemVersion,
   TextSize,
   UpdateChannel,
-} from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
-import { useLights } from '../../../organisms/Devices/hooks'
+} from '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+import { useLights } from '../../../../organisms/Devices/hooks'
 
-import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
+import { RobotSettingsDashboard } from '..'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/buildroot')
-jest.mock('../../../redux/config')
-jest.mock('../hooks/useNetworkConnection')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/buildroot')
+jest.mock('../../../../redux/config')
+jest.mock('../../hooks/useNetworkConnection')
+jest.mock('../../../../organisms/OnDeviceDisplay/Navigation')
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
-)
-jest.mock('../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TextSize')
-jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchscreenBrightness'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/UpdateChannel'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TextSize'
 )
-jest.mock('../../../organisms/Devices/hooks')
+jest.mock(
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchscreenBrightness'
+)
+jest.mock(
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/UpdateChannel'
+)
+jest.mock('../../../../organisms/Devices/hooks')
 
 const mockToggleLights = jest.fn()
 
