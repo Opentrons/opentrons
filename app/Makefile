@@ -12,7 +12,7 @@ PORT ?= 8090
 # dependency directories for dev
 shell_dir := ../app-shell
 shell_odd_dir := ../app-shell-odd
-discovery_client_dir = ../discovery-client
+discovery_client_dir := ../discovery-client
 
 # standard targets
 #####################################################################
