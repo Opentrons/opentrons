@@ -66,13 +66,13 @@ export function TouchScreenSleep({
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText>{t('sleep_settings_description')}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing5}
+        gridGap={SPACING.spacing8}
+        marginTop={SPACING.spacing24}
       >
         {settingsButtons.map(radio => (
           <RadioButton

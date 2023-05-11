@@ -38,9 +38,9 @@ export type SettingOption =
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
-  margin-bottom: ${SPACING.spacing3};
+  margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.medGreyEnabled};
-  padding: ${SPACING.spacingM} ${SPACING.spacing5};
+  padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.size_four};
 `
 
@@ -91,19 +91,19 @@ export function RobotSettingButton({
       onClick={handleClick}
       display={DISPLAY_FLEX}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing5}
+      gridGap={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
       >
         <Icon name={iconName} size="3rem" />
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing1}
+          gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
         >

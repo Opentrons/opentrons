@@ -59,7 +59,7 @@ export function RecentRunProtocolCarousel({
     <Flex
       alignItems={ALIGN_FLEX_START}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       ref={swipe.ref}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
@@ -67,7 +67,7 @@ export function RecentRunProtocolCarousel({
       onMouseUp={handleMouseUp}
       overflow={OVERFLOW_HIDDEN}
     >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         {sortedProtocols.map((protocol: ProtocolResource) => {
           const lastRun = runs.data?.data.find(
             run => run.protocolId === protocol.id

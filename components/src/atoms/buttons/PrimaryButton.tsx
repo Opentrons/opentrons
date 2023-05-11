@@ -6,8 +6,8 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: none;
-  padding-left: ${SPACING.spacing4};
-  padding-right: ${SPACING.spacing4};
+  padding-left: ${SPACING.spacing16};
+  padding-right: ${SPACING.spacing16};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}

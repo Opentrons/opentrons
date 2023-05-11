@@ -39,7 +39,7 @@ export function InvalidationWarning(
 
   return (
     <Banner type="warning">
-      <Flex flexDirection="column" paddingRight={SPACING.spacing4}>
+      <Flex flexDirection="column" paddingRight={SPACING.spacing16}>
         {warningBody}
       </Flex>
     </Banner>
