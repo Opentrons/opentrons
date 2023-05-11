@@ -9,6 +9,7 @@ import {
   STD_SLOT_Y_DIM as SLOT_Y,
   STD_SLOT_DIVIDER_WIDTH as DIVIDER,
   SPAN7_8_10_11_SLOT,
+  MAGNETIC_BLOCK_TYPE,
 } from '../constants'
 import { ModuleType, ModuleOrientation } from '../types'
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
@@ -56,6 +57,17 @@ const MODULE_VIZ_DIMS: Record<ModuleType, ModuleVizDims> = {
   },
   // TODO(sh, 2022-02-28): This is stubbed out using magdeck dimensions, all of this logic should be deprecated
   [HEATERSHAKER_MODULE_TYPE]: {
+    xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
+    yOffset: -1 * DIVIDER,
+    xDimension: SLOT_X * 1.2 + DIVIDER * 2,
+    yDimension: SLOT_Y + DIVIDER * 2,
+    childXOffset: 0,
+    childYOffset: 0,
+    childXDimension: SLOT_X,
+    childYDimension: SLOT_Y,
+  },
+  // TODO(sh, 2022-02-28): This is stubbed out using magdeck dimensions, all of this logic should be deprecated
+  [MAGNETIC_BLOCK_TYPE]: {
     xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.2 + DIVIDER * 2,

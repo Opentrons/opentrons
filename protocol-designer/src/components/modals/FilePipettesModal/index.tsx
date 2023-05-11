@@ -28,6 +28,8 @@ import {
   ModuleModel,
   getPipetteNameSpecs,
   PipetteName,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -84,6 +86,11 @@ const initialFormState: FormState = {
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
+    [MAGNETIC_BLOCK_TYPE]: {
+      onDeck: false,
+      model: MAGNETIC_BLOCK_V1,
+      slot: '1',
+    },
     [HEATERSHAKER_MODULE_TYPE]: {
       onDeck: false,
       model: HEATERSHAKER_MODULE_V1,
