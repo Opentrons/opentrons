@@ -11,7 +11,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface RobotNameProps {
   setCurrentOption: (currentOption: SettingOption | null) => void
