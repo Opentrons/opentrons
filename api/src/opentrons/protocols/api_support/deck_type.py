@@ -1,3 +1,5 @@
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons.config import feature_flags
 
 
@@ -27,3 +29,10 @@ def guess_from_global_config() -> str:
         return SHORT_TRASH_DECK
     else:
         return STANDARD_OT2_DECK
+
+
+def for_robot_type(robot_type: RobotType) -> str:
+    if robot_type == "OT-2 Standard":
+        return STANDARD_OT2_DECK
+    elif robot_type == "OT-3 Standard":
+        return STANDARD_OT3_DECK
