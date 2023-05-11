@@ -17,7 +17,6 @@ const getTargetPath = (
   isShellReady: boolean,
   unfinishedUnboxingFlowRoute: string | null
 ): string | null => {
-  console.log({ isShellReady, unfinishedUnboxingFlowRoute })
   if (!isShellReady) {
     return null
   }
