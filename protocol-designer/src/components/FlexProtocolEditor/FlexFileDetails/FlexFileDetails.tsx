@@ -2,7 +2,6 @@ import {
   Card,
   DIRECTION_COLUMN,
   Flex,
-  InstrumentGroup,
   NewPrimaryBtn,
   SPACING,
   SecondaryButton,
@@ -34,6 +33,7 @@ import { StyledText } from '../StyledText'
 import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import { FilePage } from '../../FilePage'
+import { InstrumentGroup } from '../instrument/InstrumentGroup'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
