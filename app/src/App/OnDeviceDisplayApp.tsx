@@ -244,7 +244,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }, [dispatch, isIdle, usersBrightness])
 
   return (
-    <ApiHostProvider hostname="10.13.11.68">
+    <ApiHostProvider hostname="localhost">
       <Box width="100%" css="user-select: none;">
         {Boolean(isIdle) ? (
           <SleepScreen />
@@ -274,9 +274,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 }
 
 function TopLevelRedirects(): JSX.Element | null {
-  const routeMatch = useRouteMatch()
+  const runRouteMatch = useRouteMatch({path: '/runs/:runId'})
   const currentRunRoute = useCurrentRunRoute()
-  console.log('routeMatch', routeMatch)
-  console.log('currentRunRoute', currentRunRoute)
+  if (runRouteMatch != null && currentRunRoute == null) return <Redirect to='/dashboard' />
   return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
 }

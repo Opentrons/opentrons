@@ -41,8 +41,6 @@ export function useCurrentRunRoute(): string | null {
   const hasBeenStarted = actions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
-  console.log('status', status)
-  console.log('actions', actions)
   if (status === RUN_STATUS_SUCCEEDED ||
     status === RUN_STATUS_STOPPED ||
     status === RUN_STATUS_FAILED) {
