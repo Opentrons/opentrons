@@ -31,7 +31,7 @@ const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3};
+  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8};
 `
 const TableRow = styled('tr')`
   height: 5.75rem;
@@ -39,7 +39,7 @@ const TableRow = styled('tr')`
 `
 const TableDatum = styled('td')`
   z-index: 2;
-  padding: ${SPACING.spacing3} ${SPACING.spacingM};
+  padding: ${SPACING.spacing8} ${SPACING.spacing20};
   background-color: ${COLORS.light2};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
@@ -69,7 +69,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
     null
   )
   return (
-    <Flex marginTop={SPACING.spacing5}>
+    <Flex marginTop={SPACING.spacing24}>
       {labwareIdModal != null && (
         <LiquidsLabwareDetailsModal
           labwareId={labwareIdModal}
@@ -126,7 +126,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   <Flex flexDirection={DIRECTION_ROW}>
                     <Flex
                       height="2.75rem"
-                      padding={`${SPACING.spacing3} 0.75rem`}
+                      padding={`${SPACING.spacing8} 0.75rem`}
                       width="max-content"
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}

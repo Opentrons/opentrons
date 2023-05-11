@@ -56,11 +56,9 @@ export function ConnectViaEthernet(): JSX.Element {
     <>
       <StepMeter totalSteps={5} currentStep={2} OnDevice />
       <Flex
-        margin={`${String(SPACING.spacing6)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+        margin={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
       >
         <TitleHeader title={headerTitle} />
         <DisplayConnectionStatus isConnected={isConnected} />
@@ -120,7 +118,7 @@ const TitleHeader = ({ title }: TitleHeaderProps): JSX.Element => {
         >
           <Icon
             name="chevron-left"
-            marginRight={SPACING.spacing2}
+            marginRight={SPACING.spacing4}
             size="1.875rem"
           />
           <StyledText
@@ -152,14 +150,14 @@ const DisplayConnectionStatus = ({
       {isConnected ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+          padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
           backgroundColor={COLORS.successBackgroundMed}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
           <Icon name="ot-check" size="2.5rem" color={COLORS.successEnabled} />
           <StyledText
-            marginLeft={SPACING.spacing5}
+            marginLeft={SPACING.spacing24}
             fontSize="1.625rem"
             fontWeight="700"
             lineHeight="2.1875rem"
@@ -180,14 +178,14 @@ const DisplayConnectionStatus = ({
       ) : (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+          padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
           backgroundColor={COLORS.light2}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
           <Flex flexDirection={DIRECTION_ROW}>
             <StyledText
-              marginLeft={SPACING.spacing5}
+              marginLeft={SPACING.spacing24}
               fontSize="1.625rem"
               fontWeight="700"
               lineHeight="2.1875rem"
@@ -239,7 +237,7 @@ const DisplayEthernetInfo = ({
   return (
     <Flex backgroundColor={COLORS.light2} flexDirection={DIRECTION_COLUMN}>
       <Flex
-        padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing6)}}`}
+        padding={`${SPACING.spacing24} ${SPACING.spacing32}}`}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
@@ -258,7 +256,7 @@ const DisplayEthernetInfo = ({
             {isConnected ? t('ethernet') : t('no_network_found')}
           </StyledText>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText
             fontSize="1.5rem"
             lineHeight="2.0625rem"

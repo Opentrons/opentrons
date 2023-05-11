@@ -82,8 +82,8 @@ function ProtocolSetupStep({
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
         borderRadius={BORDERS.size_four}
-        gridGap={SPACING.spacing4}
-        padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
         {status !== 'general' ? (
           <Icon
@@ -102,7 +102,7 @@ function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon marginLeft={SPACING.spacing3} name="more" size="3rem" />
+        <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
       </Flex>
     </Btn>
   )
@@ -300,8 +300,8 @@ function PrepareToRun({
       {/* Protocol Setup Header */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginBottom={SPACING.spacingXXL}
+        gridGap={SPACING.spacing24}
+        marginBottom={SPACING.spacing40}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -321,7 +321,7 @@ function PrepareToRun({
               {truncateString(protocolName as string, 100)}
             </StyledText>
           </Flex>
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
             <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
           </Flex>
@@ -330,7 +330,7 @@ function PrepareToRun({
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
@@ -435,18 +435,18 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
           <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
         </Flex>
-        <Flex gridGap={SPACING.spacing5}>
+        <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
           <PlayButton disabled onPlay={() => {}} />
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />

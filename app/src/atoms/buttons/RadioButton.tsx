@@ -65,7 +65,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   const SettingButtonLabel = styled.label`
     border-radius: ${BORDERS.size_four};
     cursor: pointer;
-    padding: ${isLarge ? SPACING.spacing5 : SPACING.spacingM};
+    padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
     width: 100%;
 
     ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}

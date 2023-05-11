@@ -53,7 +53,7 @@ export const MountGripper = (
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Link
           role="button"

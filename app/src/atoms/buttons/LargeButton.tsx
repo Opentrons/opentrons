@@ -70,7 +70,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     cursor: default;
     border-radius: ${BORDERS.size_four};
     box-shadow: none;
-    padding: ${SPACING.spacing5};
+    padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};
     ${TYPOGRAPHY.pSemiBold}
 

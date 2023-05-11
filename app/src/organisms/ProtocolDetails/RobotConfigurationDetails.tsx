@@ -107,7 +107,7 @@ export const RobotConfigurationDetails = (
     )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
         item={
@@ -159,7 +159,7 @@ export const RobotConfigurationDetails = (
                       <ModuleIcon
                         key={index}
                         moduleType={getModuleType(module.params.model)}
-                        marginRight={SPACING.spacing2}
+                        marginRight={SPACING.spacing4}
                         alignSelf={ALIGN_CENTER}
                         color={COLORS.darkGreyEnabled}
                         height={SIZE_1}
@@ -199,7 +199,7 @@ export const RobotConfigurationDetailsItem = (
         as="label"
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginRight={SPACING.spacing4}
+        marginRight={SPACING.spacing16}
         color={COLORS.darkGreyEnabled}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"
