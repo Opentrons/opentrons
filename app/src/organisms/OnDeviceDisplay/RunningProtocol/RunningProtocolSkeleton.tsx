@@ -34,7 +34,7 @@ export function RunningProtocolSkeleton({
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Skeleton
                 width="6.9375rem"
                 height="2rem"
@@ -55,10 +55,10 @@ export function RunningProtocolSkeleton({
 
           <Flex
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing6}
+            gridGap={SPACING.spacing32}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
-            marginBottom={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing40}
           >
             <StopButton />
             <PlayPauseButton />
@@ -74,9 +74,9 @@ export function RunningProtocolSkeleton({
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing40}
           >
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               <Skeleton
                 width="6.9375rem"
                 height="2rem"
@@ -88,12 +88,12 @@ export function RunningProtocolSkeleton({
                 backgroundSize={RUNNING_PROTOCOL_COMMAND_LIST_SIZE}
               />
             </Flex>
-            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
               <StopButton buttonSize="6.25rem" iconSize="5rem" />
               <PlayPauseButton buttonSize="6.25rem" iconSize="2.5rem" />
             </Flex>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Skeleton
               width="59rem"
               height="3.25rem"

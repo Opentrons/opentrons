@@ -28,14 +28,14 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
           block: (
             <StyledText
               fontSize={TYPOGRAPHY.fontSizeP}
-              paddingBottom={SPACING.spacingXS}
+              paddingBottom={SPACING.spacing4}
             />
           ),
         }}
       />
       <SecondaryButton
-        marginTop={SPACING.spacingSM}
-        marginBottom={SPACING.spacing4}
+        marginTop={SPACING.spacing12}
+        marginBottom={SPACING.spacing16}
         onClick={onClick}
         disabled={disabled}
       >

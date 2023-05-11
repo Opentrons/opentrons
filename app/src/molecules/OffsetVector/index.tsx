@@ -17,32 +17,32 @@ export function OffsetVector(props: OffsetVectorProps): JSX.Element {
     <Flex {...styleProps}>
       <StyledText
         as={as}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         X
       </StyledText>
-      <StyledText as={as} marginRight={SPACING.spacing3}>
+      <StyledText as={as} marginRight={SPACING.spacing8}>
         {x.toFixed(2)}
       </StyledText>
       <StyledText
         as={as}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         Y
       </StyledText>
-      <StyledText as={as} marginRight={SPACING.spacing3}>
+      <StyledText as={as} marginRight={SPACING.spacing8}>
         {y.toFixed(2)}
       </StyledText>
       <StyledText
         as={as}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         Z
       </StyledText>
-      <StyledText as={as} marginRight={SPACING.spacing3}>
+      <StyledText as={as} marginRight={SPACING.spacing8}>
         {z.toFixed(2)}
       </StyledText>
     </Flex>

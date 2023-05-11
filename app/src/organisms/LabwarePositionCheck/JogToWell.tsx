@@ -112,21 +112,21 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <Flex gridGap={SPACING.spacingL}>
+      <Flex gridGap={SPACING.spacing24}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_START}
         >
           <StyledText as="h1">{header}</StyledText>
           {body}
           <LiveOffsetValue {...liveOffset} />
         </Flex>
-        <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacingM}>
+        <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
               <>
@@ -156,7 +156,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
       {isOnDevice ? (
         <Flex
           width="100%"
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
         >
@@ -165,7 +165,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
             buttonText={t('shared:go_back')}
             onClick={handleGoBack}
           />
-          <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+          <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
             <SmallButton
               buttonType="secondary"
               buttonText={t('move_pipette')}
@@ -184,7 +184,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               <ModalShell
                 width="60rem"
                 height="33.5rem"
-                padding={SPACING.spacing6}
+                padding={SPACING.spacing32}
                 display="flex"
                 flexDirection={DIRECTION_COLUMN}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -231,12 +231,12 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           />
           <Flex
             width="100%"
-            marginTop={SPACING.spacing6}
+            marginTop={SPACING.spacing32}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
             <NeedHelpLink href={LPC_HELP_LINK_URL} />
-            <Flex gridGap={SPACING.spacing3}>
+            <Flex gridGap={SPACING.spacing8}>
               <SecondaryButton onClick={handleGoBack}>
                 {t('shared:go_back')}
               </SecondaryButton>

@@ -29,8 +29,8 @@ const ErrorTextArea = styled.textarea`
   background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3};
-  margin: ${SPACING.spacing4} 0;
+  padding: ${SPACING.spacing8};
+  margin: ${SPACING.spacing16} 0;
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   font-family: monospace;
   resize: none;
@@ -58,11 +58,11 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
         }
       >
         <Flex
-          padding={SPACING.spacing6}
+          padding={SPACING.spacing32}
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing16}
         >
           <Icon
             name="ot-alert"

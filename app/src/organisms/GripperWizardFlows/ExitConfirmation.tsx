@@ -35,7 +35,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}
     >
-      <SecondaryButton onClick={handleGoBack} marginRight={SPACING.spacing2}>
+      <SecondaryButton onClick={handleGoBack} marginRight={SPACING.spacing4}>
         {t('shared:go_back')}
       </SecondaryButton>
       <AlertPrimaryButton

@@ -29,7 +29,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     color: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.fundamentalsFocus};
     background-color: ${COLORS.blueEnabled};
   }
   &:active {

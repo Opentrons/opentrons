@@ -129,15 +129,15 @@ export function RecentRunProtocolCard({
       aria-label="RecentRunProtocolCard"
       css={PROTOCOL_CARD_STYLE}
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing5}
-      gridGap={SPACING.spacing5}
+      padding={SPACING.spacing24}
+      gridGap={SPACING.spacing24}
       backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
       borderRadius={BORDERS.size_four}
       onClick={handleCardClick}
     >
       {/* marginLeft is needed to cancel chip's padding */}
-      {/* <Flex marginLeft={`-${SPACING.spacing4}`}> */}
+      {/* <Flex marginLeft={`-${SPACING.spacing16}`}> */}
       <Flex>
         <Chip
           paddingLeft="0"

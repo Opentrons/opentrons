@@ -217,7 +217,7 @@ export function ProtocolSetupLabware({
             minHeight="14.375rem"
             minWidth="43.1875rem"
           >
-            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing7}>
+            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
               <LabwareThumbnail
                 viewBox={` 0 0 ${String(
                   selectedLabware.dimensions.xDimension
@@ -228,7 +228,7 @@ export function ProtocolSetupLabware({
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing4}
+                gridGap={SPACING.spacing16}
               >
                 <StyledText>
                   {mostRecentAnalysis != null
@@ -256,8 +256,8 @@ export function ProtocolSetupLabware({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing8}
+        marginTop={SPACING.spacing32}
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -266,7 +266,7 @@ export function ProtocolSetupLabware({
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
-          <Flex paddingLeft={SPACING.spacing5} width="17.9%">
+          <Flex paddingLeft={SPACING.spacing24} width="17.9%">
             <StyledText>{'Location'}</StyledText>
           </Flex>
           <Flex width="82.1%">
@@ -337,7 +337,7 @@ function LabwareLatch({
       }
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSize22}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight28}
       minWidth="11.0625rem"
@@ -447,8 +447,8 @@ function RowLabware({
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_three}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-      gridGap={SPACING.spacing5}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+      gridGap={SPACING.spacing24}
     >
       <Flex width="7.6875rem">
         <StyledText>
@@ -462,7 +462,7 @@ function RowLabware({
       <Flex
         alignSelf={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         width="86%"
       >
         <StyledText
