@@ -102,19 +102,19 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     Component: ProtocolSetup,
     exact: true,
     name: 'Protocol Setup',
-    path: '/protocols/:runId/setup',
+    path: '/runs/:runId/setup',
   },
   {
     Component: RunningProtocol,
     exact: true,
     name: 'Protocol Run',
-    path: '/protocols/:runId/run',
+    path: '/runs/:runId/run',
   },
   {
     Component: RunSummary,
     exact: true,
     name: 'Protocol Run Summary',
-    path: '/protocols/:runId/summary',
+    path: '/runs/:runId/summary',
   },
   {
     Component: InstrumentsDashboard,

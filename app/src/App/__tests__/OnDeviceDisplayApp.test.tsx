@@ -14,6 +14,7 @@ import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { ProtocolDetails } from '../../pages/OnDeviceDisplay/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
@@ -32,6 +33,7 @@ jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
+jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
 jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../pages/OnDeviceDisplay/RunSummary')
@@ -63,6 +65,9 @@ const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
 >
 const mockProtocolDashboard = ProtocolDashboard as jest.MockedFunction<
   typeof ProtocolDashboard
+>
+const mockProtocolDetails = ProtocolDetails as jest.MockedFunction<
+  typeof ProtocolDetails
 >
 const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
   typeof ProtocolSetup
@@ -104,6 +109,7 @@ describe('OnDeviceDisplayApp', () => {
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
     mockProtocolDashboard.mockReturnValue(<div>Mock ProtocolDashboard</div>)
     mockProtocolSetup.mockReturnValue(<div>Mock ProtocolSetup</div>)
+    mockProtocolDetails.mockReturnValue(<div>Mock ProtocolDetails</div>)
     mockRobotSettingsDashboard.mockReturnValue(
       <div>Mock RobotSettingsDashboard</div>
     )
@@ -149,8 +155,12 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/protocols')
     getByText('Mock ProtocolDashboard')
   })
-  it('renders ProtocolSetup component from /protocols/:runId/setup', () => {
-    const [{ getByText }] = render('/protocols/my-protocol-id/setup')
+  it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
+    const [{ getByText }] = render('/protocols/my-protocol-id')
+    getByText('Mock ProtocolDetails')
+  })
+  it('renders ProtocolSetup component from /runs/:runId/setup', () => {
+    const [{ getByText }] = render('/runs/my-run-id/setup')
     getByText('Mock ProtocolSetup')
   })
   it('renders RobotSettingsDashboard component from /robot-settings', () => {
@@ -161,12 +171,12 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/instruments')
     getByText('Mock InstrumentsDashboard')
   })
-  it('renders RunningProtocol component from /protocols/:runId/run', () => {
-    const [{ getByText }] = render('/protocols/my-run-id/run')
+  it('renders RunningProtocol component from /runs/:runId/run', () => {
+    const [{ getByText }] = render('/runs/my-run-id/run')
     getByText('Mock RunningProtocol')
   })
-  it('renders a RunSummary component from /protocols/:runId/summary', () => {
-    const [{ getByText }] = render('/protocols/my-run-id/summary')
+  it('renders a RunSummary component from /runs/:runId/summary', () => {
+    const [{ getByText }] = render('/runs/my-run-id/summary')
     getByText('Mock RunSummary')
   })
   it('renders Welcome component when the setup flow is needed', () => {
