@@ -24,6 +24,11 @@ interface SpacingsStorybookProps {
 const Template: Story<SpacingsStorybookProps> = args => {
   const targetSpacings = args.spacings.filter(s => !s[1].includes('auto'))
 
+  const convertToPx = (remFormat: string): string => {
+    const pxVal = Number(remFormat.replace('rem', '')) * 16
+    return `${pxVal}px`
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -41,7 +46,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
           height="6rem"
         >
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {`${spacing[0]} - ${spacing[1]}`}
+            {`${spacing[0]} - ${spacing[1]}: ${convertToPx(spacing[1])}`}
           </StyledText>
           <Box
             width={spacing[1]}
