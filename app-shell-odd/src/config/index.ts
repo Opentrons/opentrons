@@ -1,5 +1,6 @@
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
+import { app } from 'electron'
 import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
@@ -22,8 +23,6 @@ import type { Action, Dispatch, Logger } from '../types'
 import type { Config, Overrides } from './types'
 
 export * from './types'
-
-export const ODD_DIR = '/data/ODD'
 
 // Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
 const BRIGHTNESS_FILE =
@@ -52,7 +51,7 @@ const store = (): Store => {
     _store = (new Store({
       defaults: DEFAULTS_V12,
       // dont overwrite config dir if in dev mode because it causes issues
-      ...(process.env.NODE_ENV === 'production' && { cwd: ODD_DIR }),
+      ...(process.env.NODE_ENV === 'production' && { cwd: app.getPath('userData') }),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }

@@ -44,6 +44,7 @@ function startUp(): void {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
+  app.setPath('userData', '/data/ODD')
 
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
