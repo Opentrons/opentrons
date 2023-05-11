@@ -61,9 +61,9 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
           </Flex>
           <hr />
           {channel96SelectionNote(is96ChannelSelected)}
-          <Flex className={styles.pb_10}>
+          <div className={styles.pb_10}>
             <TipRackOptions pipetteName={pipetteName} />
-          </Flex>
+          </div>
         </>
       }
     </>
