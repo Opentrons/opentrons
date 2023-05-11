@@ -63,4 +63,34 @@ stages:
     response:
       status_code: 403
 
+  - name: Valid auth token with version 5
+    request:
+      url: '{host:s}:{port:d}/robot/lights'
+      method: POST
+      json:
+        "on": "true"
+      headers:
+        Opentrons-Version: 5
+    response:
+      status_code: 200
+
+  - name: Missing auth token on a GET endpoint with version 5
+    request:
+      url: '{host:s}:{port:d}/robot/lights'
+      method: GET
+      headers:
+        Opentrons-Version: 5
+        authenticationBearer: ''
+    response:
+      status_code: 200
+
+  - name: Valid auth token on a GET endpoint with version 5
+    request:
+      url: '{host:s}:{port:d}/robot/lights'
+      method: GET
+      headers:
+        Opentrons-Version: 5
+    response:
+      status_code: 200
+    
     
