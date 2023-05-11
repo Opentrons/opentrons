@@ -871,8 +871,8 @@ def load_attitude_matrix(to_default: bool = True) -> DeckCalibration:
             source=calibration_data.source,
             status=types.CalibrationStatus(**calibration_data.status.dict()),
             belt_attitude=calibration_data.attitude,
-            last_modified=calibration_data.last_modified,
-            pipette_calibrated_with=calibration_data.pipette_calibrated_with,
+            last_modified=calibration_data.lastModified,
+            pipette_calibrated_with=calibration_data.pipetteCalibratedWith,
         )
     else:
         # load default if calibration data does not exist
