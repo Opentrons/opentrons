@@ -93,7 +93,6 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
-    "StaticPipetteConfig",
     # plugins
     "AbstractPlugin",
 ]
