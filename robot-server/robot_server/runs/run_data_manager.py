@@ -154,7 +154,6 @@ class RunDataManager:
         Returns:
             All run resources.
         """
-        print(length)
         return [
             _build_run(
                 run_resource=run_resource,
