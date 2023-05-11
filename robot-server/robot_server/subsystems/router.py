@@ -1,8 +1,7 @@
-""" The router for the /subsystems endpoints."""
+"""The router for the /subsystems endpoints."""
 
 from datetime import datetime
-from typing import Optional, List, Dict, Union
-from typing_extensions import Final
+from typing import Optional
 
 from fastapi import APIRouter, status, Depends, Response, Request
 from typing_extensions import Literal
@@ -17,7 +16,6 @@ from robot_server.service.json_api import (
     SimpleMultiBody,
     PydanticResponse,
     MultiBodyMeta,
-    RequestModel,
     SimpleBody,
 )
 from server_utils.fastapi_utils.app_state import (
@@ -30,15 +28,13 @@ from .firmware_update_manager import (
     FirmwareUpdateManager,
     UpdateIdNotFound as _UpdateIdNotFound,
     UpdateIdExists as _UpdateIdExists,
-    UpdateFailed as _UpdateFailed,
     UpdateInProgress as _UpdateInProgress,
     NoOngoingUpdate as _NoOngoingUpdate,
     SubsystemNotFound as _SubsystemNotFound,
-    UpdateProcessSummary,
 )
 
 from robot_server.errors import ErrorDetails, ErrorBody
-from robot_server.errors.robot_errors import InstrumentNotFound, NotSupportedOnOT2
+from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.errors.global_errors import IDNotFound
 
 from robot_server.service.dependencies import get_unique_id, get_current_time
@@ -57,8 +53,6 @@ subsystems_router = APIRouter()
 _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
 )
-
-UPDATE_CREATE_TIMEOUT_S: Final = 5
 
 
 def _error_str(maybe_err: Optional[Exception]) -> Optional[str]:
@@ -109,13 +103,6 @@ class UpdateInProgress(ErrorDetails):
     title: str = "An update is already in progress."
 
 
-class TimeoutStartingUpdate(ErrorDetails):
-    """Error raised when the update took too long to start."""
-
-    id: Literal["TimeoutStartingUpdate"] = "TimeoutStartingUpdate"
-    title: str = "Timeout Starting Update"
-
-
 class FirmwareUpdateFailed(ErrorDetails):
     """An error if a firmware update failed for some reason."""
 
@@ -156,6 +143,7 @@ class NoOngoingUpdate(ErrorDetails):
 async def get_attached_subsystems(
     hardware: OT3API = Depends(get_ot3_hardware),
 ) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
+    """Return all subsystems currently present on the machine."""
     data = [
         PresentSubsystem.construct(
             name=SubSystem.from_hw(subsystem_id),
@@ -216,6 +204,7 @@ async def get_attached_subsystem(
 async def get_subsystem_updates(
     update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
+    """Return all currently-running firmware update process summaries."""
     handles = await update_manager.all_ongoing_processes()
     data = [
         UpdateProgressSummary.construct(
@@ -245,7 +234,7 @@ async def get_subsystem_update(
     subsystem: SubSystem,
     update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
-
+    """Return full data about a specific currently-running update process."""
     try:
         handle = await update_manager.get_ongoing_update_process_handle_by_subsystem(
             subsystem
@@ -278,6 +267,7 @@ async def get_subsystem_update(
 async def get_update_processes(
     update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
+    """Return summaries of all past (since robot boot) or present update processes."""
     data = [
         UpdateProgressSummary(
             id=update.process_details.update_id,
@@ -303,6 +293,7 @@ async def get_update_process(
     id: str,
     update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
+    """Return the progress of a specific past or present update process."""
     try:
         handle = update_manager.get_update_process_handle_by_id(id)
     except _UpdateIdNotFound as e:
@@ -344,23 +335,12 @@ async def begin_subsystem_update(
     update_process_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
-    """Update the firmware of the OT3 instrument on the specified mount.
-
-    Arguments:
-        request_body: Optional request body with instrument to update. If not specified,
-                      will start an update of all attached instruments.
-        firmware_update_manager: Injected manager for firmware updates.
-        update_process_id: Generated ID to assign to the update resource.
-        created_at: Timestamp to attach to created update resource.
-
-    """
-
+    """Update the firmware of the OT3 instrument on the specified mount."""
     try:
         summary = await update_manager.start_update_process(
             update_process_id,
             subsystem,
             created_at,
-            UPDATE_CREATE_TIMEOUT_S,
         )
     except _SubsystemNotFound as e:
         raise SubsystemNotPresent(
@@ -376,10 +356,6 @@ async def begin_subsystem_update(
             detail=f"{subsystem.value} is already either queued for update"
             f" or is currently updating"
         ).as_error(status.HTTP_303_SEE_OTHER) from e
-    except TimeoutError as e:
-        raise TimeoutStartingUpdate(detail=str(e)).as_error(
-            status.HTTP_408_REQUEST_TIMEOUT
-        )
     except _UpdateIdExists:
         raise UpdateInProgress(
             detail="An update is already ongoing with this ID."

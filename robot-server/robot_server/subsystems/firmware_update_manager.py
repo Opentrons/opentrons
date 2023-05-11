@@ -1,29 +1,21 @@
 """Class to monitor firmware update status."""
 from datetime import datetime
+from dataclasses import dataclass
 from typing import (
     Dict,
-    Union,
     TYPE_CHECKING,
-    Iterable,
-    Iterator,
     Optional,
     Any,
     Callable,
     Awaitable,
     List,
 )
-from typing_extensions import Literal
 
-# TODO: Remove when on py 3.11 when this isn't a different class anymore
-from concurrent.futures import TimeoutError as FuturesTimeoutError
-
-from asyncio import Lock, Queue, wait_for, QueueEmpty
+from asyncio import Lock, Queue, QueueEmpty
 from dataclasses import dataclass
-from enum import Enum, auto
 import logging
 
 from opentrons.hardware_control.types import (
-    UpdateState as HWUpdateState,
     SubSystem as HWSubSystem,
 )
 from opentrons.hardware_control.errors import UpdateOngoingError
@@ -35,163 +27,6 @@ log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
-
-
-class NoOngoingUpdate(KeyError):
-    """There is no ongoing update for this subsystem."""
-
-
-class UpdateFailed(RuntimeError):
-    """Error raised when the information from hardware controller points to a failed update."""
-
-
-class UpdateIdNotFound(KeyError):
-    """This update ID was not found."""
-
-
-class UpdateIdExists(ValueError):
-    """There is already an entry for this update key."""
-
-
-class UncontrolledUpdateInProgress(RuntimeError):
-    """An update process started by something other than the server is running."""
-
-    def __init__(self, subsystem: SubSystem) -> None:
-        super().__init__()
-        self.subsystem = subsystem
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: subsystem={self.subsystem}>"
-
-    def __str__(self) -> str:
-        return ""
-
-
-class UpdateInProgress(RuntimeError):
-    """Error raised when an update is already ongoing on the same device."""
-
-    def __init__(self, subsystem: SubSystem) -> None:
-        super().__init__()
-        self.subsystem = subsystem
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: {self.subsystem}>"
-
-    def __str__(self) -> str:
-        return f"Update for {self.subsystem} already in progress"
-
-
-class SubsystemNotFound(KeyError):
-    """Requested subsystem not attached."""
-
-    def __init__(self, subsystem: SubSystem) -> None:
-        super().__init__()
-        self.subsystem = subsystem
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: {self.subsystem}>"
-
-    def __str__(self) -> str:
-        return f"Subsystem {self.subsystem} is not attached"
-
-
-class _UpdateProcess:
-    """State storage and routing for a firmware update."""
-
-    _status_queue: "Queue[UpdateProgress]"
-    _hw_handle: "OT3API"
-    _subsystem: HWSubSystem
-    _status_cache: Optional[UpdateProgress]
-    _created_at: datetime
-    _update_id: str
-    _complete_callback: Callable[[], Awaitable[None]]
-
-    def __init__(
-        self,
-        hw_handle: "OT3API",
-        subsystem: HWSubSystem,
-        created_at: datetime,
-        update_id: str,
-        complete_callback: Callable[[], Awaitable[None]],
-    ) -> None:
-        self._status_queue = Queue()
-        self._hw_handle = hw_handle
-        self._subsystem = subsystem
-        self._status_cache = None
-        self._status_cache_lock = Lock()
-        self._created_at = created_at
-        self._update_id = update_id
-        # mypy thinks this is assignment to a method, which it is not. that means
-        # it's ok to assign this and it's also okay to not take a self argument
-        self._complete_callback = complete_callback  # type: ignore[assignment,misc]
-
-    @property
-    def status_cache(self) -> UpdateProgress:
-        if not self._status_cache:
-            raise RuntimeError(
-                "Update process was not started before asking for status"
-            )
-        return self._status_cache
-
-    @property
-    def created_at(self) -> datetime:
-        return self._created_at
-
-    @property
-    def subsystem(self) -> HWSubSystem:
-        return self._subsystem
-
-    @property
-    def update_id(self) -> str:
-        return self._update_id
-
-    async def _update_task(self) -> None:
-        last_progress = 0
-        try:
-            async for update in self._hw_handle.update_firmware({self.subsystem}):
-                packet = next(update)
-                last_progress = packet.progress
-                await self._status_queue.put(
-                    UpdateProgress(UpdateState.from_hw(packet.state), progress, None)
-                )
-            last_progress = 100
-            await self._status_queue.put(UpdateProgress(UpdateState.done, 100, None))
-        except Exception as e:
-            log.exception("Failed to update firmware")
-            await self._status_queue.put(
-                UpdateProgress(UpdateState.error, last_progress, e)
-            )
-        # mypy continues to think this is a method but it is a function stored in an
-        # attribute and therefore does not need a self argument
-        await self._complete_callback()  # type: ignore[misc]
-
-    def get_handle(self) -> "UpdateProcessHandle":
-        return UpdateProcessHandle(self)
-
-    async def provide_latest_progress(self) -> UpdateProgress:
-        """Updates the status cache with the latest update if there is one."""
-        while self._status_cache is None:
-            self._status_cache = await self._status_queue.get()
-        maybe_latest = self._drain_queue_provide_last()
-        if maybe_latest:
-            self._status_cache = maybe_latest
-
-        return self.status_cache
-
-    def _drain_queue_provide_last(self) -> Optional[UpdateProgress]:
-        """Drains the status queue to provide the latest update.
-
-        Note that this code does not yield. It should be acceptably fast because get_nowait() is
-        designed for this; and the lack of yielding makes this function as a whole atomic in an
-        async context. If multiple tasks call this function, the first to do so gets the update and
-        the rest get None.
-        """
-        packet: Optional[Progress] = None
-        while True:
-            try:
-                packet = self._status_queue.get_nowait()
-            except QueueEmpty:
-                return packet
 
 
 @dataclass
@@ -218,6 +53,196 @@ class UpdateProcessSummary:
 
     details: ProcessDetails
     progress: UpdateProgress
+
+
+class NoOngoingUpdate(KeyError):
+    """There is no ongoing update for this subsystem."""
+
+
+class UpdateFailed(RuntimeError):
+    """Error raised when the information from hardware controller points to a failed update."""
+
+
+class UpdateIdNotFound(KeyError):
+    """This update ID was not found."""
+
+
+class UpdateIdExists(ValueError):
+    """There is already an entry for this update key."""
+
+
+class UncontrolledUpdateInProgress(RuntimeError):
+    """An update process started by something other than the server is running."""
+
+    def __init__(self, subsystem: SubSystem) -> None:
+        """Build an UncontrolledUpdateInProgressError."""
+        super().__init__()
+        self.subsystem = subsystem
+
+    def __repr__(self) -> str:
+        """Internal string representation of the error."""
+        return f"<{self.__class__.__name__}: subsystem={self.subsystem}>"
+
+    def __str__(self) -> str:
+        """Public string representation of the error."""
+        return f"An update for {self.subsystem} is in progress from another source."
+
+
+class UpdateInProgress(RuntimeError):
+    """Error raised when an update is already ongoing on the same device."""
+
+    def __init__(self, subsystem: SubSystem) -> None:
+        """Build an UpdateInProgressError."""
+        super().__init__()
+        self.subsystem = subsystem
+
+    def __repr__(self) -> str:
+        """Internal string representation for the error."""
+        return f"<{self.__class__.__name__}: {self.subsystem}>"
+
+    def __str__(self) -> str:
+        """Public string representation for the error."""
+        return f"Update for {self.subsystem} already in progress"
+
+
+class SubsystemNotFound(KeyError):
+    """Requested subsystem not attached."""
+
+    def __init__(self, subsystem: SubSystem) -> None:
+        """Build a SubsystemNotFoundError."""
+        super().__init__()
+        self.subsystem = subsystem
+
+    def __repr__(self) -> str:
+        """Internal string representation for the error."""
+        return f"<{self.__class__.__name__}: {self.subsystem}>"
+
+    def __str__(self) -> str:
+        """Public string representation for the error."""
+        return f"Subsystem {self.subsystem} is not attached"
+
+
+class _UpdateProcess:
+    """State storage and routing for a firmware update."""
+
+    _status_queue: "Queue[UpdateProgress]"
+    _hw_handle: "OT3API"
+    _subsystem: HWSubSystem
+    _status_cache: Optional[UpdateProgress]
+    _created_at: datetime
+    _update_id: str
+    _complete_callback: Callable[[], Awaitable[None]]
+
+    def __init__(
+        self,
+        hw_handle: "OT3API",
+        subsystem: HWSubSystem,
+        created_at: datetime,
+        update_id: str,
+        complete_callback: Callable[[], Awaitable[None]],
+    ) -> None:
+        """Build an _UpdateProcess. Should only be done by the manager."""
+        self._status_queue = Queue()
+        self._hw_handle = hw_handle
+        self._subsystem = subsystem
+        self._status_cache = None
+        self._status_cache_lock = Lock()
+        self._created_at = created_at
+        self._update_id = update_id
+        # mypy thinks this is assignment to a method, which it is not. that means
+        # it's ok to assign this and it's also okay to not take a self argument
+        self._complete_callback = complete_callback  # type: ignore[assignment,misc]
+
+    @property
+    def status_cache(self) -> UpdateProgress:
+        """Get the last status from the worker task.
+
+        Note: this may not be up to date unless you've called provide_latest_progress.
+        """
+        if not self._status_cache:
+            raise RuntimeError(
+                "Update process was not started before asking for status"
+            )
+        return self._status_cache
+
+    @property
+    def created_at(self) -> datetime:
+        """The time at which the process began."""
+        return self._created_at
+
+    @property
+    def subsystem(self) -> HWSubSystem:
+        """The subsystem that is being upated."""
+        return self._subsystem
+
+    @property
+    def update_id(self) -> str:
+        """The ID of the update task."""
+        return self._update_id
+
+    async def _update_task(self) -> None:
+        last_progress = 0
+        try:
+            async for update in self._hw_handle.update_firmware({self.subsystem}):
+                packet = next(iter(update))
+                last_progress = packet.progress
+                await self._status_queue.put(
+                    UpdateProgress(
+                        UpdateState.from_hw(packet.state), last_progress, None
+                    )
+                )
+            last_progress = 100
+            await self._status_queue.put(UpdateProgress(UpdateState.done, 100, None))
+        except UpdateOngoingError as e:
+            log.exception(f"Update was already in progress for {self.subsystem.value}")
+            await self._status_queue.put(
+                UpdateProgress(
+                    UpdateState.failed,
+                    0,
+                    UncontrolledUpdateInProgress(SubSystem.from_hw(self.subsystem)),
+                )
+            )
+        except Exception as e:
+            log.exception("Failed to update firmware")
+            await self._status_queue.put(
+                UpdateProgress(UpdateState.failed, last_progress, e)
+            )
+        # mypy continues to think this is a method but it is a function stored in an
+        # attribute and therefore does not need a self argument
+        await self._complete_callback()  # type: ignore[misc]
+
+    def get_handle(self) -> "UpdateProcessHandle":
+        """Get a public handle for the task that is usable elsewhere.
+
+        Handles of this type should be the only way code from outside this module interacts with
+        an UpdateProcess.
+        """
+        return UpdateProcessHandle(self)
+
+    async def provide_latest_progress(self) -> UpdateProgress:
+        """Updates the status cache with the latest update if there is one."""
+        while self._status_cache is None:
+            self._status_cache = await self._status_queue.get()
+        maybe_latest = self._drain_queue_provide_last()
+        if maybe_latest:
+            self._status_cache = maybe_latest
+
+        return self.status_cache
+
+    def _drain_queue_provide_last(self) -> Optional[UpdateProgress]:
+        """Drains the status queue to provide the latest update.
+
+        Note that this code does not yield. It should be acceptably fast because get_nowait() is
+        designed for this; and the lack of yielding makes this function as a whole atomic in an
+        async context. If multiple tasks call this function, the first to do so gets the update and
+        the rest get None.
+        """
+        packet: Optional[UpdateProgress] = None
+        while True:
+            try:
+                packet = self._status_queue.get_nowait()
+            except QueueEmpty:
+                return packet
 
 
 class UpdateProcessHandle:
@@ -252,6 +277,11 @@ class UpdateProcessHandle:
 
     @property
     def cached_state(self) -> UpdateState:
+        """Get the last cached state of the update.
+
+        This may be out of date if the process is ongoing and get_progress() has not recently been
+        called on this or another handle, but if the process is complete then it will say done.
+        """
         return self._update_proc.status_cache.state
 
     async def get_process_summary(self) -> UpdateProcessSummary:
@@ -312,7 +342,7 @@ class FirmwareUpdateManager:
                     process = self._running_updates_by_subsystem.pop(hw_subsystem)
                     # make sure this process gets its progress updated since nothing may
                     # update it from the route handler after this
-                    await process.get_progress()
+                    await process.provide_latest_progress()
                 except KeyError:
                     log.exception(f"Double pop for update on {subsystem}")
 
@@ -374,7 +404,6 @@ class FirmwareUpdateManager:
         update_id: str,
         subsystem: SubSystem,
         created_at: datetime,
-        start_timeout_s: float,
     ) -> UpdateProcessHandle:
         """Try to begin an update process, checking preconditions, and return a handle if successful.
 
@@ -383,20 +412,7 @@ class FirmwareUpdateManager:
         immediately (though later exceptions may need to be found by getting progress through the
         handle).
         """
-        try:
-            return await wait_for(
-                self._start_and_get_process(update_id, subsystem, created_at),
-                start_timeout_s,
-            )
-        except FuturesTimeoutError as fte:
-            # wait_for raises the timeouterror from concurrent.futures instead of the global one, so
-            # transform it because cmon
-            raise TimeoutError from fte
-
-    async def _start_and_get_process(
-        self, update_id: str, subsystem: SubSystem, creation_time: datetime
-    ) -> UpdateProcessHandle:
         async with self._management_lock:
-            process = await self._emplace(update_id, subsystem, creation_time)
+            process = await self._emplace(update_id, subsystem, created_at)
             await process.provide_latest_progress()
         return process.get_handle()

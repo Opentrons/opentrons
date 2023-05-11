@@ -5,9 +5,8 @@ from fastapi import Response, Request
 from starlette.datastructures import URL, MutableHeaders
 
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 
-from robot_server.service.task_runner import TaskRunner
 from robot_server.subsystems.models import (
     UpdateState,
     UpdateProgressData,
@@ -20,17 +19,14 @@ from robot_server.subsystems.firmware_update_manager import (
     ProcessDetails,
     UpdateProgress,
     FirmwareUpdateManager,
-    NoOngoingUpdate as NoOngoingUpdateExc,
-    UpdateFailed as UpdateFailedExc,
     UpdateIdNotFound as UpdateIdNotFoundExc,
     UpdateIdExists as UpdateIdExistsExc,
-    UncontrolledUpdateInProgress as UncontrolledUpdateInProgressExc,
     UpdateInProgress as UpdateInProgressExc,
     SubsystemNotFound as SubsystemNotFoundExc,
+    NoOngoingUpdate as NoOngoingUpdateExc,
 )
 
 from robot_server.subsystems.router import (
-    UPDATE_CREATE_TIMEOUT_S,
     begin_subsystem_update,
     get_update_process,
     get_update_processes,
@@ -38,37 +34,27 @@ from robot_server.subsystems.router import (
     get_subsystem_updates,
     get_attached_subsystem,
     get_attached_subsystems,
-    NoOngoingUpdate,
-    InvalidSubsystem,
-    SubsystemNotPresent,
-    FirmwareUpdateFailed,
-    TimeoutStartingUpdate,
-    UpdateInProgress,
-    NoUpdateAvailable,
-    get_ot3_hardware,
-    get_firmware_update_manager,
 )
-from robot_server.errors.robot_errors import NotSupportedOnOT2
-from robot_server.errors.global_errors import IDNotFound
+
 from robot_server.errors import ApiError
 
 from opentrons.hardware_control.types import (
-    OT3Mount,
     SubSystem as HWSubSystem,
     SubSystemState,
     UpdateState as HWUpdateState,
 )
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.api import API
 
 
 @pytest.fixture
 def update_manager(decoy: Decoy) -> FirmwareUpdateManager:
+    """Build an update manager decoy dependency."""
     return decoy.mock(cls=FirmwareUpdateManager)
 
 
 @pytest.fixture()
 def hardware_api(decoy: Decoy) -> OT3API:
+    """Build a hardware controller decoy dependency."""
     return decoy.mock(cls=OT3API)
 
 
@@ -95,6 +81,19 @@ def _build_attached_subsystems(
     return {subsystem: _build_attached_subsystem(subsystem) for subsystem in subsystems}
 
 
+def _build_subsystem_data(
+    subsystem: SubSystem, state: SubSystemState
+) -> PresentSubsystem:
+    return PresentSubsystem.construct(
+        name=subsystem,
+        ok=state.ok,
+        current_fw_version=str(state.current_fw_version),
+        next_fw_version=str(state.next_fw_version),
+        fw_update_needed=state.fw_update_needed,
+        revision=str(state.pcba_revision),
+    )
+
+
 @pytest.mark.parametrize(
     "subsystems",
     [
@@ -106,10 +105,17 @@ def _build_attached_subsystems(
 async def test_get_attached_subsystems(
     hardware_api: OT3API, subsystems: Set[HWSubSystem], decoy: Decoy
 ) -> None:
-    decoy.when(hardware_api.attached_subsystems).then_return(
-        _build_attached_subsystems(subsystems)
-    )
+    """It should return all subsystems the hardware says are present."""
+    subsystem_state = _build_attached_subsystems(subsystems)
+    decoy.when(hardware_api.attached_subsystems).then_return(subsystem_state)
     resp = await get_attached_subsystems(hardware_api)
+    assert resp.status_code == 200
+    responses = [
+        _build_subsystem_data(SubSystem.from_hw(subsystem), state)
+        for subsystem, state in subsystem_state.items()
+    ]
+    for data in resp.content.data:
+        assert data in responses
 
 
 @pytest.mark.parametrize(
@@ -123,6 +129,7 @@ async def test_get_attached_subsystems(
 async def test_get_attached_subsystem(
     hardware_api: OT3API, subsystem: SubSystem, decoy: Decoy
 ) -> None:
+    """It should return data for present subsystems."""
     status = _build_attached_subsystem(subsystem.to_hw())
     decoy.when(hardware_api.attached_subsystems.get(subsystem.to_hw())).then_return(
         status
@@ -142,6 +149,7 @@ async def test_get_attached_subsystem(
 async def test_get_attached_subsystem_handles_not_present_subsystem(
     hardware_api: OT3API, decoy: Decoy
 ) -> None:
+    """It should return an error for a non-present subsystem."""
     decoy.when(hardware_api.attached_subsystems).then_return({})
     with pytest.raises(ApiError) as exc_info:
         await get_attached_subsystem(SubSystem.gantry_x, hardware_api)
@@ -152,6 +160,7 @@ async def test_get_attached_subsystem_handles_not_present_subsystem(
 async def test_get_subsystem_updates_with_some(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return data about ongoing subsystem updates."""
     x_process_details = ProcessDetails(
         created_at=datetime.now(),
         subsystem=SubSystem.gantry_x,
@@ -226,6 +235,7 @@ async def test_get_subsystem_updates_with_some(
 async def test_get_subsystem_updates_with_none(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return no data when there are no ongoing updates."""
     decoy.when(await update_manager.all_ongoing_processes()).then_return([])
     response = await get_subsystem_updates(update_manager)
     assert response.content.data == []
@@ -234,6 +244,7 @@ async def test_get_subsystem_updates_with_none(
 async def test_get_subsystem_update_succeeds(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return data about an ongoing update."""
     subsystem = SubSystem.gantry_x
     handle = decoy.mock(cls=UpdateProcessHandle)
     details = ProcessDetails(
@@ -261,6 +272,7 @@ async def test_get_subsystem_update_succeeds(
 async def test_get_subsystem_update_not_present(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return an error when the subsystem is not being updated."""
     decoy.when(
         await update_manager.get_ongoing_update_process_handle_by_subsystem(
             SubSystem.gantry_x
@@ -275,6 +287,7 @@ async def test_get_subsystem_update_not_present(
 async def test_get_subsystem_update_error(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return details of the failure when an update fails."""
     subsystem = SubSystem.gantry_x
     handle = decoy.mock(cls=UpdateProcessHandle)
     details = ProcessDetails(
@@ -304,6 +317,7 @@ async def test_get_subsystem_update_error(
 async def test_get_all_updates_some(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return all updates."""
     x_process_details = ProcessDetails(
         created_at=datetime.now(),
         subsystem=SubSystem.gantry_x,
@@ -377,6 +391,7 @@ async def test_get_all_updates_some(
 async def test_get_all_updates_none(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return nothing when there are no updates."""
     decoy.when(update_manager.all_update_processes()).then_return([])
     response = await get_update_processes(update_manager)
     assert response.content.data == []
@@ -385,6 +400,7 @@ async def test_get_all_updates_none(
 async def test_get_update_process(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return full details of a specified update."""
     mock_id = "some-fake-id"
     x_process_details = ProcessDetails(
         created_at=datetime.now(),
@@ -412,6 +428,7 @@ async def test_get_update_process(
 async def test_get_update_process_error(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return the details of a failed update."""
     mock_id = "some-fake-id"
     x_process_details = ProcessDetails(
         created_at=datetime.now(),
@@ -441,6 +458,7 @@ async def test_get_update_process_error(
 async def test_get_update_process_rejects_bad_id(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return an error if an update id does not exist."""
     mock_id = "some-fake-id"
     decoy.when(update_manager.get_update_process_handle_by_id(mock_id)).then_raise(
         UpdateIdNotFoundExc()
@@ -454,6 +472,7 @@ async def test_get_update_process_rejects_bad_id(
 async def test_begin_update(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should begin an update given proper data."""
     request = decoy.mock(cls=Request)
     response = decoy.mock(cls=Response)
     subsystem = SubSystem.gantry_x
@@ -472,9 +491,7 @@ async def test_begin_update(
     decoy.when(await mock_handle.get_progress()).then_return(progress)
     decoy.when(mock_handle.process_details).then_return(details)
     decoy.when(
-        await update_manager.start_update_process(
-            update_id, subsystem, created_at, UPDATE_CREATE_TIMEOUT_S
-        )
+        await update_manager.start_update_process(update_id, subsystem, created_at)
     ).then_return(mock_handle)
 
     response_data = await begin_subsystem_update(
@@ -497,6 +514,7 @@ async def test_begin_update(
 async def test_begin_update_subsystem_not_found(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return an error if a specified subsystem is not present."""
     request = decoy.mock(cls=Request)
     response = decoy.mock(cls=Response)
     subsystem = SubSystem.gantry_x
@@ -504,9 +522,7 @@ async def test_begin_update_subsystem_not_found(
     update_id = "some-id"
     created_at = datetime.now()
     decoy.when(
-        await update_manager.start_update_process(
-            update_id, subsystem, created_at, UPDATE_CREATE_TIMEOUT_S
-        )
+        await update_manager.start_update_process(update_id, subsystem, created_at)
     ).then_raise(SubsystemNotFoundExc(subsystem))
     with pytest.raises(ApiError) as exc_info:
         await begin_subsystem_update(
@@ -519,6 +535,7 @@ async def test_begin_update_subsystem_not_found(
 async def test_begin_update_update_in_progress(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return a redirect if a subsystem is already being updated."""
     request = decoy.mock(cls=Request)
     response = decoy.mock(cls=Response)
     url = URL("http://127.0.0.1:31950/subsystems/updates")
@@ -530,9 +547,7 @@ async def test_begin_update_update_in_progress(
     update_id = "some-id"
     created_at = datetime.now()
     decoy.when(
-        await update_manager.start_update_process(
-            update_id, subsystem, created_at, UPDATE_CREATE_TIMEOUT_S
-        )
+        await update_manager.start_update_process(update_id, subsystem, created_at)
     ).then_raise(UpdateInProgressExc(subsystem))
     with pytest.raises(ApiError) as exc_info:
         await begin_subsystem_update(
@@ -546,31 +561,10 @@ async def test_begin_update_update_in_progress(
     )
 
 
-async def test_begin_update_timeout(
-    update_manager: FirmwareUpdateManager, decoy: Decoy
-) -> None:
-    request = decoy.mock(cls=Request)
-    response = decoy.mock(cls=Response)
-    subsystem = SubSystem.gantry_x
-
-    update_id = "some-id"
-    created_at = datetime.now()
-    decoy.when(
-        await update_manager.start_update_process(
-            update_id, subsystem, created_at, UPDATE_CREATE_TIMEOUT_S
-        )
-    ).then_raise(TimeoutError())
-    with pytest.raises(ApiError) as exc_info:
-        await begin_subsystem_update(
-            subsystem, response, request, update_manager, update_id, created_at
-        )
-    assert exc_info.value.status_code == 408
-    assert exc_info.value.content["errors"][0]["id"] == "TimeoutStartingUpdate"
-
-
 async def test_begin_update_id_exists(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
+    """It should return an error if an update id is duplicated."""
     response = decoy.mock(cls=Response)
     request = decoy.mock(cls=Request)
     subsystem = SubSystem.gantry_x
@@ -578,9 +572,7 @@ async def test_begin_update_id_exists(
     update_id = "some-id"
     created_at = datetime.now()
     decoy.when(
-        await update_manager.start_update_process(
-            update_id, subsystem, created_at, UPDATE_CREATE_TIMEOUT_S
-        )
+        await update_manager.start_update_process(update_id, subsystem, created_at)
     ).then_raise(UpdateIdExistsExc())
     with pytest.raises(ApiError) as exc_info:
         await begin_subsystem_update(

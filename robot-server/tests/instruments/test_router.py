@@ -1,11 +1,9 @@
 """Tests for /instruments routes."""
 from __future__ import annotations
 
-from datetime import datetime
-
 import pytest
-from typing import TYPE_CHECKING, cast, Optional
-from decoy import Decoy, matchers
+from typing import TYPE_CHECKING, cast
+from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.hardware_control import HardwareControlAPI
@@ -18,8 +16,6 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
 )
 from opentrons.hardware_control.types import (
     GripperJawState,
-    OT3Mount,
-    UpdateState,
 )
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Point, Mount
@@ -28,7 +24,6 @@ from opentrons_shared_data.gripper.gripper_definition import (
     GripperModel,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
-from robot_server.errors import ApiError
 
 from robot_server.instruments.instrument_models import (
     Gripper,
@@ -40,7 +35,6 @@ from robot_server.instruments.instrument_models import (
 from robot_server.instruments.router import (
     get_attached_instruments,
 )
-from robot_server.service.json_api import RequestModel
 from robot_server.service.task_runner import TaskRunner
 from robot_server.subsystems.models import SubSystem
 from opentrons.hardware_control.types import SubSystem as HWSubSystem

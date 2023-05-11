@@ -1,7 +1,5 @@
 """Instruments routes."""
-from datetime import datetime
-from typing import Optional, List, Dict, Union
-from typing_extensions import Final
+from typing import Optional, List, Dict
 
 from fastapi import APIRouter, status, Depends
 
@@ -12,7 +10,6 @@ from robot_server.service.json_api import (
     SimpleMultiBody,
     PydanticResponse,
     MultiBodyMeta,
-    SimpleBody,
 )
 
 from opentrons.types import Mount

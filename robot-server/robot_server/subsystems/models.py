@@ -1,10 +1,9 @@
 """Request and response models for /subsystems endpoints."""
 
 import enum
-from typing import Optional, TypeVar, Union, Generic, cast, Dict
+from typing import Optional, Dict
 from datetime import datetime
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
@@ -31,9 +30,11 @@ class SubSystem(enum.Enum):
 
     @classmethod
     def from_hw(cls, hw_subsystem: HWSubSystem) -> "SubSystem":
+        """Build from the hardware equivalent."""
         return _HW_SUBSYSTEM_TO_SUBSYSTEM[hw_subsystem]
 
     def to_hw(self) -> HWSubSystem:
+        """Transform to the hardware equivalent."""
         return _SUBSYSTEM_TO_HW_SUBSYSTEM[self]
 
 
@@ -68,6 +69,7 @@ class UpdateState(enum.Enum):
 
     @classmethod
     def from_hw(cls, hw_update_state: HWUpdateState) -> "UpdateState":
+        """Build from the hardware equivalent."""
         return _HW_UPDATE_STATE_TO_UPDATE_STATE[hw_update_state]
 
 
