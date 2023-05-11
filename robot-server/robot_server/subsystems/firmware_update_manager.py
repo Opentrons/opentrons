@@ -337,7 +337,7 @@ class FirmwareUpdateManager:
             raise UpdateInProgress(subsystem)
 
         async def _complete() -> None:
-            with self._management_lock:
+            async with self._management_lock:
                 try:
                     process = self._running_updates_by_subsystem.pop(hw_subsystem)
                     # make sure this process gets its progress updated since nothing may

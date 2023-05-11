@@ -261,6 +261,9 @@ async def test_complete_updates_leave_ongoing(
         UpdateState.updating,
     ):
         await asyncio.sleep(0)
+    # Sadly we do have to have that extra little couple spins to get the update out of
+    # ongoing since the done-callback holds a lock and is async
+    await asyncio.sleep(0.1)
     with pytest.raises(NoOngoingUpdate):
         await subject.get_ongoing_update_process_handle_by_subsystem(SubSystem.gantry_x)
     assert subject.get_update_process_handle_by_id("some-id") == proc

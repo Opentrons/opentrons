@@ -97,9 +97,9 @@ def _build_subsystem_data(
 @pytest.mark.parametrize(
     "subsystems",
     [
-        ({HWSubSystem.gantry_x, HWSubSystem.gantry_y, HWSubSystem.head},),
-        ({HWSubSystem.gantry_x, HWSubSystem.pipette_left, HWSubSystem.gripper}),
-        ({},),
+        {HWSubSystem.gantry_x, HWSubSystem.gantry_y, HWSubSystem.head},
+        {HWSubSystem.gantry_x, HWSubSystem.pipette_left, HWSubSystem.gripper},
+        {},
     ],
 )
 async def test_get_attached_subsystems(
@@ -121,19 +121,18 @@ async def test_get_attached_subsystems(
 @pytest.mark.parametrize(
     "subsystem",
     [
-        (SubSystem.gantry_x,),
-        (SubSystem.pipette_left,),
-        (SubSystem.motor_controller_board,),
+        SubSystem.gantry_x,
+        SubSystem.pipette_left,
+        SubSystem.motor_controller_board,
     ],
 )
 async def test_get_attached_subsystem(
     hardware_api: OT3API, subsystem: SubSystem, decoy: Decoy
 ) -> None:
     """It should return data for present subsystems."""
-    status = _build_attached_subsystem(subsystem.to_hw())
-    decoy.when(hardware_api.attached_subsystems.get(subsystem.to_hw())).then_return(
-        status
-    )
+    subsystems_dict = _build_attached_subsystems({subsystem.to_hw()})
+    status = subsystems_dict[subsystem.to_hw()]
+    decoy.when(hardware_api.attached_subsystems).then_return(subsystems_dict)
     response = await get_attached_subsystem(subsystem, hardware_api)
     assert response.status_code == 200
     assert response.content.data == PresentSubsystem(
@@ -310,7 +309,7 @@ async def test_get_subsystem_update_error(
         subsystem=details.subsystem,
         updateProgress=progress.progress,
         updateStatus=progress.state,
-        updateError="RuntimeError",
+        updateError="oh no!",
     )
 
 
@@ -405,7 +404,7 @@ async def test_get_update_process(
     x_process_details = ProcessDetails(
         created_at=datetime.now(),
         subsystem=SubSystem.gantry_x,
-        update_id="mock-update-id-1",
+        update_id=mock_id,
     )
     x_progress = UpdateProgress(state=UpdateState.updating, progress=25, error=None)
     gantry_x_handler = decoy.mock(cls=UpdateProcessHandle)
@@ -433,7 +432,7 @@ async def test_get_update_process_error(
     x_process_details = ProcessDetails(
         created_at=datetime.now(),
         subsystem=SubSystem.gantry_x,
-        update_id="mock-update-id-1",
+        update_id=mock_id,
     )
     x_progress = UpdateProgress(
         state=UpdateState.failed, progress=27, error=RuntimeError("oh no!")
@@ -451,7 +450,7 @@ async def test_get_update_process_error(
         subsystem=x_process_details.subsystem,
         updateStatus=x_progress.state,
         updateProgress=x_progress.progress,
-        updateError="RuntimeError",
+        updateError="oh no!",
     )
 
 
@@ -499,7 +498,7 @@ async def test_begin_update(
     )
     assert (
         headers["Location"]
-        == f"http:127.0.0.1:31950/subsystems/updates/current/{subsystem.value}"
+        == f"http://127.0.0.1:31950/subsystems/updates/current/{subsystem.value}"
     )
     assert response_data.content.data == UpdateProgressData.construct(
         id=update_id,

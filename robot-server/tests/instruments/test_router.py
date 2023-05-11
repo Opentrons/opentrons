@@ -239,6 +239,6 @@ async def test_get_ot2_instruments(
                 min_volume=1,
                 max_volume=1,
             ),
-            subsystem=SubSystem.pipette_right
+            subsystem=SubSystem.pipette_right,
         )
     ]
