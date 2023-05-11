@@ -45,6 +45,7 @@ _HW_SUBSYSTEM_TO_SUBSYSTEM: Dict[HWSubSystem, SubSystem] = {
     HWSubSystem.pipette_left: SubSystem.pipette_left,
     HWSubSystem.pipette_right: SubSystem.pipette_right,
     HWSubSystem.rear_panel: SubSystem.rear_panel,
+    HWSubSystem.gripper: SubSystem.gripper,
     HWSubSystem.motor_controller_board: SubSystem.motor_controller_board,
 }
 
@@ -55,6 +56,7 @@ _SUBSYSTEM_TO_HW_SUBSYSTEM: Dict[SubSystem, HWSubSystem] = {
     SubSystem.pipette_left: HWSubSystem.pipette_left,
     SubSystem.pipette_right: HWSubSystem.pipette_right,
     SubSystem.rear_panel: HWSubSystem.rear_panel,
+    SubSystem.gripper: HWSubSystem.gripper,
     SubSystem.motor_controller_board: HWSubSystem.motor_controller_board,
 }
 

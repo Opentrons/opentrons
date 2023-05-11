@@ -79,14 +79,7 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
         ..., description="Type of instrument- either a pipette or a gripper."
     )
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
-    # TODO (spp, 2023-01-06): add firmware version field
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
-    currentFirmwareVersion: Optional[int] = Field(
-        None, description="The instrument's current firmware version."
-    )
-    firmwareUpdateRequired: Optional[bool] = Field(
-        None, description="Whether the instrument requires a firmware update."
-    )
     subsystem: Optional[SubSystem] = Field(
         None,
         description="The subsystem corresponding to this pipette.",

@@ -1,6 +1,8 @@
 """Class to monitor firmware update status."""
-from datetime import datetime
+from asyncio import Lock, Queue, QueueEmpty
 from dataclasses import dataclass
+from datetime import datetime
+import logging
 from typing import (
     Dict,
     TYPE_CHECKING,
@@ -11,15 +13,13 @@ from typing import (
     List,
 )
 
-from asyncio import Lock, Queue, QueueEmpty
-from dataclasses import dataclass
-import logging
-
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
 )
 from opentrons.hardware_control.errors import UpdateOngoingError
+
 from robot_server.service.task_runner import TaskRunner
+
 from .models import SubSystem, UpdateState
 
 
@@ -193,7 +193,7 @@ class _UpdateProcess:
                 )
             last_progress = 100
             await self._status_queue.put(UpdateProgress(UpdateState.done, 100, None))
-        except UpdateOngoingError as e:
+        except UpdateOngoingError:
             log.exception(f"Update was already in progress for {self.subsystem.value}")
             await self._status_queue.put(
                 UpdateProgress(

@@ -122,8 +122,6 @@ async def test_get_all_attached_instruments(
                 GripperDict,
                 {
                     "model": GripperModel.v1,
-                    "fw_current_version": 123,
-                    "fw_update_required": True,
                     "gripper_id": "GripperID321",
                     "display_name": "my-special-gripper",
                     "state": GripperJawState.UNHOMED,
@@ -241,5 +239,6 @@ async def test_get_ot2_instruments(
                 min_volume=1,
                 max_volume=1,
             ),
+            subsystem=SubSystem.pipette_right
         )
     ]
