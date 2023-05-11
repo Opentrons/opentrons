@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -16,10 +15,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
-import { updateConfigValue } from '../../redux/config'
 import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
-
-import type { Dispatch } from '../../redux/types'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
@@ -32,15 +28,8 @@ export function ConfirmRobotName({
 }: ConfirmRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const history = useHistory()
-  const dispatch = useDispatch<Dispatch>()
 
   const handleClick = (): void => {
-    dispatch(
-      updateConfigValue(
-        'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
-        null
-      )
-    )
     history.push('/dashboard')
   }
   return (
