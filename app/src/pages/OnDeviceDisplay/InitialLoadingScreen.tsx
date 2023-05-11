@@ -32,10 +32,7 @@ export function InitialLoadingScreen(): JSX.Element {
     getOnDeviceDisplaySettings
   )
   const isShellReady = useSelector(getIsShellReady)
-  const targetPath = getTargetPath(
-    isShellReady,
-    unfinishedUnboxingFlowRoute
-  )
+  const targetPath = getTargetPath(isShellReady, unfinishedUnboxingFlowRoute)
 
   return (
     <Flex
