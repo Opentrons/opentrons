@@ -191,7 +191,6 @@ function PrepareToRun({
 
   const onPlay = (): void => {
     play()
-    history.push(`/protocols/${runId}/run`)
   }
 
   // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up

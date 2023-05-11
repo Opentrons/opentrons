@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -274,7 +274,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 }
 
 function TopLevelRedirects(): JSX.Element | null {
+  const routeMatch = useRouteMatch()
   const currentRunRoute = useCurrentRunRoute()
+  console.log('routeMatch', routeMatch)
   console.log('currentRunRoute', currentRunRoute)
   return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
 }

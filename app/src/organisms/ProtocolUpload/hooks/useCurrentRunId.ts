@@ -3,7 +3,6 @@ import type { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/run
 
 export function useCurrentRunId(options: UseAllRunsQueryOptions = {}): string | null {
   const { data: allRuns } = useAllRunsQuery({pageLength: 0}, options)
-  console.log('useCRI', options, allRuns)
   const currentRunLink = allRuns?.links?.current ?? null
   return currentRunLink != null &&
     typeof currentRunLink !== 'string' &&

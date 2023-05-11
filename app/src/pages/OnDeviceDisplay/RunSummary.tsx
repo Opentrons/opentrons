@@ -82,8 +82,8 @@ export function RunSummary(): JSX.Element {
 
   const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(`/protocols/${runId}/setup`)
+  const onResetSuccess = (_createRunResponse: Run): void =>
+    history.push(`/runs/${runId}/setup`)
   const { reset } = useRunControls(runId, onResetSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()

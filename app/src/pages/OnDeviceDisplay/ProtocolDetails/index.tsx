@@ -262,7 +262,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
-      history.push(`/protocols/${runId}/setup`)
+      history.push(`/runs/${runId}/setup`)
     },
   })
 

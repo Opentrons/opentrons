@@ -114,12 +114,6 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
-  React.useEffect(() => {
-    if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
-      history.push(`/protocols/${runId}/summary`)
-    }
-  }, [history, runId, runStatus])
-
   return (
     <>
       <Flex

@@ -2,11 +2,10 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useInterval } from '@opentrons/components'
 import { checkShellUpdate } from '../redux/shell'
-import { useCurrentRunId } from '../organisms/ProtocolUpload/hooks'
 
 import type { Dispatch } from '../redux/types'
-import { useRunQuery } from '@opentrons/react-api-client'
-import { 
+import { useAllRunsQuery } from '@opentrons/react-api-client'
+import {
   RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
@@ -27,24 +26,31 @@ export function useSoftwareUpdatePoll(): void {
 }
 
 export function useCurrentRunRoute(): string | null {
-  const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
+  const { data: allRuns } = useAllRunsQuery({ pageLength: 1 }, { refetchInterval: CURRENT_RUN_POLL })
+  const currentRunLink = allRuns?.links?.current ?? null
+  const currentRun = currentRunLink != null &&
+    typeof currentRunLink !== 'string' &&
+    'href' in currentRunLink
+    ? allRuns?.data.find(run => run.id === currentRunLink.href.replace('/runs/', '')) // trim link path down to only runId
+    : null
 
-  const runRecord = useRunQuery(currentRunId, { enabled: currentRunId != null })
-  const status = runRecord.data?.data?.status
-  const actions = runRecord.data?.data?.actions
-  if (status == null || actions == null || currentRunId == null) return null
+  const status = currentRun?.status
+  const actions = currentRun?.actions
+  if (status == null || actions == null || currentRun == null) return null
 
   const hasBeenStarted = actions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
+  console.log('status', status)
+  console.log('actions', actions)
   if (status === RUN_STATUS_SUCCEEDED ||
     status === RUN_STATUS_STOPPED ||
     status === RUN_STATUS_FAILED) {
-    return `/runs/${currentRunId}/summary`
+    return `/runs/${currentRun.id}/summary`
   } else if (status === RUN_STATUS_IDLE || (!hasBeenStarted && status === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)) {
-    return `/runs/${currentRunId}/setup`
+    return `/runs/${currentRun.id}/setup`
   } else {
-    return `/runs/${currentRunId}/run`
+    return `/runs/${currentRun.id}/run`
   }
 }
 
