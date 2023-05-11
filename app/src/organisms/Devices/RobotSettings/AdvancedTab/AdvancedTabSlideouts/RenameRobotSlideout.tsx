@@ -144,16 +144,16 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Banner type="informing" marginBottom={SPACING.spacing4}>
+        <Banner type="informing" marginBottom={SPACING.spacing16}>
           {t('rename_robot_prefer_usb_connection')}
         </Banner>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
         <StyledText
           as="label"
           css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('robot_name')}
         </StyledText>

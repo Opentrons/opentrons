@@ -85,11 +85,11 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
       {toasts.length > 0 ? (
         <Flex
           flexDirection={DIRECTION_COLUMN_REVERSE}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_END}
           position={POSITION_FIXED}
-          right={SPACING.spacing6}
-          bottom={SPACING.spacing4}
+          right={SPACING.spacing32}
+          bottom={SPACING.spacing16}
           zIndex={1000}
         >
           {toasts.map(toast => (
@@ -111,7 +111,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           position="absolute"
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
           <Snackbar

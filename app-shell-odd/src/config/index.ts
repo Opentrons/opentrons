@@ -49,7 +49,8 @@ const store = (): Store => {
     // perform store migration if loading for the first time
     _store = (new Store({
       defaults: DEFAULTS_V12,
-      cwd: '/data/ODD',
+      // dont overwrite config dir if in dev mode because it causes issues
+      ...(process.env.NODE_ENV === 'production' && { cwd: '/data/ODD' }),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }

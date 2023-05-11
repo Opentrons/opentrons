@@ -37,7 +37,7 @@ export function ProtocolAnalysisErrorBanner(
   }
 
   return (
-    <Banner type="error" marginBottom={SPACING.spacing4}>
+    <Banner type="error" marginBottom={SPACING.spacing16}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
@@ -80,7 +80,7 @@ export function ProtocolAnalysisErrorBanner(
                 aria-label="close_modal_button"
                 onClick={handleToggleDetails}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>

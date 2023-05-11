@@ -70,10 +70,10 @@ export function ConfirmCancelModal(
         title={t('cancel_run_modal_heading')}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {t('cancel_run_alert_info')}
           </StyledText>
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {t('cancel_run_module_info')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -81,7 +81,7 @@ export function ConfirmCancelModal(
               <Link
                 role="button"
                 onClick={onClose}
-                marginRight={SPACING.spacing5}
+                marginRight={SPACING.spacing24}
                 css={TYPOGRAPHY.linkPSemiBold}
               >
                 {t('cancel_run_modal_back')}

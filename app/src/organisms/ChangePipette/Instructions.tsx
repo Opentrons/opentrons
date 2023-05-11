@@ -93,8 +93,8 @@ export function Instructions(props: Props): JSX.Element {
     <>
       {!actualPipette && !wantedPipette && (
         <Flex
-          paddingX={SPACING.spacing6}
-          paddingTop={SPACING.spacing6}
+          paddingX={SPACING.spacing32}
+          paddingTop={SPACING.spacing32}
           marginBottom="12.8rem"
         >
           {direction === 'attach' &&
@@ -113,8 +113,8 @@ export function Instructions(props: Props): JSX.Element {
         <>
           {(actualPipette || wantedPipette) && (
             <Flex
-              paddingX={SPACING.spacing6}
-              paddingTop={SPACING.spacing6}
+              paddingX={SPACING.spacing32}
+              paddingTop={SPACING.spacing32}
               height="14.5rem"
             >
               <InstructionStep
@@ -129,7 +129,7 @@ export function Instructions(props: Props): JSX.Element {
                       h1: (
                         <StyledText
                           css={TYPOGRAPHY.h1Default}
-                          marginBottom={SPACING.spacing4}
+                          marginBottom={SPACING.spacing16}
                         />
                       ),
                       block: <StyledText as="p" />,
@@ -151,13 +151,16 @@ export function Instructions(props: Props): JSX.Element {
                               />
                             ),
                             block: (
-                              <StyledText as="p" marginTop={SPACING.spacing4} />
+                              <StyledText
+                                as="p"
+                                marginTop={SPACING.spacing16}
+                              />
                             ),
                           }}
                         />
                       </Flex>
                     ) : (
-                      <StyledText marginTop={SPACING.spacing4} as="p">
+                      <StyledText marginTop={SPACING.spacing16} as="p">
                         {t('tighten_screws_single')}
                       </StyledText>
                     )
@@ -168,8 +171,8 @@ export function Instructions(props: Props): JSX.Element {
           )}
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing6}
-            marginX={SPACING.spacing6}
+            marginBottom={SPACING.spacing32}
+            marginX={SPACING.spacing32}
             alignSelf={ALIGN_FLEX_END}
             marginTop="5.9rem"
           >

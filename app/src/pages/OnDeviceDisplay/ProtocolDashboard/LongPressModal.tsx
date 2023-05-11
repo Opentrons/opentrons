@@ -132,7 +132,7 @@ export function LongPressModal(props: {
           <MenuItem onClick={handleRunClick} key="play-circle">
             <Flex>
               <Icon name="play-circle" size="1.75rem" />
-              <StyledText marginLeft={SPACING.spacing5}>
+              <StyledText marginLeft={SPACING.spacing24}>
                 {t('run_protocol')}
               </StyledText>
             </Flex>
@@ -140,7 +140,7 @@ export function LongPressModal(props: {
           <MenuItem onClick={handlePinClick} key="pin">
             <Flex>
               <Icon name="pin" size="1.875rem" />
-              <StyledText marginLeft={SPACING.spacing5}>
+              <StyledText marginLeft={SPACING.spacing24}>
                 {pinned ? t('unpin_protocol') : t('pin_protocol')}
               </StyledText>
             </Flex>
