@@ -24,8 +24,6 @@
   "critical_unskippable_step": "this is a critical step that cannot be skipped",
   "detach_96_attach_mount": "Detach 96-Channel Pipette and Attach {{mount}} Pipette",
   "detach_96_channel": "Detach 96-Channel Pipette",
-  "detach_mount_attach_96": "Detach {{mount}} Pipette and Attach 96-Channel Pipette",
-  "detach_pipettes_attach_96": "Detach Pipettes and Attach 96-Channel Pipette",
   "detach_and_reattach": "Detach and reattach pipette",
   "detach_mount_attach_96": "Detach {{mount}} Pipette and Attach 96-Channel Pipette",
   "detach_mounting_plate_instructions": "Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.",
@@ -78,6 +76,5 @@
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
   "unscrew_at_top": "<block>Loosen the captive screw on the top right of the  carriage. This releases the right pipette mount, which should then freely move up and down.</block>",
   "unscrew_carriage": "unscrew z-axis carriage",
-  "z_axis_still_attached": "z-axis screw still secure",
-  "error_calibrating_pipette": "Error encountered when calibrating pipette"
+  "z_axis_still_attached": "z-axis screw still secure"
 }
