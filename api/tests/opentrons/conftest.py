@@ -267,14 +267,11 @@ async def hardware(
 
 
 def _make_ot2_non_pe_ctx(
-    hardware: ThreadManagedHardware,
-    deck_type: str
+    hardware: ThreadManagedHardware, deck_type: str
 ) -> ProtocolContext:
     """Return a ProtocolContext configured for an OT-2 and not backed by Protocol Engine."""
     return create_protocol_context(
-        api_version=APIVersion(2, 13),
-        hardware_api=hardware,
-        deck_type=deck_type
+        api_version=APIVersion(2, 13), hardware_api=hardware, deck_type=deck_type
     )
 
 
@@ -307,7 +304,9 @@ def ctx(
         if request.node.get_closest_marker("apiv2_non_pe_only"):
             pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
         else:
-            with _make_ot3_pe_ctx(hardware=hardware, deck_type=deck_definition_name) as ctx:
+            with _make_ot3_pe_ctx(
+                hardware=hardware, deck_type=deck_definition_name
+            ) as ctx:
                 yield ctx
 
 
