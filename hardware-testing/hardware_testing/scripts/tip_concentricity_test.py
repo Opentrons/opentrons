@@ -147,7 +147,7 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
     test_robot = input("Enter robot ID:\n\t>> ")
 
     AXIS = OT3Axis.Z_L
-    COLUMNS = 12
+    COLUMNS = 1 #12
     GAUGES = 5
     DIAMETER = [1.4, 1.9, 2.4, 2.9, 3.4]
     CURRENT = 1.5
@@ -187,7 +187,7 @@ async def _main(is_simulating: bool, tip_len: int, mount: types.OT3Mount) -> Non
             print(f"Column: {i+1}\n")
 
             print("Move to machined cut out...\n")
-            if i == 0:
+            if gauge == 0: #i == 0:
                 cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.TIP)
                 machined_cut_out_position = await jog(api, cur_pos, CriticalPoint.TIP)
             else:
