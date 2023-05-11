@@ -11,7 +11,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType, getModuleDef2 } from '@opentrons/shared-data'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
@@ -234,7 +234,7 @@ describe('ProtocolSetup', () => {
     expect(mockPlay).toBeCalledTimes(1)
   })
 
-  it.only('should play protocol when click play button', () => {
+  it('should show snackbar when click play button', () => {
     mockGetUnmatchedModulesForProtocol.mockReturnValue({
       missingModuleIds: ['missingMod'],
       remainingAttachedModules: [],

@@ -208,13 +208,18 @@ function PrepareToRun({
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
 
-  const protocolAnalysisLoading =
+  // const protocolAnalysisLoading =
+  //   mostRecentAnalysis == null ||
+  //   attachedInstruments == null ||
+  //   (protocolHasModules && attachedModules == null) ||
+  //   allPipettesCalibrationData == null
+
+  if (
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
     (protocolHasModules && attachedModules == null) ||
     allPipettesCalibrationData == null
-
-  if (protocolAnalysisLoading) {
+  ) {
     return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
   }
 
@@ -314,6 +319,7 @@ function PrepareToRun({
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
+        overflowY="hidden"
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -335,7 +341,15 @@ function PrepareToRun({
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={protocolAnalysisLoading} onPlay={onPlay} />
+            <PlayButton
+              disabled={
+                mostRecentAnalysis == null ||
+                attachedInstruments == null ||
+                (protocolHasModules && attachedModules == null) ||
+                allPipettesCalibrationData == null
+              }
+              onPlay={onPlay}
+            />
           </Flex>
         </Flex>
       </Flex>
