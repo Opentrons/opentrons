@@ -59,6 +59,32 @@ export interface InitialValues {
   }
 }
 
+const validationSchema = Yup.object().shape({
+  fields: Yup.object().shape({
+    name: Yup.string().matches(
+      /^[a-zA-Z0-9]*$/,
+      'Protocol name must contain only letters and numbers.'
+    ),
+  }),
+  mountSide: Yup.string().required('Mount side is required'),
+  pipettesByMount: Yup.object().shape({
+    left: Yup.object().shape({
+      pipetteName: Yup.string().required('First pipette is required'),
+      tipRackList: Yup.array().min(
+        1,
+        'Select at least one tip rack for first pipette'
+      ),
+    }),
+    right: Yup.object().shape({
+      pipetteName: Yup.string().required('Second pipette is required'),
+      tipRackList: Yup.array().min(
+        1,
+        'Select at least one tip rack for second pipette'
+      ),
+    }),
+  }),
+})
+
 const getInitialValues: InitialValues = {
   fields: {
     name: '',
@@ -200,12 +226,16 @@ function FlexProtocolEditor(): JSX.Element {
             initialValues={getInitialValues}
             validateOnChange={true}
             validate={validateFields}
-            validationSchema={InitialFormSchema}
+            validationSchema={validationSchema}
             onSubmit={(values, actions) => {
               console.log({ values })
             }}
           >
-            {(props: { errors: any; handleSubmit: () => void }) => (
+            {(props: {
+              errors: any
+              isValid: any
+              handleSubmit: () => void
+            }) => (
               <form onSubmit={props.handleSubmit}>
                 <section className={styles.editor_form}>
                   {selectComponent(selectedTab)}
@@ -231,6 +261,10 @@ function FlexProtocolEditor(): JSX.Element {
                         ? styles.flex_round_tabs_button_50p
                         : styles.flex_round_tabs_button_100p
                     }
+                    // disabled={
+                    //   !Boolean(props.isValid) ||
+                    //   !(Object.values(props.errors).length === 0)
+                    // }
                   >
                     <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>

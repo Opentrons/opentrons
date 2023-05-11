@@ -19,7 +19,7 @@ export const FlexRoundTab: React.FC<RoundTabsProps> = ({
           <RoundTab
             key={index}
             isCurrent={navPillPage.includes(currentTab)}
-            // onClick={() => setCurrentTab(index)}
+            onClick={() => setCurrentTab(navPillPage[0])}
           >
             <StyledText as="h4">{name}</StyledText>
           </RoundTab>

@@ -54,7 +54,6 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
               {errors.pipette && errors.pipette}
             </StyledText>
           )}
-
           {/* Pipette Mount Selection here */}
           <hr />
           <Flex className={cx(styles[className], styles.ptb_10)}>
