@@ -50,7 +50,6 @@ const store = (): Store => {
     // perform store migration if loading for the first time
     _store = (new Store({
       defaults: DEFAULTS_V12,
-      cwd: app.getPath('userData'),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }
