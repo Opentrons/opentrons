@@ -180,6 +180,7 @@ async def set_gantry_load_per_axis_current_settings_ot3(
     load: Optional[GantryLoad] = None,
     hold_current: Optional[float] = None,
     run_current: Optional[float] = None,
+    force_reload: Optional[bool] = True,
 ) -> None:
     """Update an OT3 axis current settings."""
     if load is None:
@@ -199,7 +200,8 @@ async def set_gantry_load_per_axis_current_settings_ot3(
             value=run_current,
         )
     # make sure new currents are sent to hardware controller
-    await api.set_gantry_load(load)
+    if load != api.gantry_load or force_reload:
+        await api.set_gantry_load(load)
 
 
 async def set_gantry_load_per_axis_motion_settings_ot3(
@@ -210,6 +212,7 @@ async def set_gantry_load_per_axis_motion_settings_ot3(
     acceleration: Optional[float] = None,
     max_speed_discontinuity: Optional[float] = None,
     direction_change_speed_discontinuity: Optional[float] = None,
+    force_reload: Optional[bool] = True,
 ) -> None:
     """Update an OT3 axis motion settings."""
     if load is None:
@@ -243,7 +246,8 @@ async def set_gantry_load_per_axis_motion_settings_ot3(
             value=direction_change_speed_discontinuity,
         )
     # make sure new currents are sent to hardware controller
-    await api.set_gantry_load(load)
+    if load != api.gantry_load or force_reload:
+        await api.set_gantry_load(load)
 
 
 @dataclass

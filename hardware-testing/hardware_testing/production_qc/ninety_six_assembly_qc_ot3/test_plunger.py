@@ -82,6 +82,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 api,
                 ax,
                 run_current=current,
+                force_reload=False,
             )
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, ax, default_max_speed=speed
@@ -105,7 +106,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             # RESET CURRENTS AND HOME
             print("homing...")
             await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
-                api, ax, run_current=default_current
+                api, ax, run_current=default_current,
+                force_reload=False
             )
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api, ax, default_max_speed=default_speed
