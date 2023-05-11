@@ -1,10 +1,35 @@
 from typing import Dict
 
 import mock
+import pytest
+
+from decoy import Decoy
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
 from opentrons_hardware.firmware_update.utils import FirmwareUpdateType, UpdateInfo
+
+
+@pytest.fixture
+def controller(decoy: Decoy) -> OT3Controller:
+    return decoy.mock(cls=OT3Controller)
+
+
+@pytest.fixture
+def fw_node_info() -> Dict[NodeId, DeviceInfoCache]:
+    node_cache1 = DeviceInfoCache(
+        NodeId.head, 1, "12345678", None, PCBARevision(None), subidentifier=0, ok=True
+    )
+    node_cache2 = DeviceInfoCache(
+        NodeId.gantry_x,
+        1,
+        "12345678",
+        None,
+        PCBARevision(None),
+        subidentifier=0,
+        ok=True,
+    )
+    return {NodeId.head: node_cache1, NodeId.gantry_x: node_cache2}
 
 
 async def test_update_firmware_update_required(

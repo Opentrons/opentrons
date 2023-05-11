@@ -104,6 +104,11 @@ class SubsystemManager:
 
     @property
     def subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        def _state_or(maybe_status: Optional[UpdateStatus]) -> Optional[UpdateState]:
+            if maybe_status is not None:
+                return maybe_status.state
+            return None
+
         return {
             target_to_subsystem(target): SubSystemState(
                 ok=info.ok,
@@ -112,7 +117,9 @@ class SubsystemManager:
                 fw_update_needed=self._updates_required[target].update_needed,
                 current_fw_sha=info.shortsha,
                 pcba_revision=str(info.revision),
-                update_state=self._updates_ongoing.get(target_to_subsystem(target)),
+                update_state=_state_or(
+                    self._updates_ongoing.get(target_to_subsystem(target))
+                ),
             )
             for target, info in self._network_info.device_info.items()
         }
