@@ -1,5 +1,4 @@
 export * from './DeviceReset'
-export * from './DisplayLEDLights'
 export * from './EnableDeveloperTools'
 export * from './NetworkSettings'
 export * from './RobotName'

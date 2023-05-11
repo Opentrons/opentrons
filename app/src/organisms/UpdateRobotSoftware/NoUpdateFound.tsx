@@ -24,7 +24,7 @@ export function NoUpdateFound(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.successBackgroundMed}
         height="26.625rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
@@ -44,7 +44,7 @@ export function NoUpdateFound(): JSX.Element {
         </StyledText>
       </Flex>
       <PrimaryButton
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         height="4.4375rem"
         onClick={() => history.push('/robot-settings/rename-robot')}
       >

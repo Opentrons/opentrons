@@ -79,19 +79,19 @@ export function DisplayWifiList({
             height="4rem"
             key={nw.ssid}
             backgroundColor="#d6d6d6"
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
             borderRadius={BORDERS.size_three}
             css={NETWORK_ROW_STYLE}
             onClick={() => handleClick(nw)}
           >
             <Flex
               flexDirection={DIRECTION_ROW}
-              padding={SPACING.spacing4}
+              padding={SPACING.spacing16}
               alignItems={ALIGN_CENTER}
             >
               <Icon name="wifi" size="2.25rem" />
               <StyledText
-                marginLeft={SPACING.spacing4}
+                marginLeft={SPACING.spacing16}
                 fontSize="1.5rem"
                 lineHeight="2.0625rem"
                 fontWeight="400"
@@ -106,7 +106,7 @@ export function DisplayWifiList({
       )}
       <Btn
         onClick={() => setChangeState({ type: JOIN_OTHER, ssid: null })}
-        marginTop={SPACING.spacing3}
+        marginTop={SPACING.spacing8}
         height="4rem"
         backgroundColor="#d6d6d6"
         borderRadius={BORDERS.size_three}
@@ -114,13 +114,13 @@ export function DisplayWifiList({
         css={NETWORK_ROW_STYLE}
       >
         <Flex
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
         >
           <Icon name="plus" size="2.25rem" color={COLORS.darkGreyEnabled} />
           <StyledText
-            marginLeft={SPACING.spacingSM}
+            marginLeft={SPACING.spacing12}
             fontSize="1.5rem"
             lineHeight="1.8125rem"
             fontWeight="400"
@@ -153,7 +153,7 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               name="chevron-left"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
               size="1.875rem"
             />
             <StyledText

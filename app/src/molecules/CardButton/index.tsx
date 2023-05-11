@@ -23,7 +23,7 @@ const CARD_BUTTON_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   border-radius: ${BORDERS.size_four};
-  padding: ${SPACING.spacing6};
+  padding: ${SPACING.spacing32};
   box-shadow: none;
 
   &:focus {
@@ -92,7 +92,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         data-testid={`cardButton_icon_${String(iconName)}`}
         color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
       />
-      <Flex marginTop={SPACING.spacing4}>
+      <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
           fontSize="1.75rem"
@@ -105,7 +105,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         </StyledText>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         width="100%"
         justifyContent={JUSTIFY_CENTER}
       >

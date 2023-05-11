@@ -32,7 +32,7 @@ export function SearchNetwork(): JSX.Element {
           fontSize="2rem"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight="2.72375rem"
-          marginTop={SPACING.spacingXXL}
+          marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
         </StyledText>

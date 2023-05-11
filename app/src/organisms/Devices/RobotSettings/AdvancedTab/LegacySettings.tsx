@@ -44,13 +44,13 @@ export function LegacySettings({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacingXXL}
+      marginTop={SPACING.spacing40}
     >
       <Box width="70%">
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           id="AdvancedSettings_showLink"
         >
           {t('legacy_settings')}

@@ -56,7 +56,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing3}
+  grid-gap: ${SPACING.spacing8}
 
   &:hover {
     border: 1px solid ${COLORS.medGreyHover};
@@ -68,7 +68,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     background-color: ${COLORS.mediumBlueEnabled};
     border-width: 0; 
     border-radius: ${BORDERS.size_four};
-    padding: ${SPACING.spacing5};
+    padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;
 
@@ -158,13 +158,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             ) : (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                padding={SPACING.spacing6}
+                padding={SPACING.spacing32}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 height="29.5rem"
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing3}
+                  gridGap={SPACING.spacing8}
                 >
                   <StyledText
                     as="h4"
@@ -220,13 +220,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           ) : (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              padding={SPACING.spacing6}
+              padding={SPACING.spacing40}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText as="h1">{t('choose_pipette')}</StyledText>
                 <Flex
-                  margin={SPACING.spacing6}
+                  margin={SPACING.spacing40}
                   justifyContent={JUSTIFY_SPACE_AROUND}
                 >
                   <PipetteMountOption

@@ -4,11 +4,11 @@ import { fireEvent } from '@testing-library/dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../i18n'
-import { getLocalRobot } from '../../../redux/discovery'
-import { toggleDevtools } from '../../../redux/config'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { i18n } from '../../../../i18n'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { toggleDevtools } from '../../../../redux/config'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { Navigation } from '../../../../organisms/OnDeviceDisplay/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -17,34 +17,40 @@ import {
   RobotSystemVersion,
   TextSize,
   UpdateChannel,
-} from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+} from '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+import { useLights } from '../../../../organisms/Devices/hooks'
 
-import { RobotSettingsDashboard } from '../RobotSettingsDashboard'
+import { RobotSettingsDashboard } from '..'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/buildroot')
-jest.mock('../../../redux/config')
-jest.mock('../hooks/useNetworkConnection')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/buildroot')
+jest.mock('../../../../redux/config')
+jest.mock('../../hooks/useNetworkConnection')
+jest.mock('../../../../organisms/OnDeviceDisplay/Navigation')
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/DeviceReset'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
-)
-jest.mock('../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TextSize')
-jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchscreenBrightness'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
 )
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/UpdateChannel'
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TextSize'
 )
+jest.mock(
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchscreenBrightness'
+)
+jest.mock(
+  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/UpdateChannel'
+)
+jest.mock('../../../../organisms/Devices/hooks')
+
+const mockToggleLights = jest.fn()
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
@@ -70,6 +76,7 @@ const mockTouchscreenBrightness = TouchscreenBrightness as jest.MockedFunction<
 const mockUpdateChannel = UpdateChannel as jest.MockedFunction<
   typeof UpdateChannel
 >
+const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 
 const render = () => {
   return renderWithProviders(
@@ -96,6 +103,10 @@ describe('RobotSettingsDashboard', () => {
       <div>Mock Touchscreen Brightness</div>
     )
     mockUpdateChannel.mockReturnValue(<div>Mock Update Channel</div>)
+    mockUseLights.mockReturnValue({
+      lightsOn: false,
+      toggleLights: mockToggleLights,
+    })
   })
 
   it('should render Navigation', () => {
@@ -104,20 +115,23 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render setting buttons', () => {
-    const [{ getByText }] = render()
+    const [{ getByText, getAllByText }] = render()
     getByText('Robot Name')
     getByText('opentrons-robot-name')
     getByText('Robot System Version')
     getByText('Network Settings')
     getByText('Display LED Lights')
+    getByText(
+      'Turn on or off the strip of color lights on the front of the robot.'
+    )
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
     getByText('Text Size')
     getByText('Device Reset')
     getByText('Update Channel')
     getByText('Enable Developer Tools')
-    getByText('Off')
     getByText('Enable additional logging and allow access to feature flags.')
+    expect(getAllByText('Off').length).toBe(2) // LED & DEV tools
   })
 
   // Note(kj: 02/03/2023) This case will be changed in a following PR
@@ -133,6 +147,22 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Robot System Version')
     fireEvent.click(button)
     getByText('Mock Robot System Version')
+  })
+
+  it('should render text with lights off and clicking it, calls useLights', () => {
+    const [{ getByText }] = render()
+    const lights = getByText('Display LED Lights')
+    fireEvent.click(lights)
+    expect(mockToggleLights).toHaveBeenCalled()
+  })
+
+  it('should render text with lights on', () => {
+    mockUseLights.mockReturnValue({
+      lightsOn: true,
+      toggleLights: mockToggleLights,
+    })
+    const [{ getByText }] = render()
+    getByText('On')
   })
 
   it('should render component when tapping network settings', () => {

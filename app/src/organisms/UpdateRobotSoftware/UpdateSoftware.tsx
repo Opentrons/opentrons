@@ -43,7 +43,7 @@ export function UpdateSoftware({
     <Flex
       backgroundColor={COLORS.darkGreyDisabled}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
@@ -61,7 +61,7 @@ export function UpdateSoftware({
         fontSize="1.5rem"
         lineHeight="2.0625rem"
         fontWeight="400"
-        marginBottom={SPACING.spacingXXL}
+        marginBottom={SPACING.spacing40}
       >
         {renderText()}
       </StyledText>
