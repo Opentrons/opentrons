@@ -27,7 +27,7 @@ from opentrons.hardware_control import (
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.protocols.api_support.default_deck_type import (
+from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 

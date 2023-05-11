@@ -9,7 +9,7 @@ from opentrons.types import Location, Point
 
 from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
 
-from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocol_api.core.legacy.module_geometry import (
     create_geometry,
     ModuleGeometry,

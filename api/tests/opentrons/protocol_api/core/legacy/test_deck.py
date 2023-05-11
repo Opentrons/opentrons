@@ -7,7 +7,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.motion_planning import deck_conflict
-from opentrons.protocols.api_support.default_deck_type import (
+from opentrons.protocols.api_support.deck_type import (
     SHORT_TRASH_DECK,
     STANDARD_OT2_DECK,
 )

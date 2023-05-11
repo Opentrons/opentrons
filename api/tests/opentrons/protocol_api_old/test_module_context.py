@@ -20,7 +20,7 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
     models_compatible,
 )
-from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons_shared_data.labware import load_definition as load_labware_definition

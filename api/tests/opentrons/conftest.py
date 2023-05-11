@@ -50,7 +50,7 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.protocols.api_support import default_deck_type
+from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
 
@@ -233,12 +233,12 @@ async def robot_model(
 @pytest.fixture
 def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
-        return default_deck_type.STANDARD_OT3_DECK
+        return deck_type.STANDARD_OT3_DECK
     elif robot_model == "OT-2 Standard":
         # There are two OT-2 deck definitions (standard and short-trash),
         # but RobotModel does not draw such a distinction. We assume here that it's
         # sufficient to run OT-2 tests with the standard deck definition only.
-        return default_deck_type.STANDARD_OT2_DECK
+        return deck_type.STANDARD_OT2_DECK
 
 
 @pytest.fixture

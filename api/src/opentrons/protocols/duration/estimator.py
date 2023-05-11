@@ -8,7 +8,7 @@ import functools
 from dataclasses import dataclass
 
 from opentrons.commands import types
-from opentrons.protocols.api_support.default_deck_type import (
+from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocols.api_support.labware_like import LabwareLike

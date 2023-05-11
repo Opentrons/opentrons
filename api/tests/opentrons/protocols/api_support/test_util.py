@@ -5,7 +5,7 @@ from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocol_api.core.legacy.deck import Deck
-from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,

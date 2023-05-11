@@ -1,7 +1,7 @@
 import pytest
 
 from opentrons.types import Location, Point
-from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.geometry.planning import (
     plan_moves,
     safe_height,

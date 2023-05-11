@@ -7,7 +7,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
-from opentrons.protocols.api_support.default_deck_type import (
+from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 

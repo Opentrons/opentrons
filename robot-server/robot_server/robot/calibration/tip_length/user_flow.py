@@ -3,7 +3,7 @@ from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
-from opentrons.protocols.api_support.default_deck_type import (
+from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocol_api import labware

@@ -42,7 +42,7 @@ from opentrons.commands import types as command_types
 
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import PythonProtocol, BundleContents
-from opentrons.protocols.api_support.default_deck_type import (
+from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocols.api_support.types import APIVersion

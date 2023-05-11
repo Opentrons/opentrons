@@ -10,7 +10,7 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
-from opentrons.protocols.api_support.default_deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
