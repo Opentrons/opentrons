@@ -4,7 +4,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  MagneticBlockModel,
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import type {
