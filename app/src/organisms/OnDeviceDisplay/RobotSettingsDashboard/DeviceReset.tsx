@@ -114,7 +114,7 @@ export function DeviceReset({
           flexDirection={DIRECTION_ROW}
           backgroundColor={COLORS.warningBackgroundMed}
           alignItems={ALIGN_CENTER}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           borderRadius={BORDERS.size_three}
         >

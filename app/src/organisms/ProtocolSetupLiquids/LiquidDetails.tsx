@@ -126,7 +126,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   <Flex flexDirection={DIRECTION_ROW}>
                     <Flex
                       height="2.75rem"
-                      padding={`${SPACING.spacing8} 0.75rem`}
+                      padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                       width="max-content"
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}

@@ -262,7 +262,7 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
         css={BORDERS.cardOutlineBorder}
-        padding="0.75rem"
+        padding={SPACING.spacing12}
         height="max-content"
         backgroundColor={COLORS.white}
       >

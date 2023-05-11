@@ -25,7 +25,11 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
     <Portal>
       <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
         <AnalyticsToggle />
-        <OutlineButton onClick={setSeen} float="right" margin="0.75rem">
+        <OutlineButton
+          onClick={setSeen}
+          float="right"
+          margin={SPACING.spacing12}
+        >
           {CONTINUE}
         </OutlineButton>
       </Modal>
