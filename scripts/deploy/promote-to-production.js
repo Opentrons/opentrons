@@ -70,6 +70,27 @@ productionAssumeRole()
       })
       .then(() => {
         console.log('Promotion to production done\n')
+        const cloudfront = new AWS.CloudFront({
+          apiVersion: '2019-03-26',
+          region: 'us-east-1',
+          credentials: productionCredentials,
+        })
+        const productionCloudfrontArn = `arn:aws:cloudfront::043748923082:distribution/E20OHY6J3BRVIF`
+        const productionDistributionId = productionCloudfrontArn.split('/')[1]
+        const cloudFrontParams = {
+          DistributionId: productionDistributionId,
+          InvalidationBatch: {
+            CallerReference: Date.now().toString(),
+            Paths: {
+              Quantity: 1,
+              Items: ['/*'],
+            },
+          },
+        }
+        return cloudfront.createInvalidation(cloudFrontParams).promise()
+      })
+      .then(() => {
+        console.log('Cache invalidation initiated for production\n')
         process.exit(0)
       })
       .catch(error => {

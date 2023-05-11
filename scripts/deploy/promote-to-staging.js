@@ -77,6 +77,28 @@ stagingAssumeRole()
       })
       .then(() => {
         console.log('Promotion to staging done\n')
+
+        const cloudfront = new AWS.CloudFront({
+          apiVersion: '2019-03-26',
+          region: 'us-east-1',
+          credentials: stagingCredentials,
+        })
+        const stagingCloudfrontArn = `arn:aws:cloudfront::043748923082:distribution/EB2QTLE7OJ8O6`
+        const stagingDistributionId = stagingCloudfrontArn.split('/')[1]
+        const cloudFrontParams = {
+          DistributionId: stagingDistributionId,
+          InvalidationBatch: {
+            CallerReference: Date.now().toString(),
+            Paths: {
+              Quantity: 1,
+              Items: ['/*'],
+            },
+          },
+        }
+        return cloudfront.createInvalidation(cloudFrontParams).promise()
+      })
+      .then(() => {
+        console.log('Cache invalidation initiated for staging\n')
         process.exit(0)
       })
       .catch(error => {
