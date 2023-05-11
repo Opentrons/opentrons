@@ -39,6 +39,7 @@ import { SLEEP_NEVER_MS } from './constants'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
+import { useCurrentRunRoute } from './hooks'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
   {
@@ -200,6 +201,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const isIdle = useIdle(sleepTime, options)
   const scrollRef = React.useRef(null)
   const isScrolling = useScrolling(scrollRef)
+  const currentRunRoute = useCurrentRunRoute()
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -261,6 +263,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 }
               )}
               <Redirect exact from="/" to={targetPath} />
+              {currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null}
             </Switch>
           </ToasterOven>
         )}
