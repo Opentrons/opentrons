@@ -135,10 +135,7 @@ def run_server(
                     break
 
             time.sleep(0.1)
-        request_session.post(
-            f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
-            json={"target": "robot"},
-        )
+
         yield
 
 
@@ -177,6 +174,7 @@ def ot3_run_server(
                     break
 
             time.sleep(0.1)
+
         yield
 
 
