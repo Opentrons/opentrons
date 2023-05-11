@@ -28,7 +28,7 @@ import { useDispatchApiRequest } from '../../../redux/robot-api'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface LabelProps {
   isSelected?: boolean
@@ -42,7 +42,7 @@ const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing4} ${SPACING.spacing5};
   border: 2px solid
     ${({ isSelected }) =>
-      isSelected === true ? COLORS.blueEnabled : COLORS.light_two};
+      isSelected === true ? COLORS.blueEnabled : COLORS.light2};
   border-radius: ${BORDERS.size_four};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};

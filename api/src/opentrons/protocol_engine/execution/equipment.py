@@ -67,7 +67,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
 
     module_id: str
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
@@ -236,6 +236,41 @@ class EquipmentHandler:
         )
 
         return LoadedPipetteData(pipette_id=pipette_id)
+
+    async def load_magnetic_block(
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        module_id: Optional[str],
+    ) -> LoadedModuleData:
+        """Ensure the required magnetic block is attached.
+
+        Args:
+            model: The model name of the module.
+            location: The deck location of the module
+            module_id: Optional ID assigned to the module.
+                       If None, an ID will be generated.
+
+        Returns:
+            A LoadedModuleData object.
+
+        Raises:
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
+        """
+        assert ModuleModel.is_magnetic_block(
+            model
+        ), f"Expected Magnetic block and got {model.name}"
+        definition = self._module_data_provider.get_definition(model)
+        # when loading a hardware module select_hardware_module_to_load
+        # will ensure a module of a different type is not loaded at the same slot.
+        # this is for non-connected modules.
+        self._state_store.modules.raise_if_module_in_location(location=location)
+        return LoadedModuleData(
+            module_id=self._model_utils.ensure_id(module_id),
+            serial_number=None,
+            definition=definition,
+        )
 
     async def load_module(
         self,

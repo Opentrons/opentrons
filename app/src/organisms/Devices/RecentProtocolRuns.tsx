@@ -15,6 +15,7 @@ import {
   SIZE_4,
   SPACING,
   TYPOGRAPHY,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -46,7 +47,7 @@ export function RecentProtocolRuns({
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      padding={`0 0 ${String(SPACING.spacing3)}`}
+      padding={`0 0 ${SPACING.spacing3}`}
       width="100%"
       marginBottom="6rem"
     >
@@ -64,7 +65,7 @@ export function RecentProtocolRuns({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         minHeight={SIZE_4}
-        padding={`0 ${String(SPACING.spacing4)}`}
+        paddingX={SPACING.spacing4}
         width="100%"
       >
         {isRobotViewable && runs && runs.length > 0 && (
@@ -146,7 +147,7 @@ export function RecentProtocolRuns({
             as="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.errorDisabled}
-            display="flex"
+            display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_offline"
           >
@@ -157,7 +158,7 @@ export function RecentProtocolRuns({
           <StyledText
             as="p"
             alignItems={ALIGN_CENTER}
-            display="flex"
+            display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_no_runs"
           >

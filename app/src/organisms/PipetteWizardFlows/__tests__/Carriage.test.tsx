@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   LEFT,
@@ -39,12 +39,11 @@ describe('Carriage', () => {
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByAltText, getByRole } = render(props)
     getByText('Unscrew z-axis carriage')
     getByAltText('Unscrew gantry')
     getByRole('button', { name: 'Continue' })
-    getByLabelText('back').click()
-    expect(props.goBack).toHaveBeenCalled()
+    expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
   it('renders the correct button when is the on device display', () => {
     props = {

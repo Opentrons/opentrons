@@ -18,6 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount, Location, DeckLocation
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
@@ -30,11 +31,13 @@ from opentrons.protocols.api_support.util import (
 
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
+from .core.engine.module_core import NonConnectedModuleCore
 from .core.module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
@@ -50,6 +53,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
     ModuleContext,
 )
 
@@ -62,6 +66,7 @@ ModuleTypes = Union[
     MagneticModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 ]
 
 
@@ -512,6 +517,9 @@ class ProtocolContext(CommandPublisher):
                   :py:class:`ThermocyclerContext`, or
                   :py:class:`HeaterShakerContext`,
                   depending on what you requested with ``module_name``.
+
+                  .. versionchanged:: 2.15
+                    Added :py:class:`MagneticBlockContext` return value.
         """
         if configuration:
             if self._api_version < APIVersion(2, 4):
@@ -525,6 +533,13 @@ class ProtocolContext(CommandPublisher):
                 )
 
         requested_model = validation.ensure_module_model(module_name)
+        if isinstance(
+            requested_model, MagneticBlockModel
+        ) and self._api_version < APIVersion(2, 15):
+            raise APIVersionError(
+                f"Module of type {module_name} is only available in versions 2.15 and above."
+            )
+
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
 
         module_core = self._core.load_module(
@@ -837,7 +852,7 @@ class ProtocolContext(CommandPublisher):
 
 
 def _create_module_context(
-    module_core: ModuleCore,
+    module_core: Union[ModuleCore, NonConnectedModuleCore],
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
@@ -852,6 +867,8 @@ def _create_module_context(
         module_cls = ThermocyclerContext
     elif isinstance(module_core, AbstractHeaterShakerCore):
         module_cls = HeaterShakerContext
+    elif isinstance(module_core, AbstractMagneticBlockCore):
+        module_cls = MagneticBlockContext
     else:
         assert False, "Unsupported module type"
 

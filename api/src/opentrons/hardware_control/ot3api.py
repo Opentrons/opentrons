@@ -1248,7 +1248,12 @@ class OT3API(
             checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
 
-        home_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
+        home_seq = [
+            ax
+            for ax in OT3Axis.home_order()
+            if (ax in checked_axes and self._backend.axis_is_present(ax))
+        ]
+        self._log.info(f"home was called with {axes} generating sequence {home_seq}")
         await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
@@ -1480,19 +1485,38 @@ class OT3API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+    async def blow_out(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        volume: Optional[float] = None,
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
         realmount = OT3Mount.from_mount(mount)
-        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
+
+        max_blowout_pos = instrument.plunger_positions.blow_out
+        # start at the bottom position and move additional distance
+        # determined by plan_check_blow_out
+        blowout_distance = (
+            instrument.plunger_positions.bottom + blowout_spec.plunger_distance
+        )
+        if blowout_distance > max_blowout_pos:
+            raise ValueError(
+                f"Blow out distance exceeds plunger position limit: blowout dist = {blowout_distance}, "
+                f"max blowout distance = {max_blowout_pos}"
+            )
+
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
         )
+
         target_pos = target_position_from_plunger(
             realmount,
-            blowout_spec.plunger_distance,
+            blowout_distance,
             self._current_position,
         )
 
@@ -1959,6 +1983,7 @@ class OT3API(
         moving_axis: OT3Axis,
         target_pos: float,
         pass_settings: CapacitivePassSettings,
+        retract_after: bool = True,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -2033,7 +2058,8 @@ class OT3API(
                 probe=InstrumentProbeType.PRIMARY,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, pass_start_pos)
+        if retract_after:
+            await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
     @contextlib.asynccontextmanager

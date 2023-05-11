@@ -23,7 +23,7 @@ import {
 } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface LabelProps {
   isSelected?: boolean
@@ -119,9 +119,7 @@ export function UpdateChannel({
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={
-                    radio.value === channel
-                      ? COLORS.white
-                      : COLORS.darkBlack_seventy
+                    radio.value === channel ? COLORS.white : COLORS.darkBlack70
                   }
                 >
                   {t('alpha_description')}

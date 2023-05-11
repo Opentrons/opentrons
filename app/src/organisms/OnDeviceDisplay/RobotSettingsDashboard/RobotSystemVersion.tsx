@@ -22,7 +22,7 @@ import { StyledText } from '../../../atoms/text'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 import { getShellUpdateState } from '../../../redux/shell'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons'
 
@@ -99,7 +99,7 @@ export function RobotSystemVersion({
               'shared:view_latest_release_notes'
             )} ${GITHUB_URL}`}</StyledText>
             <Flex
-              backgroundColor={COLORS.light_two}
+              backgroundColor={COLORS.light2}
               flexDirection={DIRECTION_ROW}
               padding={SPACING.spacing5}
               justifyContent={JUSTIFY_SPACE_BETWEEN}

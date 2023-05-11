@@ -16,7 +16,7 @@ import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { i18n } from '../../i18n'
 
 const LPC_HELP_LINK_URL =

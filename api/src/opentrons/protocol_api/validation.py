@@ -15,6 +15,7 @@ from typing import (
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
@@ -23,6 +24,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
     ThermocyclerStep,
 )
 
@@ -97,6 +99,13 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
 
 
+def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+    if robot_type == "OT-2 Standard":
+        return str(slot_name)
+    else:
+        return slot_name.as_coordinate()
+
+
 def ensure_lowercase_name(name: str) -> str:
     """Ensure that a given name string is all lowercase."""
     if not isinstance(name, str):
@@ -126,6 +135,7 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
     "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
+    "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
 }
 
 

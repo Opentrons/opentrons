@@ -32,6 +32,7 @@ from .ot3utils import (
     create_tip_action_group,
     PipetteAction,
     NODEID_SUBSYSTEM,
+    motor_nodes,
 )
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -495,6 +496,15 @@ class OT3Simulator:
         return {
             NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
         }
+
+    def axis_is_present(self, axis: OT3Axis) -> bool:
+        try:
+            return axis_to_node(axis) in motor_nodes(
+                cast(Set[FirmwareTarget], self._present_nodes)
+            )
+        except KeyError:
+            # Currently unhandled axis
+            return False
 
     @property
     def update_required(self) -> bool:

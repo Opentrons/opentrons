@@ -16,7 +16,9 @@ import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCa
 import {
   useDeckCalibrationData,
   useRunStatuses,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../../../../organisms/Devices/hooks'
+import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
 
 import { OverflowMenu } from '../OverflowMenu'
 import {
@@ -68,7 +70,9 @@ const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-
+const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
+  typeof useAttachedPipettesFromInstrumentsQuery
+>
 const mockUseDeleteCalibrationMutation = useDeleteCalibrationMutation as jest.MockedFunction<
   typeof useDeleteCalibrationMutation
 >
@@ -96,6 +100,10 @@ describe('OverflowMenu', () => {
       pipetteName: PIPETTE_NAME,
       tiprackDefURI: 'mock/tiprack/uri',
     }
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: null,
+      right: null,
+    })
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
     mockUseDeckCalibrationData.mockReturnValue({
@@ -176,7 +184,11 @@ describe('OverflowMenu', () => {
     expect(saveAs).toHaveBeenCalled()
   })
 
-  it('calibration button should open up the pipette wizard flow for gen3 pipettes', () => {
+  it('recalibration button should open up the pipette wizard flow for gen3 pipettes', () => {
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: mockAttachedPipetteInformation,
+      right: null,
+    })
     mockPipetteWizardFlow.mockReturnValue(<div>mock pipette wizard flows</div>)
     props = {
       ...props,
@@ -191,6 +203,27 @@ describe('OverflowMenu', () => {
     expect(
       screen.queryByText('Download calibration data')
     ).not.toBeInTheDocument()
+    fireEvent.click(cal)
+    getByText('mock pipette wizard flows')
+  })
+
+  it('calibration button should open up the pipette wizard flow for gen3 pipettes', () => {
+    mockPipetteWizardFlow.mockReturnValue(<div>mock pipette wizard flows</div>)
+    mockUseAllPipetteOffsetCalibrationsQuery.mockReturnValue({
+      data: {
+        data: [],
+      },
+    } as any)
+    props = {
+      ...props,
+      pipetteName: OT3_PIPETTE_NAME,
+    }
+    const [{ getByText, getByLabelText }] = render(props)
+    const button = getByLabelText(
+      'CalibrationOverflowMenu_button_pipetteOffset'
+    )
+    fireEvent.click(button)
+    const cal = getByText('Calibrate pipette')
     fireEvent.click(cal)
     getByText('mock pipette wizard flows')
   })

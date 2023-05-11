@@ -20,14 +20,14 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const BUTTON_STYLE = css`
   &:focus-visible {
@@ -35,7 +35,7 @@ const BUTTON_STYLE = css`
   }
 
   &:active {
-    color: ${COLORS.darkBlack_forty};
+    color: ${COLORS.darkBlack40};
   }
 `
 
