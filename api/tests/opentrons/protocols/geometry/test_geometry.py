@@ -311,6 +311,10 @@ def test_gen2_module_transforms(deck):
     assert mmod2.labware_offset == Point(1.425, -0.125, 82.25)
 
 
+# todo(mm, 2023-05-11): This test is limited to just the OT-2 deck definition
+# because it depends on the details of the OT-2 trash height relative to troughs.
+# See if it can be rewritten to avoid that.
+@pytest.mark.parametrize("deck_definition_name", ["ot2_standard"])
 def test_instr_max_height(deck):
     fixed_trash = deck.get_fixed_trash()
     trough = labware.load(trough_name, deck.position_for(1))
