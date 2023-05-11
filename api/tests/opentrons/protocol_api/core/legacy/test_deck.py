@@ -41,7 +41,7 @@ EXPECTED_FIXED_TRASH = deck_conflict.Labware(
 # This Deck class is only used by Python Protocol API versions earlier than 2.13,
 # which only support the OT-2, not the OT-3.
 @pytest.fixture(params=[STANDARD_OT2_DECK, SHORT_TRASH_DECK])
-def subject(request) -> Deck:
+def subject(request: Any) -> Deck:
     """Get a Deck test subject."""
     return Deck(deck_type=request.param)
 
@@ -114,7 +114,7 @@ def test_highest_z(decoy: Decoy, subject: Deck) -> None:
 
 def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
     """It should correctly call the deck conflict checker with fixed trash labware."""
-    subject = Deck()
+    subject = Deck(deck_type="ot2_standard")
     decoy.verify(
         deck_conflict.check(
             existing_items={}, new_location=12, new_item=EXPECTED_FIXED_TRASH

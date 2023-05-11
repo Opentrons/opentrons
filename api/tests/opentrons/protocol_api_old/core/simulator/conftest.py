@@ -2,8 +2,8 @@ import pytest
 
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
     LegacyProtocolCore,

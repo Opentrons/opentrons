@@ -21,6 +21,7 @@ from .protocol_context import ProtocolContext
 from .deck import Deck
 
 from .core.common import ProtocolCore as AbstractProtocolCore
+from .core.legacy.deck import Deck as LegacyDeck
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
@@ -94,8 +95,6 @@ def create_protocol_context(
     else:
         sync_hardware = SynchronousAdapter(hardware_api)
 
-    deck = Deck(deck_type=deck_type)
-
     if protocol_engine is not None:
         labware_offset_provider = LabwareOffsetProvider(engine=protocol_engine)
     else:
@@ -120,10 +119,11 @@ def create_protocol_context(
 
     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
+        legacy_deck = LegacyDeck(deck_type=deck_type)
         core = LegacyProtocolCoreSimulator(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
-            deck_layout=deck,
+            deck_layout=legacy_deck,
             equipment_broker=equipment_broker,
             api_version=api_version,
             bundled_labware=bundled_labware,
@@ -131,10 +131,11 @@ def create_protocol_context(
         )
 
     else:
+        legacy_deck = LegacyDeck(deck_type=deck_type)
         core = LegacyProtocolCore(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
-            deck_layout=deck,
+            deck_layout=legacy_deck,
             equipment_broker=equipment_broker,
             api_version=api_version,
             bundled_labware=bundled_labware,
@@ -147,6 +148,9 @@ def create_protocol_context(
 
     return ProtocolContext(
         api_version=api_version,
+        # TODO(mm, 2023-05-11): This cast shouldn't be necessary.
+        # Fix this by making the appropriate TypeVars covariant?
+        # https://peps.python.org/pep-0484/#covariance-and-contravariance
         core=cast(AbstractProtocolCore, core),
         broker=broker,
         deck=deck,

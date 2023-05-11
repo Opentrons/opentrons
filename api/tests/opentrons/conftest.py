@@ -50,7 +50,6 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocols.api_support import default_deck_type
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
