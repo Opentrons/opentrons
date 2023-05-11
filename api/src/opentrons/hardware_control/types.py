@@ -29,6 +29,8 @@ class MotionChecks(enum.Enum):
     BOTH = 3
 
 
+# TODO (spp, 2023-05-11): merge OT3Axis into this and make Axis the only type.
+#  Use Z_L, Z_R, etc as the axes with aliases for Z, A, B, C
 class Axis(enum.Enum):
     X = 0  # Gantry X
     Y = 1  # Gantry Y

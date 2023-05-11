@@ -48,6 +48,7 @@ from .types import (
 )
 from .errors import (
     MustHomeError,
+    NotSupportedByHardware,
 )
 from . import modules
 from .robot_calibration import (
@@ -575,10 +576,10 @@ class API(
         # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
         # can still explicitly specify an OT3 axis even when working on an OT2.
         # Adding this check in order to prevent misuse of axes types.
-        if axes:
-            assert all(
-                axis in Axis.ot2_axes() for axis in axes
-            ), "Received a non-OT2 axis for homing."
+        if axes and any(axis not in Axis.ot2_axes() for axis in axes):
+            raise NotSupportedByHardware(
+                f"At least one axis in {axes} is not supported on the OT2."
+            )
         self._reset_last_mount()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]

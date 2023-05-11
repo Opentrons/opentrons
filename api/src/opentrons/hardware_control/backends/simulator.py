@@ -138,7 +138,7 @@ class Simulator:
 
         self._attached_instruments = {
             m: _sanitize_attached_instrument(attached_instruments.get(m))
-            for m in types.Mount  # Check if addition of extension Mount creates issues for this
+            for m in types.Mount.ot2_mounts()
         }
         self._stubbed_attached_modules = attached_modules
         self._position = copy.copy(self._smoothie_driver.homed_position)
