@@ -161,7 +161,7 @@
 
 .module_section > * {
   margin-right: 3rem;
-  height: 6rem;
+  height: 7rem;
 }
 
 .mini_card {
@@ -169,8 +169,8 @@
   min-width: 16.1rem;
 }
 
-.module_options {
-  flex: 0 1 4.75rem;
+.model_options {
+  flex: 1;
 }
 
 .line_separator {

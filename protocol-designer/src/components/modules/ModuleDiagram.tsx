@@ -14,6 +14,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  GRIPPER_V1,
+  GRIPPER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 interface Props {
@@ -42,6 +44,9 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [HEATERSHAKER_MODULE_TYPE]: {
     [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heatershaker.png'),
+  },
+  [GRIPPER_MODULE_TYPE]: {
+    [GRIPPER_V1]: require('../../images/modules/heatershaker.png'), // need to add gripper image here
   },
 }
 

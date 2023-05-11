@@ -63,6 +63,7 @@ export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
   'thermocyclerModuleType'
 export const HEATERSHAKER_MODULE_TYPE: 'heaterShakerModuleType' =
   'heaterShakerModuleType'
+export const GRIPPER_MODULE_TYPE: 'gripperModuleType' = 'gripperModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 

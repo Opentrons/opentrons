@@ -3,7 +3,8 @@
     "temperatureModuleType": "Temperature",
     "magneticModuleType": "Magnetic",
     "thermocyclerModuleType": "Thermocycler",
-    "heaterShakerModuleType": "Heater-Shaker"
+    "heaterShakerModuleType": "Heater-Shaker",
+    "gripperModuleType": "Gripper"
   },
   "module_long_names": {
     "temperatureModuleType": "Temperature module",

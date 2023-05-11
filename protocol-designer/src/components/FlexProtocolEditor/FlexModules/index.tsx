@@ -14,6 +14,7 @@ import {
   ModuleType,
   ModuleModel,
   OT3_STANDARD_MODEL,
+  GRIPPER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
@@ -127,20 +128,25 @@ function FlexModulesComponent(): JSX.Element {
                 </div>
 
                 {/* Deck Map Selecetion */}
-                {modulesByType[moduleType].onDeck && (
-                  <>
-                    <FormGroup label="Model" className={styles.module_options}>
-                      <DropdownField
-                        tabIndex={i}
-                        name={`${moduleTypeAccessor}.model`}
-                        options={MODELS_FOR_FLEX_MODULE_TYPE[moduleType]}
-                        value={selectedModel}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                    </FormGroup>
-                    <div {...targetProps} className={styles.module_options}>
-                      <FormGroup label="Position">
+                {moduleType !== GRIPPER_MODULE_TYPE &&
+                  modulesByType[moduleType].onDeck && (
+                    <>
+                      <FormGroup label="Model" className={styles.model_options}>
+                        <DropdownField
+                          tabIndex={i}
+                          name={`${moduleTypeAccessor}.model`}
+                          options={MODELS_FOR_FLEX_MODULE_TYPE[moduleType]}
+                          value={selectedModel}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                      </FormGroup>
+
+                      <FormGroup
+                        label="Position"
+                        {...targetProps}
+                        className={styles.model_options}
+                      >
                         <DropdownField
                           tabIndex={1}
                           name={`modulesByType.${moduleType}.slot`}
@@ -150,13 +156,12 @@ function FlexModulesComponent(): JSX.Element {
                           onBlur={handleBlur}
                         />
                       </FormGroup>
-                    </div>
-                    <ConnectedSlotMap
-                      fieldName={`modulesByType.${moduleType}.slot`}
-                      robotType={OT3_STANDARD_MODEL}
-                    />
-                  </>
-                )}
+                      <ConnectedSlotMap
+                        fieldName={`modulesByType.${moduleType}.slot`}
+                        robotType={OT3_STANDARD_MODEL}
+                      />
+                    </>
+                  )}
               </div>
             )
           })}

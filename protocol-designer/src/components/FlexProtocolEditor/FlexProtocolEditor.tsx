@@ -19,6 +19,8 @@ import {
   SPAN7_8_10_11_SLOT,
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V2,
+  GRIPPER_V1,
+  GRIPPER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -56,6 +58,7 @@ export interface InitialValues {
     temperatureModuleType: FormModule
     thermocyclerModuleType: FormModule
     heaterShakerModuleType: FormModule
+    gripperModuleType: FormModule
   }
 }
 
@@ -126,6 +129,11 @@ const getInitialValues: InitialValues = {
       onDeck: false,
       model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
+    },
+    [GRIPPER_MODULE_TYPE]: {
+      onDeck: false,
+      model: GRIPPER_V1,
+      slot: '',
     },
   },
 }
