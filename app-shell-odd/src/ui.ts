@@ -75,7 +75,7 @@ function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
       .getisRobotServerReady()
       .then((isReady: boolean) => {
         dispatch(sendReadyStatus(isReady))
-        if (isReady) {
+        if (!isReady) {
           waitForRobotServerAndShowMainWIndow(dispatch)
         }
       })
