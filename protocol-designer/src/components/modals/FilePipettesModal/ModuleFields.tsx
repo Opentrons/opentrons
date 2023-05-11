@@ -32,6 +32,9 @@ export interface ModuleFieldsProps {
         heaterShakerModuleType?: {
           model: string
         }
+        magneticBlockType?: {
+          model: string
+        }
       }
   touched:
     | null
@@ -47,6 +50,9 @@ export interface ModuleFieldsProps {
           model: boolean
         }
         heaterShakerModuleType?: {
+          model: boolean
+        }
+        magneticBlockType?: {
           model: boolean
         }
       }

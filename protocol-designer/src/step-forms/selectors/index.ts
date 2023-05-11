@@ -249,6 +249,14 @@ const _getInitialDeckSetup = (
               slot,
               moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
             }
+          case MAGNETIC_BLOCK_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: MAGNETIC_BLOCK_TYPE,
+              slot,
+              moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
+            }
         }
       }
     ),
