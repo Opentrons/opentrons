@@ -935,11 +935,11 @@ class OT3RobotCalibrationProvider:
         return self._robot_calibration
 
     def reset_robot_calibration(self) -> None:
-        self._validate.cache_clear()
         # need to deal with other offsets?
         self._robot_calibration.deck_calibration = load_attitude_matrix(to_default=True)
 
     def load_robot_calibration(self) -> None:
+        self._validate.cache_clear()
         self._robot_calibration.deck_calibration = load_attitude_matrix(
             to_default=False
         )
