@@ -46,7 +46,7 @@ class DeckDataProvider:
         deck_definition: DeckDefinitionV3,
     ) -> List[DeckFixedLabware]:
         """Get a list of all labware fixtures from a given deck definition."""
-        labware = []
+        labware: List[DeckFixedLabware] = []
 
         for fixture in deck_definition["locations"]["fixtures"]:
             labware_id = fixture["id"]
