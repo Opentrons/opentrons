@@ -9,6 +9,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   BORDERS,
+  SPACING,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'

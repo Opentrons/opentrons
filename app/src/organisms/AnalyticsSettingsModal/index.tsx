@@ -6,7 +6,7 @@ import {
   setAnalyticsOptInSeen,
 } from '../../redux/analytics'
 
-import { Modal, OutlineButton } from '@opentrons/components'
+import { Modal, OutlineButton, SPACING } from '@opentrons/components'
 import { AnalyticsToggle } from './AnalyticsToggle'
 import { Portal } from '../../App/portal'
 import type { Dispatch } from '../../redux/types'
