@@ -19,7 +19,7 @@ _dispense_defaults = {
     1: {
         50: {  # P50
             50: DispenseSettings(  # T50
-                flow_rate=7.85,
+                flow_rate=57,
                 delay=0.5,
                 submerge=_default_submerge_mm_t50,
                 retract=_default_retract_mm,
@@ -57,7 +57,7 @@ _dispense_defaults = {
     8: {
         50: {  # P50
             50: DispenseSettings(  # T50
-                flow_rate=7.85,
+                flow_rate=57,
                 delay=0.5,
                 submerge=_default_submerge_mm_t50,
                 retract=_default_retract_mm,
