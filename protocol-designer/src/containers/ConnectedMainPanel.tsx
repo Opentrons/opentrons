@@ -17,20 +17,25 @@ import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
+import { FlexFileDetails } from '../components/FlexProtocolEditor/FlexFileDetails'
 
 interface Props {
   page: Page
   selectedTerminalItemId: TerminalItemId | null | undefined
   ingredSelectionMode: boolean
+  robot: string
 }
 
 function MainPanelComponent(props: Props): JSX.Element {
-  const { page, selectedTerminalItemId, ingredSelectionMode } = props
+  const { page, selectedTerminalItemId, ingredSelectionMode, robot } = props
+
+  const compo =
+    robot === 'ot2_standard' ? <ConnectedFilePage /> : <FlexFileDetails />
   switch (page) {
     case 'file-splash':
       return <Splash />
     case 'file-detail':
-      return <ConnectedFilePage />
+      return compo
     case 'liquids':
       return <LiquidsPage />
     case 'settings-app':
@@ -62,6 +67,7 @@ function mapStateToProps(state: BaseState): Props {
     selectedTerminalItemId: getSelectedTerminalItemId(state),
     ingredSelectionMode:
       labwareIngredSelectors.getSelectedLabwareId(state) != null,
+    robot: state.fileData.fileMetadata?.deckId,
   }
 }
 

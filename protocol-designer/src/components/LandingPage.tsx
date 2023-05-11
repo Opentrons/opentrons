@@ -6,12 +6,15 @@ import styles from './FlexProtocolEditor/FlexComponents.css'
 import { StyledText } from './FlexProtocolEditor/StyledText'
 import { selectPageForms } from './FlexProtocolEditor/constant'
 import { ProtocolEditor } from './ProtocolEditor'
+import { actions as loadFileActions } from '../load-file'
+import { useDispatch } from 'react-redux'
 
 export interface PageProps {
   setPageProps: (type: string) => void
 }
 
 function LandingPageComponent(props: PageProps): JSX.Element {
+  const dispatch = useDispatch()
   return (
     <div className={styles.pd_landing_page}>
       <StyledText as="h1">{i18n.t('flex.landing_page.welcome')}</StyledText>
@@ -40,7 +43,13 @@ function LandingPageComponent(props: PageProps): JSX.Element {
           <StyledText as="h4">
             {i18n.t('flex.landing_page.import_protocol')}
           </StyledText>
-          <input type="file" />
+          <input
+            type="file"
+            onChange={fileChangeEvent => {
+              dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+              props.setPageProps(selectPageForms.protocolEditor)
+            }}
+          />
         </OutlineButton>
       </div>
     </div>
