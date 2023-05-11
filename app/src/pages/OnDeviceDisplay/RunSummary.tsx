@@ -55,6 +55,7 @@ import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  console.log('RUNSUMMAR', runId)
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })

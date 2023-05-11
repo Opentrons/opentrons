@@ -203,7 +203,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const isIdle = useIdle(sleepTime, options)
   const scrollRef = React.useRef(null)
   const isScrolling = useScrolling(scrollRef)
-  const currentRunRoute = useCurrentRunRoute()
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -245,7 +244,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }, [dispatch, isIdle, usersBrightness])
 
   return (
-    <ApiHostProvider hostname="localhost">
+    <ApiHostProvider hostname="10.13.11.68">
       <Box width="100%" css="user-select: none;">
         {Boolean(isIdle) ? (
           <SleepScreen />
@@ -265,11 +264,17 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 }
               )}
               <Redirect exact from="/" to={'/loading'} />
-              {currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null}
             </Switch>
           </ToasterOven>
         )}
       </Box>
+      <TopLevelRedirects />
     </ApiHostProvider>
   )
+}
+
+function TopLevelRedirects(): JSX.Element | null {
+  const currentRunRoute = useCurrentRunRoute()
+  console.log('currentRunRoute', currentRunRoute)
+  return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
 }
