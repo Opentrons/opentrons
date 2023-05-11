@@ -23,8 +23,13 @@ class Calibratable(Protocol[CalibrationType]):
         """
         ...
 
-    def load_robot_calibration(self) -> None:
-        """Loads any calibration data that is stored."""
+    def reset_deck_calibration(self) -> None:
+        """Resets only deck calibration data."""
+        ...
+
+    def load_deck_calibration(self) -> None:
+        """Loads only any deck calibration data that is stored."""
+        ...
 
     def set_robot_calibration(self, robot_calibration: CalibrationType) -> None:
         """Set the current robot calibration from stored data."""
