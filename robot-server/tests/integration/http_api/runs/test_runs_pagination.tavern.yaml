@@ -129,6 +129,9 @@ stages:
                 location: !anydict
             labwareOffsets: [ ]
             liquids: [ ]
+        links:
+          current:
+            href: '/runs/{third_run_id}'
   - name: Get runs pagination 0
     request:
       url: '{host:s}:{port:d}/runs?pageLength=0'
@@ -140,3 +143,7 @@ stages:
       json:
         data:
           []
+        links:
+          current:
+            href: '/runs/{third_run_id}'
+
