@@ -831,13 +831,13 @@ async def calibrate_belts(
         if mount == OT3Mount.GRIPPER:
             raise RuntimeError("Must use pipette mount, not gripper")
         try:
-            hcapi.reset_robot_calibration()
+            hcapi.reset_deck_calibration()
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
             belt_attitude = await _determine_transform_matrix(hcapi, mount)
             save_robot_belt_attitude(belt_attitude, pipette_id)
             return belt_attitude
         finally:
-            hcapi.load_robot_calibration()
+            hcapi.load_deck_calibration()
             await hcapi.remove_tip(mount)
 
 
