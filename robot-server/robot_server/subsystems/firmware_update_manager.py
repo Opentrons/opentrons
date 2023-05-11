@@ -292,13 +292,6 @@ class FirmwareUpdateManager:
             except KeyError as e:
                 raise UpdateIdNotFound() from e
 
-    async def _get_by_subsystem(self, subsystem: SubSystem) -> _UpdateProcess:
-        async with self._management_lock:
-            try:
-                return self._running_updates_by_subsystem[subsystem.to_hw()]
-            except KeyError as e:
-                raise NoOngoingUpdate() from e
-
     async def _emplace(
         self, update_id: str, subsystem: SubSystem, creation_time: datetime
     ) -> _UpdateProcess:
@@ -346,7 +339,7 @@ class FirmwareUpdateManager:
         except KeyError as ke:
             raise UpdateIdNotFound() from ke
 
-    def get_ongoing_update_process_handle_by_subsystem(
+    async def get_ongoing_update_process_handle_by_subsystem(
         self, subsystem: SubSystem
     ) -> UpdateProcessHandle:
         """Get a handle for a process by its subsystem.
@@ -354,21 +347,25 @@ class FirmwareUpdateManager:
         This is the way to get access to a running process - the process object itself should
         not be touched outside this object or the task runner.
         """
-        try:
-            return self._running_updates_by_subsystem[subsystem.to_hw()].get_handle()
-        except KeyError as ke:
-            raise NoOngoingUpdate() from ke
+        async with self._management_lock:
+            try:
+                return self._running_updates_by_subsystem[
+                    subsystem.to_hw()
+                ].get_handle()
+            except KeyError as ke:
+                raise NoOngoingUpdate() from ke
 
-    def all_ongoing_processes(
+    async def all_ongoing_processes(
         self,
     ) -> List[UpdateProcessHandle]:
         """Return handles for all ongoing updates."""
-        return list(
-            update.get_handle()
-            for update in self._running_updates_by_subsystem.values()
-        )
+        async with self._management_lock:
+            return list(
+                update.get_handle()
+                for update in self._running_updates_by_subsystem.values()
+            )
 
-    async def all_update_processes(self) -> List[UpdateProcessHandle]:
+    def all_update_processes(self) -> List[UpdateProcessHandle]:
         """Return handles for all historical updates."""
         return list(update.get_handle() for update in self._all_updates_by_id.values())
 

@@ -216,6 +216,7 @@ async def get_attached_subsystem(
 async def get_subsystem_updates(
     update_manager: FirmwareUpdateManager = Depends(get_firmware_update_manager),
 ) -> PydanticResponse[SimpleMultiBody[UpdateProgressSummary]]:
+    handles = await update_manager.all_ongoing_processes()
     data = [
         UpdateProgressSummary.construct(
             id=handle.process_details.update_id,
@@ -223,7 +224,7 @@ async def get_subsystem_updates(
             updateStatus=handle.cached_state,
             createdAt=handle.process_details.created_at,
         )
-        for handle in update_manager.all_ongoing_processes()
+        for handle in handles
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
@@ -246,7 +247,7 @@ async def get_subsystem_update(
 ) -> PydanticResponse[SimpleBody[UpdateProgressData]]:
 
     try:
-        handle = update_manager.get_ongoing_update_process_handle_by_subsystem(
+        handle = await update_manager.get_ongoing_update_process_handle_by_subsystem(
             subsystem
         )
     except _NoOngoingUpdate as e:
@@ -284,7 +285,7 @@ async def get_update_processes(
             updateStatus=update.cached_state,
             createdAt=update.process_details.created_at,
         )
-        for update in (await update_manager.all_update_processes())
+        for update in update_manager.all_update_processes()
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
