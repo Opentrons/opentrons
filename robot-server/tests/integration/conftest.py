@@ -9,6 +9,7 @@ import requests
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 from .dev_server import DevServer
+from .dev_system_server import DevSystemServer
 
 
 # Must match our Tavern config in common.yaml.
@@ -71,9 +72,40 @@ def request_session() -> requests.Session:
 
 
 @pytest.fixture(scope="session")
+def run_system_server(
+    request_session: requests.Session,
+) -> Iterator[None]:
+    """Run the system server as a background process."""
+    with DevSystemServer(port=_SESSION_SYSTEM_SERVER_PORT) as dev_server:
+        dev_server.start()
+
+        # Wait for a bit to get started by polling /hcpealth
+        from requests.exceptions import ConnectionError
+
+        while True:
+            try:
+                request_session.get(
+                    f"{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}/"
+                )
+            except ConnectionError:
+                # The server isn't up yet to accept requests. Keep polling.
+                pass
+            else:
+                # The server's replied with something other than a busy indicator. Stop polling.
+                break
+
+            time.sleep(0.1)
+
+        # For all future uses of request_session, a token will be included automatically
+        request_session.headers.update({"authenticationBearer": get_auth_token()})
+        yield
+
+
+@pytest.fixture(scope="session")
 def run_server(
     request_session: requests.Session,
     server_temp_directory: str,
+    run_system_server: None,
 ) -> Iterator[None]:
     """Run the robot server in a background process."""
     with DevServer(
@@ -103,7 +135,6 @@ def run_server(
                     break
 
             time.sleep(0.1)
-        request_session.headers.update({"authenticationBearer": get_auth_token()})
         request_session.post(
             f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
             json={"target": "robot"},
@@ -115,12 +146,14 @@ def run_server(
 def ot3_run_server(
     request_session: requests.Session,
     server_temp_directory: str,
+    run_system_server: object,
 ) -> Iterator[None]:
     """Run the robot server in a background process."""
     with DevServer(
         port=_OT3_SESSION_SERVER_PORT,
         is_ot3=True,
         ot_api_config_dir=Path(server_temp_directory),
+        system_server_port=_SESSION_SYSTEM_SERVER_PORT,
     ) as dev_server:
         dev_server.start()
 
@@ -144,12 +177,6 @@ def ot3_run_server(
                     break
 
             time.sleep(0.1)
-        request_session.headers.update({"authenticationBearer": get_auth_token()})
-        request_session.post(
-            f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}/home",
-            json={"target": "robot"},
-        )
-
         yield
 
 
@@ -166,7 +193,7 @@ def session_server_port(run_server: object) -> str:
 
 
 @pytest.fixture(scope="session")
-def session_system_server_port(run_server: object) -> str:
+def session_system_server_port(run_system_server: object) -> str:
     """Return the port of the running session-scoped dev server."""
     return _SESSION_SYSTEM_SERVER_PORT
 

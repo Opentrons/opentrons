@@ -20,9 +20,10 @@ async def test_protocols_auto_delete(
     num_to_configure_as_maximum: Optional[int],
     num_to_upload: int,
     num_to_expect: int,
+    session_system_server_port: str,
 ) -> None:
     port = "15555"
-    system_server_port = "33533"
+    system_server_port = session_system_server_port
     async with RobotClient.make(
         host="http://localhost",
         port=port,

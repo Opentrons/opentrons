@@ -55,9 +55,10 @@ snapshots: List[(Snapshot)] = [
 )
 async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
     snapshot: Snapshot,
+    session_system_server_port: str,
 ) -> None:
     port = "15555"
-    system_server_port = "17777"
+    system_server_port = session_system_server_port
     async with RobotClient.make(
         host="http://localhost",
         port=port,

@@ -324,3 +324,12 @@ class RobotClient:
         )
         response.raise_for_status()
         return response
+
+    async def post_robot_lights(self, on: bool) -> Response:
+        """POST /robot/lights"""
+        body = {"on": "true" if on else "false"}
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/robot/lights", json=body
+        )
+        response.raise_for_status()
+        return response

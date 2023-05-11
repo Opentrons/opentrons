@@ -5,8 +5,10 @@ marks:
 stages: 
   - name: Invalid auth token with version 2
     request:
-      url: '{host:s}:{port:d}/instruments'
-      method: GET
+      url: '{host:s}:{port:d}/robot/lights'
+      method: POST
+      json:
+        "on": "true"
       headers:
         Opentrons-Version: 2
         authenticationBearer: invalid_token
@@ -15,8 +17,10 @@ stages:
 
   - name: Invalid auth token with version 3
     request:
-      url: '{host:s}:{port:d}/instruments'
-      method: GET
+      url: '{host:s}:{port:d}/robot/lights'
+      method: POST
+      json:
+        "on": "true"
       headers:
         Opentrons-Version: 3
         authenticationBearer: invalid_token
@@ -25,8 +29,10 @@ stages:
 
   - name: Invalid auth token with version 4
     request:
-      url: '{host:s}:{port:d}/instruments'
-      method: GET
+      url: '{host:s}:{port:d}/robot/lights'
+      method: POST
+      json:
+        "on": "true"
       headers:
         Opentrons-Version: 4
         authenticationBearer: invalid_token
@@ -35,8 +41,10 @@ stages:
 
   - name: Invalid auth token with version 5
     request:
-      url: '{host:s}:{port:d}/instruments'
-      method: GET
+      url: '{host:s}:{port:d}/robot/lights'
+      method: POST
+      json:
+        "on": "true"
       headers:
         Opentrons-Version: 5
         authenticationBearer: invalid_token
@@ -45,8 +53,10 @@ stages:
 
   - name: Missing auth token with version 5
     request:
-      url: '{host:s}:{port:d}/instruments'
-      method: GET
+      url: '{host:s}:{port:d}/robot/lights'
+      method: POST
+      json:
+        "on": "true"
       headers:
         Opentrons-Version: 5
         authenticationBearer: ''

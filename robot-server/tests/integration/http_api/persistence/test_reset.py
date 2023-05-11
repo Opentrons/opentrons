@@ -74,7 +74,9 @@ async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
             ), f"Expected server to report failed initialization, but got: {response}"
 
 
-async def test_upload_protocols_and_reset_persistence_dir() -> None:
+async def test_upload_protocols_and_reset_persistence_dir(
+    session_system_server_port: str,
+) -> None:
     """Test resetting runs history.
 
     Immediately after resetting runs history, existing resources should remain
@@ -83,7 +85,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
     But after restarting the server, those resources should be gone.
     """
     port = "15555"
-    system_server_port = "19876"
+    system_server_port = session_system_server_port
     async with RobotClient.make(
         host="http://localhost",
         port=port,
@@ -134,10 +136,12 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
             server.stop()
 
 
-async def test_reset_is_available_even_with_corrupt_persistence_directory() -> None:
+async def test_reset_is_available_even_with_corrupt_persistence_directory(
+    session_system_server_port: str,
+) -> None:
     """Test resetting runs history when the persistence directory is corrupted."""
     port = "15555"
-    system_server_port = "22222"
+    system_server_port = session_system_server_port
     persistence_dir = _get_corrupt_persistence_dir()
     async with RobotClient.make(
         host="http://localhost",

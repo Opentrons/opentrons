@@ -36,12 +36,13 @@ async def _get_system_server_address() -> str:
     """Dependency to get the system server address from the settings file."""
     return get_settings().system_server_address
 
+
 def _should_check_auth(request: Request) -> bool:
     """Filters whether an auth token actually needs to be checked based on the endpoint."""
-    if request.method == 'GET':
+    if request.method == "GET":
         return False
     return True
-    
+
 
 async def check_auth_token_header(
     request: Request,
@@ -53,7 +54,7 @@ async def check_auth_token_header(
     """Get the request's auth token header and verify authenticity."""
     if version < _AUTH_TOKEN_MIN_VERSION:
         return
-    
+
     if not _should_check_auth(request):
         return
 
