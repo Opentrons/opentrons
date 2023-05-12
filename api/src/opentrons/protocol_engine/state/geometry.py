@@ -116,9 +116,9 @@ class GeometryView:
                 module_id=module_id, deck_type=deck_type
             )
             return Point(
-                x=slot_pos.x + module_offset.x,
-                y=slot_pos.y + module_offset.y,
-                z=slot_pos.z + module_offset.z,
+                slot_pos.x + module_offset.x,
+                slot_pos.y + module_offset.y,
+                slot_pos.z + module_offset.z,
             )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
