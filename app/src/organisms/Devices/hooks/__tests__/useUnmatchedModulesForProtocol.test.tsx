@@ -24,6 +24,13 @@ const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
+const mockMagneticBlockDef = {
+  labwareOffset: { x: 5, y: 5, z: 5 },
+  moduleId: 'someMagneticBlock',
+  model: 'magneticBlockV1' as ModuleModel,
+  type: 'magneticBlockType' as ModuleType,
+  compatibleWith: [],
+}
 const mockMagneticModuleDef = {
   labwareOffset: { x: 5, y: 5, z: 5 },
   moduleId: 'someMagneticModule',
@@ -56,8 +63,26 @@ describe('useModuleMatchResults', () => {
     resetAllWhenMocks()
   })
 
-  it('should return no missing Module Ids if all modules present', () => {
+  it('should return no missing Module Ids if all connecting modules are present', () => {
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
+    const moduleId = 'fakeMagBlockId'
+    when(mockUseModuleRenderInfoForProtocolById)
+      .calledWith(mockConnectedRobot.name, '1')
+      .mockReturnValue({
+        [moduleId]: {
+          moduleId: moduleId,
+          x: 0,
+          y: 0,
+          z: 0,
+          moduleDef: mockMagneticBlockDef as any,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          nestedLabwareDisplayName: null,
+          protocolLoadOrder: 0,
+          attachedModuleMatch: null,
+          slotName: '1',
+        },
+      })
 
     const { result } = renderHook(() =>
       useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
