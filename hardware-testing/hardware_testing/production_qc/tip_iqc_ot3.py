@@ -24,10 +24,10 @@ DEFAULT_NUM_SAMPLES = int(3.0 / DEFAULT_PRESSURE_FIXTURE_READ_INTERVAL_SECONDS) 
 
 WELL_NAMES = [f"{row}{col}" for row in "ABCDEFGH" for col in range(1, 13)]
 TEST_SECTIONS = {
-    "hovered": DEFAULT_NUM_SAMPLES,      
-    "submerged": DEFAULT_NUM_SAMPLES,  
-    "aspirated": int(13.0 / DEFAULT_PRESSURE_FIXTURE_READ_INTERVAL_SECONDS) + 1,  
-    "dispensed": DEFAULT_NUM_SAMPLES,   
+    "hovered": DEFAULT_NUM_SAMPLES,
+    "submerged": DEFAULT_NUM_SAMPLES,
+    "aspirated": int(13.0 / DEFAULT_PRESSURE_FIXTURE_READ_INTERVAL_SECONDS) + 1,
+    "dispensed": DEFAULT_NUM_SAMPLES,
 }
 
 
