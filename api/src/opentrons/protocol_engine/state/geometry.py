@@ -91,7 +91,7 @@ class GeometryView:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z
 
-    def get_labware_parent_origin_position(self, labware_id: str) -> Point:
+    def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
         module_id: Optional[str] = None
@@ -123,12 +123,12 @@ class GeometryView:
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the calibrated position of the labware's parent slot (deck or module)."""
-        parent_pos = self.get_labware_parent_origin_position(labware_id)
+        parent_pos = self.get_labware_parent_nominal_position(labware_id)
         cal_offset = ModuleOffsetVector(x=0, y=0, z=0)
         labware_data = self._labware.get(labware_id)
         if isinstance(labware_data.location, ModuleLocation):
             module_id = labware_data.location.moduleId
-            cal_offset = self._modules.get_module_offset_vector(module_id)
+            cal_offset = self._modules.get_module_calibration_offset(module_id)
         return Point(
             x=parent_pos.x + cal_offset.x,
             y=parent_pos.y + cal_offset.y,
@@ -188,7 +188,7 @@ class GeometryView:
         well_name: str,
     ) -> Point:
         """Get the well position without calibration offsets."""
-        parent_pos = self.get_labware_parent_origin_position(labware_id)
+        parent_pos = self.get_labware_parent_nominal_position(labware_id)
         origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
         well_def = self._labware.get_well_definition(labware_id, well_name)
         return Point(

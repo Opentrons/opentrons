@@ -143,7 +143,7 @@ def test_get_labware_parent_position_on_module(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
 
@@ -254,7 +254,7 @@ def test_get_module_labware_highest_z(
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
 
@@ -550,7 +550,7 @@ def test_get_module_labware_well_position(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
-    decoy.when(module_view.get_module_offset_vector("module-id")).then_return(
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
 

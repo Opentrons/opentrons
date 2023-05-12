@@ -630,7 +630,7 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_offset_vector(self, module_id: str) -> ModuleOffsetVector:
+    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
         """Get the stored module calibration offset."""
         module_serial = self.get(module_id).serialNumber
         if module_serial is not None:
@@ -676,11 +676,11 @@ class ModuleView(HasState[ModuleState]):
         offset_vector = self.get_nominal_module_offset(module_id, deck_type)
 
         # add the calibrated module offset if there is one
-        module_offset = self.get_module_offset_vector(module_id)
+        cal_offset = self.get_module_calibration_offset(module_id)
         return LabwareOffsetVector(
-            x=offset_vector.x + module_offset.x,
-            y=offset_vector.y + module_offset.y,
-            z=offset_vector.z + module_offset.z,
+            x=offset_vector.x + cal_offset.x,
+            y=offset_vector.y + cal_offset.y,
+            z=offset_vector.z + cal_offset.z,
         )
 
     def get_overall_height(self, module_id: str) -> float:
