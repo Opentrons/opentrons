@@ -308,7 +308,7 @@ const SummaryDatum = styled.div`
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_CENTER};
-  padding: ${SPACING.spacing8} 0.75rem;
+  padding: ${SPACING.spacing8} ${SPACING.spacing12};
   grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;

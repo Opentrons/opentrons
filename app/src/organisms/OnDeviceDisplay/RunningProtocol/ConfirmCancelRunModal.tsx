@@ -83,7 +83,7 @@ export function ConfirmCancelRunModal({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={SPACING.spacing32}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
         >
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}

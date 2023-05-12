@@ -193,7 +193,7 @@ const Summary = (props: {
         lineHeight={TYPOGRAPHY.lineHeight28}
         marginTop={SPACING.spacing24}
         maxWidth="22rem"
-        padding={`${SPACING.spacing8} 0.75rem`}
+        padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
         <StyledText>{`${t('protocol_info:date_added')}: ${
           date != null

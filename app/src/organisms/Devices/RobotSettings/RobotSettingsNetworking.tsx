@@ -100,7 +100,9 @@ export function RobotSettingsNetworking({
           <Icon
             size="1.25rem"
             name="wifi"
-            marginRight={wifi?.ipAddress != null ? '0.5rem' : '0.75rem'}
+            marginRight={
+              wifi?.ipAddress != null ? SPACING.spacing8 : SPACING.spacing12
+            }
             data-testid="RobotSettings_Networking_wifi_icon"
           />
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -183,7 +185,7 @@ export function RobotSettingsNetworking({
           <Icon
             size="1.25rem"
             name={isOT3 ? 'ethernet' : 'usb'}
-            marginRight="0.75rem"
+            marginRight={SPACING.spacing12}
             data-testid="RobotSettings_Networking_usb_icon"
           />
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -275,7 +277,7 @@ export function RobotSettingsNetworking({
               <Icon
                 size="1.25rem"
                 name="usb"
-                marginRight="0.75rem"
+                marginRight={SPACING.spacing12}
                 data-testid="RobotSettings_Networking_wifi_icon"
               />
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

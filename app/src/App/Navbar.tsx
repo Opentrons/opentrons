@@ -135,7 +135,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
           <NavbarLink key={name} to={navLinkTo as string}>
             <StyledText
               as="h3"
-              margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} 0.75rem`}
+              margin={`${SPACING.spacing8} 0 ${SPACING.spacing8} ${SPACING.spacing12}`}
             >
               {name}
             </StyledText>

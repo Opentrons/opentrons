@@ -12,7 +12,7 @@ from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import run_table, action_table
+from robot_server.persistence import run_table, action_table, sqlite_rowid
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
@@ -211,15 +211,23 @@ class RunStore:
             All stored run entries.
         """
         select_runs = sqlalchemy.select(_run_columns)
-        if length is not None:
-            select_runs = select_runs.limit(length).order_by(
-                run_table.c.created_at.desc()
-            )
-        select_actions = sqlalchemy.select(action_table)
+        select_actions = sqlalchemy.select(action_table).order_by(sqlite_rowid.asc())
         actions_by_run_id = defaultdict(list)
 
         with self._sql_engine.begin() as transaction:
-            runs = transaction.execute(select_runs).all()
+            if length is not None:
+                select_runs = (
+                    select_runs.limit(length)
+                    .order_by(sqlite_rowid.desc())
+                    .limit(length)
+                )
+                # need to select the last inserted runs and return by asc order
+                runs = list(reversed(transaction.execute(select_runs).all()))
+            else:
+                runs = transaction.execute(
+                    select_runs.order_by(sqlite_rowid.asc())
+                ).all()
+
             actions = transaction.execute(select_actions).all()
 
         for action_row in actions:

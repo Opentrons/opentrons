@@ -125,10 +125,10 @@ export function RobotSettingButton({
       {isUpdateAvailable ?? false ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.warningBackgroundMed}
-          padding={`0.75rem ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
           borderRadius={BORDERS.size_four}
         >
           <Icon name="ot-alert" size="1.75rem" color={COLORS.warningEnabled} />
@@ -141,10 +141,10 @@ export function RobotSettingButton({
       {enabledDevTools != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`0.75rem ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
           borderRadius={BORDERS.size_four}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
@@ -156,10 +156,10 @@ export function RobotSettingButton({
       {ledLights != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`0.75rem ${SPACING.spacing4}`}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
           borderRadius={BORDERS.size_four}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
