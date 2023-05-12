@@ -14,6 +14,8 @@ import {
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
+import { EmptySection } from './EmptySection'
+
 import type { ProtocolHardware } from '../../Protocols/hooks'
 import type { TFunction } from 'react-i18next'
 
@@ -78,7 +80,9 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
   const requiredProtocolHardware = useRequiredProtocolHardware(props.protocolId)
   const { t } = useTranslation('protocol_details')
 
-  return (
+  return requiredProtocolHardware.length === 0 ? (
+    <EmptySection section="hardware" />
+  ) : (
     <Table>
       <thead>
         <tr>
@@ -115,6 +119,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
                   color={COLORS.darkBlack100}
                   lineHeight={TYPOGRAPHY.lineHeight28}
                   paddingLeft={SPACING.spacing24}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
                   {getHardwareLocation(hardware, t)}
                 </StyledText>

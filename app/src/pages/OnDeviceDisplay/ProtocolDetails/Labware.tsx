@@ -16,6 +16,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import { useRequiredProtocolLabware } from '../../Protocols/hooks'
+import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -73,7 +74,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
   )
   const { t } = useTranslation('protocol_setup')
 
-  return (
+  return labwareItems.length === 0 ? (
+    <EmptySection section="labware" />
+  ) : (
     <Table>
       <thead>
         <tr>

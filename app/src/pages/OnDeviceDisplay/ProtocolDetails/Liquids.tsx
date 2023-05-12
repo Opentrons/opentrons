@@ -20,6 +20,8 @@ import {
 } from '@opentrons/api-client'
 import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import { StyledText } from '../../../atoms/text'
+import { EmptySection } from './EmptySection'
+
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
@@ -73,7 +75,9 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
   )
   const { t, i18n } = useTranslation('protocol_details')
 
-  return (
+  return liquidsInOrder.length === 0 ? (
+    <EmptySection section="liquids" />
+  ) : (
     <Table>
       <thead>
         <tr>
