@@ -13,6 +13,7 @@ from .fields import (
     OptionalRevisionField,
     LightTransitionTypeField,
     LightAnimationTypeField,
+    EepromDataField,
 )
 
 log = logging.getLogger(__name__)
@@ -267,6 +268,44 @@ class DoorSwitchStateInfo(utils.BinarySerializable):
 
 
 @dataclass
+class WriteEEPromRequest(utils.BinarySerializable):
+    """Write to the EEPROM."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.write_eeprom_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(12)
+    data_address: utils.UInt16Field = utils.UInt16Field(0)
+    data_length: utils.UInt16Field = utils.UInt16Field(0)
+    data: EepromDataField = EepromDataField(bytes())
+
+
+@dataclass
+class ReadEEPromRequest(utils.BinarySerializable):
+    """Read from the EEPROM."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.read_eeprom_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(4)
+    data_address: utils.UInt16Field = utils.UInt16Field(0)
+    data_length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class ReadEEPromResponse(utils.BinarySerializable):
+    """Read from the EEPROM response."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.read_eeprom_response
+    )
+    length: utils.UInt16Field = utils.UInt16Field(12)
+    data_address: utils.UInt16Field = utils.UInt16Field(0)
+    data_length: utils.UInt16Field = utils.UInt16Field(0)
+    data: EepromDataField = EepromDataField(bytes())
+
+
+@dataclass
 class AddLightActionRequest(utils.BinarySerializable):
     """Add an action to the staging light queue.
 
@@ -363,6 +402,9 @@ BinaryMessageDefinition = Union[
     AuxPresentRequest,
     AuxIDRequest,
     AuxIDResponse,
+    WriteEEPromRequest,
+    ReadEEPromRequest,
+    ReadEEPromResponse,
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,
