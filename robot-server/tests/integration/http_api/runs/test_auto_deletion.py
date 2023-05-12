@@ -35,11 +35,10 @@ async def test_runs_auto_delete(
                 robot_client=robot_client, num_runs=num_to_upload
             )
 
-            fetched_run_ids = await _get_run_ids(
-                robot_client=robot_client, length=num_to_expect
-            )
+            fetched_run_ids = await _get_run_ids(robot_client=robot_client)
             # Last n elements of created_run_ids.
             run_ids_to_expect = created_run_ids[-num_to_expect:]
+
             assert fetched_run_ids == run_ids_to_expect
 
 
@@ -52,7 +51,7 @@ async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:
     return created_run_ids
 
 
-async def _get_run_ids(robot_client: RobotClient, length: int) -> List[str]:
+async def _get_run_ids(robot_client: RobotClient) -> List[str]:
     """Return the IDs of all runs on the server."""
-    response = await robot_client.get_runs(length)
+    response = await robot_client.get_runs(length=None)
     return [p["id"] for p in response.json()["data"]]

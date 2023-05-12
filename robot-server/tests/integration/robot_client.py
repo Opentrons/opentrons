@@ -158,7 +158,9 @@ class RobotClient:
     async def get_runs(self, length: Optional[int] = None) -> Response:
         """GET /runs."""
         response = await self.httpx_client.get(
-            url=f"{self.base_url}/runs?length={length}"
+            url=f"{self.base_url}/runs"
+            if length is None
+            else f"{self.base_url}/runs?pageLength={length}"
         )
         response.raise_for_status()
         return response
