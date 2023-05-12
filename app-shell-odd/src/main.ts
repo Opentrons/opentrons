@@ -95,7 +95,7 @@ function createRendererLogger(): Logger {
   return logger
 }
 
-function installDevtools(): Promise<void> {
+function installDevtools(): void {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const devtools = require('electron-devtools-installer')
   const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
@@ -104,7 +104,7 @@ function installDevtools(): Promise<void> {
 
   log.debug('Installing devtools')
 
-  return install(extensions, forceReinstall)
+  install(extensions, forceReinstall)
     .then(() => log.debug('Devtools extensions installed'))
     .catch((error: unknown) => {
       log.warn('Failed to install devtools extensions', {

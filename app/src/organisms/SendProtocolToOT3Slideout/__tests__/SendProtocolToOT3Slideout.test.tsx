@@ -123,7 +123,7 @@ describe('SendProtocolToOT3Slideout', () => {
       eatToast: mockEatToast,
     })
     when(mockUseAllRunsQuery)
-      .calledWith(expect.any(Object), expect.any(Object))
+      .calledWith(expect.any(Object), expect.any(Object), expect.any(Object))
       .mockReturnValue(
         mockSuccessQueryResults({
           data: [],

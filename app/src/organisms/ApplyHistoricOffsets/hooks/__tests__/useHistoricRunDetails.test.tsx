@@ -33,7 +33,7 @@ const MOCK_RUN_EARLIER: RunData = {
 
 describe('useHistoricRunDetails', () => {
   when(mockUseAllRunsQuery)
-    .calledWith({}, undefined)
+    .calledWith({}, {}, undefined)
     .mockReturnValue(
       mockSuccessQueryResults({
         data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER],
