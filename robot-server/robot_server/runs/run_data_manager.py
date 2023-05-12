@@ -148,7 +148,7 @@ class RunDataManager:
 
         return _build_run(run_resource, state_summary, current)
 
-    def get_all(self, length: int) -> List[Run]:
+    def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.
 
         Returns:
