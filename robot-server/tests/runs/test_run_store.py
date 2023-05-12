@@ -266,15 +266,15 @@ def test_get_run_missing(subject: RunStore) -> None:
             20,
             [
                 RunResource(
-                    run_id="run-id-2",
-                    protocol_id=None,
-                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-                    actions=[],
-                ),
-                RunResource(
                     run_id="run-id-1",
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
                 ),
             ],

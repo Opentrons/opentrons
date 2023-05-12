@@ -84,10 +84,10 @@ stages:
       status_code: 200
       json:
         data:
-          - id: '{third_run_id}'
+          - id: '{first_run_id}'
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            status: idle
-            current: True
+            status: stopped
+            current: False
             actions: [ ]
             errors: [ ]
             pipettes: [ ]
@@ -114,10 +114,10 @@ stages:
                 location: !anydict
             labwareOffsets: [ ]
             liquids: [ ]
-          - id: '{first_run_id}'
+          - id: '{third_run_id}'
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-            status: stopped
-            current: False
+            status: idle
+            current: True
             actions: [ ]
             errors: [ ]
             pipettes: [ ]
