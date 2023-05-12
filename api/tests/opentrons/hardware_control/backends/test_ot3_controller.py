@@ -1,4 +1,3 @@
-from unittest.mock import mock_open
 import mock
 import pytest
 from typing import Dict, List, Optional, Set, Tuple, Any, Iterator, cast
@@ -688,15 +687,15 @@ async def test_set_default_currents(
             mocked_currents.call_args_list[0][0][1],
             use_tip_motor_message_for=expected_call,
         )
-        current_settings = controller._current_settings
-        assert current_settings
-        for k, v in current_settings.items():
+        these_current_settings = controller._current_settings
+        assert these_current_settings
+        for k, v in these_current_settings.items():
             if k == OT3Axis.P_L and (
                 gantry_load == GantryLoad.HIGH_THROUGHPUT
                 and expected_call[0] == NodeId.pipette_left
             ):
                 # q motor config
-                v = current_settings[OT3Axis.Q]
+                v = these_current_settings[OT3Axis.Q]
                 assert (
                     mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
                     == v.as_tuple()

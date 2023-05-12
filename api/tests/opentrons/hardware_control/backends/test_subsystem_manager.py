@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Iterator, Set, Optional, AsyncIterator, Tuple, AsyncIterator
+from typing import Dict, Set, Optional, AsyncIterator, Tuple
 from itertools import chain
 
 import pytest
@@ -481,7 +481,7 @@ async def test_ok_tools_get_mapped(
                     pcba_revision=str(default_revision()),
                     update_state=None,
                 ),
-                SubSystem.rear_panel: SubSystemState(
+                SubSystem.gantry_x: SubSystemState(
                     ok=True,
                     current_fw_version=default_fw_version(),
                     next_fw_version=default_fw_version(),
@@ -494,7 +494,9 @@ async def test_ok_tools_get_mapped(
             {},
         ),
         (
-            default_network_info_for({NodeId.head_bootloader, NodeId.pipette_right}),
+            default_network_info_for(
+                {NodeId.head_bootloader, NodeId.pipette_right_bootloader}
+            ),
             {
                 SubSystem.head: SubSystemState(
                     ok=False,
@@ -522,7 +524,7 @@ async def test_ok_tools_get_mapped(
 async def test_subsystems(
     target_info: Dict[FirmwareTarget, network.DeviceInfoCache],
     subsystem_info: Dict[SubSystem, SubSystemState],
-    update_info: Dict[FirmwareTarget, Tuple[int, str]],
+    required_updates: Dict[FirmwareTarget, Tuple[int, str]],
     subject: SubsystemManager,
     network_info: network.NetworkInfo,
     tool_detection_controller: ToolDetectionController,
@@ -537,14 +539,10 @@ async def test_subsystems(
     tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
     await tool_detection_controller.add_resolution(tool_struct, target_info)
 
-    good_targets = {
-        target.application_for()
-        for target in targets
-        if not (isinstance(target, NodeId) and NodeId.is_bootloader(target))
-    }
+    good_targets = {target for target, info in target_info.items() if info.ok}
     bad_targets = target_applications - good_targets
     decoy.when(update_bag.update_checker(target_info, good_targets, False)).then_return(
-        {k: v for k, v in update_info.items() if k in good_targets}
+        {k: v for k, v in required_updates.items() if k in good_targets}
     )
     decoy.when(
         update_bag.update_checker(
@@ -552,6 +550,6 @@ async def test_subsystems(
             bad_targets,
             True,
         )
-    ).then_return({k: v for k, v in update_info.items() if k in bad_targets})
+    ).then_return({k: v for k, v in required_updates.items() if k in bad_targets})
     await subject.start()
     assert subject.subsystems == subsystem_info
