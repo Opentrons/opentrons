@@ -194,6 +194,7 @@ class CanMessenger:
                 originating_node_id=NodeId.host,
             )
         )
+        print(f"PAYLOAD = {message.payload}")
         data = message.payload.serialize()
         log.debug(
             f"Sending -->\n\tarbitration_id: {arbitration_id},\n\t"

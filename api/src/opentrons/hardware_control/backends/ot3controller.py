@@ -41,6 +41,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
+    create_tip_action_home_group,
     PipetteAction,
     sub_system_to_node_id,
     NODEID_SUBSYSTEM,
@@ -150,6 +151,7 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
+from ..instruments.ot3.pipette_handler import DropTipMove
 
 if TYPE_CHECKING:
     from ..dev_types import (
@@ -157,6 +159,7 @@ if TYPE_CHECKING:
         AttachedGripper,
         OT3AttachedInstruments,
     )
+
 
 log = logging.getLogger(__name__)
 
@@ -532,6 +535,7 @@ class OT3Controller:
         """
         group = create_move_group(origin, moves, self._motor_nodes(), stop_condition)
         move_group, _ = group
+        print(f"REGULAR MOVE GROUP = {move_group}")
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
@@ -664,18 +668,33 @@ class OT3Controller:
             )
         return new_group
 
+    async def home_gear_motor(
+        self,
+        distance: float,
+        velocity: float,
+    ) -> None:
+        move_group = create_tip_action_home_group(
+            [OT3Axis.P_L],
+            distance,
+            velocity,
+            cast(PipetteAction, "home"),
+        )
+        runner = MoveGroupRunner(move_groups=[move_group])
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
+
     async def tip_action(
         self,
-        axes: Sequence[OT3Axis],
-        distance: float,
-        speed: float,
+        origin: Coordinates[OT3Axis, float],
+        moves: Any,
         tip_action: str = "home",
     ) -> None:
-        if tip_action == "home":
-            speed = speed * -1
-        move_group = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
+        move_group, _ = create_tip_action_group(
+            origin, [NodeId.pipette_left], cast(PipetteAction, tip_action), moves
         )
+        print(f"TIP ACTION GROUP = {move_group}")
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():
@@ -689,6 +708,7 @@ class OT3Controller:
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         move_group = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
+        print(f"move group type = {type(move_group)}")
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)

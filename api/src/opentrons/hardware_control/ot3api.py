@@ -1546,18 +1546,25 @@ class OT3API(
             )
             await self._move(target_down)
             # perform pick up tip
-            await self._backend.tip_action(
-                [OT3Axis.of_main_tool_actuator(mount)],
-                pipette_spec.pick_up_distance,
-                pipette_spec.speed,
-                "clamp",
-            )
+
+            origin = await self._backend.update_position()
+            target = origin.copy()
+            target[
+                OT3Axis.of_main_tool_actuator(mount)
+            ] += pipette_spec.pick_up_distance
+
+            moves = self._build_moves(origin, target, pipette_spec.speed)
+            for move in moves:
+                await self._backend.tip_action(
+                    origin,
+                    move,
+                    "clamp",
+                )
+
             # back clamps off the adapter posts
-            await self._backend.tip_action(
-                [OT3Axis.of_main_tool_actuator(mount)],
+            await self._backend.home_gear_motor(
                 pipette_spec.pick_up_distance,
                 pipette_spec.speed,
-                "home",
             )
 
     async def pick_up_tip(
@@ -1631,18 +1638,33 @@ class OT3API(
             if move.is_ht_tip_action and move.speed:
                 # The speed check is needed because speed can sometimes be None.
                 # Not sure why
+
+                origin = await self._backend.update_position()
+                # target = origin.copy()
+                # target[
+                #     OT3Axis.of_main_tool_actuator(mount)
+                # ] += pipette_spec.pick_up_distance
+
+                # moves = self._build_moves(origin, target, pipette_spec.speed)
+                # for move in moves:
                 await self._backend.tip_action(
-                    [OT3Axis.of_main_tool_actuator(mount)],
-                    move.target_position,
-                    move.speed,
+                    origin,
+                    move,
                     "clamp",
                 )
-                await self._backend.tip_action(
-                    [OT3Axis.of_main_tool_actuator(mount)],
-                    move.target_position,
-                    move.speed,
-                    "home",
-                )
+
+                # await self._backend.tip_action(
+                #     [OT3Axis.of_main_tool_actuator(mount)],
+                #     move.target_position,
+                #     move.speed,
+                #     "clamp",
+                # )
+                # await self._backend.tip_action(
+                #     [OT3Axis.of_main_tool_actuator(mount)],
+                #     move.target_position,
+                #     move.speed,
+                #     "home",
+                # )
             else:
                 target_pos = target_position_from_plunger(
                     realmount, move.target_position, self._current_position

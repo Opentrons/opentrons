@@ -295,7 +295,8 @@ class OT3Simulator:
         Returns:
             None
         """
-        _, final_positions = create_move_group(origin, moves, self._present_nodes)
+        group = create_move_group(origin, moves, self._present_nodes)
+        _, final_positions = group
         self._position.update(final_positions)
         self._encoder_position.update(final_positions)
 
@@ -347,10 +348,11 @@ class OT3Simulator:
         axes: Sequence[OT3Axis],
         distance: float = 33,
         speed: float = -5.5,
+        acceleration: float = 0,
         tip_action: str = "drop",
     ) -> None:
         _ = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
+            axes, distance, speed, acceleration, cast(PipetteAction, tip_action)
         )
 
     def _attached_to_mount(

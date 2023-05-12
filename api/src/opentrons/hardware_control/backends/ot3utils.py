@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence, Optional
 from typing_extensions import Literal
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -337,17 +337,53 @@ def create_home_group(
     return move_group
 
 
-def create_tip_action_group(
-    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+def create_tip_action_home_group(
+    axes: Sequence[OT3Axis],
+    distance: float,
+    velocity: float,
+    action: PipetteAction,
 ) -> MoveGroup:
     current_nodes = [axis_to_node(ax) for ax in axes]
     step = create_tip_action_step(
         velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+        acceleration={node_id: 0.0 for node_id in current_nodes},
         distance={node_id: np.float64(distance) for node_id in current_nodes},
         present_nodes=current_nodes,
         action=PipetteTipActionType[action],
     )
     return [step]
+
+
+def create_tip_action_group(
+    origin: Coordinates[OT3Axis, CoordinateValue],
+    present_nodes: Iterable[NodeId],
+    action: PipetteAction,
+    moves: Optional[List[Move[OT3Axis]]] = None,
+) -> Tuple[MoveGroup, Dict[NodeId, float]]:
+    pos = _convert_to_node_id_dict(origin)
+    move_group: MoveGroup = []
+    for move in moves:
+        unit_vector = move.unit_vector
+        for block in move.blocks:
+            distances = unit_vector_multiplication(unit_vector, block.distance)
+            node_id_distances = _convert_to_node_id_dict(distances)
+            velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
+            if action == "home":
+                velocities *= -1
+            accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
+            print(f"group acceleraiton = {accelerations}")
+            step = create_tip_action_step(
+                distance=node_id_distances,
+                velocity=_convert_to_node_id_dict(velocities),
+                acceleration=_convert_to_node_id_dict(accelerations),
+                # duration=block.time,
+                present_nodes=present_nodes,
+                action=PipetteTipActionType[action],
+            )
+            for ax in pos.keys():
+                pos[ax] += node_id_distances.get(ax, 0)
+            move_group.append(step)
+    return move_group, {k: float(v) for k, v in pos.items()}
 
 
 def create_gripper_jaw_grip_group(

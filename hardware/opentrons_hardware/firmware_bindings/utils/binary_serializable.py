@@ -158,7 +158,9 @@ class BinarySerializable:
             Byte buffer
         """
         string = self._get_format_string()
+        print(f"\n\nstring = {string}")
         vals = [x.value for x in astuple(self)]
+        print(f"\n\nvals = {vals}")
         try:
             return struct.pack(string, *vals)
         except struct.error as e:

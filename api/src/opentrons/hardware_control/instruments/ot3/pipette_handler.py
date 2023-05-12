@@ -446,8 +446,8 @@ class PipetteHandlerProvider:
             return top_types.Point(0, 0, 30)
 
     def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
-        if not target.has_tip:
-            raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
+        # if not target.has_tip:
+        #     raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
         if (
             action == HardwareAction.ASPIRATE
             and target.current_volume == 0

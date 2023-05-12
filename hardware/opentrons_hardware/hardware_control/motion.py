@@ -56,6 +56,7 @@ class MoveGroupTipActionStep:
     """A single tip handling action that requires movement in a move group."""
 
     velocity_mm_sec: np.float64
+    acceleration_mm_sec_sq: np.float64
     duration_sec: np.float64
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
@@ -153,6 +154,7 @@ def create_home_step(
 
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
+    acceleration: Dict[NodeId, np.float64],
     distance: Dict[NodeId, np.float64],
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
@@ -164,12 +166,15 @@ def create_tip_action_step(
         if action == PipetteTipActionType.home
         else MoveStopCondition.none
     )
+    print(f"acceleration step = {acceleration}")
+
     for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(
             velocity_mm_sec=velocity[axis_node],
+            acceleration_mm_sec_sq=acceleration[axis_node],
             duration_sec=abs(distance[axis_node] / velocity[axis_node]),
-            stop_condition=stop_condition,
             action=action,
+            stop_condition=stop_condition,
         )
     return step
 
