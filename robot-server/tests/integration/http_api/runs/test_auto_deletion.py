@@ -34,6 +34,7 @@ async def test_runs_auto_delete(
             created_run_ids = await _create_runs(
                 robot_client=robot_client, num_runs=num_to_upload
             )
+
             fetched_run_ids = await _get_run_ids(
                 robot_client=robot_client, length=num_to_expect
             )
