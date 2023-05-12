@@ -9,6 +9,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   Icon,
+  TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -23,20 +25,11 @@ export function CheckUpdates(): JSX.Element {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
-      height="33rem"
+      height="32.5rem"
+      borderRadius={BORDERS.size_three}
     >
-      <Icon
-        name="ot-spinner"
-        size="4.375rem"
-        spin
-        color={COLORS.darkGreyEnabled}
-      />
-      <StyledText
-        fontSize="2rem"
-        lineHeight="2.75rem"
-        fontWeight="700"
-        colors={COLORS.black}
-      >
+      <Icon name="ot-spinner" size="5rem" spin color={COLORS.darkGreyEnabled} />
+      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
       </StyledText>
     </Flex>
