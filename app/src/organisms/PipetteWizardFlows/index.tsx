@@ -229,7 +229,11 @@ export const PipetteWizardFlows = (
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachProbe {...currentStep} {...calibrateBaseProps} />
+      <DetachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        proceed={errorMessage != null ? handleCleanUpAndClose : proceed}
+      />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
@@ -295,8 +299,11 @@ export const PipetteWizardFlows = (
     (selectedPipette === NINETY_SIX_CHANNEL &&
       currentStep.section === SECTIONS.DETACH_PIPETTE)
 
+  const isCalibrationErrorExiting =
+    currentStep.section === SECTIONS.ATTACH_PROBE && errorMessage != null
+
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal) {
+  if (isRobotMoving || showUnskippableStepModal || isCalibrationErrorExiting) {
     exitWizardButton = undefined
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)
@@ -304,11 +311,16 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
+  const progressBarForCalError =
+    currentStep.section === SECTIONS.DETACH_PROBE && errorMessage != null
+
   const wizardHeader = (
     <WizardHeader
       exitDisabled={isRobotMoving || isFetchingPipettes}
       title={wizardTitle}
-      currentStep={currentStepIndex}
+      currentStep={
+        progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
+      }
       totalSteps={totalStepCount}
       onExit={exitWizardButton}
     />
