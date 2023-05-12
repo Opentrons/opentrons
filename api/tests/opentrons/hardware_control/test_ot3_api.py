@@ -995,38 +995,44 @@ async def test_move_to_plunger_bottom(
         ot3_hardware._current_position,
     )
 
+    # plunger will move at different speeds, depending on if:
+    #  - no tip attached (max speed)
+    #  - tip attached and moving down (blowout speed)
+    #  - tip attached and moving up (aspirate speed)
+    expected_speed_no_tip = max_speeds[ot3_hardware.gantry_load][OT3AxisKind.P]
+    expected_speed_moving_down = ot3_hardware._pipette_handler.plunger_speed(
+        pipette, pipette.blow_out_flow_rate, "dispense"
+    )
+    expected_speed_moving_up = ot3_hardware._pipette_handler.plunger_speed(
+        pipette, pipette.aspirate_flow_rate, "aspirate"
+    )
+
     # no tip attached
     await ot3_hardware.home()
-    speed_no_tip = max_speeds[ot3_hardware.gantry_load][OT3AxisKind.P]
     mock_move.reset_mock()
     await ot3_hardware.home_plunger(mount)
     mock_move.assert_called_once_with(
-        target_pos, speed=speed_no_tip, acquire_lock=False
+        target_pos, speed=expected_speed_no_tip, acquire_lock=False
     )
 
-    # tip attached, dispensing
+    # tip attached, moving DOWN towards "bottom" position
     await ot3_hardware.home()
     await ot3_hardware.add_tip(mount, 100)
-    speed_dispense = ot3_hardware._pipette_handler.plunger_speed(
-        pipette, pipette.blow_out_flow_rate, "dispense"
-    )
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
     mock_move.assert_called_once_with(
-        target_pos, speed=speed_dispense, acquire_lock=True
+        target_pos, speed=expected_speed_moving_down, acquire_lock=True
     )
 
-    # tip attached, aspirating
-    # NOTE: _move() is mocked, so we need to update the coordinate in the test
+    # tip attached, moving UP towards "bottom" position
+    # NOTE: _move() is mocked, so we need to update the OT3API's
+    #       cached coordinates in the test
     pip_ax = OT3Axis.of_main_tool_actuator(mount)
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
-    speed_aspirate = ot3_hardware._pipette_handler.plunger_speed(
-        pipette, pipette.aspirate_flow_rate, "aspirate"
-    )
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
     mock_move.assert_called_once_with(
-        target_pos, speed=speed_aspirate, acquire_lock=True
+        target_pos, speed=expected_speed_moving_up, acquire_lock=True
     )
 
 
