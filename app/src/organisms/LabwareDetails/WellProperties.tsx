@@ -48,8 +48,8 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
   return (
     <Box
       border={BORDERS.lineBorder}
-      padding={SPACING.spacing4}
-      marginBottom={SPACING.spacing4}
+      padding={SPACING.spacing16}
+      marginBottom={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -71,7 +71,7 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
             <Flex
               flexDirection={DIRECTION_COLUMN}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginRight={SPACING.spacing4}
+              marginRight={SPACING.spacing16}
             >
               <StyledText as="h6">
                 {t(wellLabel)} {t('shape')}

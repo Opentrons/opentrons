@@ -19,7 +19,7 @@ export function CheckUpdates(): JSX.Element {
     <Flex
       backgroundColor={COLORS.darkGreyDisabled}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"

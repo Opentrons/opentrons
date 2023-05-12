@@ -15,6 +15,7 @@ from typing import (
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
@@ -23,6 +24,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
     ThermocyclerStep,
 )
 
@@ -70,9 +72,17 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
-        return DeckSlotName(str(deck_slot))
+        # TODO(jbl 2023-04-25) this should raise an error when below version 2.15 and using deck coordinates
+        return DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+
+def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+    if robot_type == "OT-2 Standard":
+        return str(slot_name)
+    else:
+        return slot_name.as_coordinate()
 
 
 def ensure_lowercase_name(name: str) -> str:
@@ -104,6 +114,7 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
     "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
+    "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
 }
 
 

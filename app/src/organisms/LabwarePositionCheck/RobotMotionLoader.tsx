@@ -23,7 +23,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      minHeight="25rem"
+      minHeight="29.5rem"
     >
       <Icon
         name="ot-spinner"
@@ -32,7 +32,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
         color={COLORS.darkGreyEnabled}
       />
       {header != null ? (
-        <StyledText as="h1" marginTop={SPACING.spacing5}>
+        <StyledText as="h1" marginTop={SPACING.spacing24}>
           {header}
         </StyledText>
       ) : null}

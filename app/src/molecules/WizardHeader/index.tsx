@@ -50,7 +50,9 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     <Box backgroundColor={COLORS.white}>
       <Flex
         padding={
-          isOnDevice ? '1.75rem' : `${SPACING.spacing4} ${SPACING.spacing6}`
+          isOnDevice
+            ? `1.75rem ${SPACING.spacing32}`
+            : `${SPACING.spacing16} ${SPACING.spacing32}`
         }
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -62,10 +64,11 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
                 ? css`
                     font-size: 1.375rem;
                     font-weight: 700;
+                    line-height: ${TYPOGRAPHY.lineHeight28};
                   `
                 : TYPOGRAPHY.pSemiBold
             }
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
           >
             {title}
           </StyledText>
@@ -77,7 +80,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
                   ? css`
                       font-size: 1.375rem;
                       font-weight: 700;
-                      margin-left: ${SPACING.spacing4};
+                      margin-left: ${SPACING.spacing16};
                     `
                   : TYPOGRAPHY.pSemiBold
               }

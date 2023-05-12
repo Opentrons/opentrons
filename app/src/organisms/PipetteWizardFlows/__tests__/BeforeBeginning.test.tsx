@@ -8,17 +8,13 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedGen3Pipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../../CalibrationPanels'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { BeforeBeginning } from '../BeforeBeginning'
 import { FLOWS } from '../constants'
 import { getIsGantryEmpty } from '../utils'
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
@@ -41,10 +37,7 @@ const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedGen3Pipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('BeforeBeginning', () => {
   let props: React.ComponentProps<typeof BeforeBeginning>
   beforeEach(() => {
@@ -56,10 +49,10 @@ describe('BeforeBeginning', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
-      createRun: jest.fn(),
+      createMaintenanceRun: jest.fn(),
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
       isCreateLoading: false,
@@ -98,6 +91,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -164,6 +158,7 @@ describe('BeforeBeginning', () => {
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -180,7 +175,7 @@ describe('BeforeBeginning', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
       }
       const { getByText, getByAltText, getByRole } = render(props)
@@ -204,6 +199,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -249,6 +245,7 @@ describe('BeforeBeginning', () => {
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -269,7 +266,7 @@ describe('BeforeBeginning', () => {
       props = {
         ...props,
         mount: RIGHT,
-        attachedPipettes: { left: null, right: mockPipette },
+        attachedPipettes: { left: null, right: mockAttachedPipetteInformation },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -305,6 +302,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: RIGHT },
@@ -320,7 +318,7 @@ describe('BeforeBeginning', () => {
       mockGetIsGantryEmpty.mockReturnValue(false)
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -356,6 +354,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -372,7 +371,7 @@ describe('BeforeBeginning', () => {
     it('renders the banner for 96 channel with correct info for on device display', () => {
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
         selectedPipette: NINETY_SIX_CHANNEL,
         isOnDevice: true,
@@ -390,7 +389,7 @@ describe('BeforeBeginning', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
-        attachedPipettes: { left: mockPipette, right: null },
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.DETACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
@@ -415,6 +414,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },

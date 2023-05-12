@@ -221,4 +221,6 @@ describe('UpdateRobot', () => {
     jest.advanceTimersByTime(11000)
     getByText('mock ErrorUpdateSoftware')
   })
+
+  it.todo('add test for targetPath in a following PR')
 })

@@ -27,11 +27,19 @@ import {
 import { getIsGantryEmpty } from './utils'
 import type { AxiosError } from 'axios'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { Run, CreateRunData } from '@opentrons/api-client'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
-  createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
   isCreateLoading: boolean
 }
 export const BeforeBeginning = (
@@ -40,7 +48,7 @@ export const BeforeBeginning = (
   const {
     proceed,
     flowType,
-    createRun,
+    createMaintenanceRun,
     attachedPipettes,
     chainRunCommands,
     isCreateLoading,
@@ -53,9 +61,9 @@ export const BeforeBeginning = (
   } = props
   const { t } = useTranslation('pipette_wizard_flows')
   React.useEffect(() => {
-    createRun({})
+    createMaintenanceRun({})
   }, [])
-  const pipetteId = attachedPipettes[mount]?.id
+  const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
     isGantryEmpty &&
@@ -107,11 +115,12 @@ export const BeforeBeginning = (
         commandType: 'loadPipette' as const,
         params: {
           // @ts-expect-error pipetteName is required but missing in schema v6 type
-          pipetteName: attachedPipettes[mount]?.name,
+          pipetteName: attachedPipettes[mount]?.instrumentName,
           pipetteId: pipetteId,
           mount: mount,
         },
       },
+      { commandType: 'home' as const, params: {} },
       {
         // @ts-expect-error calibration type not yet supported
         commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -131,6 +140,7 @@ export const BeforeBeginning = (
   }
 
   const SingleMountAttachCommand: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -141,6 +151,7 @@ export const BeforeBeginning = (
   ]
 
   const NinetySixChannelAttachCommand: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -194,7 +205,7 @@ export const BeforeBeginning = (
             <Banner
               type="warning"
               size={isOnDevice ? '1.5rem' : SIZE_1}
-              marginY={SPACING.spacing2}
+              marginY={SPACING.spacing4}
             >
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>

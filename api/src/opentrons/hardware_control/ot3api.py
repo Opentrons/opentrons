@@ -6,6 +6,7 @@ import logging
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
+    AsyncGenerator,
     cast,
     Callable,
     Dict,
@@ -190,6 +191,7 @@ class OT3API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        self._instrument_cache_lock = asyncio.Lock()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -602,8 +604,12 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        await self._cache_instruments(require)
-        await self._configure_instruments()
+        if self._instrument_cache_lock.locked():
+            self._log.info("Instrument cache is locked, not refreshing")
+            return
+        async with self.instrument_cache_lock():
+            await self._cache_instruments(require)
+            await self._configure_instruments()
 
     async def _cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -704,7 +710,7 @@ class OT3API(
 
     async def halt(self) -> None:
         """Immediately stop motion."""
-        await self._backend.hard_halt()
+        await self._backend.halt()
         asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
     async def stop(self, home_after: bool = True) -> None:
@@ -1111,7 +1117,7 @@ class OT3API(
             self._log.info(f"{str(zero_length_error)}, ignoring")
             return
         self._log.info(
-            f"move: {target_position} becomes {machine_pos} from {origin} "
+            f"move: deck {target_position} becomes machine {machine_pos} from {origin} "
             f"requiring {moves}"
         )
         async with contextlib.AsyncExitStack() as stack:
@@ -1242,7 +1248,12 @@ class OT3API(
             checked_axes.append(OT3Axis.Q)
         self._log.info(f"Homing {axes}")
 
-        home_seq = [ax for ax in OT3Axis.home_order() if ax in checked_axes]
+        home_seq = [
+            ax
+            for ax in OT3Axis.home_order()
+            if (ax in checked_axes and self._backend.axis_is_present(ax))
+        ]
+        self._log.info(f"home was called with {axes} generating sequence {home_seq}")
         await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
@@ -1474,19 +1485,38 @@ class OT3API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
+    async def blow_out(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        volume: Optional[float] = None,
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
         realmount = OT3Mount.from_mount(mount)
-        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount)
+        instrument = self._pipette_handler.get_pipette(realmount)
+        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount, volume)
+
+        max_blowout_pos = instrument.plunger_positions.blow_out
+        # start at the bottom position and move additional distance
+        # determined by plan_check_blow_out
+        blowout_distance = (
+            instrument.plunger_positions.bottom + blowout_spec.plunger_distance
+        )
+        if blowout_distance > max_blowout_pos:
+            raise ValueError(
+                f"Blow out distance exceeds plunger position limit: blowout dist = {blowout_distance}, "
+                f"max blowout distance = {max_blowout_pos}"
+            )
+
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
         )
+
         target_pos = target_position_from_plunger(
             realmount,
-            blowout_spec.plunger_distance,
+            blowout_distance,
             self._current_position,
         )
 
@@ -1953,6 +1983,7 @@ class OT3API(
         moving_axis: OT3Axis,
         target_pos: float,
         pass_settings: CapacitivePassSettings,
+        retract_after: bool = True,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
 
@@ -2027,8 +2058,14 @@ class OT3API(
                 probe=InstrumentProbeType.PRIMARY,
             )
         end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, pass_start_pos)
+        if retract_after:
+            await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
+
+    @contextlib.asynccontextmanager
+    async def instrument_cache_lock(self) -> AsyncGenerator[None, None]:
+        async with self._instrument_cache_lock:
+            yield
 
     async def capacitive_sweep(
         self,

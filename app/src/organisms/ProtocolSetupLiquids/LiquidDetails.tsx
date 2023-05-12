@@ -24,14 +24,14 @@ const Table = styled('table')`
   width: 100%;
   border-spacing: 0 ${BORDERS.size_two};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  color: ${COLORS.darkBlack_ninety};
+  color: ${COLORS.darkBlack90};
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3};
+  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8};
 `
 const TableRow = styled('tr')`
   height: 5.75rem;
@@ -39,8 +39,8 @@ const TableRow = styled('tr')`
 `
 const TableDatum = styled('td')`
   z-index: 2;
-  padding: ${SPACING.spacing3} ${SPACING.spacingM};
-  background-color: ${COLORS.light_two};
+  padding: ${SPACING.spacing8} ${SPACING.spacing20};
+  background-color: ${COLORS.light2};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
@@ -69,7 +69,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
     null
   )
   return (
-    <Flex marginTop={SPACING.spacing5}>
+    <Flex marginTop={SPACING.spacing24}>
       {labwareIdModal != null && (
         <LiquidsLabwareDetailsModal
           labwareId={labwareIdModal}
@@ -126,7 +126,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   <Flex flexDirection={DIRECTION_ROW}>
                     <Flex
                       height="2.75rem"
-                      padding={`${SPACING.spacing3} 0.75rem`}
+                      padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                       width="max-content"
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}

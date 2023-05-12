@@ -104,7 +104,7 @@ describe('RobotConfigurationDetails', () => {
     }
     const { getByText } = render(props)
     getByText('robot')
-    getByText('OT-3')
+    getByText('Opentrons Flex')
   })
 
   it('renders left mount pipette when there is a pipette only in the left mount', () => {

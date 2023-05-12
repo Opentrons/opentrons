@@ -8,8 +8,9 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
@@ -30,6 +31,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     attachedPipettes,
     mount,
     handleCleanUpAndClose,
+    chainRunCommands,
     currentStepIndex,
     totalStepCount,
     selectedPipette,
@@ -37,13 +39,12 @@ export const Results = (props: ResultsProps): JSX.Element => {
     isFetching,
     setFetching,
     hasCalData,
+    isRobotMoving,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   const pipetteName =
-    attachedPipettes[mount] != null
-      ? attachedPipettes[mount]?.modelSpecs.displayName
-      : ''
+    attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -95,6 +96,32 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
+    } else if (
+      isSuccess &&
+      flowType === FLOWS.ATTACH &&
+      currentStepIndex !== totalStepCount
+    ) {
+      const axis = mount === 'left' ? 'leftPlunger' : 'rightPlunger'
+      chainRunCommands(
+        [
+          {
+            commandType: 'home' as const,
+            params: {
+              axes: [axis],
+            },
+          },
+          {
+            // @ts-expect-error calibration type not yet supported
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: mount,
+            },
+          },
+        ],
+        true
+      ).then(() => {
+        proceed()
+      })
     } else {
       proceed()
     }
@@ -104,7 +131,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       buttonText={buttonText}
-      buttonType="default"
+      buttonType="primary"
     />
   ) : (
     <PrimaryButton
@@ -127,7 +154,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             disabled={isFetching}
             aria-label="Results_errorExit"
-            marginRight={SPACING.spacing2}
+            marginRight={SPACING.spacing4}
           >
             {i18n.format(t('cancel_attachment'), 'capitalize')}
           </SecondaryButton>
@@ -142,6 +169,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       </>
     )
   }
+  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return (
     <SimpleWizardBody

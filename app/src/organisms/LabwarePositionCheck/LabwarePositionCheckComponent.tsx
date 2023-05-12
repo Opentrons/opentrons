@@ -1,13 +1,7 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import {
-  useConditionalConfirm,
-  Flex,
-  DIRECTION_COLUMN,
-  COLORS,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 import { useSelector } from 'react-redux'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
@@ -21,8 +15,8 @@ import { PickUpTip } from './PickUpTip'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 import {
-  useCreateCommandMutation,
   useCreateLabwareOffsetMutation,
+  useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -36,7 +30,7 @@ import type { RegisterPositionAction, WorkingOffset } from './types'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 
@@ -44,15 +38,22 @@ const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
   runId: string
+  maintenanceRunId: string
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
   caughtError?: Error
 }
 
-export const LabwarePositionCheckInner = (
+export const LabwarePositionCheckComponent = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element | null => {
-  const { runId, mostRecentAnalysis, onCloseClick, existingOffsets } = props
+  const {
+    mostRecentAnalysis,
+    onCloseClick,
+    existingOffsets,
+    runId,
+    maintenanceRunId,
+  } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
@@ -129,11 +130,13 @@ export const LabwarePositionCheckInner = (
     { workingOffsets: [], tipPickUpOffset: null }
   )
   const [isExiting, setIsExiting] = React.useState(false)
-  const { createCommand: createSilentCommand } = useCreateCommandMutation()
+  const {
+    createMaintenanceCommand: createSilentCommand,
+  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
-  } = useChainRunCommands(runId)
+  } = useChainMaintenanceCommands(maintenanceRunId)
 
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -188,7 +191,6 @@ export const LabwarePositionCheckInner = (
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
       createSilentCommand({
-        runId,
         command: {
           commandType: 'moveRelative',
           params: { pipetteId: pipetteId, distance: step * dir, axis },
@@ -219,9 +221,7 @@ export const LabwarePositionCheckInner = (
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
-    Promise.all(
-      offsets.map(data => createLabwareOffset({ runId: runId, data }))
-    )
+    Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
       .then(() => {
         onCloseClick()
       })
@@ -280,27 +280,26 @@ export const LabwarePositionCheckInner = (
       title={t('labware_position_check_title')}
       currentStep={currentStepIndex}
       totalSteps={totalStepCount}
-      onExit={() => {
-        if (fatalError != null) {
-          handleCleanUpAndClose()
-        } else if (!showConfirmation && !isExiting) {
-          confirmExitLPC()
-        }
-      }}
+      onExit={
+        showConfirmation || isExiting
+          ? undefined
+          : () => {
+              if (fatalError != null) {
+                handleCleanUpAndClose()
+              } else {
+                confirmExitLPC()
+              }
+            }
+      }
     />
   )
   return (
     <Portal level="top">
-      {Boolean(isOnDevice) ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="100%"
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
+      {isOnDevice ? (
+        <ModalShell fullPage>
           {wizardHeader}
           {modalContent}
-        </Flex>
+        </ModalShell>
       ) : (
         <ModalShell width="47rem" header={wizardHeader}>
           {modalContent}
@@ -309,12 +308,3 @@ export const LabwarePositionCheckInner = (
     </Portal>
   )
 }
-
-// NOTE: we are memoizing on the run id here, because this flow cannot be launched
-// until the robot analysis loads (which requires a stable run), other components that
-// rendered nearby will cause the run to be periodically polled for updates
-// and we don't need those polls causing unnecessary rerenders to the LPC flow
-export const LabwarePositionCheckComponent = React.memo(
-  LabwarePositionCheckInner,
-  ({ runId: prevRunId }, { runId: nextRunId }) => prevRunId === nextRunId
-)

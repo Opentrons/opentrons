@@ -7,6 +7,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -59,15 +60,15 @@ class MoveToMaintenancePositionImplementation(
         """Move the requested mount to a maintenance deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
-        await self._hardware_api.home()
-
         calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
             offset=_INSTRUMENT_ATTACH_OFFSET
         )
 
+        # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
         await self._hardware_api.move_to(
             mount=hardware_mount,
             abs_position=calibration_coordinates,
+            critical_point=CriticalPoint.MOUNT,
         )
 
         return MoveToMaintenancePositionResult()

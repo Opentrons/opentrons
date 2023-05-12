@@ -8,6 +8,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '../../../../redux/analytics'
 import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLiquidsList } from './SetupLiquidsList'
 import { SetupLiquidsMap } from './SetupLiquidsMap'
@@ -23,14 +24,14 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view'),
-    'liquidSetupViewToggle'
+    ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE
   )
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
-      marginTop={SPACING.spacing6}
-      gridGap={SPACING.spacing4}
+      marginTop={SPACING.spacing32}
+      gridGap={SPACING.spacing16}
     >
       {toggleGroup}
       {selectedValue === t('list_view') ? (

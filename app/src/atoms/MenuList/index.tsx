@@ -23,7 +23,6 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       borderRadius={BORDERS.size_three}
       width="18.0625rem"
       onOutsideClick={onClick}
-      isOnDeviceDisplay
     >
       <Flex
         boxShadow={BORDERS.shadowSmall}
@@ -41,7 +40,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
       top="2.6rem"
-      right={`calc(50% + ${String(SPACING.spacing2)})`}
+      right={`calc(50% + ${SPACING.spacing4})`}
       flexDirection={DIRECTION_COLUMN}
       width="max-content"
     >

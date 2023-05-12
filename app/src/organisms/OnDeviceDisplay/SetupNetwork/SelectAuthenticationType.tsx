@@ -72,9 +72,7 @@ export function SelectAuthenticationType({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+      padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -86,7 +84,7 @@ export function SelectAuthenticationType({
           <Flex flexDirection={DIRECTION_ROW}>
             <Icon
               name="chevron-left"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
               size="1.875rem"
             />
             <StyledText
@@ -121,7 +119,7 @@ export function SelectAuthenticationType({
           {t('select_authentication_method')}
         </StyledText>
         <Flex
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
@@ -131,7 +129,7 @@ export function SelectAuthenticationType({
             backgroundColor={
               selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
             }
-            padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
+            padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
             borderRadius="3.5625rem"
             onClick={() => {
               setSelectedAuthType('wpa-psk')
@@ -149,7 +147,7 @@ export function SelectAuthenticationType({
           <Btn
             backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
             borderRadius="3.5625rem"
-            padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing6)}`}
+            padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
             onClick={() => {
               setSelectedAuthType('none')
             }}
@@ -161,7 +159,7 @@ export function SelectAuthenticationType({
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing2}
+          gridGap={SPACING.spacing4}
           marginTop="7.8125rem"
         >
           <StyledText
@@ -182,9 +180,9 @@ export function SelectAuthenticationType({
           </StyledText>
         </Flex>
         <Flex
-          marginTop={SPACING.spacing5}
-          backgroundColor={COLORS.light_two}
-          padding={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
+          backgroundColor={COLORS.light2}
+          padding={SPACING.spacing24}
           width="100%"
           height="6.75rem"
           borderRadius={BORDERS.size_three}
@@ -200,8 +198,8 @@ export function SelectAuthenticationType({
             {t('switch_to_usb_description')}
           </StyledText>
           <Btn
-            marginLeft={SPACING.spacingSM}
-            padding={`0.75rem ${String(SPACING.spacing5)}`}
+            marginLeft={SPACING.spacing12}
+            padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
             width="13.8125rem"
             onClick={() => history.push('/network-setup/usb')}
           >

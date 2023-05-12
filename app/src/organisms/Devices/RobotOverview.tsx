@@ -65,13 +65,13 @@ export function RobotOverview({
         alignItems={ALIGN_START}
         backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         position={POSITION_RELATIVE}
         width="100%"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           width="100%"
         >
           <Flex>
@@ -84,17 +84,17 @@ export function RobotOverview({
               id="RobotOverview_robotImage"
             />
           </Flex>
-          <Box padding={SPACING.spacing3} width="100%">
-            <Box marginBottom={SPACING.spacing3}>
+          <Box padding={SPACING.spacing8} width="100%">
+            <Box marginBottom={SPACING.spacing8}>
               <ReachableBanner robot={robot} />
             </Box>
             {robot != null ? (
               <UpdateRobotBanner
                 robot={robot}
-                marginBottom={SPACING.spacing3}
+                marginBottom={SPACING.spacing8}
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
                 name={robot.name}
                 local={robot.local}
@@ -103,19 +103,19 @@ export function RobotOverview({
               <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText
                     as="h6"
                     color={COLORS.darkGreyEnabled}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    paddingBottom={SPACING.spacing2}
+                    paddingBottom={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformUppercase}
                   >
                     {t('controls')}
                   </StyledText>
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-                    <Flex paddingBottom={SPACING.spacing2}>
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                    <Flex paddingBottom={SPACING.spacing4}>
                       <ToggleButton
                         label={t('lights')}
                         toggledOn={lightsOn != null ? lightsOn : false}
@@ -144,17 +144,19 @@ export function RobotOverview({
           </Box>
           <Box
             position={POSITION_ABSOLUTE}
-            top={SPACING.spacing2}
+            top={SPACING.spacing4}
             right="-.75rem"
           >
             <RobotOverviewOverflowMenu robot={robot} />
           </Box>
         </Flex>
       </Flex>
-      {!isRobotBusy ? <CalibrationStatusBanner robotName={robotName} /> : null}
+      {robotModel === 'OT-2' && !isRobotBusy ? (
+        <CalibrationStatusBanner robotName={robotName} />
+      ) : null}
       <Flex
         borderBottom={BORDERS.lineBorder}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         position={POSITION_RELATIVE}
         width="100%"
       />

@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-import { spacing1, spacingXXS } from './spacing'
 import {
   blueEnabled,
   medGreyEnabled,
@@ -21,16 +20,16 @@ export const size_six = '60px'
 
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};
-  border-bottom-width: ${spacing1};
+  border-bottom-width: 2px;
   border-bottom-color: ${blueEnabled};
 `
 
-export const activeLineBorder = `${spacingXXS} ${styleSolid} ${blueEnabled}`
-export const lineBorder = `${spacingXXS} ${styleSolid} ${medGreyEnabled}`
-export const transparentLineBorder = `${spacingXXS} ${styleSolid} ${transparent}`
+export const activeLineBorder = `1px ${styleSolid} ${blueEnabled}`
+export const lineBorder = `1px ${styleSolid} ${medGreyEnabled}`
+export const transparentLineBorder = `1px ${styleSolid} ${transparent}`
 export const cardOutlineBorder = css`
   border-style: ${styleSolid};
-  border-width: ${spacingXXS};
+  border-width: 1px;
   border-color: ${medGreyEnabled};
   border-radius: ${radiusSoftCorners};
   &:hover {
@@ -42,5 +41,5 @@ export const bigDropShadow = '0 3px 6px rgba(255, 0, 0, 1)'
 export const smallDropShadow = '0px 3px 6px rgba(0, 0, 0, 0.23)'
 
 // touch screen
-export const shadowBig = '0px 3px 6px rgba(0, 0, 0, 0.23)'
-export const shadowSmall = '0px 0px 40px rgba(0, 0, 0, 0.4)'
+export const shadowBig = '0px 3px 6px rgba(0,0,0,0.23)'
+export const shadowSmall = '0px 0px 40px rgba(0,0,0,0.4)'

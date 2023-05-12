@@ -18,7 +18,10 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
-import { useTrackEvent } from '../../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_RENAME_ROBOT,
+} from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
@@ -116,7 +119,7 @@ export function RenameRobotSlideout({
 
   const handleSubmitRobotRename = (): void => {
     trackEvent({
-      name: 'renameRobot',
+      name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName,
         newRobotName: formik.values.newRobotName,
@@ -141,16 +144,16 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Banner type="informing" marginBottom={SPACING.spacing4}>
+        <Banner type="informing" marginBottom={SPACING.spacing16}>
           {t('rename_robot_prefer_usb_connection')}
         </Banner>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
         <StyledText
           as="label"
           css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('robot_name')}
         </StyledText>

@@ -85,12 +85,12 @@ export function Tick(props: TickProps): JSX.Element {
       <Portal>
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
-            padding={SPACING.spacing1}
-            gridGap={SPACING.spacing2}
+            padding={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
             alignItems={ALIGN_CENTER}
           >
             {!isAggregatedTick && iconName != null ? (
-              <Icon name={iconName} size={SPACING.spacingM} />
+              <Icon name={iconName} size={SPACING.spacing20} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="label">
