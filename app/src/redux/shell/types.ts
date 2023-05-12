@@ -1,5 +1,6 @@
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
+import type { RobotSystemAction } from './is-ready/types'
 
 export interface Remote {
   ipcRenderer: {
@@ -42,6 +43,7 @@ export type ShellUpdateAction =
 export interface ShellState {
   update: ShellUpdateState
   robotLogs: RobotLogsState
+  isReady: boolean
 }
 
 export interface UiInitializedAction {
@@ -53,3 +55,4 @@ export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotLogsAction
+  | RobotSystemAction

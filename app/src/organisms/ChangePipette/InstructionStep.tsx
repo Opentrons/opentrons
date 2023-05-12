@@ -42,7 +42,7 @@ export function InstructionStep(props: Props): JSX.Element {
         {children}
       </Box>
       <Box
-        marginTop={diagram === 'tab' ? '4.1875rem' : '0.75rem'}
+        marginTop={diagram === 'tab' ? '4.1875rem' : SPACING.spacing12}
         marginLeft={diagram === 'tab' ? '1.5625rem' : SPACING.spacing40}
         marginRight={SPACING.spacing32}
       >

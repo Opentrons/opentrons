@@ -99,7 +99,7 @@ export function FailedToConnect({
             )}
         </Flex>
       </Flex>
-      <Flex gridGap="0.75rem">
+      <Flex gridGap={SPACING.spacing12}>
         <SecondaryButton
           flex="1"
           onClick={() => setChangeState({ type: null })}

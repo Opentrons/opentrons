@@ -68,7 +68,7 @@ export function FloatingActionButton(
       fontSize={TYPOGRAPHY.fontSize28}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       lineHeight={TYPOGRAPHY.lineHeight36}
-      padding={`0.75rem ${SPACING.spacing24}`}
+      padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
       position={POSITION_FIXED}
       right={SPACING.spacing24}
       {...buttonProps}

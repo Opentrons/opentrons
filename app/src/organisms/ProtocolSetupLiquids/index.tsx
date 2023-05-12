@@ -123,7 +123,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
             backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
-            padding={`${SPACING.spacing8} 0.75rem`}
+            padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
             marginRight={SPACING.spacing8}
           >

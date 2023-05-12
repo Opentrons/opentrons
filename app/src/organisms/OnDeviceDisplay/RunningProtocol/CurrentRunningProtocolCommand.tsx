@@ -175,7 +175,7 @@ export function CurrentRunningProtocolCommand({
         />
       </Flex>
       <Flex
-        padding={`0.75rem ${SPACING.spacing24}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
         borderRadius={BORDERS.size_two}
         justifyContent={JUSTIFY_CENTER}

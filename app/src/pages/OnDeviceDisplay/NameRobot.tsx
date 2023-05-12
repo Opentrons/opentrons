@@ -204,7 +204,7 @@ export function NameRobot(): JSX.Element {
                 fontSize="1.375rem"
                 lineHeight="1.875rem"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                marginBottom="0.75rem"
+                marginBottom={SPACING.spacing12}
               >
                 {t('name_your_robot_description')}
               </StyledText>
@@ -231,7 +231,7 @@ export function NameRobot(): JSX.Element {
                 fontSize="1.5rem"
                 lineHeight="2.0625rem"
                 fontWeight="500"
-                marginBottom="0.75rem"
+                marginBottom={SPACING.spacing12}
               >
                 {t('name_rule_description')}
               </StyledText>

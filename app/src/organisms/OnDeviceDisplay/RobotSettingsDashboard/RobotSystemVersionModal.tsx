@@ -75,7 +75,7 @@ export function RobotSystemVersionModal({
           </Flex>
           <ReleaseNotes source={releaseNotes} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} gridGap="0.75rem">
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing12}>
           <SecondaryButton
             flex="1"
             onClick={() => setShowModal(false)}

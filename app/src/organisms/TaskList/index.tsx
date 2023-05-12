@@ -58,7 +58,7 @@ function ProgressTrackerItem({
           ? COLORS.blueEnabled
           : ''
       }
-      marginTop="-0.75rem"
+      marginTop={`-${SPACING.spacing12}`}
       // shorten connector length when subtasks are present
       marginBottom={
         hasSubTasks ? `-${SPACING.spacing8}` : `-${SPACING.spacing20}`
