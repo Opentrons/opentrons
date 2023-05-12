@@ -177,7 +177,7 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/protocols/my-protocol-id')
     getByText('Mock ProtocolDetails')
   })
-  
+
   it('renders RobotSettingsDashboard component from /robot-settings', () => {
     const [{ getByText }] = render('/robot-settings')
     getByText('Mock RobotSettingsDashboard')

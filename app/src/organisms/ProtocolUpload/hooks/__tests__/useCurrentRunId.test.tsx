@@ -38,14 +38,14 @@ describe('useCurrentRunId hook', () => {
 
   it('should pass through runs query options', async () => {
     when(mockUseAllRunsQuery)
-      .calledWith({ pageLength: 0 }, { onSuccess: () => { } })
+      .calledWith({ pageLength: 0 }, { enabled: true })
       .mockReturnValue({
         data: {
-          links: { current: { href: '/runs/run_id' } }
-        }
+          links: { current: { href: '/runs/run_id' } },
+        },
       } as any)
 
-    const { result } = renderHook(() => useCurrentRunId({ onSuccess: () => { } }))
+    const { result } = renderHook(() => useCurrentRunId({ enabled: true }))
 
     expect(result.current).toBe('run_id')
   })
