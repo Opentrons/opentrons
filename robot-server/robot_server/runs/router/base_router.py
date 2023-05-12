@@ -196,7 +196,7 @@ async def get_runs(
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
-    """Get all runs.
+    """Get all runs, in order from least-recently to most-recently created.
 
     Args:
         pageLength: Maximum number of items to return.
