@@ -55,5 +55,4 @@ async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:
 async def _get_run_ids(robot_client: RobotClient, length: int) -> List[str]:
     """Return the IDs of all runs on the server."""
     response = await robot_client.get_runs(length)
-    print(response.json()["data"])
     return [p["id"] for p in response.json()["data"]]
