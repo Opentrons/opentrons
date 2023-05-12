@@ -199,7 +199,7 @@ export function SelectAuthenticationType({
           </StyledText>
           <Btn
             marginLeft={SPACING.spacing12}
-            padding={`0.75rem ${SPACING.spacing24}`}
+            padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
             width="13.8125rem"
             onClick={() => history.push('/network-setup/usb')}
           >

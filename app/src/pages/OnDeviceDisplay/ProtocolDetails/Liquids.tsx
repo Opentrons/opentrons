@@ -126,7 +126,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                   backgroundColor={COLORS.darkBlack20}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
-                  padding={`${SPACING.spacing8} 0.75rem`}
+                  padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                   width="max-content"
                   alignItems={TYPOGRAPHY.textAlignCenter}
                   marginRight={SPACING.spacingAuto}

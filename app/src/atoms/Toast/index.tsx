@@ -197,7 +197,9 @@ export function Toast(props: ToastProps): JSX.Element {
           ? `${SPACING.spacing16} ${SPACING.spacing24}`
           : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
               SPACING.spacing8
-            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} 0.75rem`
+            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing12
+            }`
       }
       data-testid={`Toast_${type}`}
       height={showODDStyle ? '5.76rem' : 'auto'}

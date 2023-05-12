@@ -109,7 +109,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginTop="0.75rem"
+          marginTop={SPACING.spacing12}
         >
           {displayName}
         </StyledText>
@@ -124,7 +124,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           backgroundColor={COLORS.darkBlack20}
           borderRadius={BORDERS.radiusSoftCorners}
           height="2.75rem"
-          padding={`${SPACING.spacing8} 0.75rem`}
+          padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
           alignItems={TYPOGRAPHY.textAlignCenter}
           marginTop={SPACING.spacing16}
           width="max-content"

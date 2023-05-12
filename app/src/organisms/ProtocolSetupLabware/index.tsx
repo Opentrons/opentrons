@@ -342,7 +342,7 @@ function LabwareLatch({
       lineHeight={TYPOGRAPHY.lineHeight28}
       minWidth="11.0625rem"
       onClick={toggleLatch}
-      padding="0.75rem"
+      padding={SPACING.spacing12}
     >
       <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('labware_latch')}

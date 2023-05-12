@@ -197,7 +197,7 @@ const DisplayButtons = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      gridGap="0.75rem"
+      gridGap={SPACING.spacing12}
       height="4.375rem"
       marginTop="1.4375rem"
     >
