@@ -1,7 +1,6 @@
 """OT-3 Module Calibration Script."""
 import argparse
 from time import sleep
-from traceback import print_exc
 from typing import Optional, List
 import requests
 
@@ -72,11 +71,11 @@ def _cancel_run(ip_addr: str, run_id: Optional[str] = None) -> bool:
     print(f"Finishing run {run_id}")
     stop = {"data": {"actionType": "stop"}}
     url = f"{BASE_URL.format(ip_addr)}/runs/{run_id}/actions"
-    res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=stop)
+    requests.post(headers=HEADERS, params=PARAMS, url=url, json=stop)
     sleep(1)  # give some time to cancel the run
     # delete the run
     url = f"{BASE_URL.format(ip_addr)}/runs/{run_id}"
-    res = requests.delete(headers=HEADERS, params=PARAMS, url=url)
+    requests.delete(headers=HEADERS, params=PARAMS, url=url)
     return _get_current_run(ip_addr) is None
 
 
@@ -130,7 +129,7 @@ def _main(args: argparse.Namespace) -> None:
     if res.status_code != 201 or error:
         error_type = error.get("errorType")
         error_details = error.get("detail")
-        raise RuntimeErrorf("Error loading module: {error_type} - {error_details}")
+        raise RuntimeError(f"Error loading module: {error_type} - {error_details}")
     module_id = data["result"]["moduleId"]
 
     # load the calibration labware for the specific module
