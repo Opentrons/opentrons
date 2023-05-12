@@ -15,6 +15,7 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    ModuleOffsetVector,
     LabwareLocation,
     LabwareOffsetVector,
     DeckType,
@@ -90,11 +91,10 @@ class GeometryView:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z
 
-    def get_labware_parent_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's parent slot (deck or module)."""
+    def get_labware_parent_origin_position(self, labware_id: str) -> Point:
+        """Get the position of the labware's uncalibrated parent slot (deck or module)."""
         labware_data = self._labware.get(labware_id)
         module_id: Optional[str] = None
-
         if isinstance(labware_data.location, DeckSlotLocation):
             slot_name = labware_data.location.slotName
         elif isinstance(labware_data.location, ModuleLocation):
@@ -108,19 +108,32 @@ class GeometryView:
             )
 
         slot_pos = self._labware.get_slot_position(slot_name)
-
         if module_id is None:
             return slot_pos
         else:
             deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_module_offset(
+            module_offset = self._modules.get_nominal_module_offset(
                 module_id=module_id, deck_type=deck_type
             )
             return Point(
-                x=slot_pos.x + module_offset.x,
-                y=slot_pos.y + module_offset.y,
-                z=slot_pos.z + module_offset.z,
+                slot_pos.x + module_offset.x,
+                slot_pos.y + module_offset.y,
+                slot_pos.z + module_offset.z,
             )
+
+    def get_labware_parent_position(self, labware_id: str) -> Point:
+        """Get the calibrated position of the labware's parent slot (deck or module)."""
+        parent_pos = self.get_labware_parent_origin_position(labware_id)
+        cal_offset = ModuleOffsetVector(x=0, y=0, z=0)
+        labware_data = self._labware.get(labware_id)
+        if isinstance(labware_data.location, ModuleLocation):
+            module_id = labware_data.location.moduleId
+            cal_offset = self._modules.get_module_offset_vector(module_id)
+        return Point(
+            parent_pos.x + cal_offset.x,
+            parent_pos.y + cal_offset.y,
+            parent_pos.z + cal_offset.z,
+        )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
@@ -155,21 +168,33 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
 
+        offset = WellOffset(x=0, y=0, z=well_depth)
         if well_location is not None:
             offset = well_location.offset
-
             if well_location.origin == WellOrigin.TOP:
                 offset = offset.copy(update={"z": offset.z + well_depth})
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
 
-        else:
-            offset = WellOffset(x=0, y=0, z=well_depth)
-
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
+        )
+
+    def get_nominal_well_position(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> Point:
+        """Get the well position without calibration offsets."""
+        parent_pos = self.get_labware_parent_origin_position(labware_id)
+        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        return Point(
+            x=parent_pos.x + origin_offset.x + well_def.x,
+            y=parent_pos.y + origin_offset.y + well_def.y,
+            z=parent_pos.z + origin_offset.z + well_def.z + well_def.depth,
         )
 
     def get_relative_well_location(

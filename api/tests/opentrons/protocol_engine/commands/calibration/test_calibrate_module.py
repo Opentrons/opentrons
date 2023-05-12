@@ -59,11 +59,11 @@ async def test_calibrate_module_implementation(
     decoy.when(subject._state_view.modules.get_location(module_id)).then_return(
         location
     )
-    decoy.when(subject._state_view.modules.get_raw_module_offset(module_id)).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
-    )
     decoy.when(
-        subject._state_view.geometry.get_well_position(
+        subject._state_view.modules.get_module_offset_vector(module_id)
+    ).then_return(ModuleOffsetVector(x=0, y=0, z=0))
+    decoy.when(
+        subject._state_view.geometry.get_nominal_well_position(
             labware_id=labware_id, well_name="B1"
         )
     ).then_return(Point(x=3, y=2, z=1))
