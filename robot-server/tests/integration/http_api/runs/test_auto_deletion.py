@@ -39,7 +39,6 @@ async def test_runs_auto_delete(
             )
             # Last n elements of created_run_ids.
             run_ids_to_expect = created_run_ids[-num_to_expect:]
-            print(f"run_ids_to_expect: {run_ids_to_expect}")
             assert fetched_run_ids == run_ids_to_expect
 
 
