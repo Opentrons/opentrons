@@ -103,7 +103,7 @@ def _main(args: argparse.Namespace) -> None:
     url = f"{base_url}/runs/{run_id}/commands"
 
     # Home all axes so we are at a known state
-    _home(args.host, ["leftZ"])
+    _home(args.host)
 
     # Make sure the module is attached
     res = requests.get(headers=HEADERS, params=PARAMS, url=f"{base_url}/modules")

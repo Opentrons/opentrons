@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, add
+from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -630,8 +630,8 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_raw_module_offset(self, module_id: str) -> ModuleOffsetVector:
-        """Get the stored module calibration offset without transforms."""
+    def get_module_offset_vector(self, module_id: str) -> ModuleOffsetVector:
+        """Get the stored module calibration offset."""
         module_serial = self.get(module_id).serialNumber
         if module_serial is not None:
             offset = self._state.module_offset_by_serial.get(module_serial)
@@ -639,7 +639,7 @@ class ModuleView(HasState[ModuleState]):
                 return offset
         return ModuleOffsetVector(x=0, y=0, z=0)
 
-    def get_module_offset(
+    def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
@@ -663,13 +663,24 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+        return LabwareOffsetVector(
+            x=xformed[0],
+            y=xformed[1],
+            z=xformed[2],
+        )
+
+    def get_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
+        """Get the module's offset vector computed with slot transform and calibrated module offsets."""
+        offset_vector = self.get_nominal_module_offset(module_id, deck_type)
 
         # add the calibrated module offset if there is one
-        module_offset = self.get_raw_module_offset(module_id)
+        module_offset = self.get_module_offset_vector(module_id)
         return LabwareOffsetVector(
-            x=xformed[0] + module_offset.x,
-            y=xformed[1] + module_offset.y,
-            z=xformed[2] + module_offset.z,
+            x=offset_vector.x + module_offset.x,
+            y=offset_vector.y + module_offset.y,
+            z=offset_vector.z + module_offset.z,
         )
 
     def get_overall_height(self, module_id: str) -> float:
