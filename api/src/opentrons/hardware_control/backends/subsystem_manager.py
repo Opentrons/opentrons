@@ -5,7 +5,17 @@ import asyncio
 from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
 import logging
-from typing import TypeVar, Optional, Set, Dict, Iterator, Callable, Type, AsyncIterator
+from typing import (
+    TypeVar,
+    Optional,
+    Set,
+    Dict,
+    Iterator,
+    Callable,
+    Type,
+    AsyncIterator,
+    Union,
+)
 
 from opentrons_hardware.hardware_control import network, tools
 from opentrons_hardware.drivers import can_bus, binary_usb
@@ -15,7 +25,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     FirmwareTarget,
     ToolType,
 )
-from opentrons_hardware import firmware_update
+from opentrons_hardware.firmware_update import FirmwareUpdate
 
 from ..types import SubSystem, SubSystemState, UpdateStatus, UpdateState
 from .ot3utils import subsystem_to_target, target_to_subsystem
@@ -30,7 +40,6 @@ _Cls = TypeVar("_Cls", bound="SubsystemManager")
 @dataclass
 class FirmwareUpdateRequirements:
     target_version: int
-    update_needed: bool
     filepath: str
 
 
@@ -50,9 +59,11 @@ class SubsystemManager:
     _tool_detection_task: "Optional[asyncio.Task[None]]"
     _expected_core_targets: Set[FirmwareTarget]
     _present_tools: tools.types.ToolSummary
-    _refreshed: asyncio.Event
+    _tool_task_condition: asyncio.Condition
+    _tool_task_state: Union[bool, Exception]
     _updates_required: Dict[FirmwareTarget, FirmwareUpdateRequirements]
     _updates_ongoing: Dict[SubSystem, UpdateStatus]
+    _update_bag: FirmwareUpdate
 
     @classmethod
     async def build(
@@ -60,7 +71,13 @@ class SubsystemManager:
         can_messenger: can_bus.CanMessenger,
         usb_messenger: Optional[binary_usb.BinaryMessenger],
     ) -> _Cls:
-        inst = cls(can_messenger, usb_messenger)
+        inst = cls(
+            can_messenger,
+            usb_messenger,
+            tools.detector.ToolDetector(can_messenger),
+            network.NetworkInfo(can_messenger, usb_messenger),
+            FirmwareUpdate(),
+        )
         await inst.start()
         return inst
 
@@ -68,24 +85,34 @@ class SubsystemManager:
         self,
         can_messenger: can_bus.CanMessenger,
         usb_messenger: Optional[binary_usb.BinaryMessenger],
+        tool_detector: tools.detector.ToolDetector,
+        network_info: network.NetworkInfo,
+        update_bag: FirmwareUpdate,
     ) -> None:
         self._can_messenger = can_messenger
         self._usb_messenger = usb_messenger
-        self._tool_detector = tools.detector.ToolDetector(self._can_messenger)
-        self._network_info = network.NetworkInfo(
-            self._can_messenger, self._usb_messenger
-        )
+        self._tool_detector = tool_detector
+        self._network_info = network_info
         self._tool_detection_task = None
         self._expected_core_targets: Set[FirmwareTarget] = {
             NodeId.gantry_x,
             NodeId.gantry_y,
             NodeId.head,
         }
-        self._refreshed = asyncio.Event()
+        self._tool_task_condition = asyncio.Condition()
+        self._tool_task_state = False
         self._updates_required = {}
         self._updates_ongoing = {}
+        self._update_bag = update_bag
         if self._usb_messenger:
             self._expected_core_targets.add(USBTarget.rear_panel)
+
+    @property
+    def ok(self) -> bool:
+        """True if required subsystems are present and all present subsystems are ok."""
+        if not self._expected_core_targets.issubset(self.targets):
+            return False
+        return all(state.ok for state in self.subsystems.values())
 
     @property
     def device_info(self) -> Dict[SubSystem, network.DeviceInfoCache]:
@@ -109,12 +136,18 @@ class SubsystemManager:
                 return maybe_status.state
             return None
 
+        def _next_version(target: FirmwareTarget, current: int) -> int:
+            try:
+                return self._updates_required[target].target_version
+            except KeyError:
+                return current
+
         return {
             target_to_subsystem(target): SubSystemState(
                 ok=info.ok,
                 current_fw_version=info.version,
-                next_fw_version=self._updates_required[target].target_version,
-                fw_update_needed=self._updates_required[target].update_needed,
+                next_fw_version=_next_version(target, info.version),
+                fw_update_needed=target in self._updates_required,
                 current_fw_sha=info.shortsha,
                 pcba_revision=str(info.revision),
                 update_state=_state_or(
@@ -130,7 +163,7 @@ class SubsystemManager:
 
     async def start(self) -> None:
         await self._probe_network_and_cache_fw_updates(self._expected_core_targets)
-        self._tool_detection_task = await asyncio.create_task(
+        self._tool_detection_task = asyncio.create_task(
             self._tool_detection_task_main()
         )
         await self.refresh()
@@ -140,13 +173,22 @@ class SubsystemManager:
 
         This will not return until the information is up to date.
         """
-        self._refreshed.clear()
-        await self._tool_detector.check_once()
-        await self._refreshed.wait()
+        async with self._tool_task_condition:
+            if isinstance(self._tool_task_state, Exception):
+                raise self._tool_task_state
+            await self._tool_detector.check_once()
+            await self._tool_task_condition.wait()
+            if isinstance(self._tool_task_state, Exception):
+                raise self._tool_task_state
+            self._tool_task_state = False
 
-    def is_new(self) -> bool:
+    async def is_new(self) -> bool:
         """Returns True if there is data unread since the last call to is_new."""
-        return self._refreshed.is_set()
+        async with self._tool_task_condition:
+            state = self._tool_task_state
+            if isinstance(state, Exception):
+                raise state
+            return self._tool_task_state is True
 
     def get_update_progress(self) -> Dict[SubSystem, UpdateStatus]:
         """Returns a set of UpdateStatus of the updates."""
@@ -198,7 +240,7 @@ class SubsystemManager:
                 for subsystem in updating_subsystems
             }
 
-            updater = firmware_update.RunUpdate(
+            updater = self._update_bag.update_runner(
                 can_messenger=self._can_messenger,
                 usb_messenger=self._usb_messenger,
                 update_details=update_details,
@@ -240,26 +282,25 @@ class SubsystemManager:
             subsystem_to_target(subsystem): info
             for subsystem, info in self.device_info.items()
         }
-        good_updates = firmware_update.check_firmware_updates(
-            device_info_by_target, good_targets
+        good_updates = self._update_bag.update_checker(
+            device_info_by_target, good_targets, force
         )
-        bad_updates = firmware_update.check_firmware_updates(
+        bad_updates = self._update_bag.update_checker(
             device_info_by_target, bad_targets, True
         )
 
-        for target in to_check:
-            if target in good_targets:
-                updates_required[target] = FirmwareUpdateRequirements(
-                    target_version=good_updates[target][0],
-                    filepath=good_updates[target][1],
-                    update_needed=force,
-                )
-            elif target in bad_targets:
-                updates_required[target] = FirmwareUpdateRequirements(
-                    target_version=bad_updates[target][0],
-                    filepath=bad_updates[target][1],
-                    update_needed=True,
-                )
+        for target, (next_version, filepath) in good_updates.items():
+            updates_required[target] = FirmwareUpdateRequirements(
+                target_version=next_version,
+                filepath=filepath,
+            )
+
+        for target, (next_version, filepath) in bad_updates.items():
+            updates_required[target] = FirmwareUpdateRequirements(
+                target_version=next_version,
+                filepath=filepath,
+            )
+
         return updates_required
 
     def _update_fw_update_requirements(self) -> None:
@@ -297,7 +338,19 @@ class SubsystemManager:
             self._updates_ongoing.pop(subsystem)
 
     async def _tool_detection_task_main(self) -> None:
+        try:
+            await self._tool_detection_task_protected()
+        except Exception as e:
+            async with self._tool_task_condition:
+                self._tool_task_state = e
+                self._tool_task_condition.notify_all()
+            raise
+
+    async def _tool_detection_task_protected(self) -> None:
         """Main function of an asyncio task that responds to async notifications that tool states have changed."""
+        async with self._tool_task_condition:
+            self._tool_task_state = True
+            self._tool_task_condition.notify_all()
         async for update in self._tool_detector.detect():
             # We got a notification from the head that something changed. Let's check whether the currently
             # attached tools are okay by getting their device info
@@ -315,17 +368,24 @@ class SubsystemManager:
             except TimeoutError:
                 log.exception("Problem in internal network probe")
                 continue
+
             # Once we know which are okay, we can ask only those for their subsystems
             to_resolve = tools.types.ToolDetectionResult(
-                left=update.left
-                if self._network_info.device_info[NodeId.pipette_left].ok
-                else ToolType.nothing_attached,
-                right=update.right
-                if self._network_info.device_info[NodeId.pipette_right].ok
-                else ToolType.nothing_attached,
-                gripper=update.gripper
-                if self._network_info.device_info[NodeId.gripper].ok
-                else ToolType.nothing_attached,
+                left=self._tool_if_ok(update.left, NodeId.pipette_left),
+                right=self._tool_if_ok(update.right, NodeId.pipette_right),
+                gripper=self._tool_if_ok(update.gripper, NodeId.gripper),
             )
             self._present_tools = await self._tool_detector.resolve(to_resolve)
-            self._refreshed.set()
+            async with self._tool_task_condition:
+                self._tool_task_state = True
+                self._tool_task_condition.notify_all()
+
+    def _tool_if_ok(self, tool: ToolType, node: NodeId) -> ToolType:
+        if tool is ToolType.nothing_attached:
+            return tool
+        device_info = self._network_info.device_info
+        if node not in device_info:
+            return ToolType.nothing_attached
+        if not device_info[node].ok:
+            return ToolType.nothing_attached
+        return tool

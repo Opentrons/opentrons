@@ -88,7 +88,8 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     BinaryMessageDefinition,
     DoorSwitchStateInfo,
 )
-
+from opentrons_hardware.firmware_update import FirmwareUpdate
+from opentrons_hardware.hardware_control import network, tools
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
@@ -214,7 +215,13 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
-        self._subsystem_manager = SubsystemManager(self._messenger, self._usb_messenger)
+        self._subsystem_manager = SubsystemManager(
+            self._messenger,
+            self._usb_messenger,
+            tools.detector.ToolDetector(self._messenger),
+            network.NetworkInfo(self._messenger, self._usb_messenger),
+            FirmwareUpdate(),
+        )
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
