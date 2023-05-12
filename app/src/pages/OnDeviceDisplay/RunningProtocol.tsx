@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useParams, Link, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 
 import {
   Flex,
@@ -35,8 +36,12 @@ import {
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
+import {
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
+} from '../../organisms/Devices/hooks'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
+import { getLocalRobot } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -49,7 +54,7 @@ const Bullet = styled.div`
   border-radius: 50%;
   z-index: 2;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.darkBlack_sixty : COLORS.darkBlack_forty};
+    props.isActive ? COLORS.darkBlack60 : COLORS.darkBlack40};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
@@ -87,6 +92,9 @@ export function RunningProtocol(): JSX.Element {
     protocolRecord?.data.files[0].name
   const { playRun, pauseRun } = useRunActionMutations(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot != null ? localRobot.name : 'no name'
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   React.useEffect(() => {
     if (
@@ -139,7 +147,7 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         <Flex
           ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (
@@ -149,6 +157,7 @@ export function RunningProtocol(): JSX.Element {
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
+                robotAnalyticsData={robotAnalyticsData}
                 protocolName={protocolName}
                 runStatus={runStatus}
                 currentRunCommandIndex={currentRunCommandIndex}
@@ -163,6 +172,7 @@ export function RunningProtocol(): JSX.Element {
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
+                robotAnalyticsData={robotAnalyticsData}
                 currentRunCommandIndex={currentRunCommandIndex}
                 robotSideAnalysis={robotSideAnalysis}
               />
@@ -173,7 +183,7 @@ export function RunningProtocol(): JSX.Element {
           <Flex
             marginTop="2rem"
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
@@ -187,9 +197,9 @@ export function RunningProtocol(): JSX.Element {
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
-        paddingRight={SPACING.spacing6}
+        paddingRight={SPACING.spacing32}
       >
         <Link to="/dashboard">
           <TertiaryButton>back to RobotDashboard</TertiaryButton>

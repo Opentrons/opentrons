@@ -19,14 +19,14 @@ export function KeyParts(): JSX.Element {
   return (
     <>
       <StyledText
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightBold}
         data-testid="heater_shaker_wizard_keyparts_title"
       >
         {t('heater_shaker_key_parts')}
       </StyledText>
       <StyledText
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         data-testid="heater_shaker_wizard_keyparts_subtitle"
       >
@@ -40,7 +40,7 @@ export function KeyParts(): JSX.Element {
       </StyledText>
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginY={SPACING.spacing6}
+        marginY={SPACING.spacing32}
         alignItems={ALIGN_FLEX_START}
       >
         <img
@@ -54,7 +54,7 @@ export function KeyParts(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           marginTop="8rem"
-          marginRight={SPACING.spacing6}
+          marginRight={SPACING.spacing32}
         >
           <Trans
             t={t}
@@ -64,7 +64,7 @@ export function KeyParts(): JSX.Element {
               block: (
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  marginBottom={SPACING.spacing4}
+                  marginBottom={SPACING.spacing16}
                 />
               ),
             }}
@@ -77,7 +77,7 @@ export function KeyParts(): JSX.Element {
               block: (
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  marginBottom={SPACING.spacing4}
+                  marginBottom={SPACING.spacing16}
                 />
               ),
             }}

@@ -8,6 +8,7 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
+  OT3_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -81,7 +82,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       borderRadius={BORDERS.radiusSoftCorners}
       cursor="pointer"
       minWidth="36rem"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       position="relative"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
       css={BORDERS.cardOutlineBorder}
@@ -95,8 +96,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       />
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <ProtocolOverflowMenu
           handleRunProtocol={handleRunProtocol}
@@ -142,7 +143,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     <Flex
       alignItems={ALIGN_FLEX_START}
       flex="1 0 100%"
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
     >
       <Box
         size="6rem"
@@ -166,10 +167,10 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       <Flex
         flex="1 0"
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         {/* error and protocol name section */}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
@@ -190,12 +191,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             {t('loading_data')}
           </StyledText>
         ) : (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-            <Flex gridGap={SPACING.spacing4}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <Flex gridGap={SPACING.spacing16}>
               <Flex
-                flex={`0 0 ${String(SIZE_2)}`}
+                flex={`0 0 ${
+                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                }`}
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
               >
                 <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                   {t('robot')}
@@ -207,7 +210,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
@@ -220,7 +223,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                     loading: <StyledText as="p">{t('no_data')}</StyledText>,
                     error: <StyledText as="p">{t('no_data')}</StyledText>,
                     complete: (
-                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
+                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
                         {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
                         {leftMountPipetteName != null ? (
                           <InstrumentContainer
@@ -247,7 +250,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="0 0 6rem"
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
@@ -261,7 +264,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                           color={COLORS.darkGreyEnabled}
                           moduleType={moduleType}
                           height="1rem"
-                          marginRight={SPACING.spacing3}
+                          marginRight={SPACING.spacing8}
                         />
                       ))}
                     </Flex>

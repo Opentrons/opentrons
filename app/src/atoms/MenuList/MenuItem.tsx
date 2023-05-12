@@ -17,7 +17,8 @@ export const MenuItem = styled.button<ButtonProps>`
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${COLORS.transparent};
   color: ${COLORS.darkBlackEnabled};
-  padding: ${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem;
+  padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
+    ${SPACING.spacing12};
 
   &:hover,
   &:active {
@@ -43,14 +44,13 @@ export const MenuItem = styled.button<ButtonProps>`
     &:hover,
     &:active {
       background-color: ${({ isAlert }) =>
-        isAlert ? COLORS.errorEnabled : COLORS.darkBlack_twenty};
+        isAlert ? COLORS.errorEnabled : COLORS.darkBlack20};
     }
 
     &:disabled {
       background-color: ${({ isAlert }) =>
         isAlert ? COLORS.errorEnabled : COLORS.transparent};
-      color: ${({ isAlert }) =>
-        isAlert ? COLORS.white : COLORS.darkBlack_sixty};
+      color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.darkBlack60)};
     }
   }
 `

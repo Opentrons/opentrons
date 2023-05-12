@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { RadioButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { RadioButton } from '../../../atoms/buttons'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
@@ -20,7 +20,7 @@ import {
 import { SLEEP_NEVER_MS } from '../../../App/constants'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 
@@ -66,13 +66,13 @@ export function TouchScreenSleep({
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText>{t('sleep_settings_description')}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing5}
+        gridGap={SPACING.spacing8}
+        marginTop={SPACING.spacing24}
       >
         {settingsButtons.map(radio => (
           <RadioButton

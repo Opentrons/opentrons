@@ -81,17 +81,17 @@ export function PinnedProtocol(props: {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.light_one}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_four}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       height={cardStyleBySize[cardSize].height}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       overflowWrap="anywhere"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       ref={longpress.ref}
     >
       <StyledText
@@ -103,7 +103,7 @@ export function PinnedProtocol(props: {
       </StyledText>
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
       >

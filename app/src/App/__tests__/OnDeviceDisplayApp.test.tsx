@@ -18,6 +18,12 @@ import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
 import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
+import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
+import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
+import { getOnDeviceDisplaySettings } from '../../redux/config'
+import { getIsShellReady } from '../../redux/shell'
+
+import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
 jest.mock('../../pages/OnDeviceDisplay/Welcome')
 jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
@@ -31,6 +37,17 @@ jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../pages/OnDeviceDisplay/RunSummary')
+jest.mock('../../pages/OnDeviceDisplay/NameRobot')
+jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
+jest.mock('../../redux/config')
+jest.mock('../../redux/shell')
+
+const mockSettings = {
+  sleepMs: 60 * 1000 * 60 * 24 * 7,
+  brightness: 4,
+  textSize: 1,
+  unfinishedUnboxingFlowRoute: '/welcome',
+} as OnDeviceDisplaySettings
 
 const mockWelcome = Welcome as jest.MockedFunction<typeof Welcome>
 const mockNetworkSetupMenu = NetworkSetupMenu as jest.MockedFunction<
@@ -41,6 +58,9 @@ const mockConnectViaEthernet = ConnectViaEthernet as jest.MockedFunction<
 >
 const mockConnectViaUSB = ConnectViaUSB as jest.MockedFunction<
   typeof ConnectViaUSB
+>
+const mockInitialLoadingScreen = InitialLoadingScreen as jest.MockedFunction<
+  typeof InitialLoadingScreen
 >
 const mockConnectViaWifi = ConnectViaWifi as jest.MockedFunction<
   typeof ConnectViaWifi
@@ -64,6 +84,13 @@ const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
   typeof RunningProtocol
 >
 const mockRunSummary = RunSummary as jest.MockedFunction<typeof RunSummary>
+const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
+const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
+  typeof getOnDeviceDisplaySettings
+>
+const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
+  typeof getIsShellReady
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -92,6 +119,10 @@ describe('OnDeviceDisplayApp', () => {
     )
     mockRunningProtocol.mockReturnValue(<div>Mock RunningProtocol</div>)
     mockRunSummary.mockReturnValue(<div>Mock RunSummary</div>)
+    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings as any)
+    mockgetIsShellReady.mockReturnValue(false)
+    mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
+    mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -149,5 +180,10 @@ describe('OnDeviceDisplayApp', () => {
   it('renders a RunSummary component from /protocols/:runId/summary', () => {
     const [{ getByText }] = render('/protocols/my-run-id/summary')
     getByText('Mock RunSummary')
+  })
+  it('renders the loading screen on mount', () => {
+    const [{ getByText }] = render('/')
+    mockgetIsShellReady.mockReturnValue(true)
+    getByText('Mock Loading')
   })
 })

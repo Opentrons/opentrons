@@ -27,14 +27,14 @@ const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
   border-spacing: 0 ${BORDERS.size_two};
-  margin: ${SPACING.spacing4} 0;
+  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3} ${SPACING.spacing5};
-  color: ${COLORS.darkBlack_seventy};
+  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8} ${SPACING.spacing24};
+  color: ${COLORS.darkBlack70};
 `
 
 const TableRow = styled('tr')`
@@ -42,8 +42,8 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
-  background-color: ${COLORS.light_one};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
+  background-color: ${COLORS.light1};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
@@ -98,11 +98,11 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                 >
                   <Flex
                     borderRadius={BORDERS.size_two}
-                    padding={SPACING.spacing4}
+                    padding={SPACING.spacing16}
                     backgroundColor={COLORS.white}
                     height="3.75rem"
                     width="3.75rem"
-                    marginRight={SPACING.spacing4}
+                    marginRight={SPACING.spacing16}
                   >
                     <Icon
                       name="circle"
@@ -114,10 +114,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     <StyledText lineHeight="1.75rem">
                       {liquid.displayName}
                     </StyledText>
-                    <StyledText
-                      lineHeight="1.75rem"
-                      color={COLORS.darkBlack_seventy}
-                    >
+                    <StyledText lineHeight="1.75rem" color={COLORS.darkBlack70}>
                       {liquid.description}
                     </StyledText>
                   </Flex>
@@ -126,10 +123,10 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
 
               <TableDatum>
                 <Flex
-                  backgroundColor={COLORS.darkBlack_twenty}
+                  backgroundColor={COLORS.darkBlack20}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
-                  padding={`${SPACING.spacing3} 0.75rem`}
+                  padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                   width="max-content"
                   alignItems={TYPOGRAPHY.textAlignCenter}
                   marginRight={SPACING.spacingAuto}

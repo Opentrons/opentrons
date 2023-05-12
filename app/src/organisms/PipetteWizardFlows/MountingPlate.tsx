@@ -76,7 +76,7 @@ export const MountingPlate = (
             i18nKey="attach_mounting_plate_instructions"
             components={{
               block: (
-                <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+                <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
               ),
             }}
           />

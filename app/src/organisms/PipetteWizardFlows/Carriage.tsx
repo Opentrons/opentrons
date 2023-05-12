@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
@@ -68,7 +68,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       <SecondaryButton
         isDangerous
         onClick={goBack}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
       >
         {i18n.format(t('cancel_attachment'), 'capitalize')}
       </SecondaryButton>
@@ -103,12 +103,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
             ),
           }}
         />
       }
-      back={goBack}
+      back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
         isOnDevice ? (
           <SmallButton

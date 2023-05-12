@@ -15,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  truncateString,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
@@ -57,11 +58,11 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
         <StyledText
           as="label"
-          paddingRight={SPACING.spacing3}
+          paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
-          {`${String(displayName)}; ${t(
-            `run_details:status_${String(currentRunStatus)}`
+          {`${truncateString(displayName, 80, 65)}; ${t(
+            `run_details:status_${currentRunStatus}`
           )}`}
         </StyledText>
         <Link
@@ -82,13 +83,13 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           as="h6"
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing1}
+          paddingBottom={SPACING.spacing2}
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <StyledText
               as="h3"
               id={`RobotStatusHeader_${String(name)}_robotName`}
@@ -98,7 +99,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
             </StyledText>
             <Btn
               {...targetProps}
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               onClick={() =>
                 history.push(`/devices/${name}/robot-settings/networking`)
               }

@@ -50,9 +50,9 @@ export function ProtocolAnalysisFailure(
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
-    <Banner type="warning" marginRight={SPACING.spacing5}>
+    <Banner type="warning" marginRight={SPACING.spacing24}>
       <Flex
-        columnGap={SPACING.spacing3}
+        columnGap={SPACING.spacing8}
         flex="1"
         flexWrap={WRAP_REVERSE}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -101,7 +101,7 @@ export function ProtocolAnalysisFailure(
               <PrimaryButton
                 onClick={handleClickHideDetails}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>

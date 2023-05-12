@@ -39,28 +39,28 @@ const CHIP_PROPS_BY_TYPE: Record<
   }
 > = {
   basic: {
-    backgroundColor: COLORS.darkBlack_twenty,
+    backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.size_one,
-    textColor: COLORS.darkBlack_ninety,
+    textColor: COLORS.darkBlack90,
   },
   neutral: {
-    backgroundColor: COLORS.darkBlack_twenty,
+    backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.size_six,
-    iconColor: COLORS.darkBlack_ninety,
-    textColor: COLORS.darkBlack_seventy,
+    iconColor: COLORS.darkBlack90,
+    textColor: COLORS.darkBlack70,
   },
   success: {
-    backgroundColor: COLORS.green_three,
+    backgroundColor: COLORS.green3,
     borderRadius: BORDERS.size_six,
-    iconColor: COLORS.green_one,
+    iconColor: COLORS.green1,
     iconName: 'ot-check',
-    textColor: COLORS.green_one,
+    textColor: COLORS.green1,
   },
   warning: {
-    backgroundColor: COLORS.yellow_three,
+    backgroundColor: COLORS.yellow3,
     borderRadius: BORDERS.size_six,
-    iconColor: COLORS.yellow_two,
-    textColor: COLORS.yellow_one,
+    iconColor: COLORS.yellow1,
+    textColor: COLORS.yellow1,
   },
 }
 
@@ -83,8 +83,8 @@ export function Chip({
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-      gridGap={SPACING.spacing3}
+      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+      gridGap={SPACING.spacing8}
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
@@ -98,8 +98,8 @@ export function Chip({
         />
       )}
       <StyledText
-        fontSize="1.25rem"
-        lineHeight="1.6875rem"
+        fontSize={TYPOGRAPHY.fontSize22}
+        lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         color={CHIP_PROPS_BY_TYPE[type].textColor}
       >

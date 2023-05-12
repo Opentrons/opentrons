@@ -1,7 +1,7 @@
 // presentational components for the wifi connect form
 import * as React from 'react'
 import styled from 'styled-components'
-import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
+import { FONT_WEIGHT_SEMIBOLD, SPACING } from '@opentrons/components'
 
 export interface FormRowProps {
   label: string
@@ -21,7 +21,7 @@ const StyledLabel = styled.label`
 `
 
 const StyledInputWrapper = styled.div`
-  padding-bottom: 0.75rem;
+  padding-bottom: ${SPACING.spacing12};
   display: table-cell;
 
   & > *:not(:last-child) {

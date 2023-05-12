@@ -80,18 +80,18 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         />
       ) : null}
       {hasADuplicateModule ? (
-        <Box marginTop={SPACING.spacing3}>
+        <Box marginTop={SPACING.spacing8}>
           <Banner
-            iconMarginRight={SPACING.spacing4}
-            iconMarginLeft={SPACING.spacing3}
-            size={SPACING.spacingM}
+            iconMarginRight={SPACING.spacing16}
+            iconMarginLeft={SPACING.spacing8}
+            size={SPACING.spacing20}
             type="informing"
             onCloseClick={() => setShowMultipleModulesModal(true)}
             closeButton={
               <StyledText
                 as="p"
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                marginRight={SPACING.spacing3}
+                marginRight={SPACING.spacing8}
               >
                 {t('learn_more')}
               </StyledText>
@@ -113,13 +113,13 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing4}
-        marginLeft={SPACING.spacingM}
-        marginBottom={SPACING.spacing2}
+        marginTop={SPACING.spacing16}
+        marginLeft={SPACING.spacing20}
+        marginBottom={SPACING.spacing4}
       >
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
           data-testid="SetupModulesList_module_name"
           width="45%"
         >
@@ -128,7 +128,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_location"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
           width="15%"
         >
           {t('location')}
@@ -136,7 +136,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         <StyledText
           css={TYPOGRAPHY.labelSemiBold}
           data-testid="SetupModulesList_connection_status"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
           width="15%"
         >
           {t('connection_status')}
@@ -147,8 +147,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
         width="100%"
         overflowY="auto"
         data-testid="SetupModulesList_ListView"
-        gridGap={SPACING.spacing2}
-        marginBottom={SPACING.spacing5}
+        gridGap={SPACING.spacing4}
+        marginBottom={SPACING.spacing24}
       >
         {map(
           moduleRenderInfoForProtocolById,
@@ -214,9 +214,9 @@ export const ModulesListItem = ({
     <Box
       border={BORDERS.styleSolid}
       borderColor={COLORS.medGreyEnabled}
-      borderWidth={SPACING.spacingXXS}
+      borderWidth="1px"
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
       data-testid="ModulesListItem_Row"
     >
@@ -237,13 +237,13 @@ export const ModulesListItem = ({
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
-              marginLeft={SPACING.spacingM}
+              marginLeft={SPACING.spacing20}
             >
               {displayName}
             </StyledText>
             {moduleModel === HEATERSHAKER_MODULE_V1 ? (
               <Btn
-                marginLeft={SPACING.spacingM}
+                marginLeft={SPACING.spacing20}
                 css={css`
                   color: ${COLORS.darkGreyEnabled};
 
@@ -251,17 +251,17 @@ export const ModulesListItem = ({
                     color: ${COLORS.darkBlackEnabled};
                   }
                 `}
-                marginTop={SPACING.spacing2}
+                marginTop={SPACING.spacing4}
                 onClick={() => setShowHeaterShakerFlow(true)}
               >
                 <Flex flexDirection={DIRECTION_ROW}>
                   <Icon
                     name="information"
                     size="0.75rem"
-                    marginTop={SPACING.spacingXS}
+                    marginTop={SPACING.spacing4}
                   />
                   <StyledText
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     as="p"
                   >

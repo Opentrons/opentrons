@@ -22,19 +22,19 @@ const Table = styled('table')`
   border-collapse: separate
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
+  border-spacing: 0 ${SPACING.spacing4};
+  margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 
 const TableRow = styled('tr')`
-  background-color: ${COLORS.light_one};
+  background-color: ${COLORS.light1};
   border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `
@@ -42,7 +42,7 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   font-size: ${TYPOGRAPHY.fontSize22};
   font-weight: ${TYPOGRAPHY.lineHeight28};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
@@ -79,18 +79,18 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              color={COLORS.darkBlack_seventy}
+              color={COLORS.darkBlack70}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               lineHeight={TYPOGRAPHY.lineHeight24}
-              paddingLeft={SPACING.spacing5}
+              paddingLeft={SPACING.spacing24}
             >
               {t('labware_name')}
             </StyledText>
           </TableHeader>
           <TableHeader>
             <StyledText
-              color={COLORS.darkBlack_seventy}
+              color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               fontSize={TYPOGRAPHY.fontSize20}
               lineHeight={TYPOGRAPHY.lineHeight24}
@@ -111,7 +111,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
-                  paddingLeft={SPACING.spacing5}
+                  paddingLeft={SPACING.spacing24}
                 >
                   {definition?.namespace === 'opentrons' ? (
                     <Icon
@@ -120,14 +120,14 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                       height="1.77125rem"
                       minHeight="1.77125rem"
                       minWidth="1.77125rem"
-                      marginRight={SPACING.spacing3}
+                      marginRight={SPACING.spacing8}
                     />
                   ) : (
-                    <Flex marginLeft={SPACING.spacingM} />
+                    <Flex marginLeft={SPACING.spacing20} />
                   )}
                   <StyledText
                     alignItems={ALIGN_CENTER}
-                    color={COLORS.darkBlack_hundred}
+                    color={COLORS.darkBlack100}
                     lineHeight={TYPOGRAPHY.lineHeight28}
                   >
                     {name}
@@ -137,7 +137,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               <TableDatum>
                 <StyledText
                   alignItems={ALIGN_CENTER}
-                  color={COLORS.darkBlack_hundred}
+                  color={COLORS.darkBlack100}
                   lineHeight={TYPOGRAPHY.lineHeight28}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >

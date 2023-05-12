@@ -7,7 +7,7 @@
       "minimum": 0
     },
     "channels": {
-      "enum": [1, 8]
+      "enum": [1, 8, 96]
     },
     "displayCategory": {
       "type": "string",
