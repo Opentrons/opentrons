@@ -76,7 +76,7 @@ export function RobotSystemVersion({
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing24} ${SPACING.spacing16}`}
               gridGap={SPACING.spacing16}
-              borderRadius={BORDERS.size_three}
+              borderRadius={BORDERS.size3}
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.warningBackgroundMed}
             >
@@ -103,7 +103,7 @@ export function RobotSystemVersion({
               flexDirection={DIRECTION_ROW}
               padding={SPACING.spacing24}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              borderRadius={BORDERS.size_three}
+              borderRadius={BORDERS.size3}
             >
               <StyledText
                 fontSize="1.5rem"

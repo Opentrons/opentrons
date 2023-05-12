@@ -133,7 +133,7 @@ export function RecentRunProtocolCard({
       gridGap={SPACING.spacing24}
       backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.size4}
       onClick={handleCardClick}
     >
       {/* marginLeft is needed to cancel chip's padding */}

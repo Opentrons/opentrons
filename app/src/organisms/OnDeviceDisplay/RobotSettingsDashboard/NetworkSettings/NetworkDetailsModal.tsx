@@ -78,7 +78,7 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       padding={`${SPACING.spacing4} ${SPACING.spacing24}`}
       backgroundColor={COLORS.grey3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
     >
       <StyledText
         fontSize={TYPOGRAPHY.fontSize22}
