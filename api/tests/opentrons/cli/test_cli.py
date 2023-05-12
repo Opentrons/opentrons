@@ -1,7 +1,8 @@
 """Test cli execution."""
 import json
+import tempfile
 
-from typing import Iterator
+from typing import Any, Iterator, List, Tuple
 from pathlib import Path
 
 import pytest
@@ -16,22 +17,35 @@ def _list_fixtures(version: int) -> Iterator[Path]:
     )
 
 
+def _get_analysis_result(protocol_files: List[Path]) -> Tuple[int, Any]:
+    """Run `protocol_files` as a single protocol through the analysis CLI.
+
+    Returns:
+        A tuple (exit_code, analysis_json_dict).
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        analysis_output_file = Path(temp_dir) / "analysis_output.json"
+        runner = CliRunner()
+        exit_code = runner.invoke(
+            analyze,
+            [
+                "--json-output",
+                str(analysis_output_file),
+                *[str(p.resolve()) for p in protocol_files],
+            ],
+        ).exit_code
+        return exit_code, json.loads(analysis_output_file.read_bytes())
+
+
 @pytest.mark.parametrize("fixture_path", _list_fixtures(6))
 def test_analyze(
     fixture_path: Path,
-    tmp_path: Path,
 ) -> None:
     """Should return with no errors and a non-empty output."""
-    analysis_output_path = tmp_path / "analysis_output.json"
-    runner = CliRunner()
-    result = runner.invoke(
-        analyze,
-        [str(fixture_path.resolve()), "--json-output", str(analysis_output_path)],
-    )
+    exit_code, analysis_output_json = _get_analysis_result([fixture_path])
 
-    assert result.exit_code == 0
+    assert exit_code == 0
 
-    analysis_output_json = json.loads(analysis_output_path.read_bytes())
     assert "robotType" in analysis_output_json
     assert "pipettes" in analysis_output_json
     assert "commands" in analysis_output_json
