@@ -395,7 +395,7 @@ async def _main() -> None:
             await asyncio.sleep(3)
             nozzle_measurement = gauge.read()
             await asyncio.sleep(1)
-            d_str = f"{m_current}, {pipette_model}, {nozzle_measurement}, {noz_loc}, Nozzle \n"
+            d_str = f"{m_current}, {pipette_model}, {nozzle_measurement}, {noz_loc},{None},{tip_count}, Nozzle \n"
             data.append_data_to_file(test_n, test_f, d_str)
             # # Move over to the TipRack location and
             tiprack_loc = Point(tiprack_loc.x, tiprack_loc.y, tiprack_loc.z)
@@ -518,7 +518,7 @@ if __name__ == "__main__":
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
     parser.add_argument("--dial_indicator", action="store_true")
-    parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
     parser.add_argument(
         "--port", type=str, default="/dev/ttyUSB0", help="Force Gauge Port"
     )
