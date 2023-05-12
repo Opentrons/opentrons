@@ -187,7 +187,7 @@ async def create_run(
 async def get_runs(
     pageLength: Optional[int] = Query(
         None,
-        description="The maximum number of runs in the list to return.",
+        description="The maximum number of runs in the list to return ordered by oldest to newest.",
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
