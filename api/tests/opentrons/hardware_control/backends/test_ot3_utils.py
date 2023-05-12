@@ -4,7 +4,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.hardware_control.types import OT3Axis
 
 
-def test_create_step():
+def test_create_step() -> None:
     origin = {
         OT3Axis.X: 0,
         OT3Axis.Y: 0,

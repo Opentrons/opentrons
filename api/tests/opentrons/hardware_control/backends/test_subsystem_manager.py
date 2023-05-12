@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Iterator, Set, Optional, AsyncIterator
+from typing import Dict, Iterator, Set, Optional, AsyncIterator, Tuple, AsyncIterator
 from itertools import chain
 
 import pytest
@@ -18,7 +18,7 @@ from opentrons_hardware.firmware_update import FirmwareUpdate
 from opentrons_hardware.drivers import can_bus, binary_usb
 
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
-from opentrons.hardware_control.types import SubSystem
+from opentrons.hardware_control.types import SubSystem, SubSystemState
 
 
 def default_subidentifier_for(target: FirmwareTarget) -> int:
@@ -29,10 +29,22 @@ def default_subidentifier_for(target: FirmwareTarget) -> int:
     return 0
 
 
+def default_sha() -> str:
+    return "abcdef1"
+
+
+def default_fw_version() -> int:
+    return 1
+
+
+def default_revision() -> types.PCBARevision:
+    return types.PCBARevision("A1")
+
+
 def device_info_for(
     target: FirmwareTarget,
     subidentifier: Optional[int] = None,
-    version: int = 1,
+    version: Optional[int] = None,
 ) -> network.DeviceInfoCache:
     checked_subidentifier = (
         subidentifier
@@ -41,10 +53,10 @@ def device_info_for(
     )
     return network.DeviceInfoCache(
         target=target.application_for(),
-        version=1,
-        shortsha="abcdef1",
+        version=version if version is not None else default_fw_version(),
+        shortsha=default_sha(),
         flags=None,
-        revision=types.PCBARevision("A1"),
+        revision=default_revision(),
         subidentifier=checked_subidentifier,
         ok=((not NodeId.is_bootloader(target)) if isinstance(target, NodeId) else True),
     )
@@ -83,14 +95,11 @@ def update_bag(decoy: Decoy) -> FirmwareUpdate:
     return decoy.mock(cls=FirmwareUpdate)
 
 
-DetectionQueue = "asyncio.Queue[tools.types.ToolDetectionResult]"
-
-
 @pytest.fixture
 def detection_queue(
     tool_detector: tools.detector.ToolDetector, decoy: Decoy
-) -> DetectionQueue:
-    queue: DetectionQueue = asyncio.Queue()
+) -> "asyncio.Queue[tools.types.ToolDetectionResult]":
+    queue: "asyncio.Queue[tools.types.ToolDetectionResult]" = asyncio.Queue()
 
     async def _read() -> AsyncIterator[tools.types.ToolDetectionResult]:
         while True:
@@ -104,7 +113,7 @@ class ToolDetectionController:
     def __init__(
         self,
         tool_detector: tools.detector.ToolDetector,
-        detection_queue: DetectionQueue,
+        detection_queue: "asyncio.Queue[tools.types.ToolDetectionResult]",
         decoy: Decoy,
     ) -> None:
         self._tool_detector = tool_detector
@@ -132,7 +141,7 @@ class ToolDetectionController:
     ) -> tools.types.ToolDetectionResult:
         results = self._detection_for(targets)
 
-        async def _adder():
+        async def _adder() -> None:
             await self._detection_queue.put(results)
 
         self._decoy.when(await self._tool_detector.check_once()).then_do(_adder)
@@ -207,7 +216,7 @@ class ToolDetectionController:
 @pytest.fixture
 def tool_detection_controller(
     tool_detector: tools.detector.ToolDetector,
-    detection_queue: DetectionQueue,
+    detection_queue: "asyncio.Queue[tools.types.ToolDetectionResult]",
     decoy: Decoy,
 ) -> ToolDetectionController:
     return ToolDetectionController(tool_detector, detection_queue, decoy)
@@ -220,7 +229,7 @@ async def subject(
     tool_detector: tools.detector.ToolDetector,
     network_info: network.NetworkInfo,
     update_bag: FirmwareUpdate,
-) -> Iterator[SubsystemManager]:
+) -> AsyncIterator[SubsystemManager]:
     """
     Build a test subject using decoyed messengers.
 
@@ -228,7 +237,7 @@ async def subject(
     decoys before it sends a ping. Tests _must_ call await start() before any other method calls.
     """
     manager = SubsystemManager(
-        can_bus, binary_usb, tool_detector, network_info, update_bag
+        can_messenger, usb_messenger, tool_detector, network_info, update_bag
     )
     try:
         yield manager
@@ -356,7 +365,7 @@ async def test_targets(
     subject: SubsystemManager, network_info: network.NetworkInfo, decoy: Decoy
 ) -> None:
     """It should tell you what targets are connected if you really need to know."""
-    targets = {
+    targets: Set[FirmwareTarget] = {
         NodeId.gantry_x,
         NodeId.gantry_y_bootloader,
         USBTarget.rear_panel,
@@ -392,7 +401,12 @@ async def test_ok_tools_get_mapped(
     decoy: Decoy,
 ) -> None:
     """When tools are detected no matter their update needs, if they're ok we make them present."""
-    core_targets = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head, USBTarget.rear_panel}
+    core_targets: Set[FirmwareTarget] = {
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head,
+        USBTarget.rear_panel,
+    }
     all_targets = set(iter(target_info.keys())).union(core_targets)
     decoy.when(network_info.targets).then_return(all_targets)
     core_network_info = default_network_info_for(core_targets)
@@ -422,3 +436,122 @@ async def test_ok_tools_get_mapped(
     ).then_return({})
     await subject.start()
     assert subject.tools == summary
+
+
+@pytest.mark.parametrize(
+    "target_info,subsystem_info,required_updates",
+    [
+        ({}, {}, {}),
+        (
+            default_network_info_for({NodeId.head_bootloader, USBTarget.rear_panel}),
+            {
+                SubSystem.head: SubSystemState(
+                    ok=False,
+                    current_fw_version=default_fw_version(),
+                    next_fw_version=1,
+                    fw_update_needed=True,
+                    current_fw_sha=default_sha(),
+                    pcba_revision=str(default_revision()),
+                    update_state=None,
+                ),
+                SubSystem.rear_panel: SubSystemState(
+                    ok=True,
+                    current_fw_version=default_fw_version(),
+                    next_fw_version=2,
+                    fw_update_needed=True,
+                    current_fw_sha=default_sha(),
+                    pcba_revision=str(default_revision()),
+                    update_state=None,
+                ),
+            },
+            {
+                NodeId.head: (1, "/some/path"),
+                USBTarget.rear_panel: (2, "/some/other/path"),
+            },
+        ),
+        (
+            default_network_info_for({NodeId.pipette_left, NodeId.gantry_x}),
+            {
+                SubSystem.pipette_left: SubSystemState(
+                    ok=True,
+                    current_fw_version=default_fw_version(),
+                    next_fw_version=default_fw_version(),
+                    fw_update_needed=False,
+                    current_fw_sha=default_sha(),
+                    pcba_revision=str(default_revision()),
+                    update_state=None,
+                ),
+                SubSystem.rear_panel: SubSystemState(
+                    ok=True,
+                    current_fw_version=default_fw_version(),
+                    next_fw_version=default_fw_version(),
+                    fw_update_needed=False,
+                    current_fw_sha=default_sha(),
+                    pcba_revision=str(default_revision()),
+                    update_state=None,
+                ),
+            },
+            {},
+        ),
+        (
+            default_network_info_for({NodeId.head_bootloader, NodeId.pipette_right}),
+            {
+                SubSystem.head: SubSystemState(
+                    ok=False,
+                    current_fw_version=default_fw_version(),
+                    next_fw_version=default_fw_version(),
+                    fw_update_needed=True,
+                    current_fw_sha=default_sha(),
+                    pcba_revision=str(default_revision()),
+                    update_state=None,
+                ),
+                SubSystem.pipette_right: SubSystemState(
+                    ok=False,
+                    current_fw_version=default_fw_version(),
+                    next_fw_version=default_fw_version(),
+                    fw_update_needed=True,
+                    current_fw_sha=default_sha(),
+                    pcba_revision=str(default_revision()),
+                    update_state=None,
+                ),
+            },
+            {NodeId.head: (1, "/some/path"), NodeId.pipette_right: (1, "/some/path")},
+        ),
+    ],
+)
+async def test_subsystems(
+    target_info: Dict[FirmwareTarget, network.DeviceInfoCache],
+    subsystem_info: Dict[SubSystem, SubSystemState],
+    update_info: Dict[FirmwareTarget, Tuple[int, str]],
+    subject: SubsystemManager,
+    network_info: network.NetworkInfo,
+    tool_detection_controller: ToolDetectionController,
+    update_bag: FirmwareUpdate,
+    decoy: Decoy,
+) -> None:
+    """It should return subsystems corresponding to the detected targets with their info."""
+    targets = set(iter(target_info.keys()))
+    target_applications = {t.application_for() for t in target_info.keys()}
+    decoy.when(network_info.targets).then_return(target_applications)
+    decoy.when(network_info.device_info).then_return(target_info)
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, target_info)
+
+    good_targets = {
+        target.application_for()
+        for target in targets
+        if not (isinstance(target, NodeId) and NodeId.is_bootloader(target))
+    }
+    bad_targets = target_applications - good_targets
+    decoy.when(update_bag.update_checker(target_info, good_targets, False)).then_return(
+        {k: v for k, v in update_info.items() if k in good_targets}
+    )
+    decoy.when(
+        update_bag.update_checker(
+            target_info,
+            bad_targets,
+            True,
+        )
+    ).then_return({k: v for k, v in update_info.items() if k in bad_targets})
+    await subject.start()
+    assert subject.subsystems == subsystem_info

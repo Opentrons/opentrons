@@ -1,7 +1,7 @@
 from unittest.mock import mock_open
 import mock
 import pytest
-from typing import Dict, List, Optional, Set, Tuple, Any, Iterator
+from typing import Dict, List, Optional, Set, Tuple, Any, Iterator, cast
 from itertools import chain
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
@@ -112,7 +112,7 @@ def mock_usb_driver() -> SerialUsbDriver:
 @pytest.fixture
 def controller(
     mock_config: OT3Config, mock_can_driver: AbstractCanDriver
-) -> OT3Controller:
+) -> Iterator[OT3Controller]:
     with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
         yield OT3Controller(mock_config, mock_can_driver)
 
@@ -136,7 +136,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
 
 
 @pytest.fixture
-def mock_send_stop_threshold() -> None:
+def mock_send_stop_threshold() -> Iterator[mock.AsyncMock]:
     with mock.patch(
         "opentrons_hardware.sensors.sensor_driver.SensorDriver.send_stop_threshold",
         autospec=True,
@@ -154,9 +154,7 @@ def mock_move_group_run() -> Iterator[mock.AsyncMock]:
         yield mock_mgr_run
 
 
-def _device_info_entry(
-    subsystem: SubsystemManager,
-) -> Tuple[SubSystem, DeviceInfoCache]:
+def _device_info_entry(subsystem: SubSystem) -> Tuple[SubSystem, DeviceInfoCache]:
     return subsystem, DeviceInfoCache(
         target=subsystem_to_target(subsystem),
         version=2,
@@ -187,7 +185,7 @@ def mock_present_devices(
 
 
 @pytest.fixture
-def mock_subsystem_manager(controller: OT3Controller) -> SubsystemManager:
+def mock_subsystem_manager(controller: OT3Controller) -> Iterator[SubsystemManager]:
     with mock.patch.object(
         controller, "_subsystem_manager", mock.AsyncMock(spec=SubsystemManager)
     ) as mock_subsystem:
@@ -346,21 +344,21 @@ async def test_home_build_runners(
 
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_only_present_devices(
-    controller: OT3Controller, mock_move_group_run: mock.AsyncMock, axes: List[OT3Axis]
+    controller: OT3Controller,
+    mock_move_group_run: mock.AsyncMock,
+    axes: List[OT3Axis],
+    mock_present_devices: None,
 ) -> None:
     starting_position = {
-        NodeId.head_l: 20,
-        NodeId.head_r: 85,
-        NodeId.gantry_x: 68,
-        NodeId.gantry_y: 54,
-        NodeId.pipette_left: 30,
-        NodeId.pipette_right: 110,
+        NodeId.head_l: 20.0,
+        NodeId.head_r: 85.0,
+        NodeId.gantry_x: 68.0,
+        NodeId.gantry_y: 54.0,
+        NodeId.pipette_left: 30.0,
+        NodeId.pipette_right: 110.0,
     }
     homed_position = {}
 
-    controller._present_devices = set(
-        (NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l, NodeId.head_r)
-    )
     controller._position = starting_position
 
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
@@ -379,7 +377,6 @@ async def test_home_only_present_devices(
             for move_group_step in move_group:
                 assert move_group_step  # don't pass in empty moves
                 for node, step in move_group_step.items():
-                    assert node in controller._present_devices
                     assert step  # don't pass in empty steps
                     homed_position[node] = 0.0  # track homed position for node
 
@@ -398,7 +395,7 @@ async def test_get_attached_instruments(
     pipette_id = "P1KSV33hello"
     gripper_id = "GRPV00fake_serial"
     gripper_name = "Gripper V1"
-    mock_subsystem_manager.tools = ToolSummary(
+    cast(mock.AsyncMock, mock_subsystem_manager).tools = ToolSummary(
         left=PipetteInformation(
             name=FirmwarePipetteName.p1000_single,
             name_int=FirmwarePipetteName.p1000_single.value,
@@ -412,19 +409,26 @@ async def test_get_attached_instruments(
     detected = await controller.get_attached_instruments({})
     assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == pipette_id
-    assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
-    assert detected[OT3Mount.GRIPPER]["config"].display_name == gripper_name
+    gripper_obj = detected[OT3Mount.GRIPPER]
+    assert gripper_obj
+    assert gripper_obj["id"] == gripper_id
+    config = gripper_obj["config"]
+    assert config
+    assert config.display_name == gripper_name
 
 
 async def test_get_attached_instruments_handles_unknown_name(
     controller: OT3Controller, mock_subsystem_manager: SubsystemManager
 ) -> None:
-    mock_subsystem_manager.tools = ToolSummary(
+    cast(mock.AsyncMock, mock_subsystem_manager).tools = ToolSummary(
         left=PipetteInformation(
-            name=FirmwarePipetteName.unknown, name_int=41, model=30, serial="hello"
+            name=FirmwarePipetteName.unknown, name_int=41, model="30", serial="hello"
         ),
         right=None,
-        gripper=GripperInformation(model=0.0, serial="fake_serial"),
+        gripper=GripperInformation(
+            model="0.0",
+            serial="fake_serial",
+        ),
     )
     with pytest.raises(InvalidPipetteName):
         await controller.get_attached_instruments({})
@@ -434,7 +438,7 @@ async def test_get_attached_instruments_handles_unknown_model(
     controller: OT3Controller, mock_subsystem_manager: SubsystemManager
 ) -> None:
 
-    mock_subsystem_manager.tools = ToolSummary(
+    cast(mock.AsyncMock, mock_subsystem_manager).tools = ToolSummary(
         left=PipetteInformation(
             name=FirmwarePipetteName.p1000_single,
             name_int=0,
@@ -442,7 +446,7 @@ async def test_get_attached_instruments_handles_unknown_model(
             serial="hello",
         ),
         right=None,
-        gripper=GripperInformation(model=0.0, serial="fake_serial"),
+        gripper=GripperInformation(model="0", serial="fake_serial"),
     )
     with pytest.raises(InvalidPipetteModel):
         await controller.get_attached_instruments({})
@@ -484,7 +488,9 @@ async def test_gripper_jaw_width(
     controller: OT3Controller, mock_move_group_run: mock.AsyncMock
 ) -> None:
     max_jaw_width = 134350
-    await controller.gripper_hold_jaw(encoder_position_um=((max_jaw_width - 80000) / 2))
+    await controller.gripper_hold_jaw(
+        encoder_position_um=int((max_jaw_width - 80000) / 2)
+    )
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -547,7 +553,7 @@ async def test_get_limit_switches(
 )
 async def test_ready_for_movement(
     controller: OT3Controller,
-    motor_status: MotorStatus,
+    motor_status: Dict[NodeId, MotorStatus],
     ready: bool,
 ) -> None:
     controller._motor_status = motor_status
@@ -614,7 +620,7 @@ async def test_update_motor_status(
 ) -> None:
     async def fake_gmp(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ):
+    ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
         return {node: (0.223, 0.323, False, True) for node in nodes}
 
     with mock.patch(
@@ -632,12 +638,12 @@ async def test_update_motor_status(
 async def test_update_motor_estimation(
     mock_messenger: CanMessenger,
     controller: OT3Controller,
-    axes: Set[NodeId],
+    axes: List[OT3Axis],
     mock_present_devices: None,
 ) -> None:
     async def fake_umpe(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ):
+    ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
         return {node: (0.223, 0.323, False, True) for node in nodes}
 
     with mock.patch(
@@ -669,7 +675,7 @@ async def test_update_motor_estimation(
 async def test_set_default_currents(
     controller: OT3Controller,
     gantry_load: GantryLoad,
-    expected_call: bool,
+    expected_call: List[NodeId],
     mock_present_devices: None,
 ) -> None:
     with mock.patch(
@@ -682,13 +688,15 @@ async def test_set_default_currents(
             mocked_currents.call_args_list[0][0][1],
             use_tip_motor_message_for=expected_call,
         )
-        for k, v in controller._current_settings.items():
+        current_settings = controller._current_settings
+        assert current_settings
+        for k, v in current_settings.items():
             if k == OT3Axis.P_L and (
                 gantry_load == GantryLoad.HIGH_THROUGHPUT
                 and expected_call[0] == NodeId.pipette_left
             ):
                 # q motor config
-                v = controller._current_settings[OT3Axis.Q]
+                v = current_settings[OT3Axis.Q]
                 assert (
                     mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
                     == v.as_tuple()
@@ -785,16 +793,12 @@ async def test_update_required_flag(
 ) -> None:
     """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
     axes = [OT3Axis.X, OT3Axis.Y]
-    mock_subsystem_manager.subsystems = dict(
-        (_device_info_entry(SubSystem.gantry_x), _device_info_entry(SubSystem.gantry_y))
-    )
+    mock_subsystem_manager.update_reuqired.return_value = True
 
-    with mock.patch("builtins.open", mock_open()):
-        # raise FirmwareUpdateRequired if the _update_required flag is set
-        controller._update_required = True
-        controller._initialized = True
-        with pytest.raises(FirmwareUpdateRequired):
-            await controller.home(axes)
+    # raise FirmwareUpdateRequired if the _update_required flag is set
+    controller._initialized = True
+    with pytest.raises(FirmwareUpdateRequired):
+        await controller.home(axes)
 
 
 async def test_update_required_flag_false(
@@ -812,11 +816,11 @@ async def test_update_required_flag_false(
         )
 
     # update_required is false so dont raise FirmwareUpdateRequired
-    controller._update_required = False
+    mock_subsystem_manager.update_required = False
 
     async def fake_umpe(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ):
+    ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
         return {node: (0.223, 0.323, False, True) for node in nodes}
 
     with mock.patch(
@@ -824,7 +828,7 @@ async def test_update_required_flag_false(
         fake_umpe,
     ):
         try:
-            async for status_element in controller.update_firmware({}):
+            async for status_element in controller.update_firmware(set()):
                 pass
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
@@ -834,9 +838,7 @@ async def test_update_required_flag_initialized(
     controller: OT3Controller, mock_subsystem_manager: mock.AsyncMock
 ) -> None:
     """Do not raise FirmwareUpdateRequired if initialized is False."""
-    mock_subsystem_manager.subsystems = dict(
-        (_device_info_entry(SubSystem.gantry_x), _device_info_entry(SubSystem.gantry_y))
-    )
+    mock_subsystem_manager.update_required.return_value = True
 
     for node in controller._motor_nodes():
         controller._motor_status.update(
@@ -844,12 +846,11 @@ async def test_update_required_flag_initialized(
         )
 
     # update_required is true, but initlaized is false so dont raise FirmwareUpdateRequired
-    controller._update_required = True
     controller._initialized = False
 
     async def fake_umpe(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-    ):
+    ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
         return {node: (0.223, 0.323, False, True) for node in nodes}
 
     with mock.patch(
@@ -857,7 +858,7 @@ async def test_update_required_flag_initialized(
         fake_umpe,
     ):
         try:
-            async for status_element in controller.update_firmware({}):
+            async for status_element in controller.update_firmware(set()):
                 pass
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
