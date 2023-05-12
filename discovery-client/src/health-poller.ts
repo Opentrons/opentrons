@@ -29,11 +29,7 @@ const DEFAULT_REQUEST_OPTS: RequestInit = {
   // standalone API client library that app, app-shell, and DC can share
   // NOTE(mc, 2020-11-04): Discovery client should remain locked to the lowest
   // available HTTP API version that satisfies its data needs
-  headers: {
-    'Opentrons-Version': '2',
-    // keeps the serial port socket open for one request, at least
-    Connection: 'keep-alive',
-  },
+  headers: { 'Opentrons-Version': '2' },
 }
 
 /**
@@ -183,8 +179,6 @@ function fetchAndParse<SuccessBody>(
 /**
  * Poll both /heath and /server/update/health of an IP address and combine the
  * responses into a single result object
- * TODO: poll via serial port if connection present and combine in same object if same robot?
- * will poll serial port for every robot
  */
 function pollHealth({
   ip,

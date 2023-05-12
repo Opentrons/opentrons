@@ -1,6 +1,7 @@
 import { DEFAULT_PORT } from './constants'
 import { createHealthPoller } from './health-poller'
 import { createMdnsBrowser } from './mdns-browser'
+
 import * as Store from './store'
 
 import type {
@@ -43,10 +44,7 @@ export function createDiscoveryClient(
     let prevAddrs = getAddresses()
     let prevRobots = getRobots()
 
-    healthPoller.start({
-      list: prevAddrs,
-      interval: healthPollInterval,
-    })
+    healthPoller.start({ list: prevAddrs, interval: healthPollInterval })
     mdnsBrowser.start()
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -55,9 +53,7 @@ export function createDiscoveryClient(
         const addrs = getAddresses()
         const robots = getRobots()
 
-        if (addrs !== prevAddrs) {
-          healthPoller.start({ list: addrs })
-        }
+        if (addrs !== prevAddrs) healthPoller.start({ list: addrs })
         if (robots !== prevRobots) onListChange(robots)
 
         prevAddrs = addrs
@@ -76,10 +72,5 @@ export function createDiscoveryClient(
     }
   }
 
-  return {
-    getRobots,
-    removeRobot,
-    start,
-    stop,
-  }
+  return { getRobots, removeRobot, start, stop }
 }
