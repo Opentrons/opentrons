@@ -15,7 +15,7 @@ from typing import (
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, OFF_DECK
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
@@ -402,7 +402,7 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes],
+        new_location: Union[DeckLocation, ModuleTypes, OFF_DECK],
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
