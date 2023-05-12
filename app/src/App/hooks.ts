@@ -11,7 +11,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_STOPPED,
   RUN_STATUS_FAILED,
-  RUN_STATUS_SUCCEEDED
+  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 
 const CURRENT_RUN_POLL = 5000
@@ -26,13 +26,19 @@ export function useSoftwareUpdatePoll(): void {
 }
 
 export function useCurrentRunRoute(): string | null {
-  const { data: allRuns } = useAllRunsQuery({ pageLength: 1 }, { refetchInterval: CURRENT_RUN_POLL })
+  const { data: allRuns } = useAllRunsQuery(
+    { pageLength: 1 },
+    { refetchInterval: CURRENT_RUN_POLL }
+  )
   const currentRunLink = allRuns?.links?.current ?? null
-  const currentRun = currentRunLink != null &&
+  const currentRun =
+    currentRunLink != null &&
     typeof currentRunLink !== 'string' &&
     'href' in currentRunLink
-    ? allRuns?.data.find(run => run.id === currentRunLink.href.replace('/runs/', '')) // trim link path down to only runId
-    : null
+      ? allRuns?.data.find(
+          run => run.id === currentRunLink.href.replace('/runs/', '')
+        ) // trim link path down to only runId
+      : null
 
   const status = currentRun?.status
   const actions = currentRun?.actions
@@ -41,15 +47,18 @@ export function useCurrentRunRoute(): string | null {
   const hasBeenStarted = actions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
-  if (status === RUN_STATUS_SUCCEEDED ||
+  if (
+    status === RUN_STATUS_SUCCEEDED ||
     status === RUN_STATUS_STOPPED ||
-    status === RUN_STATUS_FAILED) {
+    status === RUN_STATUS_FAILED
+  ) {
     return `/runs/${currentRun.id}/summary`
-  } else if (status === RUN_STATUS_IDLE || (!hasBeenStarted && status === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)) {
+  } else if (
+    status === RUN_STATUS_IDLE ||
+    (!hasBeenStarted && status === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+  ) {
     return `/runs/${currentRun.id}/setup`
   } else {
     return `/runs/${currentRun.id}/run`
   }
 }
-
-

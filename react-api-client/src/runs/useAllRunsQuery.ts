@@ -4,11 +4,16 @@ import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
-export type UseAllRunsQueryOptions = UseQueryOptions<Runs, Error, Runs, Array<string | HostConfig>>
+export type UseAllRunsQueryOptions = UseQueryOptions<
+  Runs,
+  Error,
+  Runs,
+  Array<string | HostConfig>
+>
 
 export function useAllRunsQuery(
   params: GetRunsParams = {},
-  options: UseQueryOptions<Runs, Error, Runs, Array<string | HostConfig>> = {},
+  options: UseAllRunsQueryOptions = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs> {
   const contextHost = useHost()
