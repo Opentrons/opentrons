@@ -29,7 +29,7 @@ export function RobotDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useAllRunsQuery()
   const protocolsData = protocols.data?.data ?? []
-  const runData = runs.data?.data != null ? runs.data?.data : []
+  const runData = runs.data?.data ?? []
 
   /** Currently the max number of displaying recent run protocol is 8 */
   const sortedProtocols =
