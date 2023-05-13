@@ -45,10 +45,10 @@ export function WelcomedModal({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         width="100%"
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <img
             src={welcomeModalImage}
             alt="Welcome Modal Main image"
