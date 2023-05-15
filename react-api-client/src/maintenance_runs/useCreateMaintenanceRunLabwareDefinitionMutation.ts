@@ -12,36 +12,43 @@ import type {
 } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
+interface CreateMaintenanceRunLabwareDefinitionMutateParams {
+  maintenanceRunId: string
+  labwareDef: LabwareDefinition2
+}
+
 export type UseCreateLabwareDefinitionMutationResult = UseMutationResult<
   LabwareDefinitionSummary,
   unknown,
-  LabwareDefinition2
+  CreateMaintenanceRunLabwareDefinitionMutateParams
 > & {
   createLabwareDefinition: UseMutateAsyncFunction<
     LabwareDefinitionSummary,
     unknown,
-    LabwareDefinition2
+    CreateMaintenanceRunLabwareDefinitionMutateParams
   >
 }
 
 export type UseCreateLabwareDefinitionMutationOptions = UseMutationOptions<
   LabwareDefinitionSummary,
   unknown,
-  LabwareDefinition2
+  CreateMaintenanceRunLabwareDefinitionMutateParams
 >
 
-export function useCreateLabwareDefinitionMutation(
-  maintenanceRunId: string
-): UseCreateLabwareDefinitionMutationResult {
+export function useCreateMaintenanceRunLabwareDefinitionMutation(): UseCreateLabwareDefinitionMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
     LabwareDefinitionSummary,
     unknown,
-    LabwareDefinition2
-  >((labwareDef: LabwareDefinition2) =>
-    createMaintenanceRunLabwareDefinition(host as HostConfig, maintenanceRunId, labwareDef).then(response => {
+    CreateMaintenanceRunLabwareDefinitionMutateParams
+  >(({ maintenanceRunId, labwareDef }) =>
+    createMaintenanceRunLabwareDefinition(
+      host as HostConfig,
+      maintenanceRunId,
+      labwareDef
+    ).then(response => {
       queryClient
         .invalidateQueries([host, 'maintenance_runs'])
         .catch((e: Error) =>

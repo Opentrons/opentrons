@@ -7,7 +7,7 @@ import {
 import {
   UseMutationResult,
   useMutation,
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
 } from 'react-query'
 import { useHost } from '../api'
@@ -18,7 +18,7 @@ export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
   AxiosError,
   CreateMaintenanceRunData
 > & {
-  createMaintenanceRun: UseMutateFunction<
+  createMaintenanceRun: UseMutateAsyncFunction<
     MaintenanceRun,
     AxiosError,
     CreateMaintenanceRunData
@@ -53,6 +53,6 @@ export function useCreateMaintenanceRunMutation(
   )
   return {
     ...mutation,
-    createMaintenanceRun: mutation.mutate,
+    createMaintenanceRun: mutation.mutateAsync,
   }
 }
