@@ -52,7 +52,7 @@ async def create_simulating_runner(
         hardware_api=simulating_hardware_api,
         config=ProtocolEngineConfig(
             robot_type=robot_type,
-            deck_type=DeckType(deck_type.for_robot_type(robot_type)),
+            deck_type=DeckType(deck_type.for_simulation(robot_type)),
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
