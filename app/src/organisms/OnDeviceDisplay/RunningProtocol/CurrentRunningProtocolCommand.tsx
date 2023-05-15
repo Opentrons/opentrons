@@ -153,7 +153,7 @@ export function CurrentRunningProtocolCommand({
           <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
-            fontWeight="700"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             {currentRunStatus}
           </StyledText>
