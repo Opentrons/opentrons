@@ -257,7 +257,6 @@ function PrepareToRun({
   const onPlay = (): void => {
     if (isReadyToRun) {
       play()
-      history.push(`/protocols/${runId}/run`)
     } else {
       setShowSnackbar(true)
     }
