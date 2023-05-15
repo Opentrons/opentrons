@@ -303,6 +303,20 @@
           }
         }
       }
+    },
+    "stackingOverlapWithLabware": {
+      "type": "object",
+      "description": "Supported labware that can be stacked upon, with overlap height between both labware",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "stackingOverlapWithModule": {
+      "type": "object",
+      "description": "Supported module that can be stacked upon, with overlap height between labware and module",
+      "additionalProperties": {
+        "type": "number"
+      }
     }
   }
 }
