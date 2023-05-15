@@ -38,7 +38,7 @@ export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
   const port = new SerialPort({ path: opts.serialPort, baudRate: 115200 })
   const usbAgent = agent(
     (req: http.ClientRequest, opts: http.RequestOptions): Duplex => {
-      if (!port.isOpen) port.open()
+      if (!port.isOpen && !port.opening) port.open()
       return port
     }
   )
