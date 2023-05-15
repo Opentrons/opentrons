@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -37,16 +36,16 @@ describe('ConfirmRobotName', () => {
   })
 
   it('should render text, an image and a button', () => {
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('otie, love it!')
-    getByText('Your robot is ready to go!')
-    getByRole('button', { name: 'Finish setup' })
+    getByText('ma.')
+    getByText('Finish setup')
   })
 
   it('when tapping a button, call a mock function', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Finish setup' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    const button = getByText('Finish setup')
+    button.click()
     expect(mockPush).toBeCalledWith('/dashboard')
   })
 })
