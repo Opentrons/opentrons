@@ -32,7 +32,6 @@ import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from './hooks'
 import {
   DeviceReset,
-  DisplayLEDLights,
   TouchscreenBrightness,
   TouchScreenSleep,
   TextSize,
@@ -49,10 +48,10 @@ import type { Dispatch, State } from '../../redux/types'
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   height: 6.875rem;
-  margin-bottom: ${SPACING.spacing3};
+  margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.medGreyEnabled};
   padding: 1.5rem;
-  border-radius: ${BORDERS.size_four};
+  border-radius: ${BORDERS.size4};
 `
 export type SettingOption =
   | 'NetworkSettings'
@@ -88,9 +87,9 @@ export function RobotSettingsDashboard(): JSX.Element {
   return (
     // This top level Flexbox only exists to position the temporary
     // "To ODD Menu" button on the bottom. When it goes, so can this.
-    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing8}>
       {currentOption != null ? (
-        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} columnGap={SPACING.spacing8}>
           <SettingsContent
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
@@ -103,7 +102,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         </Flex>
       ) : (
         <Flex
-          padding={`0 ${SPACING.spacingXXL}`}
+          padding={`0 ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           <Navigation routes={onDeviceDisplayRoutes} />
@@ -200,7 +199,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       )}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        padding={SPACING.spacingXXL}
+        padding={SPACING.spacing40}
         width="fit-content"
       >
         <Link to="menu">
@@ -251,15 +250,15 @@ const RobotSettingButton = ({
     <Btn css={SETTING_BUTTON_STYLE} onClick={handleClick}>
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           <Icon name={iconName} size="3rem" />
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing1}
+            gridGap={SPACING.spacing2}
             alignItems={ALIGN_FLEX_START}
             justifyContent={JUSTIFY_CENTER}
           >
@@ -289,7 +288,7 @@ const RobotSettingButton = ({
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.warningBackgroundMed}
             padding={`0.75rem ${SPACING.spacing4}`}
-            borderRadius={BORDERS.size_four}
+            borderRadius={BORDERS.size4}
           >
             <Icon
               name="ot-alert"
@@ -313,7 +312,7 @@ const RobotSettingButton = ({
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.transparent}
             padding={`0.75rem ${SPACING.spacing4}`}
-            borderRadius={BORDERS.size_four}
+            borderRadius={BORDERS.size4}
           >
             <StyledText
               fontSize="1.75rem"

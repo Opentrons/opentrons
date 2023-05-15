@@ -15,6 +15,7 @@ import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { IconName, StyleProps } from '@opentrons/components'
+import type { ButtonCategory } from './SmallButton'
 
 type MediumButtonTypes =
   | 'primary'
@@ -24,13 +25,12 @@ type MediumButtonTypes =
   | 'tertiaryHigh'
   | 'tertiaryLowLight'
 
-type MediumButtonCategory = 'default' | 'rounded'
 interface MediumButtonProps extends StyleProps {
   buttonText: React.ReactNode
   buttonType?: MediumButtonTypes
   disabled?: boolean
   iconName?: IconName
-  buttonCategory?: MediumButtonCategory
+  buttonCategory?: ButtonCategory
   onClick: React.MouseEventHandler
 }
 
