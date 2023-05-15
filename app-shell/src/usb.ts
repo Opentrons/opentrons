@@ -118,7 +118,7 @@ function startUsbHttpRequests(dispatch: Dispatch): void {
       // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition
       if (ot3UsbSerialPort == null) {
         usbLog.debug('no OT-3 serial port found, retrying')
-        setTimeout(startUsbHttpRequests, 1000)
+        setTimeout(() => startUsbHttpRequests(dispatch), 1000)
         return
       }
 
