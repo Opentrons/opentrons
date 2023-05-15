@@ -185,7 +185,7 @@ export function SelectAuthenticationType({
           padding={SPACING.spacing24}
           width="100%"
           height="6.75rem"
-          borderRadius={BORDERS.size_three}
+          borderRadius={BORDERS.size3}
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
         >

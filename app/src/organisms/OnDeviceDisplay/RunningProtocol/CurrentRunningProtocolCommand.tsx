@@ -177,7 +177,7 @@ export function CurrentRunningProtocolCommand({
       <Flex
         padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
-        borderRadius={BORDERS.size_two}
+        borderRadius={BORDERS.size2}
         justifyContent={JUSTIFY_CENTER}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
