@@ -8,15 +8,10 @@ export function useMissingHardwareChipText(
   const missingProtocolHardwareType = missingProtocolHardware.map(
     hardware => hardware.hardwareType
   )
-  // Note(kj:04/13/2023) This component only check the type and count the number
-  // If we need to display any specific information, we will need to use filter
   const countMissingHardwareType = (hwType: 'pipette' | 'module'): number => {
-    return missingProtocolHardwareType.reduce((acc, hardwareType) => {
-      if (hardwareType === hwType) {
-        return acc + 1
-      }
-      return acc
-    }, 0)
+    return missingProtocolHardwareType.filter(
+      hardwareType => hardwareType === hwType
+    ).length
   }
   const countMissingPipettes = countMissingHardwareType('pipette')
   const countMissingModules = countMissingHardwareType('module')
