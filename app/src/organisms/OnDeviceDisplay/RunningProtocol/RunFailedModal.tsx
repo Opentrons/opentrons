@@ -109,7 +109,7 @@ export function RunFailedModal({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.light1}
-          borderRadius={BORDERS.size_three}
+          borderRadius={BORDERS.size3}
           gridGap={SPACING.spacing8}
           padding={SPACING.spacing16}
           overflowY="scroll"

@@ -89,7 +89,7 @@ export function SetWifiCred({
       </Flex>
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} paddingLeft="6.25rem">
         <StyledText
-          marginBottom="0.75rem"
+          marginBottom={SPACING.spacing12}
           fontSize="1.375rem"
           lineHeight="1.875rem"
           fontWeight="500"

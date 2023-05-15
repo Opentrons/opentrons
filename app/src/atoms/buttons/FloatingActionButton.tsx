@@ -39,7 +39,7 @@ export function FloatingActionButton(
   const contentColor = disabled ? COLORS.darkBlack60 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
     background-color: ${COLORS.highlightPurple1};
-    border-radius: ${BORDERS.size_five};
+    border-radius: ${BORDERS.size5};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: default;
@@ -68,7 +68,7 @@ export function FloatingActionButton(
       fontSize={TYPOGRAPHY.fontSize28}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       lineHeight={TYPOGRAPHY.lineHeight36}
-      padding={`0.75rem ${SPACING.spacing24}`}
+      padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
       position={POSITION_FIXED}
       right={SPACING.spacing24}
       {...buttonProps}

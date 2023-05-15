@@ -329,7 +329,7 @@ function LabwareLatch({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.mediumBlueEnabled}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
@@ -342,7 +342,7 @@ function LabwareLatch({
       lineHeight={TYPOGRAPHY.lineHeight28}
       minWidth="11.0625rem"
       onClick={toggleLatch}
-      padding="0.75rem"
+      padding={SPACING.spacing12}
     >
       <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('labware_latch')}
@@ -445,7 +445,7 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing24}
