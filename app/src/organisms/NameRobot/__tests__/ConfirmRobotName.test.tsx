@@ -38,7 +38,7 @@ describe('ConfirmRobotName', () => {
   it('should render text, an image and a button', () => {
     const [{ getByText }] = render(props)
     getByText('otie, love it!')
-    getByText('ma.')
+    getByText('Your robot is ready to go.')
     getByText('Finish setup')
   })
 
