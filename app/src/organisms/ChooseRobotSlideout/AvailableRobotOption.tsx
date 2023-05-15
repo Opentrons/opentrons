@@ -84,9 +84,9 @@ export function AvailableRobotOption(
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          marginLeft={SPACING.spacing4}
-          marginTop={SPACING.spacing3}
-          marginBottom={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
+          marginTop={SPACING.spacing8}
+          marginBottom={SPACING.spacing16}
         >
           <StyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {robotModel}
@@ -101,8 +101,8 @@ export function AvailableRobotOption(
               <Icon
                 // local boolean corresponds to a wired usb connection
                 aria-label={local ?? false ? 'usb' : 'wifi'}
-                marginBottom={`-${SPACING.spacing2}`}
-                marginLeft={SPACING.spacing3}
+                marginBottom={`-${SPACING.spacing4}`}
+                marginLeft={SPACING.spacing8}
                 name={local ?? false ? 'usb' : 'wifi'}
                 size={SIZE_1}
               />
@@ -125,7 +125,7 @@ export function AvailableRobotOption(
         <StyledText
           as="label"
           color={COLORS.errorText}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
           css={css`
             & > a {
               color: ${COLORS.errorText};

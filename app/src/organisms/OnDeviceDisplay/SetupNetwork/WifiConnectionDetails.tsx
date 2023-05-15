@@ -19,17 +19,12 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import {
-  getNetworkInterfaces,
-  fetchStatus,
-  fetchWifiList,
-} from '../../../redux/networking'
+import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
   SimpleInterfaceStatus,
-  WifiNetwork,
   WifiSecurityType,
 } from '../../../redux/networking/types'
 
@@ -38,7 +33,6 @@ interface WifiConnectionDetailsProps {
   authType?: WifiSecurityType
   showHeader?: boolean
   showWifiListButton?: boolean
-  wifiList?: WifiNetwork[]
 }
 
 export function WifiConnectionDetails({
@@ -46,7 +40,6 @@ export function WifiConnectionDetails({
   authType,
   showHeader = true,
   showWifiListButton = false,
-  wifiList,
 }: WifiConnectionDetailsProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -57,11 +50,10 @@ export function WifiConnectionDetails({
 
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))
-    dispatch(fetchWifiList(robotName))
   }, [robotName, dispatch])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
       {showHeader && <TitleHeader />}
       <DisplayConnectionStatus connected={wifi != null} />
       <DisplayConnectedNetworkInfo
@@ -103,7 +95,7 @@ const DisplayConnectionStatus = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing5)} ${String(SPACING.spacingXXL)}`}
+      padding={`${SPACING.spacing24} ${SPACING.spacing40}`}
       backgroundColor={connected ? COLORS.successBackgroundMed : COLORS.light2}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
@@ -115,7 +107,7 @@ const DisplayConnectionStatus = ({
         color={connected ? COLORS.successEnabled : COLORS.light2}
       />
       <StyledText
-        marginLeft={SPACING.spacing5}
+        marginLeft={SPACING.spacing24}
         fontSize="1.625rem"
         fontWeight="700"
         lineHeight="2.1875rem"
@@ -151,8 +143,8 @@ const DisplayConnectedNetworkInfo = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      paddingX={SPACING.spacing6}
-      paddingY={SPACING.spacing5}
+      paddingX={SPACING.spacing32}
+      paddingY={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.darkGreyDisabled}
       borderRadius={BORDERS.size_three}
@@ -160,7 +152,7 @@ const DisplayConnectedNetworkInfo = ({
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon name="wifi" size="2.4rem" />
         <StyledText
-          marginLeft={SPACING.spacing2}
+          marginLeft={SPACING.spacing4}
           fontSize="1.5rem"
           lineHeight="1.8rem"
           fontWeight="700"
@@ -171,7 +163,7 @@ const DisplayConnectedNetworkInfo = ({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         textAlign={TYPOGRAPHY.textAlignRight}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
       >
         <StyledText fontSize="1.5rem" lineHeight="2.0625rem" fontWeight="400">
           {/* ToDo: if wifi is undefined no data or empty */}
@@ -205,7 +197,7 @@ const DisplayButtons = ({
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      gridGap="0.75rem"
+      gridGap={SPACING.spacing12}
       height="4.375rem"
       marginTop="1.4375rem"
     >

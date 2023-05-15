@@ -9,6 +9,7 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -137,14 +138,14 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       disabled={disabled}
       css={MEDIUM_BUTTON_STYLE}
       aria-label={`MediumButton_${buttonType}`}
-      display="flex"
+      display={DISPLAY_FLEX}
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacingSM}
+      gridGap={SPACING.spacing12}
       padding={
         iconName !== undefined
-          ? `${SPACING.spacingM} ${SPACING.spacing5}`
-          : `${SPACING.spacingM} ${SPACING.spacingXXL}`
+          ? `${SPACING.spacing20} ${SPACING.spacing24}`
+          : `${SPACING.spacing20} ${SPACING.spacing40}`
       }
       {...buttonProps}
     >
@@ -157,7 +158,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
               ? COLORS.darkBlack60
               : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
-          size={SPACING.spacingXXL}
+          size={SPACING.spacing40}
         />
       )}
       <StyledText

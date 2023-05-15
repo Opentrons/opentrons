@@ -83,8 +83,8 @@ export function Chip({
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-      gridGap={SPACING.spacing3}
+      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+      gridGap={SPACING.spacing8}
       data-testid={`Chip_${type}`}
       {...styleProps}
     >

@@ -38,7 +38,7 @@ export function RobotSystemVersionModal({
   const history = useHistory()
 
   return (
-    <Flex padding={SPACING.spacingXXL}>
+    <Flex padding={SPACING.spacing40}>
       <Modal
         title={t('robot_system_version_available', {
           releaseVersion: version,
@@ -54,11 +54,11 @@ export function RobotSystemVersionModal({
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
+            paddingX={SPACING.spacing16}
+            paddingY={SPACING.spacing24}
             backgroundColor={COLORS.light2}
-            paddingX={SPACING.spacing4}
-            paddingY={SPACING.spacing5}
             borderRadius={BORDERS.size_three}
-            marginY={SPACING.spacing5}
+            marginY={SPACING.spacing24}
           >
             <Icon
               size="1.5rem"
@@ -75,7 +75,7 @@ export function RobotSystemVersionModal({
           </Flex>
           <ReleaseNotes source={releaseNotes} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} gridGap="0.75rem">
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing12}>
           <SecondaryButton
             flex="1"
             onClick={() => setShowModal(false)}

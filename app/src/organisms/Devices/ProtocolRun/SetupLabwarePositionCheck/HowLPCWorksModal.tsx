@@ -32,7 +32,7 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
         width="31.25rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" marginBottom={SPACING.spacing4}>
+          <StyledText as="p" marginBottom={SPACING.spacing16}>
             {t('what_labware_offset_is')}
           </StyledText>
           <Link
@@ -40,16 +40,16 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
             href={OFFSET_DATA_HELP_ARTICLE}
             id="HowLPCWorksModal_helpArticleLink2"
             external
-            marginBottom={SPACING.spacing4}
+            marginBottom={SPACING.spacing16}
           >
             {t('learn_more_about_offset_data')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>
-          <StyledText as="p" marginBottom={SPACING.spacing4}>
+          <StyledText as="p" marginBottom={SPACING.spacing16}>
             {t('why_use_lpc')}
           </StyledText>
           <Link
@@ -57,12 +57,12 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
             css={TYPOGRAPHY.linkPSemiBold}
             href={ROBOT_CAL_HELP_ARTICLE}
             id="HowLPCWorksModal_helpArticleLink1"
-            marginBottom={SPACING.spacing4}
+            marginBottom={SPACING.spacing16}
           >
             {t('learn_more_about_robot_cal_offset')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>

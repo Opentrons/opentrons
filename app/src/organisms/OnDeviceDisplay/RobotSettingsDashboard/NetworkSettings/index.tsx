@@ -18,7 +18,7 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { Chip } from '../../../../atoms/Chip'
-import { getWifiList } from '../../../../redux/networking'
+import { useWifiList } from '../../../../resources/networking/hooks'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { EthernetConnectionDetails } from './EthernetConnectionDetails'
 import { WifiConnectionDetails } from './WifiConnectionDetails'
@@ -26,8 +26,7 @@ import { WifiConnectionDetails } from './WifiConnectionDetails'
 import type { IconName } from '@opentrons/components'
 import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
 import type { ChipType } from '../../../../atoms/Chip'
-import type { SettingOption } from '../../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import type { State } from '../../../../redux/types'
+import type { SettingOption } from '../../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
 
@@ -53,7 +52,7 @@ export function NetworkSettings({
   } = networkConnection
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const list = useSelector((state: State) => getWifiList(state, robotName))
+  const list = useWifiList(robotName)
   const connectedWifiAuthType = list.find(wifi => wifi.ssid === activeSsid)
     ?.securityType
 
@@ -99,10 +98,10 @@ export function NetworkSettings({
       default:
         return (
           <Flex
-            paddingX={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            paddingX={SPACING.spacing40}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {/* wifi */}
             <NetworkSettingButton
@@ -149,7 +148,7 @@ export function NetworkSettings({
   return (
     <>
       <Flex
-        padding={`${SPACING.spacing6} ${SPACING.spacingXXL}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_START}
       >
@@ -189,16 +188,16 @@ function NetworkSettingButton({
     <>
       <Btn
         width="100%"
-        padding={SPACING.spacing5}
+        padding={SPACING.spacing24}
         backgroundColor={buttonBackgroundColor}
         borderRadius={BORDERS.size_three}
         onClick={displayDetailsTab}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
-          <Flex gridGap={SPACING.spacing3} width="34.8125rem">
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing5}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+          <Flex gridGap={SPACING.spacing8} width="34.8125rem">
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing24}>
               <Icon name={iconName} size="3rem" />
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing1}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}

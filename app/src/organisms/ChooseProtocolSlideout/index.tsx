@@ -150,7 +150,7 @@ export function ChooseProtocolSlideoutComponent(
       }
     >
       {storedProtocols.length > 0 ? (
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {storedProtocols.map(storedProtocol => {
             const isSelected =
               selectedProtocol != null &&
@@ -174,7 +174,7 @@ export function ChooseProtocolSlideoutComponent(
                     <Box
                       marginY={SPACING.spacingAuto}
                       backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                      marginRight={SPACING.spacing4}
+                      marginRight={SPACING.spacing16}
                       height="4.25rem"
                       width="4.75rem"
                     >
@@ -215,8 +215,8 @@ export function ChooseProtocolSlideoutComponent(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_BLOCK}
-                    marginTop={`-${SPACING.spacing2}`}
-                    marginBottom={SPACING.spacing3}
+                    marginTop={`-${SPACING.spacing4}`}
+                    marginBottom={SPACING.spacing8}
                   >
                     {runCreationErrorCode === 409 ? (
                       <Trans
@@ -250,7 +250,7 @@ export function ChooseProtocolSlideoutComponent(
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           minHeight="11rem"
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
           css={BORDERS.cardOutlineBorder}
         >
           <Icon
@@ -261,14 +261,14 @@ export function ChooseProtocolSlideoutComponent(
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             role="heading"
           >
             {t('no_protocols_found')}
           </StyledText>
           <StyledText
             as="p"
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             <Trans

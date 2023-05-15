@@ -73,6 +73,14 @@ from .drop_tip import (
     DropTipCommandType,
 )
 
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
+)
+
 from .home import (
     Home,
     HomeParams,
@@ -211,6 +219,7 @@ Command = Union[
     BlowOut,
     BlowOutInPlace,
     DropTip,
+    DropTipInPlace,
     Home,
     LoadLabware,
     LoadLiquid,
@@ -263,6 +272,7 @@ CommandParams = Union[
     BlowOutParams,
     BlowOutInPlaceParams,
     DropTipParams,
+    DropTipInPlaceParams,
     HomeParams,
     LoadLabwareParams,
     LoadLiquidParams,
@@ -316,6 +326,7 @@ CommandType = Union[
     BlowOutCommandType,
     BlowOutInPlaceCommandType,
     DropTipCommandType,
+    DropTipInPlaceCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
     LoadLiquidCommandType,
@@ -368,6 +379,7 @@ CommandCreate = Union[
     BlowOutCreate,
     BlowOutInPlaceCreate,
     DropTipCreate,
+    DropTipInPlaceCreate,
     HomeCreate,
     LoadLabwareCreate,
     LoadLiquidCreate,
@@ -420,6 +432,7 @@ CommandResult = Union[
     BlowOutResult,
     BlowOutInPlaceResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
     LoadLabwareResult,
     LoadLiquidResult,

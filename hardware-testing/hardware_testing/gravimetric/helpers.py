@@ -4,6 +4,9 @@ from types import MethodType
 from typing import Any, List, Dict, Optional
 
 from opentrons import protocol_api
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.thread_manager import ThreadManager
@@ -65,6 +68,7 @@ def get_api_context(
     return protocol_api.create_protocol_context(
         api_version=APIVersion.from_string(api_level),
         hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
+        deck_type=guess_deck_type_from_global_config(),
         extra_labware=extra_labware,
     )
 
