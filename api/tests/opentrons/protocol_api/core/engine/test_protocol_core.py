@@ -38,7 +38,12 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor, FlowRates, OFF_DECK_LOCATION
+from opentrons.protocol_engine.types import (
+    Liquid as PE_Liquid,
+    HexColor,
+    FlowRates,
+    OFF_DECK_LOCATION,
+)
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,

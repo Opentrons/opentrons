@@ -63,7 +63,11 @@ class Point(NamedTuple):
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
-OFF_DECK = "off_deck"
+class _OffDeckType(enum.Enum):
+    OFF_DECK = "off-deck"
+
+
+OFF_DECK = _OffDeckType.OFF_DECK
 
 LocationLabware = Union[
     "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"

@@ -427,6 +427,24 @@ def test_move_labware_off_deck(
     )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_move_labware_off_deck_raises(subject: ProtocolContext, decoy: Decoy) -> None:
+    """It should raise an APIVersionError if moving a labware off deck."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    with pytest.raises(APIVersionError):
+        subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+
+
 def test_load_module(
     decoy: Decoy,
     mock_core: ProtocolCore,

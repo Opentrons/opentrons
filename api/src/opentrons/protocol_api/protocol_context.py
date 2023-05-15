@@ -12,6 +12,7 @@ from typing import (
     Mapping,
     cast,
 )
+from typing_extensions import Literal
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -402,7 +403,7 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes, OFF_DECK],
+        new_location: Union[DeckLocation, ModuleTypes, Literal[OFF_DECK]],
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
@@ -419,6 +420,9 @@ class ProtocolContext(CommandPublisher):
 
         :param new_location: Deck slot location, a hardware module that is already
                              loaded on the deck using :py:meth:`load_module` or off deck using :py:type OFF_DECK.
+
+                            .. versionchanged:: 2.15
+                            Added :py:type OFF_DECK as the new location.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -444,6 +448,11 @@ class ProtocolContext(CommandPublisher):
         if not isinstance(labware, Labware):
             raise ValueError(
                 f"Expected labware of type 'Labware' but got {type(labware)}."
+            )
+
+        if new_location == OFF_DECK and self._api_version < APIVersion(2, 15):
+            raise APIVersionError(
+                f"Moving a labware off deck is only available in versions 2.15 and above."
             )
 
         if isinstance(new_location, ModuleContext):

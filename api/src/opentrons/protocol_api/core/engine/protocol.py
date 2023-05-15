@@ -26,7 +26,10 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
 )
-from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel, OFF_DECK_LOCATION
+from opentrons.protocol_engine.types import (
+    ModuleModel as ProtocolEngineModuleModel,
+    OFF_DECK_LOCATION,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
