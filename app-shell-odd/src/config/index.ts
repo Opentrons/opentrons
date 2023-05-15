@@ -23,7 +23,7 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
-export const ODD_DIR = '/data/ODD'
+const ODD_DIR = '/data/ODD'
 
 // Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
 const BRIGHTNESS_FILE =
