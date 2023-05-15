@@ -2,9 +2,9 @@ import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../../../i18n'
-import { useMissingHardwareChipText } from '..'
+import { useMissingHardwareText } from '..'
 
-describe('useMissingHardwareChipText', () => {
+describe('useMissingHardwareText', () => {
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
     wrapper = ({ children }) => (
@@ -12,7 +12,7 @@ describe('useMissingHardwareChipText', () => {
     )
   })
   it('should return string for ready', () => {
-    const { result } = renderHook(() => useMissingHardwareChipText([]), {
+    const { result } = renderHook(() => useMissingHardwareText([]), {
       wrapper,
     })
     expect(result.current).toEqual('Ready to run')
@@ -20,7 +20,7 @@ describe('useMissingHardwareChipText', () => {
   it('should return missing 1 module', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareChipText([
+        useMissingHardwareText([
           {
             hardwareType: 'module',
             moduleModel: 'temperatureModuleV2',
@@ -37,7 +37,7 @@ describe('useMissingHardwareChipText', () => {
   it('should return missing 2 modules', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareChipText([
+        useMissingHardwareText([
           {
             hardwareType: 'module',
             moduleModel: 'temperatureModuleV2',
@@ -60,7 +60,7 @@ describe('useMissingHardwareChipText', () => {
   it('should return missing 1 pipette', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareChipText([
+        useMissingHardwareText([
           {
             hardwareType: 'pipette',
             pipetteName: 'p1000_96',
@@ -77,7 +77,7 @@ describe('useMissingHardwareChipText', () => {
   it('should return missing 2 pipettes', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareChipText([
+        useMissingHardwareText([
           {
             hardwareType: 'pipette',
             pipetteName: 'p50_multi_gen3',
@@ -100,7 +100,7 @@ describe('useMissingHardwareChipText', () => {
   it('should return missing hardware', () => {
     const { result } = renderHook(
       () =>
-        useMissingHardwareChipText([
+        useMissingHardwareText([
           {
             hardwareType: 'pipette',
             pipetteName: 'p50_multi_gen3',

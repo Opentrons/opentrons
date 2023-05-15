@@ -1,1 +1,1 @@
-export * from './useMissingHardwareChipText'
+export * from './useMissingHardwareText'

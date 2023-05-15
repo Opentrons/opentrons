@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
-export function useMissingHardwareChipText(
+export function useMissingHardwareText(
   missingProtocolHardware: ProtocolHardware[]
 ): string {
   const { t, i18n } = useTranslation('device_details')

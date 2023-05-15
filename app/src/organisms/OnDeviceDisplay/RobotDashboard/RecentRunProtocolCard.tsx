@@ -20,7 +20,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
-import { useMissingHardwareChipText } from './hooks'
+import { useMissingHardwareText } from './hooks'
 import type { Run } from '@opentrons/api-client'
 interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
@@ -42,7 +42,7 @@ export function RecentRunProtocolCard({
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useMissingHardwareChipText(missingProtocolHardware)
+  const chipText = useMissingHardwareText(missingProtocolHardware)
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (createRunResponse: Run): void =>

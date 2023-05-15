@@ -17,7 +17,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useMissingHardwareChipText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
@@ -53,8 +53,8 @@ const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.Mocked
   typeof useMissingProtocolHardware
 >
 
-const mockUseMissingHardwareChipText = useMissingHardwareChipText as jest.MockedFunction<
-  typeof useMissingHardwareChipText
+const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
+  typeof useMissingHardwareText
 >
 
 const render = (path = '/protocols/fakeProtocolId') => {
@@ -75,7 +75,7 @@ describe('ODDProtocolDetails', () => {
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-    mockUseMissingHardwareChipText.mockReturnValue(
+    mockUseMissingHardwareText.mockReturnValue(
       'mock missing hardware chip text'
     )
     mockUseMissingProtocolHardware.mockReturnValue([])

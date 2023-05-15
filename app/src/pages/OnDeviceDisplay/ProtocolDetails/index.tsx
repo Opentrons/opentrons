@@ -29,7 +29,7 @@ import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
-import { useMissingHardwareChipText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useMissingHardwareText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import {
   Modal,
   SmallModalChildren,
@@ -233,7 +233,7 @@ export function ProtocolDetails(): JSX.Element | null {
   ])
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
-  const chipText = useMissingHardwareChipText(missingProtocolHardware)
+  const chipText = useMissingHardwareText(missingProtocolHardware)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
   const host = useHost()
