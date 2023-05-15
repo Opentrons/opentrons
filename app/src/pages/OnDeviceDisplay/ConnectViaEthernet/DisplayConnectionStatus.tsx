@@ -35,7 +35,7 @@ export function DisplayConnectionStatus({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={isConnected ? COLORS.green3 : COLORS.darkBlack20}
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         justifyContent={JUSTIFY_CENTER}
