@@ -51,8 +51,13 @@ export interface UiInitializedAction {
   meta: { shell: true }
 }
 
+export type UsbRequestsAction =
+  | { type: 'shell:USB_HTTP_REQUESTS_START'; meta: { shell: true } }
+  | { type: 'shell:USB_HTTP_REQUESTS_STOP'; meta: { shell: true } }
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotLogsAction
   | RobotSystemAction
+  | UsbRequestsAction
