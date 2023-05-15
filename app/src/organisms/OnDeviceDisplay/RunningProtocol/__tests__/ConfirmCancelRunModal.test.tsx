@@ -18,6 +18,7 @@ import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../redux/analytics')
+jest.mock('../../../ProtocolUpload/hooks')
 
 const mockPush = jest.fn()
 let mockStopRun: jest.Mock
@@ -133,7 +134,6 @@ describe('ConfirmCancelRunModal', () => {
     props = {
       ...props,
       isActiveRun: false,
-      protocolId: 'mockProtocolId',
     }
     const [{ getByText }] = render(props)
     const button = getByText('Cancel run')
@@ -141,6 +141,6 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockStopRun).toHaveBeenCalled()
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocolId')
+    expect(mockPush).toHaveBeenCalledWith('/dashboard')
   })
 })

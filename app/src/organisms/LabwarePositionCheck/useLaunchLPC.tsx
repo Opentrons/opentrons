@@ -17,6 +17,7 @@ export function useLaunchLPC(
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(
     null
   )
+  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
 
   const handleCloseLPC = (): void => {
     if (maintenanceRunId != null) {
@@ -30,7 +31,15 @@ export function useLaunchLPC(
   return {
     launchLPC: () =>
       createMaintenanceRun(
-        {},
+        {
+          labwareOffsets: currentOffsets.map(
+            ({ vector, location, definitionUri }) => ({
+              vector,
+              location,
+              definitionUri,
+            })
+          ),
+        },
         {
           onSuccess: maintenanceRun =>
             setMaintenanceRunId(maintenanceRun.data.id),
