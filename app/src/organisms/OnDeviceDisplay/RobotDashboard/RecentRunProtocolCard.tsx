@@ -12,15 +12,14 @@ import {
   DIRECTION_COLUMN,
   BORDERS,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
-import { useRunControls } from '../../RunTimeControl/hooks'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
+import { useCloneRun } from '../../ProtocolUpload/hooks'
 
 import type { Run } from '@opentrons/api-client'
 
@@ -30,28 +29,25 @@ interface RecentRunProtocolCardProps {
   /** protocol id that was run recently  */
   protocolId: string
   /** the time that this recent run was created  */
-  lastRun?: string
+  lastRun: string
+  runId: string
 }
 
 export function RecentRunProtocolCard({
   protocolName,
   protocolId,
   lastRun,
+  runId,
 }: RecentRunProtocolCardProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const { data: allRuns } = useAllRunsQuery()
-  const runId =
-    allRuns?.data.find(run => run.protocolId === protocolId)?.id ?? null
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (createRunResponse: Run): void =>
-    runId != null
-      ? history.push(`protocols/${runId}/setup`)
-      : history.push(`protocols/${createRunResponse.data.id}`)
-  const { reset } = useRunControls(runId, onResetSuccess)
+    history.push(`protocols/${createRunResponse.data.id}/setup`)
+  const { cloneRun } = useCloneRun(runId, onResetSuccess)
 
   const PROTOCOL_CARD_STYLE = css`
     &:active {
@@ -116,7 +112,7 @@ export function RecentRunProtocolCard({
     chipText = t('missing_both')
   }
   const handleCardClick = (): void => {
-    reset()
+    cloneRun()
     trackEvent({
       name: 'proceedToRun',
       properties: { sourceLocation: 'RecentRunProtocolCard' },
@@ -136,8 +132,6 @@ export function RecentRunProtocolCard({
       borderRadius={BORDERS.size4}
       onClick={handleCardClick}
     >
-      {/* marginLeft is needed to cancel chip's padding */}
-      {/* <Flex marginLeft={`-${SPACING.spacing16}`}> */}
       <Flex>
         <Chip
           paddingLeft="0"

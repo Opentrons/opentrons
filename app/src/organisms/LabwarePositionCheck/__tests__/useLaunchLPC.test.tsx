@@ -13,6 +13,8 @@ import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysi
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
+import type { LabwareOffset } from '@opentrons/api-client'
+
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../useMostRecentCompletedAnalysis')
@@ -32,6 +34,23 @@ const mockLabwarePositionCheck = LabwarePositionCheck as jest.MockedFunction<
 >
 const MOCK_RUN_ID = 'mockRunId'
 const MOCK_MAINTENANCE_RUN_ID = 'mockMaintenanceRunId'
+const mockCurrentOffsets: LabwareOffset[] = [
+  {
+    createdAt: '2022-12-20T14:06:23.562082+00:00',
+    definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
+    id: 'dceac542-bca4-4313-82ba-d54a19dab204',
+    location: { slotName: '2' },
+    vector: { x: 1, y: 2, z: 3 },
+  },
+  {
+    createdAt: '2022-12-20T14:06:23.562878+00:00',
+    definitionUri:
+      'opentrons/opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1',
+    id: '70ae2e31-716b-4e1f-a90c-9b0dfd4d7feb',
+    location: { slotName: '1', moduleModel: 'heaterShakerModuleV1' },
+    vector: { x: 0, y: 0, z: 0 },
+  },
+]
 
 describe('useLaunchLPC hook', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -61,7 +80,13 @@ describe('useLaunchLPC hook', () => {
     ))
     when(mockUseRunQuery)
       .calledWith(MOCK_RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({ data: {} } as any)
+      .mockReturnValue({
+        data: {
+          data: {
+            labwareOffsets: mockCurrentOffsets,
+          },
+        },
+      } as any)
     when(mockUseCreateMaintenanceRunMutation)
       .calledWith()
       .mockReturnValue({
@@ -86,11 +111,19 @@ describe('useLaunchLPC hook', () => {
     expect(result.current.LPCWizard).toEqual(null)
   })
 
-  it('returns creates maintenance run when create callback is called, closes and deletes when exit is clicked', () => {
+  it('returns creates maintenance run with current offsets when create callback is called, closes and deletes when exit is clicked', () => {
     const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
     result.current.launchLPC()
     expect(mockCreateMaintenanceRun).toHaveBeenCalledWith(
-      {},
+      {
+        labwareOffsets: mockCurrentOffsets.map(
+          ({ vector, location, definitionUri }) => ({
+            vector,
+            location,
+            definitionUri,
+          })
+        ),
+      },
       { onSuccess: expect.any(Function) }
     )
     expect(result.current.LPCWizard).not.toBeNull()
