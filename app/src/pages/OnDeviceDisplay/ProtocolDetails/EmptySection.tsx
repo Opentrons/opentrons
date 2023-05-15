@@ -24,7 +24,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
   return (
     <Flex
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       width="100%"
       height="12.625rem"
       padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
