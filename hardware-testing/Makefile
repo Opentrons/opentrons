@@ -71,6 +71,10 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONY: test-photometric
+test-photometric:
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
+
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1
