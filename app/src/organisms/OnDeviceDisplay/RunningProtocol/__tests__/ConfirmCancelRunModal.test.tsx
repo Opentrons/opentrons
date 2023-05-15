@@ -141,6 +141,6 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockStopRun).toHaveBeenCalled()
     expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
-    expect(mockPush).toHaveBeenCalledWith('/dashboard')
+    expect(mockPush).toHaveBeenCalledWith('/protocols')
   })
 })
