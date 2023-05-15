@@ -94,7 +94,6 @@ describe('ProtocolInstrumentMountItem', () => {
     getByText('Left mount')
     getByText('Calibrated')
     getByText('Flex 8-Channel 1000 μL')
-    getByText('Calibrate')
   })
   it('renders the pipette with no cal data and the calibration button and clicking on it launches the correct flow ', () => {
     props = {
