@@ -13,13 +13,12 @@ from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, 
 from opentrons.hardware_control.types import CriticalPoint
 
 def convert(seconds):
-    seconds = seconds % (24 * 3600)
-    hour = seconds // 3600
-    seconds %= 3600
-    minutes = seconds // 60
-    seconds %= 60
+    weeks, seconds = divmod(seconds, 7*24*60*60)
+    days, seconds = divmod(seconds, 24*60*60)
+    hours, seconds = divmod(seconds, 60*60)
+    minutes, seconds = divmod(seconds, 60)
 
-    return "%d:%02d:%02d" % (hour, minutes, seconds)
+    return "%02d:%02d:%02d:%02d:%02d" % (weeks, days, hours, minutes, seconds)
 
 def _create_points(pos_max_left, pos_max_right, pos_min_left, pos_min_right, x_pt, y_pt, z_pt):
     return {
