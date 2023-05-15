@@ -7,7 +7,7 @@ export function Divider(props: Props): JSX.Element {
   return (
     <Box
       borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
-      marginY={SPACING.spacing2}
+      marginY={SPACING.spacing4}
       {...props}
       data-testid="divider"
     />

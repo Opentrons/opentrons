@@ -39,7 +39,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border-radius: ${BORDERS.size_three};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green3 : COLORS.yellow3};
@@ -92,7 +92,7 @@ export function ProtocolInstrumentMountItem(
           <Flex
             flex="2"
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
           >
             <MountLabel>
               {i18n.format(
@@ -110,7 +110,7 @@ export function ProtocolInstrumentMountItem(
           <Flex
             flex="1"
             alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
             justifyContent={JUSTIFY_FLEX_START}
           >
             <Icon

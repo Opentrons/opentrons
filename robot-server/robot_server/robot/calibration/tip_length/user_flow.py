@@ -3,6 +3,9 @@ from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 
@@ -56,7 +59,7 @@ class TipCalibrationUserFlow:
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
         self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 

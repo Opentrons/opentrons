@@ -63,13 +63,13 @@ const ProtocolHeader = (props: {
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      margin={SPACING.spacing4}
-      marginBottom={SPACING.spacingXXL}
+      margin={SPACING.spacing16}
+      marginBottom={SPACING.spacing40}
     >
       <Flex
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing4}
-        marginBottom={SPACING.spacing3}
+        gridGap={SPACING.spacing16}
+        marginBottom={SPACING.spacing8}
       >
         <Btn
           paddingLeft="0rem"
@@ -81,7 +81,7 @@ const ProtocolHeader = (props: {
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           maxWidth="42.625rem"
         >
           <Flex maxWidth="15.125rem">
@@ -100,7 +100,7 @@ const ProtocolHeader = (props: {
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
-        marginLeft={SPACING.spacingXXL}
+        marginLeft={SPACING.spacing40}
         maxHeight="3.75rem"
         minWidth="15.6875rem"
       >
@@ -109,7 +109,7 @@ const ProtocolHeader = (props: {
           borderRadius={BORDERS.size_six}
           boxShadow="none"
           onClick={handleRunProtocol}
-          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         >
           <StyledText
             fontSize="2.333125rem"
@@ -142,7 +142,7 @@ interface ProtocolSectionTabsProps {
 const ProtocolSectionTabs = (props: ProtocolSectionTabsProps): JSX.Element => {
   const { currentOption, setCurrentOption } = props
   return (
-    <Flex gridGap={SPACING.spacing3} margin={SPACING.spacing4}>
+    <Flex gridGap={SPACING.spacing8} margin={SPACING.spacing16}>
       {protocolSectionTabOptions.map(option => {
         return (
           <TabbedButton
@@ -166,11 +166,11 @@ const Summary = (props: {
   const { author, description, date } = props
   const { t } = useTranslation('protocol_details')
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         lineHeight={TYPOGRAPHY.lineHeight28}
       >
         <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>{`${t(
@@ -191,9 +191,9 @@ const Summary = (props: {
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         maxWidth="22rem"
-        padding={`${SPACING.spacing3} 0.75rem`}
+        padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
         <StyledText>{`${t('protocol_info:date_added')}: ${
           date != null
@@ -238,7 +238,7 @@ const ProtocolSectionContent = (
       protocolSection = <Deck protocolId={protocolId} />
       break
   }
-  return <Flex margin={SPACING.spacing4}>{protocolSection}</Flex>
+  return <Flex margin={SPACING.spacing16}>{protocolSection}</Flex>
 }
 
 export function ProtocolDetails(): JSX.Element | null {
@@ -316,7 +316,7 @@ export function ProtocolDetails(): JSX.Element | null {
     protocolRecord?.data.files[0].name
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
       {showMaxPinsAlert && (
         <SmallModalChildren
           header={t('too_many_pins_header')}
@@ -340,9 +340,9 @@ export function ProtocolDetails(): JSX.Element | null {
       />
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        margin={SPACING.spacing4}
+        margin={SPACING.spacing16}
       >
         <MediumButton
           buttonText={

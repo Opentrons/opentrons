@@ -147,7 +147,7 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         <Flex
           ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (
@@ -183,7 +183,7 @@ export function RunningProtocol(): JSX.Element {
           <Flex
             marginTop="2rem"
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
@@ -197,9 +197,9 @@ export function RunningProtocol(): JSX.Element {
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
-        paddingRight={SPACING.spacing6}
+        paddingRight={SPACING.spacing32}
       >
         <Link to="/dashboard">
           <TertiaryButton>back to RobotDashboard</TertiaryButton>

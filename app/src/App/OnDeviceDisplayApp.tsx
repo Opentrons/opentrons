@@ -39,8 +39,15 @@ import { SLEEP_NEVER_MS } from './constants'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
+import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
+  {
+    Component: InitialLoadingScreen,
+    exact: true,
+    name: 'Initial Loading Screen',
+    path: '/loading',
+  },
   {
     Component: Welcome,
     exact: true,
@@ -183,13 +190,8 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 const TURN_OFF_BACKLIGHT = 7
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const { sleepMs, unfinishedUnboxingFlowRoute, brightness } = useSelector(
-    getOnDeviceDisplaySettings
-  )
-  const targetPath =
-    unfinishedUnboxingFlowRoute != null
-      ? unfinishedUnboxingFlowRoute
-      : '/dashboard'
+  const { brightness, sleepMs } = useSelector(getOnDeviceDisplaySettings)
+
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
     events: onDeviceDisplayEvents,
@@ -260,7 +262,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   )
                 }
               )}
-              <Redirect exact from="/" to={targetPath} />
+              <Redirect exact from="/" to={'/loading'} />
             </Switch>
           </ToasterOven>
         )}

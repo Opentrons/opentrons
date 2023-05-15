@@ -17,7 +17,8 @@ export const MenuItem = styled.button<ButtonProps>`
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${COLORS.transparent};
   color: ${COLORS.darkBlackEnabled};
-  padding: ${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem;
+  padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
+    ${SPACING.spacing12};
 
   &:hover,
   &:active {

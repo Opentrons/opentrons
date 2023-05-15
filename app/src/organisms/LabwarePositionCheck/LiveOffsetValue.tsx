@@ -28,8 +28,8 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      marginY={SPACING.spacing3}
-      gridGap={SPACING.spacing2}
+      marginY={SPACING.spacing8}
+      gridGap={SPACING.spacing4}
     >
       <StyledText
         as="label"
@@ -40,11 +40,9 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
-        border={`${String(BORDERS.styleSolid)} ${String(
-          SPACING.spacingXXS
-        )} ${String(COLORS.lightGreyHover)}`}
+        border={`${BORDERS.styleSolid} 1px ${COLORS.lightGreyHover}`}
         borderRadius={BORDERS.radiusSoftCorners}
-        padding={SPACING.spacing3}
+        padding={SPACING.spacing8}
         {...styleProps}
       >
         <Icon name="reticle" size={SIZE_1} />
@@ -52,8 +50,8 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
           <React.Fragment key={index}>
             <StyledText
               as="p"
-              marginLeft={SPACING.spacing3}
-              marginRight={SPACING.spacing2}
+              marginLeft={SPACING.spacing8}
+              marginRight={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {axisLabels[index]}

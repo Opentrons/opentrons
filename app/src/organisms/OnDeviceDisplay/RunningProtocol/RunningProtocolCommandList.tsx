@@ -118,11 +118,11 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
@@ -144,7 +144,7 @@ export function RunningProtocolCommandList({
         <Flex
           ref={viewPortRef}
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           height="20.25rem"
           position={POSITION_RELATIVE}
           overflow={OVERFLOW_HIDDEN}
@@ -164,10 +164,10 @@ export function RunningProtocolCommandList({
                 <Flex
                   key={command.id}
                   alignItems={ALIGN_CENTER}
-                  gridGap={SPACING.spacing3}
+                  gridGap={SPACING.spacing8}
                 >
                   <Flex
-                    padding={`0.75rem ${SPACING.spacing5}`}
+                    padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
                     alignItems={ALIGN_CENTER}
                     backgroundColor={backgroundColor}
                     width="100%"

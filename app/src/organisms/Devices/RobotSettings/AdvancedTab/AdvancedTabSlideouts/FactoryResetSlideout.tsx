@@ -149,26 +149,26 @@ export function FactoryResetSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('factory_reset_slideout_description')}
         </StyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Icon
             name="alert-circle"
             size={SIZE_1}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             color={COLORS.warningEnabled}
           />
           <StyledText as="p" color={COLORS.warningText}>
             {t('factory_resets_cannot_be_undone')}
           </StyledText>
         </Flex>
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <Box>
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
               {t('robot_calibration_data')}
@@ -182,7 +182,7 @@ export function FactoryResetSlideout({
             </Link>
           </Flex>
           {isOT3 ? null : (
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
+            <StyledText as="p" marginBottom={SPACING.spacing8}>
               {t('calibration_description')}
             </StyledText>
           )}
@@ -222,11 +222,11 @@ export function FactoryResetSlideout({
             />
           ) : null}
         </Box>
-        <Box marginTop={SPACING.spacing5}>
+        <Box marginTop={SPACING.spacing24}>
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
               {t('protocol_run_history')}
@@ -239,7 +239,7 @@ export function FactoryResetSlideout({
               {t('download')}
             </Link>
           </Flex>
-          <StyledText as="p" marginBottom={SPACING.spacing3}>
+          <StyledText as="p" marginBottom={SPACING.spacing8}>
             {t('protocol_run_history_description')}
           </StyledText>
           {runHistoryOption.map(opt => (
@@ -256,11 +256,11 @@ export function FactoryResetSlideout({
             />
           ))}
         </Box>
-        <Box marginTop={SPACING.spacing5}>
+        <Box marginTop={SPACING.spacing24}>
           <StyledText
             as="p"
             css={TYPOGRAPHY.pSemiBold}
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             {t('boot_scripts')}
           </StyledText>

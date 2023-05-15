@@ -44,8 +44,8 @@ import type { State, Dispatch } from '../../redux/types'
 // Need to update the InputField for the ODD app
 // That will be done in another PR
 const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacingXXL};
-  padding-bottom: ${SPACING.spacingXXL};
+  padding-top: ${SPACING.spacing40};
+  padding-bottom: ${SPACING.spacing40};
   font-size: 2.5rem;
   line-height: 3.25rem;
   text-align: center;
@@ -154,7 +154,7 @@ export function NameRobot(): JSX.Element {
       ) : (
         <>
           <StepMeter totalSteps={5} currentStep={4} OnDevice />
-          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacingXXL}>
+          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacing40}>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -186,7 +186,7 @@ export function NameRobot(): JSX.Element {
                       name="ot-spinner"
                       size="1.25rem"
                       spin
-                      marginRight={SPACING.spacing3}
+                      marginRight={SPACING.spacing8}
                     />
                   ) : null}
                   {t('shared:confirm')}
@@ -204,7 +204,7 @@ export function NameRobot(): JSX.Element {
                 fontSize="1.375rem"
                 lineHeight="1.875rem"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                marginBottom="0.75rem"
+                marginBottom={SPACING.spacing12}
               >
                 {t('name_your_robot_description')}
               </StyledText>
@@ -231,7 +231,7 @@ export function NameRobot(): JSX.Element {
                 fontSize="1.5rem"
                 lineHeight="2.0625rem"
                 fontWeight="500"
-                marginBottom="0.75rem"
+                marginBottom={SPACING.spacing12}
               >
                 {t('name_rule_description')}
               </StyledText>

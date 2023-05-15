@@ -51,10 +51,10 @@ const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
   border-style: ${BORDERS.styleSolid};
-  border-width: ${SPACING.spacingXXS};
+  border-width: 1px;
   border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
@@ -136,10 +136,10 @@ export function LabwareListItem(
                 <Icon
                   name="information"
                   size="0.75rem"
-                  marginTop={SPACING.spacingXS}
+                  marginTop={SPACING.spacing4}
                 />
                 <StyledText
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                   as="p"
                   textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 >
@@ -156,7 +156,7 @@ export function LabwareListItem(
           <StyledText
             as="p"
             color={COLORS.darkGreyEnabled}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {t('heater_shaker_labware_list_view')}
           </StyledText>
@@ -225,8 +225,8 @@ export function LabwareListItem(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
-          marginLeft={SPACING.spacing4}
-          marginRight={SPACING.spacing5}
+          marginLeft={SPACING.spacing16}
+          marginRight={SPACING.spacing24}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
@@ -239,7 +239,7 @@ export function LabwareListItem(
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           <StyledText as="p">{slotInfo}</StyledText>
@@ -254,7 +254,7 @@ export function LabwareListItem(
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              marginTop={SPACING.spacingS}
+              marginTop="3px"
             >
               <ToggleButton
                 label={`heater_shaker_${
