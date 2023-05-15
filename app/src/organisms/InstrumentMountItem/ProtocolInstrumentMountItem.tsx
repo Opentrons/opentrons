@@ -40,7 +40,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.size_three};
+  border-radius: ${BORDERS.size3};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green3 : COLORS.yellow3};
   &:hover,
