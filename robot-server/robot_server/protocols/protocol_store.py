@@ -199,10 +199,11 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all_ids(self) -> List[str]:
         select_ids = sqlalchemy.select(protocol_table.c.id)
         with self._sql_engine.begin() as transaction:
-            protocol_ids = transaction.execute(select_ids).scalars().all()
+            protocol_ids =  transaction.execute(select_ids).scalars().all()
         return protocol_ids
 
     def get_id_by_hash(self, hash: str) -> Optional[str]:
@@ -365,6 +366,7 @@ class ProtocolStore:
 
     def _clear_caches(self) -> None:
         self.get.cache_clear()
+        self.get_all_ids.cache_clear()
         self.get_all.cache_clear()
         self.has.cache_clear()
 
