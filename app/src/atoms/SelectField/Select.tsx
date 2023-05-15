@@ -128,7 +128,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      marginRight: '0.75rem',
+      marginRight: SPACING.spacing12,
       marginLeft: SPACING.spacing4,
       marginTop: '0.2rem',
       fontSize: TYPOGRAPHY.fontSizeP,

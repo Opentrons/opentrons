@@ -45,11 +45,6 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
-  mainWindow = createUi()
-  rendererLogger = createRendererLogger()
-
-  mainWindow.once('closed', () => (mainWindow = null))
-
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -58,6 +53,11 @@ function startUp(): void {
       mainWindow.webContents.send('dispatch', action)
     }
   }
+
+  mainWindow = createUi(dispatch)
+  rendererLogger = createRendererLogger()
+
+  mainWindow.once('closed', () => (mainWindow = null))
 
   log.info('Fetching latest software version')
   updateLatestVersion().catch((error: Error) => {

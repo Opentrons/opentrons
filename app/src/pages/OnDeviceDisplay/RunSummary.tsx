@@ -284,8 +284,8 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size_two} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size_three};
+  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.size3};
   grid-gap: ${SPACING.spacing40};
 `
 
@@ -308,7 +308,7 @@ const SummaryDatum = styled.div`
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_CENTER};
-  padding: ${SPACING.spacing8} 0.75rem;
+  padding: ${SPACING.spacing8} ${SPACING.spacing12};
   grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;

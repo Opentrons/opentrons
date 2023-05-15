@@ -185,7 +185,7 @@ export function SelectAuthenticationType({
           padding={SPACING.spacing24}
           width="100%"
           height="6.75rem"
-          borderRadius={BORDERS.size_three}
+          borderRadius={BORDERS.size3}
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
         >
@@ -199,7 +199,7 @@ export function SelectAuthenticationType({
           </StyledText>
           <Btn
             marginLeft={SPACING.spacing12}
-            padding={`0.75rem ${SPACING.spacing24}`}
+            padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
             width="13.8125rem"
             onClick={() => history.push('/network-setup/usb')}
           >

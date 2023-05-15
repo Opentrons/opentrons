@@ -65,8 +65,11 @@ export function setMixpanelTracking(
       })
     } else {
       log.debug('User has opted out of analytics; stopping tracking')
-      mixpanel.opt_out_tracking()
-      mixpanel.reset()
+      const config = mixpanel?.get_config?.()
+      if (config != null) {
+        mixpanel.opt_out_tracking?.()
+        mixpanel.reset?.()
+      }
     }
   }
 }

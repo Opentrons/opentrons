@@ -207,7 +207,7 @@ exports[`icons back renders correctly 1`] = `
   xmlns="http://www.w3.org/2000/svg"
 >
   <path
-    d="M16.6667 36.6666L0 20L16.6667 3.33331L19 5.70831L4.70833 20L19 34.2916L16.6667 36.6666Z\\" fill=\\"#16212D"
+    d="M16.6667 36.6666L0 20L16.6667 3.33331L19 5.70831L4.70833 20L19 34.2916L16.6667 36.6666Z"
     fillRule="evenodd"
   />
 </svg>

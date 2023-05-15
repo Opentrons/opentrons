@@ -53,7 +53,7 @@ export function WizardRequiredEquipmentList(
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
-            borderRadius={BORDERS.size_three}
+            borderRadius={BORDERS.size3}
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
               <Box
@@ -61,7 +61,7 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText fontSize="1.25rem" paddingY="0.75rem">
+                <StyledText fontSize="1.25rem" paddingY={SPACING.spacing12}>
                   {requiredEquipmentProps.displayName}
                 </StyledText>
                 {/* do not show divider after the last equipment in the list */}

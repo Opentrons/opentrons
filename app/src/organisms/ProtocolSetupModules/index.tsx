@@ -75,7 +75,7 @@ function RowModule({
           ? `${COLORS.successEnabled}${COLORS.opacity20HexCode}`
           : COLORS.warningBackgroundMed
       }
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
       gridGap={SPACING.spacing24}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
