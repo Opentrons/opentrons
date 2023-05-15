@@ -14,7 +14,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -56,14 +55,17 @@ const COMMAND_ROW_STYLE = css`
   -webkit-line-clamp: 2;
   overflow: hidden;
 `
-const BOTTOM_ROW_STYLE = css`
-  position: ${POSITION_ABSOLUTE};
-  bottom: 0;
-  width: 100%;
-  height: 5rem;
-  z-index: 6;
-  backdrop-filter: blur(1.5px);
-`
+
+// Note (kj:05/15/2023)
+// This blur part will be fixed before the launch
+// const BOTTOM_ROW_STYLE = css`
+//   position: ${POSITION_ABSOLUTE};
+//   bottom: 0;
+//   width: 100%;
+//   height: 5rem;
+//   z-index: 6;
+//   backdrop-filter: blur(1.5px);
+// `
 
 interface RunningProtocolCommandListProps {
   runStatus: RunStatus | null
@@ -187,7 +189,7 @@ export function RunningProtocolCommandList({
               )
             }}
           </ViewportList>
-          <Flex css={BOTTOM_ROW_STYLE}></Flex>
+          {/* <Flex css={BOTTOM_ROW_STYLE}></Flex> */}
         </Flex>
       ) : null}
     </Flex>

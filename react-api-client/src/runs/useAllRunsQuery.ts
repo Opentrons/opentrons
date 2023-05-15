@@ -19,8 +19,12 @@ export function useAllRunsQuery(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  let queryKey = [host as HostConfig, 'runs', 'details']
+  if (params?.pageLength != null) {
+    queryKey = [...queryKey, String(params.pageLength)]
+  }
   const query = useQuery(
-    [host as HostConfig, 'runs', 'details'],
+    queryKey,
     () => getRuns(host as HostConfig, params).then(response => response.data),
     { enabled: host !== null, ...options }
   )

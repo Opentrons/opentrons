@@ -95,6 +95,7 @@ export function RunSummary(): JSX.Element {
     : t('run_failed_modal_title')
 
   const handleReturnToDash = (): void => {
+    closeCurrentRun()
     history.push('/')
   }
 
@@ -117,7 +118,6 @@ export function RunSummary(): JSX.Element {
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
     setShowSplash(false)
   }
 
