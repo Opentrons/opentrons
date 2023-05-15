@@ -23,7 +23,7 @@ type SmallButtonTypes =
   | 'tertiaryLowLight'
   | 'tertiaryHighLight'
 
-type SmallButtonCategory = 'default' | 'rounded'
+export type ButtonCategory = 'default' | 'rounded'
 
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
@@ -32,7 +32,7 @@ interface SmallButtonProps extends StyleProps {
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement
   iconName?: IconName
-  buttonCategory?: SmallButtonCategory // if not specified, it will be 'default'
+  buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
 }
 
