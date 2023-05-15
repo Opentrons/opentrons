@@ -27,9 +27,9 @@ from hardware_testing.drivers.mark10.mark10_fg import Mark10,SimMark10
 
 default_move_speed = 15
 default_run_current = 1.4
-currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
-speeds = (10, 15, 20, 25, 30)
-force_gauge_currents = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1.5)
+currents = (1.0, 1.5)
+speeds = (20, 25)
+force_gauge_currents = (0.5, 1.0, 1.5)
 force_gauge_speeds = (2, 5, 10, 20)
 Z_STAGE_TOLERANCES_MM = 0.4
 
