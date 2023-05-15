@@ -69,26 +69,22 @@ const ProtocolHeader = (props: {
       marginX={SPACING.spacing16}
       paddingY={SPACING.spacing32}
       position={POSITION_STICKY}
-      top={0}
+      top="0"
       backgroundColor={COLORS.white}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
-        width="674px"
+        width="42.125rem"
       >
         <Btn
           paddingLeft="0rem"
           paddingRight={SPACING.spacing20}
           onClick={() => history.goBack()}
-          width={SPACING.spacing40}
+          width="2.5rem"
         >
-          <Icon
-            name="back"
-            width={SPACING.spacing40}
-            color={COLORS.darkBlack100}
-          />
+          <Icon name="back" width="2.5rem" color={COLORS.darkBlack100} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -102,9 +98,8 @@ const ProtocolHeader = (props: {
             />
           </Flex>
           <StyledText
-            fontSize={TYPOGRAPHY.fontSize38}
+            as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
-            lineHeight={TYPOGRAPHY.lineHeight48}
             onClick={toggleTruncate}
             overflowWrap="anywhere"
           >

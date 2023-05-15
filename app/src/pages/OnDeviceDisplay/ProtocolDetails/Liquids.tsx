@@ -115,10 +115,8 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText lineHeight="1.75rem">
-                      {liquid.displayName}
-                    </StyledText>
-                    <StyledText lineHeight="1.75rem" color={COLORS.darkBlack70}>
+                    <StyledText as="p">{liquid.displayName}</StyledText>
+                    <StyledText as="p" color={COLORS.darkBlack70}>
                       {liquid.description}
                     </StyledText>
                   </Flex>

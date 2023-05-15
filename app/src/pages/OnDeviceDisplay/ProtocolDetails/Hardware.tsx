@@ -78,7 +78,7 @@ const getHardwareName = (protocolHardware: ProtocolHardware): string => {
 
 export const Hardware = (props: { protocolId: string }): JSX.Element => {
   const requiredProtocolHardware = useRequiredProtocolHardware(props.protocolId)
-  const { t } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation('protocol_details')
 
   return requiredProtocolHardware.length === 0 ? (
     <EmptySection section="hardware" />
@@ -88,10 +88,9 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
+              as="label"
               color={COLORS.darkBlack70}
-              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              lineHeight={TYPOGRAPHY.lineHeight24}
               paddingLeft={SPACING.spacing24}
             >
               {t('location')}
@@ -99,10 +98,9 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           </TableHeader>
           <TableHeader>
             <StyledText
+              as="label"
               color={COLORS.darkBlack70}
-              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              lineHeight={TYPOGRAPHY.lineHeight24}
               paddingLeft={SPACING.spacing24}
             >
               {t('hardware')}
@@ -116,18 +114,17 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
             <TableRow key={id}>
               <TableDatum>
                 <StyledText
+                  as="p"
                   color={COLORS.darkBlack100}
-                  lineHeight={TYPOGRAPHY.lineHeight28}
                   paddingLeft={SPACING.spacing24}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getHardwareLocation(hardware, t)}
+                  {i18n.format(getHardwareLocation(hardware, t), 'capitalize')}
                 </StyledText>
               </TableDatum>
               <TableDatum>
                 <StyledText
+                  as="p"
                   color={COLORS.darkBlack100}
-                  lineHeight={TYPOGRAPHY.lineHeight28}
                   paddingLeft={SPACING.spacing24}
                 >
                   {getHardwareName(hardware)}

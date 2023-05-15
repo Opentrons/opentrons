@@ -82,10 +82,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
+              as="label"
               color={COLORS.darkBlack70}
-              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              lineHeight={TYPOGRAPHY.lineHeight24}
               paddingLeft={SPACING.spacing24}
             >
               {t('labware_name')}
@@ -93,10 +92,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
           </TableHeader>
           <TableHeader>
             <StyledText
+              as="label"
               color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              fontSize={TYPOGRAPHY.fontSize20}
-              lineHeight={TYPOGRAPHY.lineHeight24}
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {t('quantity')}
@@ -129,9 +127,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
                   <StyledText
+                    as="p"
                     alignItems={ALIGN_CENTER}
                     color={COLORS.darkBlack100}
-                    lineHeight={TYPOGRAPHY.lineHeight28}
                   >
                     {name}
                   </StyledText>
@@ -139,9 +137,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <StyledText
+                  as="p"
                   alignItems={ALIGN_CENTER}
                   color={COLORS.darkBlack100}
-                  lineHeight={TYPOGRAPHY.lineHeight28}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {count}

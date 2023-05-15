@@ -26,7 +26,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size_three}
       width="100%"
-      height="202px"
+      height="12.625rem"
       padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
@@ -34,7 +34,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
     >
       <Icon
         name="ot-alert"
-        size="48px"
+        size="3rem"
         color={COLORS.darkBlack90}
         marginBottom={SPACING.spacing32}
         aria-label="EmptySection_ot-alert"
