@@ -23,6 +23,7 @@
   "location": "location",
   "modules": "modules",
   "no_available_robots_found": "No available robots found",
+  "no_summary": "no summary specified for this protocol.",
   "not_connected": "not connected",
   "not_in_protocol": "no {{section}} is specified for this protocol",
   "liquids_not_in_protocol": "no liquids are specified for this protocol",

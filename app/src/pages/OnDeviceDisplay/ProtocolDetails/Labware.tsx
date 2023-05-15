@@ -28,9 +28,6 @@ const Table = styled('table')`
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 
@@ -41,8 +38,6 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  font-size: ${TYPOGRAPHY.fontSize22};
-  font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: ${WRAP};
@@ -72,7 +67,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
     },
     {}
   )
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
 
   return labwareItems.length === 0 ? (
     <EmptySection section="labware" />
@@ -82,22 +77,22 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              as="label"
+              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
-              {t('labware_name')}
+              {i18n.format(t('labware_name'), 'titleCase')}
             </StyledText>
           </TableHeader>
           <TableHeader>
             <StyledText
-              as="label"
+              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              textAlign={TYPOGRAPHY.textAlignCenter}
+              paddingRight={SPACING.spacing12}
             >
-              {t('quantity')}
+              {i18n.format(t('quantity'), 'sentenceCase')}
             </StyledText>
           </TableHeader>
         </tr>

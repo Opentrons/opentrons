@@ -156,38 +156,30 @@ const Summary = (props: {
   date: string | null
 }): JSX.Element => {
   const { author, description, date } = props
-  const { t } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <Flex
-        fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
-        lineHeight={TYPOGRAPHY.lineHeight28}
       >
-        <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>{`${t(
-          'author'
+        <StyledText as="p">{`${i18n.format(
+          t('author'),
+          'capitalize'
         )}: `}</StyledText>
-        <StyledText>{author}</StyledText>
+        <StyledText as="p">{author}</StyledText>
       </Flex>
-      <StyledText
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-      >
-        {description}
+      <StyledText as="p">
+        {description ?? i18n.format(t('no_summary'), 'capitalize')}
       </StyledText>
       <Flex
         backgroundColor={COLORS.darkBlack20}
         borderRadius={BORDERS.size1}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        lineHeight={TYPOGRAPHY.lineHeight28}
         marginTop={SPACING.spacing24}
         maxWidth="22rem"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <StyledText>{`${t('protocol_info:date_added')}: ${
+        <StyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null
             ? format(new Date(date), 'MM/dd/yyyy k:mm')
             : t('shared:no_data')

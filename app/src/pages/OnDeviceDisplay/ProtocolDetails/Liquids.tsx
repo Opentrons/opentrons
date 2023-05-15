@@ -35,7 +35,7 @@ const Table = styled('table')`
 const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
-  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8} ${SPACING.spacing24};
+  padding: 0 ${SPACING.spacing24} 0 ${SPACING.spacing24};
   color: ${COLORS.darkBlack70};
 `
 
@@ -46,7 +46,6 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   background-color: ${COLORS.light1};
-  font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
@@ -98,7 +97,6 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   alignItems={TYPOGRAPHY.textAlignCenter}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
                   <Flex
                     borderRadius={BORDERS.size2}
@@ -115,9 +113,11 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText as="p">{liquid.displayName}</StyledText>
+                    <StyledText as="p">
+                      {i18n.format(liquid.displayName, 'titleCase')}
+                    </StyledText>
                     <StyledText as="p" color={COLORS.darkBlack70}>
-                      {liquid.description}
+                      {i18n.format(liquid.description, 'titleCase')}
                     </StyledText>
                   </Flex>
                 </Flex>

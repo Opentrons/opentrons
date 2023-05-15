@@ -21,7 +21,6 @@ import type { TFunction } from 'react-i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
-  border-collapse: separate
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing4};
@@ -29,8 +28,6 @@ const Table = styled('table')`
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 
@@ -41,8 +38,6 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  font-size: ${TYPOGRAPHY.fontSize22};
-  font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: ${WRAP};
@@ -87,7 +82,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              as="label"
+              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
@@ -97,7 +92,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           </TableHeader>
           <TableHeader>
             <StyledText
-              as="label"
+              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
