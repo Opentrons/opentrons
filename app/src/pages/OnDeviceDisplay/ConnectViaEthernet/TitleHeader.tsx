@@ -11,6 +11,7 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -27,7 +28,7 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      marginBottom="1.5625rem"
+      marginBottom={SPACING.spacing32}
       position={POSITION_RELATIVE}
     >
       <Btn
