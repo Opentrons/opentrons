@@ -102,4 +102,3 @@ const ErrorTextArea = styled.textarea`
   font-family: monospace;
   resize: none;
 `
-

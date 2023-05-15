@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import {
-  LabwareRender,
-  Module,
-  RobotWorkSpace,
-} from '@opentrons/components'
+import { LabwareRender, Module, RobotWorkSpace } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
   CompletedProtocolAnalysis,
@@ -55,7 +51,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       bodyText={body}
       rightHandBody={
         <RobotWorkSpace
-          height={isOnDevice ? "80%" : "100%"}
+          height={isOnDevice ? '80%' : '100%'}
           deckDef={
             protocolData.labware.some(
               l =>
@@ -84,7 +80,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                   def={getModuleDef2(location.moduleModel)}
                   innerProps={
                     getModuleType(location.moduleModel) ===
-                      THERMOCYCLER_MODULE_TYPE
+                    THERMOCYCLER_MODULE_TYPE
                       ? { lidMotorState: 'open' }
                       : {}
                   }
@@ -112,13 +108,10 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                       key={module.id}
                       x={modX}
                       y={modY}
-                      orientation={inferModuleOrientationFromXCoordinate(
-                        modX
-                      )}
+                      orientation={inferModuleOrientationFromXCoordinate(modX)}
                       def={getModuleDef2(module.model)}
                       innerProps={
-                        getModuleType(module.model) ===
-                          THERMOCYCLER_MODULE_TYPE
+                        getModuleType(module.model) === THERMOCYCLER_MODULE_TYPE
                           ? { lidMotorState: 'open' }
                           : {}
                       }
