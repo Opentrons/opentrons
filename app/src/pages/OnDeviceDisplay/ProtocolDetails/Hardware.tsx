@@ -29,7 +29,6 @@ const Table = styled('table')`
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
@@ -93,7 +92,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
-              {t('location')}
+              {i18n.format(t('location'), 'sentenceCase')}
             </StyledText>
           </TableHeader>
           <TableHeader>
@@ -103,7 +102,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
-              {t('hardware')}
+              {i18n.format(t('hardware'), 'sentenceCase')}
             </StyledText>
           </TableHeader>
         </tr>
