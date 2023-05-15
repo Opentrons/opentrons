@@ -288,7 +288,7 @@ export function ProtocolCard(props: {
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.size4}
       fontSize={TYPOGRAPHY.fontSize22}
       lineHeight={TYPOGRAPHY.lineHeight28}
       marginBottom={SPACING.spacing8}

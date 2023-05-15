@@ -57,7 +57,7 @@ export function RobotSystemVersionModal({
             paddingX={SPACING.spacing16}
             paddingY={SPACING.spacing24}
             backgroundColor={COLORS.light2}
-            borderRadius={BORDERS.size_three}
+            borderRadius={BORDERS.size3}
             marginY={SPACING.spacing24}
           >
             <Icon
