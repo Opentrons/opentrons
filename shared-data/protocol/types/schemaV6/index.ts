@@ -27,6 +27,7 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
     category?: string | null | undefined
     subcategory?: string | null | undefined
     tags?: string[]
+    deckId?: string
   }
   designerApplication?: {
     name?: string

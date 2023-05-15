@@ -57,6 +57,19 @@ export const PD_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_50ul',
 ]
 
+// NOTE:in PD we do not want to list calibration blocks
+// OT3 Supported labware only
+export const PD_DO_NOT_LIST_OT3 = [
+  'opentrons_calibrationblock_short_side_left',
+  'opentrons_calibrationblock_short_side_right',
+  'opentrons_96_tiprack_20ul',
+  'opentrons_96_tiprack_300ul',
+  'opentrons_96_tiprack_1000ul',
+  'opentrons_96_filtertiprack_20ul',
+  'opentrons_96_filtertiprack_200ul',
+  'opentrons_96_filtertiprack_1000ul',
+]
+
 export function getLabwareV1Def(
   labwareName: string
 ): LabwareDefinition1 | null | undefined {

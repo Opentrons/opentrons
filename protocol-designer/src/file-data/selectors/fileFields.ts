@@ -14,3 +14,6 @@ export const getFileMetadata: Selector<FileMetadataFields> = createSelector(
   rootSelector,
   state => state.fileMetadata
 )
+export const protocolRobotModelName: Selector<
+  FileMetadataFields['deckId']
+> = createSelector(rootSelector, state => state.fileMetadata.deckId)

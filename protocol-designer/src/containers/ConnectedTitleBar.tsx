@@ -68,7 +68,11 @@ function mapStateToProps(state: BaseState): SP {
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStepInfo = getSelectedStepTitleInfo(state)
   const selectedTerminalId = getSelectedTerminalItemId(state)
-  const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
+  const robotModelName = fileDataSelectors.protocolRobotModelName(state)
+  const labwareNames =
+    robotModelName === 'ot3_standard'
+      ? uiLabwareSelectors.getLabwareNicknamesByIdForOT3(state)
+      : uiLabwareSelectors.getLabwareNicknamesById(state)
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(
     state
   )
