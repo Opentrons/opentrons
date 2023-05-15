@@ -29,13 +29,13 @@ def engine_config() -> Config:
 @pytest.fixture
 def subject(
     change_notifier: ChangeNotifier,
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
     engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""
     return StateStore(
         config=engine_config,
-        deck_definition=standard_deck_def,
+        deck_definition=ot2_standard_deck_def,
         deck_fixed_labware=[],
         change_notifier=change_notifier,
         is_door_open=False,

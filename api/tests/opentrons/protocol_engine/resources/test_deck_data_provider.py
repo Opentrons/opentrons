@@ -28,17 +28,17 @@ def subject(labware_data_provider: LabwareDataProvider) -> DeckDataProvider:
 
 
 async def test_get_deck_definition(
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
     subject: DeckDataProvider,
 ) -> None:
     """It should be able to load the deck definition."""
     result = await subject.get_deck_definition()
-    assert result == standard_deck_def
+    assert result == ot2_standard_deck_def
 
 
 async def test_get_deck_definition_short_trash(
     decoy: Decoy,
-    short_trash_deck_def: DeckDefinitionV3,
+    ot2_short_trash_deck_def: DeckDefinitionV3,
     subject: DeckDataProvider,
     mock_feature_flags: None,
 ) -> None:
@@ -46,13 +46,13 @@ async def test_get_deck_definition_short_trash(
     decoy.when(feature_flags.short_fixed_trash()).then_return(True)
 
     result = await subject.get_deck_definition()
-    assert result == short_trash_deck_def
+    assert result == ot2_short_trash_deck_def
 
 
 async def test_get_deck_labware_fixtures(
     decoy: Decoy,
-    standard_deck_def: DeckDefinitionV3,
-    fixed_trash_def: LabwareDefinition,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    ot2_fixed_trash_def: LabwareDefinition,
     labware_data_provider: LabwareDataProvider,
     subject: DeckDataProvider,
 ) -> None:
@@ -63,23 +63,23 @@ async def test_get_deck_labware_fixtures(
             namespace="opentrons",
             version=1,
         )
-    ).then_return(fixed_trash_def)
+    ).then_return(ot2_fixed_trash_def)
 
-    result = await subject.get_deck_fixed_labware(standard_deck_def)
+    result = await subject.get_deck_fixed_labware(ot2_standard_deck_def)
 
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
             location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
-            definition=fixed_trash_def,
+            definition=ot2_fixed_trash_def,
         )
     ]
 
 
 async def test_get_deck_labware_fixtures_short_trash(
     decoy: Decoy,
-    short_trash_deck_def: DeckDefinitionV3,
-    short_fixed_trash_def: LabwareDefinition,
+    ot2_short_trash_deck_def: DeckDefinitionV3,
+    ot2_short_fixed_trash_def: LabwareDefinition,
     labware_data_provider: LabwareDataProvider,
     subject: DeckDataProvider,
 ) -> None:
@@ -90,14 +90,14 @@ async def test_get_deck_labware_fixtures_short_trash(
             namespace="opentrons",
             version=1,
         )
-    ).then_return(short_fixed_trash_def)
+    ).then_return(ot2_short_fixed_trash_def)
 
-    result = await subject.get_deck_fixed_labware(short_trash_deck_def)
+    result = await subject.get_deck_fixed_labware(ot2_short_trash_deck_def)
 
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
             location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
-            definition=short_fixed_trash_def,
+            definition=ot2_short_fixed_trash_def,
         )
     ]
