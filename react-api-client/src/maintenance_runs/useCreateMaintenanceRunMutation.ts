@@ -36,7 +36,8 @@ export function useCreateMaintenanceRunMutation(
   hostOverride?: HostConfig | null
 ): UseCreateMaintenanceRunMutationResult {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<
     MaintenanceRun,
     AxiosError,

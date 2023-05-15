@@ -24,7 +24,9 @@ import {
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
+import { appShellRequestor } from '../../redux/shell/remote'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
@@ -126,7 +128,12 @@ export function ChooseProtocolSlideoutComponent(
       onCloseClick={onCloseClick}
       title={t('choose_protocol_to_run', { name })}
       footer={
-        <ApiHostProvider hostname={robot.ip}>
+        <ApiHostProvider
+          hostname={robot.ip}
+          requestor={
+            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+          }
+        >
           <ApplyHistoricOffsets
             offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}

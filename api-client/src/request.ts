@@ -25,9 +25,9 @@ export function request<ResData, ReqData = null>(
   config: HostConfig,
   params?: AxiosRequestConfig['params']
 ): ResponsePromise<ResData> {
-  const { hostname, port } = config
+  const { hostname, port, requestor = axios.request } = config
   const headers = { ...DEFAULT_HEADERS }
   const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
 
-  return axios.request({ headers, method, baseURL, url, data, params })
+  return requestor<ResData>({ headers, method, baseURL, url, data, params })
 }
