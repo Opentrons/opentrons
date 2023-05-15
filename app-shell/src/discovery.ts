@@ -1,24 +1,18 @@
 // app shell discovery module
-import { app, ipcMain, IpcMainInvokeEvent } from 'electron'
+import { app } from 'electron'
 import Store from 'electron-store'
-import axios, { AxiosRequestConfig } from 'axios'
-import FormData from 'form-data'
-import fs from 'fs'
 import groupBy from 'lodash/groupBy'
 import throttle from 'lodash/throttle'
-import path from 'path'
 
 import {
   createDiscoveryClient,
   DEFAULT_PORT,
 } from '@opentrons/discovery-client'
 import {
-  fetchSerialPortList,
-  DEFAULT_PRODUCT_ID,
-  DEFAULT_VENDOR_ID,
-} from '@opentrons/usb-bridge/node-client'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+  UI_INITIALIZED,
+  USB_HTTP_REQUESTS_START,
+  USB_HTTP_REQUESTS_STOP,
+} from '@opentrons/app/src/redux/shell/actions'
 import {
   DISCOVERY_START,
   DISCOVERY_FINISH,
@@ -26,29 +20,17 @@ import {
   CLEAR_CACHE,
 } from '@opentrons/app/src/redux/discovery/actions'
 import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
-import {
-  INITIALIZED as SYSTEM_INFO_INITIALIZED,
-  USB_DEVICE_ADDED,
-  USB_DEVICE_REMOVED,
-} from '@opentrons/app/src/redux/system-info/constants'
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
-import { getProtocolSrcFilePaths } from './protocol-storage'
-import {
-  createSerialPortHttpAgent,
-  destroyUsbHttpAgent,
-  getSerialPortHttpAgent,
-} from './usb'
+import { getSerialPortHttpAgent } from './usb'
 
-import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type {
   Address,
   DiscoveryClientRobot,
   LegacyService,
   DiscoveryClient,
 } from '@opentrons/discovery-client'
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 
 import type { Action, Dispatch } from './types'
 import type { Config } from './config'
@@ -102,13 +84,6 @@ const migrateLegacyServices = (
 
     return { name, health: null, serverHealth: null, addresses }
   })
-}
-
-function isUsbDeviceOt3(device: UsbDevice): boolean {
-  return (
-    device.productId === parseInt(DEFAULT_PRODUCT_ID, 16) &&
-    device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
-  )
 }
 
 export function registerDiscovery(
@@ -170,52 +145,6 @@ export function registerDiscovery(
     client.stop()
   })
 
-  async function usbListener(
-    _event: IpcMainInvokeEvent,
-    config: AxiosRequestConfig
-  ): Promise<unknown> {
-    try {
-      // TODO(bh, 2023-05-03): remove mutation
-      let { data } = config
-      let formHeaders = {}
-
-      // check for formDataProxy
-      if (data?.formDataProxy != null) {
-        // reconstruct FormData
-        const formData = new FormData()
-        const { protocolKey } = data.formDataProxy
-
-        const srcFilePaths: string[] = await getProtocolSrcFilePaths(
-          protocolKey
-        )
-
-        // create readable stream from file
-        srcFilePaths.forEach(srcFilePath => {
-          const readStream = fs.createReadStream(srcFilePath)
-          formData.append('files', readStream, path.basename(srcFilePath))
-        })
-
-        formData.append('key', protocolKey)
-
-        formHeaders = formData.getHeaders()
-        data = formData
-      }
-
-      const usbHttpAgent = getSerialPortHttpAgent()
-
-      const response = await axios.request({
-        httpAgent: usbHttpAgent,
-        ...config,
-        data,
-        headers: { ...config.headers, ...formHeaders },
-      })
-      return { data: response.data }
-    } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      log.debug(`usbListener error ${e?.message ?? 'unknown'}`)
-    }
-  }
-
   function removeCachedUsbRobot(): void {
     const cachedUsbRobotName = client
       .getRobots()
@@ -231,26 +160,31 @@ export function registerDiscovery(
     }
   }
 
-  function startUsbHttpRequests(): void {
-    fetchSerialPortList()
-      .then((list: PortInfo[]) => {
-        const ot3UsbSerialPort = list.find(
-          port =>
-            port.productId === DEFAULT_PRODUCT_ID &&
-            port.vendorId === DEFAULT_VENDOR_ID
+  return function handleIncomingAction(action: Action) {
+    log.debug('handling action in discovery', { action })
+
+    switch (action.type) {
+      case UI_INITIALIZED:
+      case DISCOVERY_START: {
+        handleRobots()
+        return client.start({
+          healthPollInterval: FAST_POLL_INTERVAL_MS,
+        })
+      }
+      case DISCOVERY_FINISH: {
+        return client.start({
+          healthPollInterval: SLOW_POLL_INTERVAL_MS,
+        })
+      }
+      case DISCOVERY_REMOVE: {
+        return client.removeRobot(
+          (action.payload as { robotName: string }).robotName
         )
-
-        // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition
-        if (ot3UsbSerialPort == null) {
-          log.debug('no OT-3 serial port found, retrying')
-          setTimeout(startUsbHttpRequests, 1000)
-          return
-        }
-
-        createSerialPortHttpAgent(ot3UsbSerialPort.path)
-
-        ipcMain.handle('usb:request', usbListener)
-
+      }
+      case CLEAR_CACHE: {
+        return clearCache()
+      }
+      case USB_HTTP_REQUESTS_START: {
         removeCachedUsbRobot()
 
         const usbHttpAgent = getSerialPortHttpAgent()
@@ -265,59 +199,18 @@ export function registerDiscovery(
             },
           ],
         })
-      })
-      .catch(e =>
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        log.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
-      )
-  }
+        break
+      }
+      case USB_HTTP_REQUESTS_STOP: {
+        // TODO(bh, 2023-05-05): we actually still want this robot to show up in the not available list
+        removeCachedUsbRobot()
 
-  return function handleIncomingAction(action: Action) {
-    log.debug('handling action in discovery', { action })
-
-    switch (action.type) {
-      case UI_INITIALIZED:
-      case DISCOVERY_START:
-        handleRobots()
-        return client.start({
+        client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
+          manualAddresses: [],
         })
-
-      case DISCOVERY_FINISH:
-        return client.start({
-          healthPollInterval: SLOW_POLL_INTERVAL_MS,
-        })
-
-      case DISCOVERY_REMOVE:
-        return client.removeRobot(
-          (action.payload as { robotName: string }).robotName
-        )
-
-      case CLEAR_CACHE:
-        return clearCache()
-      case SYSTEM_INFO_INITIALIZED:
-        if (action.payload.usbDevices.find(isUsbDeviceOt3) != null) {
-          startUsbHttpRequests()
-        }
         break
-      case USB_DEVICE_ADDED:
-        if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          startUsbHttpRequests()
-        }
-        break
-      case USB_DEVICE_REMOVED:
-        if (isUsbDeviceOt3(action.payload.usbDevice)) {
-          destroyUsbHttpAgent()
-          ipcMain.removeHandler('usb:request')
-          // TODO(bh, 2023-05-05): we actually still want this robot to show up in the not available list
-          removeCachedUsbRobot()
-
-          client.start({
-            healthPollInterval: FAST_POLL_INTERVAL_MS,
-            manualAddresses: [],
-          })
-        }
-        break
+      }
     }
   }
 
