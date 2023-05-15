@@ -44,10 +44,6 @@ function startUp(): void {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
-  // if running on the flex override userData path so things dont get stored in a tmp dir
-  if (process.env.NODE_ENV === 'production') {
-    app.setPath('userData', '/data/ODD')
-  }
 
   mainWindow = createUi()
   rendererLogger = createRendererLogger()

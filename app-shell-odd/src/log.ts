@@ -1,17 +1,16 @@
 // create logger function
-import { app } from 'electron'
 import { inspect } from 'util'
 import fse from 'fs-extra'
 import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
 
-import { getConfig } from './config'
+import { ODD_DIR, getConfig } from './config'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'
 
-export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
+const LOG_DIR = path.join(ODD_DIR, 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
 const FILE_OPTIONS = {
