@@ -13,6 +13,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   PipetteName,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -65,6 +66,7 @@ import {
   TemperatureModuleState,
   ThermocyclerModuleState,
   HeaterShakerModuleState,
+  MagneticBlockState,
 } from '../types'
 import {
   PresavedStepFormState,
@@ -179,6 +181,9 @@ const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
   targetSpeed: null,
   latchOpen: null,
 }
+const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
+  type: MAGNETIC_BLOCK_TYPE,
+}
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -243,6 +248,14 @@ const _getInitialDeckSetup = (
               type: HEATERSHAKER_MODULE_TYPE,
               slot,
               moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
+            }
+          case MAGNETIC_BLOCK_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: MAGNETIC_BLOCK_TYPE,
+              slot,
+              moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
             }
         }
       }

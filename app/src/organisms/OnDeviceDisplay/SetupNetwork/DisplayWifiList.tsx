@@ -80,7 +80,7 @@ export function DisplayWifiList({
             key={nw.ssid}
             backgroundColor="#d6d6d6"
             marginBottom={SPACING.spacing8}
-            borderRadius={BORDERS.size_three}
+            borderRadius={BORDERS.size3}
             css={NETWORK_ROW_STYLE}
             onClick={() => handleClick(nw)}
           >
@@ -109,7 +109,7 @@ export function DisplayWifiList({
         marginTop={SPACING.spacing8}
         height="4rem"
         backgroundColor="#d6d6d6"
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
         color={COLORS.black}
         css={NETWORK_ROW_STYLE}
       >

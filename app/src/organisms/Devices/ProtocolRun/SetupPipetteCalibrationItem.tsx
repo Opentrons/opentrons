@@ -28,7 +28,11 @@ import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { useDeckCalibrationData, useIsOT3 } from '../hooks'
+import {
+  useDeckCalibrationData,
+  useAttachedPipettesFromInstrumentsQuery,
+  useIsOT3,
+} from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { Mount } from '../../../redux/pipettes/types'
@@ -56,6 +60,7 @@ export function SetupPipetteCalibrationItem({
     false
   )
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const attachedPipettesForFlex = useAttachedPipettesFromInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const isOT3 = useIsOT3(robotName)
@@ -69,6 +74,9 @@ export function SetupPipetteCalibrationItem({
   let pipetteMismatchInfo
 
   if (pipetteInfo == null) return null
+  const pipetteCalDate = isOT3
+    ? attachedPipettesForFlex[mount]?.data?.calibratedOffset?.last_modified
+    : pipetteInfo.pipetteCalDate
 
   const attached =
     pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
@@ -98,7 +106,7 @@ export function SetupPipetteCalibrationItem({
   }
 
   let flowType = ''
-  if (pipetteInfo.pipetteCalDate != null && attached) {
+  if (pipetteCalDate != null && attached) {
     button = pipetteMismatchInfo
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
@@ -141,7 +149,6 @@ export function SetupPipetteCalibrationItem({
           <Flex>{pipetteMismatchInfo}</Flex>
           {isOT3 ? (
             <TertiaryButton
-              disabled={!isDeckCalibrated}
               id="PipetteCalibration_calibratePipetteButton"
               {...targetProps}
               onClick={() => setShowFlexPipetteFlow(true)}
@@ -173,7 +180,7 @@ export function SetupPipetteCalibrationItem({
     )
   }
 
-  const attachedCalibratedDate = pipetteInfo.pipetteCalDate
+  const attachedCalibratedDate = pipetteCalDate ?? null
 
   return (
     <>
