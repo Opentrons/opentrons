@@ -23,8 +23,15 @@ interface Props {
   model: ModuleModel
 }
 
+export type NewModuleType =
+  | typeof MAGNETIC_MODULE_TYPE
+  | typeof TEMPERATURE_MODULE_TYPE
+  | typeof THERMOCYCLER_MODULE_TYPE
+  | typeof HEATERSHAKER_MODULE_TYPE
+  | typeof GRIPPER_MODULE_TYPE
+
 type ModuleImg = {
-  [type in ModuleType]: {
+  [type in NewModuleType]: {
     [model in ModuleModel]?: string
   }
 }

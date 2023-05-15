@@ -15,7 +15,7 @@ const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing4};
   width: 100%;
   cursor: pointer;
 

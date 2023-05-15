@@ -118,7 +118,7 @@ function FlexModulesComponent(): JSX.Element {
                       <Flex
                         flexDirection={DIRECTION_COLUMN}
                         marginLeft={SPACING.spacing4}
-                        marginTop={SPACING.spacing3}
+                        marginTop={SPACING.spacing4}
                         marginBottom={SPACING.spacing4}
                       >
                         <StyledText as="h4">{label}</StyledText>
