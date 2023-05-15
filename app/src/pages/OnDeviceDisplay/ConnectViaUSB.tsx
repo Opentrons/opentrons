@@ -30,7 +30,7 @@ export function ConnectViaUSB(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} OnDevice />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}

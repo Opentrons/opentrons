@@ -76,7 +76,7 @@ const ICON_STYLE = css`
   }
 `
 const FLEX_SPACING_STYLE = css`
-  height: 1.5rem;
+  height: 1.75rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 0rem;
   }
