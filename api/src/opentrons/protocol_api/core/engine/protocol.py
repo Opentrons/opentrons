@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
+from opentrons.types import DeckSlotName, Location, Mount, MountType, Point, OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
@@ -26,7 +26,7 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
 )
-from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel
+from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel, OFF_DECK_LOCATION
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 
@@ -190,7 +190,7 @@ class ProtocolCore(
     def move_labware(
         self,
         labware_core: LabwareCore,
-        new_location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
+        new_location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OFF_DECK],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
@@ -198,9 +198,11 @@ class ProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location: Union[ModuleLocation, DeckSlotLocation]
+        to_location: Union[ModuleLocation, DeckSlotLocation, OFF_DECK]
         if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
             to_location = ModuleLocation(moduleId=new_location.module_id)
+        elif new_location == OFF_DECK:
+            to_location = OFF_DECK_LOCATION
         else:
             to_location = DeckSlotLocation(slotName=new_location)
 

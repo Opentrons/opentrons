@@ -417,8 +417,8 @@ class ProtocolContext(CommandPublisher):
         :param labware: Labware to move. Should be a labware already loaded
                         using :py:meth:`load_labware`
 
-        :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module`.
+        :param new_location: Deck slot location, a hardware module that is already
+                             loaded on the deck using :py:meth:`load_module` or off deck using :py:type OFF_DECK.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -446,11 +446,12 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location = (
-            new_location._core
-            if isinstance(new_location, ModuleContext)
-            else validation.ensure_deck_slot(new_location)
-        )
+        if isinstance(new_location, ModuleContext):
+            location = new_location._core
+        elif new_location == OFF_DECK:
+            location = new_location
+        else:
+            location = validation.ensure_deck_slot(new_location)
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
