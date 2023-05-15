@@ -5,11 +5,12 @@ import path from 'path'
 import dateFormat from 'dateformat'
 import winston from 'winston'
 
-import { ODD_DIR, getConfig } from './config'
+import { getConfig } from './config'
 
 import type Transport from 'winston-transport'
 import type { Config } from './config'
 
+const ODD_DIR = '/data/ODD'
 const LOG_DIR = path.join(ODD_DIR, 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
