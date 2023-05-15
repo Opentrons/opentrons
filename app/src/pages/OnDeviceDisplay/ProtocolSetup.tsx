@@ -192,7 +192,6 @@ function PrepareToRun({
 
   const { play } = useRunControls(runId)
 
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
