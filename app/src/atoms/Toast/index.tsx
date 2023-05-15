@@ -268,7 +268,7 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText.length > 0 && (
-        <Link role="button" height={SPACING.spacing24}>
+        <Link role="button">
           <StyledText
             color={COLORS.darkBlackEnabled}
             fontSize={
@@ -281,6 +281,9 @@ export function Toast(props: ToastProps): JSX.Element {
             }
             lineHeight={
               showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
+            textDecoration={
+              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
             }
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             whiteSpace="nowrap"
