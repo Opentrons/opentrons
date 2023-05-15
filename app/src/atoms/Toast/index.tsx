@@ -182,11 +182,9 @@ export function Toast(props: ToastProps): JSX.Element {
       css={showODDStyle ? ODD_ANIMATION : DESKTOP_ANIMATION}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      borderRadius={
-        showODDStyle ? BORDERS.size_three : BORDERS.radiusSoftCorners
-      }
+      borderRadius={showODDStyle ? BORDERS.size3 : BORDERS.radiusSoftCorners}
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.size_one : '1px'}
+      borderWidth={showODDStyle ? BORDERS.size1 : '1px'}
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
@@ -197,7 +195,9 @@ export function Toast(props: ToastProps): JSX.Element {
           ? `${SPACING.spacing16} ${SPACING.spacing24}`
           : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
               SPACING.spacing8
-            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} 0.75rem`
+            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing12
+            }`
       }
       data-testid={`Toast_${type}`}
       height={showODDStyle ? '5.76rem' : 'auto'}

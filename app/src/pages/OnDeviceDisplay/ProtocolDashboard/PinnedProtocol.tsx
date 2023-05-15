@@ -82,7 +82,7 @@ export function PinnedProtocol(props: {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.size4}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing8}
       height={cardStyleBySize[cardSize].height}

@@ -167,14 +167,14 @@ export function RunningProtocolCommandList({
                   gridGap={SPACING.spacing8}
                 >
                   <Flex
-                    padding={`0.75rem ${SPACING.spacing24}`}
+                    padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
                     alignItems={ALIGN_CENTER}
                     backgroundColor={backgroundColor}
                     width="100%"
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.size_two}
+                    borderRadius={BORDERS.size2}
                   >
                     <CommandIcon command={command} />
                     <CommandText

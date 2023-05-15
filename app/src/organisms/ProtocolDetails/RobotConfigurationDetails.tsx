@@ -118,14 +118,14 @@ export const RobotConfigurationDetails = (
           )
         }
       />
-      <Divider marginY="0.75rem" width="100%" />
+      <Divider marginY={SPACING.spacing12} width="100%" />
       {leftAndRightMountsItem ?? (
         <>
           <RobotConfigurationDetailsItem
             label={t('left_mount')}
             item={isLoading ? loadingText : leftMountItem}
           />
-          <Divider marginY="0.75rem" width="100%" />
+          <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
             item={isLoading ? loadingText : rightMountItem}
@@ -134,7 +134,7 @@ export const RobotConfigurationDetails = (
       )}
       {enableExtendedHardware ? (
         <>
-          <Divider marginY="0.75rem" width="100%" />
+          <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('shared:extension_mount')}
             item={isLoading ? loadingText : extensionMountItem}
@@ -145,7 +145,7 @@ export const RobotConfigurationDetails = (
         ? requiredModuleDetails.map((module, index) => {
             return (
               <React.Fragment key={index}>
-                <Divider marginY="0.75rem" width="100%" />
+                <Divider marginY={SPACING.spacing12} width="100%" />
                 <RobotConfigurationDetailsItem
                   label={t('run_details:module_slot_number', {
                     slot_number:

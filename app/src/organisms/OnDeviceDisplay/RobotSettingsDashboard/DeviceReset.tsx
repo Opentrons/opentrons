@@ -43,7 +43,7 @@ const OptionLabel = styled.label<LabelProps>`
   border: 2px solid
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light2};
-  border-radius: ${BORDERS.size_four};
+  border-radius: ${BORDERS.size4};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};
 `
@@ -114,9 +114,9 @@ export function DeviceReset({
           flexDirection={DIRECTION_ROW}
           backgroundColor={COLORS.warningBackgroundMed}
           alignItems={ALIGN_CENTER}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.size_three}
+          borderRadius={BORDERS.size3}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
           <StyledText

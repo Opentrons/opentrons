@@ -22,7 +22,7 @@ import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.size_two};
+  border-spacing: 0 ${BORDERS.size2};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   color: ${COLORS.darkBlack90};
 `
@@ -45,13 +45,13 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size_three};
-    border-bottom-left-radius: ${BORDERS.size_three};
+    border-top-left-radius: ${BORDERS.size3};
+    border-bottom-left-radius: ${BORDERS.size3};
     width: 20%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size_three};
-    border-bottom-right-radius: ${BORDERS.size_three};
+    border-top-right-radius: ${BORDERS.size3};
+    border-bottom-right-radius: ${BORDERS.size3};
   }
 `
 
@@ -103,7 +103,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                     <Flex
                       padding="0.375rem"
                       textAlign={TYPOGRAPHY.textAlignLeft}
-                      borderRadius={BORDERS.size_three}
+                      borderRadius={BORDERS.size3}
                       border={`3px solid ${COLORS.darkBlackEnabled}`}
                       fontSize={TYPOGRAPHY.fontSize20}
                       fontWeight="700"
@@ -126,7 +126,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   <Flex flexDirection={DIRECTION_ROW}>
                     <Flex
                       height="2.75rem"
-                      padding={`${SPACING.spacing8} 0.75rem`}
+                      padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                       width="max-content"
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}

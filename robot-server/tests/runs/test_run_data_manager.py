@@ -399,11 +399,11 @@ async def test_get_all_runs(
     decoy.when(mock_run_store.get_state_summary("historical-run")).then_return(
         historical_run_data
     )
-    decoy.when(mock_run_store.get_all()).then_return(
+    decoy.when(mock_run_store.get_all(length=20)).then_return(
         [historical_run_resource, current_run_resource]
     )
 
-    result = subject.get_all()
+    result = subject.get_all(length=20)
 
     assert result == [
         Run(
