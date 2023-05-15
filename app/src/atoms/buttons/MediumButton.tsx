@@ -23,11 +23,14 @@ type MediumButtonTypes =
   | 'alertSecondary'
   | 'tertiaryHigh'
   | 'tertiaryLowLight'
+
+type MediumButtonCategory = 'default' | 'rounded'
 interface MediumButtonProps extends StyleProps {
   buttonText: React.ReactNode
   buttonType?: MediumButtonTypes
   disabled?: boolean
   iconName?: IconName
+  buttonCategory?: MediumButtonCategory
   onClick: React.MouseEventHandler
 }
 
@@ -37,6 +40,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     buttonType = 'primary',
     disabled = false,
     iconName,
+    buttonCategory = 'default',
     ...buttonProps
   } = props
 
@@ -101,7 +105,9 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
   const MEDIUM_BUTTON_STYLE = css`
     background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
-    border-radius: ${BORDERS.size4};
+    border-radius: ${buttonCategory === 'rounded'
+      ? BORDERS.size5
+      : BORDERS.size4};
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     cursor: default;
