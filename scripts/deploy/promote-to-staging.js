@@ -10,6 +10,8 @@ const {
   getDeployMetadata,
   setDeployMetadata,
 } = require('./lib/deploy-metadata')
+const { getAssumeRole } = require('./assume-role')
+const { getCreateInvalidation } = require('./create-invalidation')
 
 const USAGE =
   '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> <tag> [--deploy]'
@@ -20,27 +22,10 @@ const dryrun = !flags.includes('--deploy')
 
 assert(projectDomain && tag, USAGE)
 
-const sts = new AWS.STS({ apiVersion: '2011-06-15' })
-
-const stagingAssumeRole = () => {
-  return new Promise((resolve, reject) => {
-    sts.assumeRole(
-      {
-        RoleArn: 'arn:aws:iam::043748923082:role/administrator',
-        RoleSessionName: 'promoteToStaging',
-      },
-      (err, data) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(data.Credentials)
-        }
-      }
-    )
-  })
-}
-
-stagingAssumeRole()
+getAssumeRole(
+  'arn:aws:iam::043748923082:role/administrator',
+  'promoteToStaging'
+)
   .then(credentials => {
     const stagingCredentials = new AWS.Credentials({
       accessKeyId: credentials.AccessKeyId,
@@ -77,25 +62,10 @@ stagingAssumeRole()
       })
       .then(() => {
         console.log('Promotion to staging done\n')
-
-        const cloudfront = new AWS.CloudFront({
-          apiVersion: '2019-03-26',
-          region: 'us-east-1',
-          credentials: stagingCredentials,
-        })
-        const stagingCloudfrontArn = `arn:aws:cloudfront::043748923082:distribution/EB2QTLE7OJ8O6`
-        const stagingDistributionId = stagingCloudfrontArn.split('/')[1]
-        const cloudFrontParams = {
-          DistributionId: stagingDistributionId,
-          InvalidationBatch: {
-            CallerReference: Date.now().toString(),
-            Paths: {
-              Quantity: 1,
-              Items: ['/*'],
-            },
-          },
-        }
-        return cloudfront.createInvalidation(cloudFrontParams).promise()
+        getCreateInvalidation(
+          stagingCredentials,
+          `arn:aws:cloudfront::043748923082:distribution/EB2QTLE7OJ8O6`
+        )
       })
       .then(() => {
         console.log('Cache invalidation initiated for staging\n')
