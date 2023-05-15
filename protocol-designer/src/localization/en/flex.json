@@ -25,22 +25,23 @@
     "organization_author": "Organization/Author",
     "protocol_description": "Description"
   },
-  "pipettes_selection": {
+  "pipette_selection": {
     "name": "Pipette Selection",
-    "heading": "Pipettes"
+    "heading": "Pipettes",
+    "pipette_96_selection_note": "Note: 96-channel take up both mounts and requires a tiprack adapter",
+    "pippette_ocuupies_both_mount": "Note: 96 Channel occupies both the mount.",
+    "choose_first_pipette": "Choose First Pipette",
+    "choose_second_pipette": "Choose Second Pipette",
+    "leave_second_mount_empty": "Leave second mount empty",
+    "LEAVE_SECOND_MOUNT_EMPTY_VALUE": "LEAVE_SECOND_MOUNT_EMPTY"
   },
   "modules_selection": {
     "name": "Module Selection",
     "heading": "Additional items?"
   },
-  "pipette_selection": {
-    "pipette_96_selection_note": "Note: 96-channel take up both mounts and requires a tiprack adapter",
-    "pippette_ocuupies_both_mount": "Note: 96 Channel occupies both the mount.",
-    "choose_first_pipette": "Choose First Pipette",
-    "choose_second_pipette": "Choose Second Pipette"
-  },
   "errors": {
     "first_pipette_not_selected": "You must select a pipette before proceeding.",
+    "second_pipette_not_selected": "You must select a pipette or leave mount empty before proceeding.",
     "tiprack_not_selected": "You must select a tip rack before proceeding."
   },
   "file_tab": {

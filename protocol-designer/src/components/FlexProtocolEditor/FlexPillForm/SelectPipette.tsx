@@ -15,7 +15,8 @@ interface SelectPipetteOptionProps {
 
 interface formikContextProps {
   pipettesByMount: any
-  pipette: any
+  leftPipette: any
+  rightPipette: any
 }
 
 export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
@@ -51,7 +52,12 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
           </Flex>
           {pipetteName === pipetteSlot.left && (
             <StyledText as="label" className={styles.error_text}>
-              {errors.pipette && errors.pipette}
+              {errors?.leftPipette && errors?.leftPipette}
+            </StyledText>
+          )}
+          {pipetteName === pipetteSlot.right && (
+            <StyledText as="label" className={styles.error_text}>
+              {errors?.rightPipette && errors?.rightPipette}
             </StyledText>
           )}
           {/* Pipette Mount Selection here */}

@@ -40,7 +40,9 @@ function ProtocolEditorComponent(props: Props): JSX.Element {
           <div
             id="main-page"
             className={cx(
-              styles.main_page_content,
+              !props.children
+                ? styles.main_page_content
+                : styles.flex_page_content,
               MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
             )}
           >

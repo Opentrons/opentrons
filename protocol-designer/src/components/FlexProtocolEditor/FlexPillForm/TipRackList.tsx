@@ -25,7 +25,8 @@ import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
 interface formikContextProps {
   pipettesByMount: any
-  tiprack: any
+  leftTiprack: any
+  rightTiprack: any
 }
 
 export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
@@ -98,7 +99,12 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
       </Flex>
       {pipetteName === pipetteSlot.left && (
         <StyledText as="label" className={styles.error_text}>
-          {errors.tiprack ? errors.tiprack : ''}
+          {errors.leftTiprack ? errors.leftTiprack : ''}
+        </StyledText>
+      )}
+      {pipetteName === pipetteSlot.right && (
+        <StyledText as="label" className={styles.error_text}>
+          {errors.rightTiprack ? errors.rightTiprack : ''}
         </StyledText>
       )}
     </>

@@ -62,32 +62,6 @@ export interface InitialValues {
   }
 }
 
-const validationSchema = Yup.object().shape({
-  fields: Yup.object().shape({
-    name: Yup.string().matches(
-      /^[a-zA-Z0-9]*$/,
-      'Protocol name must contain only letters and numbers.'
-    ),
-  }),
-  mountSide: Yup.string().required('Mount side is required'),
-  pipettesByMount: Yup.object().shape({
-    left: Yup.object().shape({
-      pipetteName: Yup.string().required('First pipette is required'),
-      tipRackList: Yup.array().min(
-        1,
-        'Select at least one tip rack for first pipette'
-      ),
-    }),
-    right: Yup.object().shape({
-      pipetteName: Yup.string().required('Second pipette is required'),
-      tipRackList: Yup.array().min(
-        1,
-        'Select at least one tip rack for second pipette'
-      ),
-    }),
-  }),
-})
-
 const getInitialValues: InitialValues = {
   fields: {
     name: '',
@@ -190,15 +164,11 @@ function FlexProtocolEditor(): JSX.Element {
       ? i18n.t('flex.round_tabs.go_to_liquids_page')
       : i18n.t('flex.round_tabs.next')
 
-  const InitialFormSchema = Yup.object().shape({
-    fields: Yup.object().shape({
-      name: Yup.string().matches(/^[a-zA-Z0-9]*$/),
-    }),
-  })
-
   interface FormikErrors {
-    pipette?: string
-    tiprack?: string
+    leftPipette?: string
+    rightPipette?: string
+    leftTiprack?: string
+    rightTiprack?: string
   }
 
   const validateFields = (values: InitialValues): FormikErrors => {
@@ -206,11 +176,26 @@ function FlexProtocolEditor(): JSX.Element {
     const errors: FormikErrors = {}
 
     if (!pipettesByMount.left.pipetteName) {
-      errors.pipette = `${i18n.t('flex.errors.first_pipette_not_selected')}`
+      errors.leftPipette = `${i18n.t('flex.errors.first_pipette_not_selected')}`
     }
 
     if (!pipettesByMount.left.tipRackList.length) {
-      errors.tiprack = `${i18n.t('flex.errors.tiprack_not_selected')}`
+      errors.leftTiprack = `${i18n.t('flex.errors.tiprack_not_selected')}`
+    }
+
+    if (!pipettesByMount.right.pipetteName) {
+      errors.rightPipette = `${i18n.t(
+        'flex.errors.second_pipette_not_selected'
+      )}`
+    }
+
+    if (
+      pipettesByMount.right.pipetteName &&
+      pipettesByMount.right.pipetteName !==
+        `${i18n.t('flex.pipette_selection.LEAVE_SECOND_MOUNT_EMPTY_VALUE')}` &&
+      !pipettesByMount.right.tipRackList.length
+    ) {
+      errors.rightTiprack = `${i18n.t('flex.errors.tiprack_not_selected')}`
     }
 
     return errors
@@ -234,7 +219,6 @@ function FlexProtocolEditor(): JSX.Element {
             initialValues={getInitialValues}
             validateOnChange={true}
             validate={validateFields}
-            validationSchema={validationSchema}
             onSubmit={(values, actions) => {
               console.log({ values })
             }}

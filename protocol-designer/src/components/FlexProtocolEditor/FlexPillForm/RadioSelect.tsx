@@ -11,6 +11,7 @@ import { RadioGroup } from '@opentrons/components'
 import { pipetteNameBlocklist, pipetteSlot } from '../constant'
 import { useFormikContext } from 'formik'
 import type { ActionMeta } from 'react-select'
+import { i18n } from '../../../localization'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
@@ -69,7 +70,12 @@ export const RadioSelect = ({ pipetteName, pipetteType }: any): JSX.Element => {
   ]
 
   const emptyMount = [
-    { value: 'LEAVE_SECOND_EMPTY', name: 'Leave Second Empty' },
+    {
+      value: `${i18n.t(
+        'flex.pipette_selection.LEAVE_SECOND_MOUNT_EMPTY_VALUE'
+      )}`,
+      name: `${i18n.t('flex.pipette_selection.leave_second_mount_empty')}`,
+    },
   ]
 
   const newGroupedOptions =
