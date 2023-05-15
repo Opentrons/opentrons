@@ -65,8 +65,8 @@ export function fetchRobotApi(
           host,
           path,
           method,
-          body: response.data,
-          ok: response.data != null,
+          body: response?.data,
+          ok: response?.data != null,
           // TODO(bh, 2023-04-25): until all response info forwarded (including unsuccessful requests), presume success here to quiet TS
           status: 200,
         }))
