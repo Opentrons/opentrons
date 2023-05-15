@@ -16,7 +16,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
+from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount, subsystem_from_mount, sub_system_to_node_id
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -724,11 +724,11 @@ async def get_pressure_ot3(
         raise SensorResponseBad("no response from sensor")
     return data.to_float()  # type: ignore[union-attr]
 
-def get_tip_status(api: OT3API, mount: OT3Mount) -> bool:
+async def get_tip_status(api: OT3API, mount: OT3Mount) -> bool:
     """Get the tip status for each node."""
     if api.is_simulator:
         return False
-    subsystem = mount_to_subsystem(mount)
+    subsystem = subsystem_from_mount(mount)
     node = sub_system_to_node_id(subsystem)
     event = asyncio.Event()
     response: int = 0
