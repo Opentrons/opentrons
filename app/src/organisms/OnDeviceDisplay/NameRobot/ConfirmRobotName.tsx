@@ -12,10 +12,10 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
-import { StepMeter } from '../../atoms/StepMeter'
-import { SmallButton } from '../../atoms/buttons'
-import screenImage from '../../assets/images/on-device-display/odd_abstract@x2.png'
+import { StyledText } from '../../../atoms/text'
+import { StepMeter } from '../../../atoms/StepMeter'
+import { SmallButton } from '../../../atoms/buttons'
+import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'finish setting up a robot'
 
