@@ -32,7 +32,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
         color={COLORS.darkGreyEnabled}
       />
       {header != null ? (
-        <StyledText as="h1" marginTop={SPACING.spacing5}>
+        <StyledText as="h1" marginTop={SPACING.spacing24}>
           {header}
         </StyledText>
       ) : null}

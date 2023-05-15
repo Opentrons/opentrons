@@ -60,7 +60,7 @@ export function FailedToConnect({
         height="26.5625rem"
         backgroundColor={COLORS.errorBackgroundMed}
         justifyContent={JUSTIFY_CENTER}
-        marginBottom={SPACING.spacing6}
+        marginBottom={SPACING.spacing32}
       >
         <Flex
           justifyContent={JUSTIFY_CENTER}
@@ -81,7 +81,7 @@ export function FailedToConnect({
             fontSize="2rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="2.72375rem"
-            marginTop={SPACING.spacingXXL}
+            marginTop={SPACING.spacing40}
           >
             {isInvalidPassword
               ? `Oops! Incorrect password for ${ssid}.`
@@ -93,13 +93,13 @@ export function FailedToConnect({
             requestState.error != null &&
             'message' in requestState.error &&
             requestState.error.message != null && (
-              <StyledText marginTop={SPACING.spacing4}>
+              <StyledText marginTop={SPACING.spacing16}>
                 {requestState.error.message}
               </StyledText>
             )}
         </Flex>
       </Flex>
-      <Flex gridGap="0.75rem">
+      <Flex gridGap={SPACING.spacing12}>
         <SecondaryButton
           flex="1"
           onClick={() => setChangeState({ type: null })}

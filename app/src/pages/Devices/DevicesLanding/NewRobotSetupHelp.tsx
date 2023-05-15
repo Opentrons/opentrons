@@ -40,7 +40,7 @@ export function NewRobotSetupHelp(): JSX.Element {
             onClose={() => setShowNewRobotHelpModal(false)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <StyledText as="p" marginBottom={SPACING.spacing16}>
                 {t('use_usb_cable_for_new_robot')}
               </StyledText>
               <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>

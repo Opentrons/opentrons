@@ -107,7 +107,7 @@ export const RobotConfigurationDetails = (
     )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
         item={
@@ -118,14 +118,14 @@ export const RobotConfigurationDetails = (
           )
         }
       />
-      <Divider marginY="0.75rem" width="100%" />
+      <Divider marginY={SPACING.spacing12} width="100%" />
       {leftAndRightMountsItem ?? (
         <>
           <RobotConfigurationDetailsItem
             label={t('left_mount')}
             item={isLoading ? loadingText : leftMountItem}
           />
-          <Divider marginY="0.75rem" width="100%" />
+          <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
             item={isLoading ? loadingText : rightMountItem}
@@ -134,7 +134,7 @@ export const RobotConfigurationDetails = (
       )}
       {enableExtendedHardware ? (
         <>
-          <Divider marginY="0.75rem" width="100%" />
+          <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('shared:extension_mount')}
             item={isLoading ? loadingText : extensionMountItem}
@@ -145,7 +145,7 @@ export const RobotConfigurationDetails = (
         ? requiredModuleDetails.map((module, index) => {
             return (
               <React.Fragment key={index}>
-                <Divider marginY="0.75rem" width="100%" />
+                <Divider marginY={SPACING.spacing12} width="100%" />
                 <RobotConfigurationDetailsItem
                   label={t('run_details:module_slot_number', {
                     slot_number:
@@ -159,7 +159,7 @@ export const RobotConfigurationDetails = (
                       <ModuleIcon
                         key={index}
                         moduleType={getModuleType(module.params.model)}
-                        marginRight={SPACING.spacing2}
+                        marginRight={SPACING.spacing4}
                         alignSelf={ALIGN_CENTER}
                         color={COLORS.darkGreyEnabled}
                         height={SIZE_1}
@@ -199,7 +199,7 @@ export const RobotConfigurationDetailsItem = (
         as="label"
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginRight={SPACING.spacing4}
+        marginRight={SPACING.spacing16}
         color={COLORS.darkGreyEnabled}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"

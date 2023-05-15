@@ -69,10 +69,7 @@ export const ThermocyclerModuleData = (
   }
 
   return (
-    <Flex
-      flexWrap={WRAP}
-      gridGap={`${String(SPACING.spacing1)} ${String(SPACING.spacing6)}`}
-    >
+    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid="thermocycler_module_data_lid"
@@ -82,13 +79,13 @@ export const ThermocyclerModuleData = (
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           {t('tc_lid')}
         </StyledText>
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <Box marginRight={SPACING.spacing2}>
+          <Box marginRight={SPACING.spacing4}>
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
               backgroundColor={COLORS.medGreyEnabled}
@@ -108,7 +105,7 @@ export const ThermocyclerModuleData = (
         <StyledText
           title="lid_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginBottom={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
         >
           {t(data.lidTargetTemperature == null ? 'na_temp' : 'target_temp', {
             temp: data.lidTargetTemperature,
@@ -128,7 +125,7 @@ export const ThermocyclerModuleData = (
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           {t('tc_block')}
         </StyledText>
@@ -141,7 +138,7 @@ export const ThermocyclerModuleData = (
         <StyledText
           title="tc_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginBottom={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
         >
           {t(data.targetTemperature == null ? 'na_temp' : 'target_temp', {
             temp: data.targetTemperature,

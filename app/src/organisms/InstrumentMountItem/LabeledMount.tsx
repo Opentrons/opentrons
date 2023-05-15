@@ -22,7 +22,7 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
-  padding: ${SPACING.spacing5};
+  padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.size_three};
   background-color: ${({ isAttached }) =>
     isAttached ? COLORS.green3 : COLORS.light1};
@@ -53,7 +53,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
         <Flex
           flex="1 0 auto"
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
         >
           <StyledText
             flex="2"
