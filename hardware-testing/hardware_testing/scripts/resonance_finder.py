@@ -27,16 +27,19 @@ CYCLES = 1
 
 AXIS_MICROSTEP = {'X': 16,
                   'Y': 16,
-                  'Z': 16}
+                  'L': 16,
+                  'R': 16}
 
 #units of mm/ustep
 AXIS_FSTEP_CONVERT = {'X': (12.7*np.pi)/(200*AXIS_MICROSTEP['X']),
                   'Y': (12.7254*np.pi)/(200*AXIS_MICROSTEP['Y']),
-                  'Z': 3/(200*AXIS_MICROSTEP['Z'])}
+                  'L': 3/(200*AXIS_MICROSTEP['L']),
+                  'R': 3/(200*AXIS_MICROSTEP['R'])}
 
 TEST_LIST = {}
 
 ACCEL = 1000
+START_CURRENT = 1.5
 TEST_PARAMETERS = {
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
@@ -49,7 +52,7 @@ TEST_PARAMETERS = {
                 'MAX': 3000,
                 'INC': 400},
             'CURRENT': {
-                'MIN': 1.0,
+                'MIN': START_CURRENT,
                 'MAX': 1.5,
                 'INC': 0.5}},
         'Y': {
@@ -62,7 +65,7 @@ TEST_PARAMETERS = {
                 'MAX': 2200,
                 'INC': 400},
             'CURRENT': {
-                'MIN': 1.0,
+                'MIN': START_CURRENT,
                 'MAX': 1.5,
                 'INC': 0.1}},
         'L': {
@@ -75,7 +78,7 @@ TEST_PARAMETERS = {
                 'MAX': 300,
                 'INC': 100},
             'CURRENT': {
-                'MIN': 1.0,
+                'MIN': START_CURRENT,
                 'MAX': 1.5,
                 'INC': 0.1}},
         'R': {
@@ -88,7 +91,7 @@ TEST_PARAMETERS = {
                 'MAX': 300,
                 'INC': 100},
             'CURRENT': {
-                'MIN': 1.0,
+                'MIN': START_CURRENT,
                 'MAX': 1.5,
                 'INC': 0.1}}
     },
@@ -207,7 +210,9 @@ step_z = 200
 
 MAX_MOVES = {'X':step_x,
              'Y':step_y,
-             'Z':step_z}
+             'L':step_z,
+             'R':step_z}
+
 HOME_POINT_MAP = {'Y': Point(y=-xy_home_offset),
              'X': Point(x=-xy_home_offset),
              'L': Point(z=0),
@@ -278,7 +283,9 @@ def determine_move_distance(speed, acceleration, axis, direction):
         distance = Point(y=distance*direction)
     elif axis == 'X':
         distance = Point(x=distance*direction)
-    elif axis == 'Z':
+    elif axis == 'L':
+        distance = Point(z=distance*direction)
+    elif axis == 'R':
         distance = Point(z=distance*direction)
     else:
         distance = 0
@@ -438,6 +445,10 @@ async def _main(is_simulating: bool) -> None:
                     move_output_tuple = await _single_axis_move(test_axis,
                                                                 api,
                                                                 cycles=CYCLES)
+                    if(test_axis == 'L'):
+                        move_output_tuple = await _single_axis_move('R',
+                                                                    api,
+                                                                    cycles=CYCLES)
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
 
@@ -459,7 +470,7 @@ async def _main(is_simulating: bool) -> None:
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     finally:
-        # await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         await api.clean_up()
 
 def parameter_range(test_load, test_axis, p_type):
@@ -509,6 +520,7 @@ if __name__ == "__main__":
     parser.add_argument("--start", type=int, default=START_FREQ)
     parser.add_argument("--inc", type=int, default=FREQ_INC)
     parser.add_argument("--accel", type=int, default=ACCEL)
+    parser.add_argument("--current", type=float, default=START_CURRENT)
 
     args = parser.parse_args()
     CYCLES = args.cycles
@@ -519,6 +531,7 @@ if __name__ == "__main__":
     START_FREQ = args.start
     FREQ_INC = args.inc
     ACCEL = args.accel
+    START_CURRENT = args.current
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))
