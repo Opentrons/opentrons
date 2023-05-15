@@ -41,19 +41,19 @@ const MODAL_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   padding: ${SPACING.spacing32};
-  height: '24.625rem';
+  height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: '31.5625rem';
+    height: 31.5625rem;
   }
 `
 const SPINNER_STYLE = css`
-  size: '5.125rem';
+  size: 5.125rem;
   color: ${COLORS.darkGreyEnabled};
-  opacity: '100%';
+  opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    size: '6.25rem'
+    size: 6.25rem
     color: ${COLORS.darkBlackEnabled};
-    opacity: '70%';
+    opacity: 70%;
   }
 `
 

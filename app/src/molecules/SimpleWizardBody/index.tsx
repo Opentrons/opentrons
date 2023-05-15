@@ -61,24 +61,24 @@ const BUTTON_STYLE = css`
   }
 `
 const WIZARD_CONTAINER_STYLE = css`
-  min-height: '24.625rem';
+  min-height: 24.625rem;
   flex-direction: ${DIRECTION_COLUMN}
   justify-content: ${JUSTIFY_SPACE_BETWEEN}
   height: 'auto'
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: '29.5rem';
+    height: 29.5rem;
   }
 `
 const ICON_STYLE = css`
-  size: '2.5rem';
+  size: 2.5rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     size: 3.75rem;
   }
 `
 const FLEX_SPACING_STYLE = css`
-  height: '1.5rem';
+  height: 1.5rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: '0rem';
+    height: 0rem;
   }
 `
 

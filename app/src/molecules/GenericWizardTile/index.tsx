@@ -62,9 +62,9 @@ const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
-  height: '24.625rem';
+  height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: '30rem';
+    height: 30rem;
   }
 `
 export interface GenericWizardTileProps {
