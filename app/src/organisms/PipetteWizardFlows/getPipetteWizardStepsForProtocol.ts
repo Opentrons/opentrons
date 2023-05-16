@@ -17,14 +17,14 @@ export const getPipetteWizardStepsForProtocol = (
   //  no pipette is required in the protocol
   if (
     (requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-      attachedPipettes[mount]?.data.calibratedOffset != null) ||
+      attachedPipettes[mount]?.data?.calibratedOffset?.last_modified != null) ||
     requiredPipette == null
   ) {
     return []
     //    return calibration flow only if correct pipette is attached and pipette cal null
   } else if (
     requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-    attachedPipettes[mount]?.data.calibratedOffset == null
+    attachedPipettes[mount]?.data?.calibratedOffset?.last_modified == null
   ) {
     return [
       {

@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
-  Flex,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -12,14 +14,16 @@ import {
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { StyledText } from '../../../atoms/text'
+import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
-} from '../../organisms/OnDeviceDisplay/RobotDashboard'
-import { sortProtocols } from './ProtocolDashboard/utils'
+} from '../../../organisms/OnDeviceDisplay/RobotDashboard'
+import { getOnDeviceDisplaySettings } from '../../../redux/config'
+import { sortProtocols } from '../ProtocolDashboard/utils'
+import { WelcomedModal } from './WelcomeModal'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
 const SORT_KEY = 'recentRun'
@@ -28,8 +32,14 @@ export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
   const protocols = useAllProtocolsQuery()
   const runs = useAllRunsQuery()
-  const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
-  const runData = runs.data?.data != null ? runs.data?.data : []
+  const protocolsData = protocols.data?.data ?? []
+  const runData = runs.data?.data ?? []
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
+    unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
+  )
 
   /** Currently the max number of displaying recent run protocol is 8 */
   const sortedProtocols =
@@ -44,14 +54,17 @@ export function RobotDashboard(): JSX.Element {
     <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        {showWelcomeModal ? (
+          <WelcomedModal setShowWelcomeModal={setShowWelcomeModal} />
+        ) : null}
         {sortedProtocols.length === 0 ? (
           <EmptyRecentRun />
         ) : (
           <>
             <StyledText
-              fontSize={TYPOGRAPHY.fontSize20}
-              lineHeight={TYPOGRAPHY.lineHeight28}
+              as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.darkBlack70}
             >
               {t('run_again')}
             </StyledText>

@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from textwrap import dedent
 from typing import Optional, Union
-from typing_extensions import Literal
+from typing_extensions import Literal, Final
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
@@ -41,6 +41,8 @@ from ..dependencies import get_run_data_manager, get_run_auto_deleter
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
+
+_DEFAULT_RUNS_LIST_LENGTH: Final = 20
 
 
 class RunNotFound(ErrorDetails):
@@ -187,11 +189,16 @@ async def create_run(
 async def get_runs(
     pageLength: Optional[int] = Query(
         None,
-        description="The maximum number of runs in the list to return.",
+        description=(
+            "The maximum number of runs to return."
+            " If this is less than the total number of runs,"
+            " the most-recently created runs will be returned."
+            " If this is omitted or `null`, all runs will be returned."
+        ),
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
-    """Get all runs.
+    """Get all runs, in order from least-recently to most-recently created.
 
     Args:
         pageLength: Maximum number of items to return.

@@ -14,7 +14,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
   OVERFLOW_HIDDEN,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -56,14 +55,17 @@ const COMMAND_ROW_STYLE = css`
   -webkit-line-clamp: 2;
   overflow: hidden;
 `
-const BOTTOM_ROW_STYLE = css`
-  position: ${POSITION_ABSOLUTE};
-  bottom: 0;
-  width: 100%;
-  height: 5rem;
-  z-index: 6;
-  backdrop-filter: blur(1.5px);
-`
+
+// Note (kj:05/15/2023)
+// This blur part will be fixed before the launch
+// const BOTTOM_ROW_STYLE = css`
+//   position: ${POSITION_ABSOLUTE};
+//   bottom: 0;
+//   width: 100%;
+//   height: 5rem;
+//   z-index: 6;
+//   backdrop-filter: blur(1.5px);
+// `
 
 interface RunningProtocolCommandListProps {
   runStatus: RunStatus | null
@@ -167,14 +169,14 @@ export function RunningProtocolCommandList({
                   gridGap={SPACING.spacing8}
                 >
                   <Flex
-                    padding={`0.75rem ${SPACING.spacing24}`}
+                    padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
                     alignItems={ALIGN_CENTER}
                     backgroundColor={backgroundColor}
                     width="100%"
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.size_two}
+                    borderRadius={BORDERS.size2}
                   >
                     <CommandIcon command={command} />
                     <CommandText
@@ -187,7 +189,7 @@ export function RunningProtocolCommandList({
               )
             }}
           </ViewportList>
-          <Flex css={BOTTOM_ROW_STYLE}></Flex>
+          {/* <Flex css={BOTTOM_ROW_STYLE}></Flex> */}
         </Flex>
       ) : null}
     </Flex>

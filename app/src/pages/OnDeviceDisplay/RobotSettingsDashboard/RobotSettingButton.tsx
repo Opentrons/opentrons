@@ -41,7 +41,7 @@ const SETTING_BUTTON_STYLE = css`
   margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.medGreyEnabled};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
-  border-radius: ${BORDERS.size_four};
+  border-radius: ${BORDERS.size4};
 `
 
 interface RobotSettingButtonProps {
@@ -125,11 +125,11 @@ export function RobotSettingButton({
       {isUpdateAvailable ?? false ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.warningBackgroundMed}
-          padding={`0.75rem ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size_four}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          borderRadius={BORDERS.size4}
         >
           <Icon name="ot-alert" size="1.75rem" color={COLORS.warningEnabled} />
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -141,11 +141,11 @@ export function RobotSettingButton({
       {enabledDevTools != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`0.75rem ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size_four}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          borderRadius={BORDERS.size4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
@@ -156,11 +156,11 @@ export function RobotSettingButton({
       {ledLights != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
-          padding={`0.75rem ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size_four}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          borderRadius={BORDERS.size4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}

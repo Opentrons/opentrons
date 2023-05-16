@@ -10,11 +10,11 @@ export interface CreateMaintenanceRunActionData {
 
 export function createMaintenanceRunAction(
   config: HostConfig,
-  runId: string,
+  maintenanceRunId: string,
   data: CreateMaintenanceRunActionData
 ): ResponsePromise<MaintenanceRunAction> {
   return request<
     MaintenanceRunAction,
     { data: CreateMaintenanceRunActionData }
-  >(POST, `/maintenance_runs/${runId}/actions`, { data }, config)
+  >(POST, `/maintenance_runs/${maintenanceRunId}/actions`, { data }, config)
 }

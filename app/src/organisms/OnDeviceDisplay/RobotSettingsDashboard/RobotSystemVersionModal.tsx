@@ -57,7 +57,7 @@ export function RobotSystemVersionModal({
             paddingX={SPACING.spacing16}
             paddingY={SPACING.spacing24}
             backgroundColor={COLORS.light2}
-            borderRadius={BORDERS.size_three}
+            borderRadius={BORDERS.size3}
             marginY={SPACING.spacing24}
           >
             <Icon
@@ -75,7 +75,7 @@ export function RobotSystemVersionModal({
           </Flex>
           <ReleaseNotes source={releaseNotes} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} gridGap="0.75rem">
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing12}>
           <SecondaryButton
             flex="1"
             onClick={() => setShowModal(false)}

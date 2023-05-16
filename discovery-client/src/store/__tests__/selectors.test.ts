@@ -293,13 +293,27 @@ describe('discovery client state selectors', () => {
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const result = sort([regular, linkLocalV6, linkLocalV4, localhost, home])
+      const usb: Partial<HostState> = {
+        ip: 'opentrons-usb',
+        healthStatus: HEALTH_STATUS_OK,
+        serverHealthStatus: HEALTH_STATUS_OK,
+      }
+
+      const result = sort([
+        usb,
+        regular,
+        linkLocalV6,
+        linkLocalV4,
+        localhost,
+        home,
+      ])
       expect(result).toEqual([
         home,
         localhost,
         linkLocalV4,
         linkLocalV6,
         regular,
+        usb,
       ])
     })
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, Link, useHistory } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
@@ -16,7 +16,6 @@ import {
   OVERFLOW_HIDDEN,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   useProtocolQuery,
   useRunQuery,
@@ -72,7 +71,6 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
-  const history = useHistory()
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -113,12 +111,6 @@ export function RunningProtocol(): JSX.Element {
       swipe.setSwipeType('')
     }
   }, [currentOption, swipe, swipe.setSwipeType])
-
-  React.useEffect(() => {
-    if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
-      history.push(`/protocols/${runId}/summary`)
-    }
-  }, [history, runId, runStatus])
 
   return (
     <>
