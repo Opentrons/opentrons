@@ -909,7 +909,7 @@ def validate_attitude_deck_calibration(
         return DeckTransformState.OK
 
 
-def delete_belt_calibration_data() -> None:
+def delete_belt_calibration_data(hcapi: OT3API) -> None:
     delete_robot_belt_attitude()
 
 
