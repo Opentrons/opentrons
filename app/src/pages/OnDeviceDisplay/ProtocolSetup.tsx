@@ -83,7 +83,7 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size_four}
+        borderRadius={BORDERS.size4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
@@ -192,7 +192,6 @@ function PrepareToRun({
 
   const { play } = useRunControls(runId)
 
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
@@ -258,7 +257,6 @@ function PrepareToRun({
   const onPlay = (): void => {
     if (isReadyToRun) {
       play()
-      history.push(`/protocols/${runId}/run`)
     } else {
       setShowSnackbar(true)
     }

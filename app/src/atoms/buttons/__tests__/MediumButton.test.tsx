@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { MediumButton } from '../MediumButton'
 
@@ -81,5 +81,13 @@ describe('MediumButton', () => {
     }
     const { getByLabelText } = render(props)
     getByLabelText('MediumButton_restart')
+  })
+  it('renders the rounded button category', () => {
+    props = {
+      ...props,
+      buttonCategory: 'rounded',
+    }
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toHaveStyle(`border-radius: ${BORDERS.size5}`)
   })
 })

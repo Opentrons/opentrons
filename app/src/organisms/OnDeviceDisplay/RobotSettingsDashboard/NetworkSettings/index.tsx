@@ -190,7 +190,7 @@ function NetworkSettingButton({
         width="100%"
         padding={SPACING.spacing24}
         backgroundColor={buttonBackgroundColor}
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
         onClick={displayDetailsTab}
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>

@@ -7,13 +7,13 @@ import type { CommandData, CreateCommandParams } from '../runs/types'
 
 export function createMaintenanceCommand(
   config: HostConfig,
-  runId: string,
+  maintenanceRunId: string,
   data: CreateCommand,
   params?: CreateCommandParams
 ): ResponsePromise<CommandData> {
   return request<CommandData, { data: CreateCommand }>(
     POST,
-    `/maintenance_runs/${runId}/commands`,
+    `/maintenance_runs/${maintenanceRunId}/commands`,
     { data },
     config,
     params

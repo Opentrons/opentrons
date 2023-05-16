@@ -46,7 +46,7 @@ export function LongPressModal(props: {
   const createRunUse = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
-      history.push(`/protocols/${runId}/setup`)
+      history.push(`/runs/${runId}/setup`)
     },
   })
   const createRun =

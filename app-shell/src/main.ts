@@ -14,6 +14,7 @@ import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { registerUsb } from './usb'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -88,6 +89,7 @@ function startUp(): void {
     registerLabware(dispatch, mainWindow),
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
+    registerUsb(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
