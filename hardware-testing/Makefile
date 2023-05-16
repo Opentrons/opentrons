@@ -226,19 +226,19 @@ push-ot3-gravimetric:
 	-$(MAKE) patch-for-gravimetric
 	$(MAKE) sync-sw-ot3
 
-.PHONY: patch-for-gravimetric
+.PHONY: apply-patches-gravimetric
 patch-for-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
 
-.PHONY: unpatch-for-gravimetric
+.PHONY: remove-patches-gravimetric
 unpatch-for-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
 
-.PHONY: gen-patches-for-gravimetric
+.PHONY: update-patches-gravimetric
 gen-patches-for-gravimetric:
 	rm ./hardware_testing/gravimetric/overrides/*.patch
 	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
 	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
 	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
 	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
-	$(MAKE) unpatch-for-gravimetric
+	$(MAKE) remove-patches-gravimetric
