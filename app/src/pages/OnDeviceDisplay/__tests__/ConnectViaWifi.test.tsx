@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -88,7 +87,7 @@ describe('ConnectViaWifi', () => {
       ethernet: null,
     })
     const [{ getByRole, getByText }] = render()
-    fireEvent.click(getByRole('button', { name: 'foo' }))
+    getByRole('button', { name: 'foo' }).click()
     getByText('WPA2 Personal')
   })
 
@@ -99,8 +98,8 @@ describe('ConnectViaWifi', () => {
       ethernet: null,
     })
     const [{ getByRole, getByText }] = render()
-    fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByText('Continue'))
+    getByRole('button', { name: 'foo' }).click()
+    getByText('Continue').click()
     getByText('Enter password')
   })
 
@@ -114,9 +113,9 @@ describe('ConnectViaWifi', () => {
       status: RobotApi.PENDING,
     })
     const [{ getByRole, getByText }] = render()
-    fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByText('Continue'))
-    fireEvent.click(getByRole('button', { name: 'Connect' }))
+    getByRole('button', { name: 'foo' }).click()
+    getByText('Continue').click()
+    getByText('Connect').click()
     getByText('Connecting...')
   })
 
@@ -131,9 +130,9 @@ describe('ConnectViaWifi', () => {
       response: {} as any,
     })
     const [{ getByRole, getByText }] = render()
-    fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByText('Continue'))
-    fireEvent.click(getByRole('button', { name: 'Connect' }))
+    getByRole('button', { name: 'foo' }).click()
+    getByText('Continue').click()
+    getByText('Connect').click()
     getByText('Connected')
   })
 
@@ -149,9 +148,9 @@ describe('ConnectViaWifi', () => {
       error: { message: 'mock error' },
     })
     const [{ getByRole, getByText }] = render()
-    fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByText('Continue'))
-    fireEvent.click(getByRole('button', { name: 'Connect' }))
+    getByRole('button', { name: 'foo' }).click()
+    getByText('Continue').click()
+    getByText('Connect').click()
     getByText('Oops! Incorrect password for foo.')
   })
 })

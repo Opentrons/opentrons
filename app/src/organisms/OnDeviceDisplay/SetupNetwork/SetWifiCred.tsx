@@ -3,29 +3,42 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
+  BORDERS,
   Box,
-  Flex,
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
-  SPACING,
+  Flex,
   Icon,
-  Btn,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import { InputField } from '../../../atoms/InputField'
 import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { SmallButton } from '../../../atoms/buttons'
 
 const SSID_INPUT_FIELD_STYLE = css`
-  padding-top: ${SPACING.spacing24};
-  padding-bottom: ${SPACING.spacing24};
-  font-size: 2.5rem;
-  line-height: 3.25rem;
-  text-align: center;
+  padding-top: 2.125rem;
+  padding-bottom: 2.125rem;
+  height: 4.25rem;
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  color: ${COLORS.darkBlack100};
+  padding-left: ${SPACING.spacing24};
+  box-sizing: border-box;
+
+  &:focus {
+    border: 3px solid ${COLORS.blueEnabled};
+    filter: drop-shadow(0px 0px 10px ${COLORS.blueEnabled});
+    border-radius: ${BORDERS.size1};
+  }
 `
 
 interface SetWifiCredProps {
@@ -55,37 +68,25 @@ export function SetWifiCred({
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        marginBottom="3.0625rem"
+        marginBottom={SPACING.spacing48}
       >
-        <Btn onClick={() => setShowSelectAuthenticationType(true)}>
+        <Btn
+          onClick={() => setShowSelectAuthenticationType(true)}
+          data-testid="SetWifiCred_back_button"
+        >
           <Flex flexDirection={DIRECTION_ROW}>
-            <Icon
-              name="chevron-left"
-              marginRight={SPACING.spacing4}
-              size="1.875rem"
-            />
-            <StyledText
-              fontSize="1.625rem"
-              lineHeight="2.1875rem"
-              fontWeight="700"
-            >
-              {t('shared:back')}
-            </StyledText>
+            <Icon name="back" marginRight={SPACING.spacing4} size="3rem" />
           </Flex>
         </Btn>
-        <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
-          {`${ssid}`}
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          {t('sign_into_wifi')}
         </StyledText>
-        <TertiaryButton
-          width="8.9375rem"
-          height="3.75rem"
-          fontSize="1.5rem"
-          fontWeight="500"
-          lineHeight="2.0425rem"
+        <SmallButton
+          buttonType="primary"
+          buttonCategory="rounded"
+          buttonText={t('connect')}
           onClick={handleConnect}
-        >
-          {t('connect')}
-        </TertiaryButton>
+        />
       </Flex>
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} paddingLeft="6.25rem">
         <StyledText
@@ -94,7 +95,7 @@ export function SetWifiCred({
           lineHeight="1.875rem"
           fontWeight="500"
         >
-          {'Enter password'}
+          {t('enter_password')}
         </StyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Box width="36.375rem">
@@ -110,13 +111,13 @@ export function SetWifiCred({
             marginLeft="1.5rem"
             onClick={() => setShowPassword(currentState => !currentState)}
           >
-            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-              <Icon
-                name={showPassword ? 'eye-slash' : 'eye'}
-                width="2.75rem"
-                height="1.875rem"
-              />
-              <StyledText marginLeft={SPACING.spacing16}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing16}
+            >
+              <Icon name={showPassword ? 'eye-slash' : 'eye'} size="3rem" />
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {showPassword ? t('hide') : t('show')}
               </StyledText>
             </Flex>
