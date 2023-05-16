@@ -12,7 +12,8 @@ import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
-import { RecentRunProtocolCard } from '..'
+import { useMissingHardwareText } from '../hooks'
+import { RecentRunProtocolCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -22,6 +23,7 @@ jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
+jest.mock('../hooks')
 
 const mockProtocolName = 'mockProtocol'
 const mockProtocolId = 'mockProtocolId'
@@ -84,6 +86,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
+const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
+  typeof useMissingHardwareText
+>
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -113,6 +118,7 @@ describe('RecentRunProtocolCard', () => {
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
+    mockUseMissingHardwareText.mockReturnValue('Ready to run')
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseMissingProtocolHardware.mockReturnValue([])
     mockUseAllRunsQuery.mockReturnValue({
@@ -144,18 +150,21 @@ describe('RecentRunProtocolCard', () => {
 
   it('should render missing chip when missing a pipette', () => {
     mockUseMissingProtocolHardware.mockReturnValue(mockMissingPipette)
+    mockUseMissingHardwareText.mockReturnValue('Missing 1 pipette')
     const [{ getByText }] = render(props)
     getByText('Missing 1 pipette')
   })
 
   it('should render missing chip when missing a module', () => {
     mockUseMissingProtocolHardware.mockReturnValue(mockMissingModule)
+    mockUseMissingHardwareText.mockReturnValue('Missing 1 module')
     const [{ getByText }] = render(props)
     getByText('Missing 1 module')
   })
 
   it('should render missing chip (module and pipette) when missing a pipette and a module', () => {
     mockUseMissingProtocolHardware.mockReturnValue(missingBoth)
+    mockUseMissingHardwareText.mockReturnValue('Missing hardware')
     const [{ getByText }] = render(props)
     getByText('Missing hardware')
   })

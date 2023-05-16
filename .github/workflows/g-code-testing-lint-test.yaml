@@ -8,6 +8,7 @@ on:
   push:
     paths:
       - 'Makefile'
+      - 'api/**'
       - 'g-code-testing/**'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
@@ -21,6 +22,7 @@ on:
     paths:
       - 'Makefile'
       - 'g-code-testing/**'
+      - 'api/**'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'

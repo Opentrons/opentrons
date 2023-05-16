@@ -239,7 +239,7 @@ describe('ProtocolSetup', () => {
       missingModuleIds: ['missingMod'],
       remainingAttachedModules: [],
     })
-    const [{ getByRole, getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByRole('button', { name: 'play' }).click()
     expect(mockPlay).toBeCalledTimes(0)
     getByText('Mock Snackbar')
