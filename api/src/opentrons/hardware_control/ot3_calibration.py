@@ -950,7 +950,7 @@ class OT3RobotCalibrationProvider:
     def load_deck_calibration(self) -> None:
         self._validate.cache_clear()
         self._robot_calibration.deck_calibration = load_attitude_matrix(
-            to_default=False
+            to_default=True  # make False
         )
 
     def set_robot_calibration(self, robot_calibration: OT3Transforms) -> None:
