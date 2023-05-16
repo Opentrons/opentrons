@@ -548,3 +548,63 @@ async def test_subsystems(
     ).then_return({k: v for k, v in required_updates.items() if k in bad_targets})
     await subject.start()
     assert subject.subsystems == subsystem_info
+
+
+@pytest.mark.parametrize(
+    "target_info,required_updates,outcome",
+    [
+        ({}, {}, False),
+        (
+            default_network_info_for({NodeId.head_bootloader, USBTarget.rear_panel}),
+            {
+                NodeId.head: (1, "/some/path"),
+                USBTarget.rear_panel: (2, "/some/other/path"),
+            },
+            True,
+        ),
+        (
+            default_network_info_for({NodeId.pipette_left, NodeId.gantry_x}),
+            {},
+            False,
+        ),
+        (
+            default_network_info_for(
+                {NodeId.head_bootloader, NodeId.pipette_right_bootloader}
+            ),
+            {NodeId.head: (1, "/some/path"), NodeId.pipette_right: (1, "/some/path")},
+            True,
+        ),
+    ],
+)
+async def test_update_required(
+    target_info: Dict[FirmwareTarget, network.DeviceInfoCache],
+    required_updates: Dict[FirmwareTarget, Tuple[int, str]],
+    outcome: bool,
+    subject: SubsystemManager,
+    network_info: network.NetworkInfo,
+    tool_detection_controller: ToolDetectionController,
+    update_bag: FirmwareUpdate,
+    decoy: Decoy,
+) -> None:
+    """It should have an accurate update_required attribute corresponding to whether updates are needed.."""
+    targets = set(iter(target_info.keys()))
+    target_applications = {t.application_for() for t in target_info.keys()}
+    decoy.when(network_info.targets).then_return(target_applications)
+    decoy.when(network_info.device_info).then_return(target_info)
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, target_info)
+
+    good_targets = {target for target, info in target_info.items() if info.ok}
+    bad_targets = target_applications - good_targets
+    decoy.when(update_bag.update_checker(target_info, good_targets, False)).then_return(
+        {k: v for k, v in required_updates.items() if k in good_targets}
+    )
+    decoy.when(
+        update_bag.update_checker(
+            target_info,
+            bad_targets,
+            True,
+        )
+    ).then_return({k: v for k, v in required_updates.items() if k in bad_targets})
+    await subject.start()
+    assert subject.update_required == outcome
