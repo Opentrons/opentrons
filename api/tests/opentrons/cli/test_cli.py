@@ -27,15 +27,18 @@ def _get_analysis_result(protocol_files: List[Path]) -> Tuple[int, Any]:
     with tempfile.TemporaryDirectory() as temp_dir:
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
         runner = CliRunner()
-        exit_code = runner.invoke(
+        result = runner.invoke(
             analyze,
             [
                 "--json-output",
                 str(analysis_output_file),
                 *[str(p.resolve()) for p in protocol_files],
             ],
-        ).exit_code
-        return exit_code, json.loads(analysis_output_file.read_bytes())
+        )
+        if result.exception is not None:
+            raise result.exception
+        else:
+            return result.exit_code, json.loads(analysis_output_file.read_bytes())
 
 
 @pytest.mark.parametrize("fixture_path", _list_fixtures(6))
