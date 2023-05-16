@@ -22,6 +22,7 @@ import {
   Link,
   Icon,
   PrimaryButton,
+  MoveLabwareAnimationParams,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -93,6 +94,7 @@ export interface InterventionModalProps {
   robotType?: RobotType
   moduleRenderInfo?: RunModuleInfo[] | null
   labwareRenderInfo?: RunLabwareInfo[] | null
+  labwareAnimationParams?: MoveLabwareAnimationParams | null
   labwareName?: string
   oldDisplayLocation?: string
   newDisplayLocation?: string
@@ -106,6 +108,7 @@ export function InterventionModal({
   robotType,
   moduleRenderInfo,
   labwareRenderInfo,
+  labwareAnimationParams,
   labwareName,
   oldDisplayLocation,
   newDisplayLocation,
@@ -133,11 +136,13 @@ export function InterventionModal({
         newDisplayLocation != null &&
         labwareRenderInfo != null &&
         command.params?.labwareId != null &&
-        deckDef != null ? (
+        deckDef != null &&
+        labwareAnimationParams != null ? (
           <MoveLabwareInterventionContent
             robotType={robotType}
             moduleRenderInfo={moduleRenderInfo}
             labwareRenderInfo={labwareRenderInfo}
+            labwareAnimationParams={labwareAnimationParams}
             labwareName={labwareName ?? ''}
             movedLabwareId={command.params.labwareId}
             oldDisplayLocation={oldDisplayLocation}

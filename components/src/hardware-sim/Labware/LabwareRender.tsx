@@ -25,6 +25,13 @@ export const WELL_LABEL_OPTIONS = {
 
 export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 
+export interface MoveLabwareAnimationParams {
+  xMovement: number
+  yMovement: number
+  duration: string
+  begin: string
+}
+
 export interface LabwareRenderProps {
   /** Labware definition to render */
   definition: LabwareDefinition2
@@ -58,6 +65,7 @@ export interface LabwareRenderProps {
   hover?: boolean
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  moveLabwareAnimationParams?: MoveLabwareAnimationParams | null
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -69,6 +77,19 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
+      {props.moveLabwareAnimationParams != null ? (
+        <animateTransform
+          id="labware-move"
+          attributeName="transform"
+          type="translate"
+          from={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y}`}
+          to={`${props.moveLabwareAnimationParams.xMovement} ${props.moveLabwareAnimationParams.yMovement}`}
+          begin={props.moveLabwareAnimationParams.begin}
+          dur={props.moveLabwareAnimationParams.duration}
+          calcMode="ease-out"
+          fill="freeze"
+        />
+      ) : null}
       <StaticLabware
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}

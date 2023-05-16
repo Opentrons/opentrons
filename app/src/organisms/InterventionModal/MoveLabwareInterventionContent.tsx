@@ -25,14 +25,16 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
+import type { MoveLabwareAnimationParams } from '@opentrons/components'
 import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
-import type { RunLabwareInfo, RunModuleInfo } from './utils'
+import { RunLabwareInfo, RunModuleInfo } from './utils'
 import { LabwareDisabledOverlay } from './LabwareDisabledOverlay'
 
 export interface MoveLabwareInterventionProps {
   robotType: RobotType
   moduleRenderInfo: RunModuleInfo[]
   labwareRenderInfo: RunLabwareInfo[]
+  labwareAnimationParams: MoveLabwareAnimationParams
   labwareName: string
   movedLabwareId: string
   oldDisplayLocation: string
@@ -42,6 +44,7 @@ export interface MoveLabwareInterventionProps {
 
 export function MoveLabwareInterventionContent({
   robotType,
+  labwareAnimationParams,
   labwareName,
   movedLabwareId,
   moduleRenderInfo,
@@ -127,6 +130,11 @@ export function MoveLabwareInterventionContent({
                               highlightLabware={
                                 movedLabwareId === nestedLabwareId
                               }
+                              moveLabwareAnimationParams={
+                                movedLabwareId === nestedLabwareId
+                                  ? labwareAnimationParams
+                                  : null
+                              }
                             />
                             {movedLabwareId !== nestedLabwareId ? (
                               <LabwareDisabledOverlay
@@ -149,6 +157,11 @@ export function MoveLabwareInterventionContent({
                           <LabwareRender
                             definition={labwareDef}
                             highlightLabware={movedLabwareId === labwareId}
+                            moveLabwareAnimationParams={
+                              movedLabwareId === labwareId
+                                ? labwareAnimationParams
+                                : null
+                            }
                           />
                           {movedLabwareId !== labwareId ? (
                             <LabwareDisabledOverlay definition={labwareDef} />
