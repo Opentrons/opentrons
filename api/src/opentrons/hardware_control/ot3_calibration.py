@@ -9,7 +9,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign, isclose
 from logging import getLogger
-from opentrons.util.linal import solve_attitude, SolvePoints
+from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -628,7 +628,7 @@ async def find_slot_center_binary_from_nominal_center(
 async def _determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> Tuple[types.AttitudeMatrix, SolvePoints, SolvePoints]:
+) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
@@ -664,7 +664,7 @@ async def _determine_transform_matrix(
         (point_b.x, point_b.y, point_b.z),
         (point_c.x, point_c.y, point_c.z),
     )
-    return solve_attitude(expected, actual), expected, actual
+    return solve_attitude(expected, actual)
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -814,7 +814,7 @@ async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
     pipette_id: str,
-) -> Tuple[types.AttitudeMatrix, SolvePoints, SolvePoints]:
+) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
 
@@ -833,11 +833,9 @@ async def calibrate_belts(
         try:
             hcapi.reset_deck_calibration()
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-            belt_attitude, expected, actual = await _determine_transform_matrix(
-                hcapi, mount
-            )
+            belt_attitude = await _determine_transform_matrix(hcapi, mount)
             save_robot_belt_attitude(belt_attitude, pipette_id)
-            return belt_attitude, expected, actual
+            return belt_attitude
         finally:
             hcapi.load_deck_calibration()
             await hcapi.remove_tip(mount)
@@ -919,7 +917,7 @@ class OT3RobotCalibrationProvider:
 
     def __init__(self, config: OT3Config) -> None:
         self._robot_calibration = OT3Transforms(
-            deck_calibration=load_attitude_matrix(to_default=True),  # make False
+            deck_calibration=load_attitude_matrix(to_default=False),
             carriage_offset=Point(*config.carriage_offset),
             left_mount_offset=Point(*config.left_mount_offset),
             right_mount_offset=Point(*config.right_mount_offset),
@@ -952,7 +950,7 @@ class OT3RobotCalibrationProvider:
     def load_deck_calibration(self) -> None:
         self._validate.cache_clear()
         self._robot_calibration.deck_calibration = load_attitude_matrix(
-            to_default=True  # make False
+            to_default=False
         )
 
     def set_robot_calibration(self, robot_calibration: OT3Transforms) -> None:
