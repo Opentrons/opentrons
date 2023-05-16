@@ -1197,8 +1197,8 @@ async def test_pick_up_tip_full_tiprack(
         )
         tip_action.assert_has_calls(
             calls=[
-                call([OT3Axis.P_L], 0, 0, "clamp"),
-                call([OT3Axis.P_L], 0, 0, "home"),
+                call([OT3Axis.P_L], 0, 0, 10, "clamp"),
+                call([OT3Axis.P_L], 0, 0, 0, "home"),
             ]
         )
 
@@ -1235,8 +1235,8 @@ async def test_drop_tip_full_tiprack(
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[
-                call([OT3Axis.P_L], 1, 1, "clamp"),
-                call([OT3Axis.P_L], 1, 1, "home"),
+                call([OT3Axis.P_L], 1, 1, 10, "clamp"),
+                call([OT3Axis.P_L], 1, 1, 0, "home"),
             ]
         )
 
