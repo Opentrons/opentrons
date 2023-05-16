@@ -46,13 +46,13 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
-        paddingBottom={SPACING.spacingL}
+        paddingBottom={SPACING.spacing24}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {t('step_1_of_4_attach_module')}
       </StyledText>
       <AttachedModuleItem step={t('1a')}>
-        <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacingXL}>
+        <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacing32}>
           <img src={attachHeaterShakerModule} alt="Attach Module to Deck" />
           <Box marginTop="1.375rem" marginRight="1.375rem">
             <img
@@ -64,8 +64,8 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           </Box>
 
           <Flex
-            marginLeft={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            marginLeft={SPACING.spacing40}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
             <Trans
@@ -76,7 +76,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -89,7 +89,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
                 icon: <Icon name="counter-clockwise-arrow" size="1.313rem" />,
@@ -99,10 +99,10 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
         </Flex>
       </AttachedModuleItem>
       <AttachedModuleItem step={t('1b')}>
-        <Flex flexDirection={DIRECTION_ROW} marginX={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_ROW} marginX={SPACING.spacing16}>
           <Box
             width="60%"
-            padding={SPACING.spacing3}
+            padding={SPACING.spacing8}
             data-testid="HeaterShakerWizard_deckMap"
           >
             {moduleFromProtocol != null ? (
@@ -145,8 +145,8 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             />
           </Box>
           <Flex
-            marginLeft={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            marginLeft={SPACING.spacing40}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
           >
             <Trans
@@ -157,7 +157,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -175,7 +175,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -188,7 +188,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
                 icon: <Icon name="clockwise-arrow" size="1.313rem" />,
@@ -214,25 +214,21 @@ interface AttachedModuleItemProps {
 function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
   const { step } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing12}>
       <StyledText
         color={COLORS.darkGrey}
-        paddingRight={SPACING.spacing4}
+        paddingRight={SPACING.spacing16}
         data-testid={`attach_module_${step}`}
       >
         {step}
       </StyledText>
       <Flex
-        border={`${String(SPACING.spacingXXS)} solid ${String(
-          COLORS.medGreyEnabled
-        )}`}
+        border={`1px solid ${COLORS.medGreyEnabled}`}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${String(SPACING.spacing4)} ${String(
-          SPACING.spacingM
-        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
         width="100%"
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
       >
         {props.children}
       </Flex>

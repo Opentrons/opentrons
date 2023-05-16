@@ -62,8 +62,8 @@ export function SetupRobotCalibration({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         width="100%"
-        gridGap={SPACING.spacing4}
-        marginY={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
+        marginY={SPACING.spacing16}
       >
         {!isOT3 ? (
           <SetupDeckCalibration robotName={robotName} runId={runId} />

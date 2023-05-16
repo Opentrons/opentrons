@@ -40,7 +40,7 @@ export function SetupDeckCalibration({
   )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}

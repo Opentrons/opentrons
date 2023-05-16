@@ -43,8 +43,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       backgroundColor={COLORS.white}
       color={COLORS.black}
       css={BORDERS.cardOutlineBorder}
-      paddingLeft={SPACING.spacing4}
-      paddingY={SPACING.spacing4}
+      paddingLeft={SPACING.spacing16}
+      paddingY={SPACING.spacing16}
       height="auto"
       onClick={props.onClick}
       cursor="pointer"
@@ -54,7 +54,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         1fr
       )"
     >
-      <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing5}>
+      <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
           viewBox={`0 0 ${String(definition.dimensions.xDimension)} ${String(
             definition.dimensions.yDimension
@@ -64,7 +64,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         </RobotWorkSpace>
       </Box>
       {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}
-      <Box marginRight={SPACING.spacing4}>
+      <Box marginRight={SPACING.spacing16}>
         <StyledText css={TYPOGRAPHY.pSemiBold} id="displayCategory">
           {displayCategory}
         </StyledText>
@@ -88,7 +88,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 {t('custom_def')}
               </StyledText>
             ) : (
-              <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing2}>
+              <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
                   color={COLORS.blueEnabled}
                   name="check-decagram"
@@ -97,14 +97,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 <StyledText
                   as="label"
                   id="LabwareCard_opentronsDef"
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                 >
                   {t('opentrons_def')}
                 </StyledText>
               </Flex>
             )}
           </Box>
-          <Box paddingTop={SPACING.spacing4}>
+          <Box paddingTop={SPACING.spacing16}>
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -123,10 +123,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       {/* space for custom labware min: 3rem for date */}
       {/* Note kj 06/30/2022 currently this section would not be ideal implementation
         Once the team have an agreement for grid system, we could refactor */}
-      <Box
-        marginTop={`-${String(SPACING.spacingSM)}`}
-        paddingRight={SPACING.spacing3}
-      >
+      <Box marginTop={`-10px`} paddingRight={SPACING.spacing8}>
         {modified != null && filename != null && (
           <Flex
             height="100%"

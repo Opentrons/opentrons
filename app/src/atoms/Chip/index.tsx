@@ -40,25 +40,25 @@ const CHIP_PROPS_BY_TYPE: Record<
 > = {
   basic: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.size_one,
+    borderRadius: BORDERS.size1,
     textColor: COLORS.darkBlack90,
   },
   neutral: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.size_six,
+    borderRadius: BORDERS.size6,
     iconColor: COLORS.darkBlack90,
     textColor: COLORS.darkBlack70,
   },
   success: {
     backgroundColor: COLORS.green3,
-    borderRadius: BORDERS.size_six,
+    borderRadius: BORDERS.size6,
     iconColor: COLORS.green1,
     iconName: 'ot-check',
     textColor: COLORS.green1,
   },
   warning: {
     backgroundColor: COLORS.yellow3,
-    borderRadius: BORDERS.size_six,
+    borderRadius: BORDERS.size6,
     iconColor: COLORS.yellow1,
     textColor: COLORS.yellow1,
   },
@@ -83,8 +83,8 @@ export function Chip({
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-      gridGap={SPACING.spacing3}
+      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+      gridGap={SPACING.spacing8}
       data-testid={`Chip_${type}`}
       {...styleProps}
     >

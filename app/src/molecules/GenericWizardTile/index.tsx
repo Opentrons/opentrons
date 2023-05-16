@@ -107,16 +107,18 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height={isOnDevice ? '30rem' : '24.625rem'}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
     >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           {typeof header === 'string' ? (
-            <StyledText css={HEADER_STYLE}>{header}</StyledText>
+            <StyledText as="h1" css={HEADER_STYLE}>
+              {header}
+            </StyledText>
           ) : (
             header
           )}

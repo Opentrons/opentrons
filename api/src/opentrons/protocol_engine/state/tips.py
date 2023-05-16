@@ -10,7 +10,13 @@ from ..actions import (
     ResetTipsAction,
     AddPipetteConfigAction,
 )
-from ..commands import Command, LoadLabwareResult, PickUpTipResult, DropTipResult
+from ..commands import (
+    Command,
+    LoadLabwareResult,
+    PickUpTipResult,
+    DropTipResult,
+    DropTipInPlaceResult,
+)
 
 
 class TipRackWellState(Enum):
@@ -91,7 +97,7 @@ class TipStore(HasState[TipState], HandlesActions):
             )
             self._state.length_by_pipette_id[pipette_id] = length
 
-        elif isinstance(command.result, DropTipResult):
+        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 

@@ -5,6 +5,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { DropdownOption } from '@opentrons/components'
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
@@ -12,6 +13,7 @@ export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  // MAGNETIC_BLOCK_TYPE,
 ]
 type SupportedSlotMap = Record<ModuleType, DropdownOption[]>
 export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
@@ -34,6 +36,12 @@ export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
+    {
+      name: 'Slot 1 (supported)',
+      value: '1',
+    },
+  ],
+  [MAGNETIC_BLOCK_TYPE]: [
     {
       name: 'Slot 1 (supported)',
       value: '1',

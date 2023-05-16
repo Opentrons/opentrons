@@ -48,7 +48,7 @@ export function SetupLabwareMap({
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
-      <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
         <Box margin="0 auto" maxWidth="46.25rem" width="100%">
           <RobotWorkSpace
             deckDef={deckDef}

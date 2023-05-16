@@ -356,3 +356,14 @@ def test_deactivate_heater(
             matchers.DictMatching({"$": "after"}),
         ),
     )
+
+
+def test_serial_number(
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    subject: HeaterShakerContext,
+) -> None:
+    """It should get the module's unique serial number."""
+    decoy.when(mock_core.get_serial_number()).then_return("abc-123")
+    result = subject.serial_number
+    assert result == "abc-123"

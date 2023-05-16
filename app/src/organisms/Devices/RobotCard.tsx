@@ -58,9 +58,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       backgroundColor={COLORS.white}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
       minWidth="36rem"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
       css={BORDERS.cardOutlineBorder}
@@ -72,25 +72,25 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacingSM}
+        gridGap={SPACING.spacing12}
         justifyContent={JUSTIFY_FLEX_START}
         width="100%"
       >
-        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing5} />
+        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
         <ReachableBanner robot={robot} />
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <RobotStatusHeader
             local={local}
             name={robotName}
             robotModel={robotModel}
             alignItems={ALIGN_START}
-            paddingRight={SPACING.spacing5}
+            paddingRight={SPACING.spacing24}
           />
           {robot.status === CONNECTABLE ? (
             <Flex
               flexDirection={DIRECTION_ROW}
               flexWrap={WRAP}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing16}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <AttachedInstruments robotName={robotName} />
@@ -101,8 +101,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       </Flex>
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
       </Box>
@@ -116,7 +116,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const attachedModules = useAttachedModules()
 
   return attachedModules.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -163,13 +163,13 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
+      gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
       <StyledText as="h6" color={COLORS.darkGreyEnabled}>
         {t('shared:instruments')}
       </StyledText>
-      <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
+      <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
         {leftAndRightMountsPipetteDisplayName != null ? (
           <InstrumentContainer
             displayName={leftAndRightMountsPipetteDisplayName}
