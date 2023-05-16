@@ -76,7 +76,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # We want to specifically disengage all the pipette axes on
         # the 96 channel
         if not include_motor_movement:
-            api.disengage_axes([OT3Axis.P_L, OT3Axis.Q])
+            await api.disengage_axes([OT3Axis.P_L, OT3Axis.Q])
 
         # OPEN-Pa
         open_pa = 0.0
