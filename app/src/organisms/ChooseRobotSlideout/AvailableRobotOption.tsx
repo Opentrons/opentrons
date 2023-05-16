@@ -56,7 +56,7 @@ export function AvailableRobotOption(
   )
 
   const { data: runsData } = useAllRunsQuery(
-    {},
+    { pageLength: 0 },
     {
       onSuccess: data => {
         if (data?.links?.current != null)
