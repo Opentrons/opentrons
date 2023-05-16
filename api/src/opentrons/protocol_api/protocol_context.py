@@ -421,7 +421,7 @@ class ProtocolContext(CommandPublisher):
                              loaded on the deck using :py:meth:`load_module` or off deck using :py:type OffDeckType.
 
                             .. versionchanged:: 2.15
-                            Added :py:type OffDeckType as the new location.
+                            Added :py:type OffDeckType as a new location option.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -453,7 +453,7 @@ class ProtocolContext(CommandPublisher):
             2, 15
         ):
             raise APIVersionError(
-                f"Moving a labware off deck is only available in versions 2.15 and above."
+                "Moving a labware off deck is only available in versions 2.15 and above."
             )
         location: Union[ModuleCore, OffDeckType, DeckSlotName]
         if isinstance(new_location, ModuleContext):

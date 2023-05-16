@@ -428,7 +428,12 @@ def test_move_labware_off_deck(
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_move_labware_off_deck_raises(subject: ProtocolContext, decoy: Decoy) -> None:
+def test_move_labware_off_deck_raises(
+    subject: ProtocolContext,
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+) -> None:
     """It should raise an APIVersionError if moving a labware off deck."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
