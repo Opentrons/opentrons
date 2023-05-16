@@ -10,7 +10,7 @@ from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -68,7 +68,15 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
+        # TODO remove this temporary check once we are comfortable
+        # with the motors not moving.
+        include_motor_movement = False
         ui.print_header(f"Sensor: {probe}")
+
+        # We want to specifically disengage all the pipette axes on
+        # the 96 channel
+        if not include_motor_movement:
+            api.disengage_axes([OT3Axis.P_L, OT3Axis.Q])
 
         # OPEN-Pa
         open_pa = 0.0
@@ -85,7 +93,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # SEALED-Pa
         sealed_pa = 0.0
         await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
-        await api.prepare_for_aspirate(OT3Mount.LEFT)
+        if include_motor_movement:
+            await api.prepare_for_aspirate(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
             ui.get_user_ready("SEAL tip using your FINGER")
@@ -102,7 +111,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
         # ASPIRATE-Pa
         aspirate_pa = 0.0
-        await api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
+        if include_motor_movement:
+            await api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
         if not api.is_simulator:
             try:
                 aspirate_pa = await _read_from_sensor(
@@ -119,7 +129,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
         # DISPENSE-Pa
         dispense_pa = 0.0
-        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
+        if include_motor_movement:
+            await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
         if not api.is_simulator:
             try:
                 dispense_pa = await _read_from_sensor(
