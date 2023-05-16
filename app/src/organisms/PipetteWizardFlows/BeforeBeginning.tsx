@@ -156,13 +156,6 @@ export const BeforeBeginning = (
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT,
-      },
-    },
-    {
-      // @ts-expect-error calibration type not yet supported
-      commandType: 'calibration/moveToMaintenancePosition' as const,
-      params: {
         mount: RIGHT,
       },
     },

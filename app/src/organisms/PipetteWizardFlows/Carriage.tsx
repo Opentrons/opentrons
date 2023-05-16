@@ -38,6 +38,11 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           commandType: 'home' as const,
           params: { axes: ['rightZ'] },
         },
+        {
+          // @ts-expect-error calibration command types not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: { mount: 'left' },
+        },
       ],
       false
     )
