@@ -178,8 +178,7 @@ class GCodeEngine:
                 context = create_protocol_context(
                     api_version=version,
                     hardware_api=hardware,
-                    # TODO(mm, 2023-05-16): deck_type should follow the robot type.
-                    deck_type=deck_type.guess_from_global_config(),
+                    deck_type=deck_type.for_simulation(robot_type=robot_type),
                 )
                 parsed_protocol = parse(protocol.text, protocol.filename)
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
