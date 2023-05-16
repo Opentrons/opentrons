@@ -210,6 +210,7 @@ export type ModuleModel =
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
   | MagneticBlockModel
+  | GripperModel
 
 export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
 

@@ -26,8 +26,8 @@ import { getAllFlexModuleSlotsByType } from './FlexModuleData'
 import { PDAlert } from '../../alerts/PDAlert'
 import { ModuleOnDeck } from '../../../step-forms'
 import { ModelModuleInfo } from '../../EditModules'
-import { ModuleDiagram } from '../../modules'
 import { useFormikContext } from 'formik'
+import { FlexSupportedModuleDiagram } from './FlexModuleDiagram'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
@@ -111,7 +111,7 @@ function FlexModulesComponent(): JSX.Element {
                       value={moduleType}
                       onClick={() => toggleModuleSelection(moduleType)}
                     >
-                      <ModuleDiagram
+                      <FlexSupportedModuleDiagram
                         type={moduleType}
                         model={selectedModel ?? defaultModel}
                       />
