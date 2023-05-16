@@ -20,7 +20,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
   const { children, isOnDevice = false, onClick = null } = props
   return isOnDevice && onClick != null ? (
     <ModalShell
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       width="18.0625rem"
       onOutsideClick={onClick}
     >

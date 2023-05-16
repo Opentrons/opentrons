@@ -106,7 +106,7 @@ const ProtocolHeader = (props: {
       >
         <NewPrimaryBtn
           backgroundColor={COLORS.blueEnabled}
-          borderRadius={BORDERS.size_six}
+          borderRadius={BORDERS.size6}
           boxShadow="none"
           onClick={handleRunProtocol}
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
@@ -187,7 +187,7 @@ const Summary = (props: {
       </StyledText>
       <Flex
         backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.size_one}
+        borderRadius={BORDERS.size1}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
@@ -262,7 +262,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
-      history.push(`/protocols/${runId}/setup`)
+      history.push(`/runs/${runId}/setup`)
     },
   })
 

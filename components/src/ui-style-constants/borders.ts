@@ -11,12 +11,12 @@ export const radiusRoundEdge = '20px'
 export const styleSolid = 'solid'
 
 // touch screen
-export const size_one = radiusSoftCorners
-export const size_two = '8px'
-export const size_three = '12px'
-export const size_four = '16px'
-export const size_five = '40px'
-export const size_six = '60px'
+export const size1 = radiusSoftCorners
+export const size2 = '8px'
+export const size3 = '12px'
+export const size4 = '16px'
+export const size5 = '40px'
+export const size6 = '60px'
 
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};

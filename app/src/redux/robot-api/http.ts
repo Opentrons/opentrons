@@ -5,6 +5,8 @@ import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
 import omitBy from 'lodash/omitBy'
 
+import { OPENTRONS_USB } from '../../redux/discovery'
+import { appShellRequestor } from '../../redux/shell/remote'
 import { HTTP_API_VERSION } from './constants'
 
 import type { Observable } from 'rxjs'
@@ -51,28 +53,46 @@ export function fetchRobotApi(
     options.body = reqForm
   }
 
-  return from(fetch(url, options)).pipe(
-    switchMap(response => {
-      return from(response.json()).pipe(
-        map(body => ({
+  return host.ip === OPENTRONS_USB
+    ? from(
+        appShellRequestor({
+          headers: options.headers,
+          method,
+          url,
+        })
+      ).pipe(
+        map(response => ({
           host,
           path,
           method,
-          body,
-          status: response.status,
-          ok: response.ok,
+          body: response?.data,
+          ok: response?.data != null,
+          // TODO(bh, 2023-04-25): until all response info forwarded (including unsuccessful requests), presume success here to quiet TS
+          status: 200,
         }))
       )
-    }),
-    catchError(error =>
-      of({
-        host,
-        path,
-        method,
-        body: { message: error.message },
-        status: -1,
-        ok: false,
-      })
-    )
-  )
+    : from(fetch(url, options)).pipe(
+        switchMap(response => {
+          return from(response.json()).pipe(
+            map(body => ({
+              host,
+              path,
+              method,
+              body,
+              status: response.status,
+              ok: response.ok,
+            }))
+          )
+        }),
+        catchError(error =>
+          of({
+            host,
+            path,
+            method,
+            body: { message: error.message },
+            status: -1,
+            ok: false,
+          })
+        )
+      )
 }

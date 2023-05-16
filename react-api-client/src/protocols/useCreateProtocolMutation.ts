@@ -37,7 +37,8 @@ export function useCreateProtocolMutation(
   hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
