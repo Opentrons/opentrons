@@ -24,7 +24,9 @@ import {
 } from '../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocol } from '../../redux/protocol-storage'
+import { appShellRequestor } from '../../redux/shell/remote'
 
 import type { DesktopRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
@@ -69,7 +71,6 @@ const CrumbLinkInactive = styled(Flex)`
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
-
   const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
 
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
@@ -151,7 +152,10 @@ export function Breadcrumbs(): JSX.Element | null {
   const robot = useRobot(robotName)
 
   return (
-    <ApiHostProvider hostname={robot?.ip ?? null}>
+    <ApiHostProvider
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
       <BreadcrumbsComponent />
     </ApiHostProvider>
   )

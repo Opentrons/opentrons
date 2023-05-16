@@ -12,16 +12,16 @@ export const navPillsNameTabList: NavPillTab[] = [
     navPillPage: [0],
   },
   {
-    name: i18n.t('flex.pipette_selection.name'),
-    navPillPage: [1, 2],
+    name: i18n.t('flex.pipettes_selection.name'),
+    navPillPage: [1],
   },
   {
     name: i18n.t('flex.modules_selection.name'),
-    navPillPage: [3],
+    navPillPage: [2],
   },
 ]
 
-export const navPillTabListLength = navPillsNameTabList.length
+export const navPillTabListLength = navPillsNameTabList.length - 1
 
 // Unsupported tiprack list for the flex robot
 export const blockedTipRackListForFlex: string[] = [

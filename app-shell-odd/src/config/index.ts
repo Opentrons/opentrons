@@ -23,6 +23,8 @@ import type { Config, Overrides } from './types'
 
 export * from './types'
 
+const ODD_DIR = '/data/ODD'
+
 // Note (kj:03/02/2023) this file path will be updated when the embed team cleans up
 const BRIGHTNESS_FILE =
   '/sys/class/backlight/backlight/device/backlight/backlight/brightness'
@@ -50,7 +52,7 @@ const store = (): Store => {
     _store = (new Store({
       defaults: DEFAULTS_V12,
       // dont overwrite config dir if in dev mode because it causes issues
-      ...(process.env.NODE_ENV === 'production' && { cwd: '/data/ODD' }),
+      ...(process.env.NODE_ENV === 'production' && { cwd: ODD_DIR }),
     }) as unknown) as Store<Config>
     _store.store = migrate((_store.store as unknown) as ConfigV12)
   }

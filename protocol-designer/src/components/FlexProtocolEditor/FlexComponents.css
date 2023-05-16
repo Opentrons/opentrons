@@ -42,6 +42,10 @@
   justify-content: space-between;
 }
 
+.pipette_form {
+  padding: 0px 5rem;
+}
+
 .cancel_button {
   width: 109px;
   height: 25px;

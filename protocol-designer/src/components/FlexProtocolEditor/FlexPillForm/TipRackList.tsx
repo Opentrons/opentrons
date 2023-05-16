@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { getOt3LabwareDefsByURI } from '../../../labware-defs/selectors'
 import { useFormikContext } from 'formik'
 import {
   blockedTipRackListForFlex,
@@ -31,7 +31,7 @@ interface formikContextProps {
 
 export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   const dispatch = useDispatch()
-  const allLabware = useSelector(getLabwareDefsByURI)
+  const allLabware = useSelector(getOt3LabwareDefsByURI)
   const tiprackOptions = getFlexTiprackOptions(allLabware)
   const [selected, setSelected] = useState<string[]>([])
   const [customTipRack, setCustomTipRack] = useState(false)

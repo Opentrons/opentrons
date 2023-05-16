@@ -9,10 +9,10 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
-import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
+import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
-import { useRunControls } from '../../../../organisms/RunTimeControl/hooks'
-import { RecentRunProtocolCard } from '../'
+import { useCloneRun } from '../../../ProtocolUpload/hooks'
+import { RecentRunProtocolCard } from '..'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -20,6 +20,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../pages/Protocols/hooks')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 
 const mockProtocolName = 'mockProtocol'
@@ -61,12 +62,14 @@ const missingBoth = [
 ] as ProtocolHardware[]
 
 const mockRunData = {
-  id: 'mockRunId',
+  id: RUN_ID,
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   completedAt: 'thistime',
   startedAt: 'thistime',
   protocolId: 'mockProtocolId',
 } as any
+
+let mockCloneRun: jest.Mock
 
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
@@ -80,9 +83,7 @@ const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunc
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseRunControls = useRunControls as jest.MockedFunction<
-  typeof useRunControls
->
+const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -106,6 +107,7 @@ describe('RecentRunProtocolCard', () => {
       protocolName: mockProtocolName,
       protocolId: mockProtocolId,
       lastRun: mockLastRun,
+      runId: RUN_ID,
     }
     mockTrackEvent = jest.fn()
     mockTrackProtocolRunEvent = jest.fn(
@@ -119,18 +121,10 @@ describe('RecentRunProtocolCard', () => {
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    when(mockUseRunControls)
+    mockCloneRun = jest.fn()
+    when(mockUseCloneRun)
       .calledWith(RUN_ID, expect.anything())
-      .mockReturnValue({
-        play: () => {},
-        pause: () => {},
-        stop: () => {},
-        reset: () => {},
-        isPlayRunActionLoading: false,
-        isPauseRunActionLoading: false,
-        isStopRunActionLoading: false,
-        isResetRunLoading: false,
-      })
+      .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
   })
 
   afterEach(() => {

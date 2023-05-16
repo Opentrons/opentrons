@@ -23,19 +23,22 @@ interface Props {
   page: Page
   selectedTerminalItemId: TerminalItemId | null | undefined
   ingredSelectionMode: boolean
-  robot: string
+  robot: string | null | undefined
 }
 
 function MainPanelComponent(props: Props): JSX.Element {
   const { page, selectedTerminalItemId, ingredSelectionMode, robot } = props
-
-  const compo =
-    robot === 'ot2_standard' ? <ConnectedFilePage /> : <FlexFileDetails />
+  const fileComponent =
+    !robot || robot === 'ot2_standard' ? (
+      <ConnectedFilePage />
+    ) : (
+      <FlexFileDetails />
+    )
   switch (page) {
     case 'file-splash':
       return <Splash />
     case 'file-detail':
-      return compo
+      return fileComponent
     case 'liquids':
       return <LiquidsPage />
     case 'settings-app':
