@@ -33,7 +33,7 @@ export function NoUpdateFound(): JSX.Element {
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
       >
         <Icon
           name="ot-check"
