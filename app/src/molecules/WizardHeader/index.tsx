@@ -33,8 +33,8 @@ const EXIT_BUTTON_STYLE = css`
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     margin-right: 1.75rem;
-    font-size: 1.375rem;
-    font-weight: 700;
+    font-size: ${TYPOGRAPHY.fontSize22};
+    font-weight: ${TYPOGRAPHY.fontWeightBold};
   }
 `
 const HEADER_CONTAINER_STYLE = css`
@@ -48,8 +48,8 @@ const HEADER_CONTAINER_STYLE = css`
 const HEADER_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.375rem;
-    font-weight: 700;
+    font-size: ${TYPOGRAPHY.fontSize22};
+    font-weight: ${TYPOGRAPHY.fontWeightBold};
     line-height: ${TYPOGRAPHY.lineHeight28};
   }
 `

@@ -63,12 +63,12 @@ const BUTTON_STYLE = css`
   }
 `
 const WIZARD_CONTAINER_STYLE = css`
-  min-height: 24.625rem;
+  min-height: 394px;
   flex-direction: ${DIRECTION_COLUMN}
   justify-content: ${JUSTIFY_SPACE_BETWEEN}
   height: 'auto'
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 29.5rem;
+    height: 472px;
   }
 `
 const FLEX_SPACING_STYLE = css`
