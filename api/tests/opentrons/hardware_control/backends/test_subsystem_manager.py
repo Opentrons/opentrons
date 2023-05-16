@@ -4,7 +4,7 @@ from itertools import chain
 
 import pytest
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -608,3 +608,47 @@ async def test_update_required(
     ).then_return({k: v for k, v in required_updates.items() if k in bad_targets})
     await subject.start()
     assert subject.update_required == outcome
+
+
+@pytest.mark.parametrize(
+    "present,subsystems,required_updates",
+    [
+        ({}, set(), {}),
+        (
+            default_network_info_for({NodeId.head, USBTarget.rear_panel}),
+            {SubSystem.gantry_x},
+            {},
+        ),
+        (
+            default_network_info_for(
+                {NodeId.head, NodeId.gantry_x, NodeId.gantry_y, USBTarget.rear_panel}
+            ),
+            {SubSystem.gripper},
+            {},
+        ),
+        (default_network_info_for({NodeId.head}), {SubSystem.head}, {}),
+    ],
+)
+@pytest.mark.parametrize("force", [False, True])
+async def test_update_does_not_happen_for_missing_subsystem(
+    present: Dict[FirmwareTarget, network.DeviceInfoCache],
+    subsystems: Optional[Set[SubSystem]],
+    required_updates: Dict[FirmwareTarget, Tuple[int, str]],
+    force: bool,
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+) -> None:
+    """It should instantly complete the update of missing subsystems."""
+    targets = set(iter(present.keys()))
+    decoy.when(network_info.device_info).then_return(present)
+    decoy.when(network_info.targets).then_return(targets)
+    decoy.when(
+        update_bag.update_checker(
+            matchers.Anything(), matchers.Anything(), matchers.Anything()
+        )
+    ).then_return(required_updates)
+    update_generator = subject.update_firmware(subsystems, force)
+    with pytest.raises(StopAsyncIteration):
+        await update_generator.__anext__()
