@@ -87,7 +87,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
-              {i18n.format(t('location'), 'sentenceCase')}
+              {i18n.format(t('location'), 'capitalize')}
             </StyledText>
           </TableHeader>
           <TableHeader>
@@ -97,7 +97,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
-              {i18n.format(t('hardware'), 'sentenceCase')}
+              {i18n.format(t('hardware'), 'capitalize')}
             </StyledText>
           </TableHeader>
         </tr>
