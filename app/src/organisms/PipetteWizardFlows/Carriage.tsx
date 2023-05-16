@@ -37,7 +37,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       [
         {
           commandType: 'home' as const,
-          params: { axes: ('rightZ' as unknown) as MotorAxis },
+          params: { axes: ['rightZ'] },
         },
       ],
       false

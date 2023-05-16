@@ -96,7 +96,7 @@ describe('Carriage', () => {
         {
           commandType: 'home',
           params: {
-            axes: 'rightZ',
+            axes: ['rightZ'],
           },
         },
       ],
