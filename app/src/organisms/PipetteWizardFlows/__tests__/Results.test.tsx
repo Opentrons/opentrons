@@ -293,7 +293,7 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Wrong instrument installed')
-    getByText('Please install Flex 8-Channel 50 μL')
+    getByText('Install Flex 8-Channel 50 μL instead')
     getByRole('button', { name: 'Detach and retry' }).click()
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
