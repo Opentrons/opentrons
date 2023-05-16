@@ -9,7 +9,8 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, MountType, Point, OffDeckType
+from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
+from opentrons.protocol_api import OffDeckType
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType

@@ -15,7 +15,8 @@ from typing import (
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation, OffDeckType, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.protocol_api import OffDeckType
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel

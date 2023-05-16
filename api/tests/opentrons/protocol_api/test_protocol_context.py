@@ -8,7 +8,8 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons.types import Mount, DeckSlotName, OffDeckType
+from opentrons.types import Mount, DeckSlotName
+from opentrons.protocol_api import OffDeckType
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
