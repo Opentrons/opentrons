@@ -8,6 +8,7 @@ import { selectPageForms } from './FlexProtocolEditor/constant'
 import { ProtocolEditor } from './ProtocolEditor'
 import { actions as loadFileActions } from '../load-file'
 import { useDispatch } from 'react-redux'
+import { FlexFileDetails } from './FlexProtocolEditor/FlexFileDetails'
 
 export interface PageProps {
   setPageProps: (type: string) => void
@@ -68,7 +69,11 @@ export const selectRobotPage = (
         </ProtocolEditor>
       )
     case selectPageForms.protocolEditor:
-      return <ProtocolEditor />
+      return (
+        <ProtocolEditor>
+          <FlexFileDetails setPageProps={setPage} />
+        </ProtocolEditor>
+      )
     case selectPageForms.defaultLandingPage:
       return <LandingPageComponent setPageProps={setPage} />
     default:

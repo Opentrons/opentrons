@@ -57,7 +57,11 @@ function FlexFormComponent(props: PageProps): JSX.Element {
         <StyledText as="h5" className={styles.right_end}>
           {i18n.t('flex.header.required_fields')}
         </StyledText>
-        <FlexProtocolEditorComponent />
+        <FlexProtocolEditorComponent
+          isEditValue={false}
+          tabIdValue={undefined}
+          formProps={undefined}
+        />
       </div>
     </>
   )

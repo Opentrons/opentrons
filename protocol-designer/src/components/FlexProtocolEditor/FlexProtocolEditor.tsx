@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -62,6 +62,12 @@ export interface InitialValues {
   }
 }
 
+interface FlexProtocolEditorComponentProps {
+  isEditValue: boolean
+  tabIdValue: any
+  formProps: any
+}
+
 const validationSchema = Yup.object().shape({
   fields: Yup.object().shape({
     name: Yup.string().matches(
@@ -88,7 +94,7 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
-const getInitialValues: InitialValues = {
+const initialFormValues: InitialValues = {
   fields: {
     name: '',
     author: '',
@@ -138,6 +144,58 @@ const getInitialValues: InitialValues = {
   },
 }
 
+const getInitialValues = (formProps: any): InitialValues => {
+  if (formProps) {
+    if (formProps.formValues) {
+      const { protocolName, author, description } = formProps.formValues
+      initialFormValues.fields.name = protocolName || ''
+      initialFormValues.fields.author = author || ''
+      initialFormValues.fields.description = description || ''
+    }
+
+    if (Boolean(formProps.instruments)) {
+      const { left, right } = formProps.instruments
+      if (Boolean(left)) {
+        initialFormValues.pipettesByMount.left.pipetteName =
+          left.pipetteSpecs?.name || ''
+        initialFormValues.pipettesByMount.left.tipRackList =
+          left?.tiprackModel || []
+      }
+      if (Boolean(right)) {
+        initialFormValues.pipettesByMount.right.pipetteName =
+          right.pipetteSpecs?.name || ''
+        initialFormValues.pipettesByMount.right.tipRackList =
+          right?.tiprackModel || []
+      }
+    }
+
+    if (Boolean(formProps.modules)) {
+      if (formProps.modules.magneticModuleType !== null) {
+        initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE] =
+          formProps.modules.magneticModuleType
+      }
+      if (formProps.modules.temperatureModuleType !== null) {
+        initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE] =
+          formProps.modules.temperatureModuleType
+      }
+      if (formProps.modules.thermocyclerModuleType !== null) {
+        initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE] =
+          formProps.modules.thermocyclerModuleType
+      }
+      if (formProps.modules.heaterShakerModuleType !== null) {
+        initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE] =
+          formProps.modules.heaterShakerModuleType
+      }
+
+      console.log(initialFormValues.modulesByType)
+    }
+
+    return initialFormValues
+  } else {
+    return initialFormValues
+  }
+}
+
 interface Props {
   selectedTab: number
 }
@@ -165,15 +223,33 @@ const selectComponent = (selectedTab: number): JSX.Element | null => {
   }
 }
 
-function FlexProtocolEditor(): JSX.Element {
+function FlexProtocolEditor({
+  isEditValue,
+  tabIdValue,
+  formProps,
+}: FlexProtocolEditorComponentProps): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
+  const [isEdit, setEdit] = useState<boolean>(false)
+  //On Redirction if page tab edit set to true
+  useEffect(() => {
+    if (isEditValue) {
+      setEdit(isEditValue)
+      setTab(tabIdValue)
+    }
+  }, [isEditValue, tabIdValue])
+  console.log('selectedTab', selectedTab, 'isEdit', isEdit)
+
   // Next button click
   const handleNext = ({ selectedTab }: Props): void => {
-    const setTabNumber =
-      selectedTab >= 0 && selectedTab < navPillTabListLength
-        ? selectedTab + 1
-        : selectedTab
-    setTab(setTabNumber)
+    if (isEdit) {
+      //Redirect back to file details page
+    } else {
+      const setTabNumber =
+        selectedTab >= 0 && selectedTab < navPillTabListLength
+          ? selectedTab + 1
+          : selectedTab
+      setTab(setTabNumber)
+    }
   }
 
   // Previous button click
@@ -188,6 +264,8 @@ function FlexProtocolEditor(): JSX.Element {
   const nextButton =
     selectedTab === navPillTabListLength
       ? i18n.t('flex.round_tabs.go_to_liquids_page')
+      : isEdit
+      ? i18n.t('flex.round_tabs.update')
       : i18n.t('flex.round_tabs.next')
 
   const InitialFormSchema = Yup.object().shape({
@@ -231,7 +309,7 @@ function FlexProtocolEditor(): JSX.Element {
         {
           <Formik
             enableReinitialize
-            initialValues={getInitialValues}
+            initialValues={getInitialValues(formProps)}
             validateOnChange={true}
             validate={validateFields}
             validationSchema={validationSchema}
@@ -249,7 +327,7 @@ function FlexProtocolEditor(): JSX.Element {
                   {selectComponent(selectedTab)}
                 </section>
                 <div className={styles.flex_round_tabs_button_wrapper}>
-                  {selectedTab !== 0 && (
+                  {selectedTab !== 0 && !isEdit && (
                     <NewPrimaryBtn
                       tabIndex={5}
                       onClick={() => handlePrevious({ selectedTab })}
