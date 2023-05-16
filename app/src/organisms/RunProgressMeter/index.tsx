@@ -53,13 +53,14 @@ import {
   getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
   getCurrentRunModulesRenderInfo,
-  RunLabwareInfo,
   getCurrentRunLabwareRenderInfo,
+  getLabwareMovementAnimationParams,
 } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
+import type { MoveLabwareAnimationParams } from '@opentrons/components'
 import type { LabwareLocation } from '@opentrons/shared-data'
-import type { RunModuleInfo } from '../InterventionModal/utils/getCurrentRunModulesRenderInfo'
+import type { RunModuleInfo, RunLabwareInfo } from '../InterventionModal/utils'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -179,7 +180,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     isInterventionCommand(lastRunCommand) &&
     !showInterventionModal
   ) {
-    setShowInterventionModal(true)
+    // this setTimeout is a hacky way to make sure the modal closes when we tell it to
+    // we can run into issues when there are 2 back to back move labware commands
+    // the modal never really un-renders and so the animations break after the first modal
+    // not really a fan of this, but haven't been able to fix the problem any other way
+    setTimeout(() => setShowInterventionModal(true), 0)
   }
 
   const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
@@ -204,6 +209,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   let moduleRunRenderInfo: RunModuleInfo[] | null = null
   let labwareRunRenderInfo: RunLabwareInfo[] | null = null
+  let labwareAnimationParams: MoveLabwareAnimationParams | null = null
   if (
     lastRunCommand?.commandType === 'moveLabware' &&
     runData != null &&
@@ -220,6 +226,16 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       labwareDefsByUri,
       deckDef
     )
+
+    labwareAnimationParams =
+      moduleRunRenderInfo != null && labwareRunRenderInfo != null
+        ? getLabwareMovementAnimationParams(
+            labwareRunRenderInfo,
+            moduleRunRenderInfo,
+            lastRunCommand,
+            deckDef
+          )
+        : null
   }
 
   return (
@@ -237,6 +253,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             command={lastRunCommand}
             moduleRenderInfo={moduleRunRenderInfo}
             labwareRenderInfo={labwareRunRenderInfo}
+            labwareAnimationParams={labwareAnimationParams}
             labwareName={getLabwareNameFromRunData(
               runData,
               lastRunCommand.params.labwareId,
