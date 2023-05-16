@@ -63,9 +63,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
   // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-    border-radius: ${BORDERS.size_four};
+    border-radius: ${BORDERS.size4};
     cursor: pointer;
-    padding: ${isLarge ? SPACING.spacing5 : SPACING.spacingM};
+    padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
     width: 100%;
 
     ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}

@@ -72,13 +72,13 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      paddingTop={SPACING.spacing2}
-      paddingBottom={SPACING.spacing2}
+      paddingTop={SPACING.spacing4}
+      paddingBottom={SPACING.spacing4}
     >
       <StyledText
         as="label"
         id={props.labelFor}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.label}
@@ -138,10 +138,7 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
           />
         )}
       </Field>
-      <StyledText
-        paddingLeft={SPACING.spacing3}
-        paddingTop={SPACING.spacingXXS}
-      >
+      <StyledText paddingLeft={SPACING.spacing8} paddingTop={SPACING.spacing2}>
         {displayName}
       </StyledText>
     </Flex>

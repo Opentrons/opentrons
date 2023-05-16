@@ -47,7 +47,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      marginY={SPACING.spacingM}
+      marginY={SPACING.spacing20}
     >
       <FileImporter
         onUpload={(file: File) => handleUpload(file)}

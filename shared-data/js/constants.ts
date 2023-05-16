@@ -39,6 +39,8 @@ export const THERMOCYCLER_MODULE_V2: 'thermocyclerModuleV2' =
 export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
 
+export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
+
 export const GRIPPER_V1: 'gripperV1' = 'gripperV1'
 export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
 export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1]
@@ -63,6 +65,7 @@ export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
   'thermocyclerModuleType'
 export const HEATERSHAKER_MODULE_TYPE: 'heaterShakerModuleType' =
   'heaterShakerModuleType'
+export const MAGNETIC_BLOCK_TYPE: 'magneticBlockType' = 'magneticBlockType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -78,11 +81,14 @@ export const THERMOCYCLER_MODULE_MODELS = [
 
 export const HEATERSHAKER_MODULE_MODELS = [HEATERSHAKER_MODULE_V1]
 
+export const MAGNETIC_BLOCK_MODELS = [MAGNETIC_BLOCK_V1]
+
 export const MODULE_MODELS = [
   ...MAGNETIC_MODULE_MODELS,
   ...TEMPERATURE_MODULE_MODELS,
   ...THERMOCYCLER_MODULE_MODELS,
   ...HEATERSHAKER_MODULE_MODELS,
+  ...MAGNETIC_BLOCK_MODELS,
 ]
 
 export const MODULE_TYPES = [
@@ -90,6 +96,7 @@ export const MODULE_TYPES = [
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']

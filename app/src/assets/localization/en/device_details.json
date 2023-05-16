@@ -30,6 +30,7 @@
   "firmware_update_available": "Firmware update available.",
   "firmware_update_failed": "Failed to update module firmware",
   "firmware_update_installation_successful": "Installation successful",
+  "got_it": "Got it",
   "have_not_run_description": "After you run some protocols, they will appear here.",
   "have_not_run": "No recent runs",
   "heater": "Heater",
@@ -134,5 +135,7 @@
   "view_pipette_setting": "Pipette Settings",
   "view_run_record": "View protocol run record",
   "view": "View",
+  "welcome_modal_description": "A place to run protocols, manage your instruments, and view robot status.",
+  "welcome_to_your_dashboard": "Welcome to your dashboard!",
   "yes_update_now": "Yes, update now"
 }

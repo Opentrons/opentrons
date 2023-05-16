@@ -39,11 +39,11 @@ const OptionButton = styled.input`
 `
 
 const OptionLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border: 2px solid
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light2};
-  border-radius: ${BORDERS.size_four};
+  border-radius: ${BORDERS.size4};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};
 `
@@ -114,9 +114,9 @@ export function DeviceReset({
           flexDirection={DIRECTION_ROW}
           backgroundColor={COLORS.warningBackgroundMed}
           alignItems={ALIGN_CENTER}
-          gridGap="0.75rem"
-          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-          borderRadius={BORDERS.size_three}
+          gridGap={SPACING.spacing12}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+          borderRadius={BORDERS.size3}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
           <StyledText
@@ -129,8 +129,8 @@ export function DeviceReset({
         </Flex>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing5}
-        gridGap={SPACING.spacing3}
+        marginTop={SPACING.spacing24}
+        gridGap={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
       >
         {availableOptions.map(option => (
@@ -162,7 +162,7 @@ export function DeviceReset({
         ))}
       </Flex>
       <AlertPrimaryButton
-        paddingY={SPACING.spacing5}
+        paddingY={SPACING.spacing24}
         marginTop="3.5rem"
         disabled={
           Object.keys(resetOptions).length === 0 ||

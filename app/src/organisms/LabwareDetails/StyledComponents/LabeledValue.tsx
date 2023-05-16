@@ -20,7 +20,7 @@ export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      paddingY={SPACING.spacing3}
+      paddingY={SPACING.spacing8}
     >
       <StyledText as="h6" color={COLORS.darkGreyEnabled}>
         {label}

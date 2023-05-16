@@ -14,9 +14,7 @@ export const InstrumentDetail = (): JSX.Element => {
     (attachedInstruments?.data ?? []).find(i => i.mount === mount) ?? null
   return (
     <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+      padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       flexDirection={DIRECTION_COLUMN}
       height="100%"
     >

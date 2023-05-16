@@ -7,6 +7,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -64,9 +65,11 @@ class MoveToMaintenancePositionImplementation(
             offset=_INSTRUMENT_ATTACH_OFFSET
         )
 
+        # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
         await self._hardware_api.move_to(
             mount=hardware_mount,
             abs_position=calibration_coordinates,
+            critical_point=CriticalPoint.MOUNT,
         )
 
         return MoveToMaintenancePositionResult()

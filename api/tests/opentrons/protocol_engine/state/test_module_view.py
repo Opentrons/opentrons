@@ -356,6 +356,11 @@ def test_get_module_offset_for_ot2_standard(
             DeckSlotName.SLOT_3,
             LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
+        (
+            lazy_fixture("mag_block_v1_def"),
+            DeckSlotName.SLOT_2,
+            LabwareOffsetVector(x=0, y=0, z=38.0),
+        ),
     ],
 )
 def test_get_module_offset_for_ot3_standard(

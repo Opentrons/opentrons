@@ -98,10 +98,10 @@ export function NetworkSettings({
       default:
         return (
           <Flex
-            paddingX={SPACING.spacingXXL}
-            marginTop={SPACING.spacing4}
+            paddingX={SPACING.spacing40}
+            marginTop={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {/* wifi */}
             <NetworkSettingButton
@@ -148,7 +148,7 @@ export function NetworkSettings({
   return (
     <>
       <Flex
-        padding={`${SPACING.spacing6} ${SPACING.spacingXXL}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_START}
       >
@@ -188,16 +188,16 @@ function NetworkSettingButton({
     <>
       <Btn
         width="100%"
-        padding={SPACING.spacing5}
+        padding={SPACING.spacing24}
         backgroundColor={buttonBackgroundColor}
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
         onClick={displayDetailsTab}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing5}>
-          <Flex gridGap={SPACING.spacing3} width="34.8125rem">
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing5}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+          <Flex gridGap={SPACING.spacing8} width="34.8125rem">
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing24}>
               <Icon name={iconName} size="3rem" />
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing1}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}

@@ -42,7 +42,7 @@ describe('useAllRunsQuery hook', () => {
 
   it('should return no data if the get runs request fails', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetRuns).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    when(mockGetRuns).calledWith(HOST_CONFIG, {}).mockRejectedValue('oh no')
 
     const { result } = renderHook(useAllRunsQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
@@ -51,10 +51,26 @@ describe('useAllRunsQuery hook', () => {
   it('should return all current robot runs', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetRuns)
-      .calledWith(HOST_CONFIG)
+      .calledWith(HOST_CONFIG, {})
       .mockResolvedValue({ data: mockRunsResponse } as Response<Runs>)
 
     const { result, waitFor } = renderHook(useAllRunsQuery, { wrapper })
+
+    await waitFor(() => result.current.data != null)
+
+    expect(result.current.data).toEqual(mockRunsResponse)
+  })
+
+  it('should return specified pageLength of runs', async () => {
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockGetRuns)
+      .calledWith(HOST_CONFIG, { pageLength: 20 })
+      .mockResolvedValue({ data: mockRunsResponse } as Response<Runs>)
+
+    const { result, waitFor } = renderHook(
+      () => useAllRunsQuery({ pageLength: 20 }),
+      { wrapper }
+    )
 
     await waitFor(() => result.current.data != null)
 

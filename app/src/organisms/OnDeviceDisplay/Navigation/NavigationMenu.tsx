@@ -35,7 +35,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             aria-label="home-gantry_icon"
             size={SIZE_2}
           />
-          <StyledText marginLeft={SPACING.spacing5}>
+          <StyledText marginLeft={SPACING.spacing24}>
             {t('home_gantry')}
           </StyledText>
         </Flex>
@@ -48,7 +48,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             color={COLORS.black}
             aria-label="restart_icon"
           />
-          <StyledText marginLeft={SPACING.spacing5}>
+          <StyledText marginLeft={SPACING.spacing24}>
             {t('robot_controls:restart_label')}
           </StyledText>
         </Flex>
@@ -61,7 +61,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             color={COLORS.black}
             aria-label="light_icon"
           />
-          <StyledText marginLeft={SPACING.spacing5}>
+          <StyledText marginLeft={SPACING.spacing24}>
             {i18n.format(
               t(lightsOn ? 'lights_off' : 'lights_on'),
               'capitalize'

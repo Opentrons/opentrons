@@ -18,7 +18,8 @@ export function useCalibrationStatusQuery(
   hostOverride?: HostConfig | null
 ): UseQueryResult<CalibrationStatus> {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host as HostConfig, 'calibration', 'status'],
     () =>

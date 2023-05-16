@@ -151,6 +151,9 @@ class DeckPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2023-05-10): Deduplicate with constants in
+# opentrons.protocols.api_support.deck_type
+# and consider moving to shared-data.
 class DeckType(str, Enum):
     """Types of deck available."""
 
