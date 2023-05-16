@@ -6,13 +6,11 @@ from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
 import logging
 from typing import (
-    TypeVar,
     Optional,
     Set,
     Dict,
     Iterator,
     Callable,
-    Type,
     AsyncIterator,
     Union,
 )
@@ -33,8 +31,6 @@ from .errors import SubsystemUpdating
 
 
 log = logging.getLogger(__name__)
-
-_Cls = TypeVar("_Cls", bound="SubsystemManager")
 
 
 @dataclass
@@ -64,22 +60,6 @@ class SubsystemManager:
     _updates_required: Dict[FirmwareTarget, FirmwareUpdateRequirements]
     _updates_ongoing: Dict[SubSystem, UpdateStatus]
     _update_bag: FirmwareUpdate
-
-    @classmethod
-    async def build(
-        cls: Type[_Cls],
-        can_messenger: can_bus.CanMessenger,
-        usb_messenger: Optional[binary_usb.BinaryMessenger],
-    ) -> _Cls:
-        inst = cls(
-            can_messenger,
-            usb_messenger,
-            tools.detector.ToolDetector(can_messenger),
-            network.NetworkInfo(can_messenger, usb_messenger),
-            FirmwareUpdate(),
-        )
-        await inst.start()
-        return inst
 
     def __init__(
         self,

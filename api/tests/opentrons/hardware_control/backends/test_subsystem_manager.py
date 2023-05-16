@@ -230,12 +230,7 @@ async def subject(
     network_info: network.NetworkInfo,
     update_bag: FirmwareUpdate,
 ) -> AsyncIterator[SubsystemManager]:
-    """
-    Build a test subject using decoyed messengers.
-
-    Note: this method does not use await build() so that test callers can prep the messenger
-    decoys before it sends a ping. Tests _must_ call await start() before any other method calls.
-    """
+    """Build a test subject using decoyed messengers."""
     manager = SubsystemManager(
         can_messenger, usb_messenger, tool_detector, network_info, update_bag
     )

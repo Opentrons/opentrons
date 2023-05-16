@@ -792,7 +792,7 @@ async def test_update_required_flag(
 ) -> None:
     """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
     axes = [OT3Axis.X, OT3Axis.Y]
-    mock_subsystem_manager.update_reuqired.return_value = True
+    mock_subsystem_manager.update_required.return_value = True
 
     # raise FirmwareUpdateRequired if the _update_required flag is set
     controller._initialized = True
