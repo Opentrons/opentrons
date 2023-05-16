@@ -622,7 +622,7 @@ async def find_slot_center_binary_from_nominal_center(
     offset = await find_calibration_structure_position(
         hcapi, mount, nominal_center, method=CalibrationMethod.BINARY_SEARCH
     )
-    return offset, nominal_center
+    return nominal_center - offset, nominal_center
 
 
 async def _determine_transform_matrix(
