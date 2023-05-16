@@ -72,6 +72,7 @@ async def run(args: argparse.Namespace) -> None:
                 {
                     pipette_node: MoveGroupTipActionStep(
                         velocity_mm_sec=float64(5.5),
+                        acceleration_mm_sec_sq=float64(0),
                         duration_sec=float64(2.5),
                         stop_condition=MoveStopCondition.none,
                         action=PipetteTipActionType.clamp,
@@ -86,6 +87,7 @@ async def run(args: argparse.Namespace) -> None:
                 {
                     pipette_node: MoveGroupTipActionStep(
                         velocity_mm_sec=float64(-5.5),
+                        acceleration_mm_sec_sq=float64(0),
                         duration_sec=float64(6),
                         stop_condition=MoveStopCondition.limit_switch,
                         action=PipetteTipActionType.home,
