@@ -917,7 +917,7 @@ class OT3RobotCalibrationProvider:
 
     def __init__(self, config: OT3Config) -> None:
         self._robot_calibration = OT3Transforms(
-            deck_calibration=load_attitude_matrix(to_default=False),
+            deck_calibration=load_attitude_matrix(to_default=True),  # make False
             carriage_offset=Point(*config.carriage_offset),
             left_mount_offset=Point(*config.left_mount_offset),
             right_mount_offset=Point(*config.right_mount_offset),
