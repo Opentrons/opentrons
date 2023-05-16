@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
@@ -14,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
 
@@ -69,12 +71,6 @@ const WIZARD_CONTAINER_STYLE = css`
     height: 29.5rem;
   }
 `
-const ICON_STYLE = css`
-  size: 2.5rem;
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    size: 3.75rem;
-  }
-`
 const FLEX_SPACING_STYLE = css`
   height: 1.75rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -92,6 +88,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
     isPending,
     ...styleProps
   } = props
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
@@ -122,8 +119,8 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           <>
             <Icon
               name={isSuccess ? 'ot-check' : 'ot-alert'}
+              size={isOnDevice ? '3.75rem' : '2.5rem'}
               color={iconColor}
-              css={ICON_STYLE}
               aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
             />
             <StyledText css={HEADER_STYLE}>{header}</StyledText>

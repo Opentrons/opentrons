@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,6 +13,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { getIsOnDevice } from '../../redux/config'
 
 interface Props {
   //  optional override of the spinner
@@ -47,11 +49,9 @@ const MODAL_STYLE = css`
   }
 `
 const SPINNER_STYLE = css`
-  size: 5.125rem;
   color: ${COLORS.darkGreyEnabled};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    size: 6.25rem
     color: ${COLORS.darkBlackEnabled};
     opacity: 70%;
   }
@@ -59,11 +59,18 @@ const SPINNER_STYLE = css`
 
 export function InProgressModal(props: Props): JSX.Element {
   const { alternativeSpinner, children, description } = props
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <Flex css={MODAL_STYLE}>
       {alternativeSpinner ?? (
-        <Icon name="ot-spinner" aria-label="spinner" css={SPINNER_STYLE} spin />
+        <Icon
+          name="ot-spinner"
+          aria-label="spinner"
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
+          css={SPINNER_STYLE}
+          spin
+        />
       )}
       {description != null && (
         <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
