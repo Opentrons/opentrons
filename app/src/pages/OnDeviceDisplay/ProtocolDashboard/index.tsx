@@ -260,7 +260,12 @@ export function ProtocolDashboard(): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
               borderRadius={BORDERS.size3}
             >
-              <img title={t('nothing_here_yet')} src={imgSrc} />
+              <img
+                title={t('nothing_here_yet')}
+                src={imgSrc}
+                width="284px"
+                height="166px"
+              />
               <StyledText
                 as="h3"
                 fontWeight={TYPOGRAPHY.fontWeightBold}
