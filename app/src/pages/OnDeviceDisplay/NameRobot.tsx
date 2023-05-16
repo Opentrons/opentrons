@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { useFormik } from 'formik'
 import { css } from 'styled-components'
+import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   POSITION_FIXED,
   JUSTIFY_CENTER,
@@ -17,6 +19,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   Icon,
+  Btn,
 } from '@opentrons/components'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 
@@ -33,9 +36,9 @@ import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
-import { TertiaryButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
-import { ConfirmRobotName } from '../../organisms/NameRobot/ConfirmRobotName'
+import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
@@ -57,6 +60,7 @@ interface FormikErrors {
 
 export function NameRobot(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
+  const history = useHistory()
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
   const previousName = localRobot?.name != null ? localRobot.name : null
@@ -105,7 +109,7 @@ export function NameRobot(): JSX.Element {
       // In ODD users cannot input letters and numbers from software keyboard
       // so the app only checks the length of input string
       if (newName.length < 1) {
-        errors.newRobotName = t('name_rule_error_too_short')
+        errors.newRobotName = t('name_rule_error_name_length')
       }
       if (
         [...connectableRobots, ...reachableRobots].some(
@@ -122,7 +126,11 @@ export function NameRobot(): JSX.Element {
     onSuccess: (data: UpdatedRobotName) => {
       if (data.name != null) {
         setNewName(data.name)
-        setIsShowConfirmRobotName(true)
+        if (!isInitialSetup) {
+          history.push('/robot-settings')
+        } else {
+          setIsShowConfirmRobotName(true)
+        }
         if (previousName != null) {
           dispatch(removeRobot(previousName))
         }
@@ -141,7 +149,6 @@ export function NameRobot(): JSX.Element {
       properties: {
         previousRobotName: previousName,
         newRobotName: formik.values.newRobotName,
-        appType: 'OnDeviceDisplay',
       },
     })
     formik.handleSubmit()
@@ -153,65 +160,78 @@ export function NameRobot(): JSX.Element {
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>
-          <StepMeter totalSteps={5} currentStep={4} OnDevice />
-          <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING.spacing40}>
+          {isInitialSetup ? (
+            <StepMeter totalSteps={5} currentStep={4} OnDevice />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginTop={SPACING.spacing32}
+            marginX={SPACING.spacing40}
+          >
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
+              justifyContent={
+                isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
+              }
               position={POSITION_RELATIVE}
               marginBottom="3.041875rem"
             >
-              <Flex>
-                <StyledText
-                  fontSize="2rem"
-                  fontWeight="700"
-                  lineHeight="2.72375rem"
+              <Flex position={POSITION_ABSOLUTE} left="0">
+                <Btn
+                  onClick={() => {
+                    if (isInitialSetup) {
+                      history.push('/robot-settings/update-robot')
+                    } else {
+                      history.push('/robot-settings')
+                    }
+                  }}
                 >
-                  {t('name_your_robot')}
+                  <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
+                </Btn>
+              </Flex>
+              <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
+                <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                  {isInitialSetup ? t('name_your_robot') : t('rename_robot')}
                 </StyledText>
               </Flex>
-
               <Flex position={POSITION_ABSOLUTE} right="0">
-                <TertiaryButton
-                  width="11.8125rem"
-                  height="3.75rem"
-                  fontSize="1.5rem"
-                  fontWeight="500"
-                  lineHeight="2.0425rem"
-                  onClick={handleConfirm}
-                >
-                  {Boolean(isNaming) ? (
-                    <Icon
-                      name="ot-spinner"
-                      size="1.25rem"
-                      spin
-                      marginRight={SPACING.spacing8}
-                    />
-                  ) : null}
-                  {t('shared:confirm')}
-                </TertiaryButton>
+                {Boolean(isNaming) ? (
+                  <Icon
+                    name="ot-spinner"
+                    size="1.25rem"
+                    spin
+                    marginRight={SPACING.spacing8}
+                  />
+                ) : (
+                  <SmallButton
+                    buttonType="primary"
+                    buttonText={t('shared:confirm')}
+                    buttonCategory="rounded"
+                    onClick={handleConfirm}
+                  />
+                )}
               </Flex>
             </Flex>
-
             <Flex
               width="100%"
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                color={COLORS.black}
-                fontSize="1.375rem"
-                lineHeight="1.875rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                marginBottom={SPACING.spacing12}
-              >
-                {t('name_your_robot_description')}
-              </StyledText>
+              {isInitialSetup ? (
+                <StyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  color={COLORS.darkBlack70}
+                  marginBottom={SPACING.spacing40}
+                >
+                  {t('name_your_robot_description')}
+                </StyledText>
+              ) : null}
               <Flex
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
-                marginBottom="0.625rem"
+                marginBottom={SPACING.spacing8}
                 justifyContent={JUSTIFY_CENTER}
                 width="100%"
               >
@@ -227,20 +247,17 @@ export function NameRobot(): JSX.Element {
                 />
               </Flex>
               <StyledText
-                color={COLORS.darkGreyEnabled}
-                fontSize="1.5rem"
-                lineHeight="2.0625rem"
-                fontWeight="500"
-                marginBottom={SPACING.spacing12}
+                as="p"
+                color={COLORS.darkBlack70}
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {t('name_rule_description')}
               </StyledText>
               {formik.errors.newRobotName && (
                 <StyledText
-                  fontSize="1.375rem"
-                  lineHeight="1.875rem"
-                  fontWeight="500"
-                  color={COLORS.errorText}
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  color={COLORS.red2}
                 >
                   {formik.errors.newRobotName}
                 </StyledText>

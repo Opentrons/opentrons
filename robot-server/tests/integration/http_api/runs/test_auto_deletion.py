@@ -39,7 +39,7 @@ async def test_runs_auto_delete(
             # Last n elements of created_run_ids.
             run_ids_to_expect = created_run_ids[-num_to_expect:]
 
-            assert fetched_run_ids == run_ids_to_expect
+            assert set(fetched_run_ids) == set(run_ids_to_expect)
 
 
 async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:

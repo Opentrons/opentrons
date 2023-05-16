@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -12,6 +13,7 @@ import {
   JUSTIFY_CENTER,
   COLORS,
   TYPOGRAPHY,
+  RESPONSIVENESS,
   SecondaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
@@ -40,9 +42,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
       >
         <Icon name="ot-check" size={SIZE_3} color={COLORS.warningEnabled} />
-        <StyledText as="h1" marginTop={SPACING.spacing24}>
-          {t('exit_screen_title')}
-        </StyledText>
+        <ConfirmationHeader>{t('exit_screen_title')}</ConfirmationHeader>
         <StyledText as="p" marginTop={SPACING.spacing8}>
           {t('exit_screen_subtitle')}
         </StyledText>
@@ -69,3 +69,11 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
     </Flex>
   )
 }
+
+const ConfirmationHeader = styled.h1`
+  margin-top: ${SPACING.spacing24};
+  ${TYPOGRAPHY.h1Default}
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold}
+  }
+`

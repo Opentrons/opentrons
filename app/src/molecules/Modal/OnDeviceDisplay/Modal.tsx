@@ -6,6 +6,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { BackgroundOverlay } from '../../BackgroundOverlay'
 import { ModalHeader } from './ModalHeader'
@@ -51,6 +52,7 @@ export function Modal(props: ModalProps): JSX.Element {
         onOutsideClick(e)
       }}
       justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
     >
       <Flex
         backgroundColor={isError ? COLORS.red2 : COLORS.white}
@@ -58,7 +60,7 @@ export function Modal(props: ModalProps): JSX.Element {
         width={modalWidth}
         height="max-content"
         maxHeight="33.5rem"
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
@@ -83,7 +85,7 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
           borderRadius={
-            isError ? `0px 0px ${BORDERS.size_three} ${BORDERS.size_three}` : 0
+            isError ? `0px 0px ${BORDERS.size3} ${BORDERS.size3}` : 0
           }
         >
           {children}

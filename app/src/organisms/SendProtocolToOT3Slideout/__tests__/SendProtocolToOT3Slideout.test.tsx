@@ -123,7 +123,7 @@ describe('SendProtocolToOT3Slideout', () => {
       eatToast: mockEatToast,
     })
     when(mockUseAllRunsQuery)
-      .calledWith(expect.any(Object), expect.any(Object))
+      .calledWith(expect.any(Object), expect.any(Object), expect.any(Object))
       .mockReturnValue(
         mockSuccessQueryResults({
           data: [],
@@ -163,7 +163,9 @@ describe('SendProtocolToOT3Slideout', () => {
   })
   it('does not render a robot option for a busy OT-3', () => {
     when(mockUseAllRunsQuery)
-      .calledWith(expect.any(Object), { hostname: mockConnectableOT3.ip })
+      .calledWith(expect.any(Object), expect.any(Object), {
+        hostname: mockConnectableOT3.ip,
+      })
       .mockReturnValue(
         mockSuccessQueryResults({
           data: [],

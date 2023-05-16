@@ -14,6 +14,7 @@ import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { ProtocolDetails } from '../../pages/OnDeviceDisplay/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 import { RunningProtocol } from '../../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
@@ -22,6 +23,7 @@ import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
+import { useCurrentRunRoute } from '../hooks'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
@@ -34,6 +36,7 @@ jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
+jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
 jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../pages/OnDeviceDisplay/RunSummary')
@@ -41,6 +44,7 @@ jest.mock('../../pages/OnDeviceDisplay/NameRobot')
 jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
 jest.mock('../../redux/config')
 jest.mock('../../redux/shell')
+jest.mock('../hooks')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -71,6 +75,9 @@ const mockRobotDashboard = RobotDashboard as jest.MockedFunction<
 const mockProtocolDashboard = ProtocolDashboard as jest.MockedFunction<
   typeof ProtocolDashboard
 >
+const mockProtocolDetails = ProtocolDetails as jest.MockedFunction<
+  typeof ProtocolDetails
+>
 const mockProtocolSetup = ProtocolSetup as jest.MockedFunction<
   typeof ProtocolSetup
 >
@@ -90,6 +97,9 @@ const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.Mocked
 >
 const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
   typeof getIsShellReady
+>
+const mockUseCurrentRunRoute = useCurrentRunRoute as jest.MockedFunction<
+  typeof useCurrentRunRoute
 >
 
 const render = (path = '/') => {
@@ -114,6 +124,7 @@ describe('OnDeviceDisplayApp', () => {
     mockRobotDashboard.mockReturnValue(<div>Mock RobotDashboard</div>)
     mockProtocolDashboard.mockReturnValue(<div>Mock ProtocolDashboard</div>)
     mockProtocolSetup.mockReturnValue(<div>Mock ProtocolSetup</div>)
+    mockProtocolDetails.mockReturnValue(<div>Mock ProtocolDetails</div>)
     mockRobotSettingsDashboard.mockReturnValue(
       <div>Mock RobotSettingsDashboard</div>
     )
@@ -123,6 +134,7 @@ describe('OnDeviceDisplayApp', () => {
     mockgetIsShellReady.mockReturnValue(false)
     mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
+    mockUseCurrentRunRoute.mockReturnValue(null)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -161,10 +173,11 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/protocols')
     getByText('Mock ProtocolDashboard')
   })
-  it('renders ProtocolSetup component from /protocols/:runId/setup', () => {
-    const [{ getByText }] = render('/protocols/my-protocol-id/setup')
-    getByText('Mock ProtocolSetup')
+  it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
+    const [{ getByText }] = render('/protocols/my-protocol-id')
+    getByText('Mock ProtocolDetails')
   })
+
   it('renders RobotSettingsDashboard component from /robot-settings', () => {
     const [{ getByText }] = render('/robot-settings')
     getByText('Mock RobotSettingsDashboard')
@@ -173,13 +186,25 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/instruments')
     getByText('Mock InstrumentsDashboard')
   })
-  it('renders RunningProtocol component from /protocols/:runId/run', () => {
-    const [{ getByText }] = render('/protocols/my-run-id/run')
+  it('when current run route present renders ProtocolSetup component from /runs/:runId/setup', () => {
+    mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/setup')
+    const [{ getByText }] = render('/runs/my-run-id/setup')
+    getByText('Mock ProtocolSetup')
+  })
+  it('when current run route present renders RunningProtocol component from /runs/:runId/run', () => {
+    mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/run')
+    const [{ getByText }] = render('/runs/my-run-id/run')
     getByText('Mock RunningProtocol')
   })
-  it('renders a RunSummary component from /protocols/:runId/summary', () => {
-    const [{ getByText }] = render('/protocols/my-run-id/summary')
+  it('when current run route present renders a RunSummary component from /runs/:runId/summary', () => {
+    mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/summary')
+    const [{ getByText }] = render('/runs/my-run-id/summary')
     getByText('Mock RunSummary')
+  })
+  it('redirects to dashboard no current run route present, but still on a run route', () => {
+    mockUseCurrentRunRoute.mockReturnValue(null)
+    const [{ getByText }] = render('/runs/my-run-id/summary')
+    getByText('Mock RobotDashboard')
   })
   it('renders the loading screen on mount', () => {
     const [{ getByText }] = render('/')
