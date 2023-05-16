@@ -47,7 +47,6 @@ describe('useCreateRunMutation hook', () => {
     expect(result.current.data).toBeUndefined()
     result.current.createRun({})
     await waitFor(() => {
-      console.log(result.current.status)
       return result.current.status !== 'loading'
     })
     expect(result.current.data).toBeUndefined()

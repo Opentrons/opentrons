@@ -4,6 +4,8 @@
 import path from 'path'
 
 import { fetch, postFile } from '../http'
+import { getSerialPortHttpAgent } from '../usb'
+
 import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 import type {
   RobotModel,
@@ -36,13 +38,23 @@ const getSystemFileName = (robotModel: RobotModel): string => {
 }
 
 export function startPremigration(robot: RobotHost): Promise<unknown> {
+  const serialPortHttpAgent = getSerialPortHttpAgent()
+
   const apiUrl = `http://${robot.ip}:${robot.port}/server/update`
   const serverUrl = `http://${robot.ip}:${robot.port}/server/update/bootstrap`
   const restartUrl = `http://${robot.ip}:${robot.port}/server/restart`
 
-  return postFile(apiUrl, 'whl', PREMIGRATION_API_WHL)
-    .then(() => postFile(serverUrl, 'whl', PREMIGRATION_SERVER_WHL))
-    .then(() => fetch(restartUrl, { method: 'POST' }))
+  return postFile(apiUrl, 'whl', PREMIGRATION_API_WHL, {
+    agent: serialPortHttpAgent,
+  })
+    .then(() =>
+      postFile(serverUrl, 'whl', PREMIGRATION_SERVER_WHL, {
+        agent: serialPortHttpAgent,
+      })
+    )
+    .then(() =>
+      fetch(restartUrl, { agent: serialPortHttpAgent, method: 'POST' })
+    )
 }
 
 export function uploadSystemFile(
@@ -50,7 +62,10 @@ export function uploadSystemFile(
   urlPath: string,
   file: string
 ): Promise<unknown> {
+  const serialPortHttpAgent = getSerialPortHttpAgent()
   const url = `http://${robot.ip}:${robot.port}${urlPath}`
 
-  return postFile(url, getSystemFileName(robot.robotModel), file)
+  return postFile(url, getSystemFileName(robot.robotModel), file, {
+    agent: serialPortHttpAgent,
+  })
 }
