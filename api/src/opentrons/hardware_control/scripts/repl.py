@@ -45,6 +45,7 @@ from opentrons.hardware_control.types import (  # noqa: E402
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_pipette,
     calibrate_belts,
+    delete_belt_calibration_data,
     calibrate_gripper_jaw,
     calibrate_module,
     find_calibration_structure_height,
@@ -158,6 +159,9 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             ),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
             "calibrate_belts": wrap_async_util_fn(calibrate_belts, api),
+            "delete_belt_calibration_data": wrap_async_util_fn(
+                delete_belt_calibration_data, api
+            ),
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper_jaw, api),
             "calibrate_module": wrap_async_util_fn(calibrate_module, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,

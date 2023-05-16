@@ -30,6 +30,7 @@ from opentrons.calibration_storage import types
 from opentrons.calibration_storage.ot3.deck_attitude import (
     save_robot_belt_attitude,
     get_robot_belt_attitude,
+    delete_robot_belt_attitude,
 )
 from opentrons.config.robot_configs import (
     default_ot3_deck_calibration,
@@ -906,6 +907,10 @@ def validate_attitude_deck_calibration(
     else:
         # Transform as it stands is sufficient.
         return DeckTransformState.OK
+
+
+def delete_belt_calibration_data() -> None:
+    delete_robot_belt_attitude()
 
 
 class OT3RobotCalibrationProvider:
