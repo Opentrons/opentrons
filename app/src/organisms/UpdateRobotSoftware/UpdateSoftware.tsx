@@ -58,7 +58,6 @@ export function UpdateSoftware({
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.darkBlack70}
-          marginBottom={SPACING.spacing40}
         >
           {renderText()}
         </StyledText>

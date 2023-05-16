@@ -19,7 +19,7 @@ export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
-      backgroundColor={COLORS.darkGreyDisabled}
+      backgroundColor={COLORS.darkBlack20}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
