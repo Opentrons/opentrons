@@ -58,7 +58,7 @@ def _reduce_volumes_to_not_exceed_software_limit(
     test_volumes: List[float], cfg: config.PhotometricConfig
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(cfg.pipette_volume, cfg.tip_volume, int(v))
+        liq_cls = get_liquid_class(cfg.pipette_volume, 96, cfg.tip_volume, int(v))
         max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
@@ -71,7 +71,7 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> List[fl
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+        test_volumes = get_test_volumes(cfg.pipette_volume, 96, cfg.tip_volume)
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
     if not _check_if_software_supports_high_volumes():
@@ -307,6 +307,18 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
 
+    test_volumes = _get_volumes(ctx, cfg)
+    ui.print_header("PREPARE")
+    ui.get_user_ready(
+        f"Is there 1 {cfg.photoplate} on the deck and {(len(test_volumes) * cfg.trials)-1} ready?"
+    )
+    ui.get_user_ready(
+        f"Is there {(len(test_volumes) * cfg.trials)-1} {cfg.photoplate} covers ready?"
+    )
+    ui.get_user_ready(
+        f"Is there {((cfg.reloads-1)*len(test_volumes)) + 1} extra full tipracks?"
+    )
+
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
     liquid_tracker = LiquidTracker()
@@ -322,11 +334,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         pipette_tag += "-qc"
 
     ui.print_header("GET PARAMETERS")
-    test_volumes = _get_volumes(ctx, cfg)
     for v in test_volumes:
         print(f"\t{v} uL")
     tips = get_tips(ctx, pipette)
-    total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
+    total_tips = (
+        len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * cfg.reloads
+    )
     trial_total = len(test_volumes) * cfg.trials
     assert (
         trial_total <= total_tips
@@ -402,6 +415,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                 )
+                ui.get_user_ready("Cover and replace the photoplate in slot 3")
                 print("dropping tip")
                 _drop_tip(ctx, pipette, cfg)
 

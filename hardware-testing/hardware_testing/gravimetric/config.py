@@ -37,6 +37,7 @@ class PhotometricConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
+    reloads: int
     labware_offsets: List[dict]
     photoplate: str
     photoplate_slot: int
