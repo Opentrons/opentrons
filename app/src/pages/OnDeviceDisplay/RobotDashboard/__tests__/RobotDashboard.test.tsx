@@ -7,12 +7,14 @@ import {
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../i18n'
-import { EmptyRecentRun } from '../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
-import { RecentRunProtocolCarousel } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
-import { useMissingProtocolHardware } from '../../Protocols/hooks'
-import { RobotDashboard } from '../RobotDashboard'
+import { i18n } from '../../../../i18n'
+import { EmptyRecentRun } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
+import { RecentRunProtocolCarousel } from '../../../../organisms/OnDeviceDisplay/RobotDashboard'
+import { Navigation } from '../../../../organisms/OnDeviceDisplay/Navigation'
+import { useMissingProtocolHardware } from '../../../Protocols/hooks'
+import { getOnDeviceDisplaySettings } from '../../../../redux/config'
+import { WelcomedModal } from '../WelcomeModal'
+import { RobotDashboard } from '../../RobotDashboard'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -26,12 +28,14 @@ jest.mock('react-router-dom', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
+jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
 jest.mock(
-  '../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
+  '../../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
-jest.mock('../../Protocols/hooks')
+jest.mock('../../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../Protocols/hooks')
+jest.mock('../../../../redux/config')
+jest.mock('../WelcomeModal')
 
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockUseAllProtocolsQuery = useAllProtocolsQuery as jest.MockedFunction<
@@ -49,6 +53,13 @@ const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.Mocked
 const mockRecentRunProtocolCarousel = RecentRunProtocolCarousel as jest.MockedFunction<
   typeof RecentRunProtocolCarousel
 >
+const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
+  typeof getOnDeviceDisplaySettings
+>
+const mockWelcomeModal = WelcomedModal as jest.MockedFunction<
+  typeof WelcomedModal
+>
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -92,6 +103,10 @@ describe('RobotDashboard', () => {
     mockRecentRunProtocolCarousel.mockReturnValue(
       <div>mock RecentRunProtocolCarousel</div>
     )
+    mockGetOnDeviceDisplaySettings.mockReturnValue({
+      unfinishedUnboxingFlowRoute: null,
+    } as any)
+    mockWelcomeModal.mockReturnValue(<div>mock WelcomeModal</div>)
   })
 
   afterEach(() => {
@@ -103,6 +118,7 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('mock EmptyRecentRun')
   })
+
   it('should render a recent run protocol carousel', () => {
     mockUseAllProtocolsQuery.mockReturnValue({
       data: {
@@ -116,5 +132,13 @@ describe('RobotDashboard', () => {
     getByText('mock Navigation')
     getByText('Run again')
     getByText('mock RecentRunProtocolCarousel')
+  })
+
+  it('should render WelcomeModal component when finish unboxing flow', () => {
+    mockGetOnDeviceDisplaySettings.mockReturnValue({
+      unfinishedUnboxingFlowRoute: '/robot-settings/rename-robot',
+    } as any)
+    const [{ getByText }] = render()
+    getByText('mock WelcomeModal')
   })
 })
