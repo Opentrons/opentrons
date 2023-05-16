@@ -30,6 +30,7 @@ from .tips import get_tips
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
+TARGET_END_PHOTOPLATE_VOLUME = 200
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
     # update this regularly, because the script may exit early
@@ -313,10 +314,10 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         f"Is there 1 {cfg.photoplate} on the deck and {(len(test_volumes) * cfg.trials)-1} ready?"
     )
     ui.get_user_ready(
-        f"Is there {(len(test_volumes) * cfg.trials)-1} {cfg.photoplate} covers ready?"
+        f"Is there {(len(test_volumes) * cfg.trials)} {cfg.photoplate} covers ready?"
     )
     ui.get_user_ready(
-        f"Is there {((cfg.reloads-1)*len(test_volumes)) + 1} extra full tipracks?"
+        f"Is there {(cfg.trials*(len(test_volumes)-1)) + 1}  extra full {cfg.tip_volume}ul tipracks?"
     )
 
     ui.print_header("LOAD LABWARE")
@@ -338,7 +339,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         print(f"\t{v} uL")
     tips = get_tips(ctx, pipette)
     total_tips = (
-        len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * cfg.reloads
+        len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(test_volumes)
     )
     trial_total = len(test_volumes) * cfg.trials
     assert (
@@ -389,14 +390,17 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     try:
         trial_count = 0
+        tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
+            photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME-volume, 0)
             for trial in range(cfg.trials):
+                for w in photoplate.wells():
+                    liquid_tracker.set_start_volume(w, photoplate_preped_vol)
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
-                # remove it so it's not used again
-                next_tip: Well = tips[0].pop(0)
+                next_tip: Well = tips[0][tip_iter]
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
 
@@ -416,8 +420,13 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     stable=True,
                 )
                 ui.get_user_ready("Cover and replace the photoplate in slot 3")
-                print("dropping tip")
                 _drop_tip(ctx, pipette, cfg)
+                tip_iter +=1
+                if tip_iter >= len(tips[0]):
+                    ui.get_user_ready(
+                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
+                    )
+                    tip_iter = 0
 
     finally:
         # FIXME: instead keep motors engaged, and move to an ATTACH position

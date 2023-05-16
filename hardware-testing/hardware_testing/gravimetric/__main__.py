@@ -92,7 +92,6 @@ def run_pm(
     pipette_volume: int,
     tip_volume: int,
     trials: int,
-    reloads: int,
     return_tip: bool,
     blank: bool,
     mix: bool,
@@ -110,7 +109,6 @@ def run_pm(
             pipette_volume=pipette_volume,
             tip_volume=tip_volume,
             trials=trials,
-            reloads=reloads,
             labware_offsets=LABWARE_OFFSETS,
             photoplate=protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
             photoplate_slot=protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
@@ -133,7 +131,6 @@ if __name__ == "__main__":
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--trials", type=int, required=True)
-    parser.add_argument("--reloads", type=int, default=1)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
@@ -168,7 +165,6 @@ if __name__ == "__main__":
             args.pipette,
             args.tip,
             args.trials,
-            args.reloads,
             args.return_tip,
             args.blank,
             args.mix,
