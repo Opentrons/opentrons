@@ -102,7 +102,7 @@ const mockSnackbar = Snackbar as jest.MockedFunction<typeof Snackbar>
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/protocols/:runId/setup/">
+      <Route path="/runs/:runId/setup/">
         <ProtocolSetup />
       </Route>
     </MemoryRouter>,
@@ -218,7 +218,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render text, image, and buttons', () => {
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Prepare to run')
     getByText('Instruments')
     getByText('Modules')
@@ -228,7 +228,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should play protocol when click play button', () => {
-    const [{ getByRole }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
     expect(mockPlay).toBeCalledTimes(0)
     getByRole('button', { name: 'play' }).click()
     expect(mockPlay).toBeCalledTimes(1)
@@ -247,7 +247,7 @@ describe('ProtocolSetup', () => {
 
   it('should launch cancel modal when click close button', () => {
     const [{ getByRole, getByText, queryByText }] = render(
-      `/protocols/${RUN_ID}/setup/`
+      `/runs/${RUN_ID}/setup/`
     )
     expect(queryByText('Mock ConfirmCancelRunModal')).toBeNull()
     getByRole('button', { name: 'close' }).click()
@@ -261,14 +261,14 @@ describe('ProtocolSetup', () => {
     when(mockGetProtocolModulesInfo)
       .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue([])
-    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
     queryByText('Modules')?.click()
     getByText('Mock ProtocolSetupModules')
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
-    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
     getByText('Liquids not in setup')
     getByText('Liquids').click()
@@ -276,7 +276,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch LPC when clicked', () => {
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
   })

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import {
   Flex,
   RobotWorkSpace,
@@ -17,6 +17,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   TYPOGRAPHY,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -122,7 +123,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_FLEX_START}
         >
-          <StyledText as="h1">{header}</StyledText>
+          <Header>{header}</Header>
           {body}
           <LiveOffsetValue {...liveOffset} />
         </Flex>
@@ -250,3 +251,11 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     </Flex>
   )
 }
+
+const Header = styled.h1`
+  ${TYPOGRAPHY.h1Default}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold}
+  }
+`

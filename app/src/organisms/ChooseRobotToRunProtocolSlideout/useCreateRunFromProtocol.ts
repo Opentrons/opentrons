@@ -38,7 +38,8 @@ export function useCreateRunFromProtocol(
   labwareOffsets?: LabwareOffsetCreateData[]
 ): UseCreateRun {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
   const { t } = useTranslation('shared')
 

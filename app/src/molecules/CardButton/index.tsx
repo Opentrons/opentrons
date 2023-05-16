@@ -95,8 +95,6 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
-          fontSize="1.75rem"
-          lineHeight="2.25rem"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
@@ -110,8 +108,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
       >
         <StyledText
-          fontSize="1.375rem"
-          lineHeight="1.75rem"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           css={CARD_BUTTON_TEXT_STYLE}

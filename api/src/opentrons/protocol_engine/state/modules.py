@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot
+from numpy import array, dot, add
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -64,6 +64,8 @@ from .module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    MagneticBlockSubState,
+    MagneticBlockId,
     ModuleSubStateType,
 )
 
@@ -270,6 +272,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_open=live_data is not None and live_data["lid"] == "open",
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
+            )
+        elif ModuleModel.is_magnetic_block(actual_model):
+            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
+                module_id=MagneticBlockId(module_id)
             )
 
     def _update_module_calibration(
@@ -663,6 +669,16 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+
+        # add the calibrated module offset if there is one
+        module = self.get(module_id)
+        offset: Optional[ModuleOffsetVector] = None
+        if module.serialNumber is not None:
+            offset = self._state.module_offset_by_serial.get(module.serialNumber)
+
+        if offset is not None:
+            module_offset = array((offset.x, offset.y, offset.z, 1))
+            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],

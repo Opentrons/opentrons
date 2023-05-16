@@ -1,12 +1,12 @@
 {
   "landing_page": {
     "welcome": "Welcome to Protocol Designer",
-    "create_flex_protocol": "Create new Opentrons Flex protocol",
+    "create_flex_protocol": "Create New Opentrons Flex Protocol",
     "create_ot2_protocol": "Create new OT-2 protocol",
     "import_protocol": "Import a protocol"
   },
   "header": {
-    "title": "Create new Opentrons Flex protocol",
+    "title": "Create New Opentrons Flex Protocol",
     "cancel_button": "Cancel",
     "required_fields": "*required fields"
   },
@@ -17,8 +17,8 @@
     "go_to_liquids_page": "Create protocol, on to liquids"
   },
   "name_and_description": {
-    "name": "Protocol Name and description",
-    "heading": "Protocol Name and description",
+    "name": "Protocol Name and Description",
+    "heading": "Protocol Name and Description",
     "choose_name": "Choose a name for your protocol.*",
     "protocol_name": "Protocol Name",
     "supporting_error_text": "supporting text about any error handling goes here.",

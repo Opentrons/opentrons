@@ -11,6 +11,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_ROW,
   ALIGN_FLEX_END,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
@@ -24,19 +25,19 @@ const NetworkSetupOptions = [
   {
     title: 'wifi',
     iconName: 'wifi' as IconName,
-    description: 'connection_description',
+    description: 'connection_description_wifi',
     destinationPath: '/network-setup/wifi',
   },
   {
     title: 'ethernet',
     iconName: 'ethernet' as IconName,
-    description: 'connection_description',
+    description: 'connection_description_ethernet',
     destinationPath: '/network-setup/ethernet',
   },
   {
     title: 'usb',
     iconName: 'usb' as IconName,
-    description: 'connection_description',
+    description: 'connection_description_usb',
     destinationPath: '/network-setup/usb',
   },
 ]
@@ -57,12 +58,11 @@ export function NetworkSetupMenu(): JSX.Element {
           marginBottom="3.09375rem"
         >
           <StyledText
-            fontSize="2rem"
-            lineHeight="2.75rem"
-            fontWeight="700"
+            as="h2"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black}
           >
-            {t('lets_connect_to_a_network')}
+            {t('connect_to_a_network')}
           </StyledText>
         </Flex>
         <Flex
@@ -71,11 +71,12 @@ export function NetworkSetupMenu(): JSX.Element {
           marginBottom={SPACING.spacing40}
         >
           <StyledText
-            fontSize="1.375rem"
-            lineHeight="1.875rem"
-            fontWeight="700"
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            color={COLORS.darkBlack70}
+            textAlign={TYPOGRAPHY.textAlignCenter}
           >
-            {t('choose_your_connection_type')}
+            {t('network_setup_menu_description')}
           </StyledText>
         </Flex>
         <Flex
@@ -92,7 +93,6 @@ export function NetworkSetupMenu(): JSX.Element {
             />
           ))}
         </Flex>
-        {/* temp button to robot dashboard until we can detect setup status */}
         <Flex
           alignSelf={ALIGN_FLEX_END}
           marginTop={SPACING.spacing24}

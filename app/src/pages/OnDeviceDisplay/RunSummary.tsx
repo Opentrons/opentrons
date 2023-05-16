@@ -81,8 +81,8 @@ export function RunSummary(): JSX.Element {
 
   const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(`/protocols/${runId}/setup`)
+  const onResetSuccess = (_createRunResponse: Run): void =>
+    history.push(`/runs/${runId}/setup`)
   const { reset } = useRunControls(runId, onResetSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
@@ -95,6 +95,7 @@ export function RunSummary(): JSX.Element {
     : t('run_failed_modal_title')
 
   const handleReturnToDash = (): void => {
+    closeCurrentRun()
     history.push('/')
   }
 
@@ -117,7 +118,6 @@ export function RunSummary(): JSX.Element {
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
     setShowSplash(false)
   }
 

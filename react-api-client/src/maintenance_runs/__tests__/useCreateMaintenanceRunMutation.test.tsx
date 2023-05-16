@@ -79,9 +79,9 @@ describe('useCreateMaintenanceRunMutation hook', () => {
         wrapper,
       }
     )
-    act(() =>
+    act(() => {
       result.current.createMaintenanceRun({ labwareOffsets: [mockOffset] })
-    )
+    })
 
     await waitFor(() => result.current.data != null)
 

@@ -4,13 +4,15 @@
     "magneticModuleType": "Magnetic",
     "thermocyclerModuleType": "Thermocycler",
     "heaterShakerModuleType": "Heater-Shaker",
+    "magneticBlockType": "Magnetic Block",
     "gripperModuleType": "Gripper"
   },
   "module_long_names": {
     "temperatureModuleType": "Temperature module",
     "magneticModuleType": "Magnetic module",
     "thermocyclerModuleType": "Thermocycler module",
-    "heaterShakerModuleType": "Heater-Shaker module"
+    "heaterShakerModuleType": "Heater-Shaker module",
+    "magneticBlockType": "Magnetic Block"
   },
   "model_display_name": {
     "temperatureModuleV1": "GEN1",
@@ -19,7 +21,8 @@
     "magneticModuleV2": "GEN2",
     "thermocyclerModuleV1": "GEN1",
     "thermocyclerModuleV2": "GEN2",
-    "heaterShakerModuleV1": "GEN1"
+    "heaterShakerModuleV1": "GEN1",
+    "magneticBlockV1": "GEN1"
   },
   "status": {
     "engaged": "engaged",

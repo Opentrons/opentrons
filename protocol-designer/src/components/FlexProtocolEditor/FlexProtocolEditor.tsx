@@ -7,6 +7,8 @@ import {
   BORDERS,
   SPACING,
   NewPrimaryBtn,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_V1,
@@ -201,22 +203,21 @@ interface Props {
 }
 
 const selectComponent = (selectedTab: number): JSX.Element | null => {
-  const twoPipetteOption = (selectedTab: number): JSX.Element => {
-    const { left, right } = pipetteSlot
-    return selectedTab === 1 ? (
-      <SelectPipetteOption pipetteName={left} />
-    ) : (
-      <SelectPipetteOption pipetteName={right} />
-    )
-  }
-
+  const { left, right } = pipetteSlot
   switch (selectedTab) {
     case 0:
       return <FlexProtocolName />
     case 1:
+      return (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <SelectPipetteOption pipetteName={left} />
+          <SelectPipetteOption pipetteName={right} />
+        </Flex>
+      )
     case 2:
-      return twoPipetteOption(selectedTab)
-    case 3:
       return <FlexModules />
     default:
       return null
