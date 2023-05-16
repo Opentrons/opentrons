@@ -34,7 +34,7 @@ const mockProtocol: ProtocolResource = {
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
 
-const props = { protocol: mockProtocol, setLongPressModalOpened: jest.fn() }
+const props = { protocol: mockProtocol, longPress: jest.fn() }
 
 const render = () => {
   return renderWithProviders(
@@ -62,7 +62,7 @@ describe('ProtocolCard', () => {
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     jest.advanceTimersByTime(1005)
-    expect(props.setLongPressModalOpened).toHaveBeenCalled()
+    expect(props.longPress).toHaveBeenCalled()
     getByText('Run protocol')
     getByText('Pin protocol')
     getByText('Delete protocol')

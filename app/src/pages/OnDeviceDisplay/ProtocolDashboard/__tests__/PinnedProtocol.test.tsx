@@ -34,7 +34,7 @@ const mockProtocol: ProtocolResource = {
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
 
-const props = { protocol: mockProtocol, setLongPressModalOpened: jest.fn() }
+const props = { protocol: mockProtocol, longPress: jest.fn() }
 
 const render = () => {
   return renderWithProviders(
@@ -62,7 +62,7 @@ describe('Pinned Protocol', () => {
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     jest.advanceTimersByTime(1005)
-    expect(props.setLongPressModalOpened).toHaveBeenCalled()
+    expect(props.longPress).toHaveBeenCalled()
     getByText('Run protocol')
     // This should ne "Unpin protocol" but I don't know how to pass state into the render
     // call so the longpress modal can see the pinned ids.

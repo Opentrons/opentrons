@@ -26,19 +26,19 @@ export type CardSizeType = 'full' | 'half' | 'regular'
 
 export function PinnedProtocol(props: {
   protocol: ProtocolResource
-  setLongPressModalOpened: React.Dispatch<React.SetStateAction<boolean>>
+  longPress: React.Dispatch<React.SetStateAction<boolean>>
   cardSize?: CardSizeType
   lastRun?: string
 }): JSX.Element {
-  const { lastRun, protocol, setLongPressModalOpened } = props
+  const { lastRun, protocol, longPress } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const displayedName = truncateString(
     protocolName,
-    cardSize === 'full' ? 115 : 90,
-    cardSize === 'full' ? 82 : 45
+    cardSize === 'full' ? 58 : 62,
+    25
   )
   const { t } = useTranslation('protocol_info')
 
@@ -80,9 +80,9 @@ export function PinnedProtocol(props: {
   }
   React.useEffect(() => {
     if (longpress.isLongPressed) {
-      setLongPressModalOpened(true)
+      longPress(true)
     }
-  }, [longpress.isLongPressed, setLongPressModalOpened])
+  }, [longpress.isLongPressed, longPress])
 
   return (
     <Flex
@@ -126,7 +126,7 @@ export function PinnedProtocol(props: {
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {format(new Date(protocol.createdAt), 'Pp')}
+          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (

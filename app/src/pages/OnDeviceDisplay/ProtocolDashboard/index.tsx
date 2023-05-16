@@ -153,7 +153,7 @@ export function ProtocolDashboard(): JSX.Element {
           </StyledText>
           <PinnedProtocolCarousel
             pinnedProtocols={pinnedProtocols}
-            setLongPressModalOpened={setLongPressModalOpened}
+            longPress={setLongPressModalOpened}
           />
         </Flex>
       )}
@@ -243,7 +243,7 @@ export function ProtocolDashboard(): JSX.Element {
                   key={protocol.id}
                   lastRun={lastRun}
                   protocol={protocol}
-                  setLongPressModalOpened={setLongPressModalOpened}
+                  longPress={setLongPressModalOpened}
                 />
               )
             })}
@@ -258,6 +258,7 @@ export function ProtocolDashboard(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               height="27.25rem"
               justifyContent={JUSTIFY_CENTER}
+              borderRadius={BORDERS.size3}
             >
               <img title={t('nothing_here_yet')} src={imgSrc} />
               <StyledText
@@ -281,10 +282,10 @@ export function ProtocolDashboard(): JSX.Element {
 
 export function ProtocolCard(props: {
   protocol: ProtocolResource
-  setLongPressModalOpened: React.Dispatch<React.SetStateAction<boolean>>
+  longPress: React.Dispatch<React.SetStateAction<boolean>>
   lastRun?: string
 }): JSX.Element {
-  const { protocol, lastRun, setLongPressModalOpened } = props
+  const { protocol, lastRun, longPress } = props
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
@@ -301,9 +302,9 @@ export function ProtocolCard(props: {
 
   React.useEffect(() => {
     if (longpress.isLongPressed) {
-      setLongPressModalOpened(true)
+      longPress(true)
     }
-  }, [longpress.isLongPressed, setLongPressModalOpened])
+  }, [longpress.isLongPressed, longPress])
 
   return (
     <Flex
@@ -329,7 +330,7 @@ export function ProtocolCard(props: {
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
-          {format(new Date(protocol.createdAt), 'Pp')}
+          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
         </StyledText>
         {longpress.isLongPressed && (
           <LongPressModal longpress={longpress} protocolId={protocol.id} />
