@@ -59,7 +59,7 @@ class MoveGroupTipActionStep:
     duration_sec: np.float64
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
-    acceleration_mm_sec_sq: np.float64
+    acceleration_mm_sec_sq: np.float64 = np.float64(0)
 
 
 @dataclass(frozen=True)
