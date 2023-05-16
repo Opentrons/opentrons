@@ -240,6 +240,6 @@ gen-patches-for-gravimetric:
 	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-hardware.patch
 	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-api.patch
 	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-shared-data.patch
-	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(robot-server)-api.patch
+	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-robot-server.patch
 	find ./hardware_testing/gravimetric/overrides/ -type f -empty -delete
 	-$(MAKE) patch-for-gravimetric
