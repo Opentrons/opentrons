@@ -26,10 +26,11 @@ export type CardSizeType = 'full' | 'half' | 'regular'
 
 export function PinnedProtocol(props: {
   protocol: ProtocolResource
+  setLongPressModalOpened: React.Dispatch<React.SetStateAction<boolean>>
   cardSize?: CardSizeType
   lastRun?: string
 }): JSX.Element {
-  const { lastRun, protocol } = props
+  const { lastRun, protocol, setLongPressModalOpened } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
@@ -51,7 +52,7 @@ export function PinnedProtocol(props: {
   } = {
     full: {
       fontSize: TYPOGRAPHY.fontSize32,
-      height: '100%',
+      height: '8.875rem',
       lineHeight: TYPOGRAPHY.lineHeight42,
       width: '100%',
     },
@@ -77,6 +78,11 @@ export function PinnedProtocol(props: {
       history.push(`/protocols/${protocolId}`)
     }
   }
+  React.useEffect(() => {
+    if (longpress.isLongPressed) {
+      setLongPressModalOpened(true)
+    }
+  }, [longpress.isLongPressed, setLongPressModalOpened])
 
   return (
     <Flex
@@ -91,7 +97,7 @@ export function PinnedProtocol(props: {
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       overflowWrap="anywhere"
-      padding={SPACING.spacing16}
+      padding={SPACING.spacing24}
       ref={longpress.ref}
     >
       <StyledText
@@ -106,12 +112,9 @@ export function PinnedProtocol(props: {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
+        color={COLORS.darkBlack70}
       >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
+        <StyledText as="p">
           {lastRun !== undefined
             ? `${t('last_run')} ${formatDistance(
                 new Date(lastRun),
@@ -122,11 +125,7 @@ export function PinnedProtocol(props: {
               ).replace('about ', '')}`
             : t('no_history')}
         </StyledText>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
+        <StyledText as="p">
           {format(new Date(protocol.createdAt), 'Pp')}
         </StyledText>
       </Flex>
