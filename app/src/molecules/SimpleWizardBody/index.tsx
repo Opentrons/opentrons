@@ -110,7 +110,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           <>
             <Icon
               name={isSuccess ? 'ot-check' : 'ot-alert'}
-              size={isOnDevice ? '11.25rem' : '2.5rem'}
+              size={isOnDevice ? '3.75rem' : '2.5rem'}
               color={iconColor}
               aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
             />

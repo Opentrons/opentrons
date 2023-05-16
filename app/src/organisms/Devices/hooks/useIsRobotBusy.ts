@@ -14,7 +14,7 @@ export function useIsRobotBusy(
   const { poll } = options
   const queryOptions = poll ? { refetchInterval: ROBOT_STATUS_POLL_MS } : {}
   const robotHasCurrentRun =
-    useAllRunsQuery(queryOptions)?.data?.links?.current != null
+    useAllRunsQuery({}, queryOptions)?.data?.links?.current != null
   const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
   return (
     robotHasCurrentRun ||

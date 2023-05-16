@@ -13,6 +13,13 @@ export default {
       },
       defaultValue: undefined,
     },
+    buttonCategory: {
+      control: {
+        type: 'select',
+        options: ['default', 'rounded'],
+      },
+      defaultValue: undefined,
+    },
     onClick: { action: 'clicked' },
     width: {
       control: {

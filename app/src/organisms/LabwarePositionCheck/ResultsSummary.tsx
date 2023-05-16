@@ -131,7 +131,7 @@ export const ResultsSummary = (
       padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <StyledText as="h1">{t('new_labware_offset_data')}</StyledText>
+      <Header>{t('new_labware_offset_data')}</Header>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}
@@ -188,6 +188,14 @@ const TableDatum = styled('td')`
   padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: wrap;
+`
+
+const Header = styled.h1`
+  ${TYPOGRAPHY.h1Default}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold}
+  }
 `
 
 interface OffsetTableProps {

@@ -153,7 +153,7 @@ export function CurrentRunningProtocolCommand({
           <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
-            fontWeight="700"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             {currentRunStatus}
           </StyledText>
@@ -179,12 +179,12 @@ export function CurrentRunningProtocolCommand({
         backgroundColor={COLORS.mediumBlueEnabled}
         borderRadius={BORDERS.size2}
         justifyContent={JUSTIFY_CENTER}
+        css={COMMAND_ROW_STYLE}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
-            css={COMMAND_ROW_STYLE}
           />
         ) : null}
       </Flex>
