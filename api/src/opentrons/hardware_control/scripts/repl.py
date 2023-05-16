@@ -159,9 +159,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             ),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
             "calibrate_belts": wrap_async_util_fn(calibrate_belts, api),
-            "delete_belt_calibration_data": wrap_async_util_fn(
-                delete_belt_calibration_data, api
-            ),
+            "delete_belt_calibration_data": delete_belt_calibration_data,
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper_jaw, api),
             "calibrate_module": wrap_async_util_fn(calibrate_module, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
