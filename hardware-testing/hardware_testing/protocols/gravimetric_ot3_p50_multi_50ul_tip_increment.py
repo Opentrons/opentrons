@@ -1,15 +1,15 @@
-"""Gravimetric OT3 P1000."""
+"""Gravimetric OT3."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "gravimetric-ot3-p1000-multi-1000ul-tip"}
+metadata = {"protocolName": "gravimetric-ot3-p50-multi"}
 # FIXME: bump to v2.14 to utilize protocol engine
 requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {
-    1000: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    50: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
-LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
+LABWARE_ON_SCALE = "usascientific_12_reservoir_22ml"
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -20,7 +20,7 @@ def run(ctx: ProtocolContext) -> None:
         for slot in slots
     ]
     vial = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
-    pipette = ctx.load_instrument("p1000_multi_gen3", "left")
+    pipette = ctx.load_instrument("p50_multi_gen3", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
         pipette.aspirate(pipette.min_volume, vial["A1"].top())
