@@ -56,10 +56,10 @@ class MoveGroupTipActionStep:
     """A single tip handling action that requires movement in a move group."""
 
     velocity_mm_sec: np.float64
-    acceleration_mm_sec_sq: np.float64
     duration_sec: np.float64
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
+    acceleration_mm_sec_sq: np.float64
 
 
 @dataclass(frozen=True)

@@ -347,10 +347,11 @@ class OT3Simulator:
         axes: Sequence[OT3Axis],
         distance: float = 33,
         speed: float = -5.5,
+        acceleration: float = 0,
         tip_action: str = "drop",
     ) -> None:
         _ = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
+            axes, distance, speed, cast(PipetteAction, tip_action), acceleration
         )
 
     def _attached_to_mount(

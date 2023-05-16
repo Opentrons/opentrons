@@ -1565,10 +1565,14 @@ class OT3API(
             )
             await self._move(target_down)
             # perform pick up tip
+            jaw_acceleration = (
+                self._config.motion_settings.acceleration.high_throughput[OT3AxisKind.Q]
+            )
             await self._backend.tip_action(
                 [OT3Axis.of_main_tool_actuator(mount)],
                 pipette_spec.pick_up_distance,
                 pipette_spec.speed,
+                jaw_acceleration,
                 "clamp",
             )
             # back clamps off the adapter posts
@@ -1576,6 +1580,7 @@ class OT3API(
                 [OT3Axis.of_main_tool_actuator(mount)],
                 pipette_spec.pick_up_distance,
                 pipette_spec.speed,
+                0,
                 "home",
             )
 
@@ -1639,6 +1644,9 @@ class OT3API(
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
+        jaw_acceleration = self._config.motion_settings.acceleration.high_throughput[
+            OT3AxisKind.Q
+        ]
         for move in spec.drop_moves:
             await self._backend.set_active_current(
                 {
@@ -1654,12 +1662,14 @@ class OT3API(
                     [OT3Axis.of_main_tool_actuator(mount)],
                     move.target_position,
                     move.speed,
+                    jaw_acceleration,
                     "clamp",
                 )
                 await self._backend.tip_action(
                     [OT3Axis.of_main_tool_actuator(mount)],
                     move.target_position,
                     move.speed,
+                    0,
                     "home",
                 )
             else:

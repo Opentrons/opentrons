@@ -669,12 +669,13 @@ class OT3Controller:
         axes: Sequence[OT3Axis],
         distance: float,
         speed: float,
+        acceleration: float = 0,
         tip_action: str = "home",
     ) -> None:
         if tip_action == "home":
             speed = speed * -1
         move_group = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
+            axes, distance, speed, cast(PipetteAction, tip_action), acceleration
         )
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)

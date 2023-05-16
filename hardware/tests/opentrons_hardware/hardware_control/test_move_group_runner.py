@@ -116,10 +116,10 @@ def move_group_tip_action() -> MoveGroups:
             {
                 NodeId.pipette_left: MoveGroupTipActionStep(
                     velocity_mm_sec=float64(2),
-                    acceleration_mm_sec_sq=float64(0),
                     duration_sec=float64(1),
                     action=PipetteTipActionType.clamp,
                     stop_condition=MoveStopCondition.none,
+                    acceleration_mm_sec_sq=float64(0),
                 )
             }
         ]
