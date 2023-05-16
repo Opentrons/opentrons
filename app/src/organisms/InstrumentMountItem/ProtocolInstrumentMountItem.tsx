@@ -131,19 +131,21 @@ export function ProtocolInstrumentMountItem(
               )}
             </CalibrationStatus>
           </Flex>
-          <Flex flex="1">
-            <SmallButton
-              onClick={
-                attachedInstrument != null ? handleCalibrate : handleAttach
-              }
-              buttonText={i18n.format(
-                t(attachedInstrument != null ? 'calibrate' : 'attach'),
-                'capitalize'
-              )}
-              buttonType="primary"
-              buttonCategory="rounded"
-            />
-          </Flex>
+          {!isAttachedWithCal && (
+            <Flex flex="1">
+              <SmallButton
+                onClick={
+                  attachedInstrument != null ? handleCalibrate : handleAttach
+                }
+                buttonText={i18n.format(
+                  t(attachedInstrument != null ? 'calibrate' : 'attach'),
+                  'capitalize'
+                )}
+                buttonType="primary"
+                buttonCategory="rounded"
+              />
+            </Flex>
+          )}
         </Flex>
       </MountItem>
       {showPipetteWizardFlow ? (

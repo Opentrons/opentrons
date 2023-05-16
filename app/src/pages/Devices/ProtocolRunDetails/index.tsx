@@ -34,7 +34,9 @@ import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
+import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
+import { appShellRequestor } from '../../../redux/shell/remote'
 
 import type {
   DesktopRouteParams,
@@ -140,6 +142,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
       robotName={robot.name}
     >
       <Box

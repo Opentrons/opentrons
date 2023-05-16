@@ -134,7 +134,6 @@ describe('ConnectViaWifi', () => {
     fireEvent.click(getByRole('button', { name: 'foo' }))
     fireEvent.click(getByText('Continue'))
     fireEvent.click(getByRole('button', { name: 'Connect' }))
-    getByText('Connection status:')
     getByText('Connected')
   })
 

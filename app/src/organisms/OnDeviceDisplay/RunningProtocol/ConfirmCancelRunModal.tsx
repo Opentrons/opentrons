@@ -54,13 +54,12 @@ export function ConfirmCancelRunModal({
   }
 
   const handleCancelRun = (): void => {
+    setIsCanceling(true)
     stopRun(runId, {
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
         dismissCurrentRun(runId)
-        if (isActiveRun) {
-          history.push(`/protocols/${runId}/summary`)
-        } else {
+        if (!isActiveRun) {
           if (protocolId != null) {
             history.push(`/protocols/${protocolId}`)
           } else {
