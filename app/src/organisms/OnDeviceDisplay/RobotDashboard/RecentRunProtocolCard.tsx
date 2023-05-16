@@ -17,12 +17,11 @@ import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
 import { useTrackEvent } from '../../../redux/analytics'
-import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-
+import { useTrackProtocolRunEvent } from '../../Devices/hooks'
+import { useMissingHardwareText } from './hooks'
 import type { Run } from '@opentrons/api-client'
-
 interface RecentRunProtocolCardProps {
   /** protocol name that was run recently */
   protocolName: string
@@ -43,6 +42,7 @@ export function RecentRunProtocolCard({
   const missingProtocolHardware = useMissingProtocolHardware(protocolId)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
+  const chipText = useMissingHardwareText(missingProtocolHardware)
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (createRunResponse: Run): void =>
@@ -69,48 +69,6 @@ export function RecentRunProtocolCard({
     height: max-content;
   `
 
-  const missingProtocolHardwareType = missingProtocolHardware.map(
-    hardware => hardware.hardwareType
-  )
-
-  // Note(kj:04/13/2023) This component only check the type and count the number
-  // If we need to display any specific information, we will need to use filter
-  const countMissingHardwareType = (hwType: 'pipette' | 'module'): number => {
-    return missingProtocolHardwareType.reduce((acc, hardwareType) => {
-      if (hardwareType === hwType) {
-        return acc + 1
-      }
-      return acc
-    }, 0)
-  }
-
-  const countMissingPipettes = countMissingHardwareType('pipette')
-  const countMissingModules = countMissingHardwareType('module')
-
-  let chipText: string = t('ready_to_run')
-  if (countMissingPipettes === 0 && countMissingModules > 0) {
-    if (countMissingModules === 1) {
-      chipText = t('missing_module', {
-        num: countMissingModules,
-      })
-    } else {
-      chipText = t('missing_module_plural', {
-        count: countMissingModules,
-      })
-    }
-  } else if (countMissingPipettes > 0 && countMissingModules === 0) {
-    if (countMissingPipettes === 1) {
-      chipText = t('missing_pipette', {
-        num: countMissingPipettes,
-      })
-    } else {
-      chipText = t('missing_pipettes_plural', {
-        count: countMissingPipettes,
-      })
-    }
-  } else if (countMissingPipettes > 0 && countMissingModules > 0) {
-    chipText = t('missing_both')
-  }
   const handleCardClick = (): void => {
     cloneRun()
     trackEvent({
