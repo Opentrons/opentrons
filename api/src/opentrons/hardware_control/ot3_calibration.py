@@ -9,7 +9,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign, isclose
 from logging import getLogger
-from opentrons.util.linal import solve_attitude
+from opentrons.util.linal import solve_attitude, SolvePoints
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
@@ -628,7 +628,7 @@ async def find_slot_center_binary_from_nominal_center(
 async def _determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> types.AttitudeMatrix:
+) -> Tuple[types.AttitudeMatrix, SolvePoints, SolvePoints]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
@@ -664,7 +664,7 @@ async def _determine_transform_matrix(
         (point_b.x, point_b.y, point_b.z),
         (point_c.x, point_c.y, point_c.z),
     )
-    return solve_attitude(expected, actual)
+    return solve_attitude(expected, actual), expected, actual
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -814,7 +814,7 @@ async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
     pipette_id: str,
-) -> types.AttitudeMatrix:
+) -> Tuple[types.AttitudeMatrix, SolvePoints, SolvePoints]:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
 
@@ -833,9 +833,11 @@ async def calibrate_belts(
         try:
             hcapi.reset_deck_calibration()
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-            belt_attitude = await _determine_transform_matrix(hcapi, mount)
+            belt_attitude, expected, actual = await _determine_transform_matrix(
+                hcapi, mount
+            )
             save_robot_belt_attitude(belt_attitude, pipette_id)
-            return belt_attitude
+            return belt_attitude, expected, actual
         finally:
             hcapi.load_deck_calibration()
             await hcapi.remove_tip(mount)
