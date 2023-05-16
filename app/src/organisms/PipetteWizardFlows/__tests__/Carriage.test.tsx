@@ -101,7 +101,7 @@ describe('Carriage', () => {
         },
         {
           commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: 'left' },
+          params: { mount: LEFT },
         },
       ],
       false

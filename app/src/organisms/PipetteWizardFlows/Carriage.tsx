@@ -8,7 +8,7 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { SINGLE_MOUNT_PIPETTES, LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -41,7 +41,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         {
           // @ts-expect-error calibration command types not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: 'left' },
+          params: { mount: LEFT },
         },
       ],
       false
