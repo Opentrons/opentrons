@@ -7,7 +7,11 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { LoadedPipette, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  LoadedPipette,
+  NINETY_SIX_CHANNEL,
+} from '@opentrons/shared-data'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
@@ -42,7 +46,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
-    goBack,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteName =
@@ -51,7 +54,10 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const isCorrectPipette =
     requiredPipette != null &&
     requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
-
+  const requiredPipDisplayName =
+    requiredPipette != null
+      ? getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName
+      : null
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
@@ -80,6 +86,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
       ) {
         header = i18n.format(t('wrong_pip'), 'capitalize')
         buttonText = i18n.format(t('detach_and_retry'), 'capitalize')
+        iconColor = COLORS.errorEnabled
+        isSuccess = false
       } else {
         // attachment flow fail
         header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
@@ -112,9 +120,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   }
 
   const handleProceed = (): void => {
-    if (requiredPipette != null && Boolean(!isCorrectPipette)) {
-      goBack()
-    } else if (currentStepIndex === totalStepCount || !isSuccess) {
+    if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
     } else if (
       isSuccess &&
@@ -162,8 +168,30 @@ export const Results = (props: ResultsProps): JSX.Element => {
       {buttonText}
     </PrimaryButton>
   )
-
-  if (!isSuccess && (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)) {
+  if (
+    flowType === FLOWS.ATTACH &&
+    requiredPipette != null &&
+    requiredPipDisplayName != null &&
+    Boolean(!isCorrectPipette)
+  ) {
+    subHeader = t('please_install_correct_pip', {
+      pipetteName: requiredPipDisplayName,
+    })
+    button = (
+      <CheckPipetteButton
+        proceedButtonText={buttonText}
+        setFetching={setFetching}
+        isFetching={isFetching}
+        isOnDevice={isOnDevice}
+      />
+    )
+  }
+  if (
+    !isSuccess &&
+    requiredPipette == null &&
+    requiredPipDisplayName == null &&
+    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)
+  ) {
     subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
     button = (
       <>

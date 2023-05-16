@@ -281,7 +281,7 @@ describe('Results', () => {
     const { getByText } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully attached')
   })
-  it('renders the correct information when attaching wrong pipette for run setup', () => {
+  it('renders the correct information when attaching wrong pipette for run setup', async () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -291,10 +291,11 @@ describe('Results', () => {
         mount: LEFT,
       },
     }
-    const { getByText, getByLabelText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('Wrong instrument installed')
-    getByText('Detach and retry')
-    getByLabelText('Results_exit').click()
-    expect(props.goBack).toHaveBeenCalled()
+    getByText('Please install Flex 8-Channel 50 μL')
+    getByRole('button', { name: 'Detach and retry' }).click()
+    await act(() => pipettePromise)
+    expect(mockRefetchInstruments).toHaveBeenCalled()
   })
 })

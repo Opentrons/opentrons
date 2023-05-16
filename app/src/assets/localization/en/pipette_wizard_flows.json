@@ -61,6 +61,7 @@
   "pipette_failed_to_attach": "unable to detect pipette",
   "pipette_failed_to_detach": "{{pipetteName}} still attached",
   "pipette_heavy": "The 96-Channel Pipette is heavy ({{weight}}). Ask a labmate for help, if needed.",
+  "please_install_correct_pip": "Please install {{pipetteName}}",
   "progress_will_be_lost": "{{flow}} progress will be lost",
   "reattach_carriage": "reattach z-axis carriage",
   "recalibrate_pipette": "recalibrate {{mount}} pipette",
