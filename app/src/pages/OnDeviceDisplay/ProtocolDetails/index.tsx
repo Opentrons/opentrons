@@ -23,7 +23,6 @@ import {
   useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { ProtocolResource } from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, TabbedButton } from '../../../atoms/buttons'
@@ -39,6 +38,7 @@ import { Liquids } from './Liquids'
 
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 const ProtocolHeader = (props: {
   title: string
