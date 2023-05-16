@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.types import DeckSlotName, Mount, MountType, Point, OFF_DECK
+from opentrons.types import DeckSlotName, Mount, MountType, Point, OffDeckType
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import (
     AbstractModule,
@@ -403,7 +403,7 @@ def test_move_labware_off_deck(
 
     subject.move_labware(
         labware_core=labware,
-        new_location=OFF_DECK,
+        new_location=OffDeckType.OFF_DECK,
         use_gripper=False,
         use_pick_up_location_lpc_offset=False,
         use_drop_location_lpc_offset=False,

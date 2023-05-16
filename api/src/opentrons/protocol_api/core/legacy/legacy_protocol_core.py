@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, Location, Mount, Point, OffDeckType
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -222,7 +222,9 @@ class LegacyProtocolCore(
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,
-        new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
+        new_location: Union[
+            DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType
+        ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,

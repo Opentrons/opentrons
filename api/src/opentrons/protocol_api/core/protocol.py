@@ -10,7 +10,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point, OFF_DECK
+from opentrons.types import DeckSlotName, Location, Mount, Point, OffDeckType
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -72,7 +72,7 @@ class AbstractProtocol(
     def move_labware(
         self,
         labware_core: LabwareCoreType,
-        new_location: Union[DeckSlotName, ModuleCoreType, OFF_DECK],
+        new_location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,

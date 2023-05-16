@@ -1,7 +1,8 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, NewType
+from typing_extensions import Final
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -63,11 +64,9 @@ class Point(NamedTuple):
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
-class _OffDeckType(enum.Enum):
+class OffDeckType(enum.Enum):
     OFF_DECK = "off-deck"
 
-
-OFF_DECK = _OffDeckType.OFF_DECK
 
 LocationLabware = Union[
     "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"
