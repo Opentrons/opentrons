@@ -2,7 +2,6 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
 import {
-  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
