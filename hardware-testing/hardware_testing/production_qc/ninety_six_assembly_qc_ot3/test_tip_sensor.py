@@ -25,7 +25,7 @@ from hardware_testing.opentrons_api.types import OT3Axis
 from hardware_testing.opentrons_api import helpers_ot3
 
 TIP_PRESENCE_POSITION = 6
-EXPECTED_STATE_AT_HOME_POSITION = True
+EXPECTED_STATE_AT_HOME_POSITION = False
 
 
 def _get_tag_for_state(tips_dropped: bool) -> str:
