@@ -417,7 +417,7 @@ class ProtocolContext(CommandPublisher):
         :param labware: Labware to move. Should be a labware already loaded
                         using :py:meth:`load_labware`
 
-        :param new_location: Deck slot location, a hardware module that is already
+        :param new_location: Deck slot location or a hardware module that is already
                              loaded on the deck using :py:meth:`load_module` or off deck using :py:type OffDeckType.
 
                             .. versionchanged:: 2.15
