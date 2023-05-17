@@ -784,6 +784,9 @@ async def calibrate_module(
             offset = await find_calibration_structure_position(
                 hcapi, mount, nominal_position, method=CalibrationMethod.BINARY_SEARCH
             )
+
+            # need to flip the polarity since modules are fixed on the deck
+            offset = offset * -1
             await hcapi.save_module_offset(module_id, mount, slot, offset)
             return offset
         finally:
