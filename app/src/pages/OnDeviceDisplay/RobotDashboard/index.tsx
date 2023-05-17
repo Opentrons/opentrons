@@ -41,14 +41,10 @@ export function RobotDashboard(): JSX.Element {
     unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
   )
 
-  const recentlyRunProtocols = protocolsData.filter(protocol =>
-    runData.some(run => run.protocolId === protocol.id)
-  )
-
   /** Currently the max number of displaying recent run protocol is 8 */
   const sortedProtocols =
-    recentlyRunProtocols.length > 0
-      ? sortProtocols(SORT_KEY, recentlyRunProtocols, runData).slice(
+    protocolsData.length > 0
+      ? sortProtocols(SORT_KEY, protocolsData, runData).slice(
           0,
           MAXIMUM_RECENT_RUN_PROTOCOLS
         )
