@@ -300,7 +300,7 @@ class OT3Axis(enum.Enum):
             raise KeyError(self)
 
 
-class OT3SubSystem(enum.Enum):
+class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
 
     This is a complete list of unique firmware nodes in the ot3.
@@ -313,9 +313,28 @@ class OT3SubSystem(enum.Enum):
     pipette_right = 4
     gripper = 5
     rear_panel = 6
+    motor_controller_board = 7
 
     def __str__(self) -> str:
         return self.name
+
+    @classmethod
+    def of_mount(
+        cls: "Type[SubSystem]", mount: Union[top_types.Mount, OT3Mount]
+    ) -> "Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper]":
+        return cast(
+            Literal[SubSystem.pipette_left, SubSystem.pipette_right, SubSystem.gripper],
+            {
+                top_types.Mount.LEFT: cls.pipette_left,
+                top_types.Mount.RIGHT: cls.pipette_right,
+                OT3Mount.LEFT: cls.pipette_left,
+                OT3Mount.RIGHT: cls.pipette_right,
+                OT3Mount.GRIPPER: cls.gripper,
+            }[mount],
+        )
+
+
+OT3SubSystem = SubSystem
 
 
 class PipetteSubType(enum.Enum):

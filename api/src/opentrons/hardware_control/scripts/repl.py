@@ -39,7 +39,7 @@ from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
     OT3Axis,
     OT3Mount,
-    OT3SubSystem,
+    SubSystem,
     GripperProbe,
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
@@ -150,7 +150,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Axis": Axis,
             "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
-            "OT3SubSystem": OT3SubSystem,
+            "SubSystem": SubSystem,
             "GripperProbe": GripperProbe,
             "ModuleType": ModuleType,
             "find_edge": wrap_async_util_fn(find_edge_binary, api),
