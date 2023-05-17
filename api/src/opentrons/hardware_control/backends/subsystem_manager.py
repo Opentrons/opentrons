@@ -178,7 +178,7 @@ class SubsystemManager:
         self,
         subsystems: Optional[Set[SubSystem]] = None,
         force: bool = False,
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+    ) -> AsyncIterator[UpdateStatus]:
         """Updates the firmware on the OT3."""
         # Check that there arent updates already running for given nodes
         current_subsystems = self.subsystems
@@ -238,11 +238,7 @@ class SubsystemManager:
                     progress=int(status_element[1]),
                 )
                 status_callbacks[subsystem](upstream_status)
-                yield set(
-                    status
-                    for subsystem, status in self._updates_ongoing.items()
-                    if subsystem in updating_subsystems
-                )
+                yield upstream_status
 
         # refresh the device_info cache and reset internal states
         await self.refresh()

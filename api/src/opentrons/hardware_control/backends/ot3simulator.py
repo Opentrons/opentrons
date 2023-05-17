@@ -53,6 +53,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     MotorStatus,
     UpdateStatus,
+    UpdateState,
     SubSystem,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
@@ -499,9 +500,12 @@ class OT3Simulator:
         self,
         subsystems: Set[SubSystem],
         force: bool = False,
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+    ) -> AsyncIterator[UpdateStatus]:
         """Updates the firmware on the OT3."""
-        yield set()
+        for subsystem in subsystems:
+            yield UpdateStatus(
+                subsystem=subsystem, state=UpdateState.done, progress=100
+            )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""

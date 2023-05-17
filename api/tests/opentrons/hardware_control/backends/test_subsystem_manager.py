@@ -23,6 +23,15 @@ from opentrons.hardware_control.backends.errors import SubsystemUpdating
 from opentrons.hardware_control.types import SubSystem, SubSystemState
 
 
+async def _error_update(
+    targets: Set[FirmwareTarget],
+) -> AsyncIterator[Tuple[FirmwareTarget, StatusElement]]:
+    for target in targets:
+        yield target, (FirmwareUpdateStatus.queued, 0)
+        await asyncio.sleep(0)
+    raise RuntimeError("oh no!")
+
+
 async def _quick_update(
     targets: Set[FirmwareTarget],
 ) -> AsyncIterator[Tuple[FirmwareTarget, StatusElement]]:
@@ -758,3 +767,97 @@ async def test_exception_on_multiple_updates(
                 await asyncio.sleep(0)
     finally:
         other_update.cancel()
+
+
+async def test_update_succeeds(
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+    tool_detection_controller: ToolDetectionController,
+) -> None:
+    """It should successfully run the update generator."""
+    targets: Set[FirmwareTarget] = {
+        NodeId.pipette_right,
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        USBTarget.rear_panel,
+        NodeId.head,
+    }
+    network_info_value = default_network_info_for(targets)
+    decoy.when(network_info.device_info).then_return(network_info_value)
+    decoy.when(network_info.targets).then_return(targets)
+
+    decoy.when(
+        update_bag.update_checker(matchers.Anything(), matchers.Anything(), False)
+    ).then_return(
+        {
+            NodeId.pipette_right: (1, "/some/path"),
+            NodeId.gantry_x: (1, "/some/other/path"),
+        }
+    )
+    decoy.when(update_bag.update_checker(matchers.Anything(), set(), True)).then_return(
+        {}
+    )
+
+    updater = prep_mock_update(
+        update_bag,
+        decoy,
+        {NodeId.pipette_right: "/some/path", NodeId.gantry_x: "/some/other/path"},
+    )
+    decoy.when(updater.run_updates()).then_return(
+        _quick_update({NodeId.pipette_right, NodeId.gantry_x})
+    )
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, network_info_value)
+
+    await subject.start()
+
+    async for status in subject.update_firmware(
+        {SubSystem.pipette_right, SubSystem.gantry_x}
+    ):
+        assert status.subsystem in {SubSystem.pipette_right, SubSystem.gantry_x}
+        assert status.subsystem in subject.get_update_progress()
+
+    assert subject.get_update_progress() == {}
+
+
+async def test_update_process_fails(
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+    tool_detection_controller: ToolDetectionController,
+) -> None:
+    """If the update coroutine fails, the error should be propagated."""
+    targets: Set[FirmwareTarget] = {
+        NodeId.pipette_right,
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        USBTarget.rear_panel,
+        NodeId.head,
+    }
+    network_info_value = default_network_info_for(targets)
+    decoy.when(network_info.device_info).then_return(network_info_value)
+    decoy.when(network_info.targets).then_return(targets)
+    decoy.when(
+        update_bag.update_checker(matchers.Anything(), matchers.Anything(), False)
+    ).then_return({NodeId.pipette_right: (1, "/some/path")})
+    decoy.when(update_bag.update_checker(matchers.Anything(), set(), True)).then_return(
+        {}
+    )
+
+    updater = prep_mock_update(update_bag, decoy, {NodeId.pipette_right: "/some/path"})
+    decoy.when(updater.run_updates()).then_return(_error_update({NodeId.pipette_right}))
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, network_info_value)
+
+    await subject.start()
+    with pytest.raises(RuntimeError):
+        async for status in subject.update_firmware(
+            {SubSystem.pipette_right, SubSystem.gantry_x}
+        ):
+            assert status.subsystem in {SubSystem.pipette_right, SubSystem.gantry_x}
+            assert status.subsystem in subject.get_update_progress()
+
+    assert subject.get_update_progress() == {}

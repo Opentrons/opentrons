@@ -296,7 +296,7 @@ class OT3Controller:
         self,
         subsystems: Set[SubSystem],
         force: bool = False,
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+    ) -> AsyncIterator[UpdateStatus]:
         """Updates the firmware on the OT3."""
         async for update in self._subsystem_manager.update_firmware(subsystems, force):
             yield update

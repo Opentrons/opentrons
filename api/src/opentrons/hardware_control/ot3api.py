@@ -394,7 +394,7 @@ class OT3API(
 
     async def update_firmware(
         self, subsystems: Optional[Set[SubSystem]] = None, force: bool = False
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+    ) -> AsyncIterator[UpdateStatus]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
         # start the updates and yield the progress
