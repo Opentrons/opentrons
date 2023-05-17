@@ -861,3 +861,108 @@ async def test_update_process_fails(
             assert status.subsystem in subject.get_update_progress()
 
     assert subject.get_update_progress() == {}
+
+
+async def test_update_process_fails_if_subsytem_does_not_appear_afterward(
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+    tool_detection_controller: ToolDetectionController,
+) -> None:
+    """After the update process, the updated subsystem must appear ok."""
+    targets: Set[FirmwareTarget] = {
+        NodeId.pipette_right,
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        USBTarget.rear_panel,
+        NodeId.head,
+    }
+    network_info_value = default_network_info_for(targets)
+    decoy.when(network_info.device_info).then_return(network_info_value)
+    decoy.when(network_info.targets).then_return(targets)
+    decoy.when(
+        update_bag.update_checker(matchers.Anything(), matchers.Anything(), False)
+    ).then_return({NodeId.gantry_x: (1, "/some/path")})
+    decoy.when(update_bag.update_checker(matchers.Anything(), set(), True)).then_return(
+        {}
+    )
+
+    updater = prep_mock_update(update_bag, decoy, {NodeId.gantry_x: "/some/path"})
+    decoy.when(updater.run_updates()).then_return(_quick_update({NodeId.gantry_x}))
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, network_info_value)
+
+    await subject.start()
+    iteration = 0
+    with pytest.raises(RuntimeError):
+        async for status in subject.update_firmware({SubSystem.gantry_x}):
+            iteration += 1
+            if iteration == 3:
+                new_targets = targets - {NodeId.gantry_x}
+                decoy.when(network_info.device_info).then_return(
+                    default_network_info_for(new_targets)
+                )
+                decoy.when(network_info.targets).then_return(new_targets)
+
+            assert status.subsystem == SubSystem.gantry_x
+            assert status.subsystem in subject.get_update_progress()
+
+    assert subject.get_update_progress() == {}
+
+
+async def test_update_process_fails_if_subsytem_is_not_ok_afterward(
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+    tool_detection_controller: ToolDetectionController,
+) -> None:
+    """After the update process, the updated subsystem must appear ok."""
+    targets: Set[FirmwareTarget] = {
+        NodeId.pipette_right,
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        USBTarget.rear_panel,
+        NodeId.head,
+    }
+    network_info_value = default_network_info_for(targets)
+    decoy.when(network_info.device_info).then_return(network_info_value)
+    decoy.when(network_info.targets).then_return(targets)
+    decoy.when(
+        update_bag.update_checker(matchers.Anything(), matchers.Anything(), False)
+    ).then_return({NodeId.gantry_x: (1, "/some/path")})
+    decoy.when(update_bag.update_checker(matchers.Anything(), set(), True)).then_return(
+        {}
+    )
+
+    updater = prep_mock_update(update_bag, decoy, {NodeId.gantry_x: "/some/path"})
+    decoy.when(updater.run_updates()).then_return(_quick_update({NodeId.gantry_x}))
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, network_info_value)
+
+    await subject.start()
+    iteration = 0
+    with pytest.raises(RuntimeError):
+        async for status in subject.update_firmware({SubSystem.gantry_x}):
+            iteration += 1
+            if iteration == 3:
+                new_targets = (targets - {NodeId.gantry_x}).union(
+                    {NodeId.gantry_x_bootloader}
+                )
+                decoy.when(network_info.device_info).then_return(
+                    default_network_info_for(new_targets)
+                )
+                decoy.when(network_info.targets).then_return(
+                    {x.application_for() for x in new_targets}
+                )
+                decoy.when(
+                    update_bag.update_checker(
+                        matchers.Anything(), {NodeId.gantry_x}, True
+                    )
+                ).then_return({NodeId.gantry_x: (1, "/some/path")})
+
+            assert status.subsystem == SubSystem.gantry_x
+            assert status.subsystem in subject.get_update_progress()
+
+    assert subject.get_update_progress() == {}

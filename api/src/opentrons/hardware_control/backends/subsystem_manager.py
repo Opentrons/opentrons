@@ -242,6 +242,13 @@ class SubsystemManager:
 
         # refresh the device_info cache and reset internal states
         await self.refresh()
+        # make sure the update actually succeeded
+        device_info = self.device_info
+        for subsystem in updating_subsystems:
+            if subsystem not in device_info or not device_info[subsystem].ok:
+                raise RuntimeError(
+                    f"Update failed: {str(subsystem)} not present and ok after update"
+                )
 
     def _get_required_fw_updates(
         self, targets: Set[FirmwareTarget], force: bool
