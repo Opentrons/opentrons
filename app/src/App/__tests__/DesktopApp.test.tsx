@@ -14,7 +14,7 @@ import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
-import { useProtocolReceiptToast, useSoftwareUpdatePoll } from '../hooks'
+import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
 jest.mock('../../organisms/Alerts')
@@ -53,9 +53,6 @@ const mockAppSettings = GeneralSettings as jest.MockedFunction<
 const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
   typeof useSoftwareUpdatePoll
->
-const mockUseProtocolReceiptToast = useProtocolReceiptToast as jest.MockedFunction<
-  typeof useProtocolReceiptToast
 >
 
 const render = (path = '/') => {
@@ -136,9 +133,5 @@ describe('DesktopApp', () => {
   it('should poll for software updates', () => {
     render()
     expect(mockUseSoftwareUpdatePoll).toBeCalled()
-  })
-  it('should poll for new protocols', () => {
-    render()
-    expect(mockUseProtocolReceiptToast).toBeCalled()
   })
 })
