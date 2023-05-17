@@ -12,19 +12,32 @@ import {
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useRunPipetteInfoByMount } from '../hooks'
-import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
+import { SetupInstrumentCalibrationItem } from './SetupPipetteCalibrationItem'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { GripperData } from '@opentrons/api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { isGripperRequired } from '../../../resources/protocols/utils'
 
-interface SetupPipetteCalibrationProps {
+interface SetupInstrumentCalibrationProps {
   robotName: string
   runId: string
 }
 
-export function SetupPipetteCalibration({
+export function SetupInstrumentCalibration({
   robotName,
   runId,
-}: SetupPipetteCalibrationProps): JSX.Element {
+}: SetupInstrumentCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
+
+  const { data: instrumentsQueryData } = useInstrumentsQuery()
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const usesGripper = mostRecentAnalysis != null ? isGripperRequired(mostRecentAnalysis) : false
+  const attachedGripperMatch = usesGripper
+    ? (instrumentsQueryData?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper'
+    ) ?? null
+    : null
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -41,13 +54,21 @@ export function SetupPipetteCalibration({
           <SetupPipetteCalibrationItem
             key={index}
             pipetteInfo={pipetteInfo}
-            index={index}
             mount={mount}
             robotName={robotName}
             runId={runId}
           />
         ) : null
       })}
+      {attachedGripperMatch != null ? (
+          <SetupInstrumentCalibrationItem
+            key='extension'
+            pipetteInfo={pipetteInfo}
+            mount={mount}
+            robotName={robotName}
+            runId={runId}
+          />
+      ) : null}
     </Flex>
   )
 }

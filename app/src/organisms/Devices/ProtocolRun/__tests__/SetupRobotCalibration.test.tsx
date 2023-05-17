@@ -12,7 +12,7 @@ import {
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
-import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
+import { SetupPipetteCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 

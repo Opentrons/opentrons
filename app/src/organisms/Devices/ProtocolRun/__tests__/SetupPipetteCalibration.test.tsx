@@ -7,7 +7,7 @@ import { i18n } from '../../../../i18n'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
-import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
+import { SetupPipetteCalibration } from '../SetupInstrumentCalibration'
 
 import type { PipetteInfo } from '../../hooks'
 
