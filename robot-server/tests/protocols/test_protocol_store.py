@@ -376,7 +376,7 @@ def test_get_referencing_run_ids(
 def test_get_protocol_ids(
     subject: ProtocolStore,
 ) -> None:
-    """It should return a list of protocol ids"""
+    """It should return a list of protocol ids."""
     protocol_resource_1 = ProtocolResource(
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),

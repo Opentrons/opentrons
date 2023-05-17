@@ -221,7 +221,6 @@ async def test_get_protocol_ids(
     analysis_store: AnalysisStore,
 ) -> None:
     """It should return stored protocol ids"""
-
     decoy.when(protocol_store.get_all_ids()).then_return(
         ["protocol_id_1", "protocol_id_2"]
     )

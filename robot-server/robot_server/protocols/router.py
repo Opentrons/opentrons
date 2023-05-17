@@ -27,7 +27,6 @@ from robot_server.service.json_api import (
     SimpleEmptyBody,
     MultiBodyMeta,
     PydanticResponse,
-    ResourceModel,
 )
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
