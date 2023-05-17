@@ -6,6 +6,7 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionImplementation,
     MoveToMaintenancePositionResult,
+    MaintenancePosition,
 )
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -24,17 +25,28 @@ def subject(
     )
 
 
+@pytest.mark.parametrize(
+    "maintenance_position, z_offset",
+    [
+        (MaintenancePosition.AttachInstrument, 400),
+        (MaintenancePosition.AttachPlate, 260),
+    ],
+)
 async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
     hardware_api: HardwareControlAPI,
+    maintenance_position: MaintenancePosition,
+    z_offset: int,
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
-    params = MoveToMaintenancePositionParams(mount=MountType.LEFT)
+    params = MoveToMaintenancePositionParams(
+        mount=MountType.LEFT, maintenancePosition=maintenance_position
+    )
 
     decoy.when(
-        state_view.labware.get_calibration_coordinates(offset=Point(y=10, z=400))
+        state_view.labware.get_calibration_coordinates(offset=Point(y=10, z=z_offset))
     ).then_return(Point(x=1, y=2, z=3))
 
     result = await subject.execute(params=params)

@@ -1,6 +1,7 @@
 """Calibration Move To Maintenance Location command payload, result, and implementation models."""
 from __future__ import annotations
 
+import enum
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
 
@@ -20,9 +21,18 @@ if TYPE_CHECKING:
 
 
 # These offsets are based on testing attach flows with 8/1 channel pipettes
-_INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=400)
+_ATTACH_Y_OFFSET = 10
+_INSTRUMENT_ATTACH_Z_OFFSET = 400
+_PLATE_ATTACH_Z_OFFSET = 260
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
+
+
+class MaintenancePosition(str, enum.Enum):
+    """Maintenance position options."""
+
+    AttachPlate = "attachPlate"
+    AttachInstrument = "attachInstrument"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -31,6 +41,11 @@ class MoveToMaintenancePositionParams(BaseModel):
     mount: MountType = Field(
         ...,
         description="Gantry mount to move maintenance position.",
+    )
+
+    maintenancePosition: MaintenancePosition = Field(
+        MaintenancePosition.AttachInstrument,
+        description="The position the gantry mount needs to move to.",
     )
 
 
@@ -60,8 +75,14 @@ class MoveToMaintenancePositionImplementation(
         """Move the requested mount to a maintenance deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
+        attach_offset = Point(
+            y=_ATTACH_Y_OFFSET,
+            z=_INSTRUMENT_ATTACH_Z_OFFSET
+            if params.maintenancePosition == MaintenancePosition.AttachInstrument
+            else _PLATE_ATTACH_Z_OFFSET,
+        )
         calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
-            offset=_INSTRUMENT_ATTACH_OFFSET
+            offset=attach_offset
         )
 
         # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
