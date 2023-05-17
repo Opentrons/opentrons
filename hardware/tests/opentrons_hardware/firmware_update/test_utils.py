@@ -74,6 +74,7 @@ def generate_device_info(
                     None,
                     PCBARevision(revision, None),
                     subidentifier=0,
+                    ok=True,
                 )
             }
         )
@@ -90,6 +91,7 @@ def generate_device_info(
                     None,
                     PCBARevision(revision, None),
                     subidentifier=0,
+                    ok=True,
                 )
             }
         )
@@ -148,7 +150,13 @@ def test_revision_defaulting_for_core(
     """We should pass through non-default revs and default ones that are not present."""
     _, rev = _update_type_for_device(
         DeviceInfoCache(
-            node, 2, "abcdef12", None, PCBARevision(main=reported_rev), subidentifier=0
+            node,
+            2,
+            "abcdef12",
+            None,
+            PCBARevision(main=reported_rev),
+            subidentifier=0,
+            ok=True,
         ),
     )
     if reported_rev:
@@ -185,6 +193,7 @@ def test_revision_defaulting_for_pipette(
             None,
             PCBARevision(main=reported_rev),
             subidentifier=subidentifier,
+            ok=True,
         ),
     )
     assert rev == reported_rev
@@ -412,7 +421,13 @@ def test_unknown_firmware_update_type(mock_manifest: Dict[str, Any]) -> None:
     """Don't do updates if the FirmwareUpdateType is unknown."""
     device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
         NodeId.head: DeviceInfoCache(
-            NodeId.head, 2, "12345678", None, PCBARevision(None), subidentifier=0
+            NodeId.head,
+            2,
+            "12345678",
+            None,
+            PCBARevision(None),
+            subidentifier=0,
+            ok=False,
         )
     }
     known_firmware_updates = generate_update_info(mock_manifest)
