@@ -63,11 +63,11 @@ _DECK_DEFINITION_TEST_LABWARE = "agilent_1_reservoir_290ml"
 _DECK_DEFINITION_TEST_WELL = "A1"
 
 
-def _get_deck_definition_test_source(robot_type: str) -> str:
+def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
     return textwrap.dedent(
         f"""\
         requirements = {{
-            "apiLevel": "2.14",
+            "apiLevel": "{api_level}",
             "robotType": "{robot_type}",
         }}
         def run(protocol):
@@ -82,13 +82,15 @@ def _get_deck_definition_test_source(robot_type: str) -> str:
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "expected_point"),
+    ("api_level", "robot_type", "expected_point"),
     [
         # These expected_point values were copied from known-good analysis outputs.
         # The exact values don't matter much for this test, since we're not checking positional
         # accuracy here. They just need to be clearly different between the OT-2 and OT-3.
-        ("OT-2", "(196.38, 42.785, 44.04)"),
+        ("2.13", "OT-2", "(196.38, 42.785, 44.04)"),
+        ("2.14", "OT-2", "(196.38, 42.785, 44.04)"),
         pytest.param(
+            "2.14",
             "OT-3",
             "(227.88, 42.785, 44.04)",
             marks=pytest.mark.ot3_only,  # Analyzing an OT-3 protocol requires an OT-3 hardware API.
@@ -96,6 +98,7 @@ def _get_deck_definition_test_source(robot_type: str) -> str:
     ],
 )
 def test_analysis_deck_definition(
+    api_level: str,
     robot_type: str,
     expected_point: str,
     tmp_path: Path,
@@ -109,6 +112,7 @@ def test_analysis_deck_definition(
     protocol_source_file = Path(tmp_path) / "protocol.py"
     protocol_source_file.write_text(
         _get_deck_definition_test_source(
+            api_level=api_level,
             robot_type=robot_type,
         )
     )
