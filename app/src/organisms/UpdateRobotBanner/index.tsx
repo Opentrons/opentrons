@@ -48,7 +48,7 @@ export function UpdateRobotBanner(
     robot.healthStatus === 'ok' ? (
     <Flex onClick={e => e.stopPropagation()} flexDirection={DIRECTION_COLUMN}>
       <Banner type="error" {...styleProps}>
-        <StyledText as="p" marginRight={SPACING.spacing2}>
+        <StyledText as="p" marginRight={SPACING.spacing4}>
           {t('robot_software_update_required')}
         </StyledText>
         <Btn

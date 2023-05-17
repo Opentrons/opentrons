@@ -94,6 +94,14 @@ from .drop_tip import (
     DropTipCommandType,
 )
 
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
+)
+
 from .home import (
     Home,
     HomeParams,
@@ -290,6 +298,12 @@ __all__ = [
     "DropTipParams",
     "DropTipResult",
     "DropTipCommandType",
+    # drop tip in place command models
+    "DropTipInPlace",
+    "DropTipInPlaceCreate",
+    "DropTipInPlaceParams",
+    "DropTipInPlaceResult",
+    "DropTipInPlaceCommandType",
     # home command models
     "Home",
     "HomeParams",

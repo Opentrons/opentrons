@@ -46,8 +46,8 @@ export function RecentProtocolRuns({
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      padding={`0 0 ${String(SPACING.spacing3)}`}
+      gridGap={SPACING.spacing16}
+      padding={`0 0 ${SPACING.spacing8}`}
       width="100%"
       marginBottom="6rem"
     >
@@ -55,7 +55,7 @@ export function RecentProtocolRuns({
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         borderBottom={BORDERS.lineBorder}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
         width="100%"
         id="RecentProtocolRuns_title"
       >
@@ -65,18 +65,18 @@ export function RecentProtocolRuns({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         minHeight={SIZE_4}
-        padding={`0 ${String(SPACING.spacing4)}`}
+        paddingX={SPACING.spacing16}
         width="100%"
       >
         {isRobotViewable && runs && runs.length > 0 && (
           <>
             <Flex
               justifyContent={JUSTIFY_SPACE_AROUND}
-              padding={SPACING.spacing3}
+              padding={SPACING.spacing8}
               width="100%"
             >
               <StyledText
-                marginLeft={SPACING.spacing5}
+                marginLeft={SPACING.spacing24}
                 width="25%"
                 as="label"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}

@@ -44,11 +44,11 @@ export function Navigation({ routes }: { routes: RouteProps[] }): JSX.Element {
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <NavigationLink to="/dashboard" name={robotName} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing6}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
             <NavigationLink key={name} to={navLinkTo as string} name={name} />
           ))}
@@ -98,7 +98,7 @@ const TouchNavLink = styled(NavLink)`
 `
 
 const IconButton = styled('button')`
-  border-radius: ${SPACING.spacing2};
+  border-radius: ${SPACING.spacing4};
   max-height: 100%;
   background-color: ${COLORS.white};
 

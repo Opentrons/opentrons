@@ -44,7 +44,7 @@ export function ErrorUpdateSoftware({
         flexDirection={DIRECTION_COLUMN}
         backgroundColor={COLORS.errorBackgroundMed}
         height="26.625rem"
-        gridGap={SPACING.spacingXXL}
+        gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
@@ -62,8 +62,8 @@ export function ErrorUpdateSoftware({
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginTop={SPACING.spacing6}
-        gridGap="0.75rem"
+        marginTop={SPACING.spacing32}
+        gridGap={SPACING.spacing12}
       >
         <SecondaryButton
           height="4.4375rem"

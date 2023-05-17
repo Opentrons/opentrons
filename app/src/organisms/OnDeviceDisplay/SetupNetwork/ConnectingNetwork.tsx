@@ -39,7 +39,7 @@ export function ConnectingNetwork(): JSX.Element {
             fontSize="2rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="2.72375rem"
-            marginTop={SPACING.spacingXXL}
+            marginTop={SPACING.spacing40}
           >
             {t('connecting')}
           </StyledText>

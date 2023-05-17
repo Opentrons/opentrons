@@ -1,4 +1,4 @@
-"""Test pick up tip commands."""
+"""Test drop tip commands."""
 import pytest
 from decoy import Decoy
 

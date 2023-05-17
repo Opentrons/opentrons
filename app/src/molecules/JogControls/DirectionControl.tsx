@@ -122,7 +122,7 @@ const DIRECTION_CONTROL_LAYOUT = css`
   flex: 1;
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  grid-gap: ${SPACING.spacing4};
+  grid-gap: ${SPACING.spacing16};
   min-width: 313px;
 
   @media (max-width: 750px) {
@@ -133,7 +133,7 @@ const DIRECTION_CONTROL_LAYOUT = css`
 const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
-  grid-gap: ${SPACING.spacing3};
+  grid-gap: ${SPACING.spacing8};
   min-width: 9.8125rem;
 
   @media (max-width: 750px) {
@@ -149,8 +149,8 @@ const DEFAULT_BUTTON_STYLE = css`
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
-  grid-gap: ${SPACING.spacing3};
-  padding: ${SPACING.spacing3};
+  grid-gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
 
   &:focus {
     background-color: ${COLORS.white};
@@ -285,7 +285,7 @@ const ARROW_GRID_STYLES = css`
     '.         .         ArrowDown ArrowDown .          .         '
     '.         .         .         .         .          .         ';
 
-  grid-gap: ${SPACING.spacing2};
+  grid-gap: ${SPACING.spacing4};
   align-items: ${ALIGN_CENTER};
 
   @media (max-width: 750px) {
@@ -293,7 +293,7 @@ const ARROW_GRID_STYLES = css`
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     max-width: 415px;
-    grid-gap: ${SPACING.spacingM};
+    grid-gap: ${SPACING.spacing20};
     grid-template-areas:
       '.         .         ArrowUp   ArrowUp   .          .         '
       'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
@@ -397,8 +397,8 @@ export function TouchDirectionControl(
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.darkBlack40}`}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
-      gridGap={SPACING.spacing3}
+      padding={SPACING.spacing16}
+      gridGap={SPACING.spacing8}
     >
       <TouchControlLabel>{t('jog_controls')}</TouchControlLabel>
       <Flex css={DIRECTION_CONTROL_LAYOUT}>

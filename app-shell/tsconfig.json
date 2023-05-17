@@ -7,6 +7,9 @@
     },
     {
       "path": "../shared-data"
+    },
+    {
+      "path": "../usb-bridge/node-client"
     }
   ],
   "compilerOptions": {

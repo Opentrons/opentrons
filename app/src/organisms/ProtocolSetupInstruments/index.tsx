@@ -53,7 +53,7 @@ export function ProtocolSetupInstruments({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <ODDBackButton
         label={t('instruments')}
@@ -62,7 +62,7 @@ export function ProtocolSetupInstruments({
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        paddingX={SPACING.spacing5}
+        paddingX={SPACING.spacing24}
       >
         <ColumnLabel>{t('location')}</ColumnLabel>
         <ColumnLabel>

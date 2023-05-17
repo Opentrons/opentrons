@@ -594,11 +594,7 @@ class PipetteHandlerProvider:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
-        speed = self.plunger_speed(
-            instrument,
-            instrument.blow_out_flow_rate,
-            "blowout",
-        )
+        speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
         if volume is None:
             ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
         else:

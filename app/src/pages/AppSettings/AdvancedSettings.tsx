@@ -196,11 +196,11 @@ export function AdvancedSettings(): JSX.Element {
 
   return (
     <>
-      <Box paddingX={SPACING.spacing4} paddingY={SPACING.spacing5}>
+      <Box paddingX={SPACING.spacing16} paddingY={SPACING.spacing24}>
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           {showConfirmDeleteUnavailRobots ? (
             <Portal level="top">
@@ -212,11 +212,11 @@ export function AdvancedSettings(): JSX.Element {
                 <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
                 <Flex
                   flexDirection={DIRECTION_ROW}
-                  paddingTop={SPACING.spacingXL}
+                  paddingTop={SPACING.spacing32}
                   justifyContent={JUSTIFY_FLEX_END}
                 >
                   <Flex
-                    paddingRight={SPACING.spacing2}
+                    paddingRight={SPACING.spacing4}
                     data-testid="AdvancedSettings_ConfirmClear_Cancel"
                   >
                     <Btn
@@ -224,7 +224,7 @@ export function AdvancedSettings(): JSX.Element {
                       textTransform={TYPOGRAPHY.textTransformCapitalize}
                       color={COLORS.blueEnabled}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                      marginRight={SPACING.spacing6}
+                      marginRight={SPACING.spacing32}
                     >
                       {t('shared:cancel')}
                     </Btn>
@@ -241,16 +241,16 @@ export function AdvancedSettings(): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_updatedChannel"
             >
               {t('update_channel')}
             </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+            <StyledText as="p" paddingBottom={SPACING.spacing8}>
               {t('update_description')}
             </StyledText>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <StyledText css={TYPOGRAPHY.labelSemiBold}>
               {t('channel')}
             </StyledText>
@@ -266,28 +266,28 @@ export function AdvancedSettings(): JSX.Element {
             />
           </Flex>
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_customLabware"
             >
               {t('additional_labware_folder_title')}
             </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+            <StyledText as="p" paddingBottom={SPACING.spacing8}>
               {t('additional_folder_description')}
             </StyledText>
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
             >
               {t('additional_folder_location')}
             </StyledText>
@@ -304,7 +304,7 @@ export function AdvancedSettings(): JSX.Element {
                 {labwarePath}
                 <Icon
                   height="0.75rem"
-                  marginLeft={SPACING.spacing3}
+                  marginLeft={SPACING.spacing8}
                   name="open-in-new"
                 />
               </Link>
@@ -330,11 +330,11 @@ export function AdvancedSettings(): JSX.Element {
             </TertiaryButton>
           }
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Box>
           <StyledText
             css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing3}
+            paddingBottom={SPACING.spacing8}
             id="AdvancedSettings_tipLengthCalibration"
           >
             {t('tip_length_cal_method')}
@@ -368,12 +368,12 @@ export function AdvancedSettings(): JSX.Element {
             ]}
           />
         </Box>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_unavailableRobots"
             >
               {t('prevent_robot_caching')}
@@ -402,16 +402,16 @@ export function AdvancedSettings(): JSX.Element {
             id="AdvancedSettings_unavailableRobotsToggleButton"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacingXXL}
+          gridGap={SPACING.spacing40}
         >
           <Box>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_clearRobots"
             >
               {t('clear_unavail_robots')}
@@ -426,12 +426,12 @@ export function AdvancedSettings(): JSX.Element {
             {t('clear_robots_button')}
           </TertiaryButton>
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_u2eInformation"
             >
               {t('usb_to_ethernet_adapter_info')}
@@ -440,7 +440,7 @@ export function AdvancedSettings(): JSX.Element {
               {t('usb_to_ethernet_adapter_info_description')}
             </StyledText>
             {driverOutdated && (
-              <Banner type="warning" marginTop={SPACING.spacing4}>
+              <Banner type="warning" marginTop={SPACING.spacing16}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
                   <StyledText as="p" color={COLORS.darkBlackEnabled}>
                     {t('usb_to_ethernet_adapter_toast_message')}
@@ -459,17 +459,17 @@ export function AdvancedSettings(): JSX.Element {
               </Banner>
             )}
             {device === null ? (
-              <StyledText as="p" marginTop={SPACING.spacing4}>
+              <StyledText as="p" marginTop={SPACING.spacing16}>
                 {t('usb_to_ethernet_not_connected')}
               </StyledText>
             ) : (
               <Flex
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_description')}
@@ -478,7 +478,7 @@ export function AdvancedSettings(): JSX.Element {
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_manufacturer')}
@@ -487,7 +487,7 @@ export function AdvancedSettings(): JSX.Element {
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing4}
+                  paddingRight={SPACING.spacing16}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('usb_to_ethernet_adapter_driver_version')}
@@ -502,12 +502,12 @@ export function AdvancedSettings(): JSX.Element {
             )}
           </Box>
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_showHeaterShakerAttachmentModal"
             >
               {t('heater_shaker_attach_visible')}
@@ -523,12 +523,12 @@ export function AdvancedSettings(): JSX.Element {
             id="AdvancedSettings_showHeaterShakerAttachmentBtn"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_showLink"
             >
               {t('show_labware_offset_snippets')}
@@ -544,7 +544,7 @@ export function AdvancedSettings(): JSX.Element {
             id="AdvancedSettings_showLinkToggleButton"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         {enableExtendedHardware ? (
           <>
             <Flex
@@ -554,7 +554,7 @@ export function AdvancedSettings(): JSX.Element {
               <Box width="70%">
                 <StyledText
                   css={TYPOGRAPHY.h3SemiBold}
-                  paddingBottom={SPACING.spacing3}
+                  paddingBottom={SPACING.spacing8}
                   id="AdvancedSettings_showLink"
                 >
                   {t('allow_sending_all_protocols_to_ot3')}
@@ -570,26 +570,26 @@ export function AdvancedSettings(): JSX.Element {
                 id="AdvancedSettings_sendAllProtocolsToggleButton"
               />
             </Flex>
-            <Divider marginY={SPACING.spacing5} />
+            <Divider marginY={SPACING.spacing24} />
           </>
         ) : null}
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_overridePathToPython"
             >
               {t('override_path_to_python')}
             </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing3}>
+            <StyledText as="p" paddingBottom={SPACING.spacing8}>
               {t('opentrons_app_will_use_interpreter')}
             </StyledText>
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
             >
               {t('override_path')}
             </StyledText>
@@ -606,7 +606,7 @@ export function AdvancedSettings(): JSX.Element {
                 {pathToPythonInterpreter}
                 <Icon
                   height="0.75rem"
-                  marginLeft={SPACING.spacing3}
+                  marginLeft={SPACING.spacing8}
                   name="open-in-new"
                 />
               </Link>
@@ -634,12 +634,12 @@ export function AdvancedSettings(): JSX.Element {
             </TertiaryButton>
           )}
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing3}
+              paddingBottom={SPACING.spacing8}
               id="AdvancedSettings_devTools"
             >
               {t('enable_dev_tools')}
