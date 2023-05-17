@@ -8,8 +8,7 @@ from decoy import Decoy
 from numpy import isclose
 
 from opentrons.config import CONFIG, pipette_config, feature_flags as ff
-from opentrons.hardware_control.api import API
-from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
@@ -285,7 +284,7 @@ def test_validate_overrides_pass(
 # configurations are ported over to the new format.
 @pytest.fixture
 async def attached_pipettes(
-    hardware: Union[OT3API, API],
+    hardware: HardwareControlAPI,
     request: pytest.FixtureRequest,
 ) -> AsyncGenerator[Dict[str, PipetteSpec], None]:
     """Fixture the robot to have attached pipettes
