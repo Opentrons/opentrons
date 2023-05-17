@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast, Union, Type
+from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast
 from unittest.mock import patch
 
 import pytest
@@ -8,15 +8,12 @@ from decoy import Decoy
 from numpy import isclose
 
 from opentrons.config import CONFIG, pipette_config, feature_flags as ff
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import API
 from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
-from opentrons.types import Mount
-from opentrons.hardware_control.types import OT3Mount
 
 from opentrons.hardware_control.backends import Simulator
-from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
 
 defs = json.loads(load_shared_data("pipette/definitions/1/pipetteModelSpecs.json"))
 
@@ -282,9 +279,10 @@ def test_validate_overrides_pass(
 # an effective test of whether anything actually works
 # TODO (lc, 12-05-2022): Re-write these tests when the OT2 pipette
 # configurations are ported over to the new format.
+@pytest.mark.ot2_only
 @pytest.fixture
 async def attached_pipettes(
-    hardware: HardwareControlAPI,
+    hardware: API,
     request: pytest.FixtureRequest,
 ) -> AsyncGenerator[Dict[str, PipetteSpec], None]:
     """Fixture the robot to have attached pipettes
@@ -308,29 +306,23 @@ async def attached_pipettes(
     right_name = right_mod.split("_v")[0]
     left_id = marker_with_default("attach_left_id", "abc123")
     right_id = marker_with_default("attach_right_id", "abcd123")
+    backend = cast(Simulator, hardware._backend)
+    mount_type = type(list(backend._attached_instruments.keys())[0])
 
-    backend = cast(Union[Simulator, OT3Simulator], hardware._backend)  # type: ignore[union-attr]
-    # we can't import OT3API because this test is run in the OT2-only tests, therefore we have to use the protocol, which does not contain _backend
-
-    mount_type = cast(  # type: ignore[union-attr]
-        Union[Type[Mount], Type[OT3Mount]],
-        type(list(backend._attached_instruments.keys())[0]),
-    )
-
-    backend._attached_instruments = {  # type: ignore[assignment]
-        mount_type.RIGHT: {
+    backend._attached_instruments = {
+        mount_type.RIGHT: {  # type: ignore[typeddict-item]
             "model": right_mod,
             "id": right_id,
             "name": right_name,
         },
-        mount_type.LEFT: {
+        mount_type.LEFT: {  # type: ignore[typeddict-item]
             "model": left_mod,
             "id": left_id,
             "name": left_name,
         },
     }
     await hardware.cache_instruments()
-    yield {k.name.lower(): v for k, v in backend._attached_instruments.items()}  # type: ignore[misc]
+    yield {k.name.lower(): v for k, v in backend._attached_instruments.items()}
 
     # Delete created config files
     (CONFIG["pipette_config_overrides_dir"] / "abc123.json").unlink()
