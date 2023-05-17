@@ -1202,18 +1202,15 @@ class OT3API(
                     moves[0],
                     MoveStopCondition.none,
                 )
-            self._log.info('doing home after possible fast move')
             await self._backend.home([axis])
         else:
             # both stepper and encoder positions are invalid, must home
-            self._log.info('doing basic home')
             await self._backend.home([axis])
 
     async def _home(self, axes: Sequence[OT3Axis]) -> None:
         """Home one axis at a time."""
         async with self._motion_lock:
             for axis in axes:
-                self._log.info(f'homing {axis}')
                 try:
                     if axis == OT3Axis.G:
                         await self.home_gripper_jaw()
@@ -1229,7 +1226,6 @@ class OT3API(
                     self._current_position.clear()
                     raise
                 else:
-                    self._log.info('homed, updating position')
                     await self._cache_current_position()
                     await self._cache_encoder_position()
 
