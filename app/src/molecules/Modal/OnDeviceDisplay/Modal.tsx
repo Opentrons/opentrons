@@ -7,7 +7,6 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { BackgroundOverlay } from '../../BackgroundOverlay'
 import { ModalHeader } from './ModalHeader'
@@ -54,7 +53,6 @@ export function Modal(props: ModalProps): JSX.Element {
       }}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
     >
       <Flex
         backgroundColor={isError ? COLORS.red2 : COLORS.white}
