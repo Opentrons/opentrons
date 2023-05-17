@@ -1,13 +1,17 @@
+from typing import Dict, List, Optional, Set, Tuple, Any, Iterator
+from itertools import chain
+
 import mock
 import pytest
-from typing import Dict, List, Optional, Set, Tuple, Any, Iterator, cast
-from itertools import chain
+from decoy import Decoy
+
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
     axis_to_node,
     sensor_node_for_mount,
     subsystem_to_target,
+    target_to_subsystem,
 )
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -30,6 +34,7 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     MotorStatus,
     SubSystem,
+    SubSystemState,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -165,28 +170,44 @@ def _device_info_entry(subsystem: SubSystem) -> Tuple[SubSystem, DeviceInfoCache
     )
 
 
+def _subsystems_entry(info: DeviceInfoCache) -> Tuple[SubSystem, SubSystemState]:
+    return target_to_subsystem(info.target), SubSystemState(
+        ok=info.ok,
+        current_fw_version=info.version,
+        next_fw_version=2,
+        current_fw_sha=info.shortsha,
+        pcba_revision="A1",
+        update_state=None,
+        fw_update_needed=False,
+    )
+
+
 @pytest.fixture
 def mock_present_devices(
-    controller: OT3Controller, mock_subsystem_manager: mock.AsyncMock
+    controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
-    mock_subsystem_manager.device_info = dict(
-        _device_info_entry(subsys)
-        for subsys in (
-            SubSystem.pipette_left,
-            SubSystem.gantry_x,
-            SubSystem.gantry_y,
-            SubSystem.head,
-            SubSystem.pipette_right,
-            SubSystem.gripper,
-            SubSystem.rear_panel,
+    decoy.when(mock_subsystem_manager.device_info).then_return(
+        dict(
+            _device_info_entry(subsys)
+            for subsys in (
+                SubSystem.pipette_left,
+                SubSystem.gantry_x,
+                SubSystem.gantry_y,
+                SubSystem.head,
+                SubSystem.pipette_right,
+                SubSystem.gripper,
+                SubSystem.rear_panel,
+            )
         )
     )
 
 
 @pytest.fixture
-def mock_subsystem_manager(controller: OT3Controller) -> Iterator[SubsystemManager]:
+def mock_subsystem_manager(
+    controller: OT3Controller, decoy: Decoy
+) -> Iterator[SubsystemManager]:
     with mock.patch.object(
-        controller, "_subsystem_manager", mock.AsyncMock(spec=SubsystemManager)
+        controller, "_subsystem_manager", decoy.mock(cls=SubsystemManager)
     ) as mock_subsystem:
         yield mock_subsystem
 
@@ -388,21 +409,22 @@ async def test_home_only_present_devices(
 
 
 async def test_get_attached_instruments(
-    controller: OT3Controller,
-    mock_subsystem_manager: SubsystemManager,
+    controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
     pipette_id = "P1KSV33hello"
     gripper_id = "GRPV00fake_serial"
     gripper_name = "Gripper V1"
-    cast(mock.AsyncMock, mock_subsystem_manager).tools = ToolSummary(
-        left=PipetteInformation(
-            name=FirmwarePipetteName.p1000_single,
-            name_int=FirmwarePipetteName.p1000_single.value,
-            model="3.3",
-            serial="hello",
-        ),
-        right=None,
-        gripper=GripperInformation(model="0.0", serial="fake_serial"),
+    decoy.when(mock_subsystem_manager.tools).then_return(
+        ToolSummary(
+            left=PipetteInformation(
+                name=FirmwarePipetteName.p1000_single,
+                name_int=FirmwarePipetteName.p1000_single.value,
+                model="3.3",
+                serial="hello",
+            ),
+            right=None,
+            gripper=GripperInformation(model="0.0", serial="fake_serial"),
+        )
     )
 
     detected = await controller.get_attached_instruments({})
@@ -417,35 +439,42 @@ async def test_get_attached_instruments(
 
 
 async def test_get_attached_instruments_handles_unknown_name(
-    controller: OT3Controller, mock_subsystem_manager: SubsystemManager
+    controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
-    cast(mock.AsyncMock, mock_subsystem_manager).tools = ToolSummary(
-        left=PipetteInformation(
-            name=FirmwarePipetteName.unknown, name_int=41, model="30", serial="hello"
-        ),
-        right=None,
-        gripper=GripperInformation(
-            model="0.0",
-            serial="fake_serial",
-        ),
+    decoy.when(mock_subsystem_manager.tools).then_return(
+        ToolSummary(
+            left=PipetteInformation(
+                name=FirmwarePipetteName.unknown,
+                name_int=41,
+                model="30",
+                serial="hello",
+            ),
+            right=None,
+            gripper=GripperInformation(
+                model="0.0",
+                serial="fake_serial",
+            ),
+        )
     )
     with pytest.raises(InvalidPipetteName):
         await controller.get_attached_instruments({})
 
 
 async def test_get_attached_instruments_handles_unknown_model(
-    controller: OT3Controller, mock_subsystem_manager: SubsystemManager
+    controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
 
-    cast(mock.AsyncMock, mock_subsystem_manager).tools = ToolSummary(
-        left=PipetteInformation(
-            name=FirmwarePipetteName.p1000_single,
-            name_int=0,
-            model="4.1",
-            serial="hello",
-        ),
-        right=None,
-        gripper=GripperInformation(model="0", serial="fake_serial"),
+    decoy.when(mock_subsystem_manager.tools).then_return(
+        ToolSummary(
+            left=PipetteInformation(
+                name=FirmwarePipetteName.p1000_single,
+                name_int=0,
+                model="4.1",
+                serial="hello",
+            ),
+            right=None,
+            gripper=GripperInformation(model="0", serial="fake_serial"),
+        )
     )
     with pytest.raises(InvalidPipetteModel):
         await controller.get_attached_instruments({})
@@ -503,10 +532,15 @@ async def test_gripper_jaw_width(
 
 
 async def test_get_limit_switches(
-    controller: OT3Controller, mock_subsystem_manager: mock.AsyncMock
+    controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
-    mock_subsystem_manager.device_info = dict(
-        (_device_info_entry(SubSystem.gantry_x), _device_info_entry(SubSystem.gantry_y))
+    decoy.when(mock_subsystem_manager.device_info).then_return(
+        dict(
+            (
+                _device_info_entry(SubSystem.gantry_x),
+                _device_info_entry(SubSystem.gantry_y),
+            )
+        )
     )
 
     fake_response = {
@@ -788,11 +822,12 @@ async def test_set_hold_current(
 async def test_update_required_flag(
     mock_messenger: CanMessenger,
     controller: OT3Controller,
-    mock_subsystem_manager: mock.AsyncMock,
+    mock_subsystem_manager: SubsystemManager,
+    decoy: Decoy,
 ) -> None:
     """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
     axes = [OT3Axis.X, OT3Axis.Y]
-    mock_subsystem_manager.update_required.return_value = True
+    decoy.when(mock_subsystem_manager.update_required).then_return(True)
 
     # raise FirmwareUpdateRequired if the _update_required flag is set
     controller._initialized = True
@@ -801,12 +836,17 @@ async def test_update_required_flag(
 
 
 async def test_update_required_flag_false(
-    controller: OT3Controller, mock_subsystem_manager: mock.AsyncMock
+    controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
     """Do not raise FirmwareUpdateRequired if update_required is False."""
 
-    mock_subsystem_manager.subsystems = dict(
-        (_device_info_entry(SubSystem.gantry_x), _device_info_entry(SubSystem.gantry_y))
+    decoy.when(mock_subsystem_manager.device_info).then_return(
+        dict(
+            (
+                _device_info_entry(SubSystem.gantry_x),
+                _device_info_entry(SubSystem.gantry_y),
+            )
+        )
     )
 
     for node in controller._motor_nodes():
@@ -815,29 +855,33 @@ async def test_update_required_flag_false(
         )
 
     # update_required is false so dont raise FirmwareUpdateRequired
-    mock_subsystem_manager.update_required = False
+    decoy.when(mock_subsystem_manager.update_required).then_return(False)
 
     async def fake_umpe(
         can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
     ) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
         return {node: (0.223, 0.323, False, True) for node in nodes}
 
+    # note: this patches the name in the context of the controller of the hardware
+    # method, not the method of the controller
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.update_motor_position_estimation",
         fake_umpe,
     ):
         try:
-            async for status_element in controller.update_firmware(set()):
-                pass
+            await controller.update_motor_estimation([OT3Axis.X])
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
 
 
 async def test_update_required_flag_initialized(
-    controller: OT3Controller, mock_subsystem_manager: mock.AsyncMock
+    controller: OT3Controller,
+    mock_subsystem_manager: SubsystemManager,
+    mock_present_devices: None,
+    decoy: Decoy,
 ) -> None:
     """Do not raise FirmwareUpdateRequired if initialized is False."""
-    mock_subsystem_manager.update_required.return_value = True
+    decoy.when(mock_subsystem_manager.update_required).then_return(True)
 
     for node in controller._motor_nodes():
         controller._motor_status.update(
@@ -857,7 +901,6 @@ async def test_update_required_flag_initialized(
         fake_umpe,
     ):
         try:
-            async for status_element in controller.update_firmware(set()):
-                pass
+            await controller.update_motor_estimation([OT3Axis.X])
         except FirmwareUpdateRequired:
             assert False, "update_motor_estimation raised an exception."
