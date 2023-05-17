@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from typing_extensions import Final
+from typing_extensions import Final, Protocol
 from enum import Enum
 import json
 import logging
@@ -354,3 +354,16 @@ def check_firmware_updates(
     return {
         node: (next_version, filepath) for node, next_version, filepath in update_files
     }
+
+
+class UpdateChecker(Protocol):
+    """Protocol for check_firmware_updates to make putting it in a class easier."""
+
+    def __call__(
+        self,
+        device_info: Dict[FirmwareTarget, DeviceInfoCache],
+        targets: Optional[Set[FirmwareTarget]] = None,
+        force: bool = False,
+    ) -> Dict[FirmwareTarget, Tuple[int, str]]:
+        """Check for firmware updates."""
+        ...
