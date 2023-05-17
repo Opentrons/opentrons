@@ -54,7 +54,7 @@
   "pin_protocol": "Pin protocol",
   "pinned_protocol": "Pinned protocol",
   "pinned_protocols": "Pinned Protocols",
-  "protocol_added": "{{protocol_name}} added to robot!",
+  "protocol_added": "Successfully received {{protocol_name}}",
   "protocol_finishing": "Finishing Protocol On {{robot_name}}",
   "protocol_loading": "Opening Protocol On {{robot_name}}",
   "protocol_name_title": "Protocol Name",
