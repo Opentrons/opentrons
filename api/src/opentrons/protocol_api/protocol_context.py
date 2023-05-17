@@ -16,7 +16,6 @@ from typing import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
-from opentrons.protocol_api import OffDeckType
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
@@ -30,6 +29,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
+from .types import OffDeckType
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
