@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, List
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -154,29 +154,63 @@ class Location:
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
+    EXTENSION = enum.auto()
 
     def __str__(self) -> str:
         return self.name
 
     @classmethod
+    def ot2_mounts(cls) -> List["Mount"]:
+        return [Mount.LEFT, Mount.RIGHT]
+
+    @classmethod
     def string_to_mount(cls, mount: str) -> "Mount":
         if mount == "right":
             return cls.RIGHT
-        else:
+        elif mount == "left":
             return cls.LEFT
+        else:
+            return cls.EXTENSION
 
 
 class MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
+    EXTENSION = "extension"
 
+    # TODO (spp, 2023-05-04): we should deprecate this and instead create an 'other_pipette_mount' method
     def other_mount(self) -> MountType:
         return MountType.LEFT if self is MountType.RIGHT else MountType.RIGHT
 
     def to_hw_mount(self) -> Mount:
-        return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
+        return {
+            MountType.LEFT: Mount.LEFT,
+            MountType.RIGHT: Mount.RIGHT,
+            MountType.EXTENSION: Mount.EXTENSION,
+        }[self]
+
+    @staticmethod
+    def from_hw_mount(mount: Mount) -> MountType:
+        """Convert from Mount to MountType."""
+        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
+        return mount_map[mount]
 
 
+class PipetteMountType(enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    COMBINED = "combined"  # added for 96-channel. Remove if not required
+
+    def to_mount_type(self) -> MountType:
+        return {
+            PipetteMountType.LEFT: MountType.LEFT,
+            PipetteMountType.RIGHT: MountType.RIGHT,
+        }[self]
+
+
+# What is this used for? Can we consolidate this into MountType?
+# If not, can we change the 'GRIPPER' mount name to 'EXTENSION' so that it's
+# consistent with all user-facing mount names?
 class OT3MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
