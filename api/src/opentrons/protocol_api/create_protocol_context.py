@@ -59,6 +59,7 @@ def create_protocol_context(
         api_version: The API version to target.
         hardware_api: Control interface to the device's hardware.
         deck_type: What kind of deck the device has.
+            This must match the deck type in `protocol_engine`'s config, if there is one.
         protocol_engine: A ProtocolEngine to use for labware offsets
             and core protocol logic. If omitted, labware offsets will
             all be (0, 0, 0) and ProtocolEngine-based core will not work.
@@ -96,6 +97,7 @@ def create_protocol_context(
         sync_hardware = SynchronousAdapter(hardware_api)
 
     if protocol_engine is not None:
+        assert deck_type == protocol_engine.state_view.config.deck_type.value
         labware_offset_provider = LabwareOffsetProvider(engine=protocol_engine)
     else:
         labware_offset_provider = NullLabwareOffsetProvider()
