@@ -71,9 +71,18 @@ export function ConnectViaUSB(): JSX.Element {
               gridGap={SPACING.spacing32}
             >
               <Icon name="ot-check" size="3rem" color={COLORS.green2} />
-              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {t('successfully_connected')}
-              </StyledText>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {t('successfully_connected')}
+                </StyledText>
+                <StyledText
+                  as="h4"
+                  color={COLORS.darkBlack70}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
+                >
+                  {t('find_your_robot')}
+                </StyledText>
+              </Flex>
             </Flex>
             <MediumButton
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
@@ -101,14 +110,17 @@ export function ConnectViaUSB(): JSX.Element {
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('no_connection_found')}
               </StyledText>
-              <StyledText
-                as="h4"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                textAlign={TYPOGRAPHY.textAlignCenter}
-                color={COLORS.darkBlack70}
-              >
-                {t('connect_via_usb_description')}
-              </StyledText>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
+                  {t('connect_via_usb_description_1')}
+                </StyledText>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
+                  {t('connect_via_usb_description_2')}
+                </StyledText>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
+                  {t('connect_via_usb_description_3')}
+                </StyledText>
+              </Flex>
             </Flex>
           </Flex>
         )}
