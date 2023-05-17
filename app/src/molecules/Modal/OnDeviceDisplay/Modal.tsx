@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
   Flex,
@@ -51,6 +52,7 @@ export function Modal(props: ModalProps): JSX.Element {
         e.stopPropagation()
         onOutsideClick(e)
       }}
+      alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
     >
