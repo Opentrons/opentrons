@@ -38,25 +38,37 @@ const DESCRIPTION_STYLE = css`
     line-height: ${TYPOGRAPHY.lineHeight42};
   }
 `
+const MODAL_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 31.5625rem;
+  }
+`
+const SPINNER_STYLE = css`
+  color: ${COLORS.darkGreyEnabled};
+  opacity: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    color: ${COLORS.darkBlackEnabled};
+    opacity: 70%;
+  }
+`
+
 export function InProgressModal(props: Props): JSX.Element {
   const { alternativeSpinner, children, description } = props
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
-      height={isOnDevice ? '31.5625rem' : '24.625rem'}
-      padding={SPACING.spacing32}
-    >
+    <Flex css={MODAL_STYLE}>
       {alternativeSpinner ?? (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
           size={isOnDevice ? '6.25rem' : '5.125rem'}
-          color={isOnDevice ? COLORS.darkBlackEnabled : COLORS.darkGreyEnabled}
-          opacity={isOnDevice ? '70%' : '100%'}
+          css={SPINNER_STYLE}
           spin
         />
       )}

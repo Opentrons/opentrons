@@ -53,7 +53,7 @@ jest.mock('../../UpdateRobotBanner')
 jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
-const OT3_PNG_FILE_NAME = 'OT3.png'
+const FLEX_PNG_FILE_NAME = 'FLEX.png'
 
 const MOCK_STATE: State = {
   discovery: {
@@ -179,7 +179,7 @@ describe('RobotOverview', () => {
       .mockReturnValue('Opentrons Flex')
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
-    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
+    expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a RobotStatusHeader component', () => {
