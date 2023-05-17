@@ -14,11 +14,42 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName,
 )
 from opentrons_hardware.hardware_control import network, tools, types
-from opentrons_hardware.firmware_update import FirmwareUpdate
+from opentrons_hardware.firmware_update import FirmwareUpdate, RunUpdate
+from opentrons_hardware.firmware_update.types import StatusElement, FirmwareUpdateStatus
 from opentrons_hardware.drivers import can_bus, binary_usb
 
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
+from opentrons.hardware_control.backends.errors import SubsystemUpdating
 from opentrons.hardware_control.types import SubSystem, SubSystemState
+
+
+async def _quick_update(
+    targets: Set[FirmwareTarget],
+) -> AsyncIterator[Tuple[FirmwareTarget, StatusElement]]:
+    for target in targets:
+        yield target, (FirmwareUpdateStatus.queued, 0)
+        await asyncio.sleep(0)
+    for value in range(0, 100, 10):
+        for target in targets:
+            yield target, (FirmwareUpdateStatus.updating, value / 10.0)
+            await asyncio.sleep(0)
+
+
+async def _eternal_update(
+    targets: Set[FirmwareTarget],
+) -> AsyncIterator[Tuple[FirmwareTarget, StatusElement]]:
+    while True:
+        for target in targets:
+            yield target, (FirmwareUpdateStatus.updating, 0)
+            await asyncio.sleep(0)
+
+
+async def _instant_update(
+    targets: Set[FirmwareTarget],
+) -> AsyncIterator[Tuple[FirmwareTarget, StatusElement]]:
+    for target in targets:
+        yield target, (FirmwareUpdateStatus.done, 1.0)
+        await asyncio.sleep(0)
 
 
 def default_subidentifier_for(target: FirmwareTarget) -> int:
@@ -107,6 +138,25 @@ def detection_queue(
 
     decoy.when(tool_detector.detect()).then_return(_read())
     return queue
+
+
+def prep_mock_update(
+    update_bag: FirmwareUpdate, decoy: Decoy, update_details: Dict[FirmwareTarget, str]
+) -> RunUpdate:
+
+    updater = decoy.mock(cls=RunUpdate)
+    update_class = update_bag.update_runner
+    decoy.when(
+        update_class(
+            can_messenger=matchers.Anything(),
+            usb_messenger=matchers.Anything(),
+            update_details=update_details,
+            retry_count=matchers.Anything(),
+            timeout_seconds=matchers.Anything(),
+            erase=matchers.Anything(),
+        )
+    ).then_return(updater)
+    return updater
 
 
 class ToolDetectionController:
@@ -652,3 +702,59 @@ async def test_update_does_not_happen_for_missing_subsystem(
     update_generator = subject.update_firmware(subsystems, force)
     with pytest.raises(StopAsyncIteration):
         await update_generator.__anext__()
+
+
+async def test_exception_on_multiple_updates(
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+) -> None:
+    """If you update a subsystem when an update is already occurring you get an exception."""
+    decoy.when(network_info.device_info).then_return(
+        default_network_info_for({NodeId.pipette_right})
+    )
+    decoy.when(network_info.targets).then_return({NodeId.pipette_right})
+    decoy.when(
+        update_bag.update_checker(
+            matchers.Anything(), {NodeId.pipette_right}, matchers.Anything()
+        )
+    ).then_return({NodeId.pipette_right: (1, "/some/path")})
+    decoy.when(update_bag.update_checker(matchers.Anything(), set(), True)).then_return(
+        {}
+    )
+
+    other_updater = prep_mock_update(
+        update_bag, decoy, {NodeId.pipette_right: "/some/path"}
+    )
+    decoy.when(other_updater.run_updates()).then_return(
+        _eternal_update({NodeId.pipette_right})
+    )
+
+    running = asyncio.Event()
+
+    async def _fake_update() -> None:
+        async for _ in subject.update_firmware({SubSystem.pipette_right}):
+            await asyncio.sleep(0)
+            running.set()
+
+    other_update = asyncio.create_task(_fake_update())
+    try:
+        await asyncio.wait_for(running.wait(), 0.1)
+    except asyncio.TimeoutError:
+        other_update.result()
+    while not subject.get_update_progress():
+        await asyncio.sleep(0)
+    new_updater = prep_mock_update(
+        update_bag, decoy, {NodeId.pipette_right: "/some/path"}
+    )
+    decoy.when(new_updater.run_updates()).then_return(
+        _quick_update({NodeId.pipette_right})
+    )
+
+    try:
+        with pytest.raises(SubsystemUpdating):
+            async for _ in subject.update_firmware({SubSystem.pipette_right}):
+                await asyncio.sleep(0)
+    finally:
+        other_update.cancel()
