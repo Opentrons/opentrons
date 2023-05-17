@@ -154,6 +154,7 @@ class Location:
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
+    BOTH = enum.auto()
 
     def __str__(self) -> str:
         return self.name
@@ -162,6 +163,8 @@ class Mount(enum.Enum):
     def string_to_mount(cls, mount: str) -> "Mount":
         if mount == "right":
             return cls.RIGHT
+        elif mount == "both":
+            return cls.BOTH
         else:
             return cls.LEFT
 
@@ -169,17 +172,24 @@ class Mount(enum.Enum):
 class MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
+    BOTH = "both"
 
     def other_mount(self) -> MountType:
         return MountType.LEFT if self is MountType.RIGHT else MountType.RIGHT
 
     def to_hw_mount(self) -> Mount:
-        return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
+        if self is MountType.LEFT:
+            return Mount.LEFT
+        elif self is MountType.BOTH:
+            return Mount.BOTH
+        else:
+            return Mount.RIGHT
 
 
 class OT3MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
+    BOTH = "both"
     GRIPPER = "gripper"
 
 

@@ -11,6 +11,7 @@ from typing import (
     Callable,
     Dict,
     TypeVar,
+    Any,
 )
 from typing_extensions import Literal
 from opentrons import types as top_types
@@ -38,8 +39,12 @@ class Axis(enum.Enum):
     C = 5
 
     @classmethod
-    def by_mount(cls, mount: top_types.Mount) -> "Axis":
-        bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
+    def by_mount(cls, mount: top_types.Mount) -> Any:
+        bm = {
+            top_types.Mount.LEFT: cls.Z,
+            top_types.Mount.RIGHT: cls.A,
+            top_types.Mount.BOTH: (cls.Z, cls.A),
+        }
         return bm[mount]
 
     @classmethod
@@ -79,6 +84,7 @@ class Axis(enum.Enum):
 class OT3Mount(enum.Enum):
     LEFT = top_types.Mount.LEFT.value
     RIGHT = top_types.Mount.RIGHT.value
+    BOTH = top_types.Mount.BOTH.value
     GRIPPER = enum.auto()
 
     @classmethod
@@ -137,13 +143,14 @@ class OT3Axis(enum.Enum):
     G = 8  # gripper grab
 
     @classmethod
-    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> "OT3Axis":
+    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> Any:
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
             OT3Mount.LEFT: cls.Z_L,
             OT3Mount.RIGHT: cls.Z_R,
             OT3Mount.GRIPPER: cls.Z_G,
+            OT3Mount.BOTH: (cls.Z_L, cls.Z_R),
         }
         return bm[mount]
 
@@ -195,12 +202,17 @@ class OT3Axis(enum.Enum):
     @classmethod
     def of_main_tool_actuator(
         cls, mount: Union[top_types.Mount, OT3Mount]
-    ) -> "OT3Axis":
+    ) -> Union["OT3Axis", Tuple["OT3Axis", "OT3Axis"]]:
         if isinstance(mount, top_types.Mount):
             checked_mount = OT3Mount.from_mount(mount)
         else:
             checked_mount = mount
-        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
+        pm = {
+            OT3Mount.LEFT: cls.P_L,
+            OT3Mount.RIGHT: cls.P_R,
+            OT3Mount.GRIPPER: cls.G,
+            OT3Mount.BOTH: (cls.P_L, cls.P_R),
+        }
         return pm[checked_mount]
 
     @classmethod

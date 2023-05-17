@@ -717,7 +717,7 @@ async def calibrate_gripper(
 
 async def calibrate_pipette(
     hcapi: OT3API,
-    mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
+    mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT, OT3Mount.BOTH],
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
     raise_verify_error: bool = True,
@@ -730,6 +730,11 @@ async def calibrate_pipette(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered).
     """
+
+    # dont allow both pipettes to be calibrated
+    if mount == OT3Mount.BOTH:
+        raise RuntimeError("cannot calibrate both pipettes")
+
     async with hcapi.instrument_cache_lock():
         try:
             await hcapi.reset_instrument_offset(mount)

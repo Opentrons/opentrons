@@ -796,15 +796,18 @@ class OT3Controller:
         Returns:
             A map of mount to instrument name.
         """
+
         await self._probe_core()
         attached = await self._tool_detector.detect()
 
         current_tools = dict(OT3Controller._generate_attached_instrs(attached))
         # remove pipette_left, pipette_right and gripper
         self._present_devices -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+            for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]
         )
         # add pipette_left, pipette_right and gripper if present
+
         for mount in current_tools.keys():
             self._present_devices.add(
                 axis_to_node(OT3Axis.of_main_tool_actuator(mount))

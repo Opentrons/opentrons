@@ -1128,7 +1128,7 @@ class SmoothieDriver:
         mount:
             String (str) with value 'left' or 'right'
         """
-        allowed_mounts = {"left": "L", "right": "R"}
+        allowed_mounts = {"left": "L", "right": "R", "both": "B"}
         allowed_mount = allowed_mounts.get(mount)
         if not allowed_mount:
             raise ValueError(f"Unexpected mount: {mount}")

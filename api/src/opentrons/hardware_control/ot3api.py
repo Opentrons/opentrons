@@ -954,6 +954,11 @@ class OT3API(
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        # if we're moving both mounts, realmount will be a tuple, so reformat axes_moving
+        if realmount == OT3Mount.BOTH:
+            axes_moving.pop()
+            axes_moving.append(OT3Axis.X)
+            axes_moving.append(OT3Axis.Y)
 
         # Cache current position from backend
         await self._cache_current_position()
@@ -967,29 +972,37 @@ class OT3API(
                 f"Inaccurate motor position for {str(realmount)}, please home motors."
             )
 
-        target_position = target_position_from_absolute(
-            realmount,
-            abs_position,
-            partial(self.critical_point_for, cp_override=critical_point),
-            top_types.Point(*self._config.left_mount_offset),
-            top_types.Point(*self._config.right_mount_offset),
-            top_types.Point(*self._config.gripper_mount_offset),
-        )
-        if max_speeds:
-            checked_max: Optional[OT3AxisMap[float]] = {
-                OT3Axis.from_axis(k): v for k, v in max_speeds.items()
-            }
-        else:
-            checked_max = None
-
-        await self._cache_and_maybe_retract_mount(realmount)
         await self._move_gripper_to_idle_position(realmount)
-        await self._move(
-            target_position,
-            speed=speed,
-            max_speeds=checked_max,
-            check_stalls=_check_stalls,
-        )
+
+        async def find_target_and_execute_move(target_mount: OT3Mount) -> None:
+            target_position = target_position_from_absolute(
+                target_mount,
+                abs_position,
+                partial(self.critical_point_for, cp_override=critical_point),
+                top_types.Point(*self._config.left_mount_offset),
+                top_types.Point(*self._config.right_mount_offset),
+                top_types.Point(*self._config.gripper_mount_offset),
+            )
+            if max_speeds:
+                checked_max: Optional[OT3AxisMap[float]] = {
+                    OT3Axis.from_axis(k): v for k, v in max_speeds.items()
+                }
+            else:
+                checked_max = None
+
+            await self._cache_and_maybe_retract_mount(realmount)
+            await self._move(
+                target_position,
+                speed=speed,
+                max_speeds=checked_max,
+                check_stalls=_check_stalls,
+            )
+
+        if realmount == OT3Mount.BOTH:
+            for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+                await find_target_and_execute_move(mount)
+        else:
+            await find_target_and_execute_move(realmount)
 
     async def move_rel(
         self,
@@ -1005,6 +1018,11 @@ class OT3API(
         displacement in a specified direction, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        # if we're moving both mounts, realmount will be a tuple, so reformat axes_moving
+        if realmount == OT3Mount.BOTH:
+            axes_moving.pop()
+            axes_moving.append(OT3Axis.X)
+            axes_moving.append(OT3Axis.Y)
 
         if not self._backend.check_encoder_status(axes_moving):
             await self.home()
@@ -1018,24 +1036,32 @@ class OT3API(
                 f"Inaccurate motor position for {str(realmount)}, please home motors."
             )
 
-        target_position = target_position_from_relative(
-            realmount, delta, self._current_position
-        )
-        if max_speeds:
-            checked_max: Optional[OT3AxisMap[float]] = {
-                OT3Axis.from_axis(k): v for k, v in max_speeds.items()
-            }
-        else:
-            checked_max = None
-        await self._cache_and_maybe_retract_mount(realmount)
         await self._move_gripper_to_idle_position(realmount)
-        await self._move(
-            target_position,
-            speed=speed,
-            max_speeds=checked_max,
-            check_bounds=check_bounds,
-            check_stalls=_check_stalls,
-        )
+
+        async def find_target_and_execute_move(target_mount: OT3Mount) -> None:
+            target_position = target_position_from_relative(
+                target_mount, delta, self._current_position
+            )
+            if max_speeds:
+                checked_max: Optional[OT3AxisMap[float]] = {
+                    OT3Axis.from_axis(k): v for k, v in max_speeds.items()
+                }
+            else:
+                checked_max = None
+            await self._cache_and_maybe_retract_mount(realmount)
+            await self._move(
+                target_position,
+                speed=speed,
+                max_speeds=checked_max,
+                check_bounds=check_bounds,
+                check_stalls=_check_stalls,
+            )
+
+        if realmount == OT3Mount.BOTH:
+            for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+                await find_target_and_execute_move(mount)
+        else:
+            await find_target_and_execute_move(realmount)
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
         """Retract the 'other' mount if necessary
@@ -1045,6 +1071,9 @@ class OT3API(
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
         """
+        if mount == OT3Mount.BOTH:
+            self._last_moved_mount = None
+            return
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount

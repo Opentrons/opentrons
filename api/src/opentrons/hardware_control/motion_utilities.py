@@ -1,6 +1,6 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast
+from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast, Any
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
@@ -95,7 +95,7 @@ def _z_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
+def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Any:
     if isinstance(mount, Mount):
         return Axis.by_mount(mount)
     else:
@@ -146,7 +146,7 @@ def _axis_enum(ax: OT3Axis) -> OT3Axis:
     ...
 
 
-def _axis_enum(ax: Union[str, OT3Axis]) -> Union[Axis, OT3Axis]:
+def _axis_enum(ax: Union[str, OT3Axis]) -> Any:
     if isinstance(ax, OT3Axis):
         return ax
     else:
@@ -355,7 +355,7 @@ def deck_from_machine(
     attitude: AttitudeMatrix,
     offset: Point,
 ) -> Dict[AxisType, float]:
-    """Build a deck-abs position store from the machine's position"""
+    """Build a deck-ab7 position store from the machine's position"""
     axis_enum = type(next(iter(machine_pos.keys())))
     plunger_axes = {k: v for k, v in machine_pos.items() if k not in k.gantry_axes()}
     mount_axes = {k: v for k, v in machine_pos.items() if k in k.mount_axes()}

@@ -234,7 +234,11 @@ async def test_cache_instruments_sim(sim_and_instr):
 
     await sim.cache_instruments()
     attached = sim.attached_instruments
-    assert attached == {types.Mount.LEFT: {}, types.Mount.RIGHT: {}}
+    assert attached == {
+        types.Mount.LEFT: {},
+        types.Mount.RIGHT: {},
+        types.Mount.BOTH: {},
+    }
     sim._backend._smoothie_driver.update_steps_per_mm.assert_not_called()
     sim._backend._smoothie_driver.update_pipette_config.assert_not_called()
     sim._backend._smoothie_driver.set_dwelling_current.assert_not_called()

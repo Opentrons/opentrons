@@ -35,6 +35,7 @@ def mock_get_attached_instr(
     gai_mock.return_value = {
         types.Mount.RIGHT: {"model": None, "id": None},
         types.Mount.LEFT: {"model": None, "id": None},
+        types.Mount.BOTH: {"model": None, "id": None},
     }
     return gai_mock
 
@@ -55,6 +56,10 @@ def test_execute_function_apiv2(
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
         "config": load(PipetteModel("p1000_single_v1")),
         "id": "testid2",
+    }
+    mock_get_attached_instr.return_value[types.Mount.BOTH] = {
+        "config": load(PipetteModel("p1000_single_v1")),
+        "id": "testid3",
     }
     entries = []
 

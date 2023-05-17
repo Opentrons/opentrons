@@ -130,7 +130,12 @@ class API(
         ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         PipetteHandlerProvider.__init__(
-            self, {top_types.Mount.LEFT: None, top_types.Mount.RIGHT: None}
+            self,
+            {
+                top_types.Mount.LEFT: None,
+                top_types.Mount.RIGHT: None,
+                top_types.Mount.BOTH: None,
+            },
         )
 
     @property
@@ -403,6 +408,8 @@ class API(
             found = await self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
+            if mount == top_types.Mount.BOTH:
+                continue
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)
             pip_id = instrument_data.get("id")

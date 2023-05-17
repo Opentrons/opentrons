@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any
+from typing import Iterator, Union, Dict, Tuple, List, Any, Callable
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -131,6 +131,19 @@ def mock_home_plunger(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock
         ),
     ) as mock_move:
         yield mock_move
+
+
+@pytest.fixture
+def mock_retract(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "retract",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.retract,
+            wraps=ot3_hardware.managed_obj.retract,
+        ),
+    ) as mock_retract:
+        yield mock_retract
 
 
 @pytest.fixture
@@ -501,6 +514,24 @@ async def test_blow_out_error(
         # check that blowout does not allow input values that would blow out too far
         with pytest.raises(ValueError):
             await ot3_hardware.blow_out(mount, blowout_volume)
+
+
+@pytest.mark.parametrize("mount", [OT3Mount.RIGHT, OT3Mount.LEFT, OT3Mount.BOTH])
+@pytest.mark.parametrize("move_func", [OT3API.move_to, OT3API.move_rel])
+async def test_move_both_mounts(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_retract: AsyncMock,
+    mock_backend_move,
+    mount: OT3Mount,
+    move_func: Callable,
+) -> None:
+    await ot3_hardware.cache_instruments()
+    await move_func(ot3_hardware, mount, Point(1, 1, 1))
+    if mount == OT3Mount.BOTH:
+        assert not mock_retract.called
+        assert mock_backend_move.call_count == 2
+    else:
+        assert mock_backend_move.call_count == 1
 
 
 @pytest.mark.parametrize(
