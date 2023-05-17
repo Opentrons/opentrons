@@ -16,7 +16,7 @@ from opentrons_shared_data.pipette.dev_types import (
     ChannelCount,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
-
+from robot_server.subsystems.models import SubSystem
 
 InstrumentModelT = TypeVar(
     "InstrumentModelT", bound=Union[GripperModelStr, PipetteModel]
@@ -34,8 +34,11 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
         ..., description="Type of instrument- either a pipette or a gripper."
     )
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
-    # TODO (spp, 2023-01-06): add firmware version field
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
+    subsystem: Optional[SubSystem] = Field(
+        None,
+        description="The subsystem corresponding to this pipette.",
+    )
     data: InstrumentDataT
 
 

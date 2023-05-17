@@ -6,7 +6,6 @@ from fastapi import APIRouter, status, Depends
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     PipetteOffsetByPipetteMount,
 )
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 from robot_server.hardware import get_hardware
@@ -20,6 +19,7 @@ from opentrons.types import Mount, MountType
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import OT3Mount, SubSystem as HWSubSystem
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
@@ -31,6 +31,8 @@ from .instrument_models import (
     Gripper,
     AttachedInstrument,
 )
+
+from robot_server.subsystems.models import SubSystem
 
 instruments_router = APIRouter()
 
@@ -48,6 +50,7 @@ def _pipette_dict_to_pipette_res(
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
             serialNumber=pipette_dict["pipette_id"],
+            subsystem=SubSystem.from_hw(HWSubSystem.of_mount(mount)),
             data=PipetteData(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
@@ -74,6 +77,7 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
+        subsystem=SubSystem.from_hw(HWSubSystem.of_mount(OT3Mount.GRIPPER)),
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
             calibratedOffset=InstrumentCalibrationData.construct(

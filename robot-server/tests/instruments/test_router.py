@@ -7,7 +7,10 @@ from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.dev_types import (
+    PipetteDict,
+    GripperDict,
+)
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
@@ -28,16 +31,24 @@ from robot_server.instruments.instrument_models import (
     PipetteData,
     InstrumentCalibrationData,
 )
-from robot_server.instruments.router import get_attached_instruments
+from robot_server.instruments.router import (
+    get_attached_instruments,
+)
+from robot_server.subsystems.models import SubSystem
+from opentrons.hardware_control.types import SubSystem as HWSubSystem
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
+@pytest.fixture()
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock hardware control API."""
+    return decoy.mock(cls=HardwareControlAPI)
+
+
 def get_sample_pipette_dict(
-    name: PipetteName,
-    model: PipetteModel,
-    pipette_id: str,
+    name: PipetteName, model: PipetteModel, pipette_id: str, subsystem: SubSystem
 ) -> PipetteDict:
     """Return a sample PipetteDict."""
     pipette_dict: PipetteDict = {  # type: ignore [typeddict-item]
@@ -48,6 +59,7 @@ def get_sample_pipette_dict(
         "min_volume": 1,
         "max_volume": 1,
         "channels": 1,
+        "subsystem": subsystem,
     }
     return pipette_dict
 
@@ -85,37 +97,42 @@ async def test_get_all_attached_instruments(
     ot3_hardware_api: OT3API,
 ) -> None:
     """It should get data of all attached instruments."""
+    left_pipette_dict = get_sample_pipette_dict(
+        name="p10_multi",
+        model=PipetteModel("abc"),
+        pipette_id="my-pipette-id",
+        subsystem=SubSystem.pipette_left,
+    )
+    right_pipette_dict = get_sample_pipette_dict(
+        name="p20_multi_gen2",
+        model=PipetteModel("xyz"),
+        pipette_id="my-other-pipette-id",
+        subsystem=SubSystem.pipette_right,
+    )
 
     def rehearse_instrument_retrievals() -> None:
         decoy.when(ot3_hardware_api.attached_gripper).then_return(
-            {
-                "model": GripperModel.v1,
-                "gripper_id": "GripperID321",
-                "display_name": "my-special-gripper",
-                "state": GripperJawState.UNHOMED,
-                "calibration_offset": GripperCalibrationOffset(
-                    offset=Point(x=1, y=2, z=3),
-                    source=SourceType.default,
-                    status=CalibrationStatus(markedBad=False),
-                    last_modified=None,
-                ),
-                "fw_update_required": False,
-                "fw_current_version": 1,
-                "fw_next_version": None,
-            }
+            cast(
+                GripperDict,
+                {
+                    "model": GripperModel.v1,
+                    "gripper_id": "GripperID321",
+                    "display_name": "my-special-gripper",
+                    "state": GripperJawState.UNHOMED,
+                    "calibration_offset": GripperCalibrationOffset(
+                        offset=Point(x=1, y=2, z=3),
+                        source=SourceType.default,
+                        status=CalibrationStatus(markedBad=False),
+                        last_modified=None,
+                    ),
+                    "subsystem": HWSubSystem.gripper,
+                },
+            )
         )
         decoy.when(ot3_hardware_api.attached_pipettes).then_return(
             {
-                Mount.LEFT: get_sample_pipette_dict(
-                    name="p10_multi",
-                    model=PipetteModel("abc"),
-                    pipette_id="my-pipette-id",
-                ),
-                Mount.RIGHT: get_sample_pipette_dict(
-                    name="p20_multi_gen2",
-                    model=PipetteModel("xyz"),
-                    pipette_id="my-other-pipette-id",
-                ),
+                Mount.LEFT: left_pipette_dict,
+                Mount.RIGHT: right_pipette_dict,
             }
         )
 
@@ -151,6 +168,7 @@ async def test_get_all_attached_instruments(
             instrumentName="p10_multi",
             instrumentModel=PipetteModel("abc"),
             serialNumber="my-pipette-id",
+            subsystem=SubSystem.pipette_left,
             data=PipetteData(
                 channels=1,
                 min_volume=1,
@@ -168,6 +186,7 @@ async def test_get_all_attached_instruments(
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
             serialNumber="my-other-pipette-id",
+            subsystem=SubSystem.pipette_right,
             data=PipetteData(
                 channels=1,
                 min_volume=1,
@@ -184,6 +203,7 @@ async def test_get_all_attached_instruments(
             instrumentType="gripper",
             instrumentModel=GripperModelStr("gripperV1"),
             serialNumber="GripperID321",
+            subsystem=SubSystem.gripper,
             data=GripperData(
                 jawState="unhomed",
                 calibratedOffset=InstrumentCalibrationData(
@@ -214,6 +234,7 @@ async def test_get_ot2_instruments(
                 name="p20_multi_gen2",
                 model=PipetteModel("xyz"),
                 pipette_id="pipette-id",
+                subsystem=SubSystem.pipette_right,
             ),
             Mount.LEFT: cast(PipetteDict, {}),
         }
@@ -233,6 +254,7 @@ async def test_get_ot2_instruments(
                 min_volume=1,
                 max_volume=1,
             ),
+            subsystem=SubSystem.pipette_right,
         )
     ]
 
@@ -272,5 +294,6 @@ async def test_get_96_channel_instruments(
                 min_volume=1,
                 max_volume=1000,
             ),
+            subsystem=SubSystem.pipette_left,
         )
     ]
