@@ -184,16 +184,16 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     else:
         AXIS = OT3Axis.Z_R
 
-    
+
 
     # TIP_RACKS = args.tip_rack_num # default: 12
     PICKUPS_PER_TIP = args.pick_up_num # default: 20
     COLUMNS = 12
     ROWS = 8
     CYCLES = 1
-    
+
     test_pip = api.get_attached_instrument(mount)
-    
+
     print("mount.id:{}".format(test_pip["pipette_id"]))
 
     test_name = "tip-pick-up-lifetime-test"
@@ -212,7 +212,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         header_str = data.convert_list_to_csv_line(header)
         data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-    
+
 
     print("test_pip",test_pip)
     if(len(test_pip) == 0):
@@ -236,8 +236,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     else:
         multi_pip = True
         ROWS = 1
-        CYCLES = 24
-        check_tip_presence = False
+        CYCLES = 8
+        check_tip_presence = True
 
     slot_loc = {
         "A1": (13.42, 394.92, 110),
@@ -277,9 +277,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     total_tip_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[3])
     total_fail_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[4])
 
-    
+
 
     start_time = time.perf_counter()
+    elapsed_time = 0
     rack = start_slot - 1
     total_pick_ups = total_tip_num - 1
     total_failures = total_fail_num
@@ -309,8 +310,12 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     for i in range(CYCLES):
         print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
         if i > 0:
+            stop_time = time.perf_counter()
             print("Replace tips before continuing test.")
             input("\n\t>> Press \"Enter\" to continue.")
+            resume_time = time.perf_counter()
+            elapsed_time += resume_time - stop_time
+            print(f"Elapsed time: {convert(resume_time-stop_time)}\n")
         for key_index, key in enumerate(calibrated_slot_loc.keys()):
             if (key_index >= 12):
                 break
@@ -385,8 +390,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                             tip_presence_eject_flag = 'Tip Presence Not Checked'
 
                         ### save test data and continue loop/exit based on tip eject success
-                        
-                        cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_pip["pipette_id"], rack, pick_up+1,
+
+                        cycle_data = [convert(time.perf_counter()-elapsed_time-start_time), test_robot, test_pip["pipette_id"], rack, pick_up+1,
                             total_pick_ups, tip_presence_pick_up_flag, tip_presence_eject_flag, total_failures]
                         cycle_data_str = data.convert_list_to_csv_line(cycle_data)
                         data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
@@ -397,7 +402,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                             with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
                                 print("Recording...\n")
                                 calibrated_slot_loc = json.load(openfile)
-                                complete_dict = {"cycle": i+1, "slot_num": rack, "tip_num":pick_up+1, "total_tip_pick_up": total_pick_ups, 
+                                complete_dict = {"cycle": i+1, "slot_num": rack, "tip_num":pick_up+1, "total_tip_pick_up": total_pick_ups,
                                                  "total_failure": total_failures, "col":col + 1, "row":row + 1, "csv_name":file_name}
                                 calibrated_slot_loc.update(complete_dict)
                                 with open('/data/testing_data/calibrated_slot_locations.json', 'w') as writefile:
@@ -406,7 +411,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         else:
                             print("Slot locations calibration file not found.\n")
                             print("Failed to record complete information.\n")
-                        
+
 
                         if tip_presence_eject_flag == True:
                             await api.home()
@@ -418,15 +423,16 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
                 ### adjust column increment
                 print("Moving to next column...\n")
-            
+
             # release start
             start_col = 1
             start_row = 1
             start_tip_nums = 1
 
         print("=================================\n")
-        print(f"CYCLE {i+1} COMPLETE\n")
+        print(f"\nCYCLE {i+1} COMPLETE\n")
         await api.home()
+        await api.home_plunger(mount)
 
     print("=================================\n")
     print("1/4 LIFETIME TEST COMPLETE\n")
@@ -443,7 +449,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
-    parser.add_argument("--pick_up_num", type=int, default=20)
+    parser.add_argument("--pick_up_num", type=int, default=1)
     # parser.add_argument("--tip_rack_num", type=int, default=12)
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
