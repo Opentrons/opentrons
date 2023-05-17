@@ -309,7 +309,8 @@ async def attached_pipettes(
     left_id = marker_with_default("attach_left_id", "abc123")
     right_id = marker_with_default("attach_right_id", "abcd123")
 
-    backend = cast(Union[Simulator, OT3Simulator], hardware._backend)
+    backend = cast(Union[Simulator, OT3Simulator], hardware._backend)  # type: ignore[union-attr]
+    # we can't import OT3API because this test is run in the OT2-only tests, therefore we have to use the protocol, which does not contain _backend
 
     mount_type = cast(
         Union[Type[Mount], Type[OT3Mount]],
