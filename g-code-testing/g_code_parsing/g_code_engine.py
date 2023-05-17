@@ -7,8 +7,7 @@ from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine import create_protocol_engine, Config, DeckType
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
     ProtocolConfig,
@@ -166,7 +165,12 @@ class GCodeEngine:
                     protocol_config=config,
                     protocol_engine=await create_protocol_engine(
                         hardware_api=hardware,  # type: ignore
-                        config=Config(robot_type=robot_type),
+                        config=Config(
+                            robot_type=robot_type,
+                            deck_type=DeckType(
+                                deck_type.for_simulation(robot_type=robot_type)
+                            ),
+                        ),
                     ),
                     hardware_api=hardware,  # type: ignore
                 )
