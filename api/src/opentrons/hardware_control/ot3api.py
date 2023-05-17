@@ -551,17 +551,12 @@ class OT3API(
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
 
-        pipete_subtype = (
-            PipetteSubType.from_channels(config.channels) if config else None
-        )
-        fw_update_info = self._backend.get_instrument_update(mount, pipete_subtype)
         p, _ = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
             pip_offset_cal,
-            fw_update_info,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
@@ -569,17 +564,20 @@ class OT3API(
 
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
-        fw_update_info = self._backend.get_instrument_update(OT3Mount.GRIPPER)
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
         g = compare_gripper_config_and_check_skip(
             instrument_data,
             self._gripper_handler._gripper,
             grip_cal,
-            fw_update_info,
         )
         self._gripper_handler.gripper = g
 
     def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
+        # NOTE (spp, 2023-03-07): The return type of this method indicates that
+        #  if a particular mount has no attached instrument then it will provide a
+        #  None value for that mount. But in reality, we get an empty dict.
+        #  We should either not call the value Optional, or have `_attached_...` return
+        #  a None for empty mounts.
         return {
             OT3Mount.LEFT: self.attached_pipettes[top_types.Mount.LEFT],
             OT3Mount.RIGHT: self.attached_pipettes[top_types.Mount.RIGHT],
