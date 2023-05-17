@@ -1,6 +1,6 @@
 @import '@opentrons/components';
 
-.pd_file_tab_header {
+.pd_fd_header {
   position: relative;
   font-family: Public Sans;
   font-size: 1.3rem;
@@ -8,7 +8,7 @@
   line-height: 1rem;
 }
 
-.pd_file_tab_sub_header {
+.pd_fd_sub_header {
   font-size: 0.813rem;
   font-weight: 400;
   line-height: 1rem;

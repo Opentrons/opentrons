@@ -71,7 +71,7 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   } else {
     return (
       <div>
-        {!Boolean(props.formValues.protocolName) ? (
+        {!Boolean(props.formValues) ? (
           <NoFileSelection />
         ) : (
           <div className={flexStyles.wrapper}>
@@ -92,31 +92,29 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                     <div className={styles.container}>
                       <FileProtocolInformation />
                       <div className={styles.line_separator} />
-                      <div className={styles.margin_bottom}>
-                        <div className={styles.pd_file_tab_header}>
-                          <FileProtocolNameAndDescription
-                            nameDescriptionData={values}
+                      <div
+                        className={`${styles.heading_container} ${styles.margin_bottom}`}
+                      >
+                        <FileProtocolNameAndDescription
+                          nameDescriptionData={values}
+                        />
+                        <Flex>
+                          <EditButton
+                            editProps={setEdit}
+                            setTab={0}
+                            setTabId={setTabId}
                           />
-                          <Flex className={styles.right_buttons}>
-                            <EditButton
-                              editProps={setEdit}
-                              setTab={0}
-                              setTabId={setTabId}
-                            />
-                          </Flex>
-                        </div>
+                        </Flex>
                       </div>
                       <div className={styles.line_separator} />
                       <div
                         className={`${styles.heading_container} ${styles.margin_bottom}`}
                       >
-                        <div className={styles.pd_file_tab_header}>
-                          <StyledText as="h3">
-                            {i18n.t('flex.file_tab.pipette')}
-                          </StyledText>
-                        </div>
+                        <StyledText as="h3">
+                          {i18n.t('flex.file_tab.pipette')}
+                        </StyledText>
 
-                        <Flex className={styles.right_buttons}>
+                        <Flex>
                           {Object.keys(props.instruments).length !== 1 && (
                             <SecondaryButton
                               onClick={e => {
@@ -137,41 +135,35 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                       <div>
                         <InstrumentGroup {...props.instruments} />
                       </div>
-
                       <div className={styles.line_separator} />
-                      <StyledText as="h3" className={styles.margin_bottom}>
-                        {i18n.t('flex.file_tab.additional_items')}
-                      </StyledText>
 
                       <div
                         className={`${styles.heading_container} ${styles.margin_bottom}`}
                       >
-                        <div className={styles.pd_file_tab_header}>
-                          <SelectedModules propsData={props} />
-                        </div>
-                        <EditButton
-                          editProps={setEdit}
-                          setTab={3}
-                          setTabId={setTabId}
-                        />
+                        <StyledText as="h3" className={styles.margin_bottom}>
+                          {i18n.t('flex.file_tab.additional_items')}
+                        </StyledText>
+                        <Flex>
+                          <EditButton
+                            editProps={setEdit}
+                            setTab={2}
+                            setTabId={setTabId}
+                          />
+                        </Flex>
                       </div>
+                      <SelectedModules propsData={props} />
+
                       <EditButton
                         editProps={setEdit}
-                        setTab={3}
+                        setTab={2}
                         setTabId={setTabId}
                         addItems={true}
                       />
-                      {/* <SecondaryButton
-                      onClick={() => handleAddItems(setEdit, setTabId)}
-                      >
-                        {i18n.t('flex.file_tab.add_items')}
-                      </SecondaryButton> */}
                     </div>
-                    {!isEdit && (
-                      <NewPrimaryBtn tabIndex={4} type="submit">
-                        Create protocol, on to liquids
-                      </NewPrimaryBtn>
-                    )}
+
+                    <NewPrimaryBtn type="submit">
+                      Create protocol, on to liquids
+                    </NewPrimaryBtn>
                   </form>
                 )}
               </Formik>
@@ -186,9 +178,9 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
 const FileProtocolInformation = (): JSX.Element => {
   return (
     <div className={styles.heading_container}>
-      <div className={styles.pd_file_tab_header}>
+      <div className={styles.pd_fd_header}>
         <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
-        <StyledText as="h5" className={styles.pd_file_tab_sub_header}>
+        <StyledText as="h5" className={styles.pd_fd_sub_header}>
           {i18n.t('flex.file_tab.subheading')}
         </StyledText>
       </div>
@@ -202,24 +194,22 @@ const FileProtocolInformation = (): JSX.Element => {
   )
 }
 
-const EditButton = ({
-  editProps,
-  setTab,
-  setTabId,
-  addItems,
-}: any): JSX.Element => {
+const NoFileSelection = (): JSX.Element => {
   return (
-    <SecondaryButton
-      onClick={e => {
-        e.preventDefault()
-        editProps(true)
-        setTabId(setTab)
-      }}
-    >
-      {addItems
-        ? i18n.t('flex.file_tab.add_items')
-        : i18n.t('flex.file_tab.edit')}
-    </SecondaryButton>
+    <div className={flexStyles.wrapper}>
+      <div className={styles.container}>
+        <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
+        <StyledText as="h5" className={styles.pd_fd_sub_header}>
+          {i18n.t('flex.file_tab.subheading')}
+        </StyledText>
+        <div className={styles.line_separator} />
+        <div>
+          <StyledText as="h4" className={styles.bold_text}>
+            Please select JSON file to display
+          </StyledText>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -281,24 +271,25 @@ const FileProtocolNameAndDescription = (props: {
   )
 }
 
-const NoFileSelection = (): JSX.Element => {
+const EditButton = ({
+  editProps,
+  setTab,
+  setTabId,
+  addItems,
+}: any): JSX.Element => {
   return (
-    <div className={flexStyles.wrapper}>
-      <div className={styles.container}>
-        <div className={styles.pd_file_tab_header}>
-          <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
-          <StyledText as="h5" className={styles.pd_file_tab_sub_header}>
-            {i18n.t('flex.file_tab.subheading')}
-          </StyledText>
-          <div className={styles.line_separator} />
-          <div>
-            <StyledText as="h4" className={styles.bold_text}>
-              Please select JSON file to display
-            </StyledText>
-          </div>
-        </div>
-      </div>
-    </div>
+    <SecondaryButton
+      style={{ height: 'max-content' }}
+      onClick={e => {
+        e.preventDefault()
+        editProps(true)
+        setTabId(setTab)
+      }}
+    >
+      {addItems
+        ? i18n.t('flex.file_tab.add_items')
+        : i18n.t('flex.file_tab.edit')}
+    </SecondaryButton>
   )
 }
 
@@ -313,32 +304,30 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
             className={`${styles.heading_container} ${styles.margin_bottom}`}
             key={i}
           >
-            <div className={styles.pd_file_tab_header}>
-              <Card>
-                <div className={styles.card_content}>
-                  <Flex>
-                    {' '}
-                    <ModuleDiagram
-                      type={moduleType.type}
-                      model={moduleType.model}
-                    />
-                    <Flex
-                      flexDirection={DIRECTION_COLUMN}
-                      marginLeft={SPACING.spacing4}
-                      marginTop={SPACING.spacing4}
-                      marginBottom={SPACING.spacing4}
-                    >
-                      <StyledText as="h4">
-                        {i18n.t(
-                          `modules.module_display_names.${moduleType.type}`
-                        )}{' '}
-                        - Slot {moduleType.slot}
-                      </StyledText>
-                    </Flex>
+            <Card>
+              <div className={styles.card_content}>
+                <Flex>
+                  {' '}
+                  <ModuleDiagram
+                    type={moduleType.type}
+                    model={moduleType.model}
+                  />
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    marginLeft={SPACING.spacing4}
+                    marginTop={SPACING.spacing4}
+                    marginBottom={SPACING.spacing4}
+                  >
+                    <StyledText as="h4">
+                      {i18n.t(
+                        `modules.module_display_names.${moduleType.type}`
+                      )}{' '}
+                      - Slot {moduleType.slot}
+                    </StyledText>
                   </Flex>
-                </div>
-              </Card>
-            </div>
+                </Flex>
+              </div>
+            </Card>
           </div>
         ))
       ) : (
