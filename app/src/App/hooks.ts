@@ -1,5 +1,6 @@
 import * as React from 'react'
 import difference from 'lodash/difference'
+import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 import { useInterval } from '@opentrons/components'
@@ -36,6 +37,7 @@ export function useSoftwareUpdatePoll(): void {
 
 export function useProtocolReceiptToast(): void {
   const host = useHost()
+  const { t } = useTranslation('protocol_info')
   const { makeToast } = useToaster()
   const queryClient = useQueryClient()
   const protocolIdsQuery = useAllProtocolIdsQuery(
@@ -78,7 +80,12 @@ export function useProtocolReceiptToast(): void {
       )
         .then(protocolNames => {
           protocolNames.forEach(name => {
-            makeToast(`New protocol ${name} added to robot!`, 'success')
+            makeToast(
+              t('protocol_added', {
+                protocol_name: name,
+              }),
+              'success'
+            )
           })
         })
         .then(() => {
@@ -93,7 +100,9 @@ export function useProtocolReceiptToast(): void {
         })
     }
     protocolIdsRef.current = protocolIds
-  }, [host, makeToast, protocolIds, queryClient])
+    // dont want this hook to rerun when other deps change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [protocolIds])
 }
 
 export function useCurrentRunRoute(): string | null {
