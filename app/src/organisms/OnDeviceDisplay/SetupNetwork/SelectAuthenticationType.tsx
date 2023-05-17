@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -14,13 +13,15 @@ import {
   Btn,
   Icon,
   JUSTIFY_CENTER,
-  BORDERS,
+  TYPOGRAPHY,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { RadioButton, SmallButton } from '../../../atoms/buttons'
 import { getLocalRobot } from '../../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../../redux/networking'
+import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
@@ -45,14 +46,17 @@ export function SelectAuthenticationType({
   setSelectedAuthType,
   setChangeState,
 }: SelectAuthenticationTypeProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const { wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
+  const [
+    showAlternativeSecurityTypeModal,
+    setShowAlternativeSecurityTypeModal,
+  ] = React.useState<boolean>(false)
 
   const handleClickBack = (): void => {
     if (fromWifiList != null) {
@@ -65,154 +69,107 @@ export function SelectAuthenticationType({
     }
   }
 
+  const securityButtons = [
+    {
+      label: t('wpa2_personal'),
+      subLabel: t('wpa2_personal_description'),
+      value: 'wpa-psk',
+    },
+    {
+      label: t('shared:none'),
+      subLabel: t('none_description'),
+      value: 'none',
+    },
+  ]
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setSelectedAuthType(event.target.value as AuthType)
+  }
+
   React.useEffect(() => {
     dispatch(fetchStatus(robotName))
   }, [robotName, dispatch])
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
-    >
+    <>
+      {showAlternativeSecurityTypeModal ? (
+        <AlternativeSecurityTypeModal
+          setShowAlternativeSecurityTypeModal={
+            setShowAlternativeSecurityTypeModal
+          }
+        />
+      ) : null}
       <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        marginBottom="2.2625rem"
+        flexDirection={DIRECTION_COLUMN}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
-        <Btn onClick={handleClickBack}>
-          <Flex flexDirection={DIRECTION_ROW}>
-            <Icon
-              name="chevron-left"
-              marginRight={SPACING.spacing4}
-              size="1.875rem"
-            />
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_CENTER}
+          marginBottom="2.2625rem"
+        >
+          <Btn onClick={handleClickBack}>
+            <Flex flexDirection={DIRECTION_ROW}>
+              <Icon name="back" marginRight={SPACING.spacing4} size="3rem" />
+            </Flex>
+          </Btn>
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+            {t('select_a_security_type')}
+          </StyledText>
+          <SmallButton
+            buttonType="primary"
+            buttonCategory="rounded"
+            buttonText={i18n.format(t('continue'), 'capitalize')}
+            onClick={() => {
+              setShowSelectAuthenticationType(false)
+            }}
+          />
+        </Flex>
+        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            width="100%"
+          >
+            {securityButtons.map(radio => (
+              <RadioButton
+                key={radio.label}
+                buttonLabel={radio.label}
+                buttonValue={radio.value}
+                onChange={handleChange}
+                subButtonLabel={radio.subLabel ?? undefined}
+                isSelected={radio.value === selectedAuthType}
+              />
+            ))}
+          </Flex>
+          <Flex marginTop="1.75rem">
             <StyledText
-              fontSize="1.625rem"
-              lineHeight="2.1875rem"
-              fontWeight="700"
+              as="h4"
+              fontWeight={TYPOGRAPHY.fontWeightRegular}
+              color={COLORS.darkBlack70}
             >
-              {t('shared:back')}
+              {t('your_mac_address_is', { macAddress: wifi?.macAddress })}
             </StyledText>
           </Flex>
-        </Btn>
-
-        <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
-          {t('connect_to', { ssid: ssid })}
-        </StyledText>
-        <TertiaryButton
-          width="8.9375rem"
-          height="3.75rem"
-          fontSize="1.5rem"
-          fontWeight="500"
-          lineHeight="2.0425rem"
-          borderRadius="42px"
-          onClick={() => {
-            setShowSelectAuthenticationType(false)
-          }}
-        >
-          {t('shared:next')}
-        </TertiaryButton>
-      </Flex>
-      <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-        <StyledText fontSize="1.375rem" lineHeight="1.875rem" fontWeight="500">
-          {t('select_authentication_method')}
-        </StyledText>
-        <Flex
-          marginTop={SPACING.spacing24}
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          gridGap="1.375rem"
-        >
           <Btn
-            backgroundColor={
-              selectedAuthType === 'wpa-psk' ? COLORS.medBlue : ''
-            }
-            padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
-            borderRadius="3.5625rem"
-            onClick={() => {
-              setSelectedAuthType('wpa-psk')
-            }}
+            display={DISPLAY_FLEX}
+            marginTop={SPACING.spacing40}
+            width="100%"
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            onClick={() => setShowAlternativeSecurityTypeModal(true)}
           >
             <StyledText
-              fontSize="2rem"
-              lineHeight="2.75rem"
-              fontWeight="600"
-              color={COLORS.blueEnabled}
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.darkBlack70}
             >
-              {t('wpa2_personal')}
-            </StyledText>
-          </Btn>
-          <Btn
-            backgroundColor={selectedAuthType === 'none' ? COLORS.medBlue : ''}
-            borderRadius="3.5625rem"
-            padding={`${SPACING.spacing16} ${SPACING.spacing32}`}
-            onClick={() => {
-              setSelectedAuthType('none')
-            }}
-          >
-            <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="600">
-              {t('shared:none')}
-            </StyledText>
-          </Btn>
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing4}
-          marginTop="7.8125rem"
-        >
-          <StyledText
-            fontSize="1.5rem"
-            lineHeight="2.0625rem"
-            fontWeight="400"
-            color={COLORS.black}
-          >
-            {'MAC Address:'}
-          </StyledText>
-          <StyledText
-            fontSize="1.5rem"
-            lineHeight="2.0625rem"
-            fontWeight="400"
-            color={COLORS.black}
-          >
-            {wifi?.macAddress != null ? wifi?.macAddress : t('shared:no_data')}
-          </StyledText>
-        </Flex>
-        <Flex
-          marginTop={SPACING.spacing24}
-          backgroundColor={COLORS.light2}
-          padding={SPACING.spacing24}
-          width="100%"
-          height="6.75rem"
-          borderRadius={BORDERS.size3}
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-        >
-          <StyledText
-            fontSize="1.375rem"
-            lineHeight="1.875rem"
-            fontWeight="500"
-            width="665px"
-          >
-            {t('switch_to_usb_description')}
-          </StyledText>
-          <Btn
-            marginLeft={SPACING.spacing12}
-            padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
-            width="13.8125rem"
-            onClick={() => history.push('/network-setup/usb')}
-          >
-            <StyledText
-              fontSize="1.375rem"
-              lineHeight="1.875rem"
-              fontWeight="600"
-            >
-              {t('connect_via', { type: t('usb') })}
+              {t('need_another_security_type')}
             </StyledText>
           </Btn>
         </Flex>
       </Flex>
-    </Flex>
+    </>
   )
 }

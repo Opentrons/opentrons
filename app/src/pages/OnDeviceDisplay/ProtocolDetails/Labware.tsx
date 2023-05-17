@@ -16,6 +16,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import { useRequiredProtocolLabware } from '../../Protocols/hooks'
+import { EmptySection } from './EmptySection'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -27,9 +28,6 @@ const Table = styled('table')`
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const TableHeader = styled('th')`
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 
@@ -40,8 +38,6 @@ const TableRow = styled('tr')`
 `
 
 const TableDatum = styled('td')`
-  font-size: ${TYPOGRAPHY.fontSize22};
-  font-weight: ${TYPOGRAPHY.lineHeight28};
   padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: ${WRAP};
@@ -71,32 +67,32 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
     },
     {}
   )
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
 
-  return (
+  return labwareItems.length === 0 ? (
+    <EmptySection section="labware" />
+  ) : (
     <Table>
       <thead>
         <tr>
           <TableHeader>
             <StyledText
-              color={COLORS.darkBlack70}
               fontSize={TYPOGRAPHY.fontSize20}
+              color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              lineHeight={TYPOGRAPHY.lineHeight24}
               paddingLeft={SPACING.spacing24}
             >
-              {t('labware_name')}
+              {i18n.format(t('labware_name'), 'titleCase')}
             </StyledText>
           </TableHeader>
           <TableHeader>
             <StyledText
+              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              fontSize={TYPOGRAPHY.fontSize20}
-              lineHeight={TYPOGRAPHY.lineHeight24}
-              textAlign={TYPOGRAPHY.textAlignCenter}
+              paddingRight={SPACING.spacing12}
             >
-              {t('quantity')}
+              {i18n.format(t('quantity'), 'sentenceCase')}
             </StyledText>
           </TableHeader>
         </tr>
@@ -126,9 +122,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
                   <StyledText
+                    as="p"
                     alignItems={ALIGN_CENTER}
                     color={COLORS.darkBlack100}
-                    lineHeight={TYPOGRAPHY.lineHeight28}
                   >
                     {name}
                   </StyledText>
@@ -136,9 +132,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <StyledText
+                  as="p"
                   alignItems={ALIGN_CENTER}
                   color={COLORS.darkBlack100}
-                  lineHeight={TYPOGRAPHY.lineHeight28}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {count}

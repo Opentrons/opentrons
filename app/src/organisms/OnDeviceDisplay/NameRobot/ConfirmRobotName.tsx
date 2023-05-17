@@ -14,7 +14,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { StepMeter } from '../../../atoms/StepMeter'
-import { SmallButton } from '../../../atoms/buttons'
+import { MediumButton } from '../../../atoms/buttons'
 import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'
 
 const IMAGE_ALT = 'finish setting up a robot'
@@ -65,7 +65,7 @@ export function ConfirmRobotName({
             >
               {t('your_robot_is_ready_to_go')}
             </StyledText>
-            <SmallButton
+            <MediumButton
               buttonType="primary"
               buttonCategory="rounded"
               buttonText={t('finish_setup')}
