@@ -68,6 +68,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         report(section, tag, [est, enc, result])
         return aligned
 
+    await api.home_z(OT3Mount.LEFT)
+    slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
+    await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
+
     # LOOP THROUGH CURRENTS + SPEEDS
     currents = list(CURRENTS_SPEEDS.keys())
     for current in sorted(currents, reverse=True):

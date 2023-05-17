@@ -21,7 +21,7 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.opentrons_api.types import OT3Axis
+from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 
 TIP_PRESENCE_POSITION = 6
@@ -78,6 +78,10 @@ async def get_tip_status(api: OT3API) -> bool:
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
     ax = OT3Axis.Q
+    await api.home_z(OT3Mount.LEFT)
+    slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
+    await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
     for expected_state in [False, True]:
         print("homing...")
         await api.home([ax])

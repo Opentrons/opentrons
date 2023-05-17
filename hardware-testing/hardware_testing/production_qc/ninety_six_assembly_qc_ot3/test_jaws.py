@@ -11,13 +11,13 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis
+from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
 
 RETRACT_MM = 0.25
 MAX_TRAVEL = 29.8 - RETRACT_MM  # FIXME: what is the max travel?
 ENDSTOP_OVERRUN_MM = 0.25
 ENDSTOP_OVERRUN_SPEED = 5
-SPEEDS_TO_TEST: List[float] = [5, 10, 15, 20, 30, 50]
+SPEEDS_TO_TEST: List[float] = [3, 6, 9, 12, 15]
 CURRENTS_SPEEDS: Dict[float, List[float]] = {
     1.5: SPEEDS_TO_TEST,
 }
@@ -72,6 +72,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         result = CSVResult.from_bool(no_hit and hit)
         report(section, tag, [no_hit, hit, result])
         return no_hit and hit
+
+    await api.home_z(OT3Mount.LEFT)
+    slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
+    await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
 
     # LOOP THROUGH CURRENTS + SPEEDS
     currents = list(CURRENTS_SPEEDS.keys())

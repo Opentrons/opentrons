@@ -54,7 +54,7 @@ async def _main(cfg: TestConfig) -> None:
         ui.print_title(section.value)
         await test_run(api, report, section.value)
 
-    # DISENGAGE XY FOR OPERATOR TO RELOAD GRIPPER
+    # DISENGAGE XY FOR OPERATOR TO RELOAD PIPETTE
     ui.print_title("DONE")
     await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
 

@@ -35,6 +35,10 @@ def _remove_outliers_and_average(values: List[float]) -> float:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    await api.home_z(OT3Mount.LEFT)
+    slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
+    await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
     for sensor_id in [SensorId.S0, SensorId.S1]:
         ui.print_header(sensor_id.name.upper())
         celsius_samples = []

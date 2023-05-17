@@ -21,12 +21,12 @@ ASPIRATE_VOLUME = 200
 NUM_SECONDS_TO_WAIT = 30
 HOVER_HEIGHT_MM = 50
 DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -20
-DEPTH_INTO_RESERVOIR_FOR_DISPENSE = -5
+DEPTH_INTO_RESERVOIR_FOR_DISPENSE = DEPTH_INTO_RESERVOIR_FOR_ASPIRATE
 
 TIP_RACK_LABWARE = f"opentrons_ot3_96_tiprack_{TIP_VOLUME}ul"
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 
-TIP_RACK_96_SLOT = 5
+TIP_RACK_96_SLOT = 4
 TIP_RACK_PARTIAL_SLOT = 5
 RESERVOIR_SLOT = 2
 TRASH_SLOT = 1
@@ -185,6 +185,7 @@ async def _drop_tip(api: OT3API, trash: Point) -> None:
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, trash + Point(z=20))
     await api.move_to(OT3Mount.LEFT, trash)
     await api.drop_tip(OT3Mount.LEFT)
+    await api.home_z(OT3Mount.LEFT)
 
 
 async def _partial_pick_up_z_motion(
@@ -291,7 +292,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     if not api.is_simulator:
         ui.get_user_ready(f"REMOVE 96 tip-rack to slot #{TIP_RACK_96_SLOT}")
-        ui.get_user_ready(f"ADD partial tip-rack to slot #{TIP_RACK_96_SLOT}")
+        ui.get_user_ready(f"ADD partial tip-rack to slot #{TIP_RACK_PARTIAL_SLOT}")
 
     # SAVE PARTIAL TIP-RACK POSITION
     ui.print_header("JOG to Partial-Tip RACK")

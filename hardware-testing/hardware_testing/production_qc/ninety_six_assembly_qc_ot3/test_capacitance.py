@@ -22,16 +22,21 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
-TEST_SLOT = 5
+TEST_SLOT = 8
 PROBE_PREP_HEIGHT_MM = 5
 PROBE_MAX_OVERRUN = 5
 PROBE_POS_OFFSET = Point(13, 13, 0)
 
 PROBE_READINGS = ["air-pf", "attached-pf", "deck-pf", "deck-mm"]
 
+THRESHOLDS = {
+    "air-pf": (4.0, 10.0,),
+    "attached-pf": (5.0, 12.0,),
+    "deck-pf": (10.0, 25.0,),
+}
+
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
-    assert reading in PROBE_READINGS, f"{reading} not in PROBE_READINGS"
     return f"{probe.name.lower()}-{reading}"
 
 
@@ -40,8 +45,11 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     for p in InstrumentProbeType:
         for r in PROBE_READINGS:
-            tag = _get_test_tag(p, r)
-            lines.append(CSVLine(tag, [float, CSVResult]))
+            lines.append(CSVLine(_get_test_tag(p, r), [float, CSVResult]))
+            if "mm" in r:
+                continue
+            lines.append(CSVLine(_get_test_tag(p, r + "-min"), [float]))
+            lines.append(CSVLine(_get_test_tag(p, r + "-max"), [float]))
     return lines
 
 
@@ -95,12 +103,21 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     default_probe_cfg = api.config.calibration.z_offset.pass_settings
     await api.reset_instrument_offset(OT3Mount.LEFT)
 
+    if not api.is_simulator:
+        ui.get_user_ready("REMOVE everything from the deck")
+
     for probe in InstrumentProbeType:
+        # store the thresolds (for reference)
+        for k in THRESHOLDS.keys():
+            report(section, _get_test_tag(probe, f"{k}-min"), [THRESHOLDS[k][0]])
+            report(section, _get_test_tag(probe, f"{k}-max"), [THRESHOLDS[k][1]])
+
         hover_pos, probe_pos = _get_hover_and_probe_pos(api, probe)
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Probe: {probe}")
         print("homing...")
         await api.home([z_ax, p_ax, t_ax])
+        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, hover_pos)
 
         # AIR-pF
         air_pf = await _read_from_sensor(api, sensor_id, 10)
@@ -108,8 +125,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.print_error(f"{probe} cap sensor not working, skipping")
             continue
         print(f"air-pf: {air_pf}")
-        # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "air-pf"), [air_pf, CSVResult.PASS])
+        passed = THRESHOLDS["air-pf"][0] <= air_pf <= THRESHOLDS["air-pf"][1]
+        report(section, _get_test_tag(probe, "air-pf"), [air_pf, CSVResult.from_bool(passed)])
 
         # ATTACHED-pF
         if not api.is_simulator:
@@ -120,9 +137,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.print_error(f"{probe} cap sensor not working, skipping")
             continue
         print(f"attached-pf: {attached_pf}")
-        # FIXME: create stricter pass/fail criteria
+        passed = THRESHOLDS["attached-pf"][0] <= attached_pf <= THRESHOLDS["attached-pf"][1]
+        passed = passed if attached_pf > air_pf else False
         report(
-            section, _get_test_tag(probe, "attached-pf"), [attached_pf, CSVResult.PASS]
+            section, _get_test_tag(probe, "attached-pf"), [attached_pf, CSVResult.from_bool(passed)]
         )
 
         # DECK-mm
@@ -160,28 +178,26 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         )
         await api.refresh_positions()
         found_pos = await api.gantry_position(OT3Mount.LEFT)
-        deck_mm = found_pos.z
-        pass_threshold = (PROBE_MAX_OVERRUN - 0.001) * -1.0
-        deck_mm_is_valid = deck_mm >= pass_threshold
-        print(f"deck-mm: {deck_mm} ({deck_mm_is_valid})")
+        deck_mm_relative = found_pos.z - (PROBE_MAX_OVERRUN * -1.0)
+        deck_mm_is_valid = deck_mm_relative >= 0.001
+        print(f"deck-mm: {deck_mm_relative} ({deck_mm_is_valid})")
         report(
             section,
             _get_test_tag(probe, "deck-mm"),
-            [deck_mm, CSVResult.from_bool(deck_mm_is_valid)],
+            [deck_mm_relative, CSVResult.from_bool(deck_mm_is_valid)],
         )
 
         # DECK-pF
         if deck_mm_is_valid:
-            if not api.is_simulator:
-                ui.get_user_ready("about to PRESS into the DECK")
-            await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=deck_mm))
+            await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=found_pos.z))
             deck_pf = await _read_from_sensor(api, sensor_id, 10)
             if not deck_pf:
                 ui.print_error(f"{probe} cap sensor not working, skipping")
                 continue
             print(f"deck-pf: {deck_pf}")
-            # FIXME: create stricter pass/fail criteria
-            report(section, _get_test_tag(probe, "deck-pf"), [deck_pf, CSVResult.PASS])
+            passed = THRESHOLDS["deck-pf"][0] <= deck_pf <= THRESHOLDS["deck-pf"][1]
+            passed = passed if deck_pf > attached_pf else False
+            report(section, _get_test_tag(probe, "deck-pf"), [deck_pf, CSVResult.from_bool(passed)])
         else:
             print("skipping deck-pf")
 

@@ -20,9 +20,7 @@ from hardware_testing.data.csv_report import (
 
 SECONDS_BETWEEN_READINGS = 0.25
 NUM_PRESSURE_READINGS = 10
-TIP_VOLUME = 50
-ASPIRATE_VOLUME = 300
-PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
+PRESSURE_READINGS = ["open-pa", "sealed-pa"]
 
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
@@ -66,17 +64,17 @@ async def _read_from_sensor(
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    await api.home_z(OT3Mount.LEFT)
+    slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
+    await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
     for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
-        # TODO remove this temporary check once we are comfortable
-        # with the motors not moving.
-        include_motor_movement = False
         ui.print_header(f"Sensor: {probe}")
 
-        # We want to specifically disengage all the pipette axes on
-        # the 96 channel
-        if not include_motor_movement:
-            await api.disengage_axes([OT3Axis.P_L, OT3Axis.Q])
+        # FIXME: noisy electronics force us to disengage all motors
+        #        remove this once that is fixed
+        await api.disengage_axes([OT3Axis.P_L, OT3Axis.Q])
 
         # OPEN-Pa
         open_pa = 0.0
@@ -92,12 +90,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
         # SEALED-Pa
         sealed_pa = 0.0
-        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
-        if include_motor_movement:
-            await api.prepare_for_aspirate(OT3Mount.LEFT)
         if not api.is_simulator:
-            ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
-            ui.get_user_ready("SEAL tip using your FINGER")
+            ui.get_user_ready("SEAL channel using your FINGER")
             try:
                 sealed_pa = await _read_from_sensor(
                     api, sensor_id, NUM_PRESSURE_READINGS
@@ -107,44 +101,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 break
         print(f"sealed-pa: {sealed_pa}")
         # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "open-pa"), [sealed_pa, CSVResult.PASS])
-
-        # ASPIRATE-Pa
-        aspirate_pa = 0.0
-        if include_motor_movement:
-            await api.aspirate(OT3Mount.LEFT, ASPIRATE_VOLUME)
-        if not api.is_simulator:
-            try:
-                aspirate_pa = await _read_from_sensor(
-                    api, sensor_id, NUM_PRESSURE_READINGS
-                )
-            except helpers_ot3.SensorResponseBad:
-                ui.print_error(f"{probe} pressure sensor not working, skipping")
-                break
-        print(f"aspirate-pa: {aspirate_pa}")
-        # FIXME: create stricter pass/fail criteria
-        report(
-            section, _get_test_tag(probe, "aspirate-pa"), [aspirate_pa, CSVResult.PASS]
-        )
-
-        # DISPENSE-Pa
-        dispense_pa = 0.0
-        if include_motor_movement:
-            await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
-        if not api.is_simulator:
-            try:
-                dispense_pa = await _read_from_sensor(
-                    api, sensor_id, NUM_PRESSURE_READINGS
-                )
-            except helpers_ot3.SensorResponseBad:
-                ui.print_error(f"{probe} pressure sensor not working, skipping")
-                break
-        print(f"dispense-pa: {dispense_pa}")
-        # FIXME: create stricter pass/fail criteria
-        report(
-            section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, CSVResult.PASS]
-        )
+        report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, CSVResult.PASS])
 
         if not api.is_simulator:
-            ui.get_user_ready("REMOVE tip")
+            ui.get_user_ready("REMOVE your finger")
         await api.remove_tip(OT3Mount.LEFT)
