@@ -47,6 +47,7 @@ from .exceptions import (
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
+    InvalidAxisForRobotType,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -99,7 +100,7 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
-    "FirmwareUpdateRequired",
+    "InvalidAxisForRobotType",
     # error occurrence models
     "ErrorOccurrence",
 ]
