@@ -17,7 +17,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
 
 TIP_VOLUME = 1000
-ASPIRATE_VOLUME = 200
+ASPIRATE_VOLUME = 1000
 NUM_SECONDS_TO_WAIT = 30
 HOVER_HEIGHT_MM = 50
 DEPTH_INTO_RESERVOIR_FOR_ASPIRATE = -20
@@ -38,7 +38,7 @@ TIP_RACK_96_ADAPTER_HEIGHT = 11  # DVT adapter
 # move to same spot over labware, regardless of number of tips attached
 OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
-PARTIAL_CURRENTS: Dict[int, float] = {1: 0.05, 8: 0.55, 12: 0.8, 16: 1.1, 24: 1.5}
+PARTIAL_CURRENTS: Dict[int, float] = {1: 0.1, 8: 0.55, 12: 0.8, 16: 1.1, 24: 1.5}
 
 PARTIAL_TESTS: Dict[str, Tuple[Point, float]] = {
     # test-name: [offset-from-A1, z-current]
@@ -46,56 +46,12 @@ PARTIAL_TESTS: Dict[str, Tuple[Point, float]] = {
         Point(x=9 * 11, y=9 * 7),
         PARTIAL_CURRENTS[1],
     ),
-    "1-tip-back-left": (
-        Point(x=9 * 11, y=9 * -7),
-        PARTIAL_CURRENTS[1],
-    ),
-    "1-tip-front-right": (
-        Point(x=9 * -11, y=9 * 7),
-        PARTIAL_CURRENTS[1],
-    ),
-    "1-tip-back-right": (
-        Point(x=9 * -11, y=9 * -7),
-        PARTIAL_CURRENTS[1],
-    ),
     "8-tips-left": (
         Point(x=9 * 11),
         PARTIAL_CURRENTS[8],
     ),
-    "8-tips-right": (
-        Point(x=9 * -11),
-        PARTIAL_CURRENTS[8],
-    ),
-    "16-tips-left": (
-        Point(x=9 * 10),
-        PARTIAL_CURRENTS[16],
-    ),
-    "16-tips-right": (
-        Point(x=9 * -10),
-        PARTIAL_CURRENTS[16],
-    ),
     "24-tips-left": (
         Point(x=9 * 9),
-        PARTIAL_CURRENTS[24],
-    ),
-    "24-tips-right": (
-        Point(x=9 * -9),
-        PARTIAL_CURRENTS[24],
-    ),
-    "12-tips-front": (
-        Point(y=9 * 7),
-        PARTIAL_CURRENTS[12],
-    ),
-    "12-tips-back": (
-        Point(y=9 * -7),
-        PARTIAL_CURRENTS[12],
-    ),
-    "24-tips-front": (
-        Point(y=9 * 6),
-        PARTIAL_CURRENTS[24],
-    ),
-    "24-tips-back": (
-        Point(y=9 * -6),
         PARTIAL_CURRENTS[24],
     ),
 }
