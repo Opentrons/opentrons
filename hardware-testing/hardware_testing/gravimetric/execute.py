@@ -106,7 +106,9 @@ def _reduce_volumes_to_not_exceed_software_limit(
     test_volumes: List[float], cfg: config.GravimetricConfig
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(cfg.pipette_volume, cfg.tip_volume, int(v))
+        liq_cls = get_liquid_class(
+            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
+        )
         max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
@@ -121,7 +123,9 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+        test_volumes = get_test_volumes(
+            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume
+        )
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
     if not _check_if_software_supports_high_volumes():
@@ -818,6 +822,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=test_volumes,
-        channel_count=cfg.pipette_channels,
+        channel_count=len(channels_to_test),
         test_report=test_report,
     )
