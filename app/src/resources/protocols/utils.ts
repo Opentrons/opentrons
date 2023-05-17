@@ -1,7 +1,7 @@
-import { CompletedProtocolAnalysis } from "@opentrons/shared-data";
+import type { RunTimeCommand } from "@opentrons/shared-data";
 
-export function isGripperRequired(analysis: CompletedProtocolAnalysis): boolean {
-  return analysis.commands.some(
+export function isGripperInCommands(commands: RunTimeCommand[]): boolean {
+  return commands.some(
     c =>
       c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper'
   ) ?? false
