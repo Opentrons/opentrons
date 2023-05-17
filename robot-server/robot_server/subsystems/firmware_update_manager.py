@@ -184,11 +184,10 @@ class _UpdateProcess:
         last_progress = 0
         try:
             async for update in self._hw_handle.update_firmware({self.subsystem}):
-                packet = next(iter(update))
-                last_progress = packet.progress
+                last_progress = update.progress
                 await self._status_queue.put(
                     UpdateProgress(
-                        UpdateState.from_hw(packet.state), last_progress, None
+                        UpdateState.from_hw(update.state), last_progress, None
                     )
                 )
             last_progress = 100

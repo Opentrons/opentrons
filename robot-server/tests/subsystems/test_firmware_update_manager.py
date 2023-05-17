@@ -108,45 +108,45 @@ class MockUpdater(Protocol):
     # decide it returns Coroutine[Any, Any, AsyncIterator[Set[UpdateStatus]]].
     def __call__(
         self, subsystems: Optional[Set[HWSubSystem]] = None, force: bool = False
-    ) -> AsyncIterator[Set[HWUpdateStatus]]:
+    ) -> AsyncIterator[HWUpdateStatus]:
         """Function signature."""
         ...
 
 
 async def _quick_update(
     subsystems: Optional[Set[HWSubSystem]] = None, force: bool = False
-) -> AsyncIterator[Set[HWUpdateStatus]]:
+) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield {HWUpdateStatus(subsystem, HWUpdateState.queued, 0)}
+    yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
     await asyncio.sleep(0)
     for value in range(0, 100, 10):
-        yield {HWUpdateStatus(subsystem, HWUpdateState.updating, value)}
+        yield HWUpdateStatus(subsystem, HWUpdateState.updating, value)
         await asyncio.sleep(0)
 
 
 async def _eternal_update(
     subsystems: Optional[Set[HWSubSystem]] = None, force: bool = False
-) -> AsyncIterator[Set[HWUpdateStatus]]:
+) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
     while True:
-        yield {HWUpdateStatus(subsystem, HWUpdateState.queued, 0)}
+        yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
         await asyncio.sleep(0)
 
 
 async def _instant_update(
     subsystems: Optional[Set[HWSubSystem]] = None, force: bool = False
-) -> AsyncIterator[Set[HWUpdateStatus]]:
+) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield {HWUpdateStatus(subsystem, HWUpdateState.done, 100)}
+    yield HWUpdateStatus(subsystem, HWUpdateState.done, 100)
     await asyncio.sleep(0)
 
 
 async def _conflicting_update(
     subsystems: Optional[Set[HWSubSystem]] = None, force: bool = False
-) -> AsyncIterator[Set[HWUpdateStatus]]:
+) -> AsyncIterator[HWUpdateStatus]:
     raise HWUpdateOngoingError("uh oh")
     # this yield is here to make python make this a generator
     yield
@@ -154,13 +154,13 @@ async def _conflicting_update(
 
 async def _error_update(
     subsystems: Optional[Set[HWSubSystem]], force: bool = False
-) -> AsyncIterator[Set[HWUpdateStatus]]:
+) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield {HWUpdateStatus(subsystem, HWUpdateState.queued, 0)}
+    yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
     await asyncio.sleep(0)
     for value in range(0, 30, 10):
-        yield {HWUpdateStatus(subsystem, HWUpdateState.updating, value)}
+        yield HWUpdateStatus(subsystem, HWUpdateState.updating, value)
         await asyncio.sleep(0)
     raise RuntimeError("oh no!")
 
@@ -201,10 +201,10 @@ async def test_conflicting_in_progress_updates_fail(
 
     async def eternal_update(
         subsystems: Set[HWSubSystem],
-    ) -> AsyncIterator[Set[HWUpdateStatus]]:
+    ) -> AsyncIterator[HWUpdateStatus]:
         assert subsystems == {HWSubSystem.gantry_x}
         while True:
-            yield {HWUpdateStatus(HWSubSystem.gantry_x, HWUpdateState.queued, 0)}
+            yield HWUpdateStatus(HWSubSystem.gantry_x, HWUpdateState.queued, 0)
             await asyncio.sleep(0)
 
     decoy.when(ot3_hardware_api.update_firmware).then_return(_eternal_update)
