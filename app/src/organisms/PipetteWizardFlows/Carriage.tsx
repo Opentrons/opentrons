@@ -8,7 +8,7 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { SINGLE_MOUNT_PIPETTES, LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -16,7 +16,6 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { BODY_STYLE, FLOWS } from './constants'
 
-import type { MotorAxis } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
@@ -37,7 +36,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       [
         {
           commandType: 'home' as const,
-          params: { axes: ('rightZ' as unknown) as MotorAxis },
+          params: { axes: ['rightZ'] },
+        },
+        {
+          // @ts-expect-error calibration command types not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: { mount: LEFT },
         },
       ],
       false
