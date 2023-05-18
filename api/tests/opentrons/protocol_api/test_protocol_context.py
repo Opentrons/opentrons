@@ -435,7 +435,7 @@ def test_move_labware_off_deck_raises(
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
 ) -> None:
-    """It should raise an APIVersionError if moving a labware off deck."""
+    """It should raise an APIVersionError if using move_labware in an unsupported version."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
