@@ -399,7 +399,7 @@ class ProtocolContext(CommandPublisher):
         }
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-    # TODO: gate move_labware behind API version
+    @requires_version(2, 15)
     def move_labware(
         self,
         labware: Labware,
@@ -421,8 +421,6 @@ class ProtocolContext(CommandPublisher):
         :param new_location: Deck slot location or a hardware module that is already
                              loaded on the deck using :py:meth:`load_module` or off deck using :py:type OffDeckType.
 
-                            .. versionchanged:: 2.15
-                            Added :py:type OffDeckType as a new location option.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -450,12 +448,6 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        if isinstance(new_location, OffDeckType) and self._api_version < APIVersion(
-            2, 15
-        ):
-            raise APIVersionError(
-                "Moving a labware off deck is only available in versions 2.15 and above."
-            )
         location: Union[ModuleCore, OffDeckType, DeckSlotName]
         if isinstance(new_location, ModuleContext):
             location = new_location._core

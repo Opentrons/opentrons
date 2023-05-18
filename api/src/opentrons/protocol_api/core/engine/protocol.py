@@ -31,7 +31,10 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnModuleError,
+    UnknownLocationError,
+)
 
 from ... import validation
 from ...types import OffDeckType
@@ -209,8 +212,12 @@ class ProtocolCore(
             to_location = ModuleLocation(moduleId=new_location.module_id)
         elif new_location == OffDeckType.OFF_DECK:
             to_location = OFF_DECK_LOCATION
-        else:
+        elif isinstance(new_location, DeckSlotName):
             to_location = DeckSlotLocation(slotName=new_location)
+        else:
+            raise UnknownLocationError(
+                f"move_labware is not supported with the given location: {new_location}."
+            )
 
         strategy = (
             LabwareMovementStrategy.USING_GRIPPER

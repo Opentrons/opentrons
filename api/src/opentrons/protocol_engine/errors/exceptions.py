@@ -212,6 +212,10 @@ class LocationIsOccupiedError(ProtocolEngineError):
     """Raised when attempting to place labware in a non-empty location."""
 
 
+class UnknownLocationError(ProtocolEngineError):
+    """Raised when attempting to place labware in a unknown location."""
+
+
 class FirmwareUpdateRequired(ProtocolEngineError):
     """Raised when the firmware needs to be updated."""
 

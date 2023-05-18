@@ -47,6 +47,7 @@ from .exceptions import (
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
+    UnknownLocationError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -99,6 +100,7 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
+    "UnknownLocationError",
     "FirmwareUpdateRequired",
     # error occurrence models
     "ErrorOccurrence",
