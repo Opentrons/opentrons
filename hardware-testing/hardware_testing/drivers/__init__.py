@@ -5,7 +5,7 @@ from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
 from .asair_sensor import AsairSensor, AsairSensorError
 
 
-def list_ports_and_select(device_name: str = "") -> str:
+def list_ports_and_select(device_name: str = "",pipp: str = "") -> str:
     """List serial ports and display list for user to select from."""
     ports = comports()
     assert ports, "no serial ports found"
@@ -14,7 +14,7 @@ def list_ports_and_select(device_name: str = "") -> str:
         print(f"\t{i + 1}) {p.device}")
     if not device_name:
         device_name = "desired"
-    idx_str = input(f"\nenter number next to {device_name} port: ")
+    idx_str = input(f"\nenter number next to -{pipp} - {device_name} port: ")
     try:
         idx = int(idx_str.strip())
         return ports[idx - 1].device
