@@ -65,7 +65,6 @@ export function RunFailedModal({
   return (
     <Modal
       header={modalHeader}
-      isError
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
       <Flex
