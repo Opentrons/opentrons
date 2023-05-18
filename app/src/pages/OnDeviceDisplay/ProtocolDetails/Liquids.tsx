@@ -20,6 +20,8 @@ import {
 } from '@opentrons/api-client'
 import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import { StyledText } from '../../../atoms/text'
+import { EmptySection } from './EmptySection'
+
 import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
@@ -33,7 +35,7 @@ const Table = styled('table')`
 const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
-  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8} ${SPACING.spacing24};
+  padding: 0 ${SPACING.spacing24} 0 ${SPACING.spacing24};
   color: ${COLORS.darkBlack70};
 `
 
@@ -44,7 +46,6 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   background-color: ${COLORS.light1};
-  font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
@@ -73,7 +74,9 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
   )
   const { t, i18n } = useTranslation('protocol_details')
 
-  return (
+  return liquidsInOrder.length === 0 ? (
+    <EmptySection section="liquids" />
+  ) : (
     <Table>
       <thead>
         <tr>
@@ -94,7 +97,6 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   alignItems={TYPOGRAPHY.textAlignCenter}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
                   <Flex
                     borderRadius={BORDERS.size2}
@@ -111,11 +113,11 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText lineHeight="1.75rem">
-                      {liquid.displayName}
+                    <StyledText as="p">
+                      {i18n.format(liquid.displayName, 'titleCase')}
                     </StyledText>
-                    <StyledText lineHeight="1.75rem" color={COLORS.darkBlack70}>
-                      {liquid.description}
+                    <StyledText as="p" color={COLORS.darkBlack70}>
+                      {i18n.format(liquid.description, 'titleCase')}
                     </StyledText>
                   </Flex>
                 </Flex>
