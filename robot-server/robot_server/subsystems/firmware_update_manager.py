@@ -19,7 +19,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.errors import UpdateOngoingError
 
 from robot_server.service.task_runner import TaskRunner
-
 from .models import SubSystem, UpdateState
 
 

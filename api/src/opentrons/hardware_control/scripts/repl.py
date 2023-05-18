@@ -134,6 +134,15 @@ def build_api() -> ThreadManager[HardwareControlAPI]:
     tm = build_thread_manager()
     logging.getLogger().removeHandler(stream_handler)
     tm.managed_thread_ready_blocking()
+
+    if update_firmware:
+
+        async def _do_update() -> None:
+            async for update in tm.update_firmware():
+                print(f"Update: {update.subsystem.name}: {update.progress}%")
+
+        asyncio.run(_do_update())
+
     return tm
 
 

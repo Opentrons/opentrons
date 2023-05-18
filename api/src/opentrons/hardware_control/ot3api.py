@@ -89,7 +89,6 @@ from .types import (
     GripperProbe,
     EarlyLiquidSenseTrigger,
     LiquidNotFound,
-    UpdateState,
     UpdateStatus,
     StatusBarState,
     SubSystemState,
@@ -282,15 +281,6 @@ class OT3API(
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
 
         await api_instance.set_status_bar_state(StatusBarState.IDLE)
-
-        # check for and start firmware updates if required
-        if update_firmware:
-            mod_log.info("Checking for firmware updates")
-            async for progress in api_instance.update_firmware():
-                if progress.state == UpdateState.updating:
-                    mod_log.info(progress)
-            mod_log.info("Done with firmware updates")
-
         await api_instance._configure_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision

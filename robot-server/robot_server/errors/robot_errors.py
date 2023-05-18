@@ -23,3 +23,18 @@ class NotSupportedOnFlex(ErrorDetails):
 
     id: Literal["NotSupportedOnFlex"] = "NotSupportedOnFlex"
     title: str = "Not Supported On Flex"
+
+
+class HardwareNotYetInitialized(ErrorDetails):
+    """An error when accessing the hardware API before it's initialized."""
+
+    id: Literal["HardwareNotYetInitialized"] = "HardwareNotYetInitialized"
+    title: str = "Hardware Not Yet Initialized"
+    detail: str = "The device's hardware has not finished initializing."
+
+
+class HardwareFailedToInitialize(ErrorDetails):
+    """An error if the hardware API fails to initialize."""
+
+    id: Literal["HardwareFailedToInitialize"] = "HardwareFailedToInitialize"
+    title: str = "Hardware Failed to Initialize"

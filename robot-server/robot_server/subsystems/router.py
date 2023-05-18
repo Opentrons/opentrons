@@ -1,27 +1,16 @@
 """The router for the /subsystems endpoints."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from fastapi import APIRouter, status, Depends, Response, Request
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.ot3api import OT3API
-
-from robot_server.hardware import get_hardware
 from robot_server.service.json_api import (
     SimpleMultiBody,
     PydanticResponse,
     MultiBodyMeta,
     SimpleBody,
-)
-from server_utils.fastapi_utils.app_state import (
-    AppState,
-    AppStateAccessor,
-    get_app_state,
 )
 
 from .firmware_update_manager import (
@@ -36,9 +25,13 @@ from .firmware_update_manager import (
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.errors.global_errors import IDNotFound
+from robot_server.hardware import (
+    get_firmware_update_manager,
+    get_ot3_hardware,
+    get_hardware,
+)
 
 from robot_server.service.dependencies import get_unique_id, get_current_time
-from robot_server.service.task_runner import TaskRunner, get_task_runner
 
 
 from .models import (
@@ -47,46 +40,18 @@ from .models import (
     SubSystem,
     PresentSubsystem,
 )
+from opentrons.hardware_control import HardwareControlAPI
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
 
 subsystems_router = APIRouter()
-
-_firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
-    "firmware_update_manager"
-)
 
 
 def _error_str(maybe_err: Optional[Exception]) -> Optional[str]:
     if maybe_err:
         return str(maybe_err)
     return None
-
-
-async def get_ot3_hardware(
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
-) -> OT3API:
-    """Get a flex hardware controller."""
-    try:
-        return ensure_ot3_hardware(hardware_api=hardware_api)
-    except HardwareNotSupportedError as e:
-        raise NotSupportedOnOT2(detail=str(e)).as_error(
-            status.HTTP_403_FORBIDDEN
-        ) from e
-
-
-async def get_firmware_update_manager(
-    app_state: AppState = Depends(get_app_state),
-    hardware_api: OT3API = Depends(get_ot3_hardware),
-    task_runner: TaskRunner = Depends(get_task_runner),
-) -> FirmwareUpdateManager:
-    """Get an update manager to track firmware update statuses."""
-    update_manager = _firmware_update_manager_accessor.get_from(app_state)
-
-    if update_manager is None:
-        update_manager = FirmwareUpdateManager(
-            task_runner=task_runner, hw_handle=hardware_api
-        )
-        _firmware_update_manager_accessor.set_on(app_state, update_manager)
-    return update_manager
 
 
 class NoUpdateAvailable(ErrorDetails):
@@ -141,9 +106,10 @@ class NoOngoingUpdate(ErrorDetails):
     },
 )
 async def get_attached_subsystems(
-    hardware: OT3API = Depends(get_ot3_hardware),
+    hardware_api: HardwareControlAPI = Depends(get_hardware),
 ) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
     """Return all subsystems currently present on the machine."""
+    hardware = get_ot3_hardware(hardware_api)
     data = [
         PresentSubsystem.construct(
             name=SubSystem.from_hw(subsystem_id),
@@ -170,12 +136,13 @@ async def get_attached_subsystems(
     },
 )
 async def get_attached_subsystem(
-    subsystem: SubSystem, hardware: OT3API = Depends(get_ot3_hardware)
+    subsystem: SubSystem, hardware_api: HardwareControlAPI = Depends(get_hardware)
 ) -> PydanticResponse[SimpleBody[PresentSubsystem]]:
     """Return the status of a single attached subsystem.
 
     Response: A subsystem status, if the subsystem is present. Otherwise, an appropriate error.
     """
+    hardware = get_ot3_hardware(hardware_api)
     subsystem_status = hardware.attached_subsystems.get(subsystem.to_hw(), None)
     if not subsystem_status:
         raise SubsystemNotPresent(detail=subsystem.value).as_error(
