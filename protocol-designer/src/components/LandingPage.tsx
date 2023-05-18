@@ -1,20 +1,27 @@
 import React from 'react'
 import { OutlineButton } from '@opentrons/components'
 import { i18n } from '../localization'
-import { CreateFlexFileForm } from './FlexProtocolEditor'
+
 import styles from './FlexProtocolEditor/FlexComponents.css'
 import { StyledText } from './FlexProtocolEditor/StyledText'
-import { selectPageForms } from './FlexProtocolEditor/constant'
-import { ProtocolEditor } from './ProtocolEditor'
-import { actions as loadFileActions } from '../load-file'
-import { useDispatch } from 'react-redux'
 
+import { actions as loadFileActions } from '../load-file'
+import { connect, useDispatch } from 'react-redux'
+import { ThunkDispatch } from '../types'
+import { actions as navActions } from '../navigation'
+
+type Props = React.ComponentProps<typeof LandingPage>
 export interface PageProps {
   setPageProps: (type: string) => void
 }
 
-function LandingPageComponent(props: PageProps): JSX.Element {
+function LandingPage(props: {
+  goToOT3FilePage: () => void
+  goToOT2FilePage: () => void
+}): JSX.Element {
+  const { goToOT3FilePage, goToOT2FilePage } = props
   const dispatch = useDispatch()
+
   return (
     <div className={styles.pd_landing_page}>
       <StyledText as="h1">{i18n.t('flex.landing_page.welcome')}</StyledText>
@@ -25,7 +32,7 @@ function LandingPageComponent(props: PageProps): JSX.Element {
       <div className={styles.flex_landing_buttons_wrapper}>
         <OutlineButton
           className={styles.flex_landing_button}
-          onClick={() => props.setPageProps(selectPageForms.newFlexFileForm)}
+          onClick={() => goToOT3FilePage()}
         >
           <StyledText as="h4">
             {i18n.t('flex.landing_page.create_flex_protocol')}
@@ -33,7 +40,7 @@ function LandingPageComponent(props: PageProps): JSX.Element {
         </OutlineButton>
         <OutlineButton
           className={styles.flex_landing_button}
-          onClick={() => props.setPageProps(selectPageForms.protocolEditor)}
+          onClick={() => goToOT2FilePage()}
         >
           <StyledText as="h4">
             {i18n.t('flex.landing_page.create_ot2_protocol')}
@@ -47,7 +54,7 @@ function LandingPageComponent(props: PageProps): JSX.Element {
             type="file"
             onChange={fileChangeEvent => {
               dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
-              props.setPageProps(selectPageForms.protocolEditor)
+              goToOT2FilePage()
             }}
           />
         </OutlineButton>
@@ -56,22 +63,23 @@ function LandingPageComponent(props: PageProps): JSX.Element {
   )
 }
 
-export const selectRobotPage = (
-  page: string,
-  setPage: (newPage: string) => void
-): JSX.Element | null => {
-  switch (page) {
-    case selectPageForms.newFlexFileForm:
-      return (
-        <ProtocolEditor>
-          <CreateFlexFileForm setPageProps={setPage} />
-        </ProtocolEditor>
-      )
-    case selectPageForms.protocolEditor:
-      return <ProtocolEditor />
-    case selectPageForms.defaultLandingPage:
-      return <LandingPageComponent setPageProps={setPage} />
-    default:
-      return null
+function mergeProps(
+  stateProps: SP,
+  dispatchProps: {
+    dispatch: ThunkDispatch<any>
+  }
+): Props {
+  const { _initialDeckSetup, ...passThruProps } = stateProps
+  const { dispatch } = dispatchProps
+  return {
+    ...passThruProps,
+    goToOT3FilePage: () => {
+      dispatch(navActions.navigateToPage('new-flex-file-form'))
+    },
+    goToOT2FilePage: () => {
+      dispatch(navActions.navigateToPage('file-splash'))
+    },
   }
 }
+
+export const LandingPageComponent = connect(null, null, mergeProps)(LandingPage)

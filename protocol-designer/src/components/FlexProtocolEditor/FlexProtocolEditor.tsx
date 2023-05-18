@@ -34,7 +34,19 @@ import { FlexRoundTab } from './FlexRoundTab'
 import { DeckSlot } from '../../types'
 import { FlexProtocolName, SelectPipetteOption } from './FlexPillForm'
 import { FlexModules } from './FlexModules'
-
+import { connect, useDispatch } from 'react-redux'
+import { actions as navActions } from '../../navigation'
+import { reduce } from 'lodash'
+import { PipetteOnDeck } from '../../step-forms'
+import assert from 'assert'
+import { ModuleCreationArgs } from '../modals/FilePipettesModal'
+import { LabwareDefByDefURI } from '../../labware-defs'
+import { NewProtocolFields } from '../../load-file'
+import {
+  mapDispatchToProps,
+  mapStateToProps as newModalFileMapStateToProps,
+} from '../modals/NewFileModal'
+type Props = React.ComponentProps<typeof FlexProtocolEditor>
 export interface FormModule {
   onDeck: boolean
   model: ModuleModel | null
@@ -44,7 +56,7 @@ export interface FormModule {
 export interface FormPipette {
   pipetteName: string | null | undefined
   mount: string | null | undefined
-  tipRackList: any[]
+  tiprackDefURI: any[]
   isSelected: boolean
 }
 export interface FormPipettesByMount {
@@ -75,17 +87,17 @@ const validationSchema = Yup.object().shape({
   pipettesByMount: Yup.object().shape({
     left: Yup.object().shape({
       pipetteName: Yup.string().required('First pipette is required'),
-      tipRackList: Yup.array().min(
-        1,
-        'Select at least one tip rack for first pipette'
-      ),
+      // tiprackDefURI: Yup.array().min(
+      //   1,
+      //   'Select at least one tip rack for first pipette'
+      // ),
     }),
     right: Yup.object().shape({
       pipetteName: Yup.string().required('Second pipette is required'),
-      tipRackList: Yup.array().min(
-        1,
-        'Select at least one tip rack for second pipette'
-      ),
+      // tiprackDefURI: Yup.array().min(
+      //   1,
+      //   'Select at least one tip rack for second pipette'
+      // ),
     }),
   }),
 })
@@ -101,13 +113,13 @@ const getInitialValues: InitialValues = {
     left: {
       pipetteName: '',
       mount: 'left',
-      tipRackList: [],
+      tiprackDefURI: [],
       isSelected: false,
     },
     right: {
       pipetteName: '',
       mount: 'right',
-      tipRackList: [],
+      tiprackDefURI: [],
       isSelected: false,
     },
   },
@@ -140,7 +152,7 @@ const getInitialValues: InitialValues = {
   },
 }
 
-interface Props {
+interface selectedTabProps {
   selectedTab: number
 }
 
@@ -166,19 +178,25 @@ const selectComponent = (selectedTab: number): JSX.Element | null => {
   }
 }
 
-function FlexProtocolEditor(): JSX.Element {
+type PipetteFieldsData = Omit<
+  PipetteOnDeck,
+  'id' | 'spec' | 'tiprackLabwareDef'
+>
+
+function FlexProtocolEditor(props: any): JSX.Element {
+  const dispatch = useDispatch()
   const [selectedTab, setTab] = useState<number>(0)
   // Next button click
-  const handleNext = ({ selectedTab }: Props): void => {
+  const handleNext = ({ selectedTab }: selectedTabProps): void => {
     const setTabNumber =
-      selectedTab >= 0 && selectedTab < navPillTabListLength
+      selectedTab >= 0 && selectedTab <= navPillTabListLength
         ? selectedTab + 1
         : selectedTab
     setTab(setTabNumber)
   }
 
   // Previous button click
-  const handlePrevious = ({ selectedTab }: Props): void => {
+  const handlePrevious = ({ selectedTab }: selectedTabProps): void => {
     const setTabNumber =
       selectedTab > 0 && selectedTab <= navPillTabListLength
         ? selectedTab - 1
@@ -191,12 +209,6 @@ function FlexProtocolEditor(): JSX.Element {
       ? i18n.t('flex.round_tabs.go_to_liquids_page')
       : i18n.t('flex.round_tabs.next')
 
-  const InitialFormSchema = Yup.object().shape({
-    fields: Yup.object().shape({
-      name: Yup.string().matches(/^[a-zA-Z0-9]*$/),
-    }),
-  })
-
   interface FormikErrors {
     pipette?: string
     tiprack?: string
@@ -205,16 +217,66 @@ function FlexProtocolEditor(): JSX.Element {
   const validateFields = (values: InitialValues): FormikErrors => {
     const { pipettesByMount } = values
     const errors: FormikErrors = {}
-
     if (!pipettesByMount.left.pipetteName) {
       errors.pipette = `${i18n.t('flex.errors.first_pipette_not_selected')}`
     }
 
-    if (!pipettesByMount.left.tipRackList.length) {
+    if (!pipettesByMount.left.tiprackDefURI.length) {
       errors.tiprack = `${i18n.t('flex.errors.tiprack_not_selected')}`
     }
 
     return errors
+  }
+
+  const handleSubmit = ({ values }: any): void => {
+    console.log('***Final OT3 JSON Data ***', values)
+    const newProtocolFields = values.fields
+
+    const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
+      values.pipettesByMount,
+      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
+        console.log(acc, formPipette, mount)
+        assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
+        // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
+        return formPipette &&
+          formPipette.pipetteName &&
+          formPipette.tiprackDefURI &&
+          (mount === 'left' || mount === 'right')
+          ? [
+              ...acc,
+              {
+                mount,
+                name: formPipette.pipetteName,
+                tiprackDefURI: formPipette.tiprackDefURI,
+              },
+            ]
+          : acc
+      },
+      []
+    )
+
+    // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
+    // with enum-typed key like `{[ModuleType]: ___}`
+    // @ts-expect-error(sa, 2021-6-21): TS not smart enough to take real type from Object.keys
+    const moduleTypes: ModuleType[] = Object.keys(values.modulesByType)
+    const modules: ModuleCreationArgs[] = moduleTypes.reduce<
+      ModuleCreationArgs[]
+    >((acc, moduleType) => {
+      const formModule = values.modulesByType[moduleType]
+      return formModule?.onDeck
+        ? [
+            ...acc,
+            {
+              type: moduleType,
+              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
+              slot: formModule.slot,
+            },
+          ]
+        : acc
+    }, [])
+
+    props.onSave({ modules, newProtocolFields, pipettes })
+    dispatch(navActions.navigateToPage('liquids'))
   }
 
   return (
@@ -237,7 +299,7 @@ function FlexProtocolEditor(): JSX.Element {
             validate={validateFields}
             validationSchema={validationSchema}
             onSubmit={(values, actions) => {
-              console.log({ values })
+              selectedTab > 2 && handleSubmit({ values })
             }}
           >
             {(props: {
@@ -270,10 +332,6 @@ function FlexProtocolEditor(): JSX.Element {
                         ? styles.flex_round_tabs_button_50p
                         : styles.flex_round_tabs_button_100p
                     }
-                    // disabled={
-                    //   !Boolean(props.isValid) ||
-                    //   !(Object.values(props.errors).length === 0)
-                    // }
                   >
                     <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>
@@ -287,4 +345,34 @@ function FlexProtocolEditor(): JSX.Element {
   )
 }
 
-export const FlexProtocolEditorComponent = FlexProtocolEditor
+interface CreateNewProtocolArgs {
+  customLabware: LabwareDefByDefURI
+  newProtocolFields: NewProtocolFields
+  pipettes: PipetteFieldsData[]
+  modules: ModuleCreationArgs[]
+}
+interface DP {
+  onCancel: () => unknown
+  _createNewProtocol: (arg0: CreateNewProtocolArgs) => void
+}
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  return {
+    onSave: fields => {
+      if (
+        !stateProps._hasUnsavedChanges ||
+        window.confirm(i18n.t('alert.window.confirm_create_new'))
+      ) {
+        dispatchProps._createNewProtocol({
+          ...fields,
+          customLabware: stateProps._customLabware,
+        })
+      }
+    },
+  }
+}
+
+export const FlexProtocolEditorComponent = connect(
+  newModalFileMapStateToProps,
+  mapDispatchToProps,
+  mergeProps
+)(FlexProtocolEditor)

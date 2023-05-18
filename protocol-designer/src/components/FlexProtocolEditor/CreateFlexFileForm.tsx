@@ -4,11 +4,9 @@ import { i18n } from '../../localization'
 import { FlexProtocolEditorComponent } from './FlexProtocolEditor'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
-import { selectPageForms } from './constant'
-import { PageProps } from '../LandingPage'
 import { UpdateConfirmation } from './FlexUpdateConfirmation'
 
-function FlexFormComponent(props: PageProps): JSX.Element {
+function FlexFormComponent(): JSX.Element {
   const [showConfirmation, setShowConfirmation] = useState(false)
 
   const handleCancelClick = (): any => {
@@ -17,7 +15,6 @@ function FlexFormComponent(props: PageProps): JSX.Element {
 
   const handleConfirmClick = (): any => {
     // handle the update action here
-    props.setPageProps(selectPageForms.defaultLandingPage)
     setShowConfirmation(false)
   }
 

@@ -97,6 +97,12 @@ function mapStateToProps(state: BaseState): SP {
         title: i18n.t([`nav.title.${_page}`, fileName]),
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
       }
+    case 'new-flex-file-form':
+      return {
+        _page,
+        title: i18n.t('flex.header.title'),
+        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+      }
     case 'file-splash':
     case 'settings-features':
     case 'settings-app':

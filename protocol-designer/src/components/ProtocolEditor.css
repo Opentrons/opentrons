@@ -25,3 +25,9 @@
   width: calc(100% - 22.8125rem);
   overflow-y: scroll;
 }
+
+.flex_main_page_content {
+  top: 3rem;
+  bottom: 0;
+  overflow-y: scroll;
+}

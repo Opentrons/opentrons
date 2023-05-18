@@ -18,6 +18,9 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
 import { FlexFileDetails } from '../components/FlexProtocolEditor/FlexFileDetails'
+import { LandingPageComponent } from '../components/LandingPage'
+import { CreateFlexFileForm } from '../components/FlexProtocolEditor'
+import { OT2_STANDARD_DECKID } from '@opentrons/shared-data'
 
 interface Props {
   page: Page
@@ -28,8 +31,10 @@ interface Props {
 
 function MainPanelComponent(props: Props): JSX.Element {
   const { page, selectedTerminalItemId, ingredSelectionMode, robot } = props
+  // in OT3 case : undefined while import file
+  // in OT2 case: ot2_standard while import file
   const fileComponent =
-    !robot || robot === 'ot2_standard' ? (
+    !robot || robot === OT2_STANDARD_DECKID ? (
       <ConnectedFilePage />
     ) : (
       <FlexFileDetails />
@@ -41,8 +46,12 @@ function MainPanelComponent(props: Props): JSX.Element {
       return fileComponent
     case 'liquids':
       return <LiquidsPage />
+    case 'landing-page':
+      return <LandingPageComponent />
     case 'settings-app':
       return <SettingsPage />
+    case 'new-flex-file-form':
+      return <CreateFlexFileForm />
     default: {
       const startTerminalItemSelected =
         selectedTerminalItemId === START_TERMINAL_ITEM_ID

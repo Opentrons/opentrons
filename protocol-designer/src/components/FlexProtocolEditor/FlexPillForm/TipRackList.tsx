@@ -50,17 +50,17 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
   )
   opentronsFlexTiprackData.push(customTiprackOption)
   const handleNameChange = (selected: string[]): any => {
-    setFieldValue(`pipettesByMount.${pipetteName}.tipRackList`, selected)
+    setFieldValue(`pipettesByMount.${pipetteName}.tiprackDefURI`, selected[0])
   }
-  const latestTipRackList = values.pipettesByMount[pipetteName].tipRackList
+  const latestTipRackList = values.pipettesByMount[pipetteName].tiprackDefURI
   useEffect(() => {
     setSelected(latestTipRackList)
   }, [latestTipRackList])
 
   return (
     <>
-      {opentronsFlexTiprackData.map(({ name }: any, index: number) => {
-        const isChecked = selected.includes(name)
+      {opentronsFlexTiprackData.map(({ name, value }: any, index: number) => {
+        const isChecked = selected.includes(value)
         return (
           <CheckboxField
             key={index}
@@ -70,7 +70,7 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
             onChange={(e: any) => {
               const { name, checked } = e.currentTarget
               if (checked) {
-                const tiprackCheckedData = [...selected, ...[name]]
+                const tiprackCheckedData = [...selected, ...[value]]
                 setSelected(tiprackCheckedData)
                 handleNameChange(tiprackCheckedData)
                 if (name === customTiprackOption.name) setCustomTipRack(true)
