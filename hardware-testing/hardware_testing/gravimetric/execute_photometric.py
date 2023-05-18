@@ -210,6 +210,7 @@ def _run_trial(
     liquid_tracker: LiquidTracker,
     blank: bool,
     inspect: bool,
+    do_jog: bool,
     mix: bool = False,
     stable: bool = True,
 ) -> None:
@@ -231,7 +232,18 @@ def _run_trial(
 
     channel_count = 96
     # RUN INIT
+
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
+    if (do_jog):
+        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
+        height_below_top = source.depth - _liquid_height
+        print(f"liquid is {height_below_top} mm below top of reservoir")
+        liquid_tracker.set_start_volume_from_liquid_height(
+            source, _liquid_height, name="Dye"
+        )
+        reservoir_volume = liquid_tracker.get_volume(source)
+        print(f"software thinks there is {reservoir_volume} uL of liquid in the reservoir")
+
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
@@ -363,38 +375,18 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         liquid="None",
     )
 
-    ui.print_title("FIND LIQUID HEIGHT")
     print("homing...")
     ctx.home()
     # get the first channel's first-used tip
     # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
     #       and so we can use pick-up-tip from there again
-    setup_tip = tips[0][0]
-    setup_channel_offset = _get_channel_offset(cfg, channel=0)
-    setup_tip_location = setup_tip.top().move(setup_channel_offset)
-    _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
-    print("moving to reservoir")
-    well = reservoir["A1"]
-    pipette.move_to(well.top())
-    _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
-    height_below_top = well.depth - _liquid_height
-    print(f"liquid is {height_below_top} mm below top of reservoir")
-    liquid_tracker.set_start_volume_from_liquid_height(
-        reservoir["A1"], _liquid_height, name="Dye"
-    )
-    reservoir_volume = liquid_tracker.get_volume(well)
-    print(f"software thinks there is {reservoir_volume} uL of liquid in the reservoir")
-    print("dropping tip")
-    _drop_tip(ctx, pipette, cfg)
-    if not ctx.is_simulating():
-        ui.get_user_ready("REPLACE first tiprack with new tiprack")
-
     try:
         trial_count = 0
         tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
             photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME - volume, 0)
+            first_trial = True;
             for trial in range(cfg.trials):
                 for w in photoplate.wells():
                     liquid_tracker.set_start_volume(w, photoplate_preped_vol)
@@ -417,9 +409,11 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     liquid_tracker=liquid_tracker,
                     blank=False,
                     inspect=cfg.inspect,
+                    do_jog=first_trial,
                     mix=cfg.mix,
                     stable=True,
                 )
+                first_trial = False
                 pipette.move_to(location=photoplate["A1"].top().move(Point(0, 0, 133)))
                 ui.get_user_ready("Cover and replace the photoplate in slot 3")
                 _drop_tip(ctx, pipette, cfg)
@@ -429,6 +423,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                         f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
                     )
                     tip_iter = 0
+            ui.get_user_ready(
+                        f"Replace the reservoir in slots {cfg.reservoir_slot} with new reservoir and fill with the next dye"
+            )
 
     finally:
         # FIXME: instead keep motors engaged, and move to an ATTACH position
