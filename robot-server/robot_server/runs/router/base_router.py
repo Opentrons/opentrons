@@ -5,7 +5,7 @@ Contains routes dealing primarily with `Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Optional, Union, List
+from typing import Optional, Union
 from typing_extensions import Literal, Final
 
 from fastapi import APIRouter, Depends, status, Query
@@ -22,6 +22,7 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
+    ResponseList,
 )
 
 from robot_server.protocols import (
@@ -31,7 +32,7 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
@@ -256,15 +257,17 @@ async def get_run(
 async def get_run_labware_definition(
     runId: str,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleBody[List[LabwareDefinition]]]:
+) -> PydanticResponse[SimpleBody[ResponseList[LabwareDefinition]]]:
     """Get a run's labware definition by its ID.
 
     Args:
         runId: Run ID pulled from URL.
+        run_data_manager: Current and historical run data management.
     """
     labware_definitions = run_data_manager.get_run_labware_definition(run_id=runId)
+    labware_result = ResponseList.construct(__root__=labware_definitions)
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=labware_definitions),
+        content=SimpleBody.construct(data=labware_result),
         status_code=status.HTTP_200_OK,
     )
 

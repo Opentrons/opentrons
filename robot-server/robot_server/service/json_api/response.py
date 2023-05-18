@@ -188,3 +188,7 @@ class DeprecatedMultiResponseModel(
         None,
         description=DESCRIPTION_LINKS,
     )
+
+
+class ResponseList(BaseModel, Generic[ResponseDataT]):
+    __root__: List[ResponseDataT]

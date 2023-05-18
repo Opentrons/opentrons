@@ -39,7 +39,6 @@ from robot_server.runs.router.base_router import (
     update_run,
     get_run_labware_definition,
 )
-from tests.runs.router.conftest import mock_run_data_manager
 
 
 @pytest.fixture
@@ -296,7 +295,6 @@ async def test_get_run_labware_definition(
     mock_run_data_manager: RunDataManager, decoy: Decoy
 ) -> None:
     """It should wrap the run's labware defintion in a response."""
-
     decoy.when(
         mock_run_data_manager.get_run_labware_definition(run_id="run-id")
     ).then_return([])
