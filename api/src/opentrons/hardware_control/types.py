@@ -29,19 +29,24 @@ class MotionChecks(enum.Enum):
     BOTH = 3
 
 
+# TODO (spp, 2023-05-11): merge OT3Axis into this and make Axis the only type.
+#  Use Z_L, Z_R, etc as the axes with aliases for Z, A, B, C
 class Axis(enum.Enum):
-    X = 0
-    Y = 1
-    Z = 2
-    A = 3
-    B = 4
-    C = 5
+    X = 0  # Gantry X
+    Y = 1  # Gantry Y
+    Z = 2  # left pipette mount Z
+    A = 3  # right pipette mount Z
+    B = 4  # left pipette plunger
+    C = 5  # right pipette plunger
+    Z_G = 6  # Gripper Z
+    G = 7  # Gripper Jaws
 
     @classmethod
     def by_mount(cls, mount: top_types.Mount) -> "Axis":
         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
+    # TODO (spp, 2023-5-4): deprecate this method & create a replacement called 'pipette_mount_axes'
     @classmethod
     def mount_axes(cls) -> Tuple["Axis", "Axis"]:
         """The axes which are used for moving pipettes up and down."""
@@ -66,11 +71,18 @@ class Axis(enum.Enum):
             cls.A: top_types.Mount.RIGHT,
             cls.B: top_types.Mount.LEFT,
             cls.C: top_types.Mount.RIGHT,
+            cls.Z_G: top_types.Mount.EXTENSION,
+            cls.G: top_types.Mount.EXTENSION,
         }[inst]
 
     @classmethod
     def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
         return cls.B, cls.C
+
+    @classmethod
+    def ot2_axes(cls) -> List["Axis"]:
+        """Returns only OT2 axes."""
+        return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.G]]
 
     def __str__(self) -> str:
         return self.name
@@ -88,11 +100,13 @@ class OT3Mount(enum.Enum):
             top_types.Mount, top_types.MountType, top_types.OT3MountType, "OT3Mount"
         ],
     ) -> "OT3Mount":
+        if mount == top_types.Mount.EXTENSION or mount == top_types.MountType.EXTENSION:
+            return OT3Mount.GRIPPER
         return cls[mount.name]
 
     def to_mount(self) -> top_types.Mount:
         if self.value == self.GRIPPER.value:
-            raise KeyError("Gripper mount is not representable")
+            return top_types.Mount.EXTENSION
         return top_types.Mount[self.name]
 
 
@@ -141,6 +155,7 @@ class OT3Axis(enum.Enum):
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
+            top_types.Mount.EXTENSION: cls.Z_G,
             OT3Mount.LEFT: cls.Z_L,
             OT3Mount.RIGHT: cls.Z_R,
             OT3Mount.GRIPPER: cls.Z_G,
@@ -156,6 +171,8 @@ class OT3Axis(enum.Enum):
             Axis.A: cls.Z_R,
             Axis.B: cls.P_L,
             Axis.C: cls.P_R,
+            Axis.Z_G: cls.Z_G,
+            Axis.G: cls.G,
         }
         try:
             return am[axis]  # type: ignore
@@ -170,6 +187,8 @@ class OT3Axis(enum.Enum):
             OT3Axis.Z_R: Axis.A,
             OT3Axis.P_L: Axis.B,
             OT3Axis.P_R: Axis.C,
+            OT3Axis.Z_G: Axis.Z_G,
+            OT3Axis.G: Axis.G,
         }
         return am[self]
 

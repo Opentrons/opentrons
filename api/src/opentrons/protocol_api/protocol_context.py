@@ -124,6 +124,11 @@ class ProtocolContext(CommandPublisher):
         self._core = core
         self._core_map = core_map or LoadedCoreMap()
         self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
+
+        # With the introduction of Extension mount type, this dict initializes to include
+        # the extension mount, for both ot2 & 3. While it doesn't seem like it would
+        # create an issue in the current PAPI context, it would be much safer to
+        # only use mounts available on the robot.
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }

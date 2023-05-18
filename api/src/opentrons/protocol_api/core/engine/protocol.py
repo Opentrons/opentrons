@@ -249,6 +249,10 @@ class ProtocolCore(
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
+        if strategy == LabwareMovementStrategy.USING_GRIPPER:
+            # Clear out last location since it is not relevant to pipetting
+            # and we only use last location for in-place pipetting commands
+            self.set_last_location(location=None, mount=Mount.EXTENSION)
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel

@@ -2,7 +2,6 @@
 from __future__ import annotations
 import asyncio
 import logging
-import socket
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -119,7 +118,7 @@ class Proxy:
         self._cons.append(connection)
         self._event_listener.on_server_connected(
             server_type=self._name,
-            client_uri=f"socket://{socket.gethostname()}:{self._settings.driver_port}",
+            client_uri=f"socket://127.0.0.1:{self._settings.driver_port}",
             identifier=connection.identifier,
         )
 

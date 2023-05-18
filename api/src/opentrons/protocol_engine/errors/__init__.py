@@ -48,6 +48,7 @@ from .exceptions import (
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
     UnknownLocationError,
+    InvalidAxisForRobotType,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -102,6 +103,7 @@ __all__ = [
     "LocationIsOccupiedError",
     "UnknownLocationError",
     "FirmwareUpdateRequired",
+    "InvalidAxisForRobotType",
     # error occurrence models
     "ErrorOccurrence",
 ]

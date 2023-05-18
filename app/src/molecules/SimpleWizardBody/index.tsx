@@ -62,6 +62,21 @@ const BUTTON_STYLE = css`
     padding-bottom: ${SPACING.spacing32};
   }
 `
+const WIZARD_CONTAINER_STYLE = css`
+  min-height: 394px;
+  flex-direction: ${DIRECTION_COLUMN}
+  justify-content: ${JUSTIFY_SPACE_BETWEEN}
+  height: 'auto'
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 472px;
+  }
+`
+const FLEX_SPACING_STYLE = css`
+  height: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 0rem;
+  }
+`
 
 export function SimpleWizardBody(props: Props): JSX.Element {
   const {
@@ -76,13 +91,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex
-      height={isOnDevice ? '472px' : 'auto'}
-      minHeight="394px"
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      {...styleProps}
-    >
+    <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -118,10 +127,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
             {subHeader != null ? (
               <StyledText css={SUBHEADER_STYLE}>{subHeader}</StyledText>
             ) : (
-              <Flex
-                aria-label="flex_spacing"
-                height={isOnDevice ? '0rem' : '1.75rem'}
-              />
+              <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
             )}
           </>
         )}
