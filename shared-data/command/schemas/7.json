@@ -802,7 +802,16 @@
     "MotorAxis": {
       "title": "MotorAxis",
       "description": "Motor axis on which to issue a home command.",
-      "enum": ["x", "y", "leftZ", "rightZ", "leftPlunger", "rightPlunger"],
+      "enum": [
+        "x",
+        "y",
+        "leftZ",
+        "rightZ",
+        "leftPlunger",
+        "rightPlunger",
+        "extensionZ",
+        "extensionJaw"
+      ],
       "type": "string"
     },
     "HomeParams": {
@@ -1115,7 +1124,7 @@
     "MountType": {
       "title": "MountType",
       "description": "An enumeration.",
-      "enum": ["left", "right"],
+      "enum": ["left", "right", "extension"],
       "type": "string"
     },
     "LoadPipetteParams": {

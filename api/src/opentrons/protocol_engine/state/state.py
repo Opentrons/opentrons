@@ -268,6 +268,7 @@ class StateStore(StateView, ActionHandler):
             pipette_view=self._pipettes,
         )
         self._motion = MotionView(
+            config=self._config,
             labware_view=self._labware,
             pipette_view=self._pipettes,
             geometry_view=self._geometry,

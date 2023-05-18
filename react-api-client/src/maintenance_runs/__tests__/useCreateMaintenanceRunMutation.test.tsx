@@ -44,19 +44,15 @@ describe('useCreateMaintenanceRunMutation hook', () => {
       .calledWith(HOST_CONFIG, {})
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
-      () => useCreateMaintenanceRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
-    result.current.createMaintenanceRun({})
-    await waitFor(() => {
-      console.log(result.current.status)
-      return result.current.status !== 'loading'
-    })
+
+    await expect(() => result.current.createMaintenanceRun({})).rejects.toBe(
+      'oh no'
+    )
     expect(result.current.data).toBeUndefined()
   })
 
