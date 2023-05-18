@@ -102,7 +102,6 @@ __all__ = [
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
     "UnknownLocationError",
-    "FirmwareUpdateRequired",
     "InvalidAxisForRobotType",
     # error occurrence models
     "ErrorOccurrence",
