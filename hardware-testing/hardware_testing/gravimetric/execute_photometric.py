@@ -419,6 +419,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                 )
+                pipette.move_to(location=photoplate["A1"].top().move(Point(0,0,133)))
                 ui.get_user_ready("Cover and replace the photoplate in slot 3")
                 _drop_tip(ctx, pipette, cfg)
                 tip_iter +=1
