@@ -202,12 +202,14 @@ export function registerDiscovery(
         break
       }
       case USB_HTTP_REQUESTS_STOP: {
-        // TODO(bh, 2023-05-05): we actually still want this robot to show up in the not available list
-        removeCachedUsbRobot()
-
         client.start({
           healthPollInterval: FAST_POLL_INTERVAL_MS,
-          manualAddresses: [],
+          manualAddresses: [
+            {
+              ip: OPENTRONS_USB,
+              port: DEFAULT_PORT,
+            },
+          ],
         })
         break
       }
