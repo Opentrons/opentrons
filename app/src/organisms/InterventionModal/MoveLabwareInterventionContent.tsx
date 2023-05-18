@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { map } from 'lodash'
 
 import {
   Flex,
@@ -13,22 +12,16 @@ import {
   BORDERS,
   Box,
   RobotWorkSpace,
-  LabwareRender,
-  Module,
 } from '@opentrons/components'
-import {
-  THERMOCYCLER_MODULE_V1,
-  inferModuleOrientationFromXCoordinate,
-} from '@opentrons/shared-data'
 
+import { getLabwareRenderComponents, getModuleRenderComponents } from './utils'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
 import type { MoveLabwareAnimationParams } from '@opentrons/components'
 import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
-import { RunLabwareInfo, RunModuleInfo } from './utils'
-import { LabwareDisabledOverlay } from './LabwareDisabledOverlay'
+import type { RunLabwareInfo, RunModuleInfo } from './utils'
 
 export interface MoveLabwareInterventionProps {
   robotType: RobotType
@@ -54,6 +47,26 @@ export function MoveLabwareInterventionContent({
   deckDef,
 }: MoveLabwareInterventionProps): JSX.Element {
   const { t: protocolSetupTranslator } = useTranslation('protocol_setup')
+
+  // the module/labware render info needs to be 'sorted' so that the labware that is being moved comes last in the list
+  // this ensures that the labware being moved is on-top of all other svg layers and so won't have weird visual bugs
+  // where it appears to slide under some labware and over others. This also means that the order in which modules/labware
+  // lists are rendered also need to be dynamic based on wether the labware is nested in a module or not
+  const movedLabwareIndex = labwareRenderInfo.findIndex(
+    labware => labware.labwareId === movedLabwareId
+  )
+  if (movedLabwareIndex !== -1) {
+    labwareRenderInfo.push(...labwareRenderInfo.splice(movedLabwareIndex, 1))
+  } else {
+    const moduleWithLabwareIndex = moduleRenderInfo.findIndex(
+      module => module.nestedLabwareId === movedLabwareId
+    )
+    if (moduleWithLabwareIndex !== -1) {
+      moduleRenderInfo.push(
+        ...moduleRenderInfo.splice(moduleWithLabwareIndex, 1)
+      )
+    }
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="100%">
@@ -96,80 +109,31 @@ export function MoveLabwareInterventionContent({
             >
               {() => (
                 <>
-                  {map(
-                    moduleRenderInfo,
-                    ({
-                      x,
-                      y,
-                      moduleDef,
-                      nestedLabwareDef,
-                      nestedLabwareId,
-                    }) => (
-                      <Module
-                        key={`InterventionModal_Module_${String(
-                          moduleDef.model
-                        )}_${x}${y}`}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                        def={moduleDef}
-                        innerProps={
-                          moduleDef.model === THERMOCYCLER_MODULE_V1
-                            ? { lidMotorState: 'open' }
-                            : {}
-                        }
-                      >
-                        {nestedLabwareDef != null && nestedLabwareId != null ? (
-                          <React.Fragment
-                            key={`InterventionModal_Labware_${String(
-                              nestedLabwareDef.metadata.displayName
-                            )}_${x}${y}`}
-                          >
-                            <LabwareRender
-                              definition={nestedLabwareDef}
-                              highlightLabware={
-                                movedLabwareId === nestedLabwareId
-                              }
-                              moveLabwareAnimationParams={
-                                movedLabwareId === nestedLabwareId
-                                  ? labwareAnimationParams
-                                  : null
-                              }
-                            />
-                            {movedLabwareId !== nestedLabwareId ? (
-                              <LabwareDisabledOverlay
-                                definition={nestedLabwareDef}
-                              />
-                            ) : null}
-                          </React.Fragment>
-                        ) : null}
-                      </Module>
-                    )
-                  )}
-                  {map(labwareRenderInfo, ({ x, y, labwareDef, labwareId }) => {
-                    return (
-                      <React.Fragment
-                        key={`InterventionModal_Labware_${String(
-                          labwareDef.metadata.displayName
-                        )}_${x}${y}`}
-                      >
-                        <g transform={`translate(${x},${y})`}>
-                          <LabwareRender
-                            definition={labwareDef}
-                            highlightLabware={movedLabwareId === labwareId}
-                            moveLabwareAnimationParams={
-                              movedLabwareId === labwareId
-                                ? labwareAnimationParams
-                                : null
-                            }
-                          />
-                          {movedLabwareId !== labwareId ? (
-                            <LabwareDisabledOverlay definition={labwareDef} />
-                          ) : null}
-                        </g>
-                      </React.Fragment>
-                    )
-                  })}
+                  {movedLabwareIndex !== -1
+                    ? [
+                        ...getModuleRenderComponents(
+                          moduleRenderInfo,
+                          movedLabwareId,
+                          labwareAnimationParams
+                        ),
+                        ...getLabwareRenderComponents(
+                          labwareRenderInfo,
+                          movedLabwareId,
+                          labwareAnimationParams
+                        ),
+                      ]
+                    : [
+                        ...getLabwareRenderComponents(
+                          labwareRenderInfo,
+                          movedLabwareId,
+                          labwareAnimationParams
+                        ),
+                        ...getModuleRenderComponents(
+                          moduleRenderInfo,
+                          movedLabwareId,
+                          labwareAnimationParams
+                        ),
+                      ]}
                 </>
               )}
             </RobotWorkSpace>
