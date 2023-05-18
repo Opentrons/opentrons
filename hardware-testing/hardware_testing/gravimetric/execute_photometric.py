@@ -101,7 +101,7 @@ def _load_pipette(
         f"expected {cfg.pipette_volume} uL pipette, "
         f"but got a {pipette.max_volume} uL pipette"
     )
-    pipette.default_speed = cfg.gantry_speed
+    #pipette.default_speed = cfg.gantry_speed
     return pipette
 
 
@@ -230,7 +230,7 @@ def _run_trial(
 
     channel_count = 96
     # RUN INIT
-    pipette.move_to(source.top().move(channel_offset))
+    pipette.move_to(location = source.top().move(channel_offset), minimum_z_height = 133)
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
