@@ -2,6 +2,7 @@
 from datetime import datetime
 from typing import List, Optional
 
+from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
@@ -147,6 +148,22 @@ class RunDataManager:
         current = run_id == self._engine_store.current_run_id
 
         return _build_run(run_resource, state_summary, current)
+
+    def get_run_labware_definition(self, run_id: str) -> List[LabwareDefinition]:
+        """Get a run's labware definition.
+
+        This method will pull from the current run or the historical runs,
+        depending on if `run_id` refers to the current run.
+
+        Args:
+            run_id: The identifier of the run to return.
+
+        Returns:
+            The run's labware definitions.
+
+        Raises:
+            RunNotFoundError: The given run identifier does not exist.
+        """
 
     def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.
