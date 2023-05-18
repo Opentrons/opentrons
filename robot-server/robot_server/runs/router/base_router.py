@@ -31,6 +31,8 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
+from opentrons.protocols.models import LabwareDefinition
+
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, RunCreate, RunUpdate
@@ -238,6 +240,31 @@ async def get_run(
     """
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=run_data),
+        status_code=status.HTTP_200_OK,
+    )
+
+
+@base_router.get(
+    path="/runs/{runId}/labware-definitions",
+    summary="Get a run's labware definition",
+    description="Get a specific run's labware definition by its unique identifier.",
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[Run]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def get_run_labware_definition(
+    runId: str,
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+) -> PydanticResponse[SimpleBody[LabwareDefinition]]:
+    """Get a run's labware definition by its ID.
+
+    Args:
+        runId: Run ID pulled from URL.
+    """
+    labware_definitions = await run_data_manager.get_run_labware_definition(runId)
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=labware_definitions),
         status_code=status.HTTP_200_OK,
     )
 
