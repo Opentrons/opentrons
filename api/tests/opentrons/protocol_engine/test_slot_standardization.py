@@ -1,3 +1,5 @@
+"""Tests for `slot_standardization`."""
+
 import pytest
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -35,6 +37,7 @@ def test_standardize_labware_offset(
     robot_type: RobotType,
     expected_slot_name: DeckSlotName,
 ) -> None:
+    """It should convert deck slots in `LabwareOffsetCreate`s."""
     original = LabwareOffsetCreate(
         definitionUri="opentrons-test/foo/1",
         location=LabwareOffsetLocation(
@@ -96,6 +99,7 @@ def test_standardize_load_labware_command(
     robot_type: RobotType,
     expected_location: LabwareLocation,
 ) -> None:
+    """It should convert deck slots in `LoadLabwareCreate`s."""
     original = commands.LoadLabwareCreate(
         intent=CommandIntent.SETUP,
         key="key",
@@ -165,6 +169,7 @@ def test_standardize_move_labware_command(
     robot_type: RobotType,
     expected_location: LabwareLocation,
 ) -> None:
+    """It should convert deck slots in `MoveLabwareCreate`s."""
     original = commands.MoveLabwareCreate(
         intent=CommandIntent.SETUP,
         key="key",
@@ -224,6 +229,7 @@ def test_standardize_load_module_command(
     robot_type: RobotType,
     expected_location: DeckSlotLocation,
 ) -> None:
+    """It should convert deck slots in `LoadModuleCreate`s."""
     original = commands.LoadModuleCreate(
         intent=CommandIntent.SETUP,
         key="key",
@@ -247,5 +253,6 @@ def test_standardize_load_module_command(
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_standardize_other_commands(robot_type: RobotType) -> None:
+    """If a`CommandCreate` contains no deck slot, it should be passed through unchanged."""
     original = commands.HomeCreate(params=commands.HomeParams())
     assert subject.standardize_command(original, robot_type) == original
