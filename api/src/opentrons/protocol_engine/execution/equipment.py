@@ -169,6 +169,9 @@ class EquipmentHandler:
         Returns:
             A LoadedPipetteData object.
         """
+        # TODO (spp, 2023-05-10): either raise error if using MountType.EXTENSION in
+        #  load pipettes command, or change the mount type used to be a restricted
+        #  PipetteMountType which has only pipette mounts and not the extension mount.
         use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
         pipette_name_value = (
