@@ -241,14 +241,14 @@ type PipetteFieldsData = Omit<
   'id' | 'spec' | 'tiprackLabwareDef'
 >
 
-function FlexProtocolEditor(props: any): JSX.Element {
-  const dispatch = useDispatch()
 function FlexProtocolEditor({
   isEditValue,
   tabIdValue,
   formProps,
+  onSave,
 }: FlexProtocolEditorComponentProps): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
+  const dispatch = useDispatch()
   const [isEdit, setEdit] = useState<boolean>(false)
   //On Redirction if page tab edit set to true
   useEffect(() => {
@@ -257,7 +257,6 @@ function FlexProtocolEditor({
       setTab(tabIdValue)
     }
   }, [isEditValue, tabIdValue])
-  console.log('selectedTab', selectedTab, 'isEdit', isEdit)
 
   // Next button click
   const handleNext = ({ selectedTab }: selectedTabProps): void => {
@@ -265,7 +264,7 @@ function FlexProtocolEditor({
       //Redirect back to file details page
     } else {
       const setTabNumber =
-        selectedTab >= 0 && selectedTab < navPillTabListLength
+        selectedTab >= 0 && selectedTab <= navPillTabListLength
           ? selectedTab + 1
           : selectedTab
       setTab(setTabNumber)
@@ -354,7 +353,7 @@ function FlexProtocolEditor({
         : acc
     }, [])
 
-    props.onSave({ modules, newProtocolFields, pipettes })
+    onSave({ modules, newProtocolFields, pipettes })
     dispatch(navActions.navigateToPage('liquids'))
   }
 
