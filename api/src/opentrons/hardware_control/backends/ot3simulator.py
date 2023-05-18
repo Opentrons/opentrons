@@ -33,6 +33,7 @@ from .ot3utils import (
     PipetteAction,
     NODEID_SUBSYSTEM,
     motor_nodes,
+    target_to_subsystem,
 )
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -58,6 +59,7 @@ from opentrons.hardware_control.types import (
     UpdateStatus,
     UpdateState,
     SubSystem,
+    SubSystemState,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -643,3 +645,18 @@ class OT3Simulator:
 
     def status_bar_interface(self) -> status_bar.StatusBar:
         return status_bar.StatusBar(None)
+
+    @property
+    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return {
+            target_to_subsystem(target): SubSystemState(
+                ok=True,
+                current_fw_version=1,
+                next_fw_version=1,
+                fw_update_needed=False,
+                current_fw_sha="simulated",
+                pcba_revision="A1",
+                update_state=None,
+            )
+            for target in self._present_nodes
+        }

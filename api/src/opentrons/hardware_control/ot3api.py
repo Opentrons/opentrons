@@ -2150,4 +2150,5 @@ class OT3API(
 
     @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
-        pass
+        """Get a view of the state of the currently-attached subsystems."""
+        return self._backend.subsystems
