@@ -18,9 +18,10 @@ async def _main(cfg: TestConfig) -> None:
         pipette_left="p1000_96_v3.4",
     )
     await api.home()
+    home_pos = await api.gantry_position(OT3Mount.LEFT)
     mount = OT3Mount.LEFT
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    attach_pos += Point(z=200)
+    attach_pos = attach_pos._replace(z=home_pos.z)
     if not api.hardware_pipettes[mount.to_mount()]:
         # FIXME: Do not home the plunger using the normal home method.
         #        See section below where we use OT3Controller to home it.
@@ -29,6 +30,7 @@ async def _main(cfg: TestConfig) -> None:
         while not api.hardware_pipettes[mount.to_mount()]:
             ui.get_user_ready("attach a 96ch pipette")
             await api.reset()
+        await api.home_z(OT3Mount.LEFT)
 
     pipette = api.hardware_pipettes[mount.to_mount()]
     assert pipette
@@ -54,7 +56,7 @@ async def _main(cfg: TestConfig) -> None:
         ui.print_title(section.value)
         await test_run(api, report, section.value)
 
-    # DISENGAGE XY FOR OPERATOR TO RELOAD PIPETTE
+    # RELOAD PIPETTE
     ui.print_title("DONE")
     await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
 
