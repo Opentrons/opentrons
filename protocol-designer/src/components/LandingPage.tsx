@@ -1,10 +1,8 @@
 import React from 'react'
 import { OutlineButton } from '@opentrons/components'
 import { i18n } from '../localization'
-
 import styles from './FlexProtocolEditor/FlexComponents.css'
 import { StyledText } from './FlexProtocolEditor/StyledText'
-
 import { actions as loadFileActions } from '../load-file'
 import { connect, useDispatch } from 'react-redux'
 import { ThunkDispatch } from '../types'

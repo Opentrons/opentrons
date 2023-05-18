@@ -10,7 +10,7 @@ import cx from 'classnames'
 import { format } from 'date-fns'
 import { Formik, FormikProps } from 'formik'
 import { mapValues } from 'lodash'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import {
@@ -33,7 +33,8 @@ import { StyledText } from '../StyledText'
 import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import { FilePage } from '../../FilePage'
-import { InstrumentGroup } from '../instrument/InstrumentGroup'
+import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
+import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -56,98 +57,130 @@ const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 export function FlexFileDetailsComponent(props: any): JSX.Element {
-  return (
-    <div>
-      {!Boolean(props.formValues.protocolName) ? (
-        <NoFileSelection />
-      ) : (
-        <div className={flexStyles.wrapper}>
-          <div className={flexStyles.main_page_wrapper}>
-            <Formik
-              enableReinitialize
-              initialValues={props.formValues}
-              onSubmit={props.saveFileMetadata}
-            >
-              {({
-                handleChange,
-                handleSubmit,
-                dirty,
-                touched,
-                values,
-              }: FormikProps<FileMetadataFields>) => (
-                <form onSubmit={props.handleSubmit}>
-                  <div className={styles.container}>
-                    <FileProtocolInformation />
-                    <div className={styles.line_separator} />
-                    <FileProtocolNameAndDescription
-                      nameDescriptionData={values}
-                    />
-                    <div className={styles.line_separator} />
+  const [isEdit, setEdit] = useState(false)
+  const [selectedTabId, setTabId] = useState<number>(0)
 
-                    <div
-                      className={`${styles.heading_container} ${styles.margin_bottom}`}
-                    >
-                      <div className={styles.pd_file_tab_header}>
+  if (isEdit) {
+    return (
+      <FlexProtocolEditorComponent
+        isEditValue={isEdit}
+        tabIdValue={selectedTabId}
+        formProps={props}
+      />
+    )
+  } else {
+    return (
+      <div>
+        {!Boolean(props.formValues) ? (
+          <NoFileSelection />
+        ) : (
+          <div className={flexStyles.wrapper}>
+            <div className={flexStyles.main_page_wrapper}>
+              <Formik
+                enableReinitialize
+                initialValues={props.formValues}
+                onSubmit={props.saveFileMetadata}
+              >
+                {({
+                  handleChange,
+                  handleSubmit,
+                  dirty,
+                  touched,
+                  values,
+                }: FormikProps<FileMetadataFields>) => (
+                  <form onSubmit={props.handleSubmit}>
+                    <div className={styles.container}>
+                      <FileProtocolInformation />
+                      <div className={styles.line_separator} />
+                      <div
+                        className={`${styles.heading_container} ${styles.margin_bottom}`}
+                      >
+                        <FileProtocolNameAndDescription
+                          nameDescriptionData={values}
+                        />
+                        <Flex>
+                          <EditButton
+                            editProps={setEdit}
+                            setTab={0}
+                            setTabId={setTabId}
+                          />
+                        </Flex>
+                      </div>
+                      <div className={styles.line_separator} />
+                      <div
+                        className={`${styles.heading_container} ${styles.margin_bottom}`}
+                      >
                         <StyledText as="h3">
                           {i18n.t('flex.file_tab.pipette')}
                         </StyledText>
+
+                        <Flex>
+                          {Object.keys(props.instruments).length !== 1 && (
+                            <SecondaryButton
+                              onClick={e => {
+                                e.preventDefault()
+                                props.swapPipettes()
+                              }}
+                            >
+                              {i18n.t('flex.file_tab.swap_pipette')}
+                            </SecondaryButton>
+                          )}
+                          <EditButton
+                            editProps={setEdit}
+                            setTab={1}
+                            setTabId={setTabId}
+                          />
+                        </Flex>
                       </div>
-
-                      <Flex className={styles.right_buttons}>
-                        {Object.keys(props.instruments).length !== 1 && (
-                          <SecondaryButton
-                            onClick={e => {
-                              e.preventDefault()
-                              props.swapPipettes()
-                            }}
-                          >
-                            {i18n.t('flex.file_tab.swap_pipette')}
-                          </SecondaryButton>
-                        )}
-                        <EditButton />
-                      </Flex>
-                    </div>
-
-                    <div>
-                      <InstrumentGroup {...props.instruments} />
-                    </div>
-
-                    <div className={styles.line_separator} />
-                    <StyledText as="h3" className={styles.margin_bottom}>
-                      {i18n.t('flex.file_tab.additional_items')}
-                    </StyledText>
-
-                    <div
-                      className={`${styles.heading_container} ${styles.margin_bottom}`}
-                    >
-                      <div className={styles.pd_file_tab_header}>
-                        <SelectedModules propsData={props} />
+                      <div>
+                        <InstrumentGroup {...props.instruments} />
                       </div>
-                      <EditButton />
+                      <div className={styles.line_separator} />
+
+                      <div
+                        className={`${styles.heading_container} ${styles.margin_bottom}`}
+                      >
+                        <StyledText as="h3" className={styles.margin_bottom}>
+                          {i18n.t('flex.file_tab.additional_items')}
+                        </StyledText>
+                        <Flex>
+                          <EditButton
+                            editProps={setEdit}
+                            setTab={2}
+                            setTabId={setTabId}
+                          />
+                        </Flex>
+                      </div>
+                      <SelectedModules propsData={props} />
+
+                      <EditButton
+                        editProps={setEdit}
+                        setTab={2}
+                        setTabId={setTabId}
+                        addItems={true}
+                      />
                     </div>
-                    <SecondaryButton>
-                      <div>{i18n.t('flex.file_tab.add_items')}</div>
-                    </SecondaryButton>
-                  </div>
-                  <NewPrimaryBtn tabIndex={4} type="submit">
-                    Create protocol, on to liquids
-                  </NewPrimaryBtn>
-                </form>
-              )}
-            </Formik>
+
+                    <NewPrimaryBtn type="submit">
+                      Create protocol, on to liquids
+                    </NewPrimaryBtn>
+                  </form>
+                )}
+              </Formik>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  )
+        )}
+      </div>
+    )
+  }
 }
 
 const FileProtocolInformation = (): JSX.Element => {
   return (
     <div className={styles.heading_container}>
-      <div className={styles.pd_file_tab_header}>
+      <div className={styles.pd_fd_header}>
         <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
-        <StyledText as="h5" className={styles.pd_file_tab_sub_header}>
+        <StyledText as="h5" className={styles.pd_fd_sub_header}>
           {i18n.t('flex.file_tab.subheading')}
         </StyledText>
       </div>
@@ -156,6 +189,25 @@ const FileProtocolInformation = (): JSX.Element => {
         <SecondaryButton className={styles.close_protocol_button}>
           {i18n.t('flex.file_tab.close_export')}
         </SecondaryButton>
+      </div>
+    </div>
+  )
+}
+
+const NoFileSelection = (): JSX.Element => {
+  return (
+    <div className={flexStyles.wrapper}>
+      <div className={styles.container}>
+        <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
+        <StyledText as="h5" className={styles.pd_fd_sub_header}>
+          {i18n.t('flex.file_tab.subheading')}
+        </StyledText>
+        <div className={styles.line_separator} />
+        <div>
+          <StyledText as="h4" className={styles.bold_text}>
+            Please select JSON file to display
+          </StyledText>
+        </div>
       </div>
     </div>
   )
@@ -172,7 +224,6 @@ const FileProtocolNameAndDescription = (props: {
         <StyledText as="h3" className={styles.margin_bottom}>
           {i18n.t('flex.file_tab.name_desc_title')}
         </StyledText>
-        <EditButton />
       </Flex>
       <Flex className={styles.margin_bottom}>
         <StyledText as="h4" className={styles.bold_text}>
@@ -220,32 +271,25 @@ const FileProtocolNameAndDescription = (props: {
   )
 }
 
-const EditButton = (): JSX.Element => {
+const EditButton = ({
+  editProps,
+  setTab,
+  setTabId,
+  addItems,
+}: any): JSX.Element => {
   return (
-    <div className={styles.right_buttons}>
-      <p>{i18n.t('flex.file_tab.edit')}</p>
-    </div>
-  )
-}
-
-const NoFileSelection = (): JSX.Element => {
-  return (
-    <div className={flexStyles.wrapper}>
-      <div className={styles.container}>
-        <div className={styles.pd_file_tab_header}>
-          <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
-          <StyledText as="h5" className={styles.pd_file_tab_sub_header}>
-            {i18n.t('flex.file_tab.subheading')}
-          </StyledText>
-          <div className={styles.line_separator} />
-          <div>
-            <StyledText as="h4" className={styles.bold_text}>
-              Please select JSON file to display
-            </StyledText>
-          </div>
-        </div>
-      </div>
-    </div>
+    <SecondaryButton
+      style={{ height: 'max-content' }}
+      onClick={e => {
+        e.preventDefault()
+        editProps(true)
+        setTabId(setTab)
+      }}
+    >
+      {addItems
+        ? i18n.t('flex.file_tab.add_items')
+        : i18n.t('flex.file_tab.edit')}
+    </SecondaryButton>
   )
 }
 
@@ -254,39 +298,41 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
   const existingModules = getModuleData(propsData.modules)
   return (
     <>
-      {existingModules?.map((moduleType: any, i: number) => {
-        return (
+      {existingModules?.length > 0 ? (
+        existingModules.map((moduleType: any, i: number) => (
           <div
             className={`${styles.heading_container} ${styles.margin_bottom}`}
             key={i}
           >
-            <div className={styles.pd_file_tab_header}>
-              <Card>
-                <div className={styles.card_content}>
-                  <Flex>
-                    {' '}
-                    <ModuleDiagram
-                      type={moduleType.type}
-                      model={moduleType.model}
-                    />
-                    <Flex
-                      flexDirection={DIRECTION_COLUMN}
-                      marginLeft={SPACING.spacing4}
-                      marginTop={SPACING.spacing4}
-                      marginBottom={SPACING.spacing4}
-                    >
-                      <StyledText as="h4">
-                        {moduleType.type === '"temperatureModuleType"'}
-                        Temperature Module GEN - Slot {moduleType.slot}
-                      </StyledText>
-                    </Flex>
+            <Card>
+              <div className={styles.card_content}>
+                <Flex>
+                  {' '}
+                  <ModuleDiagram
+                    type={moduleType.type}
+                    model={moduleType.model}
+                  />
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    marginLeft={SPACING.spacing4}
+                    marginTop={SPACING.spacing4}
+                    marginBottom={SPACING.spacing4}
+                  >
+                    <StyledText as="h4">
+                      {i18n.t(
+                        `modules.module_display_names.${moduleType.type}`
+                      )}{' '}
+                      - Slot {moduleType.slot}
+                    </StyledText>
                   </Flex>
-                </div>
-              </Card>
-            </div>
+                </Flex>
+              </div>
+            </Card>
           </div>
-        )
-      })}
+        ))
+      ) : (
+        <div>No modules found.</div>
+      )}
     </>
   )
 }

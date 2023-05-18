@@ -30,12 +30,12 @@ export function InstrumentGroup(props: InstrumentGroupProps): JSX.Element {
   const rightProps = right || { ...EMPTY_INSTRUMENT_PROPS, mount: 'right' }
   return (
     <section className={styles.pipette_group}>
-      {props.left && (
-        <InstrumentInfo
-          {...leftProps}
-          showMountLabel={Object.keys(props).length !== 1}
-        />
-      )}
+      {/* {props.left && ( */}
+      <InstrumentInfo
+        {...leftProps}
+        showMountLabel={Object.keys(props).length !== 1}
+      />
+      {/* )} */}
       {props.right ? (
         <InstrumentInfo
           {...rightProps}
