@@ -4,10 +4,9 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..types import DeckSlotLocation, LabwareLocation
+from ..types import LabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -15,17 +14,6 @@ if TYPE_CHECKING:
 
 
 LoadLabwareCommandType = Literal["loadLabware"]
-
-
-def canonicalize_location(
-    location: LabwareLocation, robot_type: RobotType
-) -> LabwareLocation:
-    if isinstance(location, DeckSlotLocation):
-        return DeckSlotLocation.construct(
-            slotName=location.slotName.to_equivalent_for_robot_type(robot_type)
-        )
-    else:
-        return location
 
 
 class LoadLabwareParams(BaseModel):
@@ -60,16 +48,6 @@ class LoadLabwareParams(BaseModel):
         #  user-specified label OR the displayName property of the labware's definition.
         # TODO: Make sure v6 JSON protocols don't do that.
     )
-
-    def canonicalize(self, robot_type: RobotType) -> LoadLabwareParams:
-        return LoadLabwareParams.construct(
-            location=canonicalize_location(self.location, robot_type),
-            loadName=self.loadName,
-            namespace=self.namespace,
-            version=self.version,
-            labwareId=self.labwareId,
-            displayName=self.displayName,
-        )
 
 
 class LoadLabwareResult(BaseModel):
@@ -140,7 +118,3 @@ class LoadLabwareCreate(BaseCommandCreate[LoadLabwareParams]):
     params: LoadLabwareParams
 
     _CommandCls: Type[LoadLabware] = LoadLabware
-
-    def normalize(self, robot_type: RobotType) -> LoadLabwareCreate:
-        canonicalized_params = self.params.canonicalize(robot_type)
-        return self.copy(update={"params": canonicalized_params})
