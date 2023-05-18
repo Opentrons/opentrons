@@ -10,9 +10,6 @@ export function useMostRecentCompletedAnalysis(
   const { data: runRecord } = useRunQuery(runId)
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
-  console.log('runRecord', runRecord)
-  console.log('protocolId', protocolId)
-  console.log('protocolAnalyses', protocolAnalyses)
 
   return (
     (protocolAnalyses?.data ?? [])

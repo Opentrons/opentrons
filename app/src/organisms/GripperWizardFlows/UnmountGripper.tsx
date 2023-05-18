@@ -40,7 +40,6 @@ export const UnmountGripper = (
     refetch()
       .then(() => {
         if (!isGripperStillAttached) {
-          console.log('chian', isGripperStillAttached)
           chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
             .then(() => {
               proceed()
