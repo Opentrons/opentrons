@@ -35,7 +35,7 @@ import { LongPressModal } from './LongPressModal'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 
-import imgSrc from '../../../assets/images/on-device-display/abstract@x2.png'
+import imgSrc from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'

@@ -35,11 +35,7 @@ export function PinnedProtocol(props: {
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
-  const displayedName = truncateString(
-    protocolName,
-    cardSize === 'full' ? 58 : 62,
-    25
-  )
+  const displayedName = truncateString(protocolName, 59)
   const { t } = useTranslation('protocol_info')
 
   const cardStyleBySize: {
@@ -90,7 +86,7 @@ export function PinnedProtocol(props: {
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size4}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
+      gridGap={SPACING.spacing24}
       height={cardStyleBySize[cardSize].height}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
