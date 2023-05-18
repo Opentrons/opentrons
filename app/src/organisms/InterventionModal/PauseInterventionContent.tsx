@@ -11,11 +11,11 @@ import {
   useInterval,
 } from '@opentrons/components'
 
+import { EMPTY_TIMESTAMP } from '../Devices/constants'
+import { formatInterval } from '../RunTimeControl/utils'
 import { StyledText } from '../../atoms/text'
 
 import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data'
-import { EMPTY_TIMESTAMP } from '../Devices/constants'
-import { formatInterval } from '../RunTimeControl/utils'
 
 export interface PauseContentProps {
   command: WaitForResumeRunTimeCommand
@@ -29,7 +29,7 @@ export function PauseInterventionContent({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem">
       <PauseHeader startedAt={command.startedAt} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText as="h6" color={COLORS.errorDisabled}>
           {i18n.format(t('notes'), 'upperCase')}:
         </StyledText>
@@ -61,7 +61,7 @@ function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
     <Flex alignItems={ALIGN_CENTER} gridGap="0.75rem">
       <Icon
         name="pause-circle"
-        size={SPACING.spacing6}
+        size={SPACING.spacing32}
         flex="0 0 auto"
         color={COLORS.darkGreyEnabled}
       />
