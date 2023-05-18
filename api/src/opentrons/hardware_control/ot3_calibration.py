@@ -551,7 +551,11 @@ async def _calibrate_mount(
     try:
         # find the center of the calibration sqaure
         offset = await find_calibration_structure_position(
-            hcapi, mount, nominal_center, method, raise_verify_error
+            hcapi,
+            mount,
+            nominal_center,
+            method=method,
+            raise_verify_error=raise_verify_error,
         )
         # update center with values obtained during calibration
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
@@ -595,7 +599,7 @@ async def find_calibration_structure_position(
     #  to calibrate a stationary object on the deck and need to find the offset of that
     #  deck object relative to the deck and not the instrument which sits above the deck.
     if target == CalibrationTarget.DECK_OBJECT:
-         return offset * -1
+        return offset * -1
     return offset
 
 
@@ -796,7 +800,11 @@ async def calibrate_module(
             # from the nominal position so we dont have to alter any other part of the system.
             nominal_position = nominal_position - PREP_OFFSET_DEPTH
             offset = await find_calibration_structure_position(
-                hcapi, mount, nominal_position, method=CalibrationMethod.BINARY_SEARCH, target=CalibrationTarget.DECK_OBJECT
+                hcapi,
+                mount,
+                nominal_position,
+                method=CalibrationMethod.BINARY_SEARCH,
+                target=CalibrationTarget.DECK_OBJECT,
             )
             await hcapi.save_module_offset(module_id, mount, slot, offset)
             return offset

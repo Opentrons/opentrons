@@ -53,7 +53,9 @@ def _main(args: argparse.Namespace, opentrons_api: OpentronsHTTPAPI) -> None:
         raise RuntimeError(f"Could not calibrate {args.model}")
 
     print("Moving to calibrated well center")
-    calibrated_position = opentrons_api.move_to_well(args.mount, "A1", offset=PROBE_OFFSET)
+    calibrated_position = opentrons_api.move_to_well(
+        args.mount, "A1", offset=PROBE_OFFSET
+    )
 
     # Finish and print result
     print(f"Calibration offset {offset}")
