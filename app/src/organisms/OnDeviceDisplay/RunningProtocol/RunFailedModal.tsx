@@ -84,8 +84,8 @@ export function RunFailedModal({
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing16}
+        marginTop={SPACING.spacing32}
       >
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
@@ -109,9 +109,9 @@ export function RunFailedModal({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.light1}
-          borderRadius={BORDERS.size_three}
-          gridGap={SPACING.spacing3}
-          padding={SPACING.spacing4}
+          borderRadius={BORDERS.size3}
+          gridGap={SPACING.spacing8}
+          padding={SPACING.spacing16}
           overflowY="scroll"
           maxHeight="7.75rem"
         >

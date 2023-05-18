@@ -107,26 +107,26 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         {t('step_4_of_4')}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing3}
-        marginBottom={SPACING.spacing4}
+        marginTop={SPACING.spacing8}
+        marginBottom={SPACING.spacing16}
         backgroundColor={COLORS.fundamentalsBackground}
-        paddingTop={SPACING.spacing4}
-        paddingLeft={SPACING.spacing4}
+        paddingTop={SPACING.spacing16}
+        paddingLeft={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_banner_info"
       >
         <Flex
-          size={SPACING.spacing6}
+          size={SPACING.spacing32}
           color={COLORS.darkGreyEnabled}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing16}
         >
           <Icon name="information" aria-label="information" />
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          paddingLeft={SPACING.spacing3}
+          paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing16}
         >
           <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             <Trans
@@ -144,7 +144,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
                 block: (
                   <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
-                    marginBottom={SPACING.spacing5}
+                    marginBottom={SPACING.spacing24}
                   />
                 ),
               }}
@@ -160,7 +160,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         <HeaterShakerModuleCard module={module} />
         <TertiaryButton
           marginLeft={SIZE_AUTO}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           onClick={toggleLatch}
           disabled={isShaking}
         >
@@ -169,7 +169,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
 
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginY={SPACING.spacingL}
+          marginY={SPACING.spacing24}
           alignItems={ALIGN_FLEX_START}
         >
           <Flex flexDirection={DIRECTION_COLUMN} maxWidth="6.25rem">
@@ -196,7 +196,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             onClick={sendCommands}
             disabled={
               !isLatchClosed ||
@@ -212,7 +212,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           ) : null}
         </Flex>
       </Flex>
-      <Divider marginY={SPACING.spacing4} />
+      <Divider marginY={SPACING.spacing16} />
       <Collapsible
         expanded={isExpanded}
         title={t('troubleshooting')}
@@ -221,7 +221,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_FLEX_START}
-          marginY={SPACING.spacing6}
+          marginY={SPACING.spacing32}
         >
           <StyledText width="22rem">{t('troubleshoot_step_1')}</StyledText>
           <TertiaryButton
@@ -243,7 +243,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Collapsible>
-      <Divider marginTop={SPACING.spacing4} marginBottom={SPACING.spacingXL} />
+      <Divider marginTop={SPACING.spacing16} marginBottom={SPACING.spacing32} />
     </Flex>
   )
 }

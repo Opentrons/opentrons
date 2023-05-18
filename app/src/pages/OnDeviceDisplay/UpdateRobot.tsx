@@ -10,6 +10,10 @@ import {
   startBuildrootUpdate,
 } from '../../redux/buildroot'
 import { UNREACHABLE } from '../../redux/discovery/constants'
+import {
+  getOnDeviceDisplaySettings,
+  updateConfigValue,
+} from '../../redux/config'
 import { CheckUpdates } from '../../organisms/UpdateRobotSoftware/CheckUpdates'
 import { CompleteUpdateSoftware } from '../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
 import { ErrorUpdateSoftware } from '../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware'
@@ -40,6 +44,9 @@ export function UpdateRobot(): JSX.Element {
     error: null,
   }
   const dispatch = useDispatch<Dispatch>()
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
 
   const softwareUpdateProcess = (): JSX.Element => {
     // Display Error screen
@@ -69,6 +76,14 @@ export function UpdateRobot(): JSX.Element {
           updateType = 'validating'
         } else {
           updateType = 'installing'
+          if (unfinishedUnboxingFlowRoute === '/welcome') {
+            dispatch(
+              updateConfigValue(
+                'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+                '/robot-settings/rename-robot'
+              )
+            )
+          }
         }
       }
       return (
@@ -99,9 +114,7 @@ export function UpdateRobot(): JSX.Element {
 
   return (
     <Flex
-      padding={`${String(SPACING.spacing5)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+      padding={`${SPACING.spacing24} ${SPACING.spacing40} ${SPACING.spacing40}`}
     >
       {isShowCheckingUpdates ? (
         <CheckUpdates />

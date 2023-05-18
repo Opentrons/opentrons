@@ -30,11 +30,9 @@ export function ConnectViaUSB(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} OnDevice />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
-        padding={`${String(SPACING.spacing6)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex
@@ -42,7 +40,7 @@ export function ConnectViaUSB(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_RELATIVE}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           {/* this path is temporary and it will be update soon */}
           <Btn
@@ -87,8 +85,8 @@ export function ConnectViaUSB(): JSX.Element {
             src={usbImage}
           />
           <StyledText
-            marginTop={SPACING.spacing6}
-            marginX={SPACING.spacingXXL}
+            marginTop={SPACING.spacing32}
+            marginX={SPACING.spacing40}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('connect_via_usb_description')}
@@ -122,7 +120,7 @@ const ConnectedViaDesktopApp = ({
     >
       <Icon name="ot-check" size="4.375rem" color={COLORS.successEnabled} />
       <StyledText
-        marginTop={SPACING.spacingXXL}
+        marginTop={SPACING.spacing40}
         textAlign={TYPOGRAPHY.textAlignCenter}
         color={COLORS.black}
         fontSize="1.625rem"
@@ -132,7 +130,7 @@ const ConnectedViaDesktopApp = ({
         {description}
       </StyledText>
     </Flex>
-    <PrimaryButton marginTop={SPACING.spacing5} height="4.4375rem" width="100%">
+    <PrimaryButton marginTop={SPACING.spacing24} height="4.4375rem" width="100%">
       <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
         {buttonLabel}
       </StyledText>

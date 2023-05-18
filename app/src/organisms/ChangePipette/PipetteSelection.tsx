@@ -16,7 +16,7 @@ export function PipetteSelection(props: PipetteSelectionProps): JSX.Element {
   const { t } = useTranslation('change_pipette')
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledText css={TYPOGRAPHY.h1Default} marginBottom={SPACING.spacing5}>
+      <StyledText css={TYPOGRAPHY.h1Default} marginBottom={SPACING.spacing24}>
         {t('choose_pipette')}
       </StyledText>
       <Flex marginBottom="1.2rem">

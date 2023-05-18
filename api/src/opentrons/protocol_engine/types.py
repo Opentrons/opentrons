@@ -151,6 +151,9 @@ class DeckPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2023-05-10): Deduplicate with constants in
+# opentrons.protocols.api_support.deck_type
+# and consider moving to shared-data.
 class DeckType(str, Enum):
     """Types of deck available."""
 
@@ -219,6 +222,8 @@ class MotorAxis(str, Enum):
     RIGHT_Z = "rightZ"
     LEFT_PLUNGER = "leftPlunger"
     RIGHT_PLUNGER = "rightPlunger"
+    EXTENSION_Z = "extensionZ"
+    EXTENSION_JAW = "extensionJaw"
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel

@@ -141,6 +141,7 @@ class LegacyContextCreator:
         return create_protocol_context(
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
+            deck_type=self._protocol_engine.state_view.config.deck_type.value,
             protocol_engine=self._protocol_engine,
             protocol_engine_loop=asyncio.get_running_loop(),
             broker=broker,

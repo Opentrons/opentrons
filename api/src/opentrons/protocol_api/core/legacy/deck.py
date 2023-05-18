@@ -15,7 +15,6 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict
-from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.types import DeckLocation, Location, Mount, Point
 
@@ -48,12 +47,11 @@ class DeckItem(Protocol):
 class Deck(UserDict):  # type: ignore[type-arg]
     data: Dict[int, Optional[DeckItem]]
 
-    def __init__(self) -> None:
+    def __init__(self, deck_type: str) -> None:
         super().__init__()
-        # TODO(mc, 2022-06-17): move deck type selection
-        # (and maybe deck definition loading) out of this constructor
-        # to decouple from config (and environment) reading / loading
-        self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
+        self._definition = load_deck(
+            name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION
+        )
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:
             self.data[int(slot["id"])] = None

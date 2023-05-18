@@ -4,6 +4,7 @@ import pytest
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_api import labware
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
@@ -18,13 +19,13 @@ def trough_definition() -> LabwareDefinition:
 
 @pytest.fixture(scope="session")
 def trough(trough_definition):
-    deck = Deck()
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     return labware.load_from_definition(trough_definition, deck.position_for(1))
 
 
 @pytest.fixture(scope="session")
 def module(trough):
-    deck = Deck()
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     mod = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2

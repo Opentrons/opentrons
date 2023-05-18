@@ -4,6 +4,23 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
+# Internal Release 0.7.0
+
+This is internal release 0.7.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+
+Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
+
+## Big New Things
+### Robot Control
+- Updated python api version to 2.15
+- Added load Magnetic block as a module in python api and in PE. You can now load a magnetic block using `protocol_context.load_module("magneticBlockV1", <slot_name>)` with `apiLevel` of 2.15.
+
+For more details about this release, please see the full [technical change log][]. 
+
+[technical change log]: https://github.com/Opentrons/opentrons/releases
+
+---
+
 # Internal Release 0.6.0
 
 This is internal release 0.6.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
@@ -71,4 +88,3 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## Smaller fun features
 - The lights work (don't do anything yet though)
-

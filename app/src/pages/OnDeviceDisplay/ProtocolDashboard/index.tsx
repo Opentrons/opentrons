@@ -128,11 +128,11 @@ export function ProtocolDashboard(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
-      paddingX={SPACING.spacingXXL}
+      paddingX={SPACING.spacing40}
     >
       <Navigation routes={onDeviceDisplayRoutes} />
       {pinnedProtocols.length > 0 && (
-        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing16}>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             fontWeight={TYPOGRAPHY.fontWeightBold}
@@ -150,8 +150,8 @@ export function ProtocolDashboard(): JSX.Element {
             alignItems="center"
             backgroundColor={COLORS.white}
             flexDirection={DIRECTION_ROW}
-            paddingBottom={SPACING.spacing4}
-            paddingTop={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
+            paddingTop={SPACING.spacing16}
             position="sticky"
             top="0px"
             width="100%"
@@ -245,8 +245,8 @@ export function ProtocolDashboard(): JSX.Element {
                 fontSize={TYPOGRAPHY.fontSize32}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
                 lineHeight={TYPOGRAPHY.lineHeight42}
-                marginTop={SPACING.spacing4}
-                marginBottom={SPACING.spacing3}
+                marginTop={SPACING.spacing16}
+                marginBottom={SPACING.spacing8}
               >
                 {t('nothing_here_yet')}
               </StyledText>
@@ -288,12 +288,12 @@ export function ProtocolCard(props: {
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.size4}
       fontSize={TYPOGRAPHY.fontSize22}
       lineHeight={TYPOGRAPHY.lineHeight28}
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing8}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
       ref={longpress.ref}
     >
       <Flex width="30.8125rem" overflowWrap="anywhere">

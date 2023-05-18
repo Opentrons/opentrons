@@ -71,7 +71,7 @@ export function GripperCard({
         }
         banner={
           attachedGripper != null && !isCalibrated ? (
-            <Banner type="error" marginBottom={SPACING.spacing2}>
+            <Banner type="error" marginBottom={SPACING.spacing4}>
               <Trans
                 t={t}
                 i18nKey="calibration_needed"

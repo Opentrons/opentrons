@@ -20,7 +20,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
   const { children, isOnDevice = false, onClick = null } = props
   return isOnDevice && onClick != null ? (
     <ModalShell
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       width="18.0625rem"
       onOutsideClick={onClick}
     >
@@ -40,7 +40,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
       top="2.6rem"
-      right={`calc(50% + ${String(SPACING.spacing2)})`}
+      right={`calc(50% + ${SPACING.spacing4})`}
       flexDirection={DIRECTION_COLUMN}
       width="max-content"
     >

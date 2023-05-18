@@ -40,7 +40,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
             strong: (
               <StyledText
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                paddingBottom={SPACING.spacingSM}
+                paddingBottom={SPACING.spacing12}
               />
             ),
             block: <span />,
