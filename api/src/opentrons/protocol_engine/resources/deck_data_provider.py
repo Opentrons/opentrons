@@ -5,7 +5,10 @@ from typing_extensions import final
 
 import anyio
 
-from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck import (
+    load as load_deck,
+    DEFAULT_DECK_DEFINITION_VERSION,
+)
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
@@ -40,7 +43,9 @@ class DeckDataProvider:
         """Get a labware definition given the labware's identification."""
 
         def sync() -> DeckDefinitionV3:
-            return load_deck(self._deck_type.value, 3)
+            return load_deck(
+                name=self._deck_type.value, version=DEFAULT_DECK_DEFINITION_VERSION
+            )
 
         return await anyio.to_thread.run_sync(sync)
 
