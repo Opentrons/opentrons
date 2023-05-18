@@ -402,7 +402,7 @@ def test_move_labware_off_deck(
     mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
-    """It should move labware to new module location."""
+    """It should move labware off-deck."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
