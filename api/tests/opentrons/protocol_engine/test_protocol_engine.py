@@ -16,6 +16,7 @@ from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
 from opentrons.protocol_engine.types import (
+    DeckType,
     LabwareOffset,
     LabwareOffsetCreate,
     LabwareOffsetVector,
@@ -182,8 +183,10 @@ def test_add_command(
         params=commands.HomeParams(),
     )
 
-    robot_type = "OT-3 Standard"
-    decoy.when(state_store.config).then_return(Config(robot_type=robot_type))
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
 
     decoy.when(
         slot_standardization.standardize_command(original_request, robot_type)
@@ -261,8 +264,10 @@ async def test_add_and_execute_command(
         params=commands.HomeParams(),
     )
 
-    robot_type = "OT-3 Standard"
-    decoy.when(state_store.config).then_return(Config(robot_type=robot_type))
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
 
     decoy.when(
         slot_standardization.standardize_command(original_request, robot_type)
@@ -596,7 +601,9 @@ def test_add_labware_offset(
     )
 
     robot_type: RobotType = "OT-3 Standard"
-    decoy.when(state_store.config).then_return(Config(robot_type=robot_type))
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
     decoy.when(
         slot_standardization.standardize_labware_offset(request, robot_type)
     ).then_return(standardized_request)

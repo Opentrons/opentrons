@@ -173,7 +173,7 @@ def test_standardize_move_labware_command(
             labwareId="labwareId",
             strategy=LabwareMovementStrategy.USING_GRIPPER,
             usePickUpLocationLpcOffset=True,
-            useDropLocationLpcOFfset=True,
+            useDropLocationLpcOffset=True,
             pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
             dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
         ),
@@ -186,7 +186,7 @@ def test_standardize_move_labware_command(
             labwareId="labwareId",
             strategy=LabwareMovementStrategy.USING_GRIPPER,
             usePickUpLocationLpcOffset=True,
-            useDropLocationLpcOFfset=True,
+            useDropLocationLpcOffset=True,
             pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
             dropOffset=LabwareOffsetVector(x=4, y=5, z=6),
         ),
@@ -220,9 +220,9 @@ def test_standardize_move_labware_command(
     ],
 )
 def test_standardize_load_module_command(
-    original_location: LabwareLocation,
+    original_location: DeckSlotLocation,
     robot_type: RobotType,
-    expected_location: LabwareLocation,
+    expected_location: DeckSlotLocation,
 ) -> None:
     original = commands.LoadModuleCreate(
         intent=CommandIntent.SETUP,
