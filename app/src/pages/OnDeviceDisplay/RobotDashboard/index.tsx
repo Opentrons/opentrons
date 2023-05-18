@@ -26,7 +26,7 @@ import { sortProtocols } from '../ProtocolDashboard/utils'
 import { WelcomedModal } from './WelcomeModal'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
-const SORT_KEY = 'recentRun'
+const SORT_KEY = 'recentCreated'
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')

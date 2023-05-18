@@ -69,20 +69,16 @@ export function RecentRunProtocolCarousel({
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         {sortedProtocols.map((protocol: ProtocolResource) => {
-          const run = runs.data?.data
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-            )
-            .find(run => run.protocolId === protocol.id)
+          const run = runs.data?.data.find(
+            run => run.protocolId === protocol.id
+          )
           const protocolId = protocol.id
           const protocolName =
             protocol.metadata.protocolName ?? protocol.files[0].name
 
           return (
             <React.Fragment key={protocolId}>
-              {run ? (
+              {run != null ? (
                 <RecentRunProtocolCard
                   lastRun={run?.createdAt}
                   protocolId={protocolId}
