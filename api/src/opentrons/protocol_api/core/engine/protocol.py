@@ -207,7 +207,7 @@ class ProtocolCore(
         to_location: Union[ModuleLocation, DeckSlotLocation, str]
         if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
             to_location = ModuleLocation(moduleId=new_location.module_id)
-        elif isinstance(new_location, OffDeckType):
+        elif new_location == OffDeckType.OFF_DECK:
             to_location = OFF_DECK_LOCATION
         else:
             to_location = DeckSlotLocation(slotName=new_location)
