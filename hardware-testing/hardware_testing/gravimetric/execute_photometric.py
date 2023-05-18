@@ -32,6 +32,7 @@ _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 TARGET_END_PHOTOPLATE_VOLUME = 200
 
+
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
     # update this regularly, because the script may exit early
     env_data_list = [m.environment for tag, m in _MEASUREMENTS]
@@ -101,7 +102,7 @@ def _load_pipette(
         f"expected {cfg.pipette_volume} uL pipette, "
         f"but got a {pipette.max_volume} uL pipette"
     )
-    #pipette.default_speed = cfg.gantry_speed
+    # pipette.default_speed = cfg.gantry_speed
     return pipette
 
 
@@ -230,7 +231,7 @@ def _run_trial(
 
     channel_count = 96
     # RUN INIT
-    pipette.move_to(location = source.top().move(channel_offset), minimum_z_height = 133)
+    pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
@@ -338,8 +339,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     for v in test_volumes:
         print(f"\t{v} uL")
     tips = get_tips(ctx, pipette)
-    total_tips = (
-        len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(test_volumes)
+    total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(
+        test_volumes
     )
     trial_total = len(test_volumes) * cfg.trials
     assert (
@@ -393,7 +394,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
-            photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME-volume, 0)
+            photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME - volume, 0)
             for trial in range(cfg.trials):
                 for w in photoplate.wells():
                     liquid_tracker.set_start_volume(w, photoplate_preped_vol)
@@ -419,10 +420,10 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                 )
-                pipette.move_to(location=photoplate["A1"].top().move(Point(0,0,133)))
+                pipette.move_to(location=photoplate["A1"].top().move(Point(0, 0, 133)))
                 ui.get_user_ready("Cover and replace the photoplate in slot 3")
                 _drop_tip(ctx, pipette, cfg)
-                tip_iter +=1
+                tip_iter += 1
                 if tip_iter >= len(tips[0]):
                     ui.get_user_ready(
                         f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
