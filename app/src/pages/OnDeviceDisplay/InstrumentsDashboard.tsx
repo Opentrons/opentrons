@@ -14,7 +14,6 @@ export const InstrumentsDashboard = (): JSX.Element => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
-  console.log('TOP LEVEL', attachedInstruments)
 
   return (
     <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
