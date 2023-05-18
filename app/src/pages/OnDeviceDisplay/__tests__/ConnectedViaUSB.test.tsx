@@ -32,9 +32,9 @@ describe('ConnectViaUSB', () => {
     getByText('USB')
     getByText('No connection found')
     getByLabelText('Connect_via_usb_back_button')
-    getByText(
-      'Connect the provided USB A-to-B cable to the robot’s USB-B port and an open port on your computer. (Use a USB B-to-C cable or a USB A-to-C adapter if your computer does not have a USB-A port.) To proceed with setup, the computer must have the Opentrons App installed and running.'
-    )
+    getByText('1. Connect the USB A-to-B cable to the robot’s USB-B port.')
+    getByText('2. Connect the cable to an open USB port on your computer.')
+    getByText('3. Launch the Opentrons App on the computer to continue.')
   })
 
   it('should call a mock function when tapping back button', () => {
