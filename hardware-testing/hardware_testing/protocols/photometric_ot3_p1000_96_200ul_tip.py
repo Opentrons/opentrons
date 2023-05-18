@@ -3,10 +3,10 @@ from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "photometric-ot3-p1000-96-200ul-tip"}
 # FIXME: bump to v2.14 to utilize protocol engine
-requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
+requirements = {"robotType": "OT-3", "apiLevel": "2.14"}
 
 SLOTS_TIPRACK = {
-    200: [5,6,7,8,9,10,11],
+    200: [7,8,9],
 }
 SLOT_PLATE = 3
 SLOT_RESERVOIR = 2
@@ -18,7 +18,7 @@ PHOTOPLATE_LABWARE = "corning_96_wellplate_360ul_flat"
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     tipracks = [
-        ctx.load_labware(f"opentrons_ot3_96_tiprack_{size}uL", slot)
+        ctx.load_labware(f"opentrons_ot3_96_tiprack_{size}uL_adp", slot)
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]

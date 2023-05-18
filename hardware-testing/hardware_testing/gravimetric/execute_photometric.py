@@ -133,7 +133,7 @@ def _load_labware(
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,
-            f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
+            f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul_adp",
         )
         for slot in cfg.slots_tiprack
     ]
