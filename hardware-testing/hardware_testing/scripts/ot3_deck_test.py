@@ -215,6 +215,21 @@ def _connect_to_fixture(pipp: str=""):
 
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     #path = '/data/testing_data/calibrated_slot_locations.json'
+    slot_loc = {
+        "A1": (13.42, 394.92, 200),
+        "A2": (177.32, 394.92, 200),
+        "A3": (341.03, 394.92, 200),
+        "B1": (13.42, 288.42, 200),
+        "B2": (177.32, 288.92, 200),
+        "B3": (341.03, 288.92, 200),
+        "C1": (13.42, 181.92, 200),
+        "C2": (177.32, 181.92, 200),
+        "C3": (341.03, 181.92, 200),
+        "D1": (13.42, 75.5, 200),
+        "D2": (177.32, 75.5, 200),
+        "D3": (341.03, 75.5, 200),
+    }
+
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     await api.home_plunger(mount)
@@ -261,6 +276,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                 'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+
+    await api.move_rel(mount, delta=Point(z=5))
 
 
 
@@ -325,20 +342,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         CYCLES = 24
         check_tip_presence = False
 
-    slot_loc = {
-        "A1": (13.42, 394.92, 200),
-        "A2": (177.32, 394.92, 200),
-        "A3": (341.03, 394.92, 200),
-        "B1": (13.42, 288.42, 200),
-        "B2": (177.32, 288.92, 200),
-        "B3": (341.03, 288.92, 200),
-        "C1": (13.42, 181.92, 200),
-        "C2": (177.32, 181.92, 200),
-        "C3": (341.03, 181.92, 200),
-        "D1": (13.42, 75.5, 200),
-        "D2": (177.32, 75.5, 200),
-        "D3": (341.03, 75.5, 200),
-    }
+    
 
     ### optional arg for tip rack calibration
     if(not args.load_cal):
