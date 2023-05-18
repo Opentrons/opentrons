@@ -141,6 +141,11 @@ async def _drop_tip(api: OT3API, trash: Point) -> None:
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, trash + Point(z=20))
     await api.move_to(OT3Mount.LEFT, trash)
     await api.drop_tip(OT3Mount.LEFT)
+    # NOTE: a FW bug (as of v14) will sometimes not fully drop tips.
+    #       so here we ask if the operator needs to try again
+    while not api.is_simulator and ui.get_user_answer("try dropping again"):
+        await api.add_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
+        await api.drop_tip(OT3Mount.LEFT)
     await api.home_z(OT3Mount.LEFT)
 
 
@@ -206,6 +211,8 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     print("picking up tips")
     await api.pick_up_tip(OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME))
     await api.home_z(OT3Mount.LEFT)
+    if not api.is_simulator:
+        ui.get_user_ready("about to move to RESERVOIR")
 
     # TEST DROPLETS for 96 TIPS
     ui.print_header("96 Tips: ASPIRATE and WAIT")
