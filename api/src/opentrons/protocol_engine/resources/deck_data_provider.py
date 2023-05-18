@@ -3,15 +3,17 @@ from dataclasses import dataclass
 from typing import List, Optional, cast
 from typing_extensions import final
 
-from opentrons_shared_data.deck import load as load_deck
+import anyio
+
+from opentrons_shared_data.deck import (
+    load as load_deck,
+    DEFAULT_DECK_DEFINITION_VERSION,
+)
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
-from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-)
 
-from ..types import DeckSlotLocation
+from ..types import DeckSlotLocation, DeckType
 from .labware_data_provider import LabwareDataProvider
 
 
@@ -30,23 +32,29 @@ class DeckDataProvider:
 
     _labware_data: LabwareDataProvider
 
-    def __init__(self, labware_data: Optional[LabwareDataProvider] = None) -> None:
+    def __init__(
+        self, deck_type: DeckType, labware_data: Optional[LabwareDataProvider] = None
+    ) -> None:
         """Initialize a DeckDataProvider."""
+        self._deck_type = deck_type
         self._labware_data = labware_data or LabwareDataProvider()
 
-    # NOTE(mc, 2020-11-18): async to allow file reading and parsing to be
-    # async on a worker thread in the future
-    @staticmethod
-    async def get_deck_definition() -> DeckDefinitionV3:
+    async def get_deck_definition(self) -> DeckDefinitionV3:
         """Get a labware definition given the labware's identification."""
-        return load_deck(guess_deck_type_from_global_config(), 3)
+
+        def sync() -> DeckDefinitionV3:
+            return load_deck(
+                name=self._deck_type.value, version=DEFAULT_DECK_DEFINITION_VERSION
+            )
+
+        return await anyio.to_thread.run_sync(sync)
 
     async def get_deck_fixed_labware(
         self,
         deck_definition: DeckDefinitionV3,
     ) -> List[DeckFixedLabware]:
         """Get a list of all labware fixtures from a given deck definition."""
-        labware = []
+        labware: List[DeckFixedLabware] = []
 
         for fixture in deck_definition["locations"]["fixtures"]:
             labware_id = fixture["id"]

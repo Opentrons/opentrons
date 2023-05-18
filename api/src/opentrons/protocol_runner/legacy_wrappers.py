@@ -20,9 +20,6 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
-from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-)
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 
@@ -144,11 +141,7 @@ class LegacyContextCreator:
         return create_protocol_context(
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
-            # FIXME(mm, 2022-12-02): deck_type, like hardware_api, needs to match the
-            # robot type that the protocol declares itself to run on.
-            # Guessing like this is wrong in in-app analysis.
-            # https://opentrons.atlassian.net/browse/RSS-156
-            deck_type=guess_deck_type_from_global_config(),
+            deck_type=self._protocol_engine.state_view.config.deck_type.value,
             protocol_engine=self._protocol_engine,
             protocol_engine_loop=asyncio.get_running_loop(),
             broker=broker,
