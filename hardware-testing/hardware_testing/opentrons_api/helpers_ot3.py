@@ -655,7 +655,7 @@ class SensorResponseBad(Exception):
 async def _get_temp_humidity(
     messenger: CanMessenger,
     mount: OT3Mount,
-    sensor_id: Optional[SensorId] = SensorId.S0,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Tuple[float, float]:
     node_id = sensor_node_for_mount(mount)
     environment = sensor_types.EnvironmentSensor.build(sensor_id, node_id)
@@ -671,7 +671,7 @@ async def _get_temp_humidity(
 async def get_temperature_humidity_ot3(
     api: OT3API,
     mount: OT3Mount,
-    sensor_id: Optional[SensorId] = SensorId.S0,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
@@ -683,7 +683,7 @@ async def get_temperature_humidity_ot3(
 def get_temperature_humidity_outside_api_ot3(
     mount: OT3Mount,
     is_simulating: bool = False,
-    sensor_id: Optional[SensorId] = SensorId.S0,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette outside of a protocol."""
     settings = DriverSettings(
@@ -711,7 +711,7 @@ def get_temperature_humidity_outside_api_ot3(
 
 
 async def get_capacitance_ot3(
-    api: OT3API, mount: OT3Mount, sensor_id: Optional[SensorId] = SensorId.S0
+    api: OT3API, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
 ) -> float:
     """Get the capacitance reading from the pipette."""
     if api.is_simulator:
@@ -728,7 +728,7 @@ async def get_capacitance_ot3(
 
 
 async def get_pressure_ot3(
-    api: OT3API, mount: OT3Mount, sensor_id: Optional[SensorId] = SensorId.S0
+    api: OT3API, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
 ) -> float:
     """Get the pressure reading from the pipette."""
     if api.is_simulator:

@@ -19,16 +19,18 @@ async def _read_sensor(
     api: OT3API, mount: OT3Mount, sensor_type: SensorType, sensor_id: SensorId
 ) -> List[float]:
     if sensor_type == SensorType.capacitive:
-        vals = await helpers_ot3.get_capacitance_ot3(api, mount, sensor_id)
+        val = await helpers_ot3.get_capacitance_ot3(api, mount, sensor_id)
+        vals = [val]
     elif sensor_type == SensorType.pressure:
-        vals = await helpers_ot3.get_pressure_ot3(api, mount, sensor_id)
+        val = await helpers_ot3.get_pressure_ot3(api, mount, sensor_id)
+        vals = [val]
     elif sensor_type == SensorType.environment:
-        vals = await helpers_ot3.get_temperature_humidity_ot3(api, mount, sensor_id)
-        vals = list(vals)
+        vals_tuple = await helpers_ot3.get_temperature_humidity_ot3(
+            api, mount, sensor_id
+        )
+        vals = list(vals_tuple)
     else:
         raise ValueError(f"unexpected sensor type: {sensor_type.name}")
-    if not isinstance(vals, list):
-        vals = [vals]
     return [round(v, 1) for v in vals]
 
 
