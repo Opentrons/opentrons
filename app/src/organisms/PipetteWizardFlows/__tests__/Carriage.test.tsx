@@ -96,8 +96,12 @@ describe('Carriage', () => {
         {
           commandType: 'home',
           params: {
-            axes: 'rightZ',
+            axes: ['rightZ'],
           },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: { mount: LEFT },
         },
       ],
       false

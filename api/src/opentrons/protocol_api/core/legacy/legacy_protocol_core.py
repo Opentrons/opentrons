@@ -75,7 +75,7 @@ class LegacyProtocolCore(
         self._equipment_broker = equipment_broker or EquipmentBroker()
 
         self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
-            mount: None for mount in Mount
+            mount: None for mount in Mount.ot2_mounts()  # Legacy core works only on OT2
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}

@@ -19,6 +19,7 @@ interface RadioButtonProps extends StyleProps {
   disabled?: boolean
   isSelected?: boolean
   radioButtonType?: 'large' | 'small'
+  subButtonLabel?: string
 }
 
 export function RadioButton(props: RadioButtonProps): JSX.Element {
@@ -29,6 +30,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     isSelected = false,
     onChange,
     radioButtonType = 'large',
+    subButtonLabel,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -96,6 +98,11 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         >
           {buttonLabel}
         </StyledText>
+        {subButtonLabel != null ? (
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {subButtonLabel}
+          </StyledText>
+        ) : null}
       </SettingButtonLabel>
     </Flex>
   )

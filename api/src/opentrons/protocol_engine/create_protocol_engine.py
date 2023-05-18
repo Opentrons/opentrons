@@ -18,7 +18,7 @@ async def create_protocol_engine(
         hardware_api: Hardware control API to pass down to dependencies.
         config: ProtocolEngine configuration.
     """
-    deck_data = DeckDataProvider()
+    deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
     deck_fixed_labware = await deck_data.get_deck_fixed_labware(deck_definition)
     module_calibration_offsets = ModuleDataProvider.load_module_calibrations()

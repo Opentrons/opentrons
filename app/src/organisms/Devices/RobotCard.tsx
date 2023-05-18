@@ -25,7 +25,7 @@ import {
 } from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
@@ -66,7 +66,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       css={BORDERS.cardOutlineBorder}
     >
       <img
-        src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
         style={{ width: '6rem' }}
         id={`RobotCard_${String(robotName)}_robotImage`}
       />

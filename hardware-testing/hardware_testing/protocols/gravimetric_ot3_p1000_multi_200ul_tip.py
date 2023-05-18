@@ -9,7 +9,7 @@ SLOT_SCALE = 4
 SLOTS_TIPRACK = {
     200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
 }
-LABWARE_ON_SCALE = "usascientific_12_reservoir_22ml"
+LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 
 
 def run(ctx: ProtocolContext) -> None:
