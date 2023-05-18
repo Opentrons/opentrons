@@ -78,9 +78,9 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.X: 500,
         OT3AxisKind.Y: 375,
         OT3AxisKind.Z: 35,
-        OT3AxisKind.P: 20,
+        OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 50,
-        OT3AxisKind.Q: 20,
+        OT3AxisKind.Q: 5.5,
     },
     low_throughput={
         OT3AxisKind.X: 600,
@@ -98,7 +98,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Z: 120,
         OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
-        OT3AxisKind.Q: 20,
+        OT3AxisKind.Q: 10,
     },
     low_throughput={
         OT3AxisKind.X: 1600,
@@ -154,7 +154,6 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
         OT3AxisKind.X: 0.5,
         OT3AxisKind.Y: 0.5,
         OT3AxisKind.Z: 0.8,
-        # TODO: verify this value (hopefully will lower to reduce heat)
         OT3AxisKind.P: 0.3,
         OT3AxisKind.Z_G: 0.2,
         OT3AxisKind.Q: 0.3,
@@ -163,7 +162,6 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
         OT3AxisKind.X: 0.5,
         OT3AxisKind.Y: 0.5,
         OT3AxisKind.Z: 0.1,
-        # TODO: verify this value (hopefully will lower to reduce heat)
         OT3AxisKind.P: 0.3,
         OT3AxisKind.Z_G: 0.2,
     },
@@ -182,7 +180,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.X: 1.4,
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
-        # TODO: verify this value (hopefully will lower to reduce heat)
+        # TODO: verify this value
         OT3AxisKind.P: 1.0,
         OT3AxisKind.Z_G: 0.67,
     },
