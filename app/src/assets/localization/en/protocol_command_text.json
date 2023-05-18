@@ -50,5 +50,5 @@
   "waiting_for_hs_to_reach": "Waiting for Heater-Shaker to reach target temperature",
   "waiting_for_tc_block_to_reach": "Waiting for Thermocycler block to reach target temperature and holding for specified time",
   "waiting_for_tc_lid_to_reach": "Waiting for Thermocycler lid to reach target temperature",
-  "waiting_to_reach_temp_module": "Waiting for Temperature Module to reach {{temp}}°C (rounded to nearest integer)"
+  "waiting_to_reach_temp_module": "Waiting for Temperature Module to reach target temperature"
 }

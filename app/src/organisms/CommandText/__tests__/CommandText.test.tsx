@@ -343,9 +343,7 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText(
-      'Waiting for Temperature Module to reach 20°C (rounded to nearest integer)'
-    )
+    getByText('Waiting for Temperature Module to reach target temperature')
   })
   it('renders correct text for thermocycler/setTargetBlockTemperature', () => {
     const mockTemp = 20
