@@ -134,11 +134,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.print_error(f"{probe} cap sensor not working, skipping")
             continue
         print(f"air-pf: {air_pf}")
-        passed = THRESHOLDS["air-pf"][0] <= air_pf <= THRESHOLDS["air-pf"][1]
+        air_passed = THRESHOLDS["air-pf"][0] <= air_pf <= THRESHOLDS["air-pf"][1]
         report(
             section,
             _get_test_tag(probe, "air-pf"),
-            [air_pf, CSVResult.from_bool(passed)],
+            [air_pf, CSVResult.from_bool(air_passed)],
         )
 
         # ATTACHED-pF
@@ -150,15 +150,18 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             ui.print_error(f"{probe} cap sensor not working, skipping")
             continue
         print(f"attached-pf: {attached_pf}")
-        passed = (
+        attached_passed = (
             THRESHOLDS["attached-pf"][0] <= attached_pf <= THRESHOLDS["attached-pf"][1]
         )
-        passed = passed if attached_pf > air_pf else False
+        attached_passed = attached_passed if attached_pf > air_pf else False
         report(
             section,
             _get_test_tag(probe, "attached-pf"),
-            [attached_pf, CSVResult.from_bool(passed)],
+            [attached_pf, CSVResult.from_bool(attached_passed)],
         )
+
+        if not air_passed or not attached_passed:
+            continue
 
         # DECK-mm
         async def _probe(distance: float, speed: float) -> float:

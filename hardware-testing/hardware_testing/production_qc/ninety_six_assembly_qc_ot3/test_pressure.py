@@ -103,7 +103,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 break
         print(f"sealed-pa: {sealed_pa}")
         # FIXME: create stricter pass/fail criteria
-        report(section, _get_test_tag(probe, "open-pa"), [sealed_pa, CSVResult.PASS])
+        report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, CSVResult.PASS])
 
         # ASPIRATE-Pa
         aspirate_pa = 0.0
