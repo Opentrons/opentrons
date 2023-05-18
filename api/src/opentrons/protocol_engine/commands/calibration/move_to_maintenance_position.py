@@ -7,8 +7,8 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons.types import MountType, Point
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point, MountType
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -73,14 +73,13 @@ class MoveToMaintenancePositionImplementation(
         self, params: MoveToMaintenancePositionParams
     ) -> MoveToMaintenancePositionResult:
         """Move the requested mount to a maintenance deck slot."""
-        hardware_mount = params.mount.to_hw_mount()
+        if params.maintenancePosition == MaintenancePosition.AttachInstrument:
+            hardware_mount = OT3Mount.from_mount(params.mount)
+            attach_offset = Point(y=_ATTACH_Y_OFFSET, z=_INSTRUMENT_ATTACH_Z_OFFSET)
+        else:
+            hardware_mount = OT3Mount.BOTH
+            attach_offset = Point(y=_ATTACH_Y_OFFSET, z=_PLATE_ATTACH_Z_OFFSET)
 
-        attach_offset = Point(
-            y=_ATTACH_Y_OFFSET,
-            z=_INSTRUMENT_ATTACH_Z_OFFSET
-            if params.maintenancePosition == MaintenancePosition.AttachInstrument
-            else _PLATE_ATTACH_Z_OFFSET,
-        )
         calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
             offset=attach_offset
         )
