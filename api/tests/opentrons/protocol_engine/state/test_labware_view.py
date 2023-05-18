@@ -929,3 +929,19 @@ def test_get_edge_path_type(
     )
 
     assert result == expected_result
+
+
+def test_get_all_labware_definition(
+    tip_rack_def: LabwareDefinition, falcon_tuberack_def: LabwareDefinition
+) -> None:
+    """It should return the labware definition list."""
+    subject = get_labware_view(
+        definitions_by_uri={
+            "some-tip-rack-uri": tip_rack_def,
+            "falcon-definition": falcon_tuberack_def,
+        },
+    )
+
+    result = subject.get_all_labware_definition()
+
+    assert result == [tip_rack_def, falcon_tuberack_def]

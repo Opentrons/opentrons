@@ -303,7 +303,7 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
-    def get_all_definitions(self) -> List[LabwareDefinition]:
+    def get_all_labware_definition(self) -> List[LabwareDefinition]:
         """Get all the labware definitions."""
         return list(self._state.definitions_by_uri.values())
 

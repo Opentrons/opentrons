@@ -265,9 +265,9 @@ async def get_run_labware_definition(
         run_data_manager: Current and historical run data management.
     """
     labware_definitions = run_data_manager.get_run_labware_definition(run_id=runId)
-    labware_result = ResponseList.construct(__root__=labware_definitions)
+    labware_definitions_result = ResponseList.construct(__root__=labware_definitions)
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=labware_result),
+        content=SimpleBody.construct(data=labware_definitions_result),
         status_code=status.HTTP_200_OK,
     )
 

@@ -170,7 +170,7 @@ class RunDataManager:
                 f"Cannot get labware definitions of {run_id} because it is not the current run."
             )
 
-        return self._engine_store.engine.state_view.labware.get_all_definitions()
+        return self._engine_store.engine.state_view.labware.get_all_labware_definition()
 
     def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.

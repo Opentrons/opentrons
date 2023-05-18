@@ -1,0 +1,74 @@
+test_name: Upload and run a JSONv6 protocol.
+
+marks:
+  - usefixtures:
+      - run_server
+      - clean_server_state
+stages:
+  - name: Upload simple JSONv6 protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple_v6.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+      json:
+        data:
+          id: !anystr
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          status: idle
+          current: True
+          actions: []
+          errors: []
+          pipettes: []
+          modules: []
+          labware:
+            - id: !anystr
+              loadName: !anystr
+              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              location: !anydict
+          labwareOffsets: []
+          liquids:
+            - id: waterId
+              displayName: Water
+              description: Liquid H2O
+              displayColor: '#7332a8'
+          protocolId: '{protocol_id}'
+
+  - name: Fetch run labware definitions
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/labware-definitions'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          - id: !anystr
+            metaData:
+              displayName: Opentrons Fixed Trash
+          - id: !anystr
+            metaData:
+              displayName: Opentrons 96 Tip Rack 10 µL
+          - id: !anystr
+            metaData:
+              displayName: Foo 8 Well Plate 33uL
+          - id: !anystr
+            metaData:
+              displayName: Sample Collection Plate
