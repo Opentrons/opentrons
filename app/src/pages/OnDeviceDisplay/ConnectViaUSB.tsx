@@ -24,7 +24,7 @@ export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   // ToDo (kj:05/16/2023) isConnected part will be implemented later
-  const isConnected = false
+  const isConnected = true
 
   return (
     <>
@@ -71,7 +71,11 @@ export function ConnectViaUSB(): JSX.Element {
               gridGap={SPACING.spacing32}
             >
               <Icon name="ot-check" size="3rem" color={COLORS.green2} />
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
+                alignItems={ALIGN_CENTER}
+              >
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('successfully_connected')}
                 </StyledText>
