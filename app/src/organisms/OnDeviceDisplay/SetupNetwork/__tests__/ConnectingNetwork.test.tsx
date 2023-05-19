@@ -6,10 +6,10 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { ConnectingNetwork } from '../ConnectingNetwork'
 
-const render = () => {
+const render = (props: React.ComponentProps<typeof ConnectingNetwork>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <ConnectingNetwork />
+      <ConnectingNetwork {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -18,15 +18,20 @@ const render = () => {
 }
 
 describe('ConnectingNetwork', () => {
-  it('should render connecting screen with background color', () => {
-    // Note the colors would be changed in the future
-    const [{ getByText }] = render()
-    const connectingScreen = getByText('Connecting...')
-    expect(connectingScreen).toHaveStyle(`background-color: D6D6D6`)
+  let props: React.ComponentProps<typeof ConnectingNetwork>
+
+  beforeEach(() => {
+    props = {
+      ssid: 'mockWifiSsid',
+    }
+  })
+  it('should render text', () => {
+    const [{ getByText }] = render(props)
+    getByText('Connecting to mockWifiSsid...')
   })
 
   it('should render a spinner icon', () => {
-    const [{ getByLabelText }] = render()
+    const [{ getByLabelText }] = render(props)
     expect(getByLabelText('spinner')).toBeInTheDocument()
   })
 })

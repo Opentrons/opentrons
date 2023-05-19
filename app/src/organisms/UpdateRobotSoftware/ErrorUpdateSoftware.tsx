@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import capitalize from 'lodash/capitalize'
 import { useDispatch } from 'react-redux'
 
 import {
@@ -11,13 +10,14 @@ import {
   Icon,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  PrimaryButton,
-  SecondaryButton,
   JUSTIFY_CENTER,
   DIRECTION_ROW,
+  TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
 import { startBuildrootUpdate } from '../../redux/buildroot'
 
 import type { Dispatch } from '../../redux/types'
@@ -30,7 +30,7 @@ export function ErrorUpdateSoftware({
   errorMessage,
   robotName,
 }: ErrorUpdateSoftwareProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
@@ -39,46 +39,50 @@ export function ErrorUpdateSoftware({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+      gridGap={SPACING.spacing32}
+    >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.errorBackgroundMed}
+        backgroundColor={COLORS.red3}
         height="26.625rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
+        borderRadius={BORDERS.size3}
       >
-        <Icon name="ot-alert" size="4.375rem" color={COLORS.errorEnabled} />
-        <StyledText
-          fontSize="2rem"
-          lineHeight="2.75rem"
-          fontWeight="700"
-          color={COLORS.black}
+        <Icon name="ot-alert" size="3.75rem" color={COLORS.errorEnabled} />
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          alignItems={ALIGN_CENTER}
         >
-          {t('software_update_error')}
-        </StyledText>
-        {/* ToDo add error */}
-        {errorMessage}
+          <StyledText
+            as="h2"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
+            color={COLORS.black}
+          >
+            {t('software_update_error')}
+          </StyledText>
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {errorMessage}
+          </StyledText>
+        </Flex>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        marginTop={SPACING.spacing32}
-        gridGap={SPACING.spacing12}
-      >
-        <SecondaryButton
-          height="4.4375rem"
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+        <MediumButton
+          flex="1"
+          buttonType="secondary"
+          buttonText={t('proceed_without_updating')}
           onClick={() => history.push('/robot-settings/rename-robot')}
-          width="100%"
-        >
-          <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-            {t('proceed_without_updating')}
-          </StyledText>
-        </SecondaryButton>
-        <PrimaryButton height="4.4375rem" width="100%" onClick={handleTryAgain}>
-          <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-            {capitalize(t('shared:try_again'))}
-          </StyledText>
-        </PrimaryButton>
+        />
+        <MediumButton
+          flex="1"
+          onClick={handleTryAgain}
+          buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
+        />
       </Flex>
     </Flex>
   )

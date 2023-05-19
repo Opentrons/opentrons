@@ -25,6 +25,9 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { PauseInterventionContent } from './PauseInterventionContent'
+
+import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -43,7 +46,7 @@ const MODAL_STYLE = {
   position: POSITION_RELATIVE,
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
-  width: '100%',
+  maxWidth: '47rem',
   margin: SPACING.spacing24,
   border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
   borderRadius: BORDERS.radiusSoftCorners,
@@ -80,14 +83,26 @@ const FOOTER_STYLE = {
   justifyContent: JUSTIFY_SPACE_BETWEEN,
 } as const
 
+export type InterventionCommandType = WaitForResumeRunTimeCommand
+
 export interface InterventionModalProps {
   robotName: string
+  command: InterventionCommandType
 }
 
 export function InterventionModal({
   robotName,
+  command,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
+
+  let modalContent: JSX.Element
+
+  switch (command.commandType) {
+    case 'pause': // legacy pause command
+    case 'waitForResume':
+      modalContent = <PauseInterventionContent command={command} />
+  }
 
   return (
     <Flex
@@ -113,7 +128,7 @@ export function InterventionModal({
             </StyledText>
           </Box>
           <Box {...CONTENT_STYLE}>
-            Content Goes Here
+            {modalContent}
             <Box {...FOOTER_STYLE}>
               <StyledText>
                 <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>
