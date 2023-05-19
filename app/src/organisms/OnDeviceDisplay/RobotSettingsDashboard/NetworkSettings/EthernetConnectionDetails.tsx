@@ -22,9 +22,9 @@ import type { State, Dispatch } from '../../../../redux/types'
 
 const STRETCH_LIST_STYLE = css`
   width: 100%;
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
   background-color: ${COLORS.light1};
-  border-radius: ${BORDERS.size_three};
+  border-radius: ${BORDERS.size3};
 `
 
 export function EthernetConnectionDetails(): JSX.Element {
@@ -41,7 +41,7 @@ export function EthernetConnectionDetails(): JSX.Element {
   }, [robotName, dispatch])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       {/* IP Address */}
       <EthernetDetailsRow
         title={t('ip_address')}

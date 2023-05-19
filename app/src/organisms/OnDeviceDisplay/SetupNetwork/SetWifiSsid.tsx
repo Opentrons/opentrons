@@ -28,8 +28,8 @@ import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const SSID_INPUT_FIELD_STYLE = css`
-  padding-top: ${SPACING.spacing5};
-  padding-bottom: ${SPACING.spacing5};
+  padding-top: ${SPACING.spacing24};
+  padding-bottom: ${SPACING.spacing24};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   text-align: ${TYPOGRAPHY.textAlignLeft};
@@ -93,11 +93,10 @@ export function SetWifiSsid({
           />
         </Flex>
       </Flex>
-
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingX="6.34375rem"
-        gridGap={SPACING.spacingSM}
+        gridGap={SPACING.spacing12}
       >
         <StyledText
           as="p"

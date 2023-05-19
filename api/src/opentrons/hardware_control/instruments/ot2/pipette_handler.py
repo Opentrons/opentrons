@@ -116,6 +116,11 @@ class PipetteHandlerProvider(Generic[MountType]):
         """
 
         def _reset(m: MountType) -> None:
+            if isinstance(m, top_types.Mount) and m not in top_types.Mount.ot2_mounts():
+                self._ihp_log.warning(
+                    "Received a non OT2 mount for resetting. Skipping"
+                )
+                return
             self._ihp_log.info(f"Resetting configuration for {m}")
             p = self._attached_instruments[m]
             if not p:

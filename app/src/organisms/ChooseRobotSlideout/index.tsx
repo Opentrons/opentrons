@@ -166,17 +166,17 @@ export function ChooseRobotSlideout(
       title={title}
       footer={footer}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         {isAnalysisError ? (
           <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
         ) : null}
-        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing2}>
+        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
           {isScanning ? (
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText
                 as="p"
                 color={COLORS.darkGreyEnabled}
-                marginRight={SPACING.spacingSM}
+                marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
               </StyledText>
@@ -205,7 +205,7 @@ export function ChooseRobotSlideout(
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
             height={SIZE_4}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             <Icon name="alert-circle" size={SIZE_1} />
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -242,8 +242,8 @@ export function ChooseRobotSlideout(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing2}`}
-                    marginBottom={SPACING.spacing3}
+                    marginTop={`-${SPACING.spacing4}`}
+                    marginBottom={SPACING.spacing8}
                   >
                     {runCreationErrorCode === 409 ? (
                       <Trans
@@ -275,7 +275,7 @@ export function ChooseRobotSlideout(
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
             textAlign={TYPOGRAPHY.textAlignCenter}
-            marginTop={SPACING.spacing5}
+            marginTop={SPACING.spacing24}
           >
             <StyledText as="p" color={COLORS.darkGreyEnabled}>
               {showIdleOnly

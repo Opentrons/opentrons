@@ -31,37 +31,35 @@ export const HeaterShakerModuleCard = (
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={SPACING.spacing2}
-      marginBottom={SPACING.spacing3}
-      padding={`${String(SPACING.spacing4)} ${String(
-        SPACING.spacing3
-      )} ${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
+      borderRadius={SPACING.spacing4}
+      marginBottom={SPACING.spacing8}
+      padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8}`}
       width="20rem"
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingRight={SPACING.spacing3}
+        paddingRight={SPACING.spacing8}
         alignItems={ALIGN_FLEX_START}
       >
         <img src={heaterShakerModule} alt="Heater-Shaker" />
-        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing8}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeCaption}
-            paddingBottom={SPACING.spacing2}
+            paddingBottom={SPACING.spacing4}
           >
             {t(module?.usbPort.port === null ? 'usb_hub' : 'usb_port', {
               port: module?.usbPort.hub ?? module?.usbPort.port,
             })}
           </StyledText>
-          <Flex paddingBottom={SPACING.spacing2}>
+          <Flex paddingBottom={SPACING.spacing4}>
             <Icon
               name="ot-heater-shaker"
               aria-label="heater-shaker"
               size={SIZE_1}
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
               color={COLORS.darkGreyEnabled}
             />
             <StyledText fontSize={TYPOGRAPHY.fontSizeP}>

@@ -30,8 +30,8 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
-      marginTop={SPACING.spacing6}
-      gridGap={SPACING.spacing4}
+      marginTop={SPACING.spacing32}
+      gridGap={SPACING.spacing16}
     >
       {toggleGroup}
       {selectedValue === t('list_view') ? (

@@ -300,7 +300,9 @@ class OT3Simulator:
         self._encoder_position.update(final_positions)
 
     @ensure_yield
-    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
+    async def home(
+        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+    ) -> OT3AxisMap[float]:
         """Home axes.
 
         Args:

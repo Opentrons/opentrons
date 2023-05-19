@@ -15,8 +15,8 @@ const JsonTextArea = styled.textarea`
   background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3};
-  margin: ${SPACING.spacing4} 0;
+  padding: ${SPACING.spacing8};
+  margin: ${SPACING.spacing16} 0;
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   font-family: monospace;
   resize: none;

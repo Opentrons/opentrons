@@ -81,8 +81,8 @@ export function RunSummary(): JSX.Element {
 
   const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(`/protocols/${runId}/setup`)
+  const onResetSuccess = (_createRunResponse: Run): void =>
+    history.push(`/runs/${runId}/setup`)
   const { reset } = useRunControls(runId, onResetSuccess)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
@@ -95,6 +95,7 @@ export function RunSummary(): JSX.Element {
     : t('run_failed_modal_title')
 
   const handleReturnToDash = (): void => {
+    closeCurrentRun()
     history.push('/')
   }
 
@@ -117,7 +118,6 @@ export function RunSummary(): JSX.Element {
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
-    closeCurrentRun()
     setShowSplash(false)
   }
 
@@ -141,12 +141,12 @@ export function RunSummary(): JSX.Element {
             alignItems={ALIGN_CENTER}
             position={POSITION_ABSOLUTE}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingXXL}
-            padding={SPACING.spacingXXL}
+            gridGap={SPACING.spacing40}
+            padding={SPACING.spacing40}
             backgroundColor={isRunSucceeded ? COLORS.green2 : COLORS.red2}
           >
             <SplashFrame>
-              <Flex gridGap={SPACING.spacing6} alignItems={ALIGN_CENTER}>
+              <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
                 <Icon
                   name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
                   size="4.5rem"
@@ -165,14 +165,14 @@ export function RunSummary(): JSX.Element {
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING.spacingXXL}
+            padding={SPACING.spacing40}
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing16}
             >
-              <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+              <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                 <Icon
                   name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
                   size={SIZE_2}
@@ -183,7 +183,7 @@ export function RunSummary(): JSX.Element {
                 <SummaryHeader>{runStatusText}</SummaryHeader>
               </Flex>
               <ProtocolName>{protocolName}</ProtocolName>
-              <Flex gridGap={SPACING.spacing3}>
+              <Flex gridGap={SPACING.spacing8}>
                 <SummaryDatum>{`${t(
                   'run'
                 )}: ${createdAtTimestamp}`}</SummaryDatum>
@@ -207,7 +207,7 @@ export function RunSummary(): JSX.Element {
                 )}: ${completedAtTimestamp}`}</SummaryDatum>
               </Flex>
             </Flex>
-            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing4}>
+            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
               <LargeButton
                 flex="1"
                 iconName="arrow-left"
@@ -241,9 +241,9 @@ export function RunSummary(): JSX.Element {
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
-        paddingRight={SPACING.spacing6}
+        paddingRight={SPACING.spacing32}
       >
         <Link to="/dashboard">
           <TertiaryButton>back to RobotDashboard</TertiaryButton>
@@ -284,9 +284,9 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size_two} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size_three};
-  grid-gap: ${SPACING.spacingXXL};
+  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.size3};
+  grid-gap: ${SPACING.spacing40};
 `
 
 const ProtocolName = styled.h4`
@@ -308,8 +308,8 @@ const SummaryDatum = styled.div`
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_CENTER};
-  padding: ${SPACING.spacing3} 0.75rem;
-  grid-gap: ${SPACING.spacing2};
+  padding: ${SPACING.spacing8} ${SPACING.spacing12};
+  grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;

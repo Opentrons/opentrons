@@ -65,7 +65,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       maxHeight="31.25rem"
       overflowY="auto"
       data-testid="SetupLiquidsList_ListView"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
@@ -123,7 +123,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   return (
     <Box
       css={LIQUID_CARD_STYLE}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
       backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
@@ -148,14 +148,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_FLEX_START}
-            gridGap={SPACING.spacing4}
-            marginTop={SPACING.spacing4}
-            marginBottom={SPACING.spacing3}
+            gridGap={SPACING.spacing16}
+            marginTop={SPACING.spacing16}
+            marginBottom={SPACING.spacing8}
           >
             <StyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              marginLeft={SPACING.spacing4}
+              marginLeft={SPACING.spacing16}
               width="8.125rem"
             >
               {t('location')}
@@ -163,7 +163,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             <StyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              marginRight={SPACING.spacing6}
+              marginRight={SPACING.spacing32}
             >
               {t('labware_name')}
             </StyledText>
@@ -172,7 +172,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               width="4.25rem"
               marginLeft="auto"
-              marginRight={SPACING.spacing4}
+              marginRight={SPACING.spacing16}
             >
               {t('volume')}
             </StyledText>
@@ -194,8 +194,8 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
                 borderRadius="4px"
-                marginBottom={SPACING.spacing3}
-                padding={SPACING.spacing4}
+                marginBottom={SPACING.spacing8}
+                padding={SPACING.spacing16}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${String(index)}`}
                 onClick={handleLiquidDetailsLabwareId}
@@ -203,7 +203,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_FLEX_START}
-                  gridGap={SPACING.spacing4}
+                  gridGap={SPACING.spacing16}
                 >
                   <StyledText
                     as="p"
@@ -262,7 +262,7 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
         css={BORDERS.cardOutlineBorder}
-        padding="0.75rem"
+        padding={SPACING.spacing12}
         height="max-content"
         backgroundColor={COLORS.white}
       >
@@ -272,7 +272,7 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginX={SPACING.spacing4}
+          marginX={SPACING.spacing16}
         >
           {displayName}
         </StyledText>
@@ -280,7 +280,7 @@ export const LiquidsListItemDetails = (
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.darkGreyEnabled}
-          marginX={SPACING.spacing4}
+          marginX={SPACING.spacing16}
         >
           {description != null ? description : null}
         </StyledText>
@@ -289,8 +289,8 @@ export const LiquidsListItemDetails = (
         backgroundColor={COLORS.darkBlackEnabled + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
         height="max-content"
-        paddingY={SPACING.spacing2}
-        paddingX={SPACING.spacing3}
+        paddingY={SPACING.spacing4}
+        paddingX={SPACING.spacing8}
         alignSelf={ALIGN_CENTER}
         marginLeft={SIZE_AUTO}
       >

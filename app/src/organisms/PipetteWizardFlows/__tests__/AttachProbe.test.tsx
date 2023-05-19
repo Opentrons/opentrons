@@ -8,8 +8,15 @@ import {
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { CalibrationErrorModal } from '../CalibrationErrorModal'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
+
+jest.mock('../CalibrationErrorModal')
+
+const mockCalibrationErrorModal = CalibrationErrorModal as jest.MockedFunction<
+  typeof CalibrationErrorModal
+>
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
@@ -37,6 +44,9 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
+    mockCalibrationErrorModal.mockReturnValue(
+      <div>mock calibration error modal</div>
+    )
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
@@ -119,8 +129,7 @@ describe('AttachProbe', () => {
       errorMessage: 'error shmerror',
     }
     const { getByText } = render(props)
-    getByText('Error encountered')
-    getByText('error shmerror')
+    getByText('mock calibration error modal')
   })
 
   it('renders the correct text when is on device', async () => {

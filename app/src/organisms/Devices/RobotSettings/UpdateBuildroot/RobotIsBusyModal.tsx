@@ -32,18 +32,18 @@ export function RobotIsBusyModal({
           t={t}
           i18nKey="this_robot_will_restart_with_update"
           components={{
-            block: <StyledText as="p" marginBottom={SPACING.spacing2} />,
+            block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
           }}
         />
         <Flex
           justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           <Btn
             onClick={closeModal}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}

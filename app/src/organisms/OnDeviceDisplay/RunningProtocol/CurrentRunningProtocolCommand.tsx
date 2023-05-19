@@ -142,7 +142,7 @@ export function CurrentRunningProtocolCommand({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       height="29.5rem"
     >
       <Flex
@@ -153,7 +153,7 @@ export function CurrentRunningProtocolCommand({
           <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
-            fontWeight="700"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             {currentRunStatus}
           </StyledText>
@@ -164,7 +164,7 @@ export function CurrentRunningProtocolCommand({
 
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
@@ -175,16 +175,16 @@ export function CurrentRunningProtocolCommand({
         />
       </Flex>
       <Flex
-        padding={`0.75rem ${SPACING.spacing5}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
-        borderRadius={BORDERS.size_two}
+        borderRadius={BORDERS.size2}
         justifyContent={JUSTIFY_CENTER}
+        css={COMMAND_ROW_STYLE}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
-            css={COMMAND_ROW_STYLE}
           />
         ) : null}
       </Flex>
