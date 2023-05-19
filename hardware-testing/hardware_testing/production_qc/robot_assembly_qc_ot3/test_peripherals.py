@@ -4,6 +4,7 @@ from pathlib import Path
 from subprocess import run as run_subprocess, Popen, CalledProcessError
 from typing import List, Union, Optional, Dict
 from urllib.request import urlopen
+from time import time
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import StatusBarState, DoorState
@@ -169,6 +170,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.set_lights(rails=False)
     result = _get_user_confirmation("are the DECK-LIGHTS off")
     report(section, "deck-lights-off", [CSVResult.from_bool(result)])
+    await api.set_lights(rails=True)
 
     # STATUS LIGHTS
     ui.print_header("STATUS LIGHT")
@@ -179,12 +181,25 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await api.set_status_bar_state(StatusBarState.IDLE)
 
     # DOOR SWITCH
+    # NOTE: we need to use asyncio while waiting, so that we don't
+    #       block the event loop from receiving the updated status
     ui.print_header("DOOR SWITCH")
-    if not api.is_simulator:
-        ui.get_user_ready("CLOSE the front door")
+    door_timeout_seconds = 10
+    print("CLOSE the front door")
+    start_time_seconds = time()
+    while not api.is_simulator and api.door_state != DoorState.CLOSED:
+        await asyncio.sleep(0.1)
+        if time() - start_time_seconds > door_timeout_seconds:
+            ui.print_error("timed out waiting for door to close")
+    print(api.door_state)
     is_closed = api.door_state == DoorState.CLOSED
-    if not api.is_simulator:
-        ui.get_user_ready("OPEN the front door")
+    print("OPEN the front door")
+    start_time_seconds = time()
+    while not api.is_simulator and api.door_state != DoorState.OPEN:
+        await asyncio.sleep(0.1)
+        if time() - start_time_seconds > door_timeout_seconds:
+            ui.print_error("timed out waiting for door to open")
+    print(api.door_state)
     is_open = api.door_state == DoorState.OPEN
     report(section, "door-switch", [CSVResult.from_bool(is_closed and is_open)])
 

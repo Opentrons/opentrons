@@ -146,7 +146,15 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-    return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+        kwargs["use_usb_bus"] = True  # type: ignore[assignment]
+    try:
+        return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+    except Exception as e:
+        if is_simulating:
+            raise e
+        print(e)
+        kwargs["use_usb_bus"] = False  # type: ignore[assignment]
+        return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
