@@ -539,6 +539,8 @@ class OT3Controller:
     def _build_home_pipettes_runner(
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
+        # FIXME: this should switch between using low-throughput vs high-throughput
+        #        depending on what is attached
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
@@ -568,6 +570,8 @@ class OT3Controller:
     def _build_home_gantry_z_runner(
         self, axes: Sequence[OT3Axis]
     ) -> Optional[MoveGroupRunner]:
+        # FIXME: this should switch between using low-throughput vs high-throughput
+        #        depending on what is attached
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.low_throughput
         )
