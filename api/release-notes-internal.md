@@ -4,6 +4,18 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
+# Internal Release 0.9.0
+
+This is internal release 0.9.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+
+Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
+
+## Big New Things
+### Robot Control
+- move_labware now requires apiLevel to be at least 2.15. You can now move labware off-deck using the python API by supplying OFF_DECK to the new_location arg.
+
+For more details about this release, please see the full [technical change log][]. 
+
 # Internal Release 0.7.0
 
 This is internal release 0.7.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
