@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, getByTestId } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -54,7 +53,7 @@ describe('SetWifiSsid', () => {
   it('when tapping back button, call a mock function', () => {
     const [{ getByTestId }] = render(props)
     const button = getByTestId('SetWifiSsid_back_button')
-    fireEvent.click(button)
+    button.click()
     expect(props.setChangeState).toBeCalledWith({ type: null })
   })
 
@@ -64,10 +63,10 @@ describe('SetWifiSsid', () => {
     const aKey = getByRole('button', { name: 'a' })
     const bKey = getByRole('button', { name: 'b' })
     const cKey = getByRole('button', { name: 'c' })
-    fireEvent.click(aKey)
-    fireEvent.click(bKey)
-    fireEvent.click(cKey)
-    fireEvent.click(button)
+    aKey.click()
+    bKey.click()
+    cKey.click()
+    button.click()
     expect(props.setSelectedSsid).toBeCalledWith('abc')
     expect(props.setShowSelectAuthenticationType).toBeCalledWith(true)
     expect(props.setChangeState).toBeCalledWith({
@@ -82,9 +81,9 @@ describe('SetWifiSsid', () => {
     const aKey = getByRole('button', { name: 'a' })
     const bKey = getByRole('button', { name: 'b' })
     const cKey = getByRole('button', { name: 'c' })
-    fireEvent.click(aKey)
-    fireEvent.click(bKey)
-    fireEvent.click(cKey)
+    aKey.click()
+    bKey.click()
+    cKey.click()
     expect(inputBox).toHaveValue('abc')
   })
 })
