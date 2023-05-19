@@ -1202,10 +1202,10 @@ class OT3API(
                     moves[0],
                     MoveStopCondition.none,
                 )
-            await self._backend.home([axis])
+            await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home
-            await self._backend.home([axis])
+            await self._backend.home([axis], self.gantry_load)
 
     async def _home(self, axes: Sequence[OT3Axis]) -> None:
         """Home one axis at a time."""
@@ -1215,7 +1215,7 @@ class OT3API(
                     if axis == OT3Axis.G:
                         await self.home_gripper_jaw()
                     elif axis == OT3Axis.Q:
-                        await self._backend.home([axis])
+                        await self._backend.home([axis], self.gantry_load)
                     else:
                         await self._home_axis(axis)
                 except ZeroLengthMoveError:

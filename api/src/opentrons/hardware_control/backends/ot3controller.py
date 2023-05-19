@@ -537,13 +537,13 @@ class OT3Controller:
         self._handle_motor_status_response(positions)
 
     def _build_home_pipettes_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        # FIXME: this should switch between using low-throughput vs high-throughput
-        #        depending on what is attached
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
 
         distances_pipette = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -568,13 +568,13 @@ class OT3Controller:
         return None
 
     def _build_home_gantry_z_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        # FIXME: this should switch between using low-throughput vs high-throughput
-        #        depending on what is attached
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
 
         distances_gantry = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -618,7 +618,9 @@ class OT3Controller:
         return None
 
     @requires_update
-    async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
+    async def home(
+        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+    ) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
@@ -635,8 +637,8 @@ class OT3Controller:
             return {}
 
         maybe_runners = (
-            self._build_home_gantry_z_runner(checked_axes),
-            self._build_home_pipettes_runner(checked_axes),
+            self._build_home_gantry_z_runner(checked_axes, gantry_load),
+            self._build_home_pipettes_runner(checked_axes, gantry_load),
         )
         coros = [
             runner.run(can_messenger=self._messenger)
