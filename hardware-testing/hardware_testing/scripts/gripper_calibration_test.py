@@ -48,7 +48,7 @@ class Gripper_Calibration_Test:
         self.cycles = cycles
         self.slot = slot
         self.jog_speed = 10 # mm/s
-        self.jog_distance = 25 # mm
+        self.jog_distance = 22 # mm
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -184,26 +184,29 @@ class Gripper_Calibration_Test:
         api.add_gripper_probe(self.gripper_probe)
         # Move up
         current_pos = await api.gantry_position(mount)
-        z_offset = current_pos + self.gauge_offsets_front["Z"]
+        z_offset = current_pos + self.gauge_offsets["Z"]
         await api.move_to(mount, z_offset, speed=20)
         # Move above slot center
-        above_slot_center = self.slot_center + self.gauge_offsets_front["Z"]
+        above_slot_center = self.slot_center + self.gauge_offsets["Z"]
         await api.move_to(mount, above_slot_center, speed=20)
         # Measure X-axis gauge
-        print("Measuring X Gauge...")
-        x_gauge = await self._read_gauge("X")
-        self.test_data["X Gauge"] = str(x_gauge)
-        print(f"X Gauge = ", self.test_data["X Gauge"])
+        if "X" in self.gauge_ports:
+            print("Measuring X Gauge...")
+            x_gauge = await self._read_gauge("X")
+            self.test_data["X Gauge"] = str(x_gauge)
+            print(f"X Gauge = ", self.test_data["X Gauge"])
         # Measure Y-axis gauge
-        print("Measuring Y Gauge...")
-        y_gauge = await self._read_gauge("Y")
-        self.test_data["Y Gauge"] = str(y_gauge)
-        print(f"Y Gauge = ", self.test_data["Y Gauge"])
+        if "Y" in self.gauge_ports:
+            print("Measuring Y Gauge...")
+            y_gauge = await self._read_gauge("Y")
+            self.test_data["Y Gauge"] = str(y_gauge)
+            print(f"Y Gauge = ", self.test_data["Y Gauge"])
         # Measure Z-axis gauge
-        print("Measuring Z Gauge...")
-        z_gauge = await self._read_gauge("Z")
-        self.test_data["Z Gauge"] = str(z_gauge)
-        print(f"Z Gauge = ", self.test_data["Z Gauge"])
+        if "Z" in self.gauge_ports:
+            print("Measuring Z Gauge...")
+            z_gauge = await self._read_gauge("Z")
+            self.test_data["Z Gauge"] = str(z_gauge)
+            print(f"Z Gauge = ", self.test_data["Z Gauge"])
         # Remove gripper probe
         api.remove_gripper_probe()
 
@@ -219,7 +222,6 @@ class Gripper_Calibration_Test:
     ) -> None:
         # Calibrate gripper
         await api.home_gripper_jaw()
-        #self.offset, self.slot_center = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
         self.offset = await calibrate_gripper_jaw(api, self.gripper_probe, slot)
         self.slot_center = self.nominal_center - self.offset
 
