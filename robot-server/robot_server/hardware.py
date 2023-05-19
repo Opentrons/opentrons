@@ -3,7 +3,7 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import Callable, Union, TYPE_CHECKING
+from typing import Callable, Union, TYPE_CHECKING, cast
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -155,7 +155,7 @@ async def get_hardware(
 
 
 def get_ot3_hardware(
-    hardware_api: HardwareControlAPI,
+    thread_manager: ThreadManagedHardware,
 ) -> "OT3API":
     """Get a flex hardware controller."""
     try:
@@ -164,20 +164,20 @@ def get_ot3_hardware(
         raise NotSupportedOnOT2(detail=str(exception)).as_error(
             status.HTTP_403_FORBIDDEN
         ) from exception
-    if not isinstance(hardware_api, OT3API):
+    if not thread_manager.wraps_instance(OT3API):
         raise NotSupportedOnOT2(
             detail="This route is only available on a Flex."
         ).as_error(status.HTTP_403_FORBIDDEN)
-    return hardware_api
+    return cast(OT3API, thread_manager.wrapped())
 
 
 async def get_firmware_update_manager(
     app_state: AppState = Depends(get_app_state),
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
     task_runner: TaskRunner = Depends(get_task_runner),
 ) -> FirmwareUpdateManager:
     """Get an update manager to track firmware update statuses."""
-    hardware = get_ot3_hardware(hardware_api)
+    hardware = get_ot3_hardware(thread_manager)
     update_manager = _firmware_update_manager_accessor.get_from(app_state)
 
     if update_manager is None:
@@ -235,9 +235,15 @@ async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
             pass
 
 
-async def _postinit_ot3_tasks(hardware: ThreadManagedHardware) -> None:
+async def _postinit_ot3_tasks(
+    hardware: ThreadManagedHardware, app_state: AppState
+) -> None:
     """Tasks to run on an initialized OT-3 before it is ready to use."""
-    update_manager = await get_firmware_update_manager()
+    update_manager = await get_firmware_update_manager(
+        app_state=app_state,
+        thread_manager=hardware,
+        task_runner=get_task_runner(app_state),
+    )
 
     update_handles = [
         await update_manager.start_update_process(str(uuid4()), subsystem, utc_now())
@@ -355,7 +361,7 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
             except ImportError:
                 pass
         if should_use_ot3():
-            await _postinit_ot3_tasks(hardware)
+            await _postinit_ot3_tasks(hardware, app_state)
         else:
             await _postinit_ot2_tasks(hardware)
 

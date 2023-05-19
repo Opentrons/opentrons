@@ -44,6 +44,7 @@ from opentrons.hardware_control.types import (
     UpdateState as HWUpdateState,
 )
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import ThreadManagedHardware
 
 
 @pytest.fixture
@@ -56,6 +57,14 @@ def update_manager(decoy: Decoy) -> FirmwareUpdateManager:
 def hardware_api(decoy: Decoy) -> OT3API:
     """Build a hardware controller decoy dependency."""
     return decoy.mock(cls=OT3API)
+
+
+@pytest.fixture()
+def thread_manager(decoy: Decoy, hardware_api: OT3API) -> ThreadManagedHardware:
+    """Mock thread manager."""
+    manager = decoy.mock(cls=ThreadManagedHardware)
+    decoy.when(manager.wrapped()).then_return(hardware_api)
+    return manager
 
 
 def _build_attached_subsystem(
@@ -103,12 +112,15 @@ def _build_subsystem_data(
     ],
 )
 async def test_get_attached_subsystems(
-    hardware_api: OT3API, subsystems: Set[HWSubSystem], decoy: Decoy
+    hardware_api: OT3API,
+    thread_manager: ThreadManagedHardware,
+    subsystems: Set[HWSubSystem],
+    decoy: Decoy,
 ) -> None:
     """It should return all subsystems the hardware says are present."""
     subsystem_state = _build_attached_subsystems(subsystems)
     decoy.when(hardware_api.attached_subsystems).then_return(subsystem_state)
-    resp = await get_attached_subsystems(hardware_api)
+    resp = await get_attached_subsystems(thread_manager)
     assert resp.status_code == 200
     responses = [
         _build_subsystem_data(SubSystem.from_hw(subsystem), state)
@@ -127,13 +139,16 @@ async def test_get_attached_subsystems(
     ],
 )
 async def test_get_attached_subsystem(
-    hardware_api: OT3API, subsystem: SubSystem, decoy: Decoy
+    hardware_api: OT3API,
+    thread_manager: ThreadManagedHardware,
+    subsystem: SubSystem,
+    decoy: Decoy,
 ) -> None:
     """It should return data for present subsystems."""
     subsystems_dict = _build_attached_subsystems({subsystem.to_hw()})
     status = subsystems_dict[subsystem.to_hw()]
     decoy.when(hardware_api.attached_subsystems).then_return(subsystems_dict)
-    response = await get_attached_subsystem(subsystem, hardware_api)
+    response = await get_attached_subsystem(subsystem, thread_manager)
     assert response.status_code == 200
     assert response.content.data == PresentSubsystem(
         name=subsystem,
@@ -146,12 +161,12 @@ async def test_get_attached_subsystem(
 
 
 async def test_get_attached_subsystem_handles_not_present_subsystem(
-    hardware_api: OT3API, decoy: Decoy
+    hardware_api: OT3API, thread_manager: ThreadManagedHardware, decoy: Decoy
 ) -> None:
     """It should return an error for a non-present subsystem."""
     decoy.when(hardware_api.attached_subsystems).then_return({})
     with pytest.raises(ApiError) as exc_info:
-        await get_attached_subsystem(SubSystem.gantry_x, hardware_api)
+        await get_attached_subsystem(SubSystem.gantry_x, thread_manager)
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "SubsystemNotPresent"
 

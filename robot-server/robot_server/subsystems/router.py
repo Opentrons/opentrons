@@ -28,7 +28,7 @@ from robot_server.errors.global_errors import IDNotFound
 from robot_server.hardware import (
     get_firmware_update_manager,
     get_ot3_hardware,
-    get_hardware,
+    get_thread_manager,
 )
 
 from robot_server.service.dependencies import get_unique_id, get_current_time
@@ -40,7 +40,7 @@ from .models import (
     SubSystem,
     PresentSubsystem,
 )
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import ThreadManagedHardware
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -106,10 +106,10 @@ class NoOngoingUpdate(ErrorDetails):
     },
 )
 async def get_attached_subsystems(
-    hardware_api: HardwareControlAPI = Depends(get_hardware),
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
 ) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
     """Return all subsystems currently present on the machine."""
-    hardware = get_ot3_hardware(hardware_api)
+    hardware = get_ot3_hardware(thread_manager)
     data = [
         PresentSubsystem.construct(
             name=SubSystem.from_hw(subsystem_id),
@@ -136,13 +136,14 @@ async def get_attached_subsystems(
     },
 )
 async def get_attached_subsystem(
-    subsystem: SubSystem, hardware_api: HardwareControlAPI = Depends(get_hardware)
+    subsystem: SubSystem,
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
 ) -> PydanticResponse[SimpleBody[PresentSubsystem]]:
     """Return the status of a single attached subsystem.
 
     Response: A subsystem status, if the subsystem is present. Otherwise, an appropriate error.
     """
-    hardware = get_ot3_hardware(hardware_api)
+    hardware = get_ot3_hardware(thread_manager)
     subsystem_status = hardware.attached_subsystems.get(subsystem.to_hw(), None)
     if not subsystem_status:
         raise SubsystemNotPresent(detail=subsystem.value).as_error(

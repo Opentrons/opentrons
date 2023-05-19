@@ -17,6 +17,7 @@ from typing import (
     Mapping,
     AsyncGenerator,
     Union,
+    Type,
 )
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
@@ -386,3 +387,7 @@ class ThreadManager(Generic[WrappedObj]):
         or less work out through the rest of the system. Not perfect, but ok.
         """
         return cast(WrappedObj, self)
+
+    def wraps_instance(self, of_type: Type[Any]) -> bool:
+        """Do isinstance() on the wrapped object."""
+        return isinstance(object.__getattribute__(self, "managed_obj"), of_type)
