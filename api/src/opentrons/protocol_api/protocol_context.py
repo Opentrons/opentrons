@@ -424,8 +424,8 @@ class ProtocolContext(CommandPublisher):
                         using :py:meth:`load_labware`
 
         :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module` or off deck using :py:type OFF_DECK.
-
+                             loaded on the deck using :py:meth:`load_module`
+                             or off deck using :py:obj:`OFF_DECK`.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
