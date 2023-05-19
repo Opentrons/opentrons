@@ -37,7 +37,7 @@ from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
-    OT3Axis,
+    Axis,
     OT3Mount,
     OT3SubSystem,
     GripperProbe,
@@ -137,7 +137,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Mount": Mount,
             "Point": Point,
             "Axis": Axis,
-            "OT3Axis": OT3Axis,
+            "Axis": Axis,
             "OT3Mount": OT3Mount,
             "OT3SubSystem": OT3SubSystem,
             "GripperProbe": GripperProbe,

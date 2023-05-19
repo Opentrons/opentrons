@@ -23,7 +23,7 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     HardwareAction,
     Axis,
-    OT3Axis,
+    Axis,
     OT3Mount,
 )
 from opentrons.hardware_control.errors import (
@@ -50,7 +50,7 @@ PipetteHandlingData = Tuple[Pipette, MountType]
 
 MOD_LOG = logging.getLogger(__name__)
 
-AxisType = TypeVar("AxisType", Axis, OT3Axis)
+AxisType = TypeVar("AxisType", Axis, Axis)
 
 
 @dataclass(frozen=True)
@@ -468,7 +468,7 @@ class PipetteHandlerProvider(Generic[MountType]):
     @overload
     def plan_check_aspirate(
         self, mount: OT3Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec[OT3Axis]]:
+    ) -> Optional[LiquidActionSpec[Axis]]:
         ...
 
     # note on this type ignore: see motion_utilities
@@ -519,7 +519,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         )
         if isinstance(mount, OT3Mount):
             return LiquidActionSpec(
-                axis=OT3Axis.of_main_tool_actuator(mount),
+                axis=Axis.of_main_tool_actuator(mount),
                 volume=asp_vol,
                 plunger_distance=dist,
                 speed=speed,
@@ -545,7 +545,7 @@ class PipetteHandlerProvider(Generic[MountType]):
     @overload
     def plan_check_dispense(
         self, mount: OT3Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec[OT3Axis]]:
+    ) -> Optional[LiquidActionSpec[Axis]]:
         ...
 
     def plan_check_dispense(  # type: ignore[no-untyped-def]
@@ -605,7 +605,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
         else:
             return LiquidActionSpec(
-                axis=OT3Axis.of_main_tool_actuator(mount),
+                axis=Axis.of_main_tool_actuator(mount),
                 volume=disp_vol,
                 plunger_distance=dist,
                 speed=speed,
@@ -618,7 +618,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         ...
 
     @overload
-    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[OT3Axis]:
+    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[Axis]:
         ...
 
     def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
@@ -640,7 +640,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
         else:
             return LiquidActionSpec(
-                axis=OT3Axis.of_main_tool_actuator(mount),
+                axis=Axis.of_main_tool_actuator(mount),
                 volume=0,
                 plunger_distance=instrument.config.blow_out,
                 speed=speed,
@@ -687,7 +687,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
-    ) -> Tuple[PickUpTipSpec[OT3Axis], Callable[[], None]]:
+    ) -> Tuple[PickUpTipSpec[Axis], Callable[[], None]]:
         ...
 
     def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
@@ -762,14 +762,14 @@ class PipetteHandlerProvider(Generic[MountType]):
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.config.bottom,
                     plunger_currents={
-                        OT3Axis.of_main_tool_actuator(
+                        Axis.of_main_tool_actuator(
                             mount
                         ): instrument.config.plunger_current
                     },
                     presses=[
                         PickUpTipPressSpec(
                             current={
-                                OT3Axis.by_mount(
+                                Axis.by_mount(
                                     mount
                                 ): instrument.config.pick_up_current
                             },
@@ -847,7 +847,7 @@ class PipetteHandlerProvider(Generic[MountType]):
     @overload
     def plan_check_drop_tip(
         self, mount: OT3Mount, home_after: bool
-    ) -> Tuple[DropTipSpec[OT3Axis], Callable[[], None]]:
+    ) -> Tuple[DropTipSpec[Axis], Callable[[], None]]:
         ...
 
     def plan_check_drop_tip(  # type: ignore[no-untyped-def]
@@ -899,18 +899,18 @@ class PipetteHandlerProvider(Generic[MountType]):
                 bottom,
                 droptip,
                 {
-                    OT3Axis.of_main_tool_actuator(
+                    Axis.of_main_tool_actuator(
                         mount
                     ): instrument.config.plunger_current
                 },
                 {
-                    OT3Axis.of_main_tool_actuator(
+                    Axis.of_main_tool_actuator(
                         mount
                     ): instrument.config.drop_tip_current
                 },
                 speed,
                 home_after,
-                (OT3Axis.of_main_tool_actuator(mount),),
+                (Axis.of_main_tool_actuator(mount),),
             )
 
             seq_ot3 = seq_builder_ot3()
@@ -921,7 +921,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                     drop_moves=seq_ot3,
                     shake_moves=shakes,
                     ending_current={
-                        OT3Axis.of_main_tool_actuator(
+                        Axis.of_main_tool_actuator(
                             mount
                         ): instrument.config.plunger_current
                     },

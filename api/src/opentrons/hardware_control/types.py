@@ -1,3 +1,4 @@
+from __future__ import annotations
 import enum
 import logging
 from dataclasses import dataclass
@@ -15,7 +16,7 @@ from typing import (
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
-
+from opentrons_shared_data.robot.dev_types import RobotType
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -29,63 +30,63 @@ class MotionChecks(enum.Enum):
     BOTH = 3
 
 
-# TODO (spp, 2023-05-11): merge OT3Axis into this and make Axis the only type.
-#  Use Z_L, Z_R, etc as the axes with aliases for Z, A, B, C
-class Axis(enum.Enum):
-    X = 0  # Gantry X
-    Y = 1  # Gantry Y
-    Z = 2  # left pipette mount Z
-    A = 3  # right pipette mount Z
-    B = 4  # left pipette plunger
-    C = 5  # right pipette plunger
-    Z_G = 6  # Gripper Z
-    G = 7  # Gripper Jaws
-
-    @classmethod
-    def by_mount(cls, mount: top_types.Mount) -> "Axis":
-        bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
-        return bm[mount]
-
-    # TODO (spp, 2023-5-4): deprecate this method & create a replacement called 'pipette_mount_axes'
-    @classmethod
-    def mount_axes(cls) -> Tuple["Axis", "Axis"]:
-        """The axes which are used for moving pipettes up and down."""
-        return cls.Z, cls.A
-
-    @classmethod
-    def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
-        """The axes which are tied to the gantry and require the deck
-        calibration transform
-        """
-        return cls.X, cls.Y, cls.Z, cls.A
-
-    @classmethod
-    def of_plunger(cls, mount: top_types.Mount) -> "Axis":
-        pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
-        return pm[mount]
-
-    @classmethod
-    def to_mount(cls, inst: "Axis") -> top_types.Mount:
-        return {
-            cls.Z: top_types.Mount.LEFT,
-            cls.A: top_types.Mount.RIGHT,
-            cls.B: top_types.Mount.LEFT,
-            cls.C: top_types.Mount.RIGHT,
-            cls.Z_G: top_types.Mount.EXTENSION,
-            cls.G: top_types.Mount.EXTENSION,
-        }[inst]
-
-    @classmethod
-    def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
-        return cls.B, cls.C
-
-    @classmethod
-    def ot2_axes(cls) -> List["Axis"]:
-        """Returns only OT2 axes."""
-        return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.G]]
-
-    def __str__(self) -> str:
-        return self.name
+# # TODO (spp, 2023-05-11): merge Axis into this and make Axis the only type.
+# #  Use Z_L, Z_R, etc as the axes with aliases for Z, A, B, C
+# class Axis(enum.Enum):
+#     X = 0  # Gantry X
+#     Y = 1  # Gantry Y
+#     Z = 2  # left pipette mount Z
+#     A = 3  # right pipette mount Z
+#     B = 4  # left pipette plunger
+#     C = 5  # right pipette plunger
+#     Z_G = 6  # Gripper Z
+#     G = 7  # Gripper Jaws
+#
+#     @classmethod
+#     def by_mount(cls, mount: top_types.Mount) -> "Axis":
+#         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
+#         return bm[mount]
+#
+#     # TODO (spp, 2023-5-4): deprecate this method & create a replacement called 'pipette_mount_axes'
+#     @classmethod
+#     def mount_axes(cls) -> Tuple["Axis", "Axis"]:
+#         """The axes which are used for moving pipettes up and down."""
+#         return cls.Z, cls.A
+#
+#     @classmethod
+#     def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
+#         """The axes which are tied to the gantry and require the deck
+#         calibration transform
+#         """
+#         return cls.X, cls.Y, cls.Z, cls.A
+#
+#     @classmethod
+#     def of_plunger(cls, mount: top_types.Mount) -> "Axis":
+#         pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
+#         return pm[mount]
+#
+#     @classmethod
+#     def to_mount(cls, inst: "Axis") -> top_types.Mount:
+#         return {
+#             cls.Z: top_types.Mount.LEFT,
+#             cls.A: top_types.Mount.RIGHT,
+#             cls.B: top_types.Mount.LEFT,
+#             cls.C: top_types.Mount.RIGHT,
+#             cls.Z_G: top_types.Mount.EXTENSION,
+#             cls.G: top_types.Mount.EXTENSION,
+#         }[inst]
+#
+#     @classmethod
+#     def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
+#         return cls.B, cls.C
+#
+#     @classmethod
+#     def ot2_axes(cls) -> List["Axis"]:
+#         """Returns only OT2 axes."""
+#         return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.G]]
+#
+#     def __str__(self) -> str:
+#         return self.name
 
 
 class OT3Mount(enum.Enum):
@@ -139,7 +140,7 @@ class OT3AxisKind(enum.Enum):
         return self in [OT3AxisKind.Z, OT3AxisKind.Z_G]
 
 
-class OT3Axis(enum.Enum):
+class Axis(enum.Enum):
     X = 0  # gantry
     Y = 1
     Z_L = 2  # left pipette mount Z
@@ -150,8 +151,14 @@ class OT3Axis(enum.Enum):
     Q = 7  # hi-throughput pipette tiprack grab
     G = 8  # gripper grab
 
+    # Old axes' aliases:
+    Z = Z_L  # left pipette mount Z
+    A = Z_R  # right pipette mount Z
+    B = P_L  # left pipette plunger
+    C = P_R  # right pipette plunger
+
     @classmethod
-    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> "OT3Axis":
+    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> Axis:
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
@@ -163,7 +170,7 @@ class OT3Axis(enum.Enum):
         return bm[mount]
 
     @classmethod
-    def from_axis(cls, axis: Union[Axis, "OT3Axis"]) -> "OT3Axis":
+    def from_axis(cls, axis: Union[Axis, "Axis"]) -> "Axis":
         am = {
             Axis.X: cls.X,
             Axis.Y: cls.Y,
@@ -181,31 +188,31 @@ class OT3Axis(enum.Enum):
 
     def to_axis(self) -> Axis:
         am = {
-            OT3Axis.X: Axis.X,
-            OT3Axis.Y: Axis.Y,
-            OT3Axis.Z_L: Axis.Z,
-            OT3Axis.Z_R: Axis.A,
-            OT3Axis.P_L: Axis.B,
-            OT3Axis.P_R: Axis.C,
-            OT3Axis.Z_G: Axis.Z_G,
-            OT3Axis.G: Axis.G,
+            Axis.X: Axis.X,
+            Axis.Y: Axis.Y,
+            Axis.Z_L: Axis.Z,
+            Axis.Z_R: Axis.A,
+            Axis.P_L: Axis.B,
+            Axis.P_R: Axis.C,
+            Axis.Z_G: Axis.Z_G,
+            Axis.G: Axis.G,
         }
         return am[self]
 
     @classmethod
-    def pipette_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
+    def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
         """The axes which are used for moving plunger motors."""
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
+    def mount_axes(cls, robot_type: Optional[RobotType]) -> Tuple["Axis", "Axis", "Axis"]:
         """The axes which are used for moving instruments up and down."""
         return cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod
     def gantry_axes(
         cls,
-    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
+    ) -> Tuple["Axis", "Axis", "Axis", "Axis", "Axis"]:
         """The axes which are tied to the gantry and require the deck
         calibration transform
         """
@@ -214,7 +221,7 @@ class OT3Axis(enum.Enum):
     @classmethod
     def of_main_tool_actuator(
         cls, mount: Union[top_types.Mount, OT3Mount]
-    ) -> "OT3Axis":
+    ) -> "Axis":
         if isinstance(mount, top_types.Mount):
             checked_mount = OT3Mount.from_mount(mount)
         else:
@@ -223,8 +230,8 @@ class OT3Axis(enum.Enum):
         return pm[checked_mount]
 
     @classmethod
-    def to_kind(cls, axis: "OT3Axis") -> OT3AxisKind:
-        kind_map: Dict[OT3Axis, OT3AxisKind] = {
+    def to_kind(cls, axis: "Axis") -> OT3AxisKind:
+        kind_map: Dict[Axis, OT3AxisKind] = {
             cls.P_L: OT3AxisKind.P,
             cls.P_R: OT3AxisKind.P,
             cls.X: OT3AxisKind.X,
@@ -238,8 +245,8 @@ class OT3Axis(enum.Enum):
         return kind_map[axis]
 
     @classmethod
-    def of_kind(cls, kind: OT3AxisKind) -> List["OT3Axis"]:
-        kind_map: Dict[OT3AxisKind, List[OT3Axis]] = {
+    def of_kind(cls, kind: OT3AxisKind) -> List["Axis"]:
+        kind_map: Dict[OT3AxisKind, List[Axis]] = {
             OT3AxisKind.P: [cls.P_R, cls.P_L],
             OT3AxisKind.X: [cls.X],
             OT3AxisKind.Y: [cls.Y],
@@ -250,7 +257,7 @@ class OT3Axis(enum.Enum):
         return kind_map[kind]
 
     @classmethod
-    def to_mount(cls, inst: "OT3Axis") -> OT3Mount:
+    def to_mount(cls, inst: "Axis") -> OT3Mount:
         return {
             cls.Z_R: OT3Mount.RIGHT,
             cls.Z_L: OT3Mount.LEFT,
@@ -264,15 +271,15 @@ class OT3Axis(enum.Enum):
     def home_order(
         cls,
     ) -> Tuple[
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
-        "OT3Axis",
+        "Axis",
+        "Axis",
+        "Axis",
+        "Axis",
+        "Axis",
+        "Axis",
+        "Axis",
+        "Axis",
+        "Axis",
     ]:
         return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
 
@@ -280,21 +287,21 @@ class OT3Axis(enum.Enum):
         return self.name
 
     def of_point(self, point: top_types.Point) -> float:
-        if OT3Axis.to_kind(self).is_z_axis():
+        if Axis.to_kind(self).is_z_axis():
             return point.z
-        elif self == OT3Axis.X:
+        elif self == Axis.X:
             return point.x
-        elif self == OT3Axis.Y:
+        elif self == Axis.Y:
             return point.y
         else:
             raise KeyError(self)
 
     def set_in_point(self, point: top_types.Point, position: float) -> top_types.Point:
-        if OT3Axis.to_kind(self).is_z_axis():
+        if Axis.to_kind(self).is_z_axis():
             return point._replace(z=position)
-        elif self == OT3Axis.X:
+        elif self == Axis.X:
             return point._replace(x=position)
-        elif self == OT3Axis.Y:
+        elif self == Axis.Y:
             return point._replace(y=position)
         else:
             raise KeyError(self)
@@ -395,9 +402,9 @@ def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
     return mount_lookup[subsystem]
 
 
-BCAxes = Union[Axis, OT3Axis]
+BCAxes = Axis   # This doesn't seem to be used. Remove?
 AxisMapValue = TypeVar("AxisMapValue")
-OT3AxisMap = Dict[OT3Axis, AxisMapValue]
+OT3AxisMap = Dict[Axis, AxisMapValue]
 
 
 @dataclass
@@ -640,7 +647,7 @@ class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
 
     def __init__(
-        self, triggered_at: Dict[OT3Axis, float], min_z_pos: Dict[OT3Axis, float]
+        self, triggered_at: Dict[Axis, float], min_z_pos: Dict[Axis, float]
     ) -> None:
         """Initialize EarlyLiquidSenseTrigger error."""
         super().__init__(
@@ -653,7 +660,7 @@ class LiquidNotFound(RuntimeError):
     """Error raised if liquid sensing move completes without detecting liquid."""
 
     def __init__(
-        self, position: Dict[OT3Axis, float], max_z_pos: Dict[OT3Axis, float]
+        self, position: Dict[Axis, float], max_z_pos: Dict[Axis, float]
     ) -> None:
         """Initialize LiquidNotFound error."""
         super().__init__(

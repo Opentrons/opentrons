@@ -5,7 +5,7 @@ from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
 from opentrons.util import linal
-from .types import Axis, OT3Axis, OT3Mount
+from .types import Axis, Axis, OT3Mount
 from functools import lru_cache
 
 
@@ -50,86 +50,19 @@ def offset_for_mount(
     }
     return offsets[primary_mount]
 
-
-@overload
-def _x_for_mount(mount: Mount) -> Axis:
-    ...
-
-
-@overload
-def _x_for_mount(mount: OT3Mount) -> OT3Axis:
-    ...
-
-
-def _x_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
-    if isinstance(mount, Mount):
-        return Axis.X
-    else:
-        return OT3Axis.X
-
-
-@overload
-def _y_for_mount(mount: Mount) -> Axis:
-    ...
-
-
-@overload
-def _y_for_mount(mount: OT3Mount) -> OT3Axis:
-    ...
-
-
-def _y_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
-    if isinstance(mount, Mount):
-        return Axis.Y
-    else:
-        return OT3Axis.Y
-
-
-@overload
-def _z_for_mount(mount: Mount) -> Axis:
-    ...
-
-
-@overload
-def _z_for_mount(mount: OT3Mount) -> OT3Axis:
-    ...
-
-
-def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
-    if isinstance(mount, Mount):
-        return Axis.by_mount(mount)
-    else:
-        return OT3Axis.by_mount(mount)
-
-
-@overload
-def _plunger_for_mount(mount: Mount) -> Axis:
-    ...
-
-
-@overload
-def _plunger_for_mount(mount: OT3Mount) -> OT3Axis:
-    ...
-
-
-def _plunger_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
-    if isinstance(mount, Mount):
-        return Axis.of_plunger(mount)
-    else:
-        return OT3Axis.of_main_tool_actuator(mount)
-
-
+# TODO (spp, 2023-05-19): _axis_name & _axis_enum don't seem to be used anywhere. Remove them.
 @overload
 def _axis_name(ax: Axis) -> str:
     ...
 
 
 @overload
-def _axis_name(ax: OT3Axis) -> OT3Axis:
+def _axis_name(ax: Axis) -> Axis:
     ...
 
 
-def _axis_name(ax: Union[Axis, OT3Axis]) -> Union[str, OT3Axis]:
+# TODO (spp, 2023-05-19): how to update this?
+def _axis_name(ax: Axis) -> Union[str, Axis]:
     if isinstance(ax, Axis):
         return ax.name
     else:
@@ -142,12 +75,12 @@ def _axis_enum(ax: str) -> Axis:
 
 
 @overload
-def _axis_enum(ax: OT3Axis) -> OT3Axis:
+def _axis_enum(ax: Axis) -> Axis:
     ...
 
 
-def _axis_enum(ax: Union[str, OT3Axis]) -> Union[Axis, OT3Axis]:
-    if isinstance(ax, OT3Axis):
+def _axis_enum(ax: Union[str, Axis]) -> Axis:
+    if isinstance(ax, Axis):
         return ax
     else:
         return Axis[ax]
@@ -173,7 +106,7 @@ def target_position_from_absolute(
     left_mount_offset: Point,
     right_mount_offset: Point,
     gripper_mount_offset: Point,
-) -> "OrderedDict[OT3Axis, float]":
+) -> "OrderedDict[Axis, float]":
     ...
 
 
@@ -192,7 +125,7 @@ def target_position_from_absolute(
 # def do_something(a: str, b: str)
 # narrows that to 2.
 #
-# It's needed here because OT3Mount and OT3Axis can't really be
+# It's needed here because OT3Mount and Axis can't really be
 # related, neither can Mount and Axis and str, etc.
 # The problem is that this is for _external callers_. When typechecking
 # the implementation of the overload, mypy doesn't consider the overload
@@ -211,11 +144,11 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
         mount, left_mount_offset, right_mount_offset, gripper_mount_offset
     )
     primary_cp = get_critical_point(mount)
-    primary_z = _z_for_mount(mount)
+    primary_z = Axis.by_mount(mount)
     target_position = OrderedDict(
         (
-            (_x_for_mount(mount), abs_position.x - offset.x - primary_cp.x),
-            (_y_for_mount(mount), abs_position.y - offset.y - primary_cp.y),
+            (Axis.X, abs_position.x - offset.x - primary_cp.x),
+            (Axis.Y, abs_position.y - offset.y - primary_cp.y),
             (primary_z, abs_position.z - offset.z - primary_cp.z),
         )
     )
@@ -231,8 +164,8 @@ def target_position_from_relative(
 
 @overload
 def target_position_from_relative(
-    mount: OT3Mount, delta: Point, current_position: Dict[OT3Axis, float]
-) -> "OrderedDict[OT3Axis, float]":
+    mount: OT3Mount, delta: Point, current_position: Dict[Axis, float]
+) -> "OrderedDict[Axis, float]":
     ...
 
 
@@ -242,9 +175,9 @@ def target_position_from_relative(  # type: ignore[no-untyped-def]
     current_position,
 ):
     """Create a target position for all specified machine axes."""
-    primary_z = _z_for_mount(mount)
-    x_ax = _x_for_mount(mount)
-    y_ax = _y_for_mount(mount)
+    primary_z = Axis.by_mount(mount)
+    x_ax = Axis.X
+    y_ax = Axis.Y
     target_position = OrderedDict(
         (
             (x_ax, current_position[x_ax] + delta[0]),
@@ -264,8 +197,8 @@ def target_position_from_plunger(
 
 @overload
 def target_position_from_plunger(
-    mount: OT3Mount, delta: float, current_position: Dict[OT3Axis, float]
-) -> "OrderedDict[OT3Axis, float]":
+    mount: OT3Mount, delta: float, current_position: Dict[Axis, float]
+) -> "OrderedDict[Axis, float]":
     ...
 
 
@@ -279,8 +212,8 @@ def target_position_from_plunger(  # type: ignore[no-untyped-def]
     Axis positions other than the plunger are identical to current
     position.
     """
-    x_ax = _x_for_mount(mount)
-    y_ax = _y_for_mount(mount)
+    x_ax = Axis.X
+    y_ax = Axis.Y
     all_axes_pos = OrderedDict(
         (
             (x_ax, current_position[x_ax]),
@@ -288,8 +221,8 @@ def target_position_from_plunger(  # type: ignore[no-untyped-def]
         )
     )
     plunger_pos = OrderedDict()
-    z_ax = _z_for_mount(mount)
-    plunger = _plunger_for_mount(mount)
+    z_ax = Axis.by_mount(mount)
+    plunger = Axis.of_main_tool_actuator(mount)
     all_axes_pos[z_ax] = current_position[z_ax]
     plunger_pos[plunger] = delta
     all_axes_pos.update(plunger_pos)
@@ -313,7 +246,7 @@ def machine_point_from_deck_point(
     return Point(*linal.apply_transform(attitude, deck_point)) + offset
 
 
-AxisType = TypeVar("AxisType", Axis, OT3Axis)
+AxisType = TypeVar("AxisType", Axis, Axis)
 
 
 def machine_from_deck(

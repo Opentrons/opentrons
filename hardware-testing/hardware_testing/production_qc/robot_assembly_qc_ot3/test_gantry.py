@@ -15,7 +15,7 @@ from hardware_testing.opentrons_api.types import OT3Axis
 from hardware_testing.data import ui
 
 
-GANTRY_AXES = [types.OT3Axis.X, types.OT3Axis.Y, types.OT3Axis.Z_L, types.OT3Axis.Z_R]
+GANTRY_AXES = [types.Axis.X, types.Axis.Y, types.Axis.Z_L, types.Axis.Z_R]
 
 # NOTE: max travel distances are from EVT robot extents document
 MAX_TRAVEL = {OT3Axis.X: 537.49, OT3Axis.Y: 405.815, OT3Axis.Z_L: 215, OT3Axis.Z_R: 215}

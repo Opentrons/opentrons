@@ -25,7 +25,7 @@ async def _main(is_simulating: bool) -> None:
     # drop the tip (in place)
     await api.drop_tip(mount)
     # disengage XY axes when done
-    await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
+    await api.disengage_axes([types.Axis.X, types.Axis.Y])
 
 
 if __name__ == "__main__":

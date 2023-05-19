@@ -28,7 +28,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
 from opentrons.hardware_control.types import (
-    OT3Axis,
+    Axis,
     OT3Mount,
     OT3AxisMap,
     MotorStatus,
@@ -213,16 +213,16 @@ def fw_node_info() -> Dict[NodeId, DeviceInfoCache]:
 
 
 home_test_params = [
-    [OT3Axis.X],
-    [OT3Axis.Y],
-    [OT3Axis.Z_L],
-    [OT3Axis.Z_R],
-    [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R],
-    [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
-    [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R],
-    [OT3Axis.P_R],
-    [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G],
-    [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G],
+    [Axis.X],
+    [Axis.Y],
+    [Axis.Z_L],
+    [Axis.Z_R],
+    [Axis.X, Axis.Y, Axis.Z_R],
+    [Axis.X, Axis.Z_R, Axis.P_R, Axis.Y, Axis.Z_L],
+    [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L, Axis.P_R],
+    [Axis.P_R],
+    [Axis.Z_L, Axis.Z_R, Axis.Z_G],
+    [Axis.X, Axis.Y, Axis.Z_G],
 ]
 
 
@@ -230,7 +230,7 @@ def move_group_run_side_effect(controller, axes_to_home):
     """Return homed position for axis that is present and was commanded to home."""
     gantry_homes = {
         axis_to_node(ax): (0.0, 0.0, True, True)
-        for ax in OT3Axis.gantry_axes()
+        for ax in Axis.gantry_axes()
         if ax in axes_to_home and axis_to_node(ax) in controller._present_devices
     }
     if gantry_homes:
@@ -238,7 +238,7 @@ def move_group_run_side_effect(controller, axes_to_home):
 
     pipette_homes = {
         axis_to_node(ax): (0.0, 0.0, True, True)
-        for ax in OT3Axis.pipette_axes()
+        for ax in Axis.pipette_axes()
         if ax in axes_to_home and axis_to_node(ax) in controller._present_devices
     }
     yield pipette_homes
@@ -278,13 +278,13 @@ async def test_home_prioritize_mount(
     assert not controller._motor_status
 
     await controller.home(axes)
-    has_xy = len({OT3Axis.X, OT3Axis.Y} & set(axes)) > 0
-    has_mount = len(set(OT3Axis.mount_axes()) & set(axes)) > 0
+    has_xy = len({Axis.X, Axis.Y} & set(axes)) > 0
+    has_mount = len(set(Axis.mount_axes()) & set(axes)) > 0
     run = mock_move_group_run.call_args_list[0][0][0]._move_groups
     if has_xy and has_mount:
         assert len(run) > 1
         for node in run[0][0]:
-            assert node_to_axis(node) in OT3Axis.mount_axes()
+            assert node_to_axis(node) in Axis.mount_axes()
         for node in run[1][0]:
             assert node in [NodeId.gantry_x, NodeId.gantry_y]
     else:
@@ -303,8 +303,8 @@ async def test_home_build_runners(
     assert not controller._motor_status
 
     await controller.home(axes)
-    has_pipette = len(set(OT3Axis.pipette_axes()) & set(axes)) > 0
-    has_gantry = len(set(OT3Axis.gantry_axes()) & set(axes)) > 0
+    has_pipette = len(set(Axis.pipette_axes()) & set(axes)) > 0
+    has_gantry = len(set(Axis.gantry_axes()) & set(axes)) > 0
 
     if has_pipette and has_gantry:
         assert len(mock_move_group_run.call_args_list) == 2
@@ -312,9 +312,9 @@ async def test_home_build_runners(
         run_pipette = mock_move_group_run.call_args_list[1][0][0]._move_groups
         for group in run_gantry:
             for node in group[0]:
-                assert node_to_axis(node) in OT3Axis.gantry_axes()
+                assert node_to_axis(node) in Axis.gantry_axes()
         for node in run_pipette[0][0]:
-            assert node_to_axis(node) in OT3Axis.pipette_axes()
+            assert node_to_axis(node) in Axis.pipette_axes()
 
     if not has_pipette or not has_gantry:
         assert len(mock_move_group_run.call_args_list) == 1
@@ -581,8 +581,8 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
         res = await controller.get_limit_switches()
         assert call_count == 1
         assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
-        assert OT3Axis.X in res
-        assert OT3Axis.Y in res
+        assert Axis.X in res
+        assert Axis.Y in res
 
 
 @pytest.mark.parametrize(
@@ -615,7 +615,7 @@ async def test_ready_for_movement(
 ) -> None:
     controller._motor_status = motor_status
 
-    axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]
+    axes = [Axis.X, Axis.Y, Axis.Z_L]
     assert controller.check_motor_status(axes) == ready
 
 
@@ -636,7 +636,7 @@ async def test_liquid_probe(
         log_pressure=fake_liquid_settings.log_pressure,
     )
     move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
-    head_node = axis_to_node(OT3Axis.by_mount(mount))
+    head_node = axis_to_node(Axis.by_mount(mount))
     tool_node = sensor_node_for_mount(mount)
     assert move_groups[head_node].stop_condition == MoveStopCondition.sync_line
     assert len(move_groups) == 2
@@ -644,7 +644,7 @@ async def test_liquid_probe(
 
 
 async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> None:
-    await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="clamp")
+    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="clamp")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -657,7 +657,7 @@ async def test_tip_action(controller: OT3Controller, mock_move_group_run) -> Non
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action([OT3Axis.P_L], 33, -5.5, tip_action="home")
+    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="home")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -739,12 +739,12 @@ async def test_set_default_currents(
             use_tip_motor_message_for=expected_call,
         )
         for k, v in mock_present_devices._current_settings.items():
-            if k == OT3Axis.P_L and (
+            if k == Axis.P_L and (
                 gantry_load == GantryLoad.HIGH_THROUGHPUT
                 and expected_call[0] == NodeId.pipette_left
             ):
                 # q motor config
-                v = mock_present_devices._current_settings[OT3Axis.Q]
+                v = mock_present_devices._current_settings[Axis.Q]
                 assert (
                     mocked_currents.call_args_list[0][0][1][axis_to_node(k)]
                     == v.as_tuple()
@@ -760,12 +760,12 @@ async def test_set_default_currents(
     argnames=["active_current", "gantry_load", "expected_call"],
     argvalues=[
         [
-            {OT3Axis.X: 1.0, OT3Axis.Y: 2.0},
+            {Axis.X: 1.0, Axis.Y: 2.0},
             GantryLoad.LOW_THROUGHPUT,
             [{NodeId.gantry_x: 1.0, NodeId.gantry_y: 2.0}, []],
         ],
         [
-            {OT3Axis.Q: 1.5},
+            {Axis.Q: 1.5},
             GantryLoad.HIGH_THROUGHPUT,
             [{NodeId.pipette_left: 1.5}, [NodeId.pipette_left]],
         ],
@@ -798,12 +798,12 @@ async def test_set_run_current(
     argnames=["hold_current", "gantry_load", "expected_call"],
     argvalues=[
         [
-            {OT3Axis.P_L: 0.5, OT3Axis.Y: 0.8},
+            {Axis.P_L: 0.5, Axis.Y: 0.8},
             GantryLoad.LOW_THROUGHPUT,
             [{NodeId.pipette_left: 0.5, NodeId.gantry_y: 0.8}, []],
         ],
         [
-            {OT3Axis.Q: 0.8},
+            {Axis.Q: 0.8},
             GantryLoad.HIGH_THROUGHPUT,
             [{NodeId.pipette_left: 0.8}, [NodeId.pipette_left]],
         ],
@@ -836,7 +836,7 @@ async def test_update_required_flag(
     mock_messenger: CanMessenger, controller: OT3Controller
 ) -> None:
     """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
-    axes = [OT3Axis.X, OT3Axis.Y]
+    axes = [Axis.X, Axis.Y]
     controller._present_devices = {NodeId.gantry_x, NodeId.gantry_y}
 
     with patch("builtins.open", mock_open()):
@@ -884,7 +884,7 @@ async def test_update_required_flag_false(controller: OT3Controller):
         "opentrons.hardware_control.backends.ot3controller.set_run_current",
         fake_src,
     ):
-        await controller.set_active_current({OT3Axis.X: 2})
+        await controller.set_active_current({Axis.X: 2})
 
 
 async def test_update_required_flag_initialized(controller: OT3Controller):
@@ -912,7 +912,7 @@ async def test_update_required_flag_initialized(controller: OT3Controller):
         "opentrons.hardware_control.backends.ot3controller.set_run_current",
         fake_src,
     ):
-        await controller.set_active_current({OT3Axis.X: 2})
+        await controller.set_active_current({Axis.X: 2})
 
 
 async def test_update_required_flag_disabled(controller: OT3Controller):
@@ -939,7 +939,7 @@ async def test_update_required_flag_disabled(controller: OT3Controller):
         "opentrons.hardware_control.backends.ot3controller.set_run_current",
         fake_src,
     ):
-        await controller.set_active_current({OT3Axis.X: 2})
+        await controller.set_active_current({Axis.X: 2})
 
 
 async def test_update_firmware_update_required(

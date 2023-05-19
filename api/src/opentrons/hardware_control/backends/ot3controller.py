@@ -110,7 +110,7 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
     InstrumentFWInfo,
-    OT3Axis,
+    Axis,
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
@@ -411,7 +411,7 @@ class OT3Controller:
         response = await get_motor_position(self._messenger, motor_nodes)
         self._handle_motor_status_response(response)
 
-    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
+    async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
         for node in nodes:
@@ -470,17 +470,17 @@ class OT3Controller:
         self._module_controls = module_controls
 
     def _get_motor_status(
-        self, ax: Sequence[OT3Axis]
+        self, ax: Sequence[Axis]
     ) -> Iterator[Optional[MotorStatus]]:
         return (self._motor_status.get(axis_to_node(a)) for a in ax)
 
-    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_motor_status(self, axes: Sequence[Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
             for status in self._get_motor_status(axes)
         )
 
-    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_encoder_status(self, axes: Sequence[Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
@@ -516,8 +516,8 @@ class OT3Controller:
     @requires_update
     async def move(
         self,
-        origin: Coordinates[OT3Axis, float],
-        moves: List[Move[OT3Axis]],
+        origin: Coordinates[Axis, float],
+        moves: List[Move[Axis]],
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
@@ -537,7 +537,7 @@ class OT3Controller:
         self._handle_motor_status_response(positions)
 
     def _build_home_pipettes_runner(
-        self, axes: Sequence[OT3Axis]
+        self, axes: Sequence[Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.low_throughput
@@ -546,12 +546,12 @@ class OT3Controller:
         distances_pipette = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
             for ax in axes
-            if ax in OT3Axis.pipette_axes()
+            if ax in Axis.pipette_axes()
         }
         velocities_pipette = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            ax: -1 * speed_settings[Axis.to_kind(ax)]
             for ax in axes
-            if ax in OT3Axis.pipette_axes()
+            if ax in Axis.pipette_axes()
         }
 
         move_group_pipette = []
@@ -566,7 +566,7 @@ class OT3Controller:
         return None
 
     def _build_home_gantry_z_runner(
-        self, axes: Sequence[OT3Axis]
+        self, axes: Sequence[Axis]
     ) -> Optional[MoveGroupRunner]:
         speed_settings = (
             self._configuration.motion_settings.max_speed_discontinuity.low_throughput
@@ -575,22 +575,22 @@ class OT3Controller:
         distances_gantry = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
             for ax in axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+            if ax in Axis.gantry_axes() and ax not in Axis.mount_axes()
         }
         velocities_gantry = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            ax: -1 * speed_settings[Axis.to_kind(ax)]
             for ax in axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+            if ax in Axis.gantry_axes() and ax not in Axis.mount_axes()
         }
         distances_z = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
             for ax in axes
-            if ax in OT3Axis.mount_axes()
+            if ax in Axis.mount_axes()
         }
         velocities_z = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            ax: -1 * speed_settings[Axis.to_kind(ax)]
             for ax in axes
-            if ax in OT3Axis.mount_axes()
+            if ax in Axis.mount_axes()
         }
         move_group_gantry_z = []
         if distances_z and velocities_z:
@@ -601,7 +601,7 @@ class OT3Controller:
         if distances_gantry and velocities_gantry:
             # home X axis before Y axis, to avoid collision with thermo-cycler lid
             # that could be in the back-left corner
-            for ax in [OT3Axis.X, OT3Axis.Y]:
+            for ax in [Axis.X, Axis.Y]:
                 if ax in axes:
                     gantry_move = self._filter_move_group(
                         create_home_group(
@@ -614,18 +614,18 @@ class OT3Controller:
         return None
 
     @requires_update
-    async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
+    async def home(self, axes: Sequence[Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
-            axes: List[OT3Axis]
+            axes: List[Axis]
 
         Returns:
             A dictionary containing the new positions of each axis
         """
         checked_axes = [axis for axis in axes if self.axis_is_present(axis)]
         assert (
-            OT3Axis.G not in checked_axes
+                Axis.G not in checked_axes
         ), "Please home G axis using gripper_home_jaw()"
         if not checked_axes:
             return {}
@@ -640,12 +640,12 @@ class OT3Controller:
             if runner
         ]
         positions = await asyncio.gather(*coros)
-        if OT3Axis.Q in checked_axes:
+        if Axis.Q in checked_axes:
             await self.tip_action(
-                [OT3Axis.Q],
-                self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
+                [Axis.Q],
+                self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
                 self._configuration.motion_settings.default_max_speed.high_throughput[
-                    OT3Axis.to_kind(OT3Axis.Q)
+                    Axis.to_kind(Axis.Q)
                 ],
             )
         for position in positions:
@@ -666,7 +666,7 @@ class OT3Controller:
 
     async def tip_action(
         self,
-        axes: Sequence[OT3Axis],
+        axes: Sequence[Axis],
         distance: float,
         speed: float,
         tip_action: str = "home",
@@ -802,12 +802,12 @@ class OT3Controller:
         current_tools = dict(OT3Controller._generate_attached_instrs(attached))
         # remove pipette_left, pipette_right and gripper
         self._present_devices -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
+            axis_to_node(Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
         # add pipette_left, pipette_right and gripper if present
         for mount in current_tools.keys():
             self._present_devices.add(
-                axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+                axis_to_node(Axis.of_main_tool_actuator(mount))
             )
         return current_tools
 
@@ -819,8 +819,8 @@ class OT3Controller:
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
     @staticmethod
-    def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
-        return [axis_to_node(OT3Axis.Q)] if OT3Axis.Q in axis_current_keys else []
+    def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:
+        return [axis_to_node(Axis.Q)] if Axis.Q in axis_current_keys else []
 
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
@@ -920,26 +920,26 @@ class OT3Controller:
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
-            OT3Axis.Z_L: phony_bounds,
-            OT3Axis.Z_R: phony_bounds,
-            OT3Axis.P_L: phony_bounds,
-            OT3Axis.P_R: phony_bounds,
-            OT3Axis.X: phony_bounds,
-            OT3Axis.Y: phony_bounds,
-            OT3Axis.Z_G: phony_bounds,
-            OT3Axis.Q: phony_bounds,
+            Axis.Z_L: phony_bounds,
+            Axis.Z_R: phony_bounds,
+            Axis.P_L: phony_bounds,
+            Axis.P_R: phony_bounds,
+            Axis.X: phony_bounds,
+            Axis.Y: phony_bounds,
+            Axis.Z_G: phony_bounds,
+            Axis.Q: phony_bounds,
         }
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
         return {}
 
-    async def disengage_axes(self, axes: List[OT3Axis]) -> None:
+    async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         nodes = {axis_to_node(ax) for ax in axes}
         await set_disable_motor(self._messenger, nodes)
 
-    async def engage_axes(self, axes: List[OT3Axis]) -> None:
+    async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
         nodes = {axis_to_node(ax) for ax in axes}
         await set_enable_motor(self._messenger, nodes)
@@ -972,7 +972,7 @@ class OT3Controller:
         if error != ErrorCode.ok:
             log.warning(f"Halt stop request failed: {error}")
 
-    async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
+    async def probe(self, axis: Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
 
@@ -1056,7 +1056,7 @@ class OT3Controller:
         self._present_devices = core_present
         log.info(f"The present devices are now {self._present_devices}")
 
-    def axis_is_present(self, axis: OT3Axis) -> bool:
+    def axis_is_present(self, axis: Axis) -> bool:
         try:
             return axis_to_node(axis) in self._motor_nodes()
         except KeyError:
@@ -1081,7 +1081,7 @@ class OT3Controller:
         num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
-        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_mount(OT3Mount(mount.value))
         positions = await liquid_probe(
             self._messenger,
@@ -1104,7 +1104,7 @@ class OT3Controller:
     async def capacitive_probe(
         self,
         mount: OT3Mount,
-        moving: OT3Axis,
+        moving: Axis,
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
@@ -1125,7 +1125,7 @@ class OT3Controller:
     async def capacitive_pass(
         self,
         mount: OT3Mount,
-        moving: OT3Axis,
+        moving: Axis,
         distance_mm: float,
         speed_mm_per_s: float,
         probe: InstrumentProbeType,

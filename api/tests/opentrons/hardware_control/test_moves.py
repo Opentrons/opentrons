@@ -24,7 +24,7 @@ from opentrons.hardware_control.robot_calibration import (
     RobotCalibration,
     DeckCalibration,
 )
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.hardware_control.types import Axis
 
 
 async def test_controller_must_home(hardware_api):
@@ -71,31 +71,31 @@ async def test_retract(hardware_api):
 def mock_home(ot3_hardware):
     with mock.patch.object(ot3_hardware._backend, "home") as mock_home:
         mock_home.return_value = {
-            OT3Axis.X: 0,
-            OT3Axis.Y: 0,
-            OT3Axis.Z_L: 0,
-            OT3Axis.Z_R: 0,
-            OT3Axis.P_L: 0,
-            OT3Axis.P_R: 0,
-            OT3Axis.Z_G: 0,
-            OT3Axis.G: 0,
+            Axis.X: 0,
+            Axis.Y: 0,
+            Axis.Z_L: 0,
+            Axis.Z_R: 0,
+            Axis.P_L: 0,
+            Axis.P_R: 0,
+            Axis.Z_G: 0,
+            Axis.G: 0,
         }
         yield mock_home
 
 
 async def test_home(ot3_hardware, mock_home):
     with mock.patch("opentrons.hardware_control.ot3api.deck_from_machine") as dfm_mock:
-        dfm_mock.return_value = {OT3Axis.X: 20}
-        await ot3_hardware._home([OT3Axis.X])
+        dfm_mock.return_value = {Axis.X: 20}
+        await ot3_hardware._home([Axis.X])
 
-        mock_home.assert_called_once_with([OT3Axis.X])
+        mock_home.assert_called_once_with([Axis.X])
         assert dfm_mock.call_count == 2
         dfm_mock.assert_called_with(
             mock_home.return_value,
             ot3_hardware._transforms.deck_calibration.attitude,
             ot3_hardware._transforms.carriage_offset,
         )
-    assert ot3_hardware._current_position[OT3Axis.X] == 20
+    assert ot3_hardware._current_position[Axis.X] == 20
 
 
 async def test_home_unmet(ot3_hardware, mock_home):
@@ -105,8 +105,8 @@ async def test_home_unmet(ot3_hardware, mock_home):
 
     mock_home.side_effect = MoveConditionNotMet()
     with pytest.raises(MoveConditionNotMet):
-        await ot3_hardware.home([OT3Axis.X])
-    mock_home.assert_called_once_with([OT3Axis.X])
+        await ot3_hardware.home([Axis.X])
+    mock_home.assert_called_once_with([Axis.X])
     assert ot3_hardware._current_position == {}
 
 
