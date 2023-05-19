@@ -63,7 +63,7 @@ export function getLabwareMovementAnimationParams(
         begin:
           command.params.newLocation === 'offDeck'
             ? `${LABWARE_MOVE_TO_OFFDECK_DELAY_MS}ms;labware-move.end+500ms` // these are all a bit placeholder-y for now until the other animations exist to sync off of
-            : `${LABWARE_MOVE_DELAY_MS}ms;labware-move.end+300ms`,
+            : `${LABWARE_MOVE_DELAY_MS}ms;splash.end+300ms`,
         duration:
           command.params.newLocation === 'offDeck'
             ? `${LABWARE_MOVE_TO_OFFDECK_DURATION_MS}ms`
