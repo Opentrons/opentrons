@@ -13,6 +13,7 @@ import {
   JUSTIFY_CENTER,
   DIRECTION_ROW,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -50,9 +51,14 @@ export function ErrorUpdateSoftware({
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
+        borderRadius={BORDERS.size3}
       >
         <Icon name="ot-alert" size="3.75rem" color={COLORS.errorEnabled} />
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          alignItems={ALIGN_CENTER}
+        >
           <StyledText
             as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
@@ -67,11 +73,13 @@ export function ErrorUpdateSoftware({
       </Flex>
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         <MediumButton
+          flex="1"
           buttonType="secondary"
           buttonText={t('proceed_without_updating')}
           onClick={() => history.push('/robot-settings/rename-robot')}
         />
         <MediumButton
+          flex="1"
           onClick={handleTryAgain}
           buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
         />

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -49,8 +50,13 @@ export function UpdateSoftware({
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       height="33rem"
+      borderRadius={BORDERS.size3}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        alignItems={ALIGN_CENTER}
+      >
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('update_found')}
         </StyledText>
