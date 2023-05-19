@@ -31,22 +31,22 @@ TEST_PARAMETERS = {
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 450,
-                'MAX': 800,
+                'MIN': 400,
+                'MAX': 600,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 3000,
-                'INC': 400}},
+                'MIN': 900,
+                'MAX': 1100,
+                'INC': 100}},
         'Y': {
             'SPEED': {
-                'MIN': 450,
-                'MAX': 550,
+                'MIN': 300,
+                'MAX': 600,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 800,
-                'MAX': 1400,
-                'INC': 400}},
+                'MIN': 900,
+                'MAX': 1100,
+                'INC': 100}},
         'L': {
             'SPEED': {
                 'MIN': 40,
@@ -106,6 +106,7 @@ TEST_PARAMETERS = {
     }
 }
 
+START_CURRENT = 1.0
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -114,7 +115,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
-        run_current=1.5
+        run_current=START_CURRENT
     ),
     OT3Axis.Y: GantryLoadSettings(
         max_speed=500,
@@ -122,7 +123,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.7,
-        run_current=1.5
+        run_current=START_CURRENT
     ),
     OT3Axis.Z_L: GantryLoadSettings(
         max_speed=35,
@@ -130,7 +131,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=1,
         hold_current=1.5,
-        run_current=1.5
+        run_current=START_CURRENT
     ),
     OT3Axis.Z_R: GantryLoadSettings(
         max_speed=35,
@@ -138,7 +139,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=1,
         hold_current=1.5,
-        run_current=1.5
+        run_current=START_CURRENT
     )
 }
 
@@ -245,7 +246,11 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
             move_error_correction = get_move_correction(delta_move_axis,
                                                         axis,
                                                         -1)
+            print()
+            print('**************************************')
             print('ERROR IN NEG MOVE, CORRECTING: ' + str(move_error_correction))
+            print('**************************************')
+            print()
             if(axis == 'X' or axis == 'Y'):
                 await api.move_rel(mount=MOUNT,
                                    delta=move_error_correction,
@@ -268,10 +273,14 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         final_pos = await api.encoder_current_position_ot3(mount=MOUNT)
         delta_pos = get_pos_delta(final_pos, inital_pos)
         delta_pos_axis = delta_pos[AXIS_MAP[axis]]
-        move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis) #this is wrong!!!!
+        move_error = check_move_error(delta_pos_axis, POINT_MAP[axis], axis)
         print(axis + ' Error: ' + str(move_error))
         if(abs(move_error) >= 0.1):
+            print()
+            print('**************************************')
             print('ERROR IN POS MOVE')
+            print('**************************************')
+            print()
             if(DELAY > 0):
                 time.sleep(DELAY)
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -291,12 +300,14 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
     return (sum(avg_error)/len(avg_error), c+1)
 
 
-async def match_z_settings(axis, speed, accel):
+async def match_z_settings(axis, speed, accel, current):
     if(axis == 'L' or axis == 'R'):
         SETTINGS[AXIS_MAP['L']].acceleration = accel
         SETTINGS[AXIS_MAP['L']].max_speed = speed
+        SETTINGS[AXIS_MAP['L']].run_current = current
         SETTINGS[AXIS_MAP['R']].acceleration = accel
         SETTINGS[AXIS_MAP['R']].max_speed = speed
+        SETTINGS[AXIS_MAP['R']].run_current = current
 
     return True
 
@@ -328,11 +339,13 @@ async def _main(is_simulating: bool) -> None:
                     print(p)
                     SETTINGS[AXIS_MAP[test_axis]].acceleration = p['ACCEL']
                     SETTINGS[AXIS_MAP[test_axis]].max_speed = p['SPEED']
+                    SETTINGS[AXIS_MAP[test_axis]].run_current = START_CURRENT
 
                     #update the robot settings to use test speed/accel
                     await match_z_settings(test_axis,
                                      SETTINGS[AXIS_MAP[test_axis]].max_speed,
-                                     SETTINGS[AXIS_MAP[test_axis]].acceleration)
+                                     SETTINGS[AXIS_MAP[test_axis]].acceleration,
+                                     SETTINGS[AXIS_MAP[test_axis]].run_current)
 
                     await set_gantry_load_per_axis_settings_ot3(api,
                                                     SETTINGS,
@@ -415,7 +428,6 @@ def make_test_list(test_axis, test_load):
 
     return complete_test_list
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
@@ -423,6 +435,7 @@ if __name__ == "__main__":
     parser.add_argument("--cycles", type=int, default=CYCLES)
     parser.add_argument("--load", type=str, default='LOW')
     parser.add_argument("--delay", type=int, default=0)
+    parser.add_argument("--current", type=float, default=START_CURRENT)
 
     args = parser.parse_args()
     CYCLES = args.cycles
@@ -430,6 +443,7 @@ if __name__ == "__main__":
     AXIS = args.axis
     LOAD = GANTRY_LOAD_MAP[args.load]
     DELAY = args.delay
+    START_CURRENT = args.current
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))
