@@ -27,7 +27,7 @@ export function PauseInterventionContent({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem">
       <PauseHeader startedAt={startedAt} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <InterventionCommandMessage commandMessage={message} />
       </Flex>
     </Flex>
