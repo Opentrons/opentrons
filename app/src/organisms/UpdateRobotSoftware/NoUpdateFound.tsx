@@ -9,49 +9,46 @@ import {
   Icon,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  PrimaryButton,
   JUSTIFY_CENTER,
+  BORDERS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
 
 export function NoUpdateFound(): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+      gridGap={SPACING.spacing32}
+    >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.successBackgroundMed}
-        height="26.625rem"
+        backgroundColor={COLORS.green3}
+        height="25.75rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
+        borderRadius={BORDERS.size3}
       >
         <Icon
-          name="check-circle"
-          size="4.375rem"
-          color={COLORS.successEnabled}
+          name="ot-check"
+          size="3.75rem"
+          color={COLORS.green2}
           data-testid="NoUpdateFound_check_circle_icon"
         />
-        <StyledText
-          fontSize="2rem"
-          lineHeight="2.75rem"
-          fontWeight="700"
-          color={COLORS.black}
-        >
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('software_is_up_to_date')}
         </StyledText>
       </Flex>
-      <PrimaryButton
-        marginTop={SPACING.spacing32}
-        height="4.4375rem"
+      <MediumButton
+        buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         onClick={() => history.push('/robot-settings/rename-robot')}
-      >
-        <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-          {t('shared:next')}
-        </StyledText>
-      </PrimaryButton>
+      />
     </Flex>
   )
 }
