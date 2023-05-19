@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  BORDERS,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -28,11 +29,21 @@ import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const SSID_INPUT_FIELD_STYLE = css`
-  padding-top: ${SPACING.spacing24};
-  padding-bottom: ${SPACING.spacing24};
+  padding-top: 2.125rem;
+  padding-bottom: 2.125rem;
+  height: 4.25rem;
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  text-align: ${TYPOGRAPHY.textAlignLeft};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  color: ${COLORS.darkBlack100};
+  padding-left: ${SPACING.spacing24};
+  box-sizing: border-box;
+
+  &:focus {
+    border: 3px solid ${COLORS.blueEnabled};
+    filter: drop-shadow(0px 0px 10px ${COLORS.blueEnabled});
+    border-radius: ${BORDERS.size1};
+  }
 `
 
 interface SetWifiSsidProps {
