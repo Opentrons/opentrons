@@ -293,8 +293,8 @@ export const ModulesListItem = ({
           })}
         </StyledText>
         <Flex width="15%">
-          {moduleModel === 'magneticBlockV1' ? (
-            <StyledText as="p"> {'N/A'}</StyledText>
+          {moduleModel === MAGNETIC_BLOCK_V1 ? (
+            <StyledText as="p"> {t('na')}</StyledText>
           ) : (
             <StatusLabel
               id={location}
