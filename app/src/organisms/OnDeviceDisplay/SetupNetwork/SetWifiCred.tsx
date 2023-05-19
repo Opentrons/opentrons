@@ -27,8 +27,8 @@ const SSID_INPUT_FIELD_STYLE = css`
   padding-top: 2.125rem;
   padding-bottom: 2.125rem;
   height: 4.25rem;
-  font-size: 1.75rem;
-  line-height: 2.25rem;
+  font-size: ${TYPOGRAPHY.fontSize28};
+  line-height: ${TYPOGRAPHY.lineHeight36};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   color: ${COLORS.darkBlack100};
   padding-left: ${SPACING.spacing24};
@@ -89,12 +89,7 @@ export function SetWifiCred({
         />
       </Flex>
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} paddingLeft="6.25rem">
-        <StyledText
-          marginBottom={SPACING.spacing12}
-          fontSize="1.375rem"
-          lineHeight="1.875rem"
-          fontWeight="500"
-        >
+        <StyledText as="p" marginBottom={SPACING.spacing12}>
           {t('enter_password')}
         </StyledText>
         <Flex flexDirection={DIRECTION_ROW}>
@@ -108,7 +103,7 @@ export function SetWifiCred({
             />
           </Box>
           <Btn
-            marginLeft="1.5rem"
+            marginLeft={SPACING.spacing24}
             onClick={() => setShowPassword(currentState => !currentState)}
           >
             <Flex
