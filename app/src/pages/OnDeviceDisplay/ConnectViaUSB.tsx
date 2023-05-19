@@ -24,7 +24,7 @@ export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   // ToDo (kj:05/16/2023) isConnected part will be implemented later
-  const isConnected = true
+  const isConnected = false
 
   return (
     <>
