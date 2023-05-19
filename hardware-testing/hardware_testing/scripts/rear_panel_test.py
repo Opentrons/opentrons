@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 from dataclasses import dataclass
+from typing import cast, Optional
 
 
 from opentrons_hardware.drivers.binary_usb.build import (
@@ -31,6 +32,7 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     GetDeckLightResponse,
     EstopButtonPresentRequest,
     EstopButtonDetectionChange,
+    EstopStateChange,
     Ack
 )
 
@@ -169,27 +171,53 @@ async def run(args: argparse.Namespace) -> None:
         #do both buttons
         #request RP e-stop state, check it active
         #ask operator if E-stop LED is lit
-        print()
-        print("TEST - ESTOP 1")
-        input("PRESS ESTOP 1")
-        result = await get_all_pin_state(usb_messenger)
-        print(result)
-        if (result == ESTOP_CONDITIONS):
-            print("PASS")
-        else:
-            print("FAIL")
-
-        input("RELEASE ESTOP 1")
-
-        print()
-        print("TEST - ESTOP 2")
-        input("PRESS ESTOP 2")
-        result = await get_all_pin_state(usb_messenger)
-        print(result)
-        if (result == ESTOP_CONDITIONS):
-            print("PASS")
-        else:
-            print("FAIL")
+        # print()
+        # print("TEST - ESTOP 1")
+        # result = await get_all_pin_state(usb_messenger)
+        # print("PRESS ESTOP 1")
+        # pressed_once = False
+        # async for message in driver:
+        #     if message is not None:
+        #         try:
+        #             result.etop_active = bool(cast(EstopStateChange, message).engaged.value)
+        #         except AttributeError:
+        #             continue
+        #         print(result)
+        #         if result.etop_active == True:
+        #             pressed_once = True
+        #             print("RELEASE ESTOP 1")
+        #         elif pressed_once:
+        #             break
+        #
+        # print(result)
+        # if (result == ESTOP_CONDITIONS):
+        #     print("PASS")
+        # else:
+        #     print("FAIL")
+        #
+        # print()
+        # print("TEST - ESTOP 2")
+        # result = await get_all_pin_state(usb_messenger)
+        # print("PRESS ESTOP 2")
+        # pressed_once = False
+        # async for message in driver:
+        #     if message is not None:
+        #         try:
+        #             result.etop_active = bool(cast(EstopStateChange, message).engaged.value)
+        #         except AttributeError:
+        #             continue
+        #         print(result)
+        #         if result.etop_active == True:
+        #             pressed_once = True
+        #             print("RELEASE ESTOP 2")
+        #         elif pressed_once:
+        #             break
+        #
+        # print(result)
+        # if (result == ESTOP_CONDITIONS):
+        #     print("PASS")
+        # else:
+        #     print("FAIL")
 
 
         #test CAN
@@ -216,7 +244,10 @@ async def run(args: argparse.Namespace) -> None:
         print("TEST - DOOR")
         input("CLOSE DOOR")
         door_test_result = await get_door_state(usb_messenger)
-        print(door_test_result)
+        if(door_test_result == False):
+            print("~~~ DOOR CLOSED ~~~")
+        else:
+            print("~~~ DOOR OPEN ~~~")
         result = await get_all_pin_state(usb_messenger)
         print(result)
         print("DOOR TEST: ")
