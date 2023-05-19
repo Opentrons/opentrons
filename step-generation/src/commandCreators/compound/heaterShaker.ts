@@ -34,6 +34,14 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
 
   const commandCreators: CurriedCommandCreator[] = []
 
+  if (!args.latchOpen) {
+    commandCreators.push(
+      curryCommandCreator(heaterShakerCloseLatch, {
+        moduleId: args.module,
+      })
+    )
+  }
+
   if (args.targetTemperature === null) {
     commandCreators.push(
       curryCommandCreator(heaterShakerDeactivateHeater, {
@@ -73,12 +81,6 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
   if (args.latchOpen) {
     commandCreators.push(
       curryCommandCreator(heaterShakerOpenLatch, {
-        moduleId: args.module,
-      })
-    )
-  } else {
-    commandCreators.push(
-      curryCommandCreator(heaterShakerCloseLatch, {
         moduleId: args.module,
       })
     )
