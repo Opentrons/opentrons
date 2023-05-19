@@ -217,6 +217,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     report(section, "gripper-id", [gripper_id, user_id, result])
 
     # NO-SKIP
+    # FIXME: DVT units had encoders added, so change this test to use them
     async def _z_is_hitting_endstop() -> bool:
         if api.is_simulator:
             return True

@@ -148,10 +148,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # DECK LIGHTS
     ui.print_header("DECK LIGHTS")
+    await api.set_lights(rails=False)
     result = _get_user_confirmation("are the DECK-LIGHTS on")
     report(section, "deck-lights-on", [CSVResult.from_bool(result)])
-    # TODO: enable once we are able to turn off the deck lights
-    report(section, "deck-lights-off", [CSVResult.PASS])
+    await api.set_lights(rails=False)
+    result = _get_user_confirmation("are the DECK-LIGHTS off")
+    report(section, "deck-lights-off", [CSVResult.from_bool(result)])
 
     # STATUS LIGHTS
     ui.print_header("STATUS LIGHT")
