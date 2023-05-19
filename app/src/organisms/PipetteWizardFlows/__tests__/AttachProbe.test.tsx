@@ -8,8 +8,15 @@ import {
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
+import { CalibrationErrorModal } from '../CalibrationErrorModal'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
+
+jest.mock('../CalibrationErrorModal')
+
+const mockCalibrationErrorModal = CalibrationErrorModal as jest.MockedFunction<
+  typeof CalibrationErrorModal
+>
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
@@ -37,6 +44,9 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
+    mockCalibrationErrorModal.mockReturnValue(
+      <div>mock calibration error modal</div>
+    )
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
@@ -91,9 +101,7 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
     }
     const { getByText, getByTestId } = render(props)
-    getByText(
-      'Stand back, connect and secure, Flex 1-Channel 1000 μL is calibrating'
-    )
+    getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
     getByText(
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
     )
@@ -121,8 +129,7 @@ describe('AttachProbe', () => {
       errorMessage: 'error shmerror',
     }
     const { getByText } = render(props)
-    getByText('Error encountered')
-    getByText('error shmerror')
+    getByText('mock calibration error modal')
   })
 
   it('renders the correct text when is on device', async () => {
@@ -155,5 +162,13 @@ describe('AttachProbe', () => {
     })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
+  })
+
+  it('does not render the goBack button when following a results screen from attach flow', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+    }
+    expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
 })

@@ -7,6 +7,13 @@ import {
   useModuleRenderInfoForProtocolById,
   useRobot,
 } from '.'
+import {
+  MAGNETIC_BLOCK_TYPE,
+  ModuleType,
+  getModuleType,
+} from '@opentrons/shared-data'
+
+const NON_CONNECTING_MODULE_TYPES: ModuleType[] = [MAGNETIC_BLOCK_TYPE]
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]
@@ -35,6 +42,8 @@ export function useUnmatchedModulesForProtocol(
     moduleRenderInfoById,
     (acc, { moduleDef }, id) => {
       const { model, compatibleWith } = moduleDef
+      // Skip matching any modules that don't require an electronic robot connection
+      if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model))) return acc
       // for this required module, find a remaining (unmatched) attached module of the requested model
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
         attachedModule => {

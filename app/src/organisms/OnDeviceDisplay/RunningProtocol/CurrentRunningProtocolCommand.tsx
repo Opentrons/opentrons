@@ -14,13 +14,18 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
+import {
+  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_RESUME,
+  ANALYTICS_PROTOCOL_RUN_PAUSE,
+} from '../../../redux/analytics'
 
 import type {
   CompletedProtocolAnalysis,
@@ -28,6 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
+import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const fadeIn = keyframes`
 from {
@@ -41,7 +47,7 @@ to {
 `
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -86,6 +92,7 @@ interface CurrentRunningProtocolCommandProps {
   pauseRun: () => void
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
+  robotAnalyticsData: RobotAnalyticsData | null
   protocolName?: string
   currentRunCommandIndex?: number
 }
@@ -98,6 +105,7 @@ export function CurrentRunningProtocolCommand({
   pauseRun,
   setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
+  robotAnalyticsData,
   protocolName,
   currentRunCommandIndex,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
@@ -107,33 +115,34 @@ export function CurrentRunningProtocolCommand({
   )
   const currentRunStatus = t(`status_${runStatus}`)
 
-  // ToDo (kj:04/09/2023 Add confirm modal)
-  // jira ticket RCORE-562 and RCORE-563
   const onStop = (): void => {
+    if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
 
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pauseRun()
-      trackProtocolRunEvent({ name: 'runPause' })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
     } else {
       playRun()
-      // ToDo (kj:03/28/2023) tbd
-      // trackProtocolRunEvent({
-      //   name: runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume',
-      //   properties:
-      //     runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
-      //       ? robotAnalyticsData
-      //       : {},
-      // })
+      trackProtocolRunEvent({
+        name:
+          runStatus === RUN_STATUS_IDLE
+            ? ANALYTICS_PROTOCOL_RUN_START
+            : ANALYTICS_PROTOCOL_RUN_RESUME,
+        properties:
+          runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
+            ? robotAnalyticsData
+            : {},
+      })
     }
   }
 
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       height="29.5rem"
     >
       <Flex
@@ -144,7 +153,7 @@ export function CurrentRunningProtocolCommand({
           <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
-            fontWeight="700"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             {currentRunStatus}
           </StyledText>
@@ -155,7 +164,7 @@ export function CurrentRunningProtocolCommand({
 
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
@@ -166,16 +175,16 @@ export function CurrentRunningProtocolCommand({
         />
       </Flex>
       <Flex
-        padding={`0.75rem ${SPACING.spacing5}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
-        borderRadius={BORDERS.size_two}
+        borderRadius={BORDERS.size2}
         justifyContent={JUSTIFY_CENTER}
+        css={COMMAND_ROW_STYLE}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
-            css={COMMAND_ROW_STYLE}
           />
         ) : null}
       </Flex>

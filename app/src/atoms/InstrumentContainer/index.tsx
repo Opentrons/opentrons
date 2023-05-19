@@ -18,8 +18,8 @@ export const InstrumentContainer = (
     <Flex
       backgroundColor={COLORS.fundamentalsBackgroundShade}
       borderRadius={BORDERS.radiusSoftCorners}
-      paddingX={SPACING.spacing3}
-      paddingY={SPACING.spacing1}
+      paddingX={SPACING.spacing8}
+      paddingY={SPACING.spacing2}
       width="max-content"
     >
       <StyledText as="p" id={id}>

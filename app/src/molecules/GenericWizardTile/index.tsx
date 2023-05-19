@@ -21,7 +21,7 @@ import {
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -47,7 +47,7 @@ const GO_BACK_BUTTON_STYLE = css`
 `
 const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
@@ -55,6 +55,16 @@ const HEADER_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  }
+`
+
+const TILE_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 30rem;
   }
 `
 export interface GenericWizardTileProps {
@@ -103,20 +113,17 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height={isOnDevice ? '30rem' : '24.625rem'}
-      padding={SPACING.spacing6}
-    >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
+    <Flex css={TILE_CONTAINER_STYLE}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           {typeof header === 'string' ? (
-            <StyledText css={HEADER_STYLE}>{header}</StyledText>
+            <StyledText as="h1" css={HEADER_STYLE}>
+              {header}
+            </StyledText>
           ) : (
             header
           )}

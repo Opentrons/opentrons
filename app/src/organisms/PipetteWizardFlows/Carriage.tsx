@@ -8,15 +8,14 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { SINGLE_MOUNT_PIPETTES, LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { BODY_STYLE, FLOWS } from './constants'
 
-import type { MotorAxis } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
@@ -37,7 +36,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       [
         {
           commandType: 'home' as const,
-          params: { axes: ('rightZ' as unknown) as MotorAxis },
+          params: { axes: ['rightZ'] },
+        },
+        {
+          // @ts-expect-error calibration command types not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: { mount: LEFT },
         },
       ],
       false
@@ -68,7 +72,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       <SecondaryButton
         isDangerous
         onClick={goBack}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
       >
         {i18n.format(t('cancel_attachment'), 'capitalize')}
       </SecondaryButton>
@@ -103,12 +107,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
             ),
           }}
         />
       }
-      back={goBack}
+      back={flowType === FLOWS.ATTACH ? undefined : goBack}
       proceedButton={
         isOnDevice ? (
           <SmallButton

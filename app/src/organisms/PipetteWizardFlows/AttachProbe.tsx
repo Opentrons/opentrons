@@ -4,18 +4,17 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
-  COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
 import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { CalibrationErrorModal } from './CalibrationErrorModal'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import { BODY_STYLE, SECTIONS } from './constants'
+import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
@@ -30,7 +29,7 @@ const IN_PROGRESS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
-    margin-top: ${SPACING.spacing2};
+    margin-top: ${SPACING.spacing4};
   }
 `
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
@@ -42,8 +41,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isRobotMoving,
     goBack,
     isExiting,
-    errorMessage,
     setShowErrorMessage,
+    errorMessage,
     isOnDevice,
     selectedPipette,
     flowType,
@@ -53,8 +52,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
-  //  hard coding calibration slot number for now in case it changes
-  //  in the future
   const calSlotNum = 'C2'
 
   if (pipetteId == null) return null
@@ -87,11 +84,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteProbeVid = (
-    <Flex
-      marginTop={isOnDevice ? '-5rem' : '-7.6rem'}
-      height="10.2rem"
-      paddingTop={SPACING.spacing2}
-    >
+    <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
       <video
         css={css`
           max-width: 100%;
@@ -128,12 +121,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </InProgressModal>
     )
+
   return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.errorEnabled}
-      header={t('error_encountered')}
-      subHeader={errorMessage}
+    <CalibrationErrorModal
+      proceed={proceed}
+      isOnDevice={isOnDevice}
+      errorMessage={errorMessage}
     />
   ) : (
     <GenericWizardTile
@@ -162,7 +155,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}
-      back={goBack}
+      back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )
 }

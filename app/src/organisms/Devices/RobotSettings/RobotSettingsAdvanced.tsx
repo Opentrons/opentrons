@@ -162,57 +162,57 @@ export function RobotSettingsAdvanced({
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <RobotServerVersion robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}
           robotName={robotName}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <OpenJupyterControl robotIp={ipAddress} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Troubleshooting robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <FactoryReset
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />
         {isOT3 ? null : (
           <>
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <UseOlderProtocol
               settings={findSettings('disableFastProtocolUpload')}
               robotName={robotName}
               isRobotBusy={isRobotBusy}
             />
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
               robotName={robotName}
               isRobotBusy={isRobotBusy}
             />
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <ShortTrashBin
               settings={findSettings('shortFixedTrash')}
               robotName={robotName}
               isRobotBusy={isRobotBusy}
             />
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <UseOlderAspirateBehavior
               settings={findSettings('useOldAspirationFunctions')}
               robotName={robotName}
@@ -251,10 +251,10 @@ export function FeatureFlagToggle({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom={SPACING.spacing4}
+      marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing2}>
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing4}>
           {title}
         </StyledText>
         <StyledText as="p">{description}</StyledText>

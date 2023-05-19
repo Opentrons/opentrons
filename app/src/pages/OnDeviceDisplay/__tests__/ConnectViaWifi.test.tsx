@@ -6,10 +6,12 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { useWifiList } from '../../../resources/networking/hooks'
 import * as Networking from '../../../redux/networking'
 import { ConnectViaWifi } from '../ConnectViaWifi'
 
 jest.mock('../../../redux/discovery')
+jest.mock('../../../resources/networking/hooks')
 jest.mock('../../../redux/networking/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 
@@ -32,9 +34,7 @@ const initialMockWifi = {
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
 >
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
-  typeof Networking.getWifiList
->
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
@@ -74,7 +74,7 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render DisplayWifiList', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
     const [{ getByText }] = render()
     getByText('foo')
     getByText('bar')
@@ -82,7 +82,7 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render SelectAuthenticationType', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
@@ -93,19 +93,19 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render SetWifiCred', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
     const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByRole('button', { name: 'Next' }))
+    fireEvent.click(getByText('Continue'))
     getByText('Enter password')
   })
 
   it('should render ConnectingNetwork', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
@@ -115,13 +115,13 @@ describe('ConnectViaWifi', () => {
     })
     const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByRole('button', { name: 'Next' }))
+    fireEvent.click(getByText('Continue'))
     fireEvent.click(getByRole('button', { name: 'Connect' }))
     getByText('Connecting...')
   })
 
   it('should render WifiConnectionDetails', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
@@ -132,14 +132,13 @@ describe('ConnectViaWifi', () => {
     })
     const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByRole('button', { name: 'Next' }))
+    fireEvent.click(getByText('Continue'))
     fireEvent.click(getByRole('button', { name: 'Connect' }))
-    getByText('Connection status:')
     getByText('Connected')
   })
 
   it('should render FailedToConnect', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
     mockGetNetworkInterfaces.mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
@@ -151,7 +150,7 @@ describe('ConnectViaWifi', () => {
     })
     const [{ getByRole, getByText }] = render()
     fireEvent.click(getByRole('button', { name: 'foo' }))
-    fireEvent.click(getByRole('button', { name: 'Next' }))
+    fireEvent.click(getByText('Continue'))
     fireEvent.click(getByRole('button', { name: 'Connect' }))
     getByText('Oops! Incorrect password for foo.')
   })

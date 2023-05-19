@@ -91,6 +91,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -157,6 +158,7 @@ describe('BeforeBeginning', () => {
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -197,6 +199,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -242,10 +245,7 @@ describe('BeforeBeginning', () => {
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
-          },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: RIGHT },
@@ -298,6 +298,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: RIGHT },
@@ -349,6 +350,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -408,6 +410,7 @@ describe('BeforeBeginning', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },

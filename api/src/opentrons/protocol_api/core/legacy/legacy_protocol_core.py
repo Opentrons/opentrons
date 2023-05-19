@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Set, Union, cast, Tuple
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
@@ -41,8 +42,8 @@ class LegacyProtocolCore(
         sync_hardware: SyncHardwareAPI,
         api_version: APIVersion,
         labware_offset_provider: AbstractLabwareOffsetProvider,
+        deck_layout: Deck,
         equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
-        deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
@@ -70,11 +71,11 @@ class LegacyProtocolCore(
         self._sync_hardware = sync_hardware
         self._api_version = api_version
         self._labware_offset_provider = labware_offset_provider
+        self._deck_layout = deck_layout
         self._equipment_broker = equipment_broker or EquipmentBroker()
-        self._deck_layout = Deck() if deck_layout is None else deck_layout
 
         self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
-            mount: None for mount in Mount
+            mount: None for mount in Mount.ot2_mounts()  # Legacy core works only on OT2
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
@@ -89,6 +90,10 @@ class LegacyProtocolCore(
     def api_version(self) -> APIVersion:
         """Get the API version the protocol is adhering to."""
         return self._api_version
+
+    @property
+    def robot_type(self) -> RobotType:
+        return "OT-2 Standard"
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
@@ -437,6 +442,6 @@ class LegacyProtocolCore(
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
-    ) -> Union[DeckSlotName, legacy_module_core.LegacyModuleCore, None]:
+    ) -> Union[str, legacy_module_core.LegacyModuleCore, None]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"

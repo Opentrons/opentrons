@@ -22,7 +22,7 @@ const Template: Story<
       width="100%"
       height="100%"
       flexDirection={DIRECTION_ROW}
-      marginLeft={SPACING.spacing4}
+      marginLeft={SPACING.spacing16}
     >
       <RoundTab
         isCurrent={step === 'details'}

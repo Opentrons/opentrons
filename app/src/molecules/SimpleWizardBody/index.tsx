@@ -13,6 +13,7 @@ import {
   ALIGN_CENTER,
   StyleProps,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
@@ -30,8 +31,8 @@ const BACKGROUND_SIZE = '47rem'
 
 const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
-  margin-top: ${SPACING.spacing5};
-  margin-bottom: ${SPACING.spacing3};
+  margin-top: ${SPACING.spacing24};
+  margin-bottom: ${SPACING.spacing8};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;
@@ -54,11 +55,26 @@ const SUBHEADER_STYLE = css`
 `
 const BUTTON_STYLE = css`
   justify-content: ${JUSTIFY_FLEX_END};
-  padding-right: ${SPACING.spacing6};
-  padding-bottom: ${SPACING.spacing6};
+  padding-right: ${SPACING.spacing32};
+  padding-bottom: ${SPACING.spacing32};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    padding-bottom: ${SPACING.spacing6};
+    padding-bottom: ${SPACING.spacing32};
+  }
+`
+const WIZARD_CONTAINER_STYLE = css`
+  min-height: 394px;
+  flex-direction: ${DIRECTION_COLUMN}
+  justify-content: ${JUSTIFY_SPACE_BETWEEN}
+  height: 'auto'
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 472px;
+  }
+`
+const FLEX_SPACING_STYLE = css`
+  height: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 0rem;
   }
 `
 
@@ -75,12 +91,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex
-      height={isOnDevice ? '472px' : 'auto'}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      {...styleProps}
-    >
+    <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -89,7 +100,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
       >
         {isPending ? (
           <Flex
-            gridGap={SPACING.spacing5}
+            gridGap={SPACING.spacing24}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
@@ -108,7 +119,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           <>
             <Icon
               name={isSuccess ? 'ot-check' : 'ot-alert'}
-              size={isOnDevice ? '11.25rem' : '2.5rem'}
+              size={isOnDevice ? '3.75rem' : '2.5rem'}
               color={iconColor}
               aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
             />
@@ -116,15 +127,17 @@ export function SimpleWizardBody(props: Props): JSX.Element {
             {subHeader != null ? (
               <StyledText css={SUBHEADER_STYLE}>{subHeader}</StyledText>
             ) : (
-              <Flex
-                aria-label="flex_spacing"
-                height={isOnDevice ? '0rem' : '1.75rem'}
-              />
+              <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
             )}
           </>
         )}
       </Flex>
-      <Flex flex="0 1 auto" css={BUTTON_STYLE}>
+      <Flex
+        position={POSITION_ABSOLUTE}
+        bottom={0}
+        right={0}
+        css={BUTTON_STYLE}
+      >
         {children}
       </Flex>
     </Flex>

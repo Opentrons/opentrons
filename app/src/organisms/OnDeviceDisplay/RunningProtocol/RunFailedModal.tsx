@@ -14,7 +14,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { SmallButton } from '../../../atoms/buttons/OnDeviceDisplay'
+import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
@@ -34,6 +34,7 @@ interface RunFailedModalProps {
   errors?: RunError[]
 }
 
+// ToDo (kj:05/03/2023) This component is needed to refactor to handle error messages
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
@@ -83,8 +84,8 @@ export function RunFailedModal({
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing16}
+        marginTop={SPACING.spacing32}
       >
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
@@ -107,10 +108,10 @@ export function RunFailedModal({
         </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.light_one}
-          borderRadius={BORDERS.size_three}
-          gridGap={SPACING.spacing3}
-          padding={SPACING.spacing4}
+          backgroundColor={COLORS.light1}
+          borderRadius={BORDERS.size3}
+          gridGap={SPACING.spacing8}
+          padding={SPACING.spacing16}
           overflowY="scroll"
           maxHeight="7.75rem"
         >

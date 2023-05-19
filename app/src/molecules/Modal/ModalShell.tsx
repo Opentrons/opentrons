@@ -85,7 +85,7 @@ const Overlay = styled.div`
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.darkBlack_sixty};
+    background-color: ${COLORS.darkBlack60};
   }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
@@ -100,7 +100,7 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   width: 100%;
   height: 100%;
   z-index: ${({ zIndex }) => zIndex};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
 `
 
 const ModalArea = styled.div<

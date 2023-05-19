@@ -10,7 +10,7 @@ from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckSlotLocation, WellLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
@@ -45,8 +45,9 @@ from .command_fixtures import (
 def _make_config(block_on_door_open: bool = False) -> Config:
     return Config(
         block_on_door_open=block_on_door_open,
-        # Choice of robot_type is arbitrary.
+        # Choice of robot and deck type is arbitrary.
         robot_type="OT-2 Standard",
+        deck_type=DeckType.OT2_STANDARD,
     )
 
 

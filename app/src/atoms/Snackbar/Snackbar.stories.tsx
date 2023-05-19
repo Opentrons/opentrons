@@ -26,9 +26,9 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
 
   return (
     <>
-      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
           <StyledText as="p">
             When clicking the button, the Snackbar shows up in the bottom.
           </StyledText>
@@ -43,7 +43,7 @@ const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {
           justifyContent={JUSTIFY_CENTER}
           width="100%"
           position="absolute"
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           zIndex={1000}
         >
           <Snackbar {...args} onClose={() => setIsShowSnackbar(false)} />

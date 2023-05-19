@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 
 import { radiusSoftCorners } from '../ui-style-constants/borders'
 import { fontSizeH4 } from '../ui-style-constants/typography'
-import { spacing3 } from '../ui-style-constants/spacing'
+import { spacing8 } from '../ui-style-constants/spacing'
 import { white, darkGreyEnabled } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
@@ -58,7 +58,7 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
   const TOOLTIP_CSS = css`
     position: absolute;
     z-index: 9001;
-    padding: ${spacing3};
+    padding: ${spacing8};
     color: ${white};
     filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
     cursor: pointer;

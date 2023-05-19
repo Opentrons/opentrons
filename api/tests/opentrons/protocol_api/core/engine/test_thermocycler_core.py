@@ -325,3 +325,14 @@ def test_cycle_counting(
     assert subject.get_current_cycle_index() is None
     assert subject.get_total_step_count() is None
     assert subject.get_current_step_index() is None
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: ThermocyclerModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

@@ -28,6 +28,8 @@ import {
   ModuleModel,
   getPipetteNameSpecs,
   PipetteName,
+  MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -76,7 +78,6 @@ export interface Props {
   }) => unknown
   moduleRestrictionsDisabled?: boolean | null
 }
-
 const initialFormState: FormState = {
   fields: { name: '' },
   pipettesByMount: {
@@ -84,6 +85,11 @@ const initialFormState: FormState = {
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
+    [MAGNETIC_BLOCK_TYPE]: {
+      onDeck: false,
+      model: MAGNETIC_BLOCK_V1,
+      slot: '1',
+    },
     [HEATERSHAKER_MODULE_TYPE]: {
       onDeck: false,
       model: HEATERSHAKER_MODULE_V1,
@@ -171,7 +177,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
   ) => boolean = (modules, moduleType) => {
     const formModule = modules[moduleType]
     const crashableModuleOnDeck =
-      formModule.onDeck && formModule.model
+      formModule?.onDeck && formModule?.model
         ? isModuleWithCollisionIssue(formModule.model)
         : false
 
