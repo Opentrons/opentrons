@@ -196,8 +196,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             <Flex gridGap={SPACING.spacing16}>
               <Flex
-                flex={`0 0 ${robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
-                  }`}
+                flex={`0 0 ${
+                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                }`}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
@@ -242,8 +243,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                             }
                           />
                         ) : null}
-                        {mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis) ? (
-                          <InstrumentContainer displayName={getGripperDisplayName('gripperV1')} />
+                        {mostRecentAnalysis != null &&
+                        getProtocolUsesGripper(mostRecentAnalysis) ? (
+                          <InstrumentContainer
+                            displayName={getGripperDisplayName('gripperV1')}
+                          />
                         ) : null}
                       </Flex>
                     ),

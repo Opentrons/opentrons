@@ -8,10 +8,7 @@ import {
   JUSTIFY_FLEX_END,
   WRAP,
 } from '@opentrons/components'
-import {
-  GripperModel,
-  getGripperDisplayName,
-} from '@opentrons/shared-data'
+import { GripperModel, getGripperDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
@@ -35,14 +32,21 @@ export function SetupGripperCalibrationItem({
     setOpenWizardFlowType,
   ] = React.useState<GripperWizardFlowType | null>(null)
 
-  const gripperCalLastModified = gripperData != null ? gripperData.data.calibratedOffset?.last_modified ?? null : null
+  const gripperCalLastModified =
+    gripperData != null
+      ? gripperData.data.calibratedOffset?.last_modified ?? null
+      : null
 
   let button: JSX.Element | undefined
 
   if (gripperData == null) {
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-        <TertiaryButton onClick={() => { setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH) }}>
+        <TertiaryButton
+          onClick={() => {
+            setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
+          }}
+        >
           {t('attach_gripper')}
         </TertiaryButton>
       </Flex>
@@ -57,7 +61,9 @@ export function SetupGripperCalibrationItem({
         gridGap={SPACING.spacing8}
       >
         <TertiaryButton
-          onClick={() => { setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE) }}
+          onClick={() => {
+            setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
+          }}
         >
           {t('calibrate_now_cta')}
         </TertiaryButton>
@@ -69,9 +75,17 @@ export function SetupGripperCalibrationItem({
     <>
       <SetupCalibrationItem
         button={button}
-        calibratedDate={gripperData != null ? gripperData.data.calibratedOffset?.last_modified ?? null : null}
+        calibratedDate={
+          gripperData != null
+            ? gripperData.data.calibratedOffset?.last_modified ?? null
+            : null
+        }
         label={t('extension_mount')}
-        title={gripperData != null ? getGripperDisplayName(gripperData.instrumentModel as GripperModel) : ''}
+        title={
+          gripperData != null
+            ? getGripperDisplayName(gripperData.instrumentModel as GripperModel)
+            : ''
+        }
         runId={runId}
       />
       {openWizardFlowType != null ? (

@@ -36,7 +36,10 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
-import { getGripperDisplayName, protocolHasLiquids } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -174,7 +177,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   )
 }
 
-interface ProtocolDetailsProps extends StoredProtocolData { }
+interface ProtocolDetailsProps extends StoredProtocolData {}
 
 export function ProtocolDetails(
   props: ProtocolDetailsProps
@@ -213,37 +216,38 @@ export function ProtocolDetails(
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
 
-  const requiredExtensionInstrumentName = mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
-    ? getGripperDisplayName('gripperV1')
-    : null
+  const requiredExtensionInstrumentName =
+    mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
+      ? getGripperDisplayName('gripperV1')
+      : null
 
   const requiredModuleDetails =
     mostRecentAnalysis != null
       ? map(
-        parseInitialLoadedModulesBySlot(
-          mostRecentAnalysis.commands != null
-            ? mostRecentAnalysis.commands
-            : []
+          parseInitialLoadedModulesBySlot(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          )
         )
-      )
       : []
 
   const requiredLabwareDetails =
     mostRecentAnalysis != null
       ? map({
-        ...parseInitialLoadedLabwareByModuleId(
-          mostRecentAnalysis.commands != null
-            ? mostRecentAnalysis.commands
-            : []
-        ),
-        ...parseInitialLoadedLabwareBySlot(
-          mostRecentAnalysis.commands != null
-            ? mostRecentAnalysis.commands
-            : []
-        ),
-      }).filter(
-        labware => labware.result?.definition?.parameters?.format !== 'trash'
-      )
+          ...parseInitialLoadedLabwareByModuleId(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          ),
+          ...parseInitialLoadedLabwareBySlot(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          ),
+        }).filter(
+          labware => labware.result?.definition?.parameters?.format !== 'trash'
+        )
       : []
 
   const protocolDisplayName = getProtocolDisplayName(
@@ -379,8 +383,8 @@ export function ProtocolDetails(
             width="100%"
           >
             {analysisStatus !== 'loading' &&
-              mostRecentAnalysis != null &&
-              mostRecentAnalysis.errors.length > 0 ? (
+            mostRecentAnalysis != null &&
+            mostRecentAnalysis.errors.length > 0 ? (
               <ProtocolAnalysisFailure
                 protocolKey={protocolKey}
                 errors={mostRecentAnalysis.errors.map(e => e.detail)}
@@ -584,12 +588,13 @@ export function ProtocolDetails(
               backgroundColor={COLORS.white}
               border={BORDERS.lineBorder}
               // remove left upper corner border radius when first tab is active
-              borderRadius={`${currentTab === 'robot_config'
+              borderRadius={`${
+                currentTab === 'robot_config'
                   ? '0'
                   : String(BORDERS.radiusSoftCorners)
-                } ${String(BORDERS.radiusSoftCorners)} ${String(
-                  BORDERS.radiusSoftCorners
-                )} ${String(BORDERS.radiusSoftCorners)}`}
+              } ${String(BORDERS.radiusSoftCorners)} ${String(
+                BORDERS.radiusSoftCorners
+              )} ${String(BORDERS.radiusSoftCorners)}`}
               padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
             >
               {contentsByTabName[currentTab]}

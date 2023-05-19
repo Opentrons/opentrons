@@ -45,7 +45,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   } = useMenuHandleClickOutside()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
-  const runId = useCurrentRunId({enabled: robot.status === CONNECTABLE})
+  const runId = useCurrentRunId({ enabled: robot.status === CONNECTABLE })
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,

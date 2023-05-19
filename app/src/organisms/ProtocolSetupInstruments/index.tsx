@@ -39,7 +39,10 @@ export function ProtocolSetupInstruments({
   } = useAllPipetteOffsetCalibrationsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
-  const usesGripper = mostRecentAnalysis != null ? isGripperInCommands(mostRecentAnalysis?.commands ?? []) : false
+  const usesGripper =
+    mostRecentAnalysis != null
+      ? isGripperInCommands(mostRecentAnalysis?.commands ?? [])
+      : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper'

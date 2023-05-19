@@ -36,11 +36,13 @@ export function SetupInstrumentCalibration({
   const { data: instrumentsQueryData } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
-  const usesGripper = isGripperInCommands(mostRecentAnalysis?.commands ?? storedProtocolAnalysis?.commands ?? [])
+  const usesGripper = isGripperInCommands(
+    mostRecentAnalysis?.commands ?? storedProtocolAnalysis?.commands ?? []
+  )
   const attachedGripperMatch = usesGripper
     ? (instrumentsQueryData?.data ?? []).find(
-      (i): i is GripperData => i.instrumentType === 'gripper'
-    ) ?? null
+        (i): i is GripperData => i.instrumentType === 'gripper'
+      ) ?? null
     : null
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

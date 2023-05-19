@@ -24,7 +24,11 @@ import {
   getModuleDisplayName,
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
-import { useInstrumentsQuery, usePipettesQuery, useModulesQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  usePipettesQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
@@ -88,7 +92,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             paddingRight={SPACING.spacing24}
           />
 
-
           {robot.status === CONNECTABLE ? (
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -116,10 +119,13 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
 function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const { data: modulesData, isLoading: isModulesQueryLoading } = useModulesQuery()
+  const {
+    data: modulesData,
+    isLoading: isModulesQueryLoading,
+  } = useModulesQuery()
   const attachedModules = modulesData?.data ?? []
 
-  return (!isModulesQueryLoading && attachedModules.length > 0) ? (
+  return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText
         as="h6"
@@ -146,16 +152,22 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const isOT3 = useIsOT3(props.robotName)
-  const { data: pipettesData, isLoading: isPipetteQueryLoading } = usePipettesQuery()
+  const {
+    data: pipettesData,
+    isLoading: isPipetteQueryLoading,
+  } = usePipettesQuery()
 
-  const { data: attachedInstruments, isLoading: isInstrumentsQueryLoading } = useInstrumentsQuery({ enabled: isOT3 })
+  const {
+    data: attachedInstruments,
+    isLoading: isInstrumentsQueryLoading,
+  } = useInstrumentsQuery({ enabled: isOT3 })
   const extensionInstrument =
     (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
   const leftPipetteModel = pipettesData?.left?.model ?? null
   const rightPipetteModel = pipettesData?.right?.model ?? null
   const extensionMountDisplayName =
     extensionInstrument != null &&
-      extensionInstrument.instrumentModel === 'gripperV1'
+    extensionInstrument.instrumentModel === 'gripperV1'
       ? getGripperDisplayName(extensionInstrument.instrumentModel)
       : null
 
@@ -176,9 +188,9 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
 
       {isInstrumentsQueryLoading ? 'INSTRUMENTS' : null}
       {isPipetteQueryLoading ? 'PIPETTES' : null}
-      {isPipetteQueryLoading || isInstrumentsQueryLoading
-        ? <StyledText as="h4">LOADING</StyledText>
-        :
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? (
+        <StyledText as="h4">LOADING</StyledText>
+      ) : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
           {leftAndRightMountsPipetteDisplayName != null ? (
             <InstrumentContainer
@@ -186,16 +198,24 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
             />
           ) : null}
           {leftPipetteModel != null ? (
-            <InstrumentContainer displayName={getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''} />
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
+              }
+            />
           ) : null}
           {rightPipetteModel != null ? (
-            <InstrumentContainer displayName={getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''} />
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
+              }
+            />
           ) : null}
           {extensionMountDisplayName != null ? (
             <InstrumentContainer displayName={extensionMountDisplayName} />
           ) : null}
         </Flex>
-      }
+      )}
     </Flex>
   )
 }
