@@ -2,13 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  COLORS,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -41,30 +43,31 @@ export function UpdateSoftware({
 
   return (
     <Flex
-      backgroundColor={COLORS.darkGreyDisabled}
+      backgroundColor={COLORS.darkBlack20}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
+      gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       height="33rem"
+      borderRadius={BORDERS.size3}
     >
-      <StyledText
-        fontSize="2rem"
-        lineHeight="2.75rem"
-        fontWeight="700"
-        colors={COLORS.black}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        alignItems={ALIGN_CENTER}
       >
-        {t('update_found')}
-      </StyledText>
-      <StyledText
-        fontSize="1.5rem"
-        lineHeight="2.0625rem"
-        fontWeight="400"
-        marginBottom={SPACING.spacing40}
-      >
-        {renderText()}
-      </StyledText>
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          {t('update_found')}
+        </StyledText>
+        <StyledText
+          as="h3"
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          color={COLORS.darkBlack70}
+        >
+          {renderText()}
+        </StyledText>
+      </Flex>
       <Box width="47.5rem">
         <ProgressBar percentComplete={processProgress} />
       </Box>
