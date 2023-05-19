@@ -86,6 +86,7 @@ BOTH_MOUNTS: Final = _BothMontType.BOTH
 class OT3Mount(enum.Enum):
     LEFT = top_types.Mount.LEFT.value
     RIGHT = top_types.Mount.RIGHT.value
+    BOTH = enum.auto()
     GRIPPER = enum.auto()
 
     @classmethod
