@@ -1,4 +1,21 @@
-from typing import Any, Union, Callable, Dict, Type, TypeVar
+"""Convert deck slots into the preferred style for a robot.
+
+The deck slots on an OT-2 are labeled like "1", "2", ..., and on an OT-3 they're labeled like
+"D1," "D2", ....
+
+When Protocol Engine takes a deck slot as input, we generally want it to accept either style
+of label. This helps make protocols more portable across robot types.
+
+But, Protocol Engine should then immediately convert it to the "correct" style for the robot that
+it's controlling or simulating. This makes it simpler to consume the robot's HTTP API,
+and it makes it easier for us to reason about Protocol Engine's internal state.
+
+This module does that conversion, for any Protocol Engine input that contains a reference to a
+deck slot.
+"""
+
+
+from typing import Any, Callable, Dict, Type
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -15,6 +32,7 @@ from .types import (
 def standardize_labware_offset(
     original: LabwareOffsetCreate, robot_type: RobotType
 ) -> LabwareOffsetCreate:
+    """Convert the deck slot in the given `LabwareOffsetCreate` to match the given robot type."""
     return original.copy(
         update={
             "location": original.location.copy(
@@ -31,6 +49,7 @@ def standardize_labware_offset(
 def standardize_command(
     original: commands.CommandCreate, robot_type: RobotType
 ) -> commands.CommandCreate:
+    """Convert any deck slots in the given `CommandCreate` to match the given robot type."""
     try:
         standardize = _standardize_command_functions[type(original)]
     except KeyError:
@@ -39,9 +58,11 @@ def standardize_command(
         return standardize(original, robot_type)
 
 
-# Our use of .copy(update=...) in these functions instead of .construct(...) is a tradeoff.
-# .construct() gives us better type-checking,
-# but .copy(update=...) prevents us from forgetting fields that have defaults.
+# Command-specific standardization:
+#
+# Our use of .copy(update=...) in these implementations, instead of .construct(...), is a tradeoff.
+# .construct() would give us better type-checking for the fields that we set,
+# but .copy(update=...) avoids the hazard of forgetting to set fields that have defaults.
 
 
 def _standardize_load_labware(
@@ -90,6 +111,9 @@ _standardize_command_functions: Dict[
     commands.LoadModuleCreate: _standardize_load_module,
     commands.MoveLabwareCreate: _standardize_move_labware,
 }
+
+
+# Helpers:
 
 
 def _standardize_labware_location(
