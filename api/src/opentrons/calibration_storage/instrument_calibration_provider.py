@@ -1,5 +1,6 @@
 import json
-from pydantic import ValidationError, BaseModel
+from datetime import datetime
+from pydantic import ValidationError, BaseModel, Field
 from typing import overload, Optional
 
 from opentrons import types as opentrons_types, config
@@ -127,7 +128,7 @@ class InstrumentCalibrationHandlerProvider(Generic[RobotType]):
         mount: opentrons_types.Mount,
         tiprack_hash: str,
         tiprack_uri: str,
-        cal_status: typing.Optional[
+        cal_status: Optional[
             typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
         ] = None,
     ) -> None:
