@@ -152,6 +152,6 @@ describe('ConnectViaWifi', () => {
     fireEvent.click(getByRole('button', { name: 'foo' }))
     fireEvent.click(getByText('Continue'))
     fireEvent.click(getByRole('button', { name: 'Connect' }))
-    getByText('Oops! Incorrect password for foo.')
+    getByText('Oops! Incorrect password for foo')
   })
 })
