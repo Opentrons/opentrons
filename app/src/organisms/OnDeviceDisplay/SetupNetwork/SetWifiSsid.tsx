@@ -3,23 +3,25 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_START,
-  JUSTIFY_END,
-  ALIGN_CENTER,
   POSITION_FIXED,
   SPACING,
-  Btn,
-  Icon,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import { InputField } from '../../../atoms/InputField'
-import { TertiaryButton } from '../../../atoms/buttons'
+import { SmallButton } from '../../../atoms/buttons'
 import { NormalKeyboard } from '../../../atoms/SoftwareKeyboard'
 import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants'
 
@@ -28,9 +30,9 @@ import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetw
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing5};
   padding-bottom: ${SPACING.spacing5};
-  font-size: 2.5rem;
-  line-height: 3.25rem;
-  text-align: center;
+  font-size: ${TYPOGRAPHY.fontSize28};
+  line-height: ${TYPOGRAPHY.lineHeight36};
+  text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 
 interface SetWifiSsidProps {
@@ -46,14 +48,19 @@ export function SetWifiSsid({
   setShowSelectAuthenticationType,
   setChangeState,
 }: SetWifiSsidProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const [inputSsid, setInputSsid] = React.useState<string>('')
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const keyboardRef = React.useRef(null)
 
-  const handleNext = (): void => {
-    setSelectedSsid(inputSsid)
-    setShowSelectAuthenticationType(true)
-    setChangeState({ type: JOIN_OTHER, ssid: inputSsid })
+  const handleContinue = (): void => {
+    if (inputSsid.length >= 2 && inputSsid.length <= 32) {
+      setSelectedSsid(inputSsid)
+      setShowSelectAuthenticationType(true)
+      setChangeState({ type: JOIN_OTHER, ssid: inputSsid })
+    } else {
+      setErrorMessage(t('join_other_network_error_message'))
+    }
   }
 
   return (
@@ -68,37 +75,22 @@ export function SetWifiSsid({
         <Flex justifyContent={JUSTIFY_START} flex="1">
           <Btn onClick={() => setChangeState({ type: null })}>
             <Flex flexDirection={DIRECTION_ROW}>
-              <Icon
-                name="chevron-left"
-                marginRight={SPACING.spacing2}
-                size="1.875rem"
-              />
-              <StyledText
-                fontSize="1.625rem"
-                lineHeight="2.1875rem"
-                fontWeight="700"
-              >
-                {t('shared:back')}
-              </StyledText>
+              <Icon name="back" marginRight={SPACING.spacing2} size="3rem" />
             </Flex>
           </Btn>
         </Flex>
-        <Flex justifyContent={JUSTIFY_CENTER} flex="1">
-          <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+        <Flex justifyContent={JUSTIFY_CENTER} flex="2">
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('join_other_network')}
           </StyledText>
         </Flex>
         <Flex justifyContent={JUSTIFY_END} flex="1">
-          <TertiaryButton
-            width="8.9375rem"
-            height="3.75rem"
-            fontSize="1.5rem"
-            fontWeight="500"
-            lineHeight="2.0425rem"
-            onClick={handleNext}
-          >
-            {t('shared:next')}
-          </TertiaryButton>
+          <SmallButton
+            buttonType="primary"
+            buttonCategory="rounded"
+            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+            onClick={handleContinue}
+          />
         </Flex>
       </Flex>
 
@@ -107,8 +99,12 @@ export function SetWifiSsid({
         paddingX="6.34375rem"
         gridGap={SPACING.spacingSM}
       >
-        <StyledText fontSize="1.375rem" lineHeight="1.875rem" fontWeight="500">
-          {t('enter_ssid')}
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          color={errorMessage != null ? COLORS.red2 : COLORS.darkBlack100}
+        >
+          {t('enter_network_name')}
         </StyledText>
         <InputField
           aria-label="wifi_ssid"
@@ -116,6 +112,7 @@ export function SetWifiSsid({
           onChange={e => setInputSsid(e.target.value)}
           type="text"
           css={SSID_INPUT_FIELD_STYLE}
+          error={errorMessage}
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
