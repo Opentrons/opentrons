@@ -9,7 +9,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, DeckSlotName
-from opentrons.protocol_api._types import OffDeckType
+from opentrons.protocol_api import OFF_DECK
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
@@ -414,11 +414,11 @@ def test_move_labware_off_deck(
         core_map=mock_core_map,
     )
 
-    subject.move_labware(labware=movable_labware, new_location=OffDeckType.OFF_DECK)
+    subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
     decoy.verify(
         mock_core.move_labware(
             labware_core=mock_labware_core,
-            new_location=OffDeckType.OFF_DECK,
+            new_location=OFF_DECK,
             use_gripper=False,
             use_pick_up_location_lpc_offset=False,
             use_drop_location_lpc_offset=False,
@@ -448,7 +448,7 @@ def test_move_labware_off_deck_raises(
     )
 
     with pytest.raises(APIVersionError):
-        subject.move_labware(labware=movable_labware, new_location=OffDeckType.OFF_DECK)
+        subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
 
 
 def test_load_module(
