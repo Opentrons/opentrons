@@ -121,7 +121,7 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing3}>
+              <StyledText as="h6" marginTop={SPACING.spacing8}>
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -162,7 +162,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
         <Link
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={() => setIsReadMore(!isReadMore)}
         >
@@ -344,7 +344,7 @@ export function ProtocolDetails(
       </Portal>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
         width="100%"
       >
         <ChooseRobotToRunProtocolSlideout
@@ -364,14 +364,12 @@ export function ProtocolDetails(
           position={POSITION_RELATIVE}
           flexDirection={DIRECTION_ROW}
           width="100%"
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
         >
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing4}
-            padding={`${String(SPACING.spacing4)} 0 ${String(
-              SPACING.spacing4
-            )} ${String(SPACING.spacing4)}`}
+            gridGap={SPACING.spacing16}
+            padding={`${SPACING.spacing16} 0 ${SPACING.spacing16} ${SPACING.spacing16}`}
             width="100%"
           >
             {analysisStatus !== 'loading' &&
@@ -384,7 +382,7 @@ export function ProtocolDetails(
             ) : null}
             <StyledText
               css={TYPOGRAPHY.h2SemiBold}
-              marginBottom={SPACING.spacing4}
+              marginBottom={SPACING.spacing16}
               data-testid={`ProtocolDetails_${protocolDisplayName}`}
             >
               {protocolDisplayName}
@@ -444,7 +442,7 @@ export function ProtocolDetails(
                 </PrimaryButton>
               </Flex>
             </Flex>
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <Flex css={GRID_STYLE}>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -455,7 +453,7 @@ export function ProtocolDetails(
                 </StyledText>
                 <StyledText
                   as="p"
-                  marginRight={SPACING.spacingM}
+                  marginRight={SPACING.spacing20}
                   overflowWrap="anywhere"
                 >
                   {analysisStatus === 'loading' ? t('shared:loading') : author}
@@ -482,8 +480,8 @@ export function ProtocolDetails(
           </Flex>
           <Box
             position={POSITION_RELATIVE}
-            top={SPACING.spacing1}
-            right={SPACING.spacing1}
+            top={SPACING.spacing2}
+            right={SPACING.spacing2}
           >
             <ProtocolOverflowMenu
               handleRunProtocol={() =>
@@ -513,7 +511,7 @@ export function ProtocolDetails(
             <Flex
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              padding={SPACING.spacing4}
+              padding={SPACING.spacing16}
             >
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_view')}
@@ -523,15 +521,15 @@ export function ProtocolDetails(
                 disabled={analysisStatus !== 'complete'}
                 display={DISPLAY_FLEX}
                 justifyContent={JUSTIFY_CENTER}
-                height={SPACING.spacing5}
-                width={SPACING.spacing5}
+                height={SPACING.spacing24}
+                width={SPACING.spacing24}
                 css={ZOOM_ICON_STYLE}
                 onClick={() => setShowDeckViewModal(true)}
               >
                 <Icon name="union" size={SIZE_1} />
               </Btn>
             </Flex>
-            <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
+            <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
               {deckViewByAnalysisStatus[analysisStatus]}
             </Box>
           </Flex>
@@ -540,7 +538,7 @@ export function ProtocolDetails(
             width="100%"
             height="100%"
             flexDirection={DIRECTION_COLUMN}
-            marginLeft={SPACING.spacing4}
+            marginLeft={SPACING.spacing16}
           >
             <Flex>
               <RoundTab
@@ -587,9 +585,7 @@ export function ProtocolDetails(
               } ${String(BORDERS.radiusSoftCorners)} ${String(
                 BORDERS.radiusSoftCorners
               )} ${String(BORDERS.radiusSoftCorners)}`}
-              padding={`${String(SPACING.spacing4)} ${String(
-                SPACING.spacing4
-              )} 0 ${String(SPACING.spacing4)}`}
+              padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
             >
               {contentsByTabName[currentTab]}
             </Box>

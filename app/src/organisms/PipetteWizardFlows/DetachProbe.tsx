@@ -19,6 +19,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
     mount,
     flowType,
     attachedPipettes,
+    errorMessage,
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.DETACH_PROBE }
@@ -37,9 +38,11 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
           {i18n.format(t('remove_probe'), 'capitalize')}
         </StyledText>
       }
-      proceedButtonText={t('complete_cal')}
+      proceedButtonText={
+        errorMessage != null ? t('exit_cal') : t('complete_cal')
+      }
       proceed={proceed}
-      back={goBack}
+      back={errorMessage != null ? undefined : goBack}
     />
   )
 }

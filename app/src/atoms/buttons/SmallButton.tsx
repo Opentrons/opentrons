@@ -23,7 +23,7 @@ type SmallButtonTypes =
   | 'tertiaryLowLight'
   | 'tertiaryHighLight'
 
-type SmallButtonCategory = 'default' | 'rounded'
+export type ButtonCategory = 'default' | 'rounded'
 
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
@@ -32,7 +32,7 @@ interface SmallButtonProps extends StyleProps {
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement
   iconName?: IconName
-  buttonCategory?: SmallButtonCategory // if not specified, it will be 'default'
+  buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
 }
 
@@ -100,10 +100,10 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       .defaultBackgroundColor};
     cursor: default;
     border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.size_five
-      : BORDERS.size_four};
+      ? BORDERS.size5
+      : BORDERS.size4};
     box-shadow: none;
-    padding: ${SPACING.spacing4} ${SPACING.spacing5};
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
@@ -152,7 +152,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
             <Icon
               size="1.75rem"
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               name={iconName}
             />
           </Flex>
@@ -169,7 +169,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
             <Icon
               size="1.75rem"
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
               name={iconName}
             />
           </Flex>

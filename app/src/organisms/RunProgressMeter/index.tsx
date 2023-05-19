@@ -152,9 +152,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     downloadRunLog()
   }
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
             'current_step'
           )}${
@@ -183,7 +183,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={onDownloadClick}
         >
-          <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+          <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
             <Icon name="download" size={SIZE_1} />
             {t('download_run_log')}
           </Flex>

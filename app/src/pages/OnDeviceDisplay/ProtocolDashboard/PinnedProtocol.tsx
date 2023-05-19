@@ -26,19 +26,16 @@ export type CardSizeType = 'full' | 'half' | 'regular'
 
 export function PinnedProtocol(props: {
   protocol: ProtocolResource
+  longPress: React.Dispatch<React.SetStateAction<boolean>>
   cardSize?: CardSizeType
   lastRun?: string
 }): JSX.Element {
-  const { lastRun, protocol } = props
+  const { lastRun, protocol, longPress } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
-  const displayedName = truncateString(
-    protocolName,
-    cardSize === 'full' ? 115 : 90,
-    cardSize === 'full' ? 82 : 45
-  )
+  const displayedName = truncateString(protocolName, 59)
   const { t } = useTranslation('protocol_info')
 
   const cardStyleBySize: {
@@ -51,7 +48,7 @@ export function PinnedProtocol(props: {
   } = {
     full: {
       fontSize: TYPOGRAPHY.fontSize32,
-      height: '100%',
+      height: '8.875rem',
       lineHeight: TYPOGRAPHY.lineHeight42,
       width: '100%',
     },
@@ -77,21 +74,26 @@ export function PinnedProtocol(props: {
       history.push(`/protocols/${protocolId}`)
     }
   }
+  React.useEffect(() => {
+    if (longpress.isLongPressed) {
+      longPress(true)
+    }
+  }, [longpress.isLongPressed, longPress])
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.size4}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing24}
       height={cardStyleBySize[cardSize].height}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       overflowWrap="anywhere"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing24}
       ref={longpress.ref}
     >
       <StyledText
@@ -103,15 +105,12 @@ export function PinnedProtocol(props: {
       </StyledText>
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
+        color={COLORS.darkBlack70}
       >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
+        <StyledText as="p">
           {lastRun !== undefined
             ? `${t('last_run')} ${formatDistance(
                 new Date(lastRun),
@@ -122,12 +121,8 @@ export function PinnedProtocol(props: {
               ).replace('about ', '')}`
             : t('no_history')}
         </StyledText>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
-          {format(new Date(protocol.createdAt), 'Pp')}
+        <StyledText as="p">
+          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (

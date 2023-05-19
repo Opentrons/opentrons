@@ -248,10 +248,6 @@ describe('BeforeBeginning', () => {
           { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
-          },
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: RIGHT },
           },
         ],

@@ -29,7 +29,7 @@ export function PreviousVersionModal(
   return (
     <Modal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
-        <StyledText as="p" paddingBottom={SPACING.spacing3}>
+        <StyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('restore_description')}
         </StyledText>
         <ExternalLink
@@ -38,7 +38,7 @@ export function PreviousVersionModal(
         >
           {t('learn_uninstalling')}
         </ExternalLink>
-        <Box marginY={SPACING.spacing3} />
+        <Box marginY={SPACING.spacing8} />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
           id="PreviousVersionModal_previousReleases"
@@ -48,7 +48,7 @@ export function PreviousVersionModal(
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <PrimaryButton
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           onClick={props.closeModal}
           id="PreviousVersionModal_closeButton"
         >

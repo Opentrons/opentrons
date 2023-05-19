@@ -154,7 +154,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             disabled={isFetching}
             aria-label="Results_errorExit"
-            marginRight={SPACING.spacing2}
+            marginRight={SPACING.spacing4}
           >
             {i18n.format(t('cancel_attachment'), 'capitalize')}
           </SecondaryButton>

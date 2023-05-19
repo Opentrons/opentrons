@@ -1,5 +1,6 @@
 """Test state getters for retrieving motion planning views of state."""
 import inspect
+from typing import List
 
 import pytest
 from decoy import Decoy
@@ -15,14 +16,17 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     DeckSlotLocation,
     CurrentWell,
+    MotorAxis,
 )
 from opentrons.protocol_engine.state import PipetteLocationData, move_types
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 @pytest.fixture
@@ -46,7 +50,14 @@ def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 
 @pytest.fixture
+def mock_engine_config(decoy: Decoy) -> Config:
+    """Get a ProtocolEngine config value object."""
+    return decoy.mock(cls=Config)
+
+
+@pytest.fixture
 def subject(
+    mock_engine_config: Config,
     labware_view: LabwareView,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
@@ -54,6 +65,7 @@ def subject(
 ) -> MotionView:
     """Get a MotionView with its dependencies mocked out."""
     return MotionView(
+        config=mock_engine_config,
         labware_view=labware_view,
         pipette_view=pipette_view,
         geometry_view=geometry_view,
@@ -562,3 +574,22 @@ def test_get_touch_tip_waypoints(
             position=Point(x=44, y=55, z=66), critical_point=CriticalPoint.XY_CENTER
         ),
     ]
+
+
+@pytest.mark.parametrize(
+    argnames=["robot_type", "expected_axes"],
+    argvalues=[
+        ["OT-2 Standard", [MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]],
+        ["OT-3 Standard", [MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z, MotorAxis.EXTENSION_Z]],
+    ],
+)
+def test_get_mount_axes(
+    decoy: Decoy,
+    mock_engine_config: Config,
+    subject: MotionView,
+    robot_type: RobotType,
+    expected_axes: List[MotorAxis],
+) -> None:
+    """It should return the correct mount axes for the robot type."""
+    decoy.when(mock_engine_config.robot_type).then_return(robot_type)
+    assert subject.get_robot_mount_axes() == expected_axes

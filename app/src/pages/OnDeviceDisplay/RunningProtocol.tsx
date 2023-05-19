@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useParams, Link, useHistory } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
@@ -16,7 +16,6 @@ import {
   OVERFLOW_HIDDEN,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import {
   useProtocolQuery,
   useRunQuery,
@@ -72,7 +71,6 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
-  const history = useHistory()
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -114,12 +112,6 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
-  React.useEffect(() => {
-    if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
-      history.push(`/protocols/${runId}/summary`)
-    }
-  }, [history, runId, runStatus])
-
   return (
     <>
       <Flex
@@ -135,7 +127,6 @@ export function RunningProtocol(): JSX.Element {
                 ? Number(currentRunCommandIndex) + 1
                 : 1
             }
-            OnDevice
           />
         ) : null}
         {showConfirmCancelRunModal ? (
@@ -147,7 +138,7 @@ export function RunningProtocol(): JSX.Element {
         ) : null}
         <Flex
           ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacingXXL} ${SPACING.spacingXXL}`}
+          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
           flexDirection={DIRECTION_COLUMN}
         >
           {robotSideAnalysis != null ? (
@@ -183,7 +174,7 @@ export function RunningProtocol(): JSX.Element {
           <Flex
             marginTop="2rem"
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
@@ -197,9 +188,9 @@ export function RunningProtocol(): JSX.Element {
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
-        paddingRight={SPACING.spacing6}
+        paddingRight={SPACING.spacing32}
       >
         <Link to="/dashboard">
           <TertiaryButton>back to RobotDashboard</TertiaryButton>

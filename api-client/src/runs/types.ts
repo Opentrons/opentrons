@@ -66,6 +66,10 @@ export interface RunsLinks {
   current?: ResourceLink
 }
 
+export interface GetRunsParams {
+  pageLength?: number // the number of items to include
+}
+
 export interface Runs {
   data: RunData[]
   links: RunsLinks
