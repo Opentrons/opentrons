@@ -96,6 +96,7 @@ from .types import (
     UpdateState,
     UpdateStatus,
     StatusBarState,
+    _BothMontType,
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
@@ -943,7 +944,7 @@ class OT3API(
 
     async def move_to(
         self,
-        mount: Union[top_types.Mount, OT3Mount],
+        mount: Union[top_types.Mount, OT3Mount, _BothMontType],
         abs_position: top_types.Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
@@ -952,8 +953,14 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
-        realmount = OT3Mount.from_mount(mount)
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        mount_type: Union[top_types.Mount, OT3Mount]
+        if isinstance(mount, _BothMontType):
+            mount_type = OT3Mount.BOTH
+        else:
+            mount_type = mount
+
+        realmount = OT3Mount.from_mount(mount_type)
+        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount_type)]
 
         # Cache current position from backend
         await self._cache_current_position()

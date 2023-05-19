@@ -1,8 +1,8 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, MotionChecks
+from ..types import Axis, CriticalPoint, MotionChecks, _BothMontType
 
 
 class MotionController(Protocol):
@@ -113,7 +113,7 @@ class MotionController(Protocol):
 
     async def move_to(
         self,
-        mount: Mount,
+        mount: Union[Mount, _BothMontType],
         abs_position: Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,

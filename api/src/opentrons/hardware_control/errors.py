@@ -72,3 +72,7 @@ class InvalidPipetteModel(KeyError):
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
+
+
+class InvalidMountTypeError(ValueError):
+    pass

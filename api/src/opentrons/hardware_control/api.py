@@ -45,10 +45,9 @@ from .types import (
     MotionChecks,
     PauseType,
     StatusBarState,
+    _BothMontType,
 )
-from .errors import (
-    MustHomeError,
-)
+from .errors import MustHomeError, InvalidMountTypeError
 from . import modules
 from .robot_calibration import (
     RobotCalibrationProvider,
@@ -660,7 +659,7 @@ class API(
     # TODO(mc, 2022-05-13): return resulting gantry position
     async def move_to(
         self,
-        mount: top_types.Mount,
+        mount: Union[top_types.Mount, _BothMontType],
         abs_position: top_types.Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
@@ -670,6 +669,9 @@ class API(
         Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed.
         """
+        if isinstance(mount, _BothMontType):
+            raise InvalidMountTypeError("BOTH mount type is not supported on an OT-2.")
+
         if not self._current_position:
             await self.home()
 

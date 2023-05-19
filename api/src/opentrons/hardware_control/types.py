@@ -12,7 +12,7 @@ from typing import (
     Dict,
     TypeVar,
 )
-from typing_extensions import Literal
+from typing_extensions import Literal, Final
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
@@ -74,6 +74,13 @@ class Axis(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class _BothMontType(enum.Enum):
+    BOTH = "both"
+
+
+BOTH_MOUNTS: Final = _BothMontType.BOTH
 
 
 class OT3Mount(enum.Enum):
