@@ -325,10 +325,13 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
 
         #check if we moved to correct position with encoder
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
-        print("inital_pos: " + str(inital_pos))
-        print("mov_pos: " + str(move_pos))
+        print("NEG MOVE - inital_pos: " + str(inital_pos))
+        print("NEG MOVE - mov_pos: " + str(move_pos))
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
+        #print("delta_move_pos: " + str(delta_move_pos))
         delta_move_axis = delta_move_pos[AXIS_MAP[axis]]
+        #print("delta_move_axis: " + str(delta_move_axis))
+        #print("move_distance: " + str(move_distance))
         move_error = check_move_error(delta_move_axis, (move_distance*-1), axis)
         #if we had error in the move stop move
         print(axis + ' Error: ' + str(move_error))
@@ -337,7 +340,11 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
             move_error_correction = get_move_correction(delta_move_axis,
                                                         axis,
                                                         -1)
+            print()
+            print('**************************************')
             print('ERROR IN NEG MOVE, CORRECTING: ' + str(move_error_correction))
+            print('**************************************')
+            input()
             if(axis == 'X' or axis == 'Y'):
                 await api.move_rel(mount=MOUNT,
                                    delta=move_error_correction,
@@ -362,12 +369,21 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         await api.move_rel(mount=MOUNT, delta=move_distance, speed=cur_speed)
 
         final_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+        print("POS MOVE - inital_pos: " + str(inital_pos))
+        print("POS MOVE - final_pos: " + str(final_pos))
         delta_pos = get_pos_delta(final_pos, inital_pos)
+        #print("delta_pos: " + str(delta_pos))
         delta_pos_axis = delta_pos[AXIS_MAP[axis]]
-        move_error = check_move_error(delta_move_axis, move_distance, axis)
+        #print("delta_pos_axis: " + str(delta_pos_axis))
+        #print("move_distance: " + str(move_distance))
+        move_error = check_move_error(delta_pos_axis, move_distance, axis)
         print(axis + ' Error: ' + str(move_error))
         if(abs(move_error) >= 0.1):
+            print()
+            print('**************************************')
             print('ERROR IN POS MOVE')
+            print('**************************************')
+            input()
             if(DELAY > 0):
                 time.sleep(DELAY)
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -470,7 +486,7 @@ async def _main(is_simulating: bool) -> None:
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     finally:
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        # await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         await api.clean_up()
 
 def parameter_range(test_load, test_axis, p_type):
@@ -510,6 +526,11 @@ def make_test_list(test_axis, test_load):
 
     return complete_test_list
 
+def update_test_parameters(ptype, psub, value):
+    for load in TEST_PARAMETERS:
+        for axis in ['X', 'Y', 'L', 'R']:
+            TEST_PARAMETERS[load][axis][ptype][psub] = value
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
@@ -532,6 +553,7 @@ if __name__ == "__main__":
     FREQ_INC = args.inc
     ACCEL = args.accel
     START_CURRENT = args.current
+    update_test_parameters('CURRENT', 'MIN', START_CURRENT)
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))
