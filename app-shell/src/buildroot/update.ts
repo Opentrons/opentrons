@@ -3,6 +3,8 @@
 
 import path from 'path'
 
+import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
+
 import { fetch, postFile } from '../http'
 import { getSerialPortHttpAgent } from '../usb'
 
@@ -62,10 +64,19 @@ export function uploadSystemFile(
   urlPath: string,
   file: string
 ): Promise<unknown> {
+  const isUsbUpload = robot.ip === OPENTRONS_USB
+
   const serialPortHttpAgent = getSerialPortHttpAgent()
   const url = `http://${robot.ip}:${robot.port}${urlPath}`
 
-  return postFile(url, getSystemFileName(robot.robotModel), file, {
-    agent: serialPortHttpAgent,
-  })
+  return postFile(
+    url,
+    getSystemFileName(robot.robotModel),
+    file,
+    isUsbUpload
+      ? {
+          agent: serialPortHttpAgent,
+        }
+      : {}
+  )
 }
