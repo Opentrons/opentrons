@@ -20,6 +20,16 @@ MODELS = [
 ]
 
 
+def _handle_module_case(opentrons_api: OpentronsHTTPAPI, model: str) -> bool:
+    if "heaterShaker" in model:
+        # make sure the clamp is closed
+        opentrons_api.heater_shaker_latch_open(False)
+    elif "thermocycler" in model:
+        # make sure the lid is open
+        opentrons_api.thermocycler_lid_open(True)
+    return True
+
+
 def _main(args: argparse.Namespace, opentrons_api: OpentronsHTTPAPI) -> None:
     # Create a new run
     run_id = opentrons_api.create_run()
@@ -52,6 +62,8 @@ def _main(args: argparse.Namespace, opentrons_api: OpentronsHTTPAPI) -> None:
     if not offset:
         raise RuntimeError(f"Could not calibrate {args.model}")
 
+    # set module pre-conditions (closed lid/latch)
+    _handle_module_case(opentrons_api, args.model)
     print("Moving to calibrated well center")
     calibrated_position = opentrons_api.move_to_well(
         args.mount, "A1", offset=PROBE_OFFSET
@@ -72,6 +84,9 @@ def _main(args: argparse.Namespace, opentrons_api: OpentronsHTTPAPI) -> None:
     module_id = opentrons_api.load_module(args.model, args.slot)
     opentrons_api.load_labware(module_id, args.model)
     opentrons_api.load_pipette(args.mount)
+
+    # set module pre-conditions (closed lid/latch)
+    _handle_module_case(opentrons_api, args.model)
 
     print("Moving to the uncalibrated well position")
     # we need to add the probe z offset so we dont crash into the deck

@@ -283,3 +283,56 @@ class OpentronsHTTPAPI:
             msg = f"Failed to move to well {well_name}: {error_type} - {error_details}"
             raise RuntimeError(msg)
         return Point(**data["result"]["position"])
+
+    def heater_shaker_latch_open(self, open: bool = True) -> bool:
+        """Open/Close the Heater-Shaker Latch."""
+
+        # check the type of module is a heater-shaker
+        open = "open" if open else "close"
+        heater_shaker_latch = {
+            "data": {
+                "commandType": f"heaterShaker/{open}LabwareLatch",
+                "params": {
+                    "moduleId": self._module_id,
+                },
+            }
+        }
+
+        print(f"Heater-Shaker latch will {open}")
+        url = f"{self._base_url}/runs/{self._run_id}/commands"
+        res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=heater_shaker_latch)
+        data = res.json().get("data")
+        error = data.get("error")
+        if res.status_code != 201 or error:
+            error_type = error.get("errorType")
+            error_details = error.get("detail")
+            msg = f"Failed to move to well {well_name}: {error_type} - {error_details}"
+            raise RuntimeError(msg)
+        return True
+
+    def thermocycler_lid_open(self, open: bool = True) -> bool:
+        """Open/Close the Thermocycler lid."""
+
+        # check the type of module is a heater-shaker
+        open = "open" if open else "close"
+        thermocycler_lid = {
+            "data": {
+                "commandType": f"thermocycler/{open}Lid",
+                "params": {
+                    "moduleId": self._module_id,
+                },
+            }
+        }
+
+        print(f"Thermocycler Lid will {open}")
+        url = f"{self._base_url}/runs/{self._run_id}/commands"
+        res = requests.post(headers=HEADERS, params=PARAMS, url=url, json=thermocycler_lid)
+        data = res.json().get("data")
+        error = data.get("error")
+        if res.status_code != 201 or error:
+            error_type = error.get("errorType")
+            error_details = error.get("detail")
+            msg = f"Failed to move to well {well_name}: {error_type} - {error_details}"
+            raise RuntimeError(msg)
+        return True
+
