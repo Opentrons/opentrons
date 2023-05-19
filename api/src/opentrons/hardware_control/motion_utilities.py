@@ -1,6 +1,6 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast
+from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast, Any
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
@@ -95,7 +95,7 @@ def _z_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
+def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Any:
     if isinstance(mount, Mount):
         return Axis.by_mount(mount)
     else:

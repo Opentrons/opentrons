@@ -802,7 +802,8 @@ class OT3Controller:
         current_tools = dict(OT3Controller._generate_attached_instrs(attached))
         # remove pipette_left, pipette_right and gripper
         self._present_devices -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
+            for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]
         )
         # add pipette_left, pipette_right and gripper if present
         for mount in current_tools.keys():

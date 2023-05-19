@@ -49,6 +49,7 @@ def dummy_instruments_attached_ot3():
         },
         types.Mount.RIGHT: {"model": None, "id": None, "name": None},
         OT3Mount.GRIPPER: None,
+        OT3Mount.BOTH: None,
     }
 
 

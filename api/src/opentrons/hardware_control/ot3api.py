@@ -962,6 +962,12 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount_type)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount_type)]
 
+        # if we're moving both mounts, realmount will be a tuple, so reformat axes_moving
+        if realmount == OT3Mount.BOTH:
+            axes_moving.pop()
+            axes_moving.append(OT3Axis.X)
+            axes_moving.append(OT3Axis.Y)
+
         # Cache current position from backend
         await self._cache_current_position()
         await self._cache_encoder_position()
@@ -1052,6 +1058,10 @@ class OT3API(
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
         """
+        if mount == OT3Mount.BOTH:
+            self._last_moved_mount = None
+            return
+
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
