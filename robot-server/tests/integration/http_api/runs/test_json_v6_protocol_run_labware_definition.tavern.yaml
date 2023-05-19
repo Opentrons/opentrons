@@ -57,18 +57,20 @@ stages:
       url: '{host:s}:{port:d}/runs/{run_id}/labware-definitions'
       method: GET
     response:
+      strict:
+        - json:off
       status_code: 200
       json:
         data:
           - id: !anystr
             metaData:
-              displayName: Opentrons Fixed Trash
+              displayName: 'Opentrons Fixed Trash'
           - id: !anystr
             metaData:
-              displayName: Opentrons 96 Tip Rack 10 µL
+              displayName: 'Opentrons 96 Tip Rack 10 µL'
           - id: !anystr
             metaData:
-              displayName: Foo 8 Well Plate 33uL
+              displayName: 'Foo 8 Well Plate 33uL'
           - id: !anystr
             metaData:
-              displayName: Sample Collection Plate
+              displayName: 'Sample Collection Plate'
