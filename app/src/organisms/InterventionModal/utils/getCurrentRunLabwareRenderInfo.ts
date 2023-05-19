@@ -1,5 +1,10 @@
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 
+import {
+  OT2_STANDARD_SLOT_HEIGHT,
+  OT3_STANDARD_SLOT_HEIGHT,
+} from './animationConstants'
+
 import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
@@ -23,8 +28,7 @@ export function getCurrentRunLabwareRenderInfo(
     return runData.labware.reduce<RunLabwareInfo[]>((acc, labware) => {
       const location = labware.location
       if (
-        location === 'offDeck' ||
-        'moduleId' in location ||
+        (typeof location === 'object' && 'moduleId' in location) ||
         labware.id === 'fixedTrash'
       ) {
         return acc
@@ -34,26 +38,41 @@ export function getCurrentRunLabwareRenderInfo(
       if (labwareDef == null) {
         return acc
       }
-      const slotName = location.slotName
-      const slotPosition =
-        deckDef.locations.orderedSlots.find(slot => slot.id === slotName)
-          ?.position ?? []
-      const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-        deckDef,
-        slotName
-      )
 
-      return slotHasMatingSurfaceVector
-        ? [
-            ...acc,
-            {
-              x: slotPosition[0] ?? 0,
-              y: slotPosition[1] ?? 0,
-              labwareId: labware.id,
-              labwareDef,
-            },
-          ]
-        : acc
+      if (location !== 'offDeck') {
+        const slotName = location.slotName
+        const slotPosition =
+          deckDef.locations.orderedSlots.find(slot => slot.id === slotName)
+            ?.position ?? []
+        const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
+          deckDef,
+          slotName
+        )
+        return slotHasMatingSurfaceVector
+          ? [
+              ...acc,
+              {
+                x: slotPosition[0] ?? 0,
+                y: slotPosition[1] ?? 0,
+                labwareId: labware.id,
+                labwareDef,
+              },
+            ]
+          : acc
+      } else {
+        return [
+          ...acc,
+          {
+            x: 0,
+            y:
+              deckDef.otId === 'ot3_standard'
+                ? OT3_STANDARD_SLOT_HEIGHT * -1
+                : OT2_STANDARD_SLOT_HEIGHT * -1,
+            labwareId: labware.id,
+            labwareDef,
+          },
+        ]
+      }
     }, [])
   }
   return []

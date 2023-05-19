@@ -3,6 +3,8 @@ import {
   LABWARE_MOVE_DURATION_MS,
   LABWARE_MOVE_TO_OFFDECK_DELAY_MS,
   LABWARE_MOVE_TO_OFFDECK_DURATION_MS,
+  OT2_STANDARD_SLOT_HEIGHT,
+  OT3_STANDARD_SLOT_HEIGHT,
 } from './animationConstants'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -10,9 +12,6 @@ import type { MoveLabwareAnimationParams } from '@opentrons/components'
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { RunLabwareInfo } from './getCurrentRunLabwareRenderInfo'
 import type { RunModuleInfo } from './getCurrentRunModulesRenderInfo'
-
-const OT2_STANDARD_SLOT_HEIGHT = 90.5
-const OT3_STANDARD_SLOT_HEIGHT = 107
 
 export function getLabwareMovementAnimationParams(
   runLabwareInfo: RunLabwareInfo[],
@@ -31,8 +30,6 @@ export function getLabwareMovementAnimationParams(
       return null
     }
   }
-  // will need to come back and fix this so 'offDeck' currentPos works correctly.
-  // that will require changes in the other labware helper that currently ignores offDeck labware
   const currentPos = [labwareFromRun.x, labwareFromRun.y]
   let newPos: [number, number] | null = null
   if (command.params?.newLocation === 'offDeck') {
