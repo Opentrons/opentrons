@@ -185,8 +185,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         isOnDevice={isOnDevice}
       />
     )
-  }
-  if (
+  } else if (
     !isSuccess &&
     requiredPipette == null &&
     requiredPipDisplayName == null &&
