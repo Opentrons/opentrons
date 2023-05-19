@@ -8,6 +8,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
@@ -43,8 +44,6 @@ export function RunFailedModal({
   if (errors == null) return null
   const modalHeader: ModalHeaderBaseProps = {
     title: t('run_failed_modal_title'),
-    iconName: 'ot-alert',
-    iconColor: COLORS.white,
   }
 
   const handleClose = (): void => {
@@ -67,12 +66,12 @@ export function RunFailedModal({
       header={modalHeader}
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
-        padding={SPACING.spacing32}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_FLEX_START}
+        >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {/* (kj:05/17/2023) errorType will be added when the endpoint is ready */}
             {t('error_type', {
@@ -86,12 +85,18 @@ export function RunFailedModal({
             maxHeight="5.375rem"
           >
             {errors.map(error => (
-              <StyledText as="p" key={error.id}>
+              <StyledText
+                as="p"
+                key={error.id}
+                textAlign={TYPOGRAPHY.textAlignLeft}
+              >
                 {error.detail}
               </StyledText>
             ))}
-            <StyledText as="p">{t('contact_information')}</StyledText>
           </Flex>
+          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+            {t('contact_information')}
+          </StyledText>
         </Flex>
         <SmallButton
           width="100%"
