@@ -19,7 +19,7 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
-from ..types import OffDeckType
+from .._types import OffDeckType
 
 
 class AbstractProtocol(

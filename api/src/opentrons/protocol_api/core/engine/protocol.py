@@ -33,11 +33,10 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotLoadedOnModuleError,
-    UnknownLocationError,
 )
 
 from ... import validation
-from ...types import OffDeckType
+from ..._types import OffDeckType
 from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -52,7 +51,7 @@ from .module_core import (
     NonConnectedModuleCore,
     MagneticBlockCore,
 )
-from .exceptions import InvalidModuleLocationError
+from .exceptions import InvalidModuleLocationError, UnknownLocationError
 from . import load_labware_params
 from . import deck_conflict
 

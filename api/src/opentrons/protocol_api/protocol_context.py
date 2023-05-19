@@ -29,7 +29,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from .types import OffDeckType
+from ._types import OffDeckType
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -424,7 +424,7 @@ class ProtocolContext(CommandPublisher):
                         using :py:meth:`load_labware`
 
         :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module` or off deck using :py:type OffDeckType.
+                             loaded on the deck using :py:meth:`load_module` or off deck using :py:type OFF_DECK.
 
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
