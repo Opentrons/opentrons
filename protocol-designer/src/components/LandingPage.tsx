@@ -7,6 +7,13 @@ import { actions as loadFileActions } from '../load-file'
 import { connect, useDispatch } from 'react-redux'
 import { ThunkDispatch } from '../types'
 import { actions as navActions } from '../navigation'
+import { setRobotName } from '../load-file/actions'
+import {
+  OT2_STANDARD_DECKID,
+  OT2_STANDARD_MODEL,
+  OT3_STANDARD_DECKID,
+  OT3_STANDARD_MODEL,
+} from '@opentrons/shared-data'
 
 type Props = React.ComponentProps<typeof LandingPage>
 export interface PageProps {
@@ -52,7 +59,6 @@ function LandingPage(props: {
             type="file"
             onChange={fileChangeEvent => {
               dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
-              goToOT2FilePage()
             }}
           />
         </OutlineButton>
@@ -62,7 +68,7 @@ function LandingPage(props: {
 }
 
 function mergeProps(
-  stateProps: SP,
+  stateProps: any,
   dispatchProps: {
     dispatch: ThunkDispatch<any>
   }
@@ -72,9 +78,15 @@ function mergeProps(
   return {
     ...passThruProps,
     goToOT3FilePage: () => {
+      dispatch(
+        setRobotName({ model: OT3_STANDARD_MODEL, deckId: OT3_STANDARD_DECKID })
+      )
       dispatch(navActions.navigateToPage('new-flex-file-form'))
     },
     goToOT2FilePage: () => {
+      dispatch(
+        setRobotName({ model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID })
+      )
       dispatch(navActions.navigateToPage('file-splash'))
     },
   }

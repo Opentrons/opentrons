@@ -21,12 +21,13 @@ import { FlexFileDetails } from '../components/FlexProtocolEditor/FlexFileDetail
 import { LandingPageComponent } from '../components/LandingPage'
 import { CreateFlexFileForm } from '../components/FlexProtocolEditor'
 import { OT2_STANDARD_DECKID } from '@opentrons/shared-data'
+import { selectors as fileSelectors, RobotDataFields } from '../file-data'
 
 interface Props {
   page: Page
   selectedTerminalItemId: TerminalItemId | null | undefined
   ingredSelectionMode: boolean
-  robot: string | null | undefined
+  robot: RobotDataFields
 }
 
 function MainPanelComponent(props: Props): JSX.Element {
@@ -34,7 +35,7 @@ function MainPanelComponent(props: Props): JSX.Element {
   // in OT3 case : undefined while import file
   // in OT2 case: ot2_standard while import file
   const fileComponent =
-    !robot || robot === OT2_STANDARD_DECKID ? (
+    !robot || robot.deckId === OT2_STANDARD_DECKID ? (
       <ConnectedFilePage />
     ) : (
       <FlexFileDetails />
@@ -79,7 +80,7 @@ function mapStateToProps(state: BaseState): Props {
     selectedTerminalItemId: getSelectedTerminalItemId(state),
     ingredSelectionMode:
       labwareIngredSelectors.getSelectedLabwareId(state) != null,
-    robot: state.fileData.fileMetadata?.deckId,
+    robot: fileSelectors.protocolRobotModelName(state),
   }
 }
 

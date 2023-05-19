@@ -80,6 +80,11 @@ interface FlexProtocolEditorComponentProps {
   isEditValue: boolean
   tabIdValue: any
   formProps: any
+  onSave: (args: {
+    newProtocolFields: NewProtocolFields
+    pipettes: PipetteFieldsData[]
+    modules: ModuleCreationArgs[]
+  }) => void
 }
 
 const validationSchema = Yup.object().shape({
@@ -313,7 +318,6 @@ function FlexProtocolEditor({
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
-        console.log(acc, formPipette, mount)
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
@@ -377,7 +381,7 @@ function FlexProtocolEditor({
             validate={validateFields}
             validationSchema={validationSchema}
             onSubmit={(values, actions) => {
-              selectedTab > 2 && handleSubmit({ values })
+              selectedTab === 3 && handleSubmit({ values })
             }}
           >
             {(props: {

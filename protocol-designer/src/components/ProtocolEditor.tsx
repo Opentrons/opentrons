@@ -20,17 +20,20 @@ import styles from './ProtocolEditor.css'
 import { connect } from 'react-redux'
 import { selectors } from '../navigation'
 import { BaseState } from '../types'
+import { RobotDataFields, selectors as fileSelectors } from '../file-data'
+import { OT3_STANDARD_DECKID } from '@opentrons/shared-data'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 export interface Props {
   children?: React.ReactNode
   page: string
-  robot: string | null | undefined
+  robot: RobotDataFields
 }
 
 function ProtocolEditorComponent(props: Props): JSX.Element {
-  const { page } = props
+  const { page, robot } = props
+  console.log(`Selected page name is ${page} and robot name is ${robot}`)
   const pages = ['landing-page', 'new-flex-file-form']
   const conditionalStyle = pages.includes(page)
     ? cx(styles.flex_main_page_content, MAIN_CONTENT_FORCED_SCROLL_CLASSNAME)
@@ -45,7 +48,7 @@ function ProtocolEditorComponent(props: Props): JSX.Element {
         {page !== 'landing-page' && (
           <>
             <ConnectedNav />
-            <ConnectedSidebar />
+            {robot?.deckId !== OT3_STANDARD_DECKID && <ConnectedSidebar />}
           </>
         )}
 
@@ -69,7 +72,7 @@ function ProtocolEditorComponent(props: Props): JSX.Element {
 function mapStateToProps(state: BaseState): Props {
   return {
     page: selectors.getCurrentPage(state),
-    robot: state.fileData.fileMetadata?.deckId,
+    robot: fileSelectors.protocolRobotModelName(state),
   }
 }
 

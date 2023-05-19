@@ -1,5 +1,5 @@
 import { migration } from './migration'
-import { selectors as fileDataSelectors } from '../file-data'
+import { RobotDataFields, selectors as fileDataSelectors } from '../file-data'
 import { saveFile } from './utils'
 import { PDProtocolFile } from '../file-types'
 import { GetState, ThunkAction, ThunkDispatch } from '../types'
@@ -108,3 +108,15 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () =>
   const fileName = `${protocolName}.json`
   saveFile(fileData, fileName)
 }
+
+export interface SetRobotNameAction {
+  type: 'SET_ROBOT_NAME'
+  payload: RobotDataFields
+}
+
+export const setRobotName = (
+  payload: SetRobotNameAction['payload']
+): SetRobotNameAction => ({
+  type: 'SET_ROBOT_NAME',
+  payload,
+})

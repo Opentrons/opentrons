@@ -16,16 +16,16 @@ const definitionsContext = require.context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
+  const sampleArr = true ? PD_DO_NOT_LIST_OT3 : PD_DO_NOT_LIST
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
   // also, more convenient & performant to make a map {labwareDefURI: def} not an array
   if (!_definitions) {
     _definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def: LabwareDefinition2 = definitionsContext(filename)
       const labwareDefURI = getLabwareDefURI(def)
-      return PD_DO_NOT_LIST.includes(def.parameters.loadName)
+      return sampleArr.includes(def.parameters.loadName)
         ? acc
         : { ...acc, [labwareDefURI]: def }
     }, {})

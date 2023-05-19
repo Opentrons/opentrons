@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import { BaseState, Selector } from '../../types'
 import { RootState } from '../reducers'
-import { FileMetadataFields } from '../types'
+import { FileMetadataFields, RobotDataFields } from '../types'
 export const rootSelector = (state: BaseState): RootState => state.fileData
 export const getCurrentProtocolExists: Selector<boolean> = createSelector(
   rootSelector,
@@ -14,6 +14,7 @@ export const getFileMetadata: Selector<FileMetadataFields> = createSelector(
   rootSelector,
   state => state.fileMetadata
 )
-export const protocolRobotModelName: Selector<
-  FileMetadataFields['deckId']
-> = createSelector(rootSelector, state => state.fileMetadata.deckId)
+export const protocolRobotModelName: Selector<RobotDataFields> = createSelector(
+  rootSelector,
+  state => state.robot
+)
