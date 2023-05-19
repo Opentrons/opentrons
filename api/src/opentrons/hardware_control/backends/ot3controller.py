@@ -650,7 +650,7 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )
