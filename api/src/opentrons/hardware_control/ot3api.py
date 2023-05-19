@@ -1619,7 +1619,7 @@ class OT3API(
             # back clamps off the adapter posts
             await self._backend.tip_action(
                 [OT3Axis.of_main_tool_actuator(mount)],
-                pipette_spec.pick_up_distance,
+                pipette_spec.pick_up_distance + pipette_spec.home_buffer,
                 pipette_spec.speed,
                 "home",
             )
@@ -1703,7 +1703,7 @@ class OT3API(
                 )
                 await self._backend.tip_action(
                     [OT3Axis.of_main_tool_actuator(mount)],
-                    move.target_position,
+                    move.target_position + move.home_buffer,
                     move.speed,
                     "home",
                 )
