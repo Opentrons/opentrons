@@ -6,6 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ModuleInfo } from '../ModuleInfo'
 import { useRunHasStarted } from '../hooks'
+import { screen } from '@testing-library/react'
 
 jest.mock('../hooks')
 
@@ -81,5 +82,15 @@ describe('ModuleInfo', () => {
     const { getByText, queryByText } = render(props)
     expect(queryByText('Connected')).toBeNull()
     getByText('Connection info not available once run has started')
+  })
+
+  it('should show the correct information when the magnetic block is in the protocol', () => {
+    props = {
+      ...props,
+      moduleModel: 'magneticBlockV1',
+    }
+    const { getByText } = render(props)
+    getByText('No USB required')
+    expect(screen.queryByText('Connected')).toBeNull()
   })
 })
