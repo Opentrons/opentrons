@@ -121,7 +121,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState !== null &&
       currentRequestState.status === RobotApi.PENDING
     ) {
-      return <ConnectingNetwork />
+      return <ConnectingNetwork ssid={changeState.ssid} />
     } else if (
       changeState.ssid != null &&
       currentRequestState !== null &&

@@ -26,6 +26,7 @@ from .types import (
     LabwareOffsetLocation,
     LabwareMovementStrategy,
     DeckPoint,
+    DeckType,
     DeckSlotLocation,
     ModuleLocation,
     OFF_DECK_LOCATION,
@@ -76,6 +77,7 @@ __all__ = [
     "LabwareMovementStrategy",
     "DeckSlotLocation",
     "DeckPoint",
+    "DeckType",
     "ModuleLocation",
     "OFF_DECK_LOCATION",
     "Dimensions",
@@ -93,7 +95,6 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
-    "StaticPipetteConfig",
     # plugins
     "AbstractPlugin",
 ]
