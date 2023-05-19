@@ -265,6 +265,7 @@ async def _postinit_ot3_tasks(
                 await asyncio.sleep(1)
 
     await asyncio.gather(*(_until_update_finishes(handle) for handle in update_handles))
+    await api_instance.cache_instruments()
     if not ff.disable_home_on_boot():
         log.info("Homing Z axes")
         try:
