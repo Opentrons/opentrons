@@ -84,7 +84,10 @@ export function SetWifiSsid({
         flex="1"
       >
         <Flex justifyContent={JUSTIFY_START} flex="1">
-          <Btn onClick={() => setChangeState({ type: null })}>
+          <Btn
+            onClick={() => setChangeState({ type: null })}
+            data-testid="SetWifiSsid_back_button"
+          >
             <Flex flexDirection={DIRECTION_ROW}>
               <Icon name="back" marginRight={SPACING.spacing2} size="3rem" />
             </Flex>
