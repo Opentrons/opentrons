@@ -15,8 +15,9 @@ from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 
 from opentrons.hardware_control.types import CriticalPoint
 from hardware_testing.drivers import list_ports_and_select
-from drivers.asair_sensor import AsairSensor
+from hardware_testing.drivers.asair_sensor import AsairSensor
 from serial import Serial
+import serial
 
 def convert(seconds):
     weeks, seconds = divmod(seconds, 7*24*60*60)
@@ -87,10 +88,12 @@ async def jogste(api, position, cp):
                 mount, refresh=True, critical_point=cp
             )
             print("\r\n")
-            return position
+            return [step_size[step_length_index], xy_speed,position]
+             
         position = await api.current_position_ot3(
             mount, refresh=True, critical_point=cp
         )
+
 
         print(
             "Coordinates: ",
@@ -105,7 +108,7 @@ async def jogste(api, position, cp):
         )
         print("\r", end="")
 
-        return [step_size[step_length_index], xy_speed]
+    
 
 async def jog(api, position, cp):
     step_size = [0.01, 0.05, 0.1, 0.5, 1, 10, 20, 50]
@@ -245,9 +248,9 @@ def _reading(hardware):
         time.sleep(0.05)
         if hardware.inWaiting():# == self.response_length:
             hardware_read = hardware.read(31)
-            print(hardware_read)
+            #print(hardware_read)
             hardware_read = hardware_read.decode("utf-8")
-            print(hardware_read)
+            #print(hardware_read)
             endlen = hardware_read.rfind("\r")
             #print(endlen)
             results = hardware_read[endlen-8:endlen]
@@ -263,9 +266,9 @@ def _connect_to_fixture(pipp: str=""):
     _port = list_ports_and_select("Dial gauge",pipp)
     hardware = Serial(port=_port,
                                    baudrate=9600,
-                                   parity=Serial.PARITY_NONE,
-                                   stopbits=Serial.STOPBITS_TWO,
-                                   bytesize=Serial.EIGHTBITS)
+                                   parity=serial.PARITY_NONE,
+                                   stopbits=serial.STOPBITS_TWO,
+                                   bytesize=serial.EIGHTBITS)
 
 
 
@@ -302,12 +305,15 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     if args.test_robot:
         test_robot = input("Enter robot ID:\n\t>> ")
 
+    whereval = "OT3Mount.LEFT"
     if(mount == OT3Mount.LEFT):
         AXIS = OT3Axis.Z_L
+        whereval = "OT3Mount.LEFT"
 
 
     else:
         AXIS = OT3Axis.Z_R
+        whereval = "OT3Mount.LEFT"
 
     
     
@@ -340,19 +346,32 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
     }
     
+    
     for i in range(3):
-        Toollength = zijulis[mount] - steplist[0]
+        Toollength = zijulis[whereval] - steplist[0]
+        move = steplist[0]
+        if i%2==0:
+            move = steplist[0]
+        else:
+            move = -steplist[0]
+
         while Toollength >= 0:
+            print("Toollength:::::{}".format(Toollength))
             await api.move_rel(
-                        mount, Point(steplist[0]), speed=steplist[1]
+                        mount, Point(x=move), speed=steplist[1]
                     )
             readval = _reading(hardewar)
-            print("testig:",readval)
+            print("testig=:::::{}".format(readval))
             Toollength = Toollength - steplist[0]
         else:
-            await api.move_rel(
-                        mount, Point(z=-5, speed=steplist[1]
-                    ))
+            if mount == OT3Mount.LEFT:
+                await api.move_rel(
+                            mount, Point(z=-5), speed=steplist[1]
+                        )
+            else:
+                await api.move_rel(
+                            mount, Point(y=-5), speed=steplist[1]
+                        )
 
 
 
