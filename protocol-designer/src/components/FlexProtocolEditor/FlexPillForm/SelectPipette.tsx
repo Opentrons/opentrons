@@ -11,6 +11,8 @@ import { TipRackOptions } from './TipRackList'
 
 interface SelectPipetteOptionProps {
   pipetteName: string
+  changeIs96Selected: any
+  isLeft96ChannelSelected: boolean
 }
 
 interface formikContextProps {
@@ -20,13 +22,30 @@ interface formikContextProps {
 
 export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   pipetteName,
+  changeIs96Selected,
+  isLeft96ChannelSelected,
 }) => {
   const { values, errors } = useFormikContext<formikContextProps>()
 
   const is96ChannelSelected = checkSelectedPipette(
     values.pipettesByMount[pipetteName].pipetteName
   )
+  if (pipetteSlot.left === pipetteName) {
+    console.log('TR==>', is96ChannelSelected)
+    changeIs96Selected(is96ChannelSelected)
+  }
+  // changeIs96Selected(
+  //   checkSelectedPipette(values.pipettesByMount[pipetteName].pipetteName)
+  // )
+  // console.log('Is==>', is96ChannelSelected, '==>', changeIs96Selected)
   const className = cx({ disable_mount_option: is96ChannelSelected })
+
+  const dynamicPipetteDisable = cx({
+    [styles.pb_10]: pipetteName === pipetteSlot.left || !is96ChannelSelected,
+    [styles.disable_mount_option]: !(
+      pipetteName === pipetteSlot.left || !is96ChannelSelected
+    ),
+  })
 
   const pipetteHeaderText =
     pipetteSlot.left === pipetteName
@@ -43,7 +62,15 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
             {i18n.t('flex.pipette_selection.pipette_96_selection_note')}
           </StyledText>
           {/* Pipette Selection here */}
-          <Flex className={styles.pb_10}>
+          <Flex
+            className={
+              pipetteName === pipetteSlot.left
+                ? styles.pb_10
+                : !isLeft96ChannelSelected
+                ? styles.pb_10
+                : styles.disable_mount_option
+            }
+          >
             <RadioSelect
               pipetteName={`pipettesByMount.${pipetteName}.pipetteName`}
               pipetteType={values.pipettesByMount[pipetteName].pipetteName}
@@ -56,13 +83,25 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
           )}
           {/* Pipette Mount Selection here */}
           <hr />
-          <Flex className={cx(styles[className], styles.ptb_10)}>
-            <SelectPipetteMount pipetteName={pipetteName} />
-          </Flex>
+          {!is96ChannelSelected ? (
+            <>
+              <Flex className={cx(styles[className], styles.ptb_10)}>
+                <SelectPipetteMount
+                  pipetteName={pipetteName}
+                  is96ChannelSelected={isLeft96ChannelSelected}
+                />
+              </Flex>
+            </>
+          ) : (
+            <>{channel96SelectionNote(is96ChannelSelected)}</>
+          )}
+
           <hr />
-          {channel96SelectionNote(is96ChannelSelected)}
           <div className={styles.pb_10}>
-            <TipRackOptions pipetteName={pipetteName} />
+            <TipRackOptions
+              pipetteName={pipetteName}
+              isLeft96ChannelSelected={isLeft96ChannelSelected}
+            />
           </div>
         </>
       }
@@ -86,25 +125,41 @@ const channel96SelectionNote = (
   )
 }
 
-const SelectPipetteMount = (props: { pipetteName: string }): JSX.Element => {
+const SelectPipetteMount = (props: {
+  pipetteName: string
+  is96ChannelSelected: boolean
+}): JSX.Element => {
   const {
     values: { pipettesByMount, mountSide },
     handleChange,
     handleBlur,
   } = useFormikContext<any>()
-
   return (
     <>
-      {
-        <RadioGroup
-          inline
-          name={`pipettesByMount.${props.pipetteName}.mount`}
-          value={pipettesByMount[props.pipetteName].mount}
-          options={mountSide}
-          onChange={handleChange}
-          onBlur={handleBlur}
-        />
-      }
+      {props.pipetteName === 'left' ? (
+        <>
+          <RadioGroup
+            inline
+            name={`pipettesByMount.${props.pipetteName}.mount`}
+            value={pipettesByMount[props.pipetteName].mount}
+            options={mountSide}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+        </>
+      ) : props.is96ChannelSelected ? (
+        <StyledText as={'p'} className={styles.ptb_10}>
+          {i18n.t('flex.pipette_selection.pippette_ocuupies_both_mount')}
+        </StyledText>
+      ) : pipettesByMount[pipetteSlot.left].mount === 'left' ? (
+        <StyledText as={'p'} className={styles.ptb_10}>
+          {i18n.t('flex.pipette_selection.right_pipette_display')}
+        </StyledText>
+      ) : (
+        <StyledText as={'p'} className={styles.ptb_10}>
+          {i18n.t('flex.pipette_selection.left_pipette_display')}
+        </StyledText>
+      )}
     </>
   )
 }

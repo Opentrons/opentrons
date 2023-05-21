@@ -46,6 +46,7 @@ import {
   mapDispatchToProps,
   mapStateToProps as newModalFileMapStateToProps,
 } from '../modals/NewFileModal'
+import { FlexFileDetails } from './FlexFileDetails'
 type Props = React.ComponentProps<typeof FlexProtocolEditor>
 export interface FormModule {
   onDeck: boolean
@@ -78,7 +79,7 @@ export interface InitialValues {
 
 interface FlexProtocolEditorComponentProps {
   isEditValue: boolean
-  tabIdValue: any
+  tabIdValue: number
   formProps: any
   onSave: (args: {
     newProtocolFields: NewProtocolFields
@@ -88,12 +89,6 @@ interface FlexProtocolEditorComponentProps {
 }
 
 const validationSchema = Yup.object().shape({
-  fields: Yup.object().shape({
-    name: Yup.string().matches(
-      /^[a-zA-Z0-9]*$/,
-      'Protocol name must contain only letters and numbers.'
-    ),
-  }),
   mountSide: Yup.string().required('Mount side is required'),
   pipettesByMount: Yup.object().shape({
     left: Yup.object().shape({
@@ -219,7 +214,8 @@ interface selectedTabProps {
   selectedTab: number
 }
 
-const selectComponent = (selectedTab: number): JSX.Element | null => {
+const SelectComponent = (selectedTab: number): JSX.Element | null => {
+  const [is96ChannelSelected, setIs96ChangeSelected] = useState(false)
   const { left, right } = pipetteSlot
   switch (selectedTab) {
     case 0:
@@ -230,8 +226,16 @@ const selectComponent = (selectedTab: number): JSX.Element | null => {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <SelectPipetteOption pipetteName={left} />
-          <SelectPipetteOption pipetteName={right} />
+          <SelectPipetteOption
+            pipetteName={left}
+            changeIs96Selected={setIs96ChangeSelected}
+            isLeft96ChannelSelected={is96ChannelSelected}
+          />
+          <SelectPipetteOption
+            pipetteName={right}
+            changeIs96Selected={setIs96ChangeSelected}
+            isLeft96ChannelSelected={is96ChannelSelected}
+          />
         </Flex>
       )
     case 2:
@@ -253,8 +257,9 @@ function FlexProtocolEditor({
   onSave,
 }: FlexProtocolEditorComponentProps): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
+  const [redirectToDetails, setRedirectToDetails] = useState(false)
   const dispatch = useDispatch()
-  const [isEdit, setEdit] = useState<boolean>(false)
+  const [isEdit, setEdit] = useState(false)
   //On Redirction if page tab edit set to true
   useEffect(() => {
     if (isEditValue) {
@@ -264,9 +269,11 @@ function FlexProtocolEditor({
   }, [isEditValue, tabIdValue])
 
   // Next button click
-  const handleNext = ({ selectedTab }: selectedTabProps): void => {
+  const handleNext = ({ selectedTab }: selectedTabProps): any => {
     if (isEdit) {
       //Redirect back to file details page
+      setRedirectToDetails(true)
+      return <FlexFileDetails />
     } else {
       const setTabNumber =
         selectedTab >= 0 && selectedTab <= navPillTabListLength
@@ -361,10 +368,16 @@ function FlexProtocolEditor({
     dispatch(navActions.navigateToPage('liquids'))
   }
 
-  return (
+  return redirectToDetails ? (
+    <FlexFileDetails />
+  ) : (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex>
-        <FlexRoundTab setCurrentTab={setTab} currentTab={selectedTab} />
+        <FlexRoundTab
+          setCurrentTab={setTab}
+          currentTab={selectedTab}
+          isEdit={isEditValue}
+        />
       </Flex>
       <Box
         backgroundColor={COLORS.white}
@@ -391,7 +404,7 @@ function FlexProtocolEditor({
             }) => (
               <form onSubmit={props.handleSubmit}>
                 <section className={styles.editor_form}>
-                  {selectComponent(selectedTab)}
+                  {SelectComponent(selectedTab)}
                 </section>
                 <div className={styles.flex_round_tabs_button_wrapper}>
                   {selectedTab !== 0 && !isEdit && (
@@ -437,8 +450,12 @@ interface DP {
   onCancel: () => unknown
   _createNewProtocol: (arg0: CreateNewProtocolArgs) => void
 }
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: any): Props {
+  const { isEditValue, tabIdValue, formProps } = ownProps.FlexFileDetails
   return {
+    isEditValue,
+    tabIdValue,
+    formProps,
     onSave: fields => {
       if (
         !stateProps._hasUnsavedChanges ||

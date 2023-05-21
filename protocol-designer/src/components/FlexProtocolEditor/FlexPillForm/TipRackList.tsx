@@ -26,9 +26,13 @@ import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 interface formikContextProps {
   pipettesByMount: any
   tiprack: any
+  isLeft96ChannelSelected: boolean
 }
 
-export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
+export const TipRackOptions = ({
+  pipetteName,
+  isLeft96ChannelSelected,
+}: any): JSX.Element => {
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
   const tiprackOptions = getFlexTiprackOptions(allLabware)
@@ -59,36 +63,47 @@ export const TipRackOptions = ({ pipetteName }: any): JSX.Element => {
 
   return (
     <>
-      {opentronsFlexTiprackData.map(({ name, value }: any, index: number) => {
-        const isChecked = selected.includes(value)
-        return (
-          <CheckboxField
-            key={index}
-            label={name}
-            name={name}
-            value={isChecked}
-            onChange={(e: any) => {
-              const { name, checked } = e.currentTarget
-              if (checked) {
-                const tiprackCheckedData = [...selected, ...[value]]
-                setSelected(tiprackCheckedData)
-                handleNameChange(tiprackCheckedData)
-                if (name === customTiprackOption.name) setCustomTipRack(true)
-              } else {
-                const indexToRemove = selected.indexOf(name)
-                if (indexToRemove !== -1) {
-                  selected.splice(indexToRemove, 1)
+      <section
+        className={
+          pipetteName === pipetteSlot.left
+            ? styles.pb_10
+            : !isLeft96ChannelSelected
+            ? styles.pb_10
+            : styles.disable_mount_option
+        }
+      >
+        {opentronsFlexTiprackData.map(({ name, value }: any, index: number) => {
+          const isChecked = selected.includes(value)
+          return (
+            <CheckboxField
+              key={index}
+              label={name}
+              name={name}
+              value={isChecked}
+              onChange={(e: any) => {
+                const { name, checked } = e.currentTarget
+                if (checked) {
+                  const tiprackCheckedData = [...selected, ...[value]]
+                  setSelected(tiprackCheckedData)
+                  handleNameChange(tiprackCheckedData)
+                  if (name === customTiprackOption.name) setCustomTipRack(true)
+                } else {
+                  const indexToRemove = selected.indexOf(name)
+                  if (indexToRemove !== -1) {
+                    selected.splice(indexToRemove, 1)
+                  }
+                  setSelected(selected)
+                  handleNameChange(selected)
+                  if (name === customTiprackOption.name) {
+                    setCustomTipRack(false)
+                  }
                 }
-                setSelected(selected)
-                handleNameChange(selected)
-                if (name === customTiprackOption.name) {
-                  setCustomTipRack(false)
-                }
-              }
-            }}
-          ></CheckboxField>
-        )
-      })}
+              }}
+            ></CheckboxField>
+          )
+        })}
+      </section>
+
       {customTiprackFilteredData.length > 0 && (
         <ShowCustomTiprackList customTipRackProps={customTiprackFilteredData} />
       )}
@@ -129,10 +144,19 @@ function customFileUpload(
 }
 
 function ShowCustomTiprackList({ customTipRackProps }: any): any {
-  const removeCustomTipRackFile = (fileName: string): void => {
-    console.log('Removing filename from custom tiprack', fileName)
-  }
+  // const [customTipRackPropsUpdated, setCustomTipRackProps] = useState(
+  //   customTipRackProps
+  // )
+  // useEffect(() => {
+  //   setCustomTipRackProps(customTipRackProps)
+  // }, [customTipRackProps])
 
+  const removeCustomTipRackFile = (fileName: string): void => {
+    // const updatedCustomTipRackProps = customTipRackPropsUpdated.filter(
+    //   (obj: { name: string }) => obj.name !== fileName
+    // )
+    // setCustomTipRackProps([...updatedCustomTipRackProps])
+  }
   return (
     <Flex className={styles.filter_data}>
       {customTipRackProps.map(({ name }: any, index: number) => {

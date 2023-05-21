@@ -25,6 +25,7 @@ const EMPTY_INSTRUMENT_PROPS = {
  */
 export function InstrumentGroup(props: InstrumentGroupProps): JSX.Element {
   const { left, right } = props
+  const Hide96CH = props.left?.description.includes('Flex 96-Channel 1000 μL')
 
   const leftProps = left || { ...EMPTY_INSTRUMENT_PROPS, mount: 'left' }
   const rightProps = right || { ...EMPTY_INSTRUMENT_PROPS, mount: 'right' }
@@ -42,13 +43,15 @@ export function InstrumentGroup(props: InstrumentGroupProps): JSX.Element {
           showMountLabel={Object.keys(props).length !== 1}
         />
       ) : (
-        <SecondaryButton
-          onClick={e => {
-            e.preventDefault()
-          }}
-        >
-          {i18n.t('flex.file_tab.add_pipette')}
-        </SecondaryButton>
+        Hide96CH && (
+          <SecondaryButton
+            onClick={e => {
+              e.preventDefault()
+            }}
+          >
+            {i18n.t('flex.file_tab.add_pipette')}
+          </SecondaryButton>
+        )
       )}
     </section>
   )

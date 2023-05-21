@@ -38,7 +38,9 @@
     "pipette_96_selection_note": "Note: 96-channel take up both mounts and requires a tiprack adapter",
     "pippette_ocuupies_both_mount": "Note: 96 Channel occupies both the mount.",
     "choose_first_pipette": "Choose First Pipette",
-    "choose_second_pipette": "Choose Second Pipette"
+    "choose_second_pipette": "Choose Second Pipette",
+    "left_pipette_display": "Left Mount",
+    "right_pipette_display": "Right Mount"
   },
   "errors": {
     "first_pipette_not_selected": "You must select a pipette before proceeding.",
