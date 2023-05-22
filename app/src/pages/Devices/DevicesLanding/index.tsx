@@ -58,10 +58,6 @@ export function DevicesLanding(): JSX.Element {
     reachableRobots,
     robot => robot.healthStatus === 'ok'
   )
-  console.log('healthyReachableRobots', healthyReachableRobots)
-  console.log('unhealthyReachableRobots', unhealthyReachableRobots)
-  console.log('reachableRobots', reachableRobots)
-  console.log('unreachableRobots', unreachableRobots)
 
   const noRobots =
     [

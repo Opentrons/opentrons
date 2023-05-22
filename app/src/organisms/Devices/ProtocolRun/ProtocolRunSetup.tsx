@@ -180,8 +180,6 @@ export function ProtocolRunSetup({
     },
   }
 
-  console.log('runHasStarted', runHasStarted)
-  console.log('calibrationStatus', calibrationStatus)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

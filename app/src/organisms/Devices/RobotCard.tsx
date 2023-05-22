@@ -37,7 +37,7 @@ import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useAttachedModules, useIsOT3 } from './hooks'
+import { useIsOT3 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
@@ -189,7 +189,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       {isInstrumentsQueryLoading ? 'INSTRUMENTS' : null}
       {isPipetteQueryLoading ? 'PIPETTES' : null}
       {isPipetteQueryLoading || isInstrumentsQueryLoading ? (
-        <StyledText as="h4">LOADING</StyledText>
+        <StyledText as="h5">{t('loading').toUpperCase()}</StyledText>
       ) : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
           {leftAndRightMountsPipetteDisplayName != null ? (
