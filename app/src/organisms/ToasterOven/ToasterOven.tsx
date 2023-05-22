@@ -91,6 +91,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           right={SPACING.spacing32}
           bottom={SPACING.spacing16}
           zIndex={1000}
+          width="100%"
         >
           {toasts.map(toast => (
             <Toast
