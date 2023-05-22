@@ -18,6 +18,7 @@ describe('CalibrationErrorModal', () => {
       isOnDevice: false,
       chainRunCommands: jest.fn(() => Promise.resolve()),
       mount: 'left',
+      setShowErrorMessage: jest.fn(),
     }
     const { getByText, getByRole } = render(props)
     getByText('Pipette calibration failed')
@@ -32,6 +33,7 @@ describe('CalibrationErrorModal', () => {
       isOnDevice: true,
       chainRunCommands: jest.fn(() => Promise.resolve()),
       mount: 'left',
+      setShowErrorMessage: jest.fn(),
     }
     const { getByText, getByLabelText } = render(props)
     getByText('Pipette calibration failed')

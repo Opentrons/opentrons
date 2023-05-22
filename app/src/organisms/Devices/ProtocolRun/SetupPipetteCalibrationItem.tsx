@@ -45,7 +45,7 @@ interface SetupInstrumentCalibrationItemProps {
   mount: Mount
   robotName: string
   runId: string
-  instrumentsRefetch: () => void
+  instrumentsRefetch?: () => void
 }
 
 export function SetupPipetteCalibrationItem({
