@@ -45,9 +45,9 @@ class RearPinState:
     aux2_aux_det: bool = False
     aux1_id_active: bool = False
     aux2_id_active: bool = False
-    etop_active: bool = False
+    estop_active: bool = False
     door_open: bool = False
-    sync_engageds: bool = False
+    sync_engaged: bool = False
 
 
 async def write_eeprom(
@@ -229,14 +229,15 @@ async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinStat
         response_type=EstopStateChange,
     )
     if response is not None:
-        current_state.etop_active = bool(cast(EstopStateChange, response).engaged.value)
+        current_state.estop_active = bool(cast(EstopStateChange, response).engaged.value)
+
     # sync out pin
     response = await messenger.send_and_receive(
         message=SyncStateRequest(),
         response_type=SyncStateResponse,
     )
     if response is not None:
-        current_state.etop_active = bool(
+        current_state.sync_engaged = bool(
             cast(SyncStateResponse, response).engaged.value
         )
     # door state

@@ -46,8 +46,9 @@ PRE_TEST_CONDITIONS.aux1_aux_det = False
 PRE_TEST_CONDITIONS.aux2_aux_det = False
 PRE_TEST_CONDITIONS.aux1_id_active = False
 PRE_TEST_CONDITIONS.aux2_id_active = False
-PRE_TEST_CONDITIONS.etop_active = False
+PRE_TEST_CONDITIONS.estop_active = False
 PRE_TEST_CONDITIONS.door_open = True
+PRE_TEST_CONDITIONS.sync_engaged = False
 
 #Aux 1 only plugged in, sync active on tester
 AUX_1_CONDITIONS = RearPinState()
@@ -57,8 +58,9 @@ AUX_1_CONDITIONS.aux1_aux_det = True
 AUX_1_CONDITIONS.aux2_aux_det = False
 AUX_1_CONDITIONS.aux1_id_active = True
 AUX_1_CONDITIONS.aux2_id_active = False
-AUX_1_CONDITIONS.etop_active = False
+AUX_1_CONDITIONS.estop_active = False
 AUX_1_CONDITIONS.door_open = False
+AUX_1_CONDITIONS.sync_engaged = True
 
 #Aux 2 only plugged in, sync active on tester
 AUX_2_CONDITIONS = RearPinState()
@@ -68,8 +70,9 @@ AUX_2_CONDITIONS.aux1_aux_det = False
 AUX_2_CONDITIONS.aux2_aux_det = True
 AUX_2_CONDITIONS.aux1_id_active = False
 AUX_2_CONDITIONS.aux2_id_active = True
-AUX_2_CONDITIONS.etop_active = False
+AUX_2_CONDITIONS.estop_active = False
 AUX_2_CONDITIONS.door_open = False
+AUX_2_CONDITIONS.sync_engaged = True
 
 #Aux 1 and 2 plugged in, sync NOT active on tester
 POST_PLUG_CONDITIONS = RearPinState()
@@ -79,8 +82,9 @@ POST_PLUG_CONDITIONS.aux1_aux_det = True
 POST_PLUG_CONDITIONS.aux2_aux_det = True
 POST_PLUG_CONDITIONS.aux1_id_active = False
 POST_PLUG_CONDITIONS.aux2_id_active = False
-POST_PLUG_CONDITIONS.etop_active = False
+POST_PLUG_CONDITIONS.estop_active = False
 POST_PLUG_CONDITIONS.door_open = True
+POST_PLUG_CONDITIONS.sync_engaged = False
 
 #Aux 1 and 2 plugged in, ESTOP pressed, sync NOT active on tester
 ESTOP_CONDITIONS = RearPinState()
@@ -90,8 +94,9 @@ ESTOP_CONDITIONS.aux1_aux_det = True
 ESTOP_CONDITIONS.aux2_aux_det = True
 ESTOP_CONDITIONS.aux1_id_active = False
 ESTOP_CONDITIONS.aux2_id_active = False
-ESTOP_CONDITIONS.etop_active = True
+ESTOP_CONDITIONS.estop_active = True
 ESTOP_CONDITIONS.door_open = True
+ESTOP_CONDITIONS.sync_engaged = False
 
 #Aux 1 and 2 not plugged in, door closed
 DOOR_CONDITIONS = RearPinState()
@@ -101,20 +106,11 @@ DOOR_CONDITIONS.aux1_aux_det = False
 DOOR_CONDITIONS.aux2_aux_det = False
 DOOR_CONDITIONS.aux1_id_active = False
 DOOR_CONDITIONS.aux2_id_active = False
-DOOR_CONDITIONS.etop_active = False
+DOOR_CONDITIONS.estop_active = False
 DOOR_CONDITIONS.door_open = False
+DOOR_CONDITIONS.sync_engaged = False
 
 ##END TEST PASSING CONDITIONS
-
-
-
-async def get_all_states(usb_messenger):
-    state = await get_all_pin_state(usb_messenger)
-    # print(str(state))
-    return 1
-
-async def check_all_states(usb_messenger):
-    return 1
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
@@ -165,59 +161,36 @@ async def run(args: argparse.Namespace) -> None:
         else:
             print("FAIL")
 
+        # test E-Stop
+        # make robot move, instruct operator to e-stop
+        # do both buttons
+        # request RP e-stop state, check it active
+        # ask operator if E-stop LED is lit
+        print()
+        print("TEST - ESTOP 1")
+        result = await get_all_pin_state(usb_messenger)
+        input("PRESS ESTOP 1")
+        result = await get_all_pin_state(usb_messenger)
 
-        #test E-Stop
-        #make robot move, instruct operator to e-stop
-        #do both buttons
-        #request RP e-stop state, check it active
-        #ask operator if E-stop LED is lit
-        # print()
-        # print("TEST - ESTOP 1")
-        # result = await get_all_pin_state(usb_messenger)
-        # print("PRESS ESTOP 1")
-        # pressed_once = False
-        # async for message in driver:
-        #     if message is not None:
-        #         try:
-        #             result.etop_active = bool(cast(EstopStateChange, message).engaged.value)
-        #         except AttributeError:
-        #             continue
-        #         print(result)
-        #         if result.etop_active == True:
-        #             pressed_once = True
-        #             print("RELEASE ESTOP 1")
-        #         elif pressed_once:
-        #             break
-        #
-        # print(result)
-        # if (result == ESTOP_CONDITIONS):
-        #     print("PASS")
-        # else:
-        #     print("FAIL")
-        #
-        # print()
-        # print("TEST - ESTOP 2")
-        # result = await get_all_pin_state(usb_messenger)
-        # print("PRESS ESTOP 2")
-        # pressed_once = False
-        # async for message in driver:
-        #     if message is not None:
-        #         try:
-        #             result.etop_active = bool(cast(EstopStateChange, message).engaged.value)
-        #         except AttributeError:
-        #             continue
-        #         print(result)
-        #         if result.etop_active == True:
-        #             pressed_once = True
-        #             print("RELEASE ESTOP 2")
-        #         elif pressed_once:
-        #             break
-        #
-        # print(result)
-        # if (result == ESTOP_CONDITIONS):
-        #     print("PASS")
-        # else:
-        #     print("FAIL")
+        print(result)
+        if (result == ESTOP_CONDITIONS):
+            print("PASS")
+        else:
+            print("FAIL")
+        input("RELEASE ESTOP 1")
+
+        print()
+        print("TEST - ESTOP 2")
+        result = await get_all_pin_state(usb_messenger)
+        input("PRESS ESTOP 2")
+        result = await get_all_pin_state(usb_messenger)
+
+        print(result)
+        if (result == ESTOP_CONDITIONS):
+            print("PASS")
+        else:
+            print("FAIL")
+        input("RELEASE ESTOP 2")
 
 
         #test CAN
@@ -243,11 +216,11 @@ async def run(args: argparse.Namespace) -> None:
 
         print("TEST - DOOR")
         input("CLOSE DOOR")
-        door_test_result = await get_door_state(usb_messenger)
-        if(door_test_result == False):
-            print("~~~ DOOR CLOSED ~~~")
-        else:
+        door_open_result = await get_door_state(usb_messenger)
+        if(door_open_result == True):
             print("~~~ DOOR OPEN ~~~")
+        else:
+            print("~~~ DOOR CLOSED ~~~")
         result = await get_all_pin_state(usb_messenger)
         print(result)
         print("DOOR TEST: ")
