@@ -329,8 +329,10 @@ class OT3API(
     @classmethod
     async def build_hardware_simulator(
         cls,
-        attached_instruments: Optional[
-            Dict[Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]]
+        attached_instruments: Union[
+            None,
+            Dict[OT3Mount, Dict[str, Optional[str]]],
+            Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
         attached_modules: Optional[List[str]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
@@ -343,7 +345,6 @@ class OT3API(
         Multiple simulating hardware controllers may be active at one time.
         """
 
-        checked_attached = attached_instruments or {}
         checked_modules = attached_modules or []
 
         checked_loop = use_or_initialize_loop(loop)
@@ -352,7 +353,9 @@ class OT3API(
         else:
             checked_config = config
         backend = await OT3Simulator.build(
-            {OT3Mount.from_mount(k): v for k, v in checked_attached.items()},
+            {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
+            if attached_instruments
+            else {},
             checked_modules,
             checked_config,
             checked_loop,
