@@ -13,7 +13,7 @@ class ResourceModel(BaseModel):
     id: str = Field(..., description="Unique identifier of the resource.")
 
 
-ResponseDataT = TypeVar("ResponseDataT", bound=BaseModel)
+ResponseDataT = TypeVar("ResponseDataT")
 ResponseLinksT = TypeVar("ResponseLinksT")
 
 

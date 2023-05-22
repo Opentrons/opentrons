@@ -23,7 +23,7 @@ import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
-import { useCurrentRunRoute } from '../hooks'
+import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
@@ -100,6 +100,9 @@ const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
 >
 const mockUseCurrentRunRoute = useCurrentRunRoute as jest.MockedFunction<
   typeof useCurrentRunRoute
+>
+const mockUseProtocolReceiptToasts = useProtocolReceiptToast as jest.MockedFunction<
+  typeof useProtocolReceiptToast
 >
 
 const render = (path = '/') => {
@@ -210,5 +213,9 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/')
     mockgetIsShellReady.mockReturnValue(true)
     getByText('Mock Loading')
+  })
+  it('renders protocol receipt toasts', () => {
+    render('/')
+    expect(mockUseProtocolReceiptToasts).toHaveBeenCalled()
   })
 })

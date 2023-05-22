@@ -1171,23 +1171,23 @@ async def test_move_gripper_mount_without_gripper_attached(
     """It should move the empty gripper mount to specified position."""
 
 
-@pytest.mark.parametrize("enable_stalls", [True, False])
-async def test_move_stall_flag(
+@pytest.mark.parametrize("expect_stalls", [True, False])
+async def test_move_expect_stall_flag(
     ot3_hardware: ThreadManager[OT3API],
     mock_backend_move: AsyncMock,
-    enable_stalls: bool,
+    expect_stalls: bool,
 ) -> None:
 
-    expected = MoveStopCondition.stall if enable_stalls else MoveStopCondition.none
+    expected = MoveStopCondition.stall if expect_stalls else MoveStopCondition.none
 
-    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _check_stalls=enable_stalls)
+    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _expect_stalls=expect_stalls)
     mock_backend_move.assert_called_once()
     _, _, condition = mock_backend_move.call_args_list[0][0]
     assert condition == expected
 
     mock_backend_move.reset_mock()
     await ot3_hardware.move_rel(
-        Mount.LEFT, Point(10, 0, 0), _check_stalls=enable_stalls
+        Mount.LEFT, Point(10, 0, 0), _expect_stalls=expect_stalls
     )
     mock_backend_move.assert_called_once()
     _, _, condition = mock_backend_move.call_args_list[0][0]
@@ -1497,19 +1497,14 @@ async def test_home_axis(
 
         await ot3_hardware._home_axis(axis)
 
-        # FIXME: uncomment the following when stall detection
-        # is fully re-enable
-        # if stepper_ok:
-        #     """Move to home position"""
-        #     # move is called
-        #     mock_backend_move.assert_awaited_once()
-        #     move = mock_backend_move.call_args_list[0][0][1][0]
-        #     assert move.distance == 100.0
-        #     # home is NOT called
-        #     mock_backend_home.assert_not_awaited()
-        if encoder_ok:
-            """Copy encoder position to stepper pos"""
+        if not stepper_ok and encoder_ok:
+            # position estimation updated!
             mock_estimate.assert_awaited_once()
+            mock_check_motor.return_value = encoder_ok
+            mock_check_encoder.return_value = encoder_ok
+
+        if stepper_ok and encoder_ok:
+            """Copy encoder position to stepper pos"""
             # for accurate axis, we just move to home pos:
             if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
                 # move is called

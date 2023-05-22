@@ -106,6 +106,7 @@
   "multiple_modules_missing": "Multiple modules missing",
   "multiple_modules_modal": "Setting up modules of the same type",
   "multiple_modules": "Multiple modules of the same type",
+  "n_a": "N/A",
   "no_data": "no data",
   "no_labware_offset_data": "No Labware Offset Data yet",
   "no_usb_port_yet": "No USB Port Yet",

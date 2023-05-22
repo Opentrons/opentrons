@@ -8,6 +8,7 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -18,7 +19,6 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -28,14 +28,27 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const { proceed, attachedGripper, isRobotMoving, goBack } = props
+  const { proceed, isRobotMoving, goBack } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
-  const handleOnClick = (): void => {
-    attachedGripper == null ? setShowUnableToDetect(true) : proceed()
-  }
+
   // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
-  useInstrumentsQuery({ refetchInterval: 3000 })
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    refetchInterval: 3000,
+  })
+  const isGripperAttached = (instrumentsQueryData?.data ?? []).some(
+    i => i.mount === 'extension'
+  )
+
+  const handleOnClick = (): void => {
+    refetch()
+      .then(() => {
+        isGripperAttached ? proceed() : setShowUnableToDetect(true)
+      })
+      .catch(() => {
+        setShowUnableToDetect(true)
+      })
+  }
 
   if (isRobotMoving)
     return (
