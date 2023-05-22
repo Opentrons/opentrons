@@ -128,16 +128,16 @@ export const ResultsSummary = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <StyledText as="h1">{t('new_labware_offset_data')}</StyledText>
+      <Header>{t('new_labware_offset_data')}</Header>
       {isLabwareOffsetCodeSnippetsOn ? (
         <LabwareOffsetTabs
           TableComponent={TableComponent}
           JupyterComponent={JupyterSnippet}
           CommandLineComponent={CommandLineSnippet}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         />
       ) : (
         <OffsetTable
@@ -147,7 +147,7 @@ export const ResultsSummary = (
       )}
       <Flex
         width="100%"
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         css={css`
@@ -169,8 +169,8 @@ const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing2};
-  margin: ${SPACING.spacing4} 0;
+  border-spacing: 0 ${SPACING.spacing4};
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const TableHeader = styled('th')`
@@ -178,16 +178,24 @@ const TableHeader = styled('th')`
   color: ${COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
   background-color: ${COLORS.fundamentalsBackground};
 `
 
 const TableDatum = styled('td')`
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: wrap;
+`
+
+const Header = styled.h1`
+  ${TYPOGRAPHY.h1Default}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold}
+  }
 `
 
 interface OffsetTableProps {
@@ -237,8 +245,8 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                       <React.Fragment key={index}>
                         <StyledText
                           as="p"
-                          marginLeft={index > 0 ? SPACING.spacing3 : 0}
-                          marginRight={SPACING.spacing2}
+                          marginLeft={index > 0 ? SPACING.spacing8 : 0}
+                          marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}

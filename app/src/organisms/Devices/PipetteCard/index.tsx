@@ -137,8 +137,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               ? LEFT
               : (mount as PipetteMount)
           }
-          setSelectedPipette={setSelectedPipette}
-          closeFlow={() => setPipetteWizardFlow(null)}
+          closeFlow={() => {
+            setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+            setPipetteWizardFlow(null)
+          }}
           selectedPipette={
             pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
           }
@@ -168,11 +170,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           isExpanded={true}
         />
       )}
-      <Box
-        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
-        width="100%"
-      >
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START}>
             {pipetteInfo === null ? null : (
               <InstrumentDiagram
@@ -187,10 +186,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
           >
             {isOT3PipetteAttached && !isPipetteCalibrated ? (
-              <Banner type="error" marginBottom={SPACING.spacing2}>
+              <Banner type="error" marginBottom={SPACING.spacing4}>
                 <Trans
                   t={t}
                   i18nKey="calibration_needed"
@@ -215,7 +214,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               color={COLORS.darkGreyEnabled}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               fontSize={TYPOGRAPHY.fontSizeH6}
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
               data-testid={`PipetteCard_mount_${String(pipetteDisplayName)}`}
             >
               {is96ChannelAttached
@@ -225,7 +224,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                   })}
             </StyledText>
             <Flex
-              paddingBottom={SPACING.spacing2}
+              paddingBottom={SPACING.spacing4}
               data-testid={`PipetteCard_display_name_${String(
                 pipetteDisplayName
               )}`}
@@ -239,7 +238,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       </Box>
       <Box
         alignSelf={ALIGN_START}
-        padding={SPACING.spacing2}
+        padding={SPACING.spacing4}
         data-testid={`PipetteCard_overflow_btn_${String(pipetteDisplayName)}`}
       >
         <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />

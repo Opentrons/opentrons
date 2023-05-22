@@ -8,7 +8,10 @@ import { renderHook } from '@testing-library/react-hooks'
 
 import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_RUN_START,
+} from '../../../../redux/analytics'
 
 jest.mock('../../hooks')
 jest.mock('../useProtocolRunAnalyticsData')
@@ -74,10 +77,13 @@ describe('useTrackProtocolRunEvent hook', () => {
       wrapper,
     })
     await waitFor(() =>
-      result.current.trackProtocolRunEvent({ name: 'runStart', properties: {} })
+      result.current.trackProtocolRunEvent({
+        name: ANALYTICS_PROTOCOL_RUN_START,
+        properties: {},
+      })
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'runStart',
+      name: ANALYTICS_PROTOCOL_RUN_START,
       properties: PROTOCOL_PROPERTIES,
     })
   })
@@ -95,10 +101,13 @@ describe('useTrackProtocolRunEvent hook', () => {
       wrapper,
     })
     await waitFor(() =>
-      result.current.trackProtocolRunEvent({ name: 'runStart', properties: {} })
+      result.current.trackProtocolRunEvent({
+        name: ANALYTICS_PROTOCOL_RUN_START,
+        properties: {},
+      })
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'runStart',
+      name: ANALYTICS_PROTOCOL_RUN_START,
       properties: {},
     })
   })

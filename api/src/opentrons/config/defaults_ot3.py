@@ -39,7 +39,7 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
     z_offset=ZSenseSettings(
         pass_settings=CapacitivePassSettings(
             prep_distance_mm=4.0,
-            max_overrun_distance_mm=2.0,
+            max_overrun_distance_mm=5.0,
             speed_mm_per_s=1.0,
             sensor_threshold_pf=3.0,
         ),
@@ -96,7 +96,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.X: 1000,
         OT3AxisKind.Y: 1000,
         OT3AxisKind.Z: 120,
-        OT3AxisKind.P: 10,
+        OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
         OT3AxisKind.Q: 10,
     },
@@ -116,9 +116,9 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 10,
+        OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 10,
-        OT3AxisKind.Q: 10,
+        OT3AxisKind.Q: 5,
     },
     low_throughput={
         OT3AxisKind.X: 10,
@@ -172,8 +172,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
         OT3AxisKind.X: 1.4,
         OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
-        # TODO: verify this value
-        OT3AxisKind.P: 2.0,
+        OT3AxisKind.P: 2.2,
         OT3AxisKind.Z_G: 0.67,
         OT3AxisKind.Q: 1.5,
     },

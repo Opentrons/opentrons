@@ -17,22 +17,16 @@ import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import * as RobotApi from '../../../redux/robot-api'
 import { getIsOnDevice } from '../../../redux/config'
-import { useAttachedPipetteCalibrations } from '../../Devices/hooks/useAttachedPipetteCalibrations'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery'
 import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
+import { usePipetteFlowWizardHeaderText } from '../hooks'
 import { ExitModal } from '../ExitModal'
 import { FLOWS, SECTIONS } from '../constants'
 import { UnskippableModal } from '../UnskippableModal'
 import { PipetteWizardFlows } from '..'
-
-import type { PipetteCalibrationsByMount } from '../../../redux/pipettes/types'
 
 jest.mock('../../../redux/pipettes')
 jest.mock('../getPipetteWizardSteps')
@@ -44,12 +38,9 @@ jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-api')
 jest.mock('../UnskippableModal')
 jest.mock('../../../redux/config')
-jest.mock('../../Devices/hooks/useAttachedPipetteCalibrations')
 jest.mock('../../Devices/hooks/useAttachedPipettesFromInstrumentsQuery')
+jest.mock('../hooks')
 
-const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof useAttachedPipetteCalibrations
->
 const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
   typeof useAttachedPipettesFromInstrumentsQuery
 >
@@ -68,7 +59,6 @@ const mockUseCreateMaintenanceRunMutation = useCreateMaintenanceRunMutation as j
 const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
   typeof useDeleteMaintenanceRunMutation
 >
-
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
@@ -79,20 +69,16 @@ const mockUnskippableModal = UnskippableModal as jest.MockedFunction<
 const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
   typeof getIsOnDevice
 >
+const mockUsePipetteFlowWizardHeaderText = usePipetteFlowWizardHeaderText as jest.MockedFunction<
+  typeof usePipetteFlowWizardHeaderText
+>
+
 const render = (props: React.ComponentProps<typeof PipetteWizardFlows>) => {
   return renderWithProviders(<PipetteWizardFlows {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
-  left: {
-    offset: mockPipetteOffsetCalibration1,
-  },
-  right: {
-    offset: mockPipetteOffsetCalibration2,
-  },
-} as any
 describe('PipetteWizardFlows', () => {
   let props: React.ComponentProps<typeof PipetteWizardFlows>
   let mockCreateMaintenanceRun: jest.Mock
@@ -104,12 +90,8 @@ describe('PipetteWizardFlows', () => {
       flowType: FLOWS.CALIBRATE,
       mount: LEFT,
       closeFlow: jest.fn(),
-      setSelectedPipette: jest.fn(),
+      onComplete: jest.fn(),
     }
-    mockUseAttachedPipetteCalibrations.mockReturnValue({
-      left: {},
-      right: {},
-    } as any)
     mockCreateMaintenanceRun = jest.fn()
     mockDeleteMaintenanceRun = jest.fn()
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
@@ -154,14 +136,14 @@ describe('PipetteWizardFlows', () => {
     mockGetRequestById.mockReturnValue(null)
     mockUnskippableModal.mockReturnValue(<div>mock unskippable modal</div>)
     mockGetIsOnDevice.mockReturnValue(false)
+    mockUsePipetteFlowWizardHeaderText.mockReturnValue(
+      'mock wizard header text'
+    )
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
     const { getByText, getByRole } = render(props)
     //  first page
-    getByText('Recalibrate Left Pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     getByText(
       'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
@@ -182,6 +164,7 @@ describe('PipetteWizardFlows', () => {
               pipetteName: 'p1000_single_gen3',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -240,12 +223,9 @@ describe('PipetteWizardFlows', () => {
     // })
   })
   it('renders the correct first page for calibrating single mount when rendering from on device display', () => {
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
     mockGetIsOnDevice.mockReturnValue(true)
     const { getByText } = render(props)
-    getByText('Recalibrate Left Pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     getByText(
       'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
@@ -299,7 +279,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText } = render(props)
-    getByText('Detach Left Pipette')
+    getByText('mock wizard header text')
     //  TODO(jr 11/11/22): finish the rest of the test
   })
 
@@ -345,7 +325,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Attach Left Pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -353,6 +333,7 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -401,7 +382,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Attach 96-Channel Pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -409,10 +390,7 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
-          },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition' as const,
             params: { mount: RIGHT },
@@ -464,7 +442,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Detach 96-Channel Pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -480,6 +458,7 @@ describe('PipetteWizardFlows', () => {
               pipetteName: 'p1000_96',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -534,7 +513,7 @@ describe('PipetteWizardFlows', () => {
       },
     ])
     const { getByText, getByRole } = render(props)
-    getByText('Detach Flex 1-Channel 1000 μL and Attach 96-Channel Pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     // page 1
     const getStarted = getByRole('button', { name: 'Move gantry to front' })
@@ -542,6 +521,7 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },
@@ -564,7 +544,7 @@ describe('PipetteWizardFlows', () => {
     }
     const { getByText, getByRole } = render(props)
     //  first page
-    getByText('Calibrate 96-Channel pipette')
+    getByText('mock wizard header text')
     getByText('Before you begin')
     getByRole('button', { name: 'Move gantry to front' }).click()
     await waitFor(() => {
@@ -578,6 +558,7 @@ describe('PipetteWizardFlows', () => {
               pipetteName: 'p1000_96',
             },
           },
+          { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
             params: { mount: LEFT },

@@ -8,6 +8,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -21,11 +22,12 @@ export function EmptyRecentRun(): JSX.Element {
       width="100%"
       height="27.25rem"
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity15HexCode}`}
+      borderRadius={BORDERS.size3}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       padding="5.25rem 3.75rem"
     >
-      <Flex marginBottom={SPACING.spacing4}>
+      <Flex marginBottom={SPACING.spacing16}>
         <img
           src={abstractImage}
           alt="There is no recent run protocol"
@@ -35,13 +37,13 @@ export function EmptyRecentRun(): JSX.Element {
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         <StyledText
           fontSize={TYPOGRAPHY.fontSize32}
           lineHeight={TYPOGRAPHY.lineHeight42}
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
         >
           {t('no_recent_runs')}
         </StyledText>
@@ -49,7 +51,7 @@ export function EmptyRecentRun(): JSX.Element {
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
         >
           {t('no_recent_runs_description')}
         </StyledText>

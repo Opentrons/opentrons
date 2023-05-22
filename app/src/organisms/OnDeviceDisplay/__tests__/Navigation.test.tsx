@@ -84,8 +84,26 @@ describe('Navigation', () => {
     expect(queryByText('Get started')).not.toBeInTheDocument()
   })
   it('should render the overflow btn and clicking on it renders the menu', () => {
-    const [{ getByLabelText, getByText }] = render(props)
-    getByLabelText('Navigation_OverflowBtn').click()
+    const [{ getByRole, getByText }] = render(props)
+    getByRole('button', { name: 'overflow menu button' }).click()
     getByText('mock NavigationMenu')
+  })
+  it('should call the setNavMenuIsOpened prop when you click on the overflow menu button', () => {
+    props = {
+      ...props,
+      setNavMenuIsOpened: jest.fn(),
+    }
+    const [{ getByRole, getByText }] = render(props)
+    getByRole('button', { name: 'overflow menu button' }).click()
+    getByText('mock NavigationMenu')
+    expect(props.setNavMenuIsOpened).toHaveBeenCalled()
+  })
+  it('should change z index of nav bar when longPressModalIsOpened is defined and true', () => {
+    props = {
+      ...props,
+      longPressModalIsOpened: true,
+    }
+    const [{ getByLabelText }] = render(props)
+    expect(getByLabelText('Navigation_container')).toHaveStyle({ zIndex: 0 })
   })
 })

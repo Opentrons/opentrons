@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
@@ -22,19 +23,35 @@ import {
   DIRECTION_ROW,
   DISPLAY_FLEX,
   SIZE_2,
+  Btn,
 } from '@opentrons/components'
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '../../atoms/buttons'
-import { LargeButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
-import { useRunCreatedAtTimestamp } from '../../organisms/Devices/hooks'
+import { LargeButton, TertiaryButton } from '../../atoms/buttons'
+import {
+  useRunTimestamps,
+  useRunControls,
+} from '../../organisms/RunTimeControl/hooks'
+import {
+  useRunCreatedAtTimestamp,
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
+} from '../../organisms/Devices/hooks'
+import { useCloseCurrentRun } from '../../organisms/ProtocolUpload/hooks'
 import { onDeviceDisplayFormatTimestamp } from '../../organisms/Devices/utils'
 import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
+import {
+  useTrackEvent,
+  // ANALYTICS_PROTOCOL_RUN_CANCEL,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
+} from '../../redux/analytics'
 
+import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
+import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -62,18 +79,33 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(true)
+  const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const onResetSuccess = (_createRunResponse: Run): void =>
+    history.push(`/runs/${runId}/setup`)
+  const { reset } = useRunControls(runId, onResetSuccess)
+  const trackEvent = useTrackEvent()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? 'no name'
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const runStatusText = isRunSucceeded
     ? t('run_complete')
     : t('run_failed_modal_title')
 
   const handleReturnToDash = (): void => {
+    closeCurrentRun()
     history.push('/')
   }
 
   const handleRunAgain = (): void => {
-    history.push(`/protocols/${runId}/setup`)
+    reset()
+    trackEvent({
+      name: 'proceedToRun',
+      properties: { sourceLocation: 'RunSummary' },
+    })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
   }
 
   const handleViewErrorDetails = (): void => {
@@ -81,16 +113,25 @@ export function RunSummary(): JSX.Element {
     console.log('will be added')
   }
 
+  const handleClickSplash = (): void => {
+    trackProtocolRunEvent({
+      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      properties: robotAnalyticsData ?? undefined,
+    })
+    setShowSplash(false)
+  }
+
   return (
     <>
-      <Flex
+      <Btn
+        display={DISPLAY_FLEX}
+        width="100%"
         height="100vh"
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
         overflow={OVERFLOW_HIDDEN}
-        onClick={() => {
-          setShowSplash(false)
-        }}
+        disabled={isClosingCurrentRun}
+        onClick={handleClickSplash}
       >
         {showSplash ? (
           <Flex
@@ -100,12 +141,12 @@ export function RunSummary(): JSX.Element {
             alignItems={ALIGN_CENTER}
             position={POSITION_ABSOLUTE}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingXXL}
-            padding={SPACING.spacingXXL}
-            backgroundColor={isRunSucceeded ? COLORS.green_two : COLORS.red_two}
+            gridGap={SPACING.spacing40}
+            padding={SPACING.spacing40}
+            backgroundColor={isRunSucceeded ? COLORS.green2 : COLORS.red2}
           >
             <SplashFrame>
-              <Flex gridGap={SPACING.spacing6} alignItems={ALIGN_CENTER}>
+              <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
                 <Icon
                   name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
                   size="4.5rem"
@@ -113,7 +154,7 @@ export function RunSummary(): JSX.Element {
                 />
                 <SplashHeader> {runStatusText} </SplashHeader>
               </Flex>
-              <Flex width="49rem">
+              <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
                 <SplashBody>{protocolName}</SplashBody>
               </Flex>
             </SplashFrame>
@@ -124,14 +165,14 @@ export function RunSummary(): JSX.Element {
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING.spacingXXL}
+            padding={SPACING.spacing40}
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing16}
             >
-              <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+              <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                 <Icon
                   name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
                   size={SIZE_2}
@@ -142,7 +183,7 @@ export function RunSummary(): JSX.Element {
                 <SummaryHeader>{runStatusText}</SummaryHeader>
               </Flex>
               <ProtocolName>{protocolName}</ProtocolName>
-              <Flex gridGap={SPACING.spacing3}>
+              <Flex gridGap={SPACING.spacing8}>
                 <SummaryDatum>{`${t(
                   'run'
                 )}: ${createdAtTimestamp}`}</SummaryDatum>
@@ -166,7 +207,7 @@ export function RunSummary(): JSX.Element {
                 )}: ${completedAtTimestamp}`}</SummaryDatum>
               </Flex>
             </Flex>
-            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing4}>
+            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
               <LargeButton
                 flex="1"
                 iconName="arrow-left"
@@ -184,11 +225,9 @@ export function RunSummary(): JSX.Element {
                 height="17rem"
               />
               {!isRunSucceeded ? (
-                // Note: (04/28/2023) info icon will be added by NetworkDetailsModal.
-                // Once the PR is merged into edge this icon name will be updated.
                 <LargeButton
                   flex="1"
-                  iconName="information"
+                  iconName="info"
                   buttonType="alert"
                   onClick={handleViewErrorDetails}
                   buttonText={t('view_error_details')}
@@ -198,13 +237,13 @@ export function RunSummary(): JSX.Element {
             </Flex>
           </Flex>
         )}
-      </Flex>
+      </Btn>
       {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing5}
+        marginTop={SPACING.spacing24}
         width="fit-content"
-        paddingRight={SPACING.spacing6}
+        paddingRight={SPACING.spacing32}
       >
         <Link to="/dashboard">
           <TertiaryButton>back to RobotDashboard</TertiaryButton>
@@ -232,7 +271,7 @@ const SplashBody = styled.h4`
 `
 
 const SummaryHeader = styled.h4`
-  font-weight: ${TYPOGRAPHY.fontWeightLevel2_bold};
+  font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
@@ -245,9 +284,9 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size_two} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size_three};
-  grid-gap: ${SPACING.spacingXXL};
+  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.size3};
+  grid-gap: ${SPACING.spacing40};
 `
 
 const ProtocolName = styled.h4`
@@ -256,19 +295,25 @@ const ProtocolName = styled.h4`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const SummaryDatum = styled.div`
   display: ${DISPLAY_FLEX};
   flex-direction: ${DIRECTION_ROW};
   align-items: ${ALIGN_CENTER};
-  padding: ${SPACING.spacing3} 0.75rem;
-  grid-gap: ${SPACING.spacing2};
+  padding: ${SPACING.spacing8} ${SPACING.spacing12};
+  grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;
-  color: ${COLORS.darkBlack_ninety};
+  color: ${COLORS.darkBlack90};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};

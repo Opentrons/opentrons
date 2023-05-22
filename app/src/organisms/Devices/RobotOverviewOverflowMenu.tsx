@@ -11,7 +11,6 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   useHoverTooltip,
-  useInterval,
   useMountEffect,
 } from '@opentrons/components'
 
@@ -27,7 +26,6 @@ import { UpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBui
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
-import { fetchWifiList, getCanDisconnect } from '../../redux/networking'
 import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
@@ -35,12 +33,11 @@ import { useIsRobotBusy } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
+import { useCanDisconnect } from '../../resources/networking/hooks'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
 }
-
-const LIST_REFRESH_MS = 10000
 
 export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
@@ -80,9 +77,7 @@ export const RobotOverviewOverflowMenu = (
     false
   )
 
-  const canDisconnect = useSelector((state: State) =>
-    getCanDisconnect(state, robot.name)
-  )
+  const canDisconnect = useCanDisconnect(robot.name)
 
   const handleClickDisconnect: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowDisconnectModal(true)
@@ -106,8 +101,6 @@ export const RobotOverviewOverflowMenu = (
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
-
-  useInterval(() => dispatch(fetchWifiList(robot.name)), LIST_REFRESH_MS, true)
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>

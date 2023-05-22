@@ -3,10 +3,10 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
-
 import { i18n } from '../../../../i18n'
 import { ProtocolCard } from '../'
+
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -34,10 +34,12 @@ const mockProtocol: ProtocolResource = {
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
 
+const props = { protocol: mockProtocol, longPress: jest.fn() }
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolCard protocol={mockProtocol} />
+      <ProtocolCard {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -60,6 +62,7 @@ describe('ProtocolCard', () => {
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     jest.advanceTimersByTime(1005)
+    expect(props.longPress).toHaveBeenCalled()
     getByText('Run protocol')
     getByText('Pin protocol')
     getByText('Delete protocol')

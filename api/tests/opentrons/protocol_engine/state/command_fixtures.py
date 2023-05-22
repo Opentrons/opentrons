@@ -300,6 +300,24 @@ def create_drop_tip_command(
     )
 
 
+def create_drop_tip_in_place_command(
+    pipette_id: str,
+) -> cmd.DropTipInPlace:
+    """Get a completed DropTip command."""
+    params = cmd.DropTipInPlaceParams(pipetteId=pipette_id)
+
+    result = cmd.DropTipInPlaceResult()
+
+    return cmd.DropTipInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_move_to_well_command(
     pipette_id: str,
     labware_id: str = "labware-id",

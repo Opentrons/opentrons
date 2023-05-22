@@ -252,7 +252,7 @@ async def test_home_execute(
     assert not controller._motor_status
 
     commanded_homes = set(axes)
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     all_calls = list(chain([args[0][0] for args in mock_move_group_run.call_args_list]))
     for command in all_calls:
         for group in command._move_groups:
@@ -276,7 +276,7 @@ async def test_home_prioritize_mount(
     # nothing has been homed
     assert not controller._motor_status
 
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     has_xy = len({OT3Axis.X, OT3Axis.Y} & set(axes)) > 0
     has_mount = len(set(OT3Axis.mount_axes()) & set(axes)) > 0
     run = mock_move_group_run.call_args_list[0][0][0]._move_groups
@@ -301,7 +301,7 @@ async def test_home_build_runners(
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     assert not controller._motor_status
 
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     has_pipette = len(set(OT3Axis.pipette_axes()) & set(axes)) > 0
     has_gantry = len(set(OT3Axis.gantry_axes()) & set(axes)) > 0
 
@@ -347,7 +347,7 @@ async def test_home_only_present_devices(
 
     # nothing has been homed
     assert not controller._motor_status
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
 
     for call in mock_move_group_run.call_args_list:
         # pull the bound-self argument that is the runner instance out of
@@ -511,34 +511,6 @@ async def test_get_attached_instruments_handles_unknown_model(
     with patch.object(controller._network_info, "probe", fake_probe):
         with pytest.raises(InvalidPipetteModel):
             await controller.get_attached_instruments({})
-
-
-def test_nodeid_replace_head():
-    assert OT3Controller._replace_head_node(set([NodeId.head, NodeId.gantry_x])) == set(
-        [NodeId.head_l, NodeId.head_r, NodeId.gantry_x]
-    )
-    assert OT3Controller._replace_head_node(set([NodeId.gantry_x])) == set(
-        [NodeId.gantry_x]
-    )
-    assert OT3Controller._replace_head_node(set([NodeId.head_l])) == set(
-        [NodeId.head_l]
-    )
-
-
-def test_nodeid_replace_gripper():
-    assert OT3Controller._replace_gripper_node(
-        set([NodeId.gripper, NodeId.head])
-    ) == set([NodeId.gripper_g, NodeId.gripper_z, NodeId.head])
-    assert OT3Controller._replace_gripper_node(set([NodeId.head])) == set([NodeId.head])
-    assert OT3Controller._replace_gripper_node(set([NodeId.gripper_g])) == set(
-        [NodeId.gripper_g]
-    )
-
-
-def test_nodeid_filter_probed_core():
-    assert OT3Controller._filter_probed_core_nodes(
-        set([NodeId.gantry_x, NodeId.pipette_left]), set([NodeId.gantry_y])
-    ) == set([NodeId.gantry_y, NodeId.pipette_left])
 
 
 async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
@@ -869,7 +841,7 @@ async def test_update_required_flag(
         controller._initialized = True
         controller._check_updates = True
         with pytest.raises(FirmwareUpdateRequired):
-            await controller.home(axes)
+            await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
 
 
 async def test_update_required_bypass_firmware_update(controller: OT3Controller):

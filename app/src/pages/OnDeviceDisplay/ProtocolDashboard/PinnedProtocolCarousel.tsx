@@ -15,8 +15,9 @@ import type { CardSizeType } from './PinnedProtocol'
 
 export function PinnedProtocolCarousel(props: {
   pinnedProtocols: ProtocolResource[]
+  longPress: React.Dispatch<React.SetStateAction<boolean>>
 }): JSX.Element {
-  const { pinnedProtocols } = props
+  const { pinnedProtocols, longPress } = props
   const runs = useAllRunsQuery()
   const swipe = useSwipe()
 
@@ -68,7 +69,7 @@ export function PinnedProtocolCarousel(props: {
     <Flex
       alignItems={ALIGN_FLEX_START}
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       ref={swipe.ref}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
@@ -86,6 +87,7 @@ export function PinnedProtocolCarousel(props: {
             key={protocol.key}
             lastRun={lastRun}
             protocol={protocol}
+            longPress={longPress}
           />
         )
       })}

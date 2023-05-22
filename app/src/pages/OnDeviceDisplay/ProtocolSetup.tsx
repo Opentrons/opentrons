@@ -15,9 +15,11 @@ import {
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_ALIGN_RIGHT,
+  truncateString,
   TYPOGRAPHY,
   BORDERS,
   SPACING,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -32,16 +34,15 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import {
-  useAttachedModules,
-  useRunCreatedAtTimestamp,
-} from '../../organisms/Devices/hooks'
+import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { Snackbar } from '../../atoms/Snackbar'
 import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -49,15 +50,11 @@ import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
-import {
-  useRunControls,
-  useRunStatus,
-} from '../../organisms/RunTimeControl/hooks'
+import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -77,42 +74,43 @@ function ProtocolSetupStep({
   subDetail,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: `${COLORS.successEnabled}${COLORS.opacity20HexCode}`,
-    'not ready': COLORS.warningBackgroundMed,
-    general: COLORS.light_two,
+    ready: COLORS.green3,
+    'not ready': COLORS.yellow3,
+    general: COLORS.light1,
   }
   return (
     <Btn onClick={onClickSetupStep} width="100%">
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size_four}
-        gridGap="1.5rem"
-        padding="1.5rem 1rem"
+        borderRadius={BORDERS.size4}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
         {status !== 'general' ? (
           <Icon
-            color={
-              status === 'ready' ? COLORS.successEnabled : COLORS.warningEnabled
-            }
+            color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText as="h1">{title}</StyledText>
+        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {title}
+        </StyledText>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
-          <StyledText as="h2" textAlign={TEXT_ALIGN_RIGHT}>
+          <StyledText as="p" textAlign={TEXT_ALIGN_RIGHT}>
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon name="chevron-right" size="3rem" />
+        <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
       </Flex>
     </Btn>
   )
 }
 
+// TODO(ew, 05/03/2023): refactor the run buttons into a shared component
 interface CloseButtonProps {
   onClose: () => void
 }
@@ -121,16 +119,16 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      border={`2px solid ${COLORS.errorEnabled}`}
-      borderRadius="4.25rem"
+      backgroundColor={COLORS.red2}
+      borderRadius="6.25rem"
       display={DISPLAY_FLEX}
-      height="4.25rem"
+      height="6.25rem"
       justifyContent={JUSTIFY_CENTER}
-      width="4.25rem"
+      width="6.25rem"
       onClick={onClose}
       aria-label="close"
     >
-      <Icon color={COLORS.errorEnabled} name="ot-close" size="2rem" />
+      <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
     </Btn>
   )
 }
@@ -144,17 +142,21 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.successDisabled : COLORS.blueEnabled}
-      borderRadius="4.25rem"
+      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.blueEnabled}
+      borderRadius="6.25rem"
       display={DISPLAY_FLEX}
-      height="4.25rem"
+      height="6.25rem"
       justifyContent={JUSTIFY_CENTER}
-      width="4.25rem"
+      width="6.25rem"
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
     >
-      <Icon color={COLORS.white} marginLeft="0.25rem" name="play" size="2rem" />
+      <Icon
+        color={disabled ? COLORS.darkBlack60 : COLORS.white}
+        name="play-icon"
+        size="2.5rem"
+      />
     </Btn>
   )
 }
@@ -168,7 +170,7 @@ function PrepareToRun({
   runId,
   setSetupScreen,
 }: PrepareToRunProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
@@ -186,18 +188,10 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-
-  const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const runStatus: string = useRunStatus(runId) ?? ''
+  const [showSnackbar, setShowSnackbar] = React.useState<boolean>(false)
 
   const { play } = useRunControls(runId)
 
-  const onPlay = (): void => {
-    play()
-    history.push(`/protocols/${runId}/run`)
-  }
-
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
@@ -212,6 +206,12 @@ function PrepareToRun({
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
+
+  // const protocolAnalysisLoading =
+  //   mostRecentAnalysis == null ||
+  //   attachedInstruments == null ||
+  //   (protocolHasModules && attachedModules == null) ||
+  //   allPipettesCalibrationData == null
 
   if (
     mostRecentAnalysis == null ||
@@ -253,6 +253,14 @@ function PrepareToRun({
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
+
+  const onPlay = (): void => {
+    if (isReadyToRun) {
+      play()
+    } else {
+      setShowSnackbar(true)
+    }
+  }
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
@@ -303,41 +311,50 @@ function PrepareToRun({
       {/* Protocol Setup Header */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginBottom={SPACING.spacingXXL}
+        gridGap={SPACING.spacing24}
+        paddingBottom={SPACING.spacing40}
+        paddingTop={SPACING.spacing32}
+        position={POSITION_STICKY}
+        top={0}
+        backgroundColor={COLORS.white}
+        overflowY="hidden"
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-            <StyledText fontSize="2rem">{t('prepare_to_run')}</StyledText>
-            <StyledText fontSize="2rem" color={COLORS.darkGreyEnabled}>
-              {protocolName}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing2}
+            maxWidth="43rem"
+          >
+            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+              {t('prepare_to_run')}
+            </StyledText>
+            <StyledText
+              as="h4"
+              color={COLORS.darkGreyEnabled}
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              overflowWrap="anywhere"
+            >
+              {truncateString(protocolName as string, 100)}
             </StyledText>
           </Flex>
-          <Flex gridGap={SPACING.spacing5}>
+          <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
-          </Flex>
-        </Flex>
-        <Flex gridGap={SPACING.spacing4}>
-          <Flex
-            backgroundColor={COLORS.fundamentalsBackgroundShade}
-            padding="0.25rem 0.5rem"
-          >
-            {`Run: ${createdAtTimestamp}`}
-          </Flex>
-          <Flex
-            backgroundColor={COLORS.fundamentalsBackgroundShade}
-            padding="0.25rem 0.5rem"
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-          >
-            {`${t('status')}: ${runStatus}`}
+            <PlayButton
+              disabled={
+                mostRecentAnalysis == null ||
+                attachedInstruments == null ||
+                (protocolHasModules && attachedModules == null) ||
+                allPipettesCalibrationData == null
+              }
+              onPlay={onPlay}
+            />
           </Flex>
         </Flex>
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
@@ -352,12 +369,7 @@ function PrepareToRun({
           subDetail={modulesSubDetail}
           status={modulesStatus}
         />
-        <ProtocolSetupStep
-          onClickSetupStep={launchLPC}
-          title={t('labware_position_check')}
-          detail={t('recommended')}
-          status="general"
-        />
+
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('labware')}
           title={t('labware')}
@@ -366,24 +378,49 @@ function PrepareToRun({
           status="general"
         />
         <ProtocolSetupStep
+          onClickSetupStep={launchLPC}
+          title={t('labware_position_check')}
+          detail={t('recommended')}
+          status="general"
+        />
+        <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}
           title={t('liquids')}
           status="general"
           detail={
-            liquidsInProtocol.length < 0
+            liquidsInProtocol.length > 0
               ? t('initial_liquids_num', {
-                  num: liquidsInProtocol.length,
+                  count: liquidsInProtocol.length,
                 })
               : t('liquids_not_in_setup')
           }
         />
       </Flex>
+      {showSnackbar && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position={POSITION_STICKY}
+          bottom={SPACING.spacing40}
+          zIndex={1000}
+        >
+          <Snackbar
+            message={i18n.format(
+              t('complete_setup_before_proceeding'),
+              'capitalize'
+            )}
+            onClose={() => setShowSnackbar(false)}
+          />
+        </Flex>
+      )}
       {LPCWizard}
       {showConfirmCancelModal ? (
         <ConfirmCancelRunModal
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
+          protocolId={protocolId}
         />
       ) : null}
     </>
@@ -429,7 +466,14 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding="2rem 2.5rem">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      padding={
+        setupScreen === 'prepare to run'
+          ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+          : `${SPACING.spacing32} ${SPACING.spacing40}`
+      }
+    >
       {setupComponentByScreen[setupScreen]}
     </Flex>
   )
@@ -440,18 +484,18 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
           <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
         </Flex>
-        <Flex gridGap={SPACING.spacing5}>
+        <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
           <PlayButton disabled onPlay={() => {}} />
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />

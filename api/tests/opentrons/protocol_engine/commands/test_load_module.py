@@ -51,3 +51,40 @@ async def test_load_module_implementation(
         model=ModuleModel.TEMPERATURE_MODULE_V2,
         definition=tempdeck_v2_def,
     )
+
+
+async def test_load_module_implementation_mag_block(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    mag_block_v1_def: ModuleDefinition,
+) -> None:
+    """A loadModule command for mag block should have an execution implementation."""
+    subject = LoadModuleImplementation(equipment=equipment)
+
+    data = LoadModuleParams(
+        model=ModuleModel.MAGNETIC_BLOCK_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        moduleId="some-id",
+    )
+
+    decoy.when(
+        await equipment.load_magnetic_block(
+            model=ModuleModel.MAGNETIC_BLOCK_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            module_id="some-id",
+        )
+    ).then_return(
+        LoadedModuleData(
+            module_id="module-id",
+            serial_number=None,
+            definition=mag_block_v1_def,
+        )
+    )
+
+    result = await subject.execute(data)
+    assert result == LoadModuleResult(
+        moduleId="module-id",
+        serialNumber=None,
+        model=ModuleModel.MAGNETIC_BLOCK_V1,
+        definition=mag_block_v1_def,
+    )

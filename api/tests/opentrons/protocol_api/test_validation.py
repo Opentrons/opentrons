@@ -35,11 +35,21 @@ def test_ensure_mount(input_value: Union[str, Mount], expected: Mount) -> None:
 
 def test_ensure_mount_input_invalid() -> None:
     """It should raise if given invalid mount input."""
-    with pytest.raises(ValueError, match="must be 'left' or 'right'"):
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="must be 'left' or 'right'"
+    ):
         subject.ensure_mount("oh no")
 
-    with pytest.raises(TypeError, match="'left', 'right', or an opentrons.types.Mount"):
+    with pytest.raises(
+        subject.PipetteMountTypeError,
+        match="'left', 'right', or an opentrons.types.Mount",
+    ):
         subject.ensure_mount(42)  # type: ignore[arg-type]
+
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="Use the left or right mounts instead"
+    ):
+        subject.ensure_mount(Mount.EXTENSION)
 
 
 @pytest.mark.parametrize(
@@ -82,7 +92,7 @@ def test_ensure_deck_slot(input_value: Union[str, int], expected: DeckSlotName) 
 
 def test_ensure_deck_slot_invalid() -> None:
     """It should raise a ValueError if given an invalid name."""
-    input_values: List[Union[str, int]] = ["0", 0, "13", 13]
+    input_values: List[Union[str, int]] = ["0", 0, "13", 13, "b7", "B7"]
 
     for input_value in input_values:
         with pytest.raises(ValueError, match="not a valid deck slot"):

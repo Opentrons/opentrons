@@ -5,6 +5,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import { useWifiList } from '../../../../resources/networking/hooks'
 import * as Networking from '../../../../redux/networking'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
@@ -13,11 +14,10 @@ const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedF
   typeof Networking.getNetworkInterfaces
 >
 
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
-  typeof Networking.getWifiList
->
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
 const mockPush = jest.fn()
 
+jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/networking')
 jest.mock('../../../../redux/discovery/selectors')
 jest.mock('react-router-dom', () => {
@@ -62,7 +62,7 @@ describe('WifiConnectionDetails', () => {
       wifi: initialMockWifi,
       ethernet: null,
     })
-    mockGetWifiList.mockReturnValue(mockWifiList)
+    mockUseWifiList.mockReturnValue(mockWifiList)
   })
 
   afterEach(() => {
@@ -72,7 +72,6 @@ describe('WifiConnectionDetails', () => {
   it('should render title and description', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Connect via Wi-Fi')
-    getByText('Connection status:')
     getByText('Connected')
     getByText('mockWifi')
     getByText('IP Address: 127.0.0.100')

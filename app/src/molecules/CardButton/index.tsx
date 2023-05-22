@@ -14,7 +14,7 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import type { IconName } from '@opentrons/components'
 
@@ -22,8 +22,8 @@ const CARD_BUTTON_STYLE = css`
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
-  border-radius: ${BORDERS.size_four};
-  padding: ${SPACING.spacing6};
+  border-radius: ${BORDERS.size4};
+  padding: ${SPACING.spacing32};
   box-shadow: none;
 
   &:focus {
@@ -48,8 +48,8 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlack_twenty};
-    color: ${COLORS.darkBlack_seventy};
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack70};
   }
 `
 
@@ -83,39 +83,34 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
-      backgroundColor={
-        disabled ? COLORS.darkBlack_twenty : COLORS.mediumBlueEnabled
-      }
+      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.mediumBlueEnabled}
       disabled={disabled}
     >
       <Icon
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? COLORS.darkBlack_sixty : COLORS.blueEnabled}
+        color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
       />
-      <Flex marginTop={SPACING.spacing4}>
+      <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
-          fontSize="1.75rem"
-          lineHeight="2.25rem"
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
-          color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
         </StyledText>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         width="100%"
         justifyContent={JUSTIFY_CENTER}
       >
         <StyledText
-          fontSize="1.375rem"
-          lineHeight="1.75rem"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? COLORS.darkBlack_sixty : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}
