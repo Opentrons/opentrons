@@ -513,9 +513,7 @@ def test_get_slot_definition_raises_with_bad_slot_name(
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     with pytest.raises(errors.SlotDoesNotExistError):
-        # note: normally the typechecker should catch this, but clients may
-        # not be using typechecking or our enums
-        subject.get_slot_definition(42)  # type: ignore[arg-type]
+        subject.get_slot_definition(DeckSlotName.SLOT_A1)
 
 
 def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
