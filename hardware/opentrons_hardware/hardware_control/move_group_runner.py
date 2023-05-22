@@ -27,7 +27,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddBrushedLinearMoveRequest,
     TipActionRequest,
     TipActionResponse,
-    Acknowledgement,
     ErrorMessage,
     StopRequest,
 )
