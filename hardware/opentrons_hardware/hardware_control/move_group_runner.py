@@ -397,7 +397,9 @@ class MoveScheduler:
             self._should_stop = True
         self._event.set()
 
-    def _handle_move_completed(self, message: _AcceptableMoves, arbitration_id: ArbitrationId) -> None:
+    def _handle_move_completed(
+        self, message: _AcceptableMoves, arbitration_id: ArbitrationId
+    ) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
         node_id = arbitration_id.parts.originating_node_id
@@ -450,7 +452,9 @@ class MoveScheduler:
             if err != ErrorCode.stop_requested:
                 log.warning("Stop request failed")
             if self._error:
-                raise RuntimeError(f"Unrecoverable firmware error during move group {group_id}: {self._error}")
+                raise RuntimeError(
+                    f"Unrecoverable firmware error during move group {group_id}: {self._error}"
+                )
             else:
                 # This happens when the move completed without stop condition
                 raise MoveConditionNotMet
