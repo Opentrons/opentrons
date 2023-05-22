@@ -947,7 +947,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _check_stalls: bool = False,  # For testing only
+        _expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -955,8 +955,8 @@ class OT3API(
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
         # Cache current position from backend
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        if not self._current_position:
+            await self.refresh_positions()
 
         if not self._backend.check_encoder_status(axes_moving):
             # a moving axis has not been homed before, homing robot now
@@ -987,7 +987,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            check_stalls=_check_stalls,
+            expect_stalls=_expect_stalls,
         )
 
     async def move_rel(
@@ -998,10 +998,13 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _check_stalls: bool = False,  # For testing only
+        _expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
+        if not self._current_position:
+            await self.refresh_positions()
+
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
@@ -1033,7 +1036,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            check_stalls=_check_stalls,
+            expect_stalls=_expect_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -1093,7 +1096,7 @@ class OT3API(
         max_speeds: Optional[OT3AxisMap[float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
-        check_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
@@ -1126,7 +1129,9 @@ class OT3API(
                 await self._backend.move(
                     origin,
                     moves[0],
-                    MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
+                    MoveStopCondition.stall
+                    if expect_stalls
+                    else MoveStopCondition.none,
                 )
             except Exception:
                 self._log.exception("Move failed")
@@ -1163,27 +1168,20 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [OT3Axis.G, OT3Axis.Q]
 
-        # FIXME: See https://github.com/Opentrons/opentrons/pull/11978
-        # Because of the workaround introduced above, we cannot fully trust the motor
-        # flag until the already_homed check is removed. Until then, we should only
-        # evaluate the encoder status and update motor pos as a safeguard.
-        # if self._backend.check_motor_status(
-        #     [axis]
-        # ) and self._backend.check_encoder_status([axis]):
-        #     # retrieve home position
-        #     origin, target_pos = await _retrieve_home_position()
-        #     # move directly the home position if the stepper position is valid
-        #     moves = self._build_moves(origin, target_pos)
-        #     await self._backend.move(
-        #         origin,
-        #         moves[0],
-        #         MoveStopCondition.none,
-        #     )
-        if self._backend.check_encoder_status([axis]):
+        motor_ok = self._backend.check_motor_status([axis])
+        encoder_ok = self._backend.check_encoder_status([axis])
+
+        # we can update the motor position if the encoder position is valid
+        if encoder_ok and not motor_ok:
             # ensure stepper position can be updated after boot
             await self.engage_axes([axis])
-            # update stepper position using the valid encoder position
             await self._update_position_estimation([axis])
+            # refresh motor and encoder statuses after position estimation update
+            motor_ok = self._backend.check_motor_status([axis])
+            encoder_ok = self._backend.check_encoder_status([axis])
+
+        # we can move to safe home distance!
+        if encoder_ok and motor_ok:
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
                 axis_home_dist = self._config.safe_home_distance
@@ -1220,8 +1218,8 @@ class OT3API(
                 except ZeroLengthMoveError:
                     self._log.info(f"{axis} already at home position, skip homing")
                     continue
-                except (MoveConditionNotMet, Exception):
-                    self._log.exception("Homing failed")
+                except (MoveConditionNotMet, Exception) as e:
+                    self._log.exception(f"Homing failed: {e}")
                     self._current_position.clear()
                     raise
                 else:
@@ -1589,7 +1587,10 @@ class OT3API(
                 target_down = target_position_from_relative(
                     mount, press.relative_down, self._current_position
                 )
-                await self._move(target_down, speed=press.speed)
+                await self._move(target_down, speed=press.speed, expect_stalls=True)
+            # we expect a stall has happened during pick up, so we want to
+            # update the motor estimation
+            await self._update_position_estimation([OT3Axis.by_mount(mount)])
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
@@ -1642,10 +1643,6 @@ class OT3API(
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
             await self._force_pick_up_tip(realmount, spec)
-
-        # we expect a stall has happened during pick up, so we want to
-        # update the motor estimation
-        await self._update_position_estimation([OT3Axis.by_mount(realmount)])
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
