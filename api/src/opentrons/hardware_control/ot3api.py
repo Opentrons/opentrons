@@ -953,20 +953,14 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
-        mount_type: Union[top_types.Mount, OT3Mount]
+        realmount: Union[OT3Mount, _BothMontType]
         if isinstance(mount, _BothMontType):
-            mount_type = OT3Mount.BOTH
+            realmount = mount
+            axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
         else:
             mount_type = mount
-
-        realmount = OT3Mount.from_mount(mount_type)
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount_type)]
-
-        # if we're moving both mounts, realmount will be a tuple, so reformat axes_moving
-        if realmount == OT3Mount.BOTH:
-            axes_moving.pop()
-            axes_moving.append(OT3Axis.X)
-            axes_moving.append(OT3Axis.Y)
+            realmount = OT3Mount.from_mount(mount_type)
+            axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount_type)]
 
         # Cache current position from backend
         await self._cache_current_position()
@@ -976,8 +970,9 @@ class OT3API(
             # a moving axis has not been homed before, homing robot now
             await self.home()
         elif not self._backend.check_motor_status(axes_moving):
+            home_mounts = realmount if realmount else [OT3Mount.LEFT, OT3Mount.RIGHT]
             raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
+                f"Inaccurate motor position for {str(home_mounts)}, please home motors."
             )
 
         target_position = target_position_from_absolute(
@@ -1050,7 +1045,9 @@ class OT3API(
             check_stalls=_check_stalls,
         )
 
-    async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
+    async def _cache_and_maybe_retract_mount(
+        self, mount: Union[OT3Mount, _BothMontType]
+    ) -> None:
         """Retract the 'other' mount if necessary
 
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
@@ -1058,7 +1055,7 @@ class OT3API(
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
         """
-        if mount == OT3Mount.BOTH:
+        if isinstance(mount, _BothMontType):
             self._last_moved_mount = None
             return
 
@@ -1066,7 +1063,9 @@ class OT3API(
             await self.retract(self._last_moved_mount, 10)
         self._last_moved_mount = mount
 
-    async def _move_gripper_to_idle_position(self, mount_in_use: OT3Mount) -> None:
+    async def _move_gripper_to_idle_position(
+        self, mount_in_use: Union[OT3Mount, _BothMontType]
+    ) -> None:
         """Move gripper to its idle, gripped position.
 
         If the gripper is not currently in use, puts its jaws in a low-current,

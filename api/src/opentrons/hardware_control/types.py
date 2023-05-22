@@ -11,7 +11,6 @@ from typing import (
     Callable,
     Dict,
     TypeVar,
-    Any,
 )
 from typing_extensions import Literal, Final
 from opentrons import types as top_types
@@ -87,7 +86,6 @@ BOTH_MOUNTS: Final = _BothMontType.BOTH
 class OT3Mount(enum.Enum):
     LEFT = top_types.Mount.LEFT.value
     RIGHT = top_types.Mount.RIGHT.value
-    BOTH = enum.auto()
     GRIPPER = enum.auto()
 
     @classmethod
@@ -146,14 +144,13 @@ class OT3Axis(enum.Enum):
     G = 8  # gripper grab
 
     @classmethod
-    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> Any:
+    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> "OT3Axis":
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
             OT3Mount.LEFT: cls.Z_L,
             OT3Mount.RIGHT: cls.Z_R,
             OT3Mount.GRIPPER: cls.Z_G,
-            OT3Mount.BOTH: (cls.Z_L, cls.Z_R),
         }
         return bm[mount]
 

@@ -1,11 +1,11 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast, Any
+from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
 from opentrons.util import linal
-from .types import Axis, OT3Axis, OT3Mount
+from .types import Axis, OT3Axis, OT3Mount, _BothMontType
 from functools import lru_cache
 
 
@@ -95,7 +95,7 @@ def _z_for_mount(mount: OT3Mount) -> OT3Axis:
     ...
 
 
-def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Any:
+def _z_for_mount(mount: Union[Mount, OT3Mount]) -> Union[Axis, OT3Axis]:
     if isinstance(mount, Mount):
         return Axis.by_mount(mount)
     else:
@@ -168,6 +168,18 @@ def target_position_from_absolute(
 @overload
 def target_position_from_absolute(
     mount: OT3Mount,
+    abs_position: Point,
+    get_critical_point: Callable[[OT3Mount], Point],
+    left_mount_offset: Point,
+    right_mount_offset: Point,
+    gripper_mount_offset: Point,
+) -> "OrderedDict[OT3Axis, float]":
+    ...
+
+
+@overload
+def target_position_from_absolute(
+    mount: _BothMontType,
     abs_position: Point,
     get_critical_point: Callable[[OT3Mount], Point],
     left_mount_offset: Point,
