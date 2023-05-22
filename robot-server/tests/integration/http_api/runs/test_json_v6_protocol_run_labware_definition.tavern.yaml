@@ -63,9 +63,9 @@ stages:
       status_code: 200
       json:
         data:
-          - metaData:
+          - metadata:
               displayName: 'Opentrons Fixed Trash'
-#          - metaData:
-#              displayName: 'Opentrons 96 Tip Rack 10 µL'
-#          - metaData:
-#              displayName: 'Foo 8 Well Plate 33uL'
+          - metadata:
+              displayName: 'Opentrons 96 Tip Rack 10 µL'
+          - metadata:
+              displayName: 'Foo 8 Well Plate 33uL'
