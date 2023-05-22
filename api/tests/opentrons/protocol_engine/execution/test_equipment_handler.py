@@ -80,12 +80,6 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI instance."""
-    return decoy.mock(cls=HardwareControlAPI)
-
-
-@pytest.fixture
 def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
     """Get a mocked out ActionDispatcher instance."""
     return decoy.mock(cls=ActionDispatcher)

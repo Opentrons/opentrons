@@ -70,7 +70,6 @@ from .backends.ot3utils import (
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
-from .util import DeckTransformState
 from .types import (
     Axis,
     CriticalPoint,
@@ -99,13 +98,9 @@ from .types import (
 )
 from .errors import MustHomeError, GripperNotAttachedError
 from . import modules
-from .robot_calibration import (
-    OT3Transforms,
-    RobotCalibration,
-    build_ot3_transforms,
-)
+from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -151,12 +146,13 @@ mod_log = logging.getLogger(__name__)
 
 class OT3API(
     ExecutionManagerProvider,
+    OT3RobotCalibrationProvider,
     # This MUST be kept last in the inheritance list so that it is
     # deprioritized in the method resolution order; otherwise, invocations
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[OT3Transforms],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -207,7 +203,6 @@ class OT3API(
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager()
-        self._transforms = build_ot3_transforms(self._config)
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
         self._move_manager = MoveManager(
             constraints=get_system_constraints(
@@ -220,20 +215,8 @@ class OT3API(
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
+        OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
-
-    def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
-        self._transforms.deck_calibration = robot_calibration.deck_calibration
-
-    def reset_robot_calibration(self) -> None:
-        self._transforms = build_ot3_transforms(self._config)
-
-    @property
-    def robot_calibration(self) -> OT3Transforms:
-        return self._transforms
-
-    def validate_calibration(self) -> DeckTransformState:
-        return DeckTransformState.OK
 
     @property
     def door_state(self) -> DoorState:
@@ -273,8 +256,8 @@ class OT3API(
     ) -> Dict[OT3Axis, float]:
         return deck_from_machine(
             machine_pos,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
+            self._robot_calibration.deck_calibration.attitude,
+            self._robot_calibration.carriage_offset,
         )
 
     @classmethod
@@ -1101,8 +1084,8 @@ class OT3API(
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
             target_position,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
+            self._robot_calibration.deck_calibration.attitude,
+            self._robot_calibration.carriage_offset,
         )
         bounds = self._backend.axis_bounds
         to_check = {
@@ -1319,9 +1302,6 @@ class OT3API(
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
-
-    async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
-        pass
 
     @ExecutionManagerProvider.wait_for_running
     async def _grip(self, duty_cycle: float) -> None:
@@ -2074,7 +2054,7 @@ class OT3API(
         machine_pass_distance = moving_axis.of_point(
             machine_vector_from_deck_vector(
                 moving_axis.set_in_point(top_types.Point(0, 0, 0), pass_distance),
-                self._transforms.deck_calibration.attitude,
+                self._robot_calibration.deck_calibration.attitude,
             )
         )
         pass_start_pos = moving_axis.set_in_point(here, pass_start)
@@ -2127,7 +2107,8 @@ class OT3API(
             )
         sweep_distance = moving_axis.of_point(
             machine_vector_from_deck_vector(
-                end - begin, self._transforms.deck_calibration.attitude
+                end - begin,
+                self._robot_calibration.deck_calibration.attitude,
             )
         )
 
