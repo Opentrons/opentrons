@@ -1,9 +1,6 @@
 """A script to test the rear panel board"""
 import argparse
 import asyncio
-from dataclasses import dataclass
-from typing import cast, Optional
-
 
 from opentrons_hardware.drivers.binary_usb.build import (
     build_rear_panel_messenger,
@@ -19,26 +16,9 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
     set_sync_pin
 )
 
-from opentrons_hardware.drivers.binary_usb import BinaryMessenger
-from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    DoorSwitchStateRequest,
-    DoorSwitchStateInfo,
-    AuxPresentDetectionChange,
-    AuxPresentRequest,
-    AuxIDRequest,
-    AuxIDResponse,
-    SetDeckLightRequest,
-    GetDeckLightRequest,
-    GetDeckLightResponse,
-    EstopButtonPresentRequest,
-    EstopButtonDetectionChange,
-    EstopStateChange,
-    Ack
-)
-
 ##START TEST PASSING CONDITIONS
 
-#needs a sync state
+#Pre-test conditions, nothing plugged in
 PRE_TEST_CONDITIONS = RearPinState()
 PRE_TEST_CONDITIONS.aux1_estop_det = False
 PRE_TEST_CONDITIONS.aux2_estop_det = False
