@@ -10,7 +10,7 @@ This is 0.9.0, an internal release for the app supporting the Opentrons Flex.
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
 ## New Stuff In This Release
-- USB connectivity improvements: the app will display an icon next to a USB robot's name, USB robots will disappear properly when disconnected, things of this nature.
+- USB connectivity improvements: the app will display a nice big icon in the network settings page for a USB robot, USB robots will disappear properly when disconnected, things of this nature.
 - 96-channel detach improvements
 - Visual fixes and improvements
 
