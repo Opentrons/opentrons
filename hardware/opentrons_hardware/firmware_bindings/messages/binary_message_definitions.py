@@ -292,7 +292,7 @@ class SyncStateResponse(utils.BinarySerializable):
     """Request the version information from the device."""
 
     message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.estop_state_change
+        BinaryMessageId.sync_state_resposne
     )
     length: utils.UInt16Field = utils.UInt16Field(1)
     engaged: utils.UInt8Field = utils.UInt8Field(0)
