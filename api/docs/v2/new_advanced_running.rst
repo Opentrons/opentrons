@@ -14,6 +14,9 @@ Jupyter Notebook
 
 The OT-2 runs a `Jupyter Notebook <https://jupyter.org>`_ server on port 48888, which you can connect to with your web browser. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells and run a single cell at a time.
 
+.. note::
+    The Jupyter Notebook server only supports versions 2.13 and earlier of the Python API. Use the Opentrons App to run protocols that require functionality added in newer versions.
+
 To access the OT-2’s Jupyter Notebook, either:
 
 - go to the **Advanced** tab of Robot Settings and click the **Launch Jupyter Notebook** button, or
@@ -32,7 +35,7 @@ Rather than writing a  ``run`` function and embedding commands within it, start 
     :substitutions:
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
+    protocol = opentrons.execute.get_protocol_api('2.13')
     protocol.home()
 
 The first command you execute should always be :py:meth:`~opentrons.protocol_api.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
