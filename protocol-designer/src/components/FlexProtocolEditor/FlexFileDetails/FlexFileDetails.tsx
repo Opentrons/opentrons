@@ -31,6 +31,7 @@ import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
 import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
+import { actions as navActions } from '../../../navigation'
 import { UpdateConfirmation } from '../FlexUpdateConfirmation'
 export interface Props {
   formValues: FileMetadataFields
@@ -177,7 +178,7 @@ const FileProtocolInformation = (): JSX.Element => {
     setShowConfirmation(false)
   }
 
-  function protocolCancelClick(e): any {
+  function protocolCancelClick(e: { preventDefault: () => void }): any {
     e.preventDefault()
     setShowConfirmation(true)
   }

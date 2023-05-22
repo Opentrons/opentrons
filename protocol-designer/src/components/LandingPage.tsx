@@ -4,7 +4,7 @@ import { i18n } from '../localization'
 import styles from './FlexProtocolEditor/FlexComponents.css'
 import { StyledText } from './FlexProtocolEditor/StyledText'
 import { actions as loadFileActions } from '../load-file'
-import { connect, useDispatch } from 'react-redux'
+import { MapDispatchToPropsParam, connect, useDispatch } from 'react-redux'
 import { ThunkDispatch } from '../types'
 import { actions as navActions } from '../navigation'
 import { setRobotName } from '../load-file/actions'
@@ -67,6 +67,13 @@ function LandingPage(props: {
   )
 }
 
+const mapDispatchToProps: MapDispatchToPropsParam<
+  { dispatch: ThunkDispatch<any> },
+  {}
+> = dispatch => ({
+  dispatch,
+})
+
 function mergeProps(
   stateProps: any,
   dispatchProps: {
@@ -92,4 +99,8 @@ function mergeProps(
   }
 }
 
-export const LandingPageComponent = connect(null, null, mergeProps)(LandingPage)
+export const LandingPageComponent = connect(
+  null,
+  mapDispatchToProps,
+  mergeProps
+)(LandingPage)

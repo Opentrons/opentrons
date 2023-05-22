@@ -39,7 +39,10 @@ import { actions as navActions } from '../../navigation'
 import { reduce } from 'lodash'
 import { PipetteOnDeck } from '../../step-forms'
 import assert from 'assert'
-import { ModuleCreationArgs } from '../modals/FilePipettesModal'
+import {
+  ModuleCreationArgs,
+  PipetteFieldsData,
+} from '../modals/FilePipettesModal'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import { NewProtocolFields } from '../../load-file'
 import {
@@ -243,10 +246,10 @@ const SelectComponent = (selectedTab: number): JSX.Element | null => {
   }
 }
 
-type PipetteFieldsData = Omit<
-  PipetteOnDeck,
-  'id' | 'spec' | 'tiprackLabwareDef'
->
+// type PipetteFieldsData = Omit<
+//   PipetteOnDeck,
+//   'id' | 'spec' | 'tiprackLabwareDef'
+// >
 
 function FlexProtocolEditor({
   isEditValue,
@@ -324,7 +327,7 @@ function FlexProtocolEditor({
 
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
-      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
+      (acc, formPipette: FormPipette, mount: string): PipetteFieldsData[] => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
@@ -445,6 +448,11 @@ interface CreateNewProtocolArgs {
   newProtocolFields: NewProtocolFields
   pipettes: PipetteFieldsData[]
   modules: ModuleCreationArgs[]
+}
+
+interface SP {
+  _customLabware: LabwareDefByDefURI
+  _hasUnsavedChanges?: boolean | null
 }
 interface DP {
   onCancel: () => unknown

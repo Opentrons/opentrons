@@ -171,6 +171,12 @@ export const MODELS_FOR_FLEX_MODULE_TYPE: Record<
       value: HEATERSHAKER_MODULE_V1,
     },
   ],
+  [MAGNETIC_BLOCK_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_BLOCK_V1}`),
+      value: MAGNETIC_BLOCK_V1,
+    },
+  ],
 }
 
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
