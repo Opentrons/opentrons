@@ -436,7 +436,7 @@ async def test_probing(
             ),
             "P1KSV33hello",
             "GRPV00fake_serial",
-            "Gripper V1",
+            "Flex Gripper",
         ),
     ],
 )
