@@ -5,7 +5,7 @@ For more details about this release, please see the full [technical changelog][]
 
 # Internal Release 0.9.0
 
-This is 0.8.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.9.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
