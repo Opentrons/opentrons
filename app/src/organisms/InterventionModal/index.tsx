@@ -119,7 +119,7 @@ export function InterventionModal({
     case 'waitForResume':
       modalContent = (
         <PauseInterventionContent
-          startedAt={command.params?.startedAt ?? null}
+          startedAt={command.startedAt ?? null}
           message={command.params?.message ?? null}
         />
       )
