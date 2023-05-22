@@ -1,5 +1,7 @@
 """Functions and utilites for OT3 calibration."""
 from __future__ import annotations
+from functools import lru_cache
+from dataclasses import dataclass
 from typing_extensions import Final, Literal, TYPE_CHECKING
 from typing import Tuple, List, Dict, Any, Optional, Union
 import datetime
@@ -11,7 +13,7 @@ from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
-from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
+from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
 import json
 
 from opentrons_shared_data.deck import (
@@ -20,7 +22,21 @@ from opentrons_shared_data.deck import (
     CALIBRATION_PROBE_RADIUS,
     CALIBRATION_SQUARE_EDGES as SQUARE_EDGES,
 )
-from opentrons.calibration_storage.types import AttitudeMatrix
+from .robot_calibration import (
+    RobotCalibration,
+    DeckCalibration,
+)
+from opentrons.calibration_storage import types
+from opentrons.calibration_storage.ot3.deck_attitude import (
+    save_robot_belt_attitude,
+    get_robot_belt_attitude,
+    delete_robot_belt_attitude,
+)
+from opentrons.config.robot_configs import (
+    default_ot3_deck_calibration,
+    defaults_ot3,
+)
+from .util import DeckTransformState
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -625,13 +641,13 @@ async def find_slot_center_binary_from_nominal_center(
     offset = await find_calibration_structure_position(
         hcapi, mount, nominal_center, method=CalibrationMethod.BINARY_SEARCH
     )
-    return offset, nominal_center
+    return nominal_center - offset, nominal_center
 
 
 async def _determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> AttitudeMatrix:
+) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
@@ -820,7 +836,8 @@ async def calibrate_module(
 async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> AttitudeMatrix:
+    pipette_id: str,
+) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
 
@@ -837,7 +854,164 @@ async def calibrate_belts(
         if mount == OT3Mount.GRIPPER:
             raise RuntimeError("Must use pipette mount, not gripper")
         try:
+            hcapi.reset_deck_calibration()
             await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-            return await _determine_transform_matrix(hcapi, mount)
+            belt_attitude = await _determine_transform_matrix(hcapi, mount)
+            save_robot_belt_attitude(belt_attitude, pipette_id)
+            return belt_attitude
         finally:
+            hcapi.load_deck_calibration()
             await hcapi.remove_tip(mount)
+
+
+def apply_machine_transform(
+    belt_attitude: types.AttitudeMatrix,
+) -> types.AttitudeMatrix:
+    """
+    This applies the machine attitude matrix (which happens to be a negative identity) to the belt attitude matrix to form the deck attitude matrix.
+
+    Param
+    -----
+    belt_attitude: attitude matrix with regards to belt coordinate system
+
+    Returns
+    -------
+    Attitude matrix with regards to machine coordinate system.
+    """
+    belt_attitude_arr = np.array(belt_attitude)
+    machine_transform_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
+    deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)  # type: ignore[no-untyped-call]
+    deck_attitude = deck_attitude_arr.round(4).tolist()
+    return deck_attitude  # type: ignore[no-any-return]
+
+
+def load_attitude_matrix(to_default: bool = True) -> DeckCalibration:
+    calibration_data = get_robot_belt_attitude()
+
+    if calibration_data and not to_default:
+        return DeckCalibration(
+            attitude=apply_machine_transform(calibration_data.attitude),
+            source=calibration_data.source,
+            status=types.CalibrationStatus(**calibration_data.status.dict()),
+            belt_attitude=calibration_data.attitude,
+            last_modified=calibration_data.lastModified,
+            pipette_calibrated_with=calibration_data.pipetteCalibratedWith,
+        )
+    else:
+        # load default if calibration data does not exist
+        return DeckCalibration(
+            attitude=apply_machine_transform(default_ot3_deck_calibration()),
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+            belt_attitude=default_ot3_deck_calibration(),
+        )
+
+
+def validate_attitude_deck_calibration(
+    deck_cal: DeckCalibration,
+) -> DeckTransformState:
+    """
+    This function determines whether the deck calibration is valid
+    or not based on the following use-cases:
+
+    TODO(pm, 5/9/2023): As with the OT2, expand on this method,
+    or create another method to diagnose bad instrument offset data
+    """
+    curr_cal = np.array(deck_cal.attitude)
+    row, _ = curr_cal.shape
+    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
+    if row != rank:
+        # Check that the matrix is non-singular
+        return DeckTransformState.SINGULARITY
+    elif not deck_cal.last_modified:
+        # Check that the matrix is not an identity
+        return DeckTransformState.IDENTITY
+    else:
+        # Transform as it stands is sufficient.
+        return DeckTransformState.OK
+
+
+def delete_belt_calibration_data(hcapi: OT3API) -> None:
+    delete_robot_belt_attitude()
+    hcapi.reset_deck_calibration()
+
+
+class OT3RobotCalibrationProvider:
+    """This class provides the following robot calibration data:
+    deck calibration: transform matrix to account for stretch of x and y belts
+    carriage offset: the vector from the deck origin to the bottom center of the gantry carriage when the gantry is homed
+    mount offset (per mount): the vector from the carriage origin (bottom center) to the mount origin (centered on the top peg of the mount flush with the mating face)
+    """
+
+    def __init__(self, config: OT3Config) -> None:
+        self._robot_calibration = OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=False),
+            carriage_offset=Point(*config.carriage_offset),
+            left_mount_offset=Point(*config.left_mount_offset),
+            right_mount_offset=Point(*config.right_mount_offset),
+            gripper_mount_offset=Point(*config.gripper_mount_offset),
+        )
+
+    @lru_cache(1)
+    def _validate(self) -> DeckTransformState:
+        return validate_attitude_deck_calibration(
+            self._robot_calibration.deck_calibration
+        )
+
+    @property
+    def robot_calibration(self) -> OT3Transforms:
+        return self._robot_calibration
+
+    def reset_robot_calibration(self) -> None:
+        self._validate.cache_clear()
+        self._robot_calibration = OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=True),
+            carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
+            left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
+            right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),
+            gripper_mount_offset=Point(*defaults_ot3.DEFAULT_GRIPPER_MOUNT_OFFSET),
+        )
+
+    def reset_deck_calibration(self) -> None:
+        self._robot_calibration.deck_calibration = load_attitude_matrix(to_default=True)
+
+    def load_deck_calibration(self) -> None:
+        self._validate.cache_clear()
+        self._robot_calibration.deck_calibration = load_attitude_matrix(
+            to_default=False
+        )
+
+    def set_robot_calibration(self, robot_calibration: OT3Transforms) -> None:
+        self._validate.cache_clear()
+        self._robot_calibration = robot_calibration
+
+    def validate_calibration(self) -> DeckTransformState:
+        """
+        The lru cache decorator is currently not supported by the
+        ThreadManager. To work around this, we need to wrap the
+        actual function around a dummy outer function.
+
+        Once decorators are more fully supported, we can remove this.
+        """
+        return self._validate()
+
+    def build_temporary_identity_calibration(self) -> OT3Transforms:
+        """
+        Get temporary default calibration data suitable for use during
+        calibration
+        """
+        return OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=True),
+            carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
+            left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
+            right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),
+            gripper_mount_offset=Point(*defaults_ot3.DEFAULT_GRIPPER_MOUNT_OFFSET),
+        )
+
+
+@dataclass
+class OT3Transforms(RobotCalibration):
+    carriage_offset: Point
+    left_mount_offset: Point
+    right_mount_offset: Point
+    gripper_mount_offset: Point
