@@ -142,18 +142,21 @@ export const PipetteWizardFlows = (
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => handleClose(),
+    onError: () => handleClose(),
   })
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      chainRunCommands(
-        [{ commandType: 'home' as const, params: {} }],
-        true
-      ).then(() => {
-        deleteMaintenanceRun(maintenanceRunId)
-      })
+      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunId)
+        })
+        .catch(error => {
+          console.error(error)
+          handleClose()
+        })
     }
   }
   const {
