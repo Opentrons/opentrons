@@ -9,6 +9,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   Box,
+  BORDERS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -26,26 +28,21 @@ export function CompleteUpdateSoftware({
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.darkGreyDisabled}
+        backgroundColor={COLORS.darkBlack20}
         height="33rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
+        borderRadius={BORDERS.size3}
       >
         <StyledText
-          fontSize="2rem"
-          lineHeight="2.75rem"
-          fontWeight="700"
+          as="h2"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           color={COLORS.black}
         >
           {t('update_complete')}
         </StyledText>
-        <StyledText
-          marginTop={SPACING.spacing16}
-          fontSize="1.5rem"
-          lineHeight="2.0625rem"
-          fontWeight="400"
-        >
+        <StyledText as="h3" marginTop={SPACING.spacing16}>
           {t('restarting_robot')}
         </StyledText>
         <Box width="47.5rem">
