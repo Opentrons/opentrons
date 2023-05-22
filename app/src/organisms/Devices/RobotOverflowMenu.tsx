@@ -21,6 +21,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
+import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
@@ -45,6 +46,10 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
   const runId = useCurrentRunId({ enabled: robot.status === CONNECTABLE })
+  const [
+    showChooseProtocolSlideout,
+    setShowChooseProtocolSlideout,
+  ] = React.useState<boolean>(false)
   const [
     showConnectionTroubleshootingModal,
     setShowConnectionTroubleshootingModal,
@@ -156,6 +161,15 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         >
           {menuItems}
         </Flex>
+      ) : null}
+      {showChooseProtocolSlideout && robot.status === CONNECTABLE ? (
+        <ChooseProtocolSlideout
+          robot={robot}
+          showSlideout={showChooseProtocolSlideout}
+          onCloseClick={() => {
+            setShowChooseProtocolSlideout(false)
+          }}
+        />
       ) : null}
       <Portal level="top">
         {showOverflowMenu && menuOverlay}
