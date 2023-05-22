@@ -256,7 +256,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         )
 
     def resolve_module_location(
-        self, module_type: ModuleType, slot_id: Optional[str]
+        self, module_type: ModuleType, location: Optional[DeckLocation]
     ) -> DeckLocation:
         dn_from_type = {
             ModuleType.MAGNETIC: "Magnetic Module",
@@ -264,15 +264,15 @@ class Deck(UserDict):  # type: ignore[type-arg]
             ModuleType.TEMPERATURE: "Temperature Module",
             ModuleType.HEATER_SHAKER: "Heater-Shaker",
         }
-        if slot_id is not None:
-            slot_def = self.get_slot_definition(slot_id)
+        if isinstance(location, str) or isinstance(location, int):
+            slot_def = self.get_slot_definition(str(location))
             compatible_modules = slot_def["compatibleModuleTypes"]
             if module_type.value in compatible_modules:
-                return slot_id
+                return location
             else:
                 raise ValueError(
                     f"A {dn_from_type[module_type]} cannot be loaded"
-                    f" into slot {slot_id}"
+                    f" into slot {location}"
                 )
         else:
             valid_slots = [
