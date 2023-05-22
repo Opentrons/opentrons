@@ -56,8 +56,6 @@ def load_schema(version: int) -> "DeckSchema":
     )
 
 
-# TODO(mm, 2023-04-18): Taking the slot as an OT-2-style int will not scale to expansion slots.
-# This should take an id str instead.
 def get_calibration_square_position_in_slot(slot: int) -> Offset:
     """Get the position of an OT-3 deck slot's calibration square.
 
@@ -68,8 +66,10 @@ def get_calibration_square_position_in_slot(slot: int) -> Offset:
     deck = load("ot3_standard", version=3)
     slots = deck["locations"]["orderedSlots"]
 
-    # Assume that the OT-3 deck definition has the same number of slots,
-    # and in the same order, as the OT-2.
+    # Assume that the OT-3 deck definition has the same number of slots, and in the same order,
+    # as the OT-2.
+    # TODO(mm, 2023-05-22): This assumption will break down when the OT-3 has staging area slots.
+    # https://opentrons.atlassian.net/browse/RLAB-345
     s = slots[slot - 1]
 
     bottom_left = s["position"]
