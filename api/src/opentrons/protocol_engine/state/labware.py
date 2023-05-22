@@ -269,11 +269,11 @@ class LabwareView(HasState[LabwareState]):
         deck_def = self.get_deck_definition()
 
         for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == str(slot):
+            if slot_def["id"] == slot.id:
                 return slot_def
 
         raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot} does not exist in deck {deck_def['otId']}"
+            f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
         )
 
     def get_slot_position(self, slot: DeckSlotName) -> Point:
