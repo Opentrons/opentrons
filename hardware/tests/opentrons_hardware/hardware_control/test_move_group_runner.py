@@ -1280,7 +1280,7 @@ class MockSendMoveErrorCompleter:
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)
                     payload = ErrorMessagePayload(
-                        severity=ErrorSeverityField(ErrorSeverity.recoverable),
+                        severity=ErrorSeverityField(ErrorSeverity.unrecoverable),
                         error_code=ErrorCodeField(ErrorCode.collision_detected),
                     )
                     payload.message_index = message.payload.message_index
