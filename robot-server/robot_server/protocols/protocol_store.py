@@ -202,7 +202,7 @@ class ProtocolStore:
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all_ids(self) -> List[str]:
         """Get all protocol ids currently saved in this store."""
-        select_ids = sqlalchemy.select(protocol_table.c.id)
+        select_ids = sqlalchemy.select(protocol_table.c.id).order_by(sqlite_rowid)
         with self._sql_engine.begin() as transaction:
             protocol_ids = transaction.execute(select_ids).scalars().all()
         return protocol_ids
