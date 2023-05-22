@@ -333,12 +333,15 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     run_id, start_time = create_run_id_and_start_time()
 
     test_volumes = _get_volumes(ctx, cfg)
+    total_photoplates = 0
+    for vol in test_volumes:
+        total_photoplates = total_photoplates + (ceil(vol/TARGET_END_PHOTOPLATE_VOLUME) * cfg.trials)
     ui.print_header("PREPARE")
     ui.get_user_ready(
-        f"Is there 1 {cfg.photoplate} on the deck and {(len(test_volumes) * cfg.trials)-1} ready?"
+        f"Is there 1 {cfg.photoplate} on the deck and {total_photoplates-1} ready?"
     )
     ui.get_user_ready(
-        f"Is there {(len(test_volumes) * cfg.trials)} {cfg.photoplate} covers ready?"
+        f"Is there {total_photoplates} {cfg.photoplate} covers ready?"
     )
     ui.get_user_ready(
         f"Is there {(cfg.trials*(len(test_volumes)-1)) + 1}  extra full {cfg.tip_volume}ul tipracks?"
@@ -428,7 +431,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                         f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
                     )
                     tip_iter = 0
-                if (volume > 500):
+                if (volume > 500 and not (trial+1 == cfg.trials):
                     first_trial = True
                     ui.get_user_ready(
                         f"Refill the dye for the {reservoir} in slot {cfg.reservoir_slot}"
