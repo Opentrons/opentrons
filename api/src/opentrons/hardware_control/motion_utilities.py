@@ -219,18 +219,54 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
     right_mount_offset,
     gripper_mount_offset=None,
 ):
-    offset = offset_for_mount(
-        mount, left_mount_offset, right_mount_offset, gripper_mount_offset
-    )
-    primary_cp = get_critical_point(mount)
-    primary_z = _z_for_mount(mount)
-    target_position = OrderedDict(
-        (
-            (_x_for_mount(mount), abs_position.x - offset.x - primary_cp.x),
-            (_y_for_mount(mount), abs_position.y - offset.y - primary_cp.y),
-            (primary_z, abs_position.z - offset.z - primary_cp.z),
+    if isinstance(mount, _BothMontType):
+        right_offset = offset_for_mount(
+            OT3Mount.RIGHT, left_mount_offset, right_mount_offset, gripper_mount_offset
         )
-    )
+        left_offset = offset_for_mount(
+            OT3Mount.LEFT, left_mount_offset, right_mount_offset, gripper_mount_offset
+        )
+        primary_cp_right = get_critical_point(OT3Mount.RIGHT)
+        primary_z_right = _z_for_mount(OT3Mount.RIGHT)
+        primary_cp_left = get_critical_point(OT3Mount.RIGHT)
+        primary_z_left = _z_for_mount(OT3Mount.RIGHT)
+        target_position = OrderedDict(
+            (
+                # right mount
+                (
+                    _x_for_mount(OT3Mount.RIGHT),
+                    abs_position.x - right_offset.x - primary_cp_right.x,
+                ),
+                (
+                    _y_for_mount(OT3Mount.RIGHT),
+                    abs_position.y - right_offset.y - primary_cp_right.y,
+                ),
+                (primary_z_right, abs_position.z - right_offset.z - primary_cp_right.z),
+                # left mount
+                (
+                    _x_for_mount(OT3Mount.LEFT),
+                    abs_position.x - left_offset.x - primary_cp_left.x,
+                ),
+                (
+                    _y_for_mount(OT3Mount.LEFT),
+                    abs_position.y - left_offset.y - primary_cp_left.y,
+                ),
+                (primary_z_left, abs_position.z - left_offset.z - primary_cp_left.z),
+            )
+        )
+    else:
+        offset = offset_for_mount(
+            mount, left_mount_offset, right_mount_offset, gripper_mount_offset
+        )
+        primary_cp = get_critical_point(mount)
+        primary_z = _z_for_mount(mount)
+        target_position = OrderedDict(
+            (
+                (_x_for_mount(mount), abs_position.x - offset.x - primary_cp.x),
+                (_y_for_mount(mount), abs_position.y - offset.y - primary_cp.y),
+                (primary_z, abs_position.z - offset.z - primary_cp.z),
+            )
+        )
     return target_position
 
 
