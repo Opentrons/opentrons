@@ -232,15 +232,15 @@ push-ot3-gravimetric:
 	$(MAKE) sync-sw-ot3
 
 .PHONY: apply-patches-gravimetric
-patch-for-gravimetric:
+apply-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
 
 .PHONY: remove-patches-gravimetric
-unpatch-for-gravimetric:
+remove-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
 
 .PHONY: update-patches-gravimetric
-gen-patches-for-gravimetric:
+update-patches-gravimetric:
 	rm ./hardware_testing/gravimetric/overrides/*.patch
 	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
 	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
