@@ -104,7 +104,7 @@ stages:
           startedAt: !anystr
           completedAt: !anystr
 
-  - name: Load a labware on the module, and make sure and the 1st labware offset applies to it
+  - name: Load a labware on the module, and make sure the 1st labware offset applies to it
     request:
       method: POST
       url: '{host:s}:{port:d}/runs/{run_id}/commands'

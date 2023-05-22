@@ -30,7 +30,7 @@ P300M_GEN2_MAX_HEIGHT = 155.75
     # Limit the tests in this file to just test with OT-2 deck definitions.
     #
     # We need to do this because the tests in this file use the `Deck` class from
-    # he older, nnon-Protocol-Engine versions of the Python Protocol API (apiLevel<=2.13),
+    # the older, non-Protocol-Engine versions of the Python Protocol API (apiLevel<=2.13),
     # and those versions do not support OT-3s.
     #
     # TODO(mm, 2023-05-18) We should either:
