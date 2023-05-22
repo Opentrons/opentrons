@@ -3,15 +3,15 @@ For more details about this release, please see the full [technical changelog][]
 
 ---
 
-# Internal Release 0.8.0
+# Internal Release 0.9.0
 
-This is 0.8.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.9.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
 ## New Stuff In This Release
-- USB connectivity! If you connect your Flex via USB, it should show up.
-- LPC supports custom labware again
+- USB connectivity improvements: the app will display a nice big icon in the network settings page for a USB robot, USB robots will disappear properly when disconnected, things of this nature.
+- 96-channel detach improvements
 - Visual fixes and improvements
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
