@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from ...state import StateView
 
 
+# Question (spp): Does this offset work for gripper mount too?
 # These offsets are based on testing attach flows with 8/1 channel pipettes
 _INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=400)
 

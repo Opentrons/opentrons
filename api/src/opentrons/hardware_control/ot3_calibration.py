@@ -47,6 +47,11 @@ class CalibrationMethod(Enum):
     NONCONTACT_PASS = "noncontact pass"
 
 
+class CalibrationTarget(Enum):
+    DECK_OBJECT = "deck_object"
+    GANTRY_INSTRUMENT = "gantry_instrument"
+
+
 class CalibrationStructureNotFoundError(RuntimeError):
     def __init__(self, structure_height: float, lower_limit: float) -> None:
         super().__init__(
@@ -546,7 +551,11 @@ async def _calibrate_mount(
     try:
         # find the center of the calibration sqaure
         offset = await find_calibration_structure_position(
-            hcapi, mount, nominal_center, method, raise_verify_error
+            hcapi,
+            mount,
+            nominal_center,
+            method=method,
+            raise_verify_error=raise_verify_error,
         )
         # update center with values obtained during calibration
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
@@ -570,6 +579,7 @@ async def find_calibration_structure_position(
     mount: OT3Mount,
     nominal_center: Point,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
+    target: CalibrationTarget = CalibrationTarget.GANTRY_INSTRUMENT,
     raise_verify_error: bool = True,
 ) -> Point:
     """Find the calibration square offset given an arbitry postition on the deck."""
@@ -582,7 +592,15 @@ async def find_calibration_structure_position(
     found_center = await find_calibration_structure_center(
         hcapi, mount, initial_center, method, raise_verify_error
     )
-    return nominal_center - found_center
+
+    offset = nominal_center - found_center
+    # NOTE: If the calibration target is a deck object the polarity of the calibrated
+    #  offset needs to be reversed. This is because we are using the gantry instrument
+    #  to calibrate a stationary object on the deck and need to find the offset of that
+    #  deck object relative to the deck and not the instrument which sits above the deck.
+    if target == CalibrationTarget.DECK_OBJECT:
+        return offset * -1
+    return offset
 
 
 async def find_slot_center_binary_from_nominal_center(
@@ -782,7 +800,11 @@ async def calibrate_module(
             # from the nominal position so we dont have to alter any other part of the system.
             nominal_position = nominal_position - PREP_OFFSET_DEPTH
             offset = await find_calibration_structure_position(
-                hcapi, mount, nominal_position, method=CalibrationMethod.BINARY_SEARCH
+                hcapi,
+                mount,
+                nominal_position,
+                method=CalibrationMethod.BINARY_SEARCH,
+                target=CalibrationTarget.DECK_OBJECT,
             )
             await hcapi.save_module_offset(module_id, mount, slot, offset)
             return offset

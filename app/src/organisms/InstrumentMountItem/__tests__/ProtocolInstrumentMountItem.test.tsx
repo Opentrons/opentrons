@@ -136,7 +136,7 @@ describe('ProtocolInstrumentMountItem', () => {
     const { getByText } = render(props)
     getByText('Extension mount')
     getByText('No data')
-    getByText('Gripper V1')
+    getByText('Flex Gripper')
     getByText('Attach')
   })
   it('renders the correct information when gripper is attached', () => {
@@ -149,6 +149,6 @@ describe('ProtocolInstrumentMountItem', () => {
     const { getByText } = render(props)
     getByText('Extension mount')
     getByText('Calibrated')
-    getByText('Gripper V1')
+    getByText('Flex Gripper')
   })
 })

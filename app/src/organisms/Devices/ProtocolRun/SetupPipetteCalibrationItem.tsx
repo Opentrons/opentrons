@@ -40,9 +40,8 @@ import type { PipetteInfo } from '../hooks'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
-interface SetupPipetteCalibrationItemProps {
+interface SetupInstrumentCalibrationItemProps {
   pipetteInfo: PipetteInfo
-  index: number
   mount: Mount
   robotName: string
   runId: string
@@ -53,7 +52,7 @@ export function SetupPipetteCalibrationItem({
   mount,
   robotName,
   runId,
-}: SetupPipetteCalibrationItemProps): JSX.Element | null {
+}: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const deviceDetailsUrl = `/devices/${robotName}`
   const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState<boolean>(

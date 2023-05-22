@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
 import {
@@ -83,23 +82,12 @@ export function ConfirmCancelRunModal({
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          padding={SPACING.spacing32}
           gridGap={SPACING.spacing12}
+          paddingBottom={SPACING.spacing40}
+          paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize22}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('cancel_run_alert_info')}
-          </StyledText>
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize22}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('cancel_run_module_info')}
-          </StyledText>
+          <StyledText as="p">{t('cancel_run_alert_info')}</StyledText>
+          <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

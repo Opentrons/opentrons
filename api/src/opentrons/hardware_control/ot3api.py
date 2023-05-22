@@ -776,11 +776,10 @@ class OT3API(
         await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
-            target_pos = target_position_from_plunger(
-                checked_mount, instr.plunger_positions.bottom, self._current_position
-            )
             self._log.info("Attempting to move the plunger to bottom.")
-            await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
+            await self._move_to_plunger_bottom(
+                checked_mount, rate=1.0, acquire_lock=False
+            )
             await self.current_position_ot3(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
@@ -948,7 +947,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _check_stalls: bool = False,  # For testing only
+        _expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -956,8 +955,8 @@ class OT3API(
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
         # Cache current position from backend
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        if not self._current_position:
+            await self.refresh_positions()
 
         if not self._backend.check_encoder_status(axes_moving):
             # a moving axis has not been homed before, homing robot now
@@ -988,7 +987,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            check_stalls=_check_stalls,
+            expect_stalls=_expect_stalls,
         )
 
     async def move_rel(
@@ -999,10 +998,13 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _check_stalls: bool = False,  # For testing only
+        _expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
+        if not self._current_position:
+            await self.refresh_positions()
+
         realmount = OT3Mount.from_mount(mount)
         axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
 
@@ -1034,7 +1036,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            check_stalls=_check_stalls,
+            expect_stalls=_expect_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -1094,7 +1096,7 @@ class OT3API(
         max_speeds: Optional[OT3AxisMap[float]] = None,
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
-        check_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
@@ -1127,7 +1129,9 @@ class OT3API(
                 await self._backend.move(
                     origin,
                     moves[0],
-                    MoveStopCondition.stall if check_stalls else MoveStopCondition.none,
+                    MoveStopCondition.stall
+                    if expect_stalls
+                    else MoveStopCondition.none,
                 )
             except Exception:
                 self._log.exception("Move failed")
@@ -1164,27 +1168,20 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [OT3Axis.G, OT3Axis.Q]
 
-        # FIXME: See https://github.com/Opentrons/opentrons/pull/11978
-        # Because of the workaround introduced above, we cannot fully trust the motor
-        # flag until the already_homed check is removed. Until then, we should only
-        # evaluate the encoder status and update motor pos as a safeguard.
-        # if self._backend.check_motor_status(
-        #     [axis]
-        # ) and self._backend.check_encoder_status([axis]):
-        #     # retrieve home position
-        #     origin, target_pos = await _retrieve_home_position()
-        #     # move directly the home position if the stepper position is valid
-        #     moves = self._build_moves(origin, target_pos)
-        #     await self._backend.move(
-        #         origin,
-        #         moves[0],
-        #         MoveStopCondition.none,
-        #     )
-        if self._backend.check_encoder_status([axis]):
+        motor_ok = self._backend.check_motor_status([axis])
+        encoder_ok = self._backend.check_encoder_status([axis])
+
+        # we can update the motor position if the encoder position is valid
+        if encoder_ok and not motor_ok:
             # ensure stepper position can be updated after boot
             await self.engage_axes([axis])
-            # update stepper position using the valid encoder position
             await self._update_position_estimation([axis])
+            # refresh motor and encoder statuses after position estimation update
+            motor_ok = self._backend.check_motor_status([axis])
+            encoder_ok = self._backend.check_encoder_status([axis])
+
+        # we can move to safe home distance!
+        if encoder_ok and motor_ok:
             origin, target_pos = await _retrieve_home_position()
             if OT3Axis.to_kind(axis) in [OT3AxisKind.Z, OT3AxisKind.P]:
                 axis_home_dist = self._config.safe_home_distance
@@ -1202,10 +1199,10 @@ class OT3API(
                     moves[0],
                     MoveStopCondition.none,
                 )
-            await self._backend.home([axis])
+            await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home
-            await self._backend.home([axis])
+            await self._backend.home([axis], self.gantry_load)
 
     async def _home(self, axes: Sequence[OT3Axis]) -> None:
         """Home one axis at a time."""
@@ -1215,14 +1212,14 @@ class OT3API(
                     if axis == OT3Axis.G:
                         await self.home_gripper_jaw()
                     elif axis == OT3Axis.Q:
-                        await self._backend.home([axis])
+                        await self._backend.home([axis], self.gantry_load)
                     else:
                         await self._home_axis(axis)
                 except ZeroLengthMoveError:
                     self._log.info(f"{axis} already at home position, skip homing")
                     continue
-                except (MoveConditionNotMet, Exception):
-                    self._log.exception("Homing failed")
+                except (MoveConditionNotMet, Exception) as e:
+                    self._log.exception(f"Homing failed: {e}")
                     self._current_position.clear()
                     raise
                 else:
@@ -1385,6 +1382,65 @@ class OT3API(
         await self._hold_jaw_width(jaw_width_mm)
         self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
+    async def _move_to_plunger_bottom(
+        self, mount: OT3Mount, rate: float, acquire_lock: bool = True
+    ) -> None:
+        """
+        Move an instrument's plunger to its bottom position, while no liquids
+        are held by said instrument.
+
+        Possible events where this occurs:
+
+        1. After homing the plunger
+        2. Between a blow-out and an aspiration (eg: re-using tips)
+
+        Three possible physical tip states when this happens:
+
+        1. no tip on pipette
+        2. empty and dry (unused) tip on pipette
+        3. empty and wet (used) tip on pipette
+
+        With wet tips, the primary concern is leftover droplets inside the tip.
+        These droplets ideally only move down and out of the tip, not up into the tip.
+        Therefore, it is preferable to use the "blow-out" speed when moving the
+        plunger down, and the slower "aspirate" speed when moving the plunger up.
+
+        Assume all tips are wet, because we do not differentiate between wet/dry tips.
+
+        When no tip is attached, moving at the max speed is preferable, to save time.
+        """
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        if instrument.current_volume > 0:
+            raise RuntimeError("cannot position plunger while holding liquid")
+        target_pos = target_position_from_plunger(
+            OT3Mount.from_mount(mount),
+            instrument.plunger_positions.bottom,
+            self._current_position,
+        )
+        pip_ax = OT3Axis.of_main_tool_actuator(mount)
+        current_pos = self._current_position[pip_ax]
+        if instrument.has_tip:
+            if current_pos > target_pos[pip_ax]:
+                # using slower aspirate flow-rate, to avoid pulling droplets up
+                speed = self._pipette_handler.plunger_speed(
+                    instrument, instrument.aspirate_flow_rate, "aspirate"
+                )
+            else:
+                # use blow-out flow-rate, so we can push droplets out
+                speed = self._pipette_handler.plunger_speed(
+                    instrument, instrument.blow_out_flow_rate, "dispense"
+                )
+        else:
+            # save time by using max speed
+            max_speeds = self.config.motion_settings.default_max_speed
+            speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+        await self._move(
+            target_pos,
+            speed=(speed * rate),
+            acquire_lock=acquire_lock,
+        )
+
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0
@@ -1392,24 +1448,11 @@ class OT3API(
         """Prepare the pipette for aspiration."""
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
-
         self._pipette_handler.ready_for_tip_action(
             instrument, HardwareAction.PREPARE_ASPIRATE
         )
-
         if instrument.current_volume == 0:
-            speed = self._pipette_handler.plunger_speed(
-                instrument, instrument.blow_out_flow_rate, "aspirate"
-            )
-            bottom = instrument.plunger_positions.bottom
-            target_pos = target_position_from_plunger(
-                OT3Mount.from_mount(mount), bottom, self._current_position
-            )
-            await self._move(
-                target_pos,
-                speed=(speed * rate),
-                home_flagged_axes=False,
-            )
+            await self._move_to_plunger_bottom(checked_mount, rate)
             instrument.ready_to_aspirate = True
 
     async def aspirate(
@@ -1544,7 +1587,10 @@ class OT3API(
                 target_down = target_position_from_relative(
                     mount, press.relative_down, self._current_position
                 )
-                await self._move(target_down, speed=press.speed)
+                await self._move(target_down, speed=press.speed, expect_stalls=True)
+            # we expect a stall has happened during pick up, so we want to
+            # update the motor estimation
+            await self._update_position_estimation([OT3Axis.by_mount(mount)])
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
@@ -1574,7 +1620,7 @@ class OT3API(
             # back clamps off the adapter posts
             await self._backend.tip_action(
                 [OT3Axis.of_main_tool_actuator(mount)],
-                pipette_spec.pick_up_distance,
+                pipette_spec.pick_up_distance + pipette_spec.home_buffer,
                 pipette_spec.speed,
                 "home",
             )
@@ -1597,10 +1643,6 @@ class OT3API(
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
             await self._force_pick_up_tip(realmount, spec)
-
-        # we expect a stall has happened during pick up, so we want to
-        # update the motor estimation
-        await self._update_position_estimation([OT3Axis.by_mount(realmount)])
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -1658,7 +1700,7 @@ class OT3API(
                 )
                 await self._backend.tip_action(
                     [OT3Axis.of_main_tool_actuator(mount)],
-                    move.target_position,
+                    move.target_position + move.home_buffer,
                     move.speed,
                     "home",
                 )

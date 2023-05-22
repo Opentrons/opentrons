@@ -24,6 +24,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.actions import ActionDispatcher, AddPipetteConfigAction
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    DeckType,
     ModuleLocation,
     LoadedPipette,
     LabwareOffset,
@@ -57,7 +58,9 @@ from opentrons.protocol_engine.execution.equipment import (
 def _make_config(use_virtual_modules: bool) -> Config:
     return Config(
         use_virtual_modules=use_virtual_modules,
-        robot_type="OT-2 Standard",  # Arbitrary.
+        # Robot and deck type are arbitrary.
+        robot_type="OT-2 Standard",
+        deck_type=DeckType.OT2_STANDARD,
     )
 
 

@@ -8,7 +8,7 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -16,18 +16,10 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
 import { BODY_STYLE, FLOWS } from './constants'
 
-import type { MotorAxis } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
-  const {
-    goBack,
-    proceed,
-    flowType,
-    selectedPipette,
-    chainRunCommands,
-    isOnDevice,
-  } = props
+  const { goBack, proceed, flowType, chainRunCommands, isOnDevice } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [errorMessage, setErrorMessage] = React.useState<boolean>(false)
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
@@ -37,7 +29,12 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       [
         {
           commandType: 'home' as const,
-          params: { axes: ('rightZ' as unknown) as MotorAxis },
+          params: { axes: ['rightZ'] },
+        },
+        {
+          // @ts-expect-error calibration command types not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: { mount: LEFT },
         },
       ],
       false
@@ -50,9 +47,6 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         setErrorMessage(true)
       })
   }
-  //  this should never happen but to be safe
-  if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
-    return null
 
   return errorMessage ? (
     <SimpleWizardBody
