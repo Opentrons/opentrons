@@ -1050,6 +1050,7 @@ async def test_gripper_move_to(
             OT3Axis.Z_G,
         ]
 
+
 async def test_home_plunger(
     ot3_hardware: ThreadManager[OT3API],
     mock_move_to_plunger_bottom: AsyncMock,

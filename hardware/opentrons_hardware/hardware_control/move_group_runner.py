@@ -427,7 +427,7 @@ class MoveScheduler:
             self._expected_tip_action_motors.remove(gear_id)
             if len(self._expected_tip_action_motors) == 0:
                 self._remove_move_group(message, arbitration_id)
-            self._handle_move_completed(message)
+            self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
 
