@@ -46,6 +46,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
+    setShowErrorMessage,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteName =
@@ -134,6 +135,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
       chainRunCommands(
         [
           {
+            commandType: 'loadPipette' as const,
+            params: {
+              // @ts-expect-error pipetteName is required but missing in schema v6 type
+              pipetteName: attachedPipettes[mount]?.instrumentName,
+              pipetteId: attachedPipettes[mount]?.serialNumber,
+              mount: mount,
+            },
+          },
+          {
             commandType: 'home' as const,
             params: {
               axes: [axis],
@@ -147,10 +157,14 @@ export const Results = (props: ResultsProps): JSX.Element => {
             },
           },
         ],
-        true
-      ).then(() => {
-        proceed()
-      })
+        false
+      )
+        .then(() => {
+          proceed()
+        })
+        .catch(error => {
+          setShowErrorMessage(error.message)
+        })
     } else if (
       isSuccess &&
       flowType === FLOWS.DETACH &&
@@ -166,10 +180,14 @@ export const Results = (props: ResultsProps): JSX.Element => {
             },
           },
         ],
-        true
-      ).then(() => {
-        proceed()
-      })
+        false
+      )
+        .then(() => {
+          proceed()
+        })
+        .catch(error => {
+          setShowErrorMessage(error.message)
+        })
     } else {
       proceed()
     }

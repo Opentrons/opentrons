@@ -90,11 +90,24 @@ export const BeforeBeginning = (
     }
     case FLOWS.ATTACH: {
       bodyTranslationKey = 'remove_labware'
+      let displayName: string | undefined
+      if (requiredPipette != null) {
+        displayName =
+          getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName ??
+          requiredPipette.pipetteName
+      }
       if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        equipmentList = [PIPETTE, CALIBRATION_PROBE, HEX_SCREWDRIVER]
+        equipmentList = [
+          { ...PIPETTE, displayName: displayName ?? PIPETTE.displayName },
+          CALIBRATION_PROBE,
+          HEX_SCREWDRIVER,
+        ]
       } else {
         equipmentList = [
-          NINETY_SIX_CHANNEL_PIPETTE,
+          {
+            ...NINETY_SIX_CHANNEL_PIPETTE,
+            displayName: displayName ?? NINETY_SIX_CHANNEL_PIPETTE.displayName,
+          },
           CALIBRATION_PROBE,
           HEX_SCREWDRIVER,
           NINETY_SIX_CHANNEL_MOUNTING_PLATE,

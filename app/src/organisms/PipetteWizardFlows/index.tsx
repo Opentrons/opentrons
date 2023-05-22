@@ -83,14 +83,14 @@ export const PipetteWizardFlows = (
   )
   const hasCalData =
     attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
-
+  const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
     selectedPipette,
     hasCalData,
     isGantryEmpty,
-    attachedPipettes,
+    attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
 
@@ -132,7 +132,7 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
-    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
+    if (onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({

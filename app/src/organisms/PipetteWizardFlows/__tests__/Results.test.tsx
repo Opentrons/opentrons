@@ -90,6 +90,14 @@ describe('Results', () => {
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
+          commandType: 'loadPipette' as const,
+          params: {
+            pipetteName: 'p1000_single_gen3',
+            pipetteId: 'abc',
+            mount: 'left',
+          },
+        },
+        {
           commandType: 'home' as const,
           params: {
             axes: ['leftPlunger'],
@@ -102,7 +110,7 @@ describe('Results', () => {
           },
         },
       ],
-      true
+      false
     )
   })
   it('renders the correct information when pipette wizard is a fail for attach flow', async () => {
@@ -205,7 +213,7 @@ describe('Results', () => {
           },
         },
       ],
-      true
+      false
     )
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {

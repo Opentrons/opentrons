@@ -439,7 +439,7 @@ describe('BeforeBeginning', () => {
       )
       getByAltText('2.5 mm Hex Screwdriver')
       getByAltText('Calibration Probe')
-      getByAltText('96-Channel Pipette')
+      getByAltText('Flex 96-Channel 1000 μL')
       getByAltText('96-Channel Mounting Plate')
       getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
