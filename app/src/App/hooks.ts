@@ -46,8 +46,6 @@ export function useProtocolReceiptToast(): void {
     },
     true
   )
-  // wrapping protocolIds in a useMemo doesnt fix the issue that this eslint calls out
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const protocolIds = protocolIdsQuery.data?.data ?? []
   const protocolIdsRef = React.useRef(protocolIds)
   const hasRefetched = React.useRef(true)
