@@ -15,17 +15,18 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     EstopButtonPresentRequest,
     EstopButtonDetectionChange,
     Ack,
-<<<<<<< HEAD
     EngageSyncOut,
     ReleaseSyncOut,
     StartLightAction,
     AddLightActionRequest,
     BinaryMessageDefinition,
-=======
+    EstopStateRequest,
+    EstopStateChange,
+    SyncStateRequest,
+    SyncStateResponse,
     WriteEEPromRequest,
     ReadEEPromRequest,
     ReadEEPromResponse,
->>>>>>> edge
 )
 from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.messages.fields import EepromDataField
@@ -46,6 +47,7 @@ class RearPinState:
     aux2_id_active: bool = False
     etop_active: bool = False
     door_open: bool = False
+    sync_engageds: bool = False
 
 
 async def write_eeprom(
@@ -221,16 +223,22 @@ async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinStat
         current_state.aux2_id_active = bool(
             cast(AuxIDResponse, response).aux2_id_state.value
         )
-    # TODO add estop port detection request
-    """
-    #estop active pin
+    # estop active pin
     response = await messenger.send_and_receive(
-        message=EStopActiveRequeset(),
+        message=EstopStateRequest(),
         response_type=EstopStateChange,
     )
     if response is not None:
         current_state.etop_active = bool(cast(EstopStateChange, response).engaged.value)
-    """
+    # sync out pin
+    response = await messenger.send_and_receive(
+        message=SyncStateRequest(),
+        response_type=SyncStateResponse,
+    )
+    if response is not None:
+        current_state.etop_active = bool(
+            cast(SyncStateResponse, response).engaged.value
+        )
     # door state
-    current_state.door_open = bool(get_door_state(messenger))
+    current_state.door_open = bool(await get_door_state(messenger))
     return current_state
