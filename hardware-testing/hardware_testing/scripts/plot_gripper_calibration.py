@@ -133,7 +133,6 @@ class Plot:
             print("-> {}-axis Average Accuracy = {:.3f}%".format(axis, self.axes_data[axis]["Accuracy"].mean()))
         print("")
 
-
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
             figure.data[idx].name = name
