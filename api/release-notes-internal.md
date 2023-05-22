@@ -12,7 +12,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## Big New Things
 ### Robot Control
-- move_labware now requires apiLevel to be at least 2.15. You can now move labware off-deck using the python API by supplying OFF_DECK to the new_location arg.
+- Stall detection is enabled for most moves. You might now get stall detection failures if you stall the robot.
 
 For more details about this release, please see the full [technical change log][]. 
 
