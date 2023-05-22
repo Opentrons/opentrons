@@ -2,6 +2,7 @@
 from inspect import getsource
 from statistics import stdev
 from typing import Tuple, List
+from math import ceil
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.types import Location
@@ -30,7 +31,7 @@ from .tips import get_tips
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
-TARGET_END_PHOTOPLATE_VOLUME = 200
+TARGET_END_PHOTOPLATE_VOLUME = 250
 
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
@@ -202,7 +203,7 @@ def _run_trial(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
     source: Well,
-    dest: Well,
+    dest: Labware,
     channel_offset: Point,
     tip_volume: int,
     volume: float,
@@ -233,6 +234,10 @@ def _run_trial(
     channel_count = 96
     # RUN INIT
 
+    num_dispenses = ceil(volume/TARGET_END_PHOTOPLATE_VOLUME)
+    volume_to_dispense = volume/num_dispenses
+    photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME - volume_to_dispense, 0)
+
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
     if (do_jog):
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
@@ -261,23 +266,29 @@ def _run_trial(
         mix=mix,
     )
 
-    pipette.move_to(dest.top().move(channel_offset))
+    for i in range(num_dispenses):
 
-    # RUN DISPENSE
-    dispense_with_liquid_class(
-        ctx,
-        pipette,
-        tip_volume,
-        volume,
-        dest,
-        channel_offset,
-        channel_count,
-        liquid_tracker,
-        callbacks=pipetting_callbacks,
-        blank=blank,
-        inspect=inspect,
-        mix=mix,
-    )
+        for w in dest.wells():
+            liquid_tracker.set_start_volume(w, photoplate_preped_vol)
+        pipette.move_to(dest["A1"].top().move(channel_offset))
+
+        # RUN DISPENSE
+        dispense_with_liquid_class(
+            ctx,
+            pipette,
+            tip_volume,
+            volume_to_dispense,
+            dest["A1"],
+            channel_offset,
+            channel_count,
+            liquid_tracker,
+            callbacks=pipetting_callbacks,
+            blank=blank,
+            inspect=inspect,
+            mix=mix,
+        )
+        pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
+        ui.get_user_ready("Cover and replace the photoplate in slot 3")
     return
 
 
@@ -385,11 +396,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
-            photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME - volume, 0)
             first_trial = True;
             for trial in range(cfg.trials):
-                for w in photoplate.wells():
-                    liquid_tracker.set_start_volume(w, photoplate_preped_vol)
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
@@ -401,7 +409,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     ctx=ctx,
                     pipette=pipette,
                     source=reservoir["A1"],
-                    dest=photoplate["A1"],
+                    dest=photoplate,
                     channel_offset=Point(),
                     tip_volume=cfg.tip_volume,
                     volume=volume,
@@ -413,19 +421,22 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                 )
-                first_trial = False
-                pipette.move_to(location=photoplate["A1"].top().move(Point(0, 0, 133)))
-                ui.get_user_ready("Cover and replace the photoplate in slot 3")
                 _drop_tip(ctx, pipette, cfg)
                 tip_iter += 1
-                if tip_iter >= len(tips[0]):
+                if tip_iter >= len(tips[0]) and not ((trial+1) == cfg.trials and volume == test_volumes[-1]):
                     ui.get_user_ready(
                         f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
                     )
                     tip_iter = 0
-            ui.get_user_ready(
-                        f"Replace the reservoir in slots {cfg.reservoir_slot} with new reservoir and fill with the next dye"
-            )
+                if (volume > 500):
+                    first_trial = True
+                    ui.get_user_ready(
+                        f"Refill the dye for the {reservoir} in slot {cfg.reservoir_slot}"
+                    )
+            if volume != test_volumes[-1]:
+                ui.get_user_ready(
+                            f"Replace the reservoir in slots {cfg.reservoir_slot} with new reservoir and fill with the next dye"
+                )
 
     finally:
         # FIXME: instead keep motors engaged, and move to an ATTACH position

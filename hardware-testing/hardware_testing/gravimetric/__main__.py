@@ -12,7 +12,9 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p1000_multi_50ul_tip,
     gravimetric_ot3_p1000_multi_200ul_tip,
     gravimetric_ot3_p1000_multi_1000ul_tip,
+    photometric_ot3_p1000_96_50ul_tip,
     photometric_ot3_p1000_96_200ul_tip,
+    photometric_ot3_p1000_96_1000ul_tip,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -39,7 +41,9 @@ PROTOCOL_CFG = {
             1000: gravimetric_ot3_p1000_multi_1000ul_tip,
         },
         96: {
+            50: photometric_ot3_p1000_96_50ul_tip,
             200: photometric_ot3_p1000_96_200ul_tip,
+            1000: photometric_ot3_p1000_96_1000ul_tip,
         },
     },
 }
