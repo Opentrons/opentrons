@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { COLORS, PrimaryButton } from '@opentrons/components'
-import { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 import { SmallButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 
 interface CalibrationErrorModalProps {
   proceed: () => void
