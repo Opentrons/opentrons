@@ -103,6 +103,7 @@ async def run(args: argparse.Namespace) -> None:
         #request all states from rp
         #check states match PRE_TEST_CONDITIONS
         print("TEST - UNPLUGGED STATE")
+        await set_sync_pin(0, usb_messenger)
         result = await get_all_pin_state(usb_messenger)
         print(result)
         if (result == PRE_TEST_CONDITIONS):
@@ -128,12 +129,11 @@ async def run(args: argparse.Namespace) -> None:
         else:
             print("FAIL")
 
-        await set_sync_pin(0, usb_messenger)
-
         #test the default plugged state after plugging in both aux 1 and 2
         print()
         print("TEST - PLUGGED STATE")
         input("PLUG IN AUX PORT 2 LEFT, PRESS ENTER WHEN COMPLETE")
+        await set_sync_pin(0, usb_messenger)
         result = await get_all_pin_state(usb_messenger)
         print(result)
         if (result == POST_PLUG_CONDITIONS):
@@ -148,6 +148,7 @@ async def run(args: argparse.Namespace) -> None:
         # ask operator if E-stop LED is lit
         print()
         print("TEST - ESTOP 1")
+        await set_sync_pin(0, usb_messenger)
         result = await get_all_pin_state(usb_messenger)
         input("PRESS ESTOP 1")
         result = await get_all_pin_state(usb_messenger)
@@ -161,6 +162,7 @@ async def run(args: argparse.Namespace) -> None:
 
         print()
         print("TEST - ESTOP 2")
+        await set_sync_pin(0, usb_messenger)
         result = await get_all_pin_state(usb_messenger)
         input("PRESS ESTOP 2")
         result = await get_all_pin_state(usb_messenger)
@@ -196,6 +198,7 @@ async def run(args: argparse.Namespace) -> None:
 
         print("TEST - DOOR")
         input("CLOSE DOOR")
+        await set_sync_pin(0, usb_messenger)
         door_open_result = await get_door_state(usb_messenger)
         if(door_open_result == True):
             print("~~~ DOOR OPEN ~~~")
