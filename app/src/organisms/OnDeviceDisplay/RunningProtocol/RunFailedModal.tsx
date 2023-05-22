@@ -72,9 +72,8 @@ export function RunFailedModal({
           alignItems={ALIGN_FLEX_START}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            {/* (kj:05/17/2023) errorType will be added when the endpoint is ready */}
             {t('error_type', {
-              errorType: '',
+              errorType: errors[0].errorType,
             })}
           </StyledText>
           <Flex
