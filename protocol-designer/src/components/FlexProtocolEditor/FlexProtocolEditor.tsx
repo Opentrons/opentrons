@@ -200,8 +200,6 @@ const getInitialValues = (formProps: any): InitialValues => {
         initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE] =
           formProps.modules.heaterShakerModuleType
       }
-
-      console.log(initialFormValues.modulesByType)
     }
 
     return initialFormValues
@@ -294,7 +292,9 @@ function FlexProtocolEditor({
 
   const nextButton =
     selectedTab === navPillTabListLength
-      ? i18n.t('flex.round_tabs.go_to_liquids_page')
+      ? isEdit
+        ? i18n.t('flex.round_tabs.update')
+        : i18n.t('flex.round_tabs.go_to_liquids_page')
       : isEdit
       ? i18n.t('flex.round_tabs.update')
       : i18n.t('flex.round_tabs.next')

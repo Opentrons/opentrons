@@ -64,6 +64,7 @@
     "edit": "Edit",
     "left": "Left mount -",
     "right": "Right mount -",
-    "add_pipette": "Add Pipette"
+    "add_pipette": "Add Pipette",
+    "no_modules_found": "No modules found."
   }
 }

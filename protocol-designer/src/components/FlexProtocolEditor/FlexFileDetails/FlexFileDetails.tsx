@@ -2,7 +2,6 @@ import {
   Card,
   DIRECTION_COLUMN,
   Flex,
-  NewPrimaryBtn,
   SPACING,
   SecondaryButton,
 } from '@opentrons/components'
@@ -15,11 +14,9 @@ import { connect, useDispatch } from 'react-redux'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import {
   FileMetadataFields,
-  actions,
   selectors as fileSelectors,
 } from '../../../file-data'
 import { i18n } from '../../../localization'
-import { actions as navActions } from '../../../navigation'
 import {
   InitialDeckSetup,
   ModulesForEditModulesCard,
@@ -38,8 +35,6 @@ import { UpdateConfirmation } from '../FlexUpdateConfirmation'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
-  goToNextPage: () => unknown
-  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
   swapPipettes: () => unknown
   modules: ModulesForEditModulesCard
 }
@@ -61,7 +56,6 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   const [selectedTabId, setTabId] = useState<number>(0)
 
   if (isEdit) {
-    console.log('propsFleDetails', props, isEdit, selectedTabId)
     return (
       <FlexProtocolEditorComponent
         FlexFileDetails={{
@@ -82,16 +76,13 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
               <Formik
                 enableReinitialize
                 initialValues={props.formValues}
-                onSubmit={props.saveFileMetadata}
+                onSubmit={props.handleSubmit}
               >
                 {({
-                  handleChange,
                   handleSubmit,
-                  dirty,
-                  touched,
                   values,
                 }: FormikProps<FileMetadataFields>) => (
-                  <form onSubmit={props.handleSubmit}>
+                  <form onSubmit={handleSubmit}>
                     <div className={styles.container}>
                       <FileProtocolInformation />
                       <div className={styles.line_separator} />
@@ -162,10 +153,6 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         addItems={true}
                       />
                     </div>
-
-                    <NewPrimaryBtn type="submit">
-                      Create protocol, on to liquids
-                    </NewPrimaryBtn>
                   </form>
                 )}
               </Formik>
@@ -349,7 +336,7 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
       {existingModules?.length > 0 ? (
         existingModules.map((moduleType: any, i: number) => (
           <div
-            className={`${styles.heading_container} ${styles.margin_bottom}`}
+            className={` ${styles.card_width} ${styles.margin_bottom}`}
             key={i}
           >
             <Card>
@@ -378,7 +365,9 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
           </div>
         ))
       ) : (
-        <StyledText as="h4">No modules found.</StyledText>
+        <StyledText as="h4">
+          {i18n.t('flex.file_tab.no_modules_found')}
+        </StyledText>
       )}
     </>
   )
@@ -415,9 +404,6 @@ function mergeProps(
   })
   return {
     ...passThruProps,
-    goToNextPage: () => dispatch(navActions.navigateToPage('liquids')),
-    saveFileMetadata: (nextFormValues: FileMetadataFields) =>
-      dispatch(actions.saveFileMetadata(nextFormValues)),
     swapPipettes: () =>
       dispatch(
         steplistActions.changeSavedStepForm({

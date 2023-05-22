@@ -60,6 +60,6 @@
   margin-left: 42px;
 }
 
-.card_content {
-  padding: 1rem;
+.card_width {
+  width: 50%;
 }
