@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Type, Union, cast
+from typing import Type, Union, TYPE_CHECKING
 
 import pytest
 
@@ -8,37 +8,35 @@ from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
 from opentrons.hardware_control import simulator_setup, API
 from opentrons.types import Mount
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount
 
-
-@pytest.fixture(params=["OT-2 Standard", "OT-3 Standard"])
-def machine_type(request: pytest.FixtureRequest) -> RobotType:
-    """Get both kinds of machine type."""
-    return cast(RobotType, request.param)
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
-def setup_klass(machine_type: RobotType) -> Type[simulator_setup.SimulatorSetup]:
+def setup_klass(robot_model: RobotType) -> Type[simulator_setup.SimulatorSetup]:
     """Get the appropriate setup class for the machine type."""
-    if machine_type == "OT-2 Standard":
+    if robot_model == "OT-2 Standard":
         return simulator_setup.OT2SimulatorSetup
     else:
         return simulator_setup.OT3SimulatorSetup
 
 
 @pytest.fixture
-def simulator_type(machine_type: RobotType) -> Union[Type[API], Type[OT3API]]:
+def simulator_type(robot_model: RobotType) -> Union[Type[API], Type["OT3API"]]:
     """Get the appropriate simulated hardware controller instance type."""
-    if machine_type == "OT-2 Standard":
+    if robot_model == "OT-2 Standard":
         return API
     else:
+        from opentrons.hardware_control.ot3api import OT3API
+
         return OT3API
 
 
 async def assure_simulator_type(
     setup_klass: Type[simulator_setup.SimulatorSetup],
-    simulator_type: Union[Type[API], Type[OT3API]],
+    simulator_type: Union[Type[API], Type["OT3API"]],
 ) -> None:
     """It should create the appropriate kind of direct simulator."""
     simulator = await simulator_setup.create_simulator(setup_klass())
@@ -47,7 +45,7 @@ async def assure_simulator_type(
 
 async def assure_thread_manager_type(
     setup_klass: Type[simulator_setup.SimulatorSetup],
-    simulator_type: Union[Type[API], Type[OT3API]],
+    simulator_type: Union[Type[API], Type["OT3API"]],
 ) -> None:
     """It should create the appropriate kind of thread manager simulator."""
     manager = await simulator_setup.create_simulator_thread_manager(setup_klass())
