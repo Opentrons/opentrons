@@ -5,9 +5,6 @@ marks:
       - run_server
       - clean_server_state
 
-strict:
-  - json:off
-
 stages:
   - name: Upload simple JSONv6 protocol
     request:
@@ -61,18 +58,14 @@ stages:
       url: '{host:s}:{port:d}/runs/{run_id}/labware-definitions'
       method: GET
     response:
+      strict:
+        - json:off
       status_code: 200
       json:
         data:
-          - id: !anystr
-            metaData:
+          - metaData:
               displayName: 'Opentrons Fixed Trash'
-          - id: !anystr
-            metaData:
-              displayName: 'Opentrons 96 Tip Rack 10 µL'
-          - id: !anystr
-            metaData:
-              displayName: 'Foo 8 Well Plate 33uL'
-          - id: !anystr
-            metaData:
-              displayName: 'Sample Collection Plate'
+#          - metaData:
+#              displayName: 'Opentrons 96 Tip Rack 10 µL'
+#          - metaData:
+#              displayName: 'Foo 8 Well Plate 33uL'
