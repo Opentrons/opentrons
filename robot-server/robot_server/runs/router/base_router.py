@@ -45,8 +45,6 @@ from ..dependencies import get_run_data_manager, get_run_auto_deleter
 log = logging.getLogger(__name__)
 base_router = APIRouter()
 
-_DEFAULT_RUNS_LIST_LENGTH: Final = 20
-
 
 class RunNotFound(ErrorDetails):
     """An error if a given run is not found."""
