@@ -34,7 +34,6 @@ async def _main(cfg: TestConfig) -> None:
         pipette_left="p1000_single_v3.3",
         pipette_right="p1000_single_v3.3",
         gripper="GRPV102",
-
     )
 
     # RUN TESTS
