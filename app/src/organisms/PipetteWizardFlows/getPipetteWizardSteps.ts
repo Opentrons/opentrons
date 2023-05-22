@@ -6,14 +6,12 @@ import type {
   SelectablePipettes,
 } from './types'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
-  isGantryEmpty: boolean,
-  attachedPipettes: AttachedPipettesFromInstrumentsQuery
+  isGantryEmpty: boolean
 ): PipetteWizardStep[] => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {
@@ -51,28 +49,22 @@ export const getPipetteWizardSteps = (
           },
         ]
       } else {
-        let detachMount = mount
-        if (attachedPipettes[LEFT] == null) {
-          detachMount = RIGHT
-        } else if (attachedPipettes[RIGHT] == null) {
-          detachMount = LEFT
-        }
         //  pipette needs to be detached before attached 96 channel
         if (!isGantryEmpty) {
           return [
             {
               section: SECTIONS.BEFORE_BEGINNING,
-              mount: detachMount,
+              mount: RIGHT,
               flowType: flowType,
             },
             {
               section: SECTIONS.DETACH_PIPETTE,
-              mount: detachMount,
+              mount: RIGHT,
               flowType: FLOWS.DETACH,
             },
             {
               section: SECTIONS.RESULTS,
-              mount: detachMount,
+              mount: RIGHT,
               flowType: FLOWS.DETACH,
             },
             {

@@ -168,7 +168,7 @@ describe('Results', () => {
       screen.queryByRole('button', { name: 'Results_errorExit' })
     ).not.toBeInTheDocument()
   })
-  it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', async () => {
+  it('renders the correct information when pipette wizard is a failing to detach before 96 channel attach flow', async () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -182,7 +182,7 @@ describe('Results', () => {
     getByRole('button', { name: 'Try again' }).click()
     await act(() => pipettePromise)
   })
-  it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
+  it('renders the correct information when pipette wizard is a success for detaching before 96 channel attach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -196,7 +196,17 @@ describe('Results', () => {
     )
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: 'left',
+          },
+        },
+      ],
+      true
+    )
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {
     props = {

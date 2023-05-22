@@ -103,6 +103,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
         isSuccess = false
       } else {
         header = i18n.format(t('pipette_detached'), 'capitalize')
+        if (requiredPipette != null) {
+          buttonText = t('attach_pip')
+        }
         if (selectedPipette === NINETY_SIX_CHANNEL) {
           if (currentStepIndex === totalStepCount) {
             header = t('ninety_six_detached_success', {
@@ -136,6 +139,25 @@ export const Results = (props: ResultsProps): JSX.Element => {
               axes: [axis],
             },
           },
+          {
+            // @ts-expect-error calibration type not yet supported
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: mount,
+            },
+          },
+        ],
+        true
+      ).then(() => {
+        proceed()
+      })
+    } else if (
+      isSuccess &&
+      flowType === FLOWS.DETACH &&
+      currentStepIndex !== totalStepCount
+    ) {
+      chainRunCommands(
+        [
           {
             // @ts-expect-error calibration type not yet supported
             commandType: 'calibration/moveToMaintenancePosition' as const,

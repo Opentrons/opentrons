@@ -56,26 +56,21 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = React.useMemo(
     () =>
-      props.pipetteInfo == null
-        ? getPipetteWizardSteps(
-            flowType,
-            mount,
-            selectedPipette,
-            isGantryEmpty,
-            attachedPipettes
-          )
+      memoizedPipetteInfo == null
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
-            props.pipetteInfo,
+            memoizedPipetteInfo,
             mount
           ),
     []
   )
-  const requiredPipette = props.pipetteInfo?.find(
+  const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
   )
   const host = useHost()
@@ -96,7 +91,7 @@ export const PipetteWizardFlows = (
     hasCalData,
     isGantryEmpty,
     attachedPipettes,
-    pipetteInfo: props.pipetteInfo ?? null,
+    pipetteInfo: memoizedPipetteInfo,
   })
 
   const goBack = (): void => {
@@ -220,6 +215,7 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         createMaintenanceRun={createMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
