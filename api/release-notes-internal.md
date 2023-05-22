@@ -13,6 +13,17 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Big New Things
 ### Robot Control
 - Stall detection is enabled for most moves. You might now get stall detection failures if you stall the robot.
+- Motor driver configuration changes should improve performance and prevent step loss on the gantry.
+- More USB connectivity fixes; updating should now work
+- Many 96-channel behavior fixes, especially around tip pickup.
+
+### Python Protocol API
+- You can now `move_labware` to a special `OFF_DECK` location
+- The Mount type has an `EXTENSION` entry for the gripper now
+
+### ODD
+- Design passes on the following screens should improve little usability issues: protocols dashboard, connect to network, protocol details
+- The unboxing flow should handle USB connections better now
 
 For more details about this release, please see the full [technical change log][]. 
 
