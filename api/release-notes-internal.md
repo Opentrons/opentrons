@@ -13,6 +13,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Big New Things
 ### Robot Control
 - Stall detection is enabled for most moves. You might now get stall detection failures if you stall the robot.
+- move_labware now requires apiLevel to be at least 2.15. You can now move labware off-deck using the python API by supplying OFF_DECK to the new_location arg.
 - Motor driver configuration changes should improve performance and prevent step loss on the gantry.
 - More USB connectivity fixes; updating should now work
 - Many 96-channel behavior fixes, especially around tip pickup.
