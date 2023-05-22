@@ -9,6 +9,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, DeckSlotName
+from opentrons.protocol_api import OFF_DECK
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
@@ -393,6 +394,61 @@ def test_move_labware_to_module(
             drop_offset=None,
         )
     )
+
+
+def test_move_labware_off_deck(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware off-deck."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=OFF_DECK,
+            use_gripper=False,
+            use_pick_up_location_lpc_offset=False,
+            use_drop_location_lpc_offset=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_move_labware_off_deck_raises(
+    subject: ProtocolContext,
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+) -> None:
+    """It should raise an APIVersionError if using move_labware in an unsupported version."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    with pytest.raises(APIVersionError):
+        subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
 
 
 def test_load_module(

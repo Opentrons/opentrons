@@ -7,7 +7,11 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  LoadedPipette,
+  NINETY_SIX_CHANNEL,
+} from '@opentrons/shared-data'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
@@ -22,6 +26,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   isFetching: boolean
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
   hasCalData: boolean
+  requiredPipette?: LoadedPipette
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -40,11 +45,20 @@ export const Results = (props: ResultsProps): JSX.Element => {
     setFetching,
     hasCalData,
     isRobotMoving,
+    requiredPipette,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
-  const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   const pipetteName =
     attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
+
+  const isCorrectPipette =
+    requiredPipette != null &&
+    requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
+  const requiredPipDisplayName =
+    requiredPipette != null
+      ? getPipetteNameSpecs(requiredPipette.pipetteName)?.displayName
+      : null
+  const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   let header: string = 'unknown results screen'
   let iconColor: string = COLORS.successEnabled
   let isSuccess: boolean = true
@@ -59,11 +73,23 @@ export const Results = (props: ResultsProps): JSX.Element => {
     }
     case FLOWS.ATTACH: {
       // attachment flow success
-      if (attachedPipettes[mount] != null) {
+      if (
+        (attachedPipettes[mount] != null && requiredPipette == null) ||
+        Boolean(isCorrectPipette)
+      ) {
         header = t('pipette_attached', { pipetteName: pipetteName })
         buttonText = t('cal_pipette')
-        // attachment flow fail
+        // attached wrong pipette
+      } else if (
+        attachedPipettes[mount] != null &&
+        Boolean(!isCorrectPipette)
+      ) {
+        header = i18n.format(t('wrong_pip'), 'capitalize')
+        buttonText = i18n.format(t('detach_and_retry'), 'capitalize')
+        iconColor = COLORS.errorEnabled
+        isSuccess = false
       } else {
+        // attachment flow fail
         header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
         iconColor = COLORS.errorEnabled
         isSuccess = false
@@ -142,8 +168,29 @@ export const Results = (props: ResultsProps): JSX.Element => {
       {buttonText}
     </PrimaryButton>
   )
-
-  if (!isSuccess && (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)) {
+  if (
+    flowType === FLOWS.ATTACH &&
+    requiredPipette != null &&
+    requiredPipDisplayName != null &&
+    Boolean(!isCorrectPipette)
+  ) {
+    subHeader = t('please_install_correct_pip', {
+      pipetteName: requiredPipDisplayName,
+    })
+    button = (
+      <CheckPipetteButton
+        proceedButtonText={buttonText}
+        setFetching={setFetching}
+        isFetching={isFetching}
+        isOnDevice={isOnDevice}
+      />
+    )
+  } else if (
+    !isSuccess &&
+    requiredPipette == null &&
+    requiredPipDisplayName == null &&
+    (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)
+  ) {
     subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
     button = (
       <>

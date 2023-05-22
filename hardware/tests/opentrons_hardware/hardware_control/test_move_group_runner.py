@@ -54,6 +54,9 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     MoveScheduler,
     _CompletionPacket,
 )
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    MoveConditionNotMet,
+)
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
@@ -316,6 +319,54 @@ async def test_single_send_setup_commands(
     )
 
 
+@pytest.mark.parametrize(
+    "stop_condition",
+    [
+        MoveStopCondition.none,
+        MoveStopCondition.sync_line,
+        MoveStopCondition.stall,
+        MoveStopCondition.limit_switch,
+    ],
+)
+async def test_send_ignore_stalls_requests(
+    mock_can_messenger: AsyncMock,
+    stop_condition: MoveStopCondition,
+) -> None:
+    """Moves sent should have ignore_stalls as part of the stop condition."""
+    move_group: MoveGroups = [
+        [
+            {
+                NodeId.head: MoveGroupSingleAxisStep(
+                    distance_mm=float64(246),
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    stop_condition=stop_condition,
+                )
+            }
+        ]
+    ]
+    subject = MoveGroupRunner(move_groups=move_group, ignore_stalls=True)
+    await subject.prep(can_messenger=mock_can_messenger)
+    step = move_group[0][0].get(NodeId.head)
+    assert isinstance(step, MoveGroupSingleAxisStep)
+    request_stop_condition = MoveStopConditionField(
+        stop_condition.value + MoveStopCondition.ignore_stalls.value
+    )
+    mock_can_messenger.send.assert_any_call(
+        node_id=NodeId.head,
+        message=AddLinearMoveRequest(
+            payload=AddLinearMoveRequestPayload(
+                group_id=UInt8Field(0),
+                seq_id=UInt8Field(0),
+                request_stop_condition=request_stop_condition,
+                velocity=Int32Field(calc_velocity(step)),
+                acceleration=Int32Field(calc_acceleration(step)),
+                duration=UInt32Field(calc_duration(step)),
+            )
+        ),
+    )
+
+
 async def test_multi_send_setup_commands(
     mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
 ) -> None:
@@ -424,11 +475,13 @@ class MockSendMoveCompleter:
         move_groups: MoveGroups,
         listener: MessageListenerCallback,
         start_at_index: int = 0,
+        ack_id: int = 1,
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
         self._start_at_index = start_at_index
+        self._ack_id = ack_id
 
     @property
     def groups(self) -> MoveGroups:
@@ -465,7 +518,7 @@ class MockSendMoveCompleter:
                                 int(move.distance_mm * 4000)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                         )
                         arbitration_id = ArbitrationId(
                             parts=ArbitrationIdParts(originating_node_id=node)
@@ -484,7 +537,7 @@ class MockSendMoveCompleter:
                                 int(move.velocity_mm_sec * 0)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                             action=PipetteTipActionTypeField(move.action.value),
                             success=UInt8Field(1),
                             gear_motor_id=GearMotorIdField(1),
@@ -506,7 +559,7 @@ class MockSendMoveCompleter:
                                 int(move.velocity_mm_sec * 0)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                             action=PipetteTipActionTypeField(move.action.value),
                             success=UInt8Field(1),
                             gear_motor_id=GearMotorIdField(0),
@@ -546,7 +599,7 @@ class MockSendMoveCompleter:
                                 int(move.velocity_mm_sec * 0)
                             ),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(1),
+                            ack_id=UInt8Field(self._ack_id),
                             action=PipetteTipActionTypeField(move.action.value),
                             success=UInt8Field(1),
                             gear_motor_id=GearMotorIdField(1),
@@ -619,14 +672,17 @@ class MockGripperSendMoveCompleter:
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
                 for node, move in moves.items():
+                    ack_id = UInt8Field(1)
                     assert isinstance(move, MoveGroupSingleGripperStep)
+                    if move.stop_condition == MoveStopCondition.limit_switch:
+                        ack_id = UInt8Field(2)
                     payload = MoveCompletedPayload(
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(0)),
                         encoder_position_um=Int32Field(int(0)),
                         position_flags=MotorPositionFlagsField(0),
-                        ack_id=UInt8Field(1),
+                        ack_id=ack_id,
                     )
                     arbitration_id = ArbitrationId(
                         parts=ArbitrationIdParts(originating_node_id=node)
@@ -674,6 +730,18 @@ async def test_single_move(
     )
     assert len(position) == 1
     assert position[0][1].payload.current_position_um.value == 246000
+
+
+async def test_home_timeout(
+    mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups
+) -> None:
+    """It should send a start group command."""
+    subject = MoveScheduler(move_groups=move_group_home_single)
+    mock_sender = MockSendMoveCompleter(move_group_home_single, subject, ack_id=3)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    with pytest.raises(MoveConditionNotMet):
+        await subject.run(can_messenger=mock_can_messenger)
 
 
 async def test_tip_action_move_runner_receives_two_responses(
@@ -1212,7 +1280,7 @@ class MockSendMoveErrorCompleter:
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)
                     payload = ErrorMessagePayload(
-                        severity=ErrorSeverityField(ErrorSeverity.recoverable),
+                        severity=ErrorSeverityField(ErrorSeverity.unrecoverable),
                         error_code=ErrorCodeField(ErrorCode.collision_detected),
                     )
                     payload.message_index = message.payload.message_index

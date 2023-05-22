@@ -14,6 +14,7 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, Mount, MountType, Point
+from opentrons.protocol_api import OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import (
     AbstractModule,
@@ -38,7 +39,12 @@ from opentrons.protocol_engine import (
     LabwareOffsetVector,
 )
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import Liquid as PE_Liquid, HexColor, FlowRates
+from opentrons.protocol_engine.types import (
+    Liquid as PE_Liquid,
+    HexColor,
+    FlowRates,
+    OFF_DECK_LOCATION,
+)
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,
@@ -373,6 +379,42 @@ def test_move_labware_on_non_connected_module(
         mock_engine_client.move_labware(
             labware_id="labware-id",
             new_location=ModuleLocation(moduleId="module-id"),
+            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
+            use_pick_up_location_lpc_offset=False,
+            use_drop_location_lpc_offset=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+def test_move_labware_off_deck(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    mock_engine_client: EngineClient,
+    api_version: APIVersion,
+) -> None:
+    """It should issue a move labware command to the engine with pause strategy."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition("labware-id")
+    ).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+
+    subject.move_labware(
+        labware_core=labware,
+        new_location=OFF_DECK,
+        use_gripper=False,
+        use_pick_up_location_lpc_offset=False,
+        use_drop_location_lpc_offset=False,
+        pick_up_offset=None,
+        drop_offset=None,
+    )
+    decoy.verify(
+        mock_engine_client.move_labware(
+            labware_id="labware-id",
+            new_location=OFF_DECK_LOCATION,
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             use_pick_up_location_lpc_offset=False,
             use_drop_location_lpc_offset=False,

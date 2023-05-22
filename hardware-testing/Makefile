@@ -96,6 +96,7 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.ninety_six_assembly_qc_ot3 --simulate
 
 .PHONY: test-examples
 test-examples:
