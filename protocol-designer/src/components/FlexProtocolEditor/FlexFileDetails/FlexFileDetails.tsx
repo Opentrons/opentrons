@@ -11,7 +11,7 @@ import { format } from 'date-fns'
 import { Formik, FormikProps } from 'formik'
 import { mapValues } from 'lodash'
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import {
   FileMetadataFields,
@@ -34,6 +34,7 @@ import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
 import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
+import { UpdateConfirmation } from '../FlexUpdateConfirmation'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -177,20 +178,66 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
 }
 
 const FileProtocolInformation = (): JSX.Element => {
+  const dispatch = useDispatch()
+  const [showConfirmation, setShowConfirmation] = useState(false)
+
+  const handleCancelClick = (): any => {
+    setShowConfirmation(false)
+  }
+  const handleConfirmClick = (): any => {
+    // handle the update action here
+    dispatch(navActions.navigateToPage('landing-page'))
+    setShowConfirmation(false)
+  }
+
+  function protocolCancelClick(e): any {
+    e.preventDefault()
+    setShowConfirmation(true)
+  }
   return (
-    <div className={styles.heading_container}>
-      <div className={styles.pd_fd_header}>
-        <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
-        <StyledText as="h5" className={styles.pd_fd_sub_header}>
-          {i18n.t('flex.file_tab.subheading')}
-        </StyledText>
+    <>
+      {Boolean(showConfirmation) && (
+        <>
+          <UpdateConfirmation
+            confirmationTitle={'Cancel Create Protocol?'}
+            confirmationMessage={
+              'Are you sure you want to cancel creating a protocol? Progress will be lost, You can’t undo this change.'
+            }
+            cancelButtonName={'Go back'}
+            continueButtonName={'Cancel New Protocol'}
+            handleCancelClick={handleCancelClick}
+            handleConfirmClick={handleConfirmClick}
+          />
+        </>
+      )}
+      <div className={styles.heading_container}>
+        <div className={styles.pd_fd_header}>
+          <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
+          <StyledText as="h5" className={styles.pd_fd_sub_header}>
+            {i18n.t('flex.file_tab.subheading')}
+          </StyledText>
+        </div>
+        <FlexHeadingButtonGroup
+          protocolCancelClickProps={protocolCancelClick}
+        />
       </div>
-      <div className={styles.right_buttons}>
-        <SecondaryButton>{i18n.t('flex.file_tab.export')}</SecondaryButton>
-        <SecondaryButton className={styles.close_protocol_button}>
-          {i18n.t('flex.file_tab.close_export')}
-        </SecondaryButton>
-      </div>
+    </>
+  )
+}
+
+export const FlexHeadingButtonGroup = (props: {
+  protocolCancelClickProps: any
+}) => {
+  const { protocolCancelClickProps } = props
+  return (
+    <div className={styles.right_buttons}>
+      <SecondaryButton>{i18n.t('flex.file_tab.export')}</SecondaryButton>
+      <SecondaryButton
+        className={styles.close_protocol_button}
+        onClick={e => protocolCancelClickProps(e)}
+      >
+        {i18n.t('flex.file_tab.close_export')}
+      </SecondaryButton>
     </div>
   )
 }
