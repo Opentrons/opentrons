@@ -295,6 +295,8 @@ function FlexProtocolEditor({
       ? isEdit
         ? i18n.t('flex.round_tabs.update')
         : i18n.t('flex.round_tabs.go_to_liquids_page')
+      : isEdit
+      ? i18n.t('flex.round_tabs.update')
       : i18n.t('flex.round_tabs.next')
 
   interface FormikErrors {
