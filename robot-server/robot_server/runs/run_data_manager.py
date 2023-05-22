@@ -153,7 +153,7 @@ class RunDataManager:
     def get_run_labware_definition(self, run_id: str) -> List[LabwareDefinition]:
         """Get a run's labware definition.
 
-        This method will pull from the current run or the historical runs,
+        This method will pull from the current run
         depending on if `run_id` refers to the current run.
 
         Args:
