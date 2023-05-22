@@ -259,11 +259,15 @@ class DeckSlotName(enum.Enum):
         return cls(str_val)
 
     # TODO(mm, 2023-05-08):
-    # Some callers use this method to do arithmetic on deck slots,
-    # and some use it to look up the slot definition by its list index in the deck definition.
-    # Those uses will break down when the OT-3's deck definition includes deck slots that don't
-    # have a direct OT-2 equivalent, like the staging area slots.
+    # Migrate callers off of this method. https://opentrons.atlassian.net/browse/RLAB-345
     def as_int(self) -> int:
+        """Return this deck slot as an OT-2-style integer.
+
+        For example, `SLOT_5.as_int()` and `SLOT_C2.as_int()` are both `5`.
+
+        Deprecated:
+            This will not make sense when the OT-3 has staging area slots.
+        """
         return int(self.to_ot2_equivalent().value)
 
     def to_ot2_equivalent(self) -> DeckSlotName:
