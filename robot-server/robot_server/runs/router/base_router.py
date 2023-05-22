@@ -249,7 +249,7 @@ async def get_run(
     description="Get a specific run's labware definition by its unique identifier.",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped]]},
     },
 )
 async def get_run_labware_definition(
@@ -262,7 +262,11 @@ async def get_run_labware_definition(
         runId: Run ID pulled from URL.
         run_data_manager: Current and historical run data management.
     """
-    labware_definitions = run_data_manager.get_run_labware_definition(run_id=runId)
+    try:
+        labware_definitions = run_data_manager.get_run_labware_definition(run_id=runId)
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
     labware_definitions_result = ResponseList.construct(__root__=labware_definitions)
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=labware_definitions_result),
