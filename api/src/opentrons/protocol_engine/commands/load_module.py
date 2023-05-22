@@ -1,9 +1,7 @@
 """Implementation, request models, and response models for the load module command."""
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
-
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
