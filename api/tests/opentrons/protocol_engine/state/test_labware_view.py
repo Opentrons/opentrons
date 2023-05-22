@@ -945,3 +945,15 @@ def test_get_all_labware_definition(
     result = subject.get_all_labware_definition()
 
     assert result == [tip_rack_def, falcon_tuberack_def]
+
+
+def test_get_all_labware_definition_empty(
+) -> None:
+    """It should return the labware definition list."""
+    subject = get_labware_view(
+        definitions_by_uri={},
+    )
+
+    result = subject.get_all_labware_definition()
+
+    assert result == []
