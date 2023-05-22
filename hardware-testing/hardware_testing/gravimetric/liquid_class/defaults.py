@@ -132,7 +132,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=3.5,
+                        leading_air_gap=2,
                         trailing_air_gap=0.1,
                     ),
                 ),
@@ -166,7 +166,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=3.2,
+                        leading_air_gap=5,
                         trailing_air_gap=0.1,
                     ),
                 ),
@@ -198,7 +198,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=10,
                         trailing_air_gap=5,
                     ),
                 ),
@@ -230,7 +230,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=20,
                         trailing_air_gap=10,
                     ),
                 ),
@@ -300,7 +300,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=3.2,
+                        leading_air_gap=2.0,
                         trailing_air_gap=0.1,
                     ),
                 ),
