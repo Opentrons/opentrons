@@ -25,7 +25,6 @@ from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Center Test')
-    arg_parser.add_argument('-p', '--probe', choices=['front','rear'], required=False, help='The gripper probe position to be tested', default='front')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number for calibration', default=6)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
@@ -33,8 +32,11 @@ def build_arg_parser():
 
 class Gripper_Center_Test:
     def __init__(
-        self, simulate: bool, probe: string, cycles: int, slot: int
+        self, simulate: bool, cycles: int, slot: int
     ) -> None:
+        self.simulate = simulate
+        self.cycles = cycles
+        self.slot = slot
         self.api = None
         self.mount = None
         self.home = None
@@ -43,10 +45,6 @@ class Gripper_Center_Test:
         self.slot_center = None
         self.deck_encoder = None
         self.deck_z = None
-        self.simulate = simulate
-        self.probe = probe
-        self.cycles = cycles
-        self.slot = slot
         self.gauge_read = 0 # mm
         self.jog_speed = 10 # mm/s
         self.jog_distance = 22 # mm
@@ -106,7 +104,7 @@ class Gripper_Center_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"slot{self.slot}_" + self.probe
+        self.test_tag = f"slot{self.slot}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -258,5 +256,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper Center Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Center_Test(args.simulate, args.probe, args.cycles, args.slot)
+    test = Gripper_Center_Test(args.simulate, args.cycles, args.slot)
     asyncio.run(test.run())
