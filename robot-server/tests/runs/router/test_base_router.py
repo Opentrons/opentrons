@@ -299,9 +299,11 @@ async def test_get_run_labware_definition(
         mock_run_data_manager.get_run_labware_definition(run_id="run-id")
     ).then_return([])
 
-    result = await get_run_labware_definition(runId="run-id")
+    result = await get_run_labware_definition(
+        runId="run-id", run_data_manager=mock_run_data_manager
+    )
 
-    assert result.content.data == []
+    assert result.content.data.__root__ == []
     assert result.status_code == 200
 
 
