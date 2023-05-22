@@ -13,16 +13,16 @@ Some things are known not to work, and are listed below. Specific compatibility 
 ## Big New Things
 ### Robot Control
 - Stall detection is enabled for most moves. You might now get stall detection failures if you stall the robot.
-- move_labware now requires apiLevel to be at least 2.15. You can now move labware off-deck using the python API by supplying OFF_DECK to the new_location arg.
 - Motor driver configuration changes should improve performance and prevent step loss on the gantry.
 - More USB connectivity fixes; updating should now work
 - Many 96-channel behavior fixes, especially around tip pickup.
 
 ### Python Protocol API
-- You can now `move_labware` to a special `OFF_DECK` location
+- ``move_labware`` now requires api level 2.15; as a bonus feature to sweeten the deal, however, you can now `move_labware` to a special `OFF_DECK` location
 - The Mount type has an `EXTENSION` entry for the gripper now
 
 ### ODD
+- You now get lovely little popups on the ODD when you send a protocol to an OT-3. 
 - Design passes on the following screens should improve little usability issues: protocols dashboard, connect to network, protocol details
 - The unboxing flow should handle USB connections better now
 
