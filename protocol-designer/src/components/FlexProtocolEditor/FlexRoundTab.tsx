@@ -6,11 +6,13 @@ import { StyledText } from './StyledText'
 interface RoundTabsProps {
   setCurrentTab: (tabIndex: number) => void
   currentTab: number
+  isEdit: boolean
 }
 
 export const FlexRoundTab: React.FC<RoundTabsProps> = ({
   setCurrentTab,
   currentTab,
+  isEdit,
 }): JSX.Element => {
   return (
     <>
@@ -19,7 +21,10 @@ export const FlexRoundTab: React.FC<RoundTabsProps> = ({
           <RoundTab
             key={index}
             isCurrent={navPillPage.includes(currentTab)}
-            onClick={() => setCurrentTab(navPillPage[0])}
+            onClick={() => {
+              if (!isEdit) setCurrentTab(navPillPage[0])
+            }}
+            disabled={isEdit && !currentTab}
           >
             <StyledText as="h4">{name}</StyledText>
           </RoundTab>

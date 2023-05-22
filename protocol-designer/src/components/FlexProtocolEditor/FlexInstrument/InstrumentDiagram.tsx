@@ -33,7 +33,7 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
     }
   }
   return (
-    <Box className={className} {...styleProps}>
+    <Box className={className} {...styleProps} style={{ minWidth: 'auto' }}>
       <img
         className={cx({ [styles.flipped_image]: mount === 'right' })}
         src={imgSrc}

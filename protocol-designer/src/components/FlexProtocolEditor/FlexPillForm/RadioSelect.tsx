@@ -69,12 +69,15 @@ export const RadioSelect = ({ pipetteName, pipetteType }: any): JSX.Element => {
   ]
 
   const emptyMount = [
-    { value: 'LEAVE_SECOND_EMPTY', name: 'Leave Second Empty' },
+    { value: 'LEAVE_SECOND_EMPTY', name: 'Leave Second Mount Empty' },
   ]
 
+  const filteredGroupOptions = groupedOptions.filter(
+    groupedOption => groupedOption.value !== 'p1000_96'
+  )
   const newGroupedOptions =
     pipetteName.split('.')[1] === pipetteSlot.right
-      ? [...groupedOptions, ...emptyMount]
+      ? [...filteredGroupOptions, ...emptyMount]
       : groupedOptions
 
   return (

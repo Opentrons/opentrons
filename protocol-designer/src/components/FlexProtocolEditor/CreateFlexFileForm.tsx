@@ -55,9 +55,11 @@ function FlexFormComponent(): JSX.Element {
           {i18n.t('flex.header.required_fields')}
         </StyledText>
         <FlexProtocolEditorComponent
-          isEditValue={false}
-          tabIdValue={undefined}
-          formProps={undefined}
+          FlexFileDetails={{
+            isEditValue: false,
+            tabIdValue: undefined,
+            formProps: undefined,
+          }}
         />
       </div>
     </>

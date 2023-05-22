@@ -32,7 +32,6 @@ import { StyledText } from '../StyledText'
 
 import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
-import { FilePage } from '../../FilePage'
 import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
 import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 export interface Props {
@@ -44,7 +43,7 @@ export interface Props {
   modules: ModulesForEditModulesCard
 }
 
-type PropsData = React.ComponentProps<typeof FilePage>
+type PropsData = React.ComponentProps<typeof FlexFileDetailsComponent>
 interface SP {
   instruments: PropsData['instruments']
   formValues: PropsData['formValues']
@@ -61,11 +60,14 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   const [selectedTabId, setTabId] = useState<number>(0)
 
   if (isEdit) {
+    console.log('propsFleDetails', props, isEdit, selectedTabId)
     return (
       <FlexProtocolEditorComponent
-        isEditValue={isEdit}
-        tabIdValue={selectedTabId}
-        formProps={props}
+        FlexFileDetails={{
+          isEditValue: isEdit,
+          tabIdValue: selectedTabId,
+          formProps: props,
+        }}
       />
     )
   } else {
@@ -152,7 +154,6 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         </Flex>
                       </div>
                       <SelectedModules propsData={props} />
-
                       <EditButton
                         editProps={setEdit}
                         setTab={2}
@@ -307,7 +308,6 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
             <Card>
               <div className={styles.card_content}>
                 <Flex>
-                  {' '}
                   <ModuleDiagram
                     type={moduleType.type}
                     model={moduleType.model}
@@ -321,7 +321,7 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
                     <StyledText as="h4">
                       {i18n.t(
                         `modules.module_display_names.${moduleType.type}`
-                      )}{' '}
+                      )}
                       - Slot {moduleType.slot}
                     </StyledText>
                   </Flex>
@@ -331,13 +331,13 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
           </div>
         ))
       ) : (
-        <div>No modules found.</div>
+        <StyledText as="h4">No modules found.</StyledText>
       )}
     </>
   )
 }
 
-function getModuleData(modules: any): any {
+export function getModuleData(modules: any): any {
   const moduleData = []
   for (const obj in modules) {
     if (modules[obj] != null) moduleData.push(modules[obj])
