@@ -35,7 +35,8 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
-    ProbeTarget,
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -116,7 +117,7 @@ async def test_liquid_probe(
     mock_bind_output: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
-    target_node: ProbeTarget,
+    target_node: PipetteProbeTarget,
     motor_node: NodeId,
     threshold_pascals: float,
 ) -> None:
@@ -222,7 +223,7 @@ async def test_capacitive_probe(
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
     mock_bind_sync: AsyncMock,
-    target_node: ProbeTarget,
+    target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     caplog: Any,
     distance: float,
@@ -302,7 +303,7 @@ async def test_capacitive_sweep(
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
     mock_bind_sync: AsyncMock,
-    target_node: ProbeTarget,
+    target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     distance: float,
     speed: float,

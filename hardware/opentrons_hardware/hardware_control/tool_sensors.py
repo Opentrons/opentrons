@@ -1,5 +1,6 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
+from functools import partial
 from typing import Union, List, Iterator, Tuple, Dict
 from logging import getLogger
 from numpy import float64
@@ -30,7 +31,8 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 LOG = getLogger(__name__)
-ProbeTarget = Union[Literal[NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]]
+PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
+InstrumentProbeTarget = Union[PipetteProbeTarget, Literal[NodeId.gripper]]
 
 
 def _build_pass_step(
@@ -55,7 +57,7 @@ def _build_pass_step(
 
 async def liquid_probe(
     messenger: CanMessenger,
-    tool: ProbeTarget,
+    tool: PipetteProbeTarget,
     head_node: NodeId,
     max_z_distance: float,
     plunger_speed: float,
@@ -124,9 +126,14 @@ async def liquid_probe(
     return positions
 
 
+async def check_overpressure(messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0):
+    sensor_scheduler = SensorScheduler()
+    sensor_info = SensorInformation(SensorType.pressure, sensor_id, tool)
+    return partial(sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger)
+
 async def capacitive_probe(
     messenger: CanMessenger,
-    tool: ProbeTarget,
+    tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
     speed: float,
@@ -168,7 +175,7 @@ async def capacitive_probe(
 
 async def capacitive_pass(
     messenger: CanMessenger,
-    tool: ProbeTarget,
+    tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
     speed: float,
@@ -195,3 +202,5 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+

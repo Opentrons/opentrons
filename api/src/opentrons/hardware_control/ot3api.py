@@ -1476,16 +1476,17 @@ class OT3API(
             )
             backlash_pos = target_pos.copy()
             backlash_pos[pip_ax] -= instrument.backlash_distance
-            await self._move(
-                backlash_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
-            await self._move(
-                target_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(mount):
+                await self._move(
+                    backlash_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
@@ -1517,11 +1518,12 @@ class OT3API(
             await self._backend.set_active_current(
                 {OT3Axis.from_axis(dispense_spec.axis): dispense_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=dispense_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(mount):
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Dispense failed")
             dispense_spec.instr.set_current_volume(0)
@@ -1682,6 +1684,7 @@ class OT3API(
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
+
         for move in spec.drop_moves:
             await self._backend.set_active_current(
                 {
@@ -1709,11 +1712,12 @@ class OT3API(
                 target_pos = target_position_from_plunger(
                     realmount, move.target_position, self._current_position
                 )
-                await self._move(
-                    target_pos,
-                    speed=move.speed,
-                    home_flagged_axes=False,
-                )
+                async with self._backend.monitor_overpressure(mount):
+                    await self._move(
+                        target_pos,
+                        speed=move.speed,
+                        home_flagged_axes=False,
+                    )
         if move.home_after:
             await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 

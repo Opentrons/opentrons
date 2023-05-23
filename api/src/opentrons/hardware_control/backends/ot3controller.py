@@ -128,6 +128,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
+    check_overpressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -932,6 +933,18 @@ class OT3Controller:
     ) -> NodeMap[MapPayload]:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
+
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        # TODO we should switch the sensor type based on the channel
+        # used when partial tip pick up is implemented.
+        # TODO we should also monitor pressure in all available channels
+        provided_context_manager = check_overpressure(self._messenger, tool, sensor_id)
+        async with provided_context_manager():
+            yield
 
     async def liquid_probe(
         self,
