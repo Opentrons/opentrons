@@ -55,7 +55,6 @@ class DevServer:
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev-flex.env"
             if self.is_ot3
             else "dev.env",
-            "OT_API_FF_enableOT3HardwareController": "true" if self.is_ot3 else "false",
             "OT_API_CONFIG_DIR": str(self.ot_api_config_dir),
             "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
         }
