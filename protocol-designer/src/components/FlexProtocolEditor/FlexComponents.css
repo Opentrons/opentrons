@@ -43,7 +43,7 @@
 }
 
 .pipette_form {
-  padding: 0px 5rem;
+  padding: 0px 5rem 0px 5rem;
 }
 
 .cancel_button {
@@ -221,7 +221,7 @@
 .confirmation_model_x_button {
   margin: 0 !important;
   padding: 0 !important;
-  color: #000000 !important;
+  color: #000 !important;
 }
 
 .confirmation_model button {
@@ -230,7 +230,7 @@
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  color: #ffffff;
+  color: white;
 }
 
 .confirmation_model_cancel_button {

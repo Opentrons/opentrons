@@ -2,7 +2,7 @@
 
 .pd_fd_header {
   position: relative;
-  font-family: Public Sans;
+  font-family: 'Open Sans', sans-serif;
   font-size: 1.3rem;
   font-weight: 900;
   line-height: 1rem;
@@ -53,9 +53,11 @@
 .name_margin {
   margin-left: 50px;
 }
+
 .desc_margin {
   margin-left: 11px;
 }
+
 .author_margin {
   margin-left: 42px;
 }
