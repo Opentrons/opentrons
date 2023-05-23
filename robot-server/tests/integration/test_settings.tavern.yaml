@@ -60,6 +60,12 @@ stages:
             description: !re_search 'This is an Opentrons-internal setting to test new rear-panel.'
             restart_required: false
             value: !anything
+          - id: disableStallDetection
+            old_id: Null
+            title: 'Disable stall detection on the Flex.'
+            description: !re_search 'This is an Opentrons-internal setting for hardware-testing.'
+            restart_required: false
+            value: !anything
         links: !anydict
 
 ---

@@ -1,5 +1,23 @@
+diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
+index beae5cc110..b9c706a5e0 100644
+--- a/api/src/opentrons/config/defaults_ot3.py
++++ b/api/src/opentrons/config/defaults_ot3.py
+@@ -101,10 +101,10 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
+         OT3AxisKind.Q: 10,
+     },
+     low_throughput={
+-        OT3AxisKind.X: 1600,
+-        OT3AxisKind.Y: 1000,
++        OT3AxisKind.X: 500,
++        OT3AxisKind.Y: 200,
+         OT3AxisKind.Z: 300,
+-        OT3AxisKind.P: 100,
++        OT3AxisKind.P: 1500,
+         OT3AxisKind.Z_G: 150,
+     },
+ )
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-index fd92408abe..a02144a48c 100644
+index 5f96add2a4..047dc58add 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 +++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 @@ -422,11 +422,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):

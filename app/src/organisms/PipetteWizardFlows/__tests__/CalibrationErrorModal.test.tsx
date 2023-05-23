@@ -16,23 +16,27 @@ describe('CalibrationErrorModal', () => {
       proceed: jest.fn(),
       errorMessage: 'error shmerror',
       isOnDevice: false,
+      chainRunCommands: jest.fn(() => Promise.resolve()),
+      mount: 'left',
     }
     const { getByText, getByRole } = render(props)
     getByText('Pipette calibration failed')
     getByText('error shmerror')
     getByRole('button', { name: 'Next' }).click()
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalled()
   })
   it('renders the on device button with correct text', () => {
     props = {
       proceed: jest.fn(),
       errorMessage: 'error shmerror',
       isOnDevice: true,
+      chainRunCommands: jest.fn(() => Promise.resolve()),
+      mount: 'left',
     }
     const { getByText, getByLabelText } = render(props)
     getByText('Pipette calibration failed')
     getByText('error shmerror')
     getByLabelText('SmallButton_primary').click()
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalled()
   })
 })

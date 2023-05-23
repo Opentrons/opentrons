@@ -34,12 +34,17 @@ export const getAddresses: (state: State) => Address[] = createSelector(
   state => state.manualAddresses,
   getHostStates,
   (manualAddresses, hosts) => {
-    const trackedAddresses = hosts.map(({ ip, port, agent }) => ({
-      ip,
-      port,
-      agent,
-    }))
-    return unionBy(trackedAddresses, manualAddresses, 'ip')
+    const trackedAddresses = hosts.map(({ ip, port, agent }) =>
+      agent != null
+        ? {
+            ip,
+            port,
+            agent,
+          }
+        : { ip, port }
+    )
+    // prefer reference from manualAddresses
+    return unionBy(manualAddresses, trackedAddresses, 'ip')
   }
 )
 

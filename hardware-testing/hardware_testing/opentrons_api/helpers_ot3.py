@@ -16,6 +16,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
+from opentrons.config.advanced_settings import set_adv_setting
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
@@ -128,8 +129,12 @@ async def build_async_ot3_hardware_api(
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
     loop: Optional[asyncio.AbstractEventLoop] = None,
+    stall_detection_enable: bool = True,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
+    await set_adv_setting(
+        "disableStallDetection", False if stall_detection_enable else True
+    )
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     kwargs = {"config": config}
     if is_simulating:
@@ -473,7 +478,7 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
     """Get the endstop's position per mount."""
-    transforms = api._transforms
+    transforms = api._robot_calibration
     machine_pos_per_axis = api._backend.home_position()
     deck_pos_per_axis = deck_from_machine(
         machine_pos_per_axis,
