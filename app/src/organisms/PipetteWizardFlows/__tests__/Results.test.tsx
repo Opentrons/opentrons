@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -74,7 +74,7 @@ describe('Results', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('renders the correct information when pipette wizard is a success for attach flow', () => {
+  it('renders the correct information when pipette wizard is a success for attach flow', async () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -112,6 +112,45 @@ describe('Results', () => {
       ],
       false
     )
+    await waitFor(() => expect(props.proceed).toHaveBeenCalled())
+  })
+  it('calls setShowErrorMessage when chainRunCommands fails', async () => {
+    props = {
+      ...props,
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.reject(new Error('error'))),
+      flowType: FLOWS.ATTACH,
+    }
+    const { getByRole } = render(props)
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'loadPipette' as const,
+          params: {
+            pipetteName: 'p1000_single_gen3',
+            pipetteId: 'abc',
+            mount: 'left',
+          },
+        },
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: ['leftPlunger'],
+          },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: 'left',
+          },
+        },
+      ],
+      false
+    )
+    await waitFor(() => expect(props.setShowErrorMessage).toHaveBeenCalled())
   })
   it('renders the correct information when pipette wizard is a fail for attach flow', async () => {
     props = {
@@ -202,6 +241,7 @@ describe('Results', () => {
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
+    getByText('attach pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
     expect(props.chainRunCommands).toHaveBeenCalledWith(
