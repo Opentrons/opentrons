@@ -21,6 +21,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { InlineNotification } from '../../../atoms/InlineNotification'
 import { toggleDevtools } from '../../../redux/config'
 
 import type { IconName } from '@opentrons/components'
@@ -72,7 +73,7 @@ export function RobotSettingButton({
   lightsOn,
   toggleLights,
 }: RobotSettingButtonProps): JSX.Element {
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t, i18n } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
   const handleClick = (): void => {
@@ -112,7 +113,7 @@ export function RobotSettingButton({
           </StyledText>
           {settingInfo != null ? (
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.darkBlack70}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignLeft}
@@ -122,22 +123,6 @@ export function RobotSettingButton({
           ) : null}
         </Flex>
       </Flex>
-      {isUpdateAvailable ?? false ? (
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing12}
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.warningBackgroundMed}
-          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size4}
-        >
-          <Icon name="ot-alert" size="1.75rem" color={COLORS.warningEnabled} />
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('update_available')}
-          </StyledText>
-        </Flex>
-      ) : null}
-
       {enabledDevTools != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -167,10 +152,18 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-
-      {enabledDevTools == null && ledLights == null ? (
-        <Icon name="chevron-right" size="3rem" />
-      ) : null}
+      <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+        {isUpdateAvailable ?? false ? (
+          <InlineNotification
+            type="alert"
+            heading={i18n.format(t('update_available'), 'capitalize')}
+            hug={true}
+          />
+        ) : null}
+        {enabledDevTools == null && ledLights == null ? (
+          <Icon name="more" size="3rem" />
+        ) : null}
+      </Flex>
     </Btn>
   )
 }
