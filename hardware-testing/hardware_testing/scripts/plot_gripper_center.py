@@ -48,6 +48,7 @@ class Plot:
         self.create_folder()
         self.df_data = self.import_file(self.data)
         self.df_offset = self.compute_offset(self.df_data)
+        print(f"Test Cycles = {len(self.df_data)}")
         self.print_offset(self.df_offset)
 
     def import_file(self, file):
@@ -93,6 +94,7 @@ class Plot:
         print("-> Average Relative Error = {:.3f} mm".format(df["Relative Error"].mean()))
         print("-> Average Percent Error = {:.3f}%".format(df["Percent Error"].mean()))
         print("-> Average Accuracy = {:.3f}%".format(df["Accuracy"].mean()))
+        print("")
 
     def set_legend(self, figure, legend):
         for idx, name in enumerate(legend):
@@ -175,8 +177,8 @@ class Plot:
         y_avg_xpos = 0
         y_avg_text = f"Avg = {y_avg}mm ± {y_range}mm"
 
-        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=-100)
-        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=100, ay_pos=100)
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=100)
+        annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=-100)
         annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=-100)
 
         fig1 = px.line(df, x=x_axis, y=[y_axis], markers=True)
