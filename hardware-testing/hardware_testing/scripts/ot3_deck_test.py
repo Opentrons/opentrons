@@ -346,7 +346,24 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
     }
     
-    
+    test_pip = api.get_attached_instrument(mount)
+    test_name = "deck-test"
+    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
+    header = ['Time (W:H:M:S)', 'Test Robot']
+    header_str = data.convert_list_to_csv_line(header)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+
+    txtval = ["slot:",slot]
+    header_str = data.convert_list_to_csv_line(txtval)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+
+    txtval = ["device:",test_robot]
+    header_str = data.convert_list_to_csv_line(txtval)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+
+    txtval = ["------------------------------------"]
+    header_str = data.convert_list_to_csv_line(txtval)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
     for i in range(3):
         Toollength = zijulis[whereval] - steplist[0]
         move = steplist[0]
@@ -362,6 +379,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                     )
             readval = _reading(hardewar)
             print("testig=:::::{}".format(readval))
+            txtval = [time.time(),test_robot]
+            header_str = data.convert_list_to_csv_line(txtval)
+            data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
             Toollength = Toollength - steplist[0]
         else:
             if mount == OT3Mount.LEFT:
@@ -375,13 +395,12 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
 
 
-    # test_name = "deck-test"
-    # file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
-    # header = ['Time (W:H:M:S)', 'Test Robot']
-    # header_str = data.convert_list_to_csv_line(header)
-    # data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+    
 
-    # await api.move_rel(mount, delta=Point(z=5))
+    
+    
+    
+    await api.move_rel(mount, delta=Point(z=5))
 
 
 
@@ -393,237 +412,237 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
     
 
-    # # TIP_RACKS = args.tip_rack_num # default: 12
-    # PICKUPS_PER_TIP = args.pick_up_num # default: 20
-    # COLUMNS = 12
-    # ROWS = 8
-    # CYCLES = 1
+    # TIP_RACKS = args.tip_rack_num # default: 12
+    PICKUPS_PER_TIP = args.pick_up_num # default: 20
+    COLUMNS = 12
+    ROWS = 8
+    CYCLES = 1
     
-    # test_pip = api.get_attached_instrument(mount)
+    test_pip = api.get_attached_instrument(mount)
     
-    # print("mount.id:{}".format(test_pip["pipette_id"]))
+    print("mount.id:{}".format(test_pip["pipette_id"]))
 
-    # test_name = "tip-pick-up-lifetime-test"
-    # if args.restart_flag:
-    #     if(os.path.exists(path)):
-    #         with open(path, 'r') as openfile:
-    #             complete_dict = json.load(openfile)
-    #             file_name = complete_dict['csv_name']
-    #     else:
-    #         print("Slot locations calibration file not found.\n")
-    #         calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
-    # else:
-    #     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
-    #     header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
-    #                 'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
-    #     header_str = data.convert_list_to_csv_line(header)
-    #     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+    test_name = "tip-pick-up-lifetime-test"
+    if args.restart_flag:
+        if(os.path.exists(path)):
+            with open(path, 'r') as openfile:
+                complete_dict = json.load(openfile)
+                file_name = complete_dict['csv_name']
+        else:
+            print("Slot locations calibration file not found.\n")
+            calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
+    else:
+        file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
+        header = ['Time (W:H:M:S)', 'Test Robot', 'Test Pipette', 'Tip Rack', 'Tip Number', 'Total Tip Pick Ups',
+                    'Tip Presence - Tip Pick Up (P/F)', 'Tip Presence - Tip Eject (P/F)', 'Total Failures']
+        header_str = data.convert_list_to_csv_line(header)
+        data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
     
 
-    # print("test_pip",test_pip)
-    # if(len(test_pip) == 0):
-    #     print(f"No pipette recognized on {mount.name} mount\n")
-    #     sys.exit()
-    # if('p1000' in test_pip['name']):
-    #     tip_len = 85
-    # elif('p50' in test_pip['name']):
-    #     tip_len = 57
+    print("test_pip",test_pip)
+    if(len(test_pip) == 0):
+        print(f"No pipette recognized on {mount.name} mount\n")
+        sys.exit()
+    if('p1000' in test_pip['name']):
+        tip_len = 85
+    elif('p50' in test_pip['name']):
+        tip_len = 57
 
-    # print(f"\nTest pipette: {test_pip['name']}\n")
+    print(f"\nTest pipette: {test_pip['name']}\n")
 
-    # # if args.check_tip:
-    # #     check_tip_presence = True
-    # # else:
-    # #     check_tip_presence = False
-
-    # if "single" in test_pip['name']:
-    #     multi_pip = False
+    # if args.check_tip:
     #     check_tip_presence = True
     # else:
-    #     multi_pip = True
-    #     ROWS = 1
-    #     CYCLES = 24
     #     check_tip_presence = False
 
-    
-
-    # ### optional arg for tip rack calibration
-    # if(not args.load_cal):
-    #     calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
-    # else:
-    #     ### import calibrated json file
-    #     # path = '/home/root/.opentrons/testing_data/calibrated_slot_locations.json'
-    #     print("Loading calibration data...\n")
-    #     path = '/data/testing_data/calibrated_slot_locations.json'
-    #     if(os.path.exists(path)):
-    #         with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
-    #             calibrated_slot_loc = json.load(openfile)
-    #     else:
-    #         print("Slot locations calibration file not found.\n")
-    #         calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
-    #     print("Calibration data successfully loaded!\n")
-
-    # # add cfg start slot
-    # start_slot = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[0])
-    # start_row = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[1])
-    # start_col = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[2])
-    # total_tip_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[3])
-    # total_fail_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[4])
+    if "single" in test_pip['name']:
+        multi_pip = False
+        check_tip_presence = True
+    else:
+        multi_pip = True
+        ROWS = 1
+        CYCLES = 24
+        check_tip_presence = False
 
     
 
-    # start_time = time.perf_counter()
-    # rack = start_slot - 1
-    # total_pick_ups = total_tip_num - 1
-    # total_failures = total_fail_num
-    # start_tip_nums = 1
+    ### optional arg for tip rack calibration
+    if(not args.load_cal):
+        calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
+    else:
+        ### import calibrated json file
+        # path = '/home/root/.opentrons/testing_data/calibrated_slot_locations.json'
+        print("Loading calibration data...\n")
+        path = '/data/testing_data/calibrated_slot_locations.json'
+        if(os.path.exists(path)):
+            with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
+                calibrated_slot_loc = json.load(openfile)
+        else:
+            print("Slot locations calibration file not found.\n")
+            calibrated_slot_loc = await calibrate_tip_racks(api, mount, slot_loc, AXIS)
+        print("Calibration data successfully loaded!\n")
 
-    # # load complete information
-    # if args.restart_flag:
-    #     if(os.path.exists(path)):
-    #         with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
-    #             print("load complete information...\n")
-    #             load_complete_dict = json.load(openfile)
-    #             CYCLES = CYCLES - (load_complete_dict["cycle"] -1)
-    #             rack = (load_complete_dict["slot_num"] - 1)
-    #             total_pick_ups = load_complete_dict["total_tip_pick_up"]
-    #             total_failures = load_complete_dict["total_failure"]
-    #             start_slot = rack + 1
-    #             start_row = load_complete_dict["row"]
-    #             start_col = load_complete_dict["col"]
-    #             start_tip_nums = load_complete_dict["tip_num"] + 1
-    # else:
-    #     print("Failed to load complete information.\n")
+    # add cfg start slot
+    start_slot = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[0])
+    start_row = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[1])
+    start_col = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[2])
+    total_tip_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[3])
+    total_fail_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[4])
 
-    # for i in range(start_slot-1):
-    #     del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
+    
+
+    start_time = time.perf_counter()
+    rack = start_slot - 1
+    total_pick_ups = total_tip_num - 1
+    total_failures = total_fail_num
+    start_tip_nums = 1
+
+    # load complete information
+    if args.restart_flag:
+        if(os.path.exists(path)):
+            with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
+                print("load complete information...\n")
+                load_complete_dict = json.load(openfile)
+                CYCLES = CYCLES - (load_complete_dict["cycle"] -1)
+                rack = (load_complete_dict["slot_num"] - 1)
+                total_pick_ups = load_complete_dict["total_tip_pick_up"]
+                total_failures = load_complete_dict["total_failure"]
+                start_slot = rack + 1
+                start_row = load_complete_dict["row"]
+                start_col = load_complete_dict["col"]
+                start_tip_nums = load_complete_dict["tip_num"] + 1
+    else:
+        print("Failed to load complete information.\n")
+
+    for i in range(start_slot-1):
+        del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
 
 
-    # for i in range(CYCLES):
-    #     print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
-    #     if i > 0:
-    #         print("Replace tips before continuing test.")
-    #         input("\n\t>> Press \"Enter\" to continue.")
-    #     for key_index, key in enumerate(calibrated_slot_loc.keys()):
-    #         if (key_index >= 12):
-    #             break
-    #         rack += 1
-    #         await api.home([AXIS])
-    #         await api.move_to(mount, Point(calibrated_slot_loc[key][0],
-    #                     calibrated_slot_loc[key][1], 250.0))
-    #         await api.move_to(mount, Point(calibrated_slot_loc[key][0],
-    #                     calibrated_slot_loc[key][1], calibrated_slot_loc[key][2]+5))
-    #         for col in range(COLUMNS):
-    #             if col < start_col - 1:
-    #                 continue
-    #             await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
-    #                         calibrated_slot_loc[key][1], calibrated_slot_loc[key][2]+5))
-    #             for row in range(ROWS):
-    #                 if col == start_col -1 and row < start_row -1:
-    #                     continue
-    #                 print("=================================\n")
-    #                 print(f"Tip rack in slot {key}, Column: {col+1}, Row: {row+1}\n")
-    #                 await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
-    #                             calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]+5))
-    #                 await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
-    #                             calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]))
-    #                 for pick_up in range(PICKUPS_PER_TIP):
-    #                     if col == start_col -1 and row == start_row -1 and pick_up < start_tip_nums -1:
-    #                         continue
-    #                     print("= = = = = = = = = = = = = = = = =\n")
-    #                     print(f"Tip Pick Up #{pick_up+1}\n")
-    #                     print("Picking up tip...\n")
-    #                     await api.pick_up_tip(mount, tip_len)
-    #                     total_pick_ups += 1
+    for i in range(CYCLES):
+        print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
+        if i > 0:
+            print("Replace tips before continuing test.")
+            input("\n\t>> Press \"Enter\" to continue.")
+        for key_index, key in enumerate(calibrated_slot_loc.keys()):
+            if (key_index >= 12):
+                break
+            rack += 1
+            await api.home([AXIS])
+            await api.move_to(mount, Point(calibrated_slot_loc[key][0],
+                        calibrated_slot_loc[key][1], 250.0))
+            await api.move_to(mount, Point(calibrated_slot_loc[key][0],
+                        calibrated_slot_loc[key][1], calibrated_slot_loc[key][2]+5))
+            for col in range(COLUMNS):
+                if col < start_col - 1:
+                    continue
+                await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
+                            calibrated_slot_loc[key][1], calibrated_slot_loc[key][2]+5))
+                for row in range(ROWS):
+                    if col == start_col -1 and row < start_row -1:
+                        continue
+                    print("=================================\n")
+                    print(f"Tip rack in slot {key}, Column: {col+1}, Row: {row+1}\n")
+                    await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
+                                calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]+5))
+                    await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
+                                calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]))
+                    for pick_up in range(PICKUPS_PER_TIP):
+                        if col == start_col -1 and row == start_row -1 and pick_up < start_tip_nums -1:
+                            continue
+                        print("= = = = = = = = = = = = = = = = =\n")
+                        print(f"Tip Pick Up #{pick_up+1}\n")
+                        print("Picking up tip...\n")
+                        await api.pick_up_tip(mount, tip_len)
+                        total_pick_ups += 1
 
-    #                     ### check tip presence after tip pick up
-    #                     if check_tip_presence:
-    #                         tip_presence_pick_up = await api.get_tip_status(mount)
-    #                         pick_up_keys = list(tip_presence_pick_up.keys())
-    #                         if(tip_presence_pick_up[pick_up_keys[0]]):
-    #                             print("\t>> Tip detected!\n")
-    #                             tip_presence_pick_up_flag = True
-    #                         else:
-    #                             total_failures += 1
-    #                             tip_presence_pick_up_flag = False
-    #                             print(f"\t>> Tip not detected! Total failures: {total_failures}\n")
-    #                     else:
-    #                         tip_presence_pick_up_flag = 'Tip Presence Not Checked'
+                        ### check tip presence after tip pick up
+                        if check_tip_presence:
+                            tip_presence_pick_up = await api.get_tip_status(mount)
+                            pick_up_keys = list(tip_presence_pick_up.keys())
+                            if(tip_presence_pick_up[pick_up_keys[0]]):
+                                print("\t>> Tip detected!\n")
+                                tip_presence_pick_up_flag = True
+                            else:
+                                total_failures += 1
+                                tip_presence_pick_up_flag = False
+                                print(f"\t>> Tip not detected! Total failures: {total_failures}\n")
+                        else:
+                            tip_presence_pick_up_flag = 'Tip Presence Not Checked'
 
-    #                     ### move plunger from blowout to top, back to blow_out
-    #                     top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
+                        ### move plunger from blowout to top, back to blow_out
+                        top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
-    #                     print("Move to bottom plunger position\n")
-    #                     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-    #                     print("Move to top plunger position\n")
-    #                     await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
-    #                     print("Move to bottom plunger position\n")
-    #                     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        print("Move to bottom plunger position\n")
+                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        print("Move to top plunger position\n")
+                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
+                        print("Move to bottom plunger position\n")
+                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
 
-    #                     ### check tip presence after tip drop
-    #                     print("Dropping tip...\n")
-    #                     await api.drop_tip(mount)
-    #                     if check_tip_presence:
-    #                         tip_presence_eject = await api.get_tip_status(mount)
-    #                         drop_tip_keys = list(tip_presence_eject.keys())
-    #                         if(tip_presence_eject[drop_tip_keys[0]]):
-    #                             print("\t>> Tip detected after ejecting tip!\n")
-    #                             print("\t>> Canceling script...\n")
-    #                             total_failures += 1
-    #                             tip_presence_eject_flag = True
-    #                         else:
-    #                             print("\t>> Tip not detected!\n")
-    #                             tip_presence_eject_flag = False
-    #                     else:
-    #                         tip_presence_eject_flag = 'Tip Presence Not Checked'
+                        ### check tip presence after tip drop
+                        print("Dropping tip...\n")
+                        await api.drop_tip(mount)
+                        if check_tip_presence:
+                            tip_presence_eject = await api.get_tip_status(mount)
+                            drop_tip_keys = list(tip_presence_eject.keys())
+                            if(tip_presence_eject[drop_tip_keys[0]]):
+                                print("\t>> Tip detected after ejecting tip!\n")
+                                print("\t>> Canceling script...\n")
+                                total_failures += 1
+                                tip_presence_eject_flag = True
+                            else:
+                                print("\t>> Tip not detected!\n")
+                                tip_presence_eject_flag = False
+                        else:
+                            tip_presence_eject_flag = 'Tip Presence Not Checked'
 
-    #                     ### save test data and continue loop/exit based on tip eject success
+                        ### save test data and continue loop/exit based on tip eject success
                         
-    #                     cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_pip["pipette_id"], rack, pick_up+1,
-    #                         total_pick_ups, tip_presence_pick_up_flag, tip_presence_eject_flag, total_failures]
-    #                     cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-    #                     data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
+                        cycle_data = [convert(time.perf_counter()-start_time), test_robot, test_pip["pipette_id"], rack, pick_up+1,
+                            total_pick_ups, tip_presence_pick_up_flag, tip_presence_eject_flag, total_failures]
+                        cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+                        data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
 
-    #                     ### save the last complate information
+                        ### save the last complate information
 
-    #                     if(os.path.exists(path)):
-    #                         with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
-    #                             print("Recording...\n")
-    #                             calibrated_slot_loc = json.load(openfile)
-    #                             complete_dict = {"cycle": i+1, "slot_num": rack, "tip_num":pick_up+1, "total_tip_pick_up": total_pick_ups, 
-    #                                              "total_failure": total_failures, "col":col + 1, "row":row + 1, "csv_name":file_name}
-    #                             calibrated_slot_loc.update(complete_dict)
-    #                             with open('/data/testing_data/calibrated_slot_locations.json', 'w') as writefile:
-    #                                 json.dump(calibrated_slot_loc, writefile)
+                        if(os.path.exists(path)):
+                            with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
+                                print("Recording...\n")
+                                calibrated_slot_loc = json.load(openfile)
+                                complete_dict = {"cycle": i+1, "slot_num": rack, "tip_num":pick_up+1, "total_tip_pick_up": total_pick_ups, 
+                                                 "total_failure": total_failures, "col":col + 1, "row":row + 1, "csv_name":file_name}
+                                calibrated_slot_loc.update(complete_dict)
+                                with open('/data/testing_data/calibrated_slot_locations.json', 'w') as writefile:
+                                    json.dump(calibrated_slot_loc, writefile)
 
-    #                     else:
-    #                         print("Slot locations calibration file not found.\n")
-    #                         print("Failed to record complete information.\n")
+                        else:
+                            print("Slot locations calibration file not found.\n")
+                            print("Failed to record complete information.\n")
                         
 
-    #                     if tip_presence_eject_flag == True:
-    #                         await api.home()
-    #                         sys.exit()
+                        if tip_presence_eject_flag == True:
+                            await api.home()
+                            sys.exit()
 
-    #                 ### adjust row increment
-    #                 print("Moving to next row...\n")
-    #                 await api.move_rel(mount, delta=Point(z=5))
+                    ### adjust row increment
+                    print("Moving to next row...\n")
+                    await api.move_rel(mount, delta=Point(z=5))
 
-    #             ### adjust column increment
-    #             print("Moving to next column...\n")
+                ### adjust column increment
+                print("Moving to next column...\n")
             
-    #         # release start
-    #         start_col = 1
-    #         start_row = 1
-    #         start_tip_nums = 1
+            # release start
+            start_col = 1
+            start_row = 1
+            start_tip_nums = 1
 
-    #     print("=================================\n")
-    #     print(f"CYCLE {i+1} COMPLETE\n")
-    #     await api.home()
+        print("=================================\n")
+        print(f"CYCLE {i+1} COMPLETE\n")
+        await api.home()
 
-    # print("=================================\n")
-    # print("1/4 LIFETIME TEST COMPLETE\n")
+    print("=================================\n")
+    print("1/4 LIFETIME TEST COMPLETE\n")
     await api.home()
 
 if __name__ == "__main__":
