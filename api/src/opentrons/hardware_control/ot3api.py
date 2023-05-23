@@ -1011,8 +1011,14 @@ class OT3API(
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
-        realmount = OT3Mount.from_mount(mount)
-        axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
+        realmount: Union[OT3Mount, _BothMontType]
+        if isinstance(mount, _BothMontType):
+            realmount = mount
+            axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
+        else:
+            mount_type = mount
+            realmount = OT3Mount.from_mount(mount_type)
+            axes_moving = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount_type)]
 
         if not self._backend.check_encoder_status(axes_moving):
             await self.home()
@@ -1022,8 +1028,9 @@ class OT3API(
         await self._cache_encoder_position()
 
         if not self._backend.check_motor_status([axis for axis in axes_moving]):
+            home_mounts = realmount if realmount else [OT3Mount.LEFT, OT3Mount.RIGHT]
             raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
+                f"Inaccurate motor position for {str(home_mounts)}, please home motors."
             )
 
         target_position = target_position_from_relative(

@@ -226,8 +226,8 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
         left_offset = offset_for_mount(
             OT3Mount.LEFT, left_mount_offset, right_mount_offset, gripper_mount_offset
         )
-        # primary_cp_right = get_critical_point(OT3Mount.RIGHT)
-        # primary_z_right = _z_for_mount(OT3Mount.RIGHT)
+        primary_cp_right = get_critical_point(OT3Mount.RIGHT)
+        primary_z_right = _z_for_mount(OT3Mount.RIGHT)
         # TODO (tz, 5-23-23): change this to ambiguous values
         primary_cp_left = get_critical_point(OT3Mount.LEFT)
         primary_z_left = _z_for_mount(OT3Mount.LEFT)
@@ -244,7 +244,7 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
                 ),
                 (primary_z_left, abs_position.z - left_offset.z - primary_cp_left.z),
                 # right z mount
-                (primary_z_left, abs_position.z - right_offset.z - primary_cp_left.z),
+                (primary_z_right, abs_position.z - right_offset.z - primary_cp_right.z),
             )
         )
     else:
@@ -277,22 +277,43 @@ def target_position_from_relative(
     ...
 
 
+@overload
+def target_position_from_relative(
+    mount: _BothMontType, delta: Point, current_position: Dict[OT3Axis, float]
+) -> "OrderedDict[OT3Axis, float]":
+    ...
+
+
 def target_position_from_relative(  # type: ignore[no-untyped-def]
     mount,
     delta,
     current_position,
 ):
     """Create a target position for all specified machine axes."""
-    primary_z = _z_for_mount(mount)
-    x_ax = _x_for_mount(mount)
-    y_ax = _y_for_mount(mount)
-    target_position = OrderedDict(
-        (
-            (x_ax, current_position[x_ax] + delta[0]),
-            (y_ax, current_position[y_ax] + delta[1]),
-            (primary_z, current_position[primary_z] + delta[2]),
+    if isinstance(mount, _BothMontType):
+        primary_z_left = _z_for_mount(OT3Mount.LEFT)
+        primary_z_right = _z_for_mount(OT3Mount.RIGHT)
+        x_ax = _x_for_mount(OT3Mount.LEFT)
+        y_ax = _y_for_mount(OT3Mount.LEFT)
+        target_position = OrderedDict(
+            (
+                (x_ax, current_position[x_ax] + delta[0]),
+                (y_ax, current_position[y_ax] + delta[1]),
+                (primary_z_left, current_position[primary_z_left] + delta[2]),
+                (primary_z_right, current_position[primary_z_right] + delta[2]),
+            )
         )
-    )
+    else:
+        primary_z = _z_for_mount(mount)
+        x_ax = _x_for_mount(mount)
+        y_ax = _y_for_mount(mount)
+        target_position = OrderedDict(
+            (
+                (x_ax, current_position[x_ax] + delta[0]),
+                (y_ax, current_position[y_ax] + delta[1]),
+                (primary_z, current_position[primary_z] + delta[2]),
+            )
+        )
     return target_position
 
 
