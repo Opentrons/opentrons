@@ -13,7 +13,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
-  JUSTIFY_CENTER,
+  truncateString,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   POSITION_STICKY,
@@ -21,9 +21,11 @@ import {
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { useNetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
+import type { IconName } from '@opentrons/components'
 import type { RouteProps } from '../../../App/types'
 
 interface NavigationProps {
@@ -38,6 +40,16 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+
+  // We need to display an icon for what type of network connection (if any)
+  // is active next to the robot's name. The designs call for it to change color
+  // from black70 to black100 depending on the which page is being displayed
+  // but we are using ReactRouter NavLinks, which doesn't easily support complex
+  // children like this. For now the icon will just be black70 regardless.
+  //
+  // TODO(ew, 05/21/2023): Integrate icon into NavLink so color changes
+  const networkConnection = useNetworkConnection(robotName)
+  const { icon } = networkConnection
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
   )
@@ -66,30 +78,33 @@ export function Navigation(props: NavigationProps): JSX.Element {
         backgroundColor={COLORS.white}
         aria-label="Navigation_container"
       >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_FLEX_START}
-          justifyContent={JUSTIFY_CENTER}
-          gridGap={SPACING.spacing8}
-        >
-          <NavigationLink to="/dashboard" name={robotName} />
-        </Flex>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
+          <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+            <NavigationLink
+              to="/dashboard"
+              name={truncateString(robotName, 12)}
+            />
+            {icon && (
+              <Icon name={icon} size="40px" color={COLORS.darkBlack70} />
+            )}
+          </Flex>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
             <NavigationLink key={name} to={navLinkTo as string} name={name} />
           ))}
         </Flex>
-        <IconButton
-          aria-label="overflow menu button"
-          onClick={() => handleMenu(true)}
-        >
-          <Icon
-            name="overflow-btn-touchscreen"
-            height="60px"
-            width="48px"
-            color={COLORS.darkBlack70}
-          />
-        </IconButton>
+        <Flex marginTop={`-${SPACING.spacing12}`}>
+          <IconButton
+            aria-label="overflow menu button"
+            onClick={() => handleMenu(true)}
+          >
+            <Icon
+              name="overflow-btn-touchscreen"
+              height="60px"
+              width="48px"
+              color={COLORS.darkBlack70}
+            />
+          </IconButton>
+        </Flex>
       </Flex>
       {showNavMenu && (
         <NavigationMenu
