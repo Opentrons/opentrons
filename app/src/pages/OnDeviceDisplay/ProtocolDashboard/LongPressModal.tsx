@@ -46,7 +46,7 @@ export function LongPressModal(props: {
   const createRunUse = useCreateRunMutation({
     onSuccess: data => {
       const runId: string = data.data.id
-      history.push(`/protocols/${runId}/setup`)
+      history.push(`/runs/${runId}/setup`)
     },
   })
   const createRun =
@@ -148,7 +148,9 @@ export function LongPressModal(props: {
           <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
             <Flex>
               <Icon name="trash" size="1.875rem" />
-              <StyledText>{t('delete_protocol')}</StyledText>
+              <StyledText marginLeft={SPACING.spacing24}>
+                {t('delete_protocol')}
+              </StyledText>
             </Flex>
           </MenuItem>
         </MenuList>

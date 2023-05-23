@@ -32,6 +32,7 @@ import type { PipetteName, RobotType } from '@opentrons/shared-data'
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
+  extensionInstrumentName: string | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
   robotType: RobotType | null
@@ -43,6 +44,7 @@ export const RobotConfigurationDetails = (
   const {
     leftMountPipetteName,
     rightMountPipetteName,
+    extensionInstrumentName,
     requiredModuleDetails,
     isLoading,
     robotType,
@@ -96,12 +98,9 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
-  // TODO(bh, 2022-10-18): insert gripper display name
-  // const extensionMountDisplayName = 'Gripper GEN1'
-  const extensionMountDisplayName = null
   const extensionMountItem =
-    extensionMountDisplayName != null ? (
-      <InstrumentContainer displayName={extensionMountDisplayName} />
+    extensionInstrumentName != null ? (
+      <InstrumentContainer displayName={extensionInstrumentName} />
     ) : (
       emptyText
     )

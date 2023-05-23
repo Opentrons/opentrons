@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
   Flex,
@@ -50,6 +51,7 @@ export function Modal(props: ModalProps): JSX.Element {
         e.stopPropagation()
         onOutsideClick(e)
       }}
+      alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >
       <Flex
@@ -58,7 +60,7 @@ export function Modal(props: ModalProps): JSX.Element {
         width={modalWidth}
         height="max-content"
         maxHeight="33.5rem"
-        borderRadius={BORDERS.size_three}
+        borderRadius={BORDERS.size3}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
@@ -83,7 +85,7 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
           borderRadius={
-            isError ? `0px 0px ${BORDERS.size_three} ${BORDERS.size_three}` : 0
+            isError ? `0px 0px ${BORDERS.size3} ${BORDERS.size3}` : 0
           }
         >
           {children}

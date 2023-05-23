@@ -7,6 +7,10 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.motion_planning import deck_conflict
+from opentrons.protocols.api_support.deck_type import (
+    SHORT_TRASH_DECK,
+    STANDARD_OT2_DECK,
+)
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.module_geometry import (
@@ -34,10 +38,12 @@ EXPECTED_FIXED_TRASH = deck_conflict.Labware(
 )
 
 
-@pytest.fixture
-def subject() -> Deck:
+# This Deck class is only used by Python Protocol API versions earlier than 2.13,
+# which only support the OT-2, not the OT-3.
+@pytest.fixture(params=[STANDARD_OT2_DECK, SHORT_TRASH_DECK])
+def subject(request: Any) -> Deck:
     """Get a Deck test subject."""
-    return Deck()
+    return Deck(deck_type=request.param)
 
 
 @pytest.mark.parametrize("slot_number", range(1, 12))
@@ -108,7 +114,7 @@ def test_highest_z(decoy: Decoy, subject: Deck) -> None:
 
 def test_fixed_trash_conflict_checking(decoy: Decoy) -> None:
     """It should correctly call the deck conflict checker with fixed trash labware."""
-    subject = Deck()
+    subject = Deck(deck_type=STANDARD_OT2_DECK)
     decoy.verify(
         deck_conflict.check(
             existing_items={}, new_location=12, new_item=EXPECTED_FIXED_TRASH

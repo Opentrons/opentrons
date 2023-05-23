@@ -26,11 +26,17 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
 )
-from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel
+from opentrons.protocol_engine.types import (
+    ModuleModel as ProtocolEngineModuleModel,
+    OFF_DECK_LOCATION,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnModuleError,
+)
 
 from ... import validation
+from ..._types import OffDeckType
 from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -45,7 +51,7 @@ from .module_core import (
     NonConnectedModuleCore,
     MagneticBlockCore,
 )
-from .exceptions import InvalidModuleLocationError
+from .exceptions import InvalidModuleLocationError, UnknownLocationError
 from . import load_labware_params
 from . import deck_conflict
 
@@ -190,7 +196,9 @@ class ProtocolCore(
     def move_labware(
         self,
         labware_core: LabwareCore,
-        new_location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
+        new_location: Union[
+            DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
@@ -198,11 +206,17 @@ class ProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location: Union[ModuleLocation, DeckSlotLocation]
+        to_location: Union[ModuleLocation, DeckSlotLocation, str]
         if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
             to_location = ModuleLocation(moduleId=new_location.module_id)
-        else:
+        elif new_location == OffDeckType.OFF_DECK:
+            to_location = OFF_DECK_LOCATION
+        elif isinstance(new_location, DeckSlotName):
             to_location = DeckSlotLocation(slotName=new_location)
+        else:
+            raise UnknownLocationError(
+                f"move_labware is not supported with the given location: {new_location}."
+            )
 
         strategy = (
             LabwareMovementStrategy.USING_GRIPPER
@@ -234,6 +248,10 @@ class ProtocolCore(
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
+        if strategy == LabwareMovementStrategy.USING_GRIPPER:
+            # Clear out last location since it is not relevant to pipetting
+            # and we only use last location for in-place pipetting commands
+            self.set_last_location(location=None, mount=Mount.EXTENSION)
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel

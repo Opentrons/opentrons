@@ -99,7 +99,7 @@ const DisplayConnectionStatus = ({
       backgroundColor={connected ? COLORS.successBackgroundMed : COLORS.light2}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
     >
       <Icon
         name="ot-check"
@@ -147,7 +147,7 @@ const DisplayConnectedNetworkInfo = ({
       paddingY={SPACING.spacing24}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       backgroundColor={COLORS.darkGreyDisabled}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
     >
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon name="wifi" size="2.4rem" />

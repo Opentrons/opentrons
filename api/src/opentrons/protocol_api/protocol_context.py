@@ -15,7 +15,7 @@ from typing import (
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
@@ -29,6 +29,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
+from ._types import OffDeckType
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -123,6 +124,11 @@ class ProtocolContext(CommandPublisher):
         self._core = core
         self._core_map = core_map or LoadedCoreMap()
         self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
+
+        # With the introduction of Extension mount type, this dict initializes to include
+        # the extension mount, for both ot2 & 3. While it doesn't seem like it would
+        # create an issue in the current PAPI context, it would be much safer to
+        # only use mounts available on the robot.
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
@@ -398,11 +404,11 @@ class ProtocolContext(CommandPublisher):
         }
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-    # TODO: gate move_labware behind API version
+    @requires_version(2, 15)
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes],
+        new_location: Union[DeckLocation, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
@@ -418,7 +424,8 @@ class ProtocolContext(CommandPublisher):
                         using :py:meth:`load_labware`
 
         :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module`.
+                             loaded on the deck using :py:meth:`load_module`
+                             or off deck using :py:obj:`OFF_DECK`.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -446,11 +453,13 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location = (
-            new_location._core
-            if isinstance(new_location, ModuleContext)
-            else validation.ensure_deck_slot(new_location)
-        )
+        location: Union[ModuleCore, OffDeckType, DeckSlotName]
+        if isinstance(new_location, ModuleContext):
+            location = new_location._core
+        elif isinstance(new_location, OffDeckType):
+            location = new_location
+        else:
+            location = validation.ensure_deck_slot(new_location)
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)

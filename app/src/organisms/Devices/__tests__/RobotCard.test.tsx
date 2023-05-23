@@ -41,7 +41,7 @@ jest.mock('../RobotOverflowMenu')
 jest.mock('../RobotStatusHeader')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
-const OT3_PNG_FILE_NAME = 'OT3.png'
+const FLEX_PNG_FILE_NAME = 'FLEX.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -162,7 +162,7 @@ describe('RobotCard', () => {
     const [{ getByRole }] = render(props)
     const image = getByRole('img')
 
-    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
+    expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {
@@ -180,17 +180,10 @@ describe('RobotCard', () => {
     getByText('Mock RobotStatusHeader')
   })
 
-  it('renders the type of pipettes attached to left and right mounts', () => {
+  it('renders loading text while loading instruments', () => {
     const [{ getByText }] = render(props)
 
     getByText('instruments')
-    getByText(mockLeftProtoPipette.modelSpecs.displayName)
-    getByText(mockRightProtoPipette.modelSpecs.displayName)
-  })
-
-  it('renders a modules section', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Modules')
+    getByText('LOADING')
   })
 })

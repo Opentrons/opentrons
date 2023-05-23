@@ -94,7 +94,6 @@ describe('ProtocolInstrumentMountItem', () => {
     getByText('Left mount')
     getByText('Calibrated')
     getByText('Flex 8-Channel 1000 μL')
-    getByText('Calibrate')
   })
   it('renders the pipette with no cal data and the calibration button and clicking on it launches the correct flow ', () => {
     props = {
@@ -137,7 +136,7 @@ describe('ProtocolInstrumentMountItem', () => {
     const { getByText } = render(props)
     getByText('Extension mount')
     getByText('No data')
-    getByText('Gripper V1')
+    getByText('Flex Gripper')
     getByText('Attach')
   })
   it('renders the correct information when gripper is attached', () => {
@@ -150,6 +149,6 @@ describe('ProtocolInstrumentMountItem', () => {
     const { getByText } = render(props)
     getByText('Extension mount')
     getByText('Calibrated')
-    getByText('Gripper V1')
+    getByText('Flex Gripper')
   })
 })

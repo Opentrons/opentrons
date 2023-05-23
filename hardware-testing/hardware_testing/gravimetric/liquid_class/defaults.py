@@ -16,75 +16,127 @@ _default_retract_mm = 3.0
 
 # dispense settings are constant across volumes
 _dispense_defaults = {
-    50: {  # P50
-        50: DispenseSettings(  # T50
-            flow_rate=7.85,
-            delay=0.5,
-            submerge=_default_submerge_mm_t50,
-            retract=_default_retract_mm,
-            acceleration=40000,  # this is a fake number
-            deceleration=40000,  # this is a fake number
-        ),
+    1: {
+        50: {  # P50
+            50: DispenseSettings(  # T50
+                flow_rate=57,
+                delay=0.5,
+                submerge=_default_submerge_mm_t50,
+                retract=_default_retract_mm,
+                acceleration=40000,  # this is a fake number
+                deceleration=40000,  # this is a fake number
+            ),
+        },
+        1000: {  # P1000
+            50: DispenseSettings(  # T50
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm_t50,
+                retract=_default_retract_mm,
+                acceleration=10000,  # this is a fake number
+                deceleration=20000,  # this is a fake number
+            ),
+            200: DispenseSettings(  # T200
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm,
+                retract=_default_retract_mm,
+                acceleration=10000,  # this is a fake number
+                deceleration=20000,  # this is a fake number
+            ),
+            1000: DispenseSettings(  # T1000
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm,
+                retract=_default_retract_mm,
+                acceleration=10000,
+                deceleration=20000,
+            ),
+        },
     },
-    1000: {  # P1000
-        50: DispenseSettings(  # T50
-            flow_rate=160,
-            delay=0.5,
-            submerge=_default_submerge_mm_t50,
-            retract=_default_retract_mm,
-            acceleration=10000,  # this is a fake number
-            deceleration=20000,  # this is a fake number
-        ),
-        200: DispenseSettings(  # T200
-            flow_rate=160,
-            delay=0.5,
-            submerge=_default_submerge_mm,
-            retract=_default_retract_mm,
-            acceleration=10000,  # this is a fake number
-            deceleration=20000,  # this is a fake number
-        ),
-        1000: DispenseSettings(  # T1000
-            flow_rate=160,
-            delay=0.5,
-            submerge=_default_submerge_mm,
-            retract=_default_retract_mm,
-            acceleration=10000,
-            deceleration=20000,
-        ),
+    8: {
+        50: {  # P50
+            50: DispenseSettings(  # T50
+                flow_rate=57,
+                delay=0.5,
+                submerge=_default_submerge_mm_t50,
+                retract=_default_retract_mm,
+                acceleration=40000,  # this is a fake number
+                deceleration=40000,  # this is a fake number
+            ),
+        },
+        1000: {  # P1000
+            50: DispenseSettings(  # T50
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm_t50,
+                retract=_default_retract_mm,
+                acceleration=10000,  # this is a fake number
+                deceleration=20000,  # this is a fake number
+            ),
+            200: DispenseSettings(  # T200
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm,
+                retract=_default_retract_mm,
+                acceleration=10000,  # this is a fake number
+                deceleration=20000,  # this is a fake number
+            ),
+            1000: DispenseSettings(  # T1000
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm,
+                retract=_default_retract_mm,
+                acceleration=10000,
+                deceleration=20000,
+            ),
+        },
+    },
+    96: {
+        1000: {  # P1000
+            50: DispenseSettings(  # T50
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm_t50,
+                retract=_default_retract_mm,
+                acceleration=10000,  # this is a fake number
+                deceleration=20000,  # this is a fake number
+            ),
+            200: DispenseSettings(  # T200
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm,
+                retract=_default_retract_mm,
+                acceleration=10000,  # this is a fake number
+                deceleration=20000,  # this is a fake number
+            ),
+            1000: DispenseSettings(  # T1000
+                flow_rate=160,
+                delay=0.5,
+                submerge=_default_submerge_mm,
+                retract=_default_retract_mm,
+                acceleration=10000,
+                deceleration=20000,
+            ),
+        },
     },
 }
 
-OT3_LIQUID_CLASS = {
-    50: {  # P50
-        50: {  # T50
-            1: LiquidClassSettings(  # 1uL
-                aspirate=AspirateSettings(
-                    flow_rate=7.85,
+_aspirate_defaults = {
+    1: {
+        50: {  # P50
+            50: {  # T50
+                1: AspirateSettings(  # 1uL
+                    flow_rate=57,
                     delay=1.0,
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=1.5,
+                        leading_air_gap=3.5,
                         trailing_air_gap=0.1,
                     ),
                 ),
-                dispense=_dispense_defaults[50][50],
-            ),
-            10: LiquidClassSettings(  # 10uL
-                aspirate=AspirateSettings(
-                    flow_rate=7.85,
-                    delay=1.0,
-                    submerge=_default_submerge_mm_t50,
-                    retract=_default_retract_mm,
-                    air_gap=AirGapSettings(
-                        leading_air_gap=2.5,
-                        trailing_air_gap=0.1,
-                    ),
-                ),
-                dispense=_dispense_defaults[50][50],
-            ),
-            50: LiquidClassSettings(  # 50uL
-                aspirate=AspirateSettings(
+                10: AspirateSettings(  # 10uL
                     flow_rate=7.85,
                     delay=1.0,
                     submerge=_default_submerge_mm_t50,
@@ -94,14 +146,21 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=0.1,
                     ),
                 ),
-                dispense=_dispense_defaults[50][50],
-            ),
+                50: AspirateSettings(  # 50uL
+                    flow_rate=7.85,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=2.5,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+            },
         },
-    },
-    1000: {  # P1000
-        50: {  # T50
-            5: LiquidClassSettings(  # 5uL
-                aspirate=AspirateSettings(
+        1000: {  # P1000
+            50: {  # T50
+                5: AspirateSettings(  # 5uL
                     flow_rate=6.5,
                     delay=1.0,
                     submerge=_default_submerge_mm_t50,
@@ -111,10 +170,7 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=0.1,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][50],
-            ),
-            10: LiquidClassSettings(  # 10uL
-                aspirate=AspirateSettings(
+                10: AspirateSettings(  # 10uL
                     flow_rate=6.5,
                     delay=1.0,
                     submerge=_default_submerge_mm_t50,
@@ -124,10 +180,7 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=0.1,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][50],
-            ),
-            50: LiquidClassSettings(  # 50uL
-                aspirate=AspirateSettings(
+                50: AspirateSettings(  # 50uL
                     flow_rate=6.5,
                     delay=1.0,
                     submerge=_default_submerge_mm_t50,
@@ -137,12 +190,9 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=0.1,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][50],
-            ),
-        },
-        200: {  # T200
-            5: LiquidClassSettings(  # 5uL
-                aspirate=AspirateSettings(
+            },
+            200: {  # T200
+                5: AspirateSettings(  # 5uL
                     flow_rate=80,
                     delay=1.0,
                     submerge=_default_submerge_mm,
@@ -152,10 +202,7 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=5,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][200],
-            ),
-            50: LiquidClassSettings(  # 50uL
-                aspirate=AspirateSettings(
+                50: AspirateSettings(  # 50uL
                     flow_rate=80,
                     delay=1.0,
                     submerge=_default_submerge_mm,
@@ -165,10 +212,7 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=3.5,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][200],
-            ),
-            200: LiquidClassSettings(  # 200uL
-                aspirate=AspirateSettings(
+                200: AspirateSettings(  # 200uL
                     flow_rate=80,
                     delay=1.0,
                     submerge=_default_submerge_mm,
@@ -178,12 +222,143 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=2,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][200],
-            ),
+            },
+            1000: {  # T1000
+                10: AspirateSettings(  # 10uL
+                    flow_rate=160,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=10,
+                    ),
+                ),
+                100: AspirateSettings(  # 100uL
+                    flow_rate=160,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=10,
+                    ),
+                ),
+                1000: AspirateSettings(  # 1000uL
+                    flow_rate=160,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=10,
+                    ),
+                ),
+            },
         },
-        1000: {  # T1000
-            10: LiquidClassSettings(  # 10uL
-                aspirate=AspirateSettings(
+    },
+    8: {
+        50: {  # P50
+            50: {  # T50
+                1: AspirateSettings(  # 1uL
+                    flow_rate=7.85,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=1.5,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+                10: AspirateSettings(  # 10uL
+                    flow_rate=7.85,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=2.5,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+                50: AspirateSettings(  # 50uL
+                    flow_rate=7.85,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=2.5,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+            },
+        },
+        1000: {  # P1000
+            50: {  # T50
+                5: AspirateSettings(  # 5uL
+                    flow_rate=6.5,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=3.2,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+                10: AspirateSettings(  # 10uL
+                    flow_rate=6.5,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=3.2,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+                50: AspirateSettings(  # 50uL
+                    flow_rate=6.5,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=3.2,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+            },
+            200: {  # T200
+                5: AspirateSettings(  # 5uL
+                    flow_rate=80,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=5,
+                    ),
+                ),
+                50: AspirateSettings(  # 50uL
+                    flow_rate=80,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=3.5,
+                    ),
+                ),
+                200: AspirateSettings(  # 200uL
+                    flow_rate=80,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=2,
+                    ),
+                ),
+            },
+            1000: {  # T1000
+                10: AspirateSettings(  # 10uL
                     flow_rate=160,
                     delay=1.0,
                     submerge=_default_submerge_mm,
@@ -193,10 +368,7 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=10,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][1000],
-            ),
-            100: LiquidClassSettings(  # 100uL
-                aspirate=AspirateSettings(
+                100: AspirateSettings(  # 100uL
                     flow_rate=160,
                     delay=1.0,
                     submerge=_default_submerge_mm,
@@ -206,10 +378,7 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=10,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][1000],
-            ),
-            1000: LiquidClassSettings(  # 1000uL
-                aspirate=AspirateSettings(
+                1000: AspirateSettings(  # 1000uL
                     flow_rate=160,
                     delay=1.0,
                     submerge=_default_submerge_mm,
@@ -219,41 +388,148 @@ OT3_LIQUID_CLASS = {
                         trailing_air_gap=10,
                     ),
                 ),
-                dispense=_dispense_defaults[1000][1000],
-            ),
+            },
+        },
+    },
+    96: {
+        1000: {  # P1000
+            50: {  # T50
+                5: AspirateSettings(  # 5uL
+                    flow_rate=6.5,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=3.2,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+                10: AspirateSettings(  # 10uL
+                    flow_rate=6.5,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=3.2,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+                50: AspirateSettings(  # 50uL
+                    flow_rate=6.5,
+                    delay=1.0,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=3.2,
+                        trailing_air_gap=0.1,
+                    ),
+                ),
+            },
+            200: {  # T200
+                5: AspirateSettings(  # 5uL
+                    flow_rate=80,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=5,
+                    ),
+                ),
+                50: AspirateSettings(  # 50uL
+                    flow_rate=80,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=3.5,
+                    ),
+                ),
+                200: AspirateSettings(  # 200uL
+                    flow_rate=80,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=2,
+                    ),
+                ),
+            },
+            1000: {  # T1000
+                10: AspirateSettings(  # 10uL
+                    flow_rate=160,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=10,
+                    ),
+                ),
+                100: AspirateSettings(  # 100uL
+                    flow_rate=160,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=10,
+                    ),
+                ),
+                1000: AspirateSettings(  # 1000uL
+                    flow_rate=160,
+                    delay=1.0,
+                    submerge=_default_submerge_mm,
+                    retract=_default_retract_mm,
+                    air_gap=AirGapSettings(
+                        leading_air_gap=16,
+                        trailing_air_gap=10,
+                    ),
+                ),
+            },
         },
     },
 }
 
 
 def get_liquid_class(
-    pipette_volume: int, tip_volume: int, test_volume: int
+    pipette: int, channels: int, tip: int, volume: int
 ) -> LiquidClassSettings:
     """Get liquid class."""
-    pip_classes = OT3_LIQUID_CLASS[pipette_volume]
-    tip_classes = pip_classes[tip_volume]
-    defined_volumes = list(tip_classes.keys())
+    aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
+    dispense_cls = _dispense_defaults[channels][pipette][tip]
+    defined_volumes = list(aspirate_cls_per_volume.keys())
     defined_volumes.sort()
     assert len(defined_volumes) == 3
 
-    def _get_interp_liq_class(lower: int, upper: int) -> LiquidClassSettings:
-        factor = (test_volume - lower) / (upper - lower)
-        return interpolate(tip_classes[lower], tip_classes[upper], factor)
+    def _build_liquid_class(vol: int) -> LiquidClassSettings:
+        return LiquidClassSettings(
+            aspirate=aspirate_cls_per_volume[vol],
+            dispense=dispense_cls,
+        )
 
-    if test_volume <= defined_volumes[0]:
-        return tip_classes[defined_volumes[0]]
-    elif test_volume < defined_volumes[1]:
+    def _get_interp_liq_class(lower_ul: int, upper_ul: int) -> LiquidClassSettings:
+        factor = (volume - lower_ul) / (upper_ul - lower_ul)
+        lower_cls = _build_liquid_class(lower_ul)
+        upper_cls = _build_liquid_class(upper_ul)
+        return interpolate(lower_cls, upper_cls, factor)
+
+    if volume <= defined_volumes[0]:
+        return _build_liquid_class(defined_volumes[0])
+    elif volume < defined_volumes[1]:
         return _get_interp_liq_class(defined_volumes[0], defined_volumes[1])
-    elif test_volume == defined_volumes[1]:
-        return tip_classes[defined_volumes[1]]
-    elif test_volume < defined_volumes[2]:
+    elif volume == defined_volumes[1]:
+        return _build_liquid_class(defined_volumes[1])
+    elif volume < defined_volumes[2]:
         return _get_interp_liq_class(defined_volumes[1], defined_volumes[2])
     else:
-        return tip_classes[defined_volumes[2]]
+        return _build_liquid_class(defined_volumes[2])
 
 
-def get_test_volumes(pipette_volume: int, tip_volume: int) -> List[float]:
+def get_test_volumes(pipette: int, channels: int, tip: int) -> List[float]:
     """Get test volumes."""
-    pip_classes = OT3_LIQUID_CLASS[pipette_volume]
-    tip_classes = pip_classes[tip_volume]
-    return list(tip_classes.keys())
+    aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
+    defined_volumes = list(aspirate_cls_per_volume.keys())
+    return [float(v) for v in defined_volumes]

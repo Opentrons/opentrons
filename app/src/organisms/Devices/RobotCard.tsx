@@ -22,23 +22,28 @@ import {
 import {
   getGripperDisplayName,
   getModuleDisplayName,
+  getPipetteModelSpecs,
 } from '@opentrons/shared-data'
+import {
+  useInstrumentsQuery,
+  usePipettesQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useAttachedModules, useAttachedPipettes, useIsOT3 } from './hooks'
+import { useIsOT3 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -66,7 +71,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       css={BORDERS.cardOutlineBorder}
     >
       <img
-        src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
         style={{ width: '6rem' }}
         id={`RobotCard_${String(robotName)}_robotImage`}
       />
@@ -86,6 +91,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             alignItems={ALIGN_START}
             paddingRight={SPACING.spacing24}
           />
+
           {robot.status === CONNECTABLE ? (
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -113,9 +119,13 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
 function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const attachedModules = useAttachedModules()
+  const {
+    data: modulesData,
+    isLoading: isModulesQueryLoading,
+  } = useModulesQuery()
+  const attachedModules = modulesData?.data ?? []
 
-  return attachedModules.length > 0 ? (
+  return !isModulesQueryLoading && attachedModules.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText
         as="h6"
@@ -138,17 +148,23 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     </Flex>
   ) : null
 }
+
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
-  const attachedPipettes = useAttachedPipettes()
   const isOT3 = useIsOT3(props.robotName)
-  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
+  const {
+    data: pipettesData,
+    isLoading: isPipetteQueryLoading,
+  } = usePipettesQuery()
+
+  const {
+    data: attachedInstruments,
+    isLoading: isInstrumentsQueryLoading,
+  } = useInstrumentsQuery({ enabled: isOT3 })
   const extensionInstrument =
     (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
-
-  const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
-  const rightPipetteDisplayName =
-    attachedPipettes?.right?.modelSpecs.displayName
+  const leftPipetteModel = pipettesData?.left?.model ?? null
+  const rightPipetteModel = pipettesData?.right?.model ?? null
   const extensionMountDisplayName =
     extensionInstrument != null &&
     extensionInstrument.instrumentModel === 'gripperV1'
@@ -169,22 +185,37 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       <StyledText as="h6" color={COLORS.darkGreyEnabled}>
         {t('shared:instruments')}
       </StyledText>
-      <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
-        {leftAndRightMountsPipetteDisplayName != null ? (
-          <InstrumentContainer
-            displayName={leftAndRightMountsPipetteDisplayName}
-          />
-        ) : null}
-        {leftPipetteDisplayName != null ? (
-          <InstrumentContainer displayName={leftPipetteDisplayName} />
-        ) : null}
-        {rightPipetteDisplayName != null ? (
-          <InstrumentContainer displayName={rightPipetteDisplayName} />
-        ) : null}
-        {extensionMountDisplayName != null ? (
-          <InstrumentContainer displayName={extensionMountDisplayName} />
-        ) : null}
-      </Flex>
+
+      {isInstrumentsQueryLoading ? 'INSTRUMENTS' : null}
+      {isPipetteQueryLoading ? 'PIPETTES' : null}
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? (
+        <StyledText as="h5">{t('loading').toUpperCase()}</StyledText>
+      ) : (
+        <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
+          {leftAndRightMountsPipetteDisplayName != null ? (
+            <InstrumentContainer
+              displayName={leftAndRightMountsPipetteDisplayName}
+            />
+          ) : null}
+          {leftPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {rightPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {extensionMountDisplayName != null ? (
+            <InstrumentContainer displayName={extensionMountDisplayName} />
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   )
 }

@@ -1,3 +1,5 @@
+import type { Agent } from 'http'
+
 import type {
   HealthResponse,
   ServerHealthResponse,
@@ -49,6 +51,8 @@ export interface Address {
   ip: string
   /** Port */
   port: number
+  /** custom http agent */
+  agent?: Agent
 }
 
 /**
