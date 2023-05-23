@@ -5,6 +5,7 @@ import { useInterval } from '@opentrons/components'
 import { useWifiList } from '../../../resources/networking/hooks'
 import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 
+import type { IconName } from '@opentrons/components'
 import type { Dispatch, State } from '../../../redux/types'
 
 export interface NetworkConnection {
@@ -13,6 +14,7 @@ export interface NetworkConnection {
   isUsbConnected: boolean
   connectionStatus: string
   activeSsid?: string
+  icon?: IconName
 }
 
 const CONNECTION_POLL_MS = 10000 // Note: (kj:02/02/2023) temp value
@@ -21,6 +23,7 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   let connectionStatus: string = ''
+  let iconName: 'wifi' | 'usb' | 'ethernet' | null = null
   const list = useWifiList(robotName, CONNECTION_POLL_MS)
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
@@ -42,6 +45,7 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
 
   if (isWifiConnected) {
     connectionStatus = t('connected_via', { networkInterface: t('wifi') })
+    iconName = 'wifi'
   }
 
   if (isEthernetConnected) {
@@ -51,6 +55,7 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
       connectionStatus.length === 0
         ? t('connected_via', { networkInterface: t('ethernet') })
         : `${connectionStatus} and ${t('ethernet')}`
+    iconName = 'ethernet'
   }
 
   if (isUsbConnected) {
@@ -60,6 +65,7 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
       connectionStatus.length === 0
         ? t('connected_via', { networkInterface: t('usb') })
         : `${connectionStatus} and ${t('usb')}`
+    iconName = 'usb'
   }
 
   if (isWifiConnected && !isEthernetConnected && !isUsbConnected) {
@@ -76,5 +82,6 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
     isUsbConnected,
     connectionStatus,
     activeSsid,
+    icon: iconName !== null ? iconName : undefined,
   }
 }
