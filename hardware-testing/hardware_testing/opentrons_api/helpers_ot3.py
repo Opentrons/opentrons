@@ -138,13 +138,13 @@ async def build_async_ot3_hardware_api(
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     kwargs = {"config": config}
     if is_simulating:
-        builder = OT3API.build_hardware_simulator
+        builder = OT3API.build_hardware_simulator  # type: ignore
         sim_pips = _create_attached_instruments_dict(
             pipette_left, pipette_right, gripper
         )
         kwargs["attached_instruments"] = sim_pips  # type: ignore[assignment]
     else:
-        builder = OT3API.build_hardware_controller
+        builder = OT3API.build_hardware_controller  # type: ignore
         stop_server_ot3()
         restart_canbus_ot3()
         kwargs["use_usb_bus"] = True  # type: ignore[assignment]
