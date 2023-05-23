@@ -9,7 +9,7 @@ import { StyledText } from '../../atoms/text'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import { GripperWizardFlowType } from '../GripperWizardFlows/types'
+import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {
   attachedGripper: InstrumentData | null
@@ -71,7 +71,7 @@ export function GripperCard({
         }
         banner={
           attachedGripper != null && !isCalibrated ? (
-            <Banner type="error" marginBottom={SPACING.spacing2}>
+            <Banner type="error" marginBottom={SPACING.spacing4}>
               <Trans
                 t={t}
                 i18nKey="calibration_needed"

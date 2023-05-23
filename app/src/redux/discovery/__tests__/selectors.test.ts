@@ -583,6 +583,24 @@ describe('discovery selectors', () => {
       args: ['qux'],
       expected: 'Opentrons Flex',
     },
+    {
+      name: 'getRobotAddressesByName returns addresses by name',
+      selector: discovery.getRobotAddressesByName,
+      state: MOCK_STATE,
+      args: ['qux'],
+      expected: [
+        {
+          ip: '10.0.0.4',
+          port: 31950,
+          seen: true,
+          healthStatus: HEALTH_STATUS_UNREACHABLE,
+          serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+          healthError: mockHealthFetchErrorResponse,
+          serverHealthError: mockHealthFetchErrorResponse,
+          advertisedModel: ROBOT_MODEL_OT3,
+        },
+      ],
+    },
   ]
 
   SPECS.forEach(spec => {

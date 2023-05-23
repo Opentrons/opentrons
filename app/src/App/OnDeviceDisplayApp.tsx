@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -33,14 +33,22 @@ import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
 import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
+import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
+import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
+  {
+    Component: InitialLoadingScreen,
+    exact: true,
+    name: 'Initial Loading Screen',
+    path: '/loading',
+  },
   {
     Component: Welcome,
     exact: true,
@@ -102,19 +110,19 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     Component: ProtocolSetup,
     exact: true,
     name: 'Protocol Setup',
-    path: '/protocols/:runId/setup',
+    path: '/runs/:runId/setup',
   },
   {
     Component: RunningProtocol,
     exact: true,
     name: 'Protocol Run',
-    path: '/protocols/:runId/run',
+    path: '/runs/:runId/run',
   },
   {
     Component: RunSummary,
     exact: true,
     name: 'Protocol Run Summary',
-    path: '/protocols/:runId/summary',
+    path: '/runs/:runId/summary',
   },
   {
     Component: InstrumentsDashboard,
@@ -183,13 +191,8 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 const TURN_OFF_BACKLIGHT = 7
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
-  const { sleepMs, unfinishedUnboxingFlowRoute, brightness } = useSelector(
-    getOnDeviceDisplaySettings
-  )
-  const targetPath =
-    unfinishedUnboxingFlowRoute != null
-      ? unfinishedUnboxingFlowRoute
-      : '/dashboard'
+  const { brightness, sleepMs } = useSelector(getOnDeviceDisplaySettings)
+
   const sleepTime = sleepMs != null ? sleepMs : SLEEP_NEVER_MS
   const options = {
     events: onDeviceDisplayEvents,
@@ -247,6 +250,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
           <SleepScreen />
         ) : (
           <ToasterOven>
+            <ProtocolReceiptToasts />
             <Switch>
               {onDeviceDisplayRoutes.map(
                 ({ Component, exact, path }: RouteProps) => {
@@ -260,11 +264,26 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   )
                 }
               )}
-              <Redirect exact from="/" to={targetPath} />
+              <Redirect exact from="/" to={'/loading'} />
             </Switch>
           </ToasterOven>
         )}
       </Box>
+      <TopLevelRedirects />
     </ApiHostProvider>
   )
+}
+
+function TopLevelRedirects(): JSX.Element | null {
+  const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
+  const currentRunRoute = useCurrentRunRoute()
+
+  if (runRouteMatch != null && currentRunRoute == null)
+    return <Redirect to="/dashboard" />
+  return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
+}
+
+function ProtocolReceiptToasts(): null {
+  useProtocolReceiptToast()
+  return null
 }

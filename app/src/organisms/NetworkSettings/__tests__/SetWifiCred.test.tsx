@@ -45,9 +45,8 @@ describe('SetWifiCred', () => {
     const [{ getByText, getByRole, getAllByRole, getByLabelText }] = render(
       props
     )
-    getByText('mockWifi')
-    getByText('Back')
-    getByRole('button', { name: 'Connect' })
+    getByText('Sign into Wi-Fi')
+    getByText('Connect')
     getByText('Enter password')
     expect(getByLabelText('wifi_password')).toBeInTheDocument()
     getByRole('button', { name: 'Show' })
@@ -76,16 +75,16 @@ describe('SetWifiCred', () => {
   })
 
   it('should call mock function when tapping back', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Back')
-    fireEvent.click(button)
+    const [{ getByTestId }] = render(props)
+    const button = getByTestId('SetWifiCred_back_button')
+    button.click()
     expect(props.setShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping connect', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Connect' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    const button = getByText('Connect')
+    button.click()
     expect(props.handleConnect).toHaveBeenCalled()
   })
 })

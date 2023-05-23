@@ -225,7 +225,7 @@ export const MultiSelectToolbar = (props: Props): JSX.Element => {
         <Flex
           alignItems={ALIGN_CENTER}
           height={SIZE_2}
-          paddingX={SPACING.spacing3}
+          paddingX={SPACING.spacing8}
           backgroundColor={C_NEAR_WHITE}
           zIndex="100"
         >

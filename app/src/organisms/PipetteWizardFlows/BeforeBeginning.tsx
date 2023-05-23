@@ -2,7 +2,6 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { COLORS, SIZE_1, SPACING } from '@opentrons/components'
 import {
-  LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
@@ -156,13 +155,6 @@ export const BeforeBeginning = (
       // @ts-expect-error calibration type not yet supported
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT,
-      },
-    },
-    {
-      // @ts-expect-error calibration type not yet supported
-      commandType: 'calibration/moveToMaintenancePosition' as const,
-      params: {
         mount: RIGHT,
       },
     },
@@ -205,7 +197,7 @@ export const BeforeBeginning = (
             <Banner
               type="warning"
               size={isOnDevice ? '1.5rem' : SIZE_1}
-              marginY={SPACING.spacing2}
+              marginY={SPACING.spacing4}
             >
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
             </Banner>

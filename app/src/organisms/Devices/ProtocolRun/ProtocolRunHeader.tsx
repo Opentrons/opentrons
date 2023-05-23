@@ -199,9 +199,9 @@ export function ProtocolRunHeader({
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      marginBottom={SPACING.spacing4}
-      padding={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
+      marginBottom={SPACING.spacing16}
+      padding={SPACING.spacing16}
     >
       {showAnalysisErrorModal &&
         analysisErrors != null &&
@@ -271,7 +271,7 @@ export function ProtocolRunHeader({
           backgroundColor={COLORS.fundamentalsBackground}
           display="grid"
           gridTemplateColumns="4fr 6fr 4fr"
-          padding={SPACING.spacing3}
+          padding={SPACING.spacing8}
         >
           <LabeledValue
             label={t('protocol_start')}
@@ -312,7 +312,7 @@ interface LabeledValueProps {
 
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText as="h6">{props.label}</StyledText>
       {typeof props.value === 'string' ? (
         <StyledText as="p">{props.value}</StyledText>
@@ -335,8 +335,8 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
         <Icon
           name="circle"
           color={COLORS.blueEnabled}
-          size={SPACING.spacing2}
-          marginRight={SPACING.spacing2}
+          size={SPACING.spacing4}
+          marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
@@ -534,7 +534,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
         disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
@@ -544,7 +544,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
           <Icon
             name={buttonIconName}
             size={SIZE_1}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             spin={
               isProtocolAnalyzing || runStatus === RUN_STATUS_STOP_REQUESTED
             }

@@ -8,17 +8,22 @@ import {
   createDiscoveryClient,
   DEFAULT_PORT,
 } from '@opentrons/discovery-client'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import {
+  UI_INITIALIZED,
+  USB_HTTP_REQUESTS_START,
+  USB_HTTP_REQUESTS_STOP,
+} from '@opentrons/app/src/redux/shell/actions'
 import {
   DISCOVERY_START,
   DISCOVERY_FINISH,
   DISCOVERY_REMOVE,
   CLEAR_CACHE,
 } from '@opentrons/app/src/redux/discovery/actions'
+import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
+import { getSerialPortHttpAgent } from './usb'
 
 import type {
   Address,
@@ -145,20 +150,52 @@ export function registerDiscovery(
 
     switch (action.type) {
       case UI_INITIALIZED:
-      case DISCOVERY_START:
+      case DISCOVERY_START: {
         handleRobots()
-        return client.start({ healthPollInterval: FAST_POLL_INTERVAL_MS })
-
-      case DISCOVERY_FINISH:
-        return client.start({ healthPollInterval: SLOW_POLL_INTERVAL_MS })
-
-      case DISCOVERY_REMOVE:
+        return client.start({
+          healthPollInterval: FAST_POLL_INTERVAL_MS,
+        })
+      }
+      case DISCOVERY_FINISH: {
+        return client.start({
+          healthPollInterval: SLOW_POLL_INTERVAL_MS,
+        })
+      }
+      case DISCOVERY_REMOVE: {
         return client.removeRobot(
           (action.payload as { robotName: string }).robotName
         )
-
-      case CLEAR_CACHE:
+      }
+      case CLEAR_CACHE: {
         return clearCache()
+      }
+      case USB_HTTP_REQUESTS_START: {
+        const usbHttpAgent = getSerialPortHttpAgent()
+
+        client.start({
+          healthPollInterval: FAST_POLL_INTERVAL_MS,
+          manualAddresses: [
+            {
+              ip: OPENTRONS_USB,
+              port: DEFAULT_PORT,
+              agent: usbHttpAgent,
+            },
+          ],
+        })
+        break
+      }
+      case USB_HTTP_REQUESTS_STOP: {
+        client.start({
+          healthPollInterval: FAST_POLL_INTERVAL_MS,
+          manualAddresses: [
+            {
+              ip: OPENTRONS_USB,
+              port: DEFAULT_PORT,
+            },
+          ],
+        })
+        break
+      }
     }
   }
 
@@ -174,6 +211,6 @@ export function registerDiscovery(
   }
 
   function clearCache(): void {
-    client.start({ initialRobots: [] })
+    client.start({ initialRobots: [], manualAddresses: [] })
   }
 }

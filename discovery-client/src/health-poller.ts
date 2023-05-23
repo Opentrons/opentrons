@@ -1,14 +1,17 @@
 import net from 'net'
 import fetch from 'node-fetch'
 import intersectionBy from 'lodash/intersectionBy'
+import isEqual from 'lodash/isEqual'
 import unionBy from 'lodash/unionBy'
-import xorBy from 'lodash/xorBy'
+import xorWith from 'lodash/xorWith'
 
 import {
   ROBOT_SERVER_HEALTH_PATH,
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
 
+import type { Agent } from 'http'
+import type { RequestInit } from 'node-fetch'
 import type {
   HealthPoller,
   HealthPollerTarget,
@@ -20,7 +23,7 @@ import type {
   LogLevel,
 } from './types'
 
-const DEFAULT_REQUEST_OPTS = {
+const DEFAULT_REQUEST_OPTS: RequestInit = {
   timeout: 10000,
   // NOTE(mc, 2020-11-04): This api version is slightly duplicated
   // across the larger monorepo codebase and is a good argument for a
@@ -48,12 +51,17 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
   let pollIntervalId: NodeJS.Timeout | null = null
   let lastCompletedPollTimeByIp: { [ip: string]: number | undefined } = {}
 
-  const pollAndNotify = (ip: string, port: number): Promise<void> => {
-    log('silly', 'Polling health', { ip, port })
+  const pollAndNotify = (target: {
+    ip: string
+    port: number
+    agent?: Agent
+  }): Promise<void> => {
+    const { ip, port, agent } = target
+    log('silly', 'Polling health', { ip, port, agent })
 
     const pollTime = Date.now()
 
-    return pollHealth(ip, port)
+    return pollHealth(target)
       .then(result => {
         const lastPollTime = lastCompletedPollTimeByIp[ip] ?? 0
 
@@ -84,11 +92,12 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
     // if xor (symmetric difference) returns values, then elements exist in
     // one list and not the other and need to be added to and/or removed from the queue
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (nextList && xorBy(pollQueue, nextList, 'ip').length > 0) {
+    if (nextList && xorWith(pollQueue, nextList, isEqual).length > 0) {
       // keeping the order of `pollQueue`, remove all elements that aren't
       // in the new list via `intersection`, then add new elements via `union`
       pollQueue = unionBy(
-        intersectionBy(pollQueue, nextList, 'ip'),
+        // prefer reference from nextList
+        intersectionBy(nextList, pollQueue, 'ip'),
         nextList,
         'ip'
       )
@@ -104,7 +113,7 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
           // take the head of the queue out and put it back in at the end
           pollQueue.push(head)
           // eslint-disable-next-line no-void
-          void pollAndNotify(head.ip, head.port)
+          void pollAndNotify(head)
         }
       }
 
@@ -119,8 +128,9 @@ export function createHealthPoller(options: HealthPollerOptions): HealthPoller {
   function stop(): void {
     log('debug', 'stopping health poller')
     lastCompletedPollTimeByIp = {}
-    // @ts-expect-error(mc, 2021-02-16): guard with a null check for pollIntervalId
-    clearInterval(pollIntervalId)
+    if (pollIntervalId != null) {
+      clearInterval(pollIntervalId)
+    }
     pollIntervalId = null
   }
 
@@ -136,9 +146,10 @@ type FetchAndParseResult<SuccessBody> =
  * be parsed, return the string body to preserve non-JSON NGINX responses
  */
 function fetchAndParse<SuccessBody>(
-  url: string
+  url: string,
+  options?: RequestInit
 ): Promise<FetchAndParseResult<SuccessBody>> {
-  return fetch(url, DEFAULT_REQUEST_OPTS)
+  return fetch(url, { ...DEFAULT_REQUEST_OPTS, ...options })
     .then(resp => {
       const { ok, status } = resp
 
@@ -171,15 +182,25 @@ function fetchAndParse<SuccessBody>(
  * Poll both /heath and /server/update/health of an IP address and combine the
  * responses into a single result object
  */
-function pollHealth(ip: string, port: number): Promise<HealthPollerResult> {
+function pollHealth({
+  ip,
+  port,
+  agent,
+}: {
+  ip: string
+  port: number
+  agent?: Agent
+}): Promise<HealthPollerResult> {
   // IPv6 addresses require brackets
   const urlIp = net.isIPv6(ip) ? `[${ip}]` : ip
 
   const healthReq = fetchAndParse<HealthResponse>(
-    `http://${urlIp}:${port}${ROBOT_SERVER_HEALTH_PATH}`
+    `http://${urlIp}:${port}${ROBOT_SERVER_HEALTH_PATH}`,
+    { agent }
   )
   const serverHealthReq = fetchAndParse<ServerHealthResponse>(
-    `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`
+    `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`,
+    { agent }
   )
 
   return Promise.all([healthReq, serverHealthReq]).then(

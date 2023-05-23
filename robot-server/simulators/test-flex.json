@@ -1,0 +1,64 @@
+{
+  "machine": "OT-3 Standard",
+  "attached_instruments": {
+    "right": {
+      "model": "p1000_single_v3.4",
+      "id": "321",
+      "max_volume": 1000,
+      "name": "p1000_single",
+      "tip_length": 0,
+      "channels": 1
+    },
+    "left": {
+      "model": "p50_single_v3.4",
+      "id": "123",
+      "max_volume": 50,
+      "name": "p50_single",
+      "tip_length": 0,
+      "channels": 1
+    }
+  },
+  "attached_modules": {
+    "thermocycler": [
+      {
+        "function_name": "set_temperature",
+        "kwargs": {
+          "temperature": 3,
+          "hold_time_seconds": 1,
+          "hold_time_minutes": 2,
+          "ramp_rate": 4,
+          "volume": 5
+        }
+      },
+      {
+        "function_name": "set_lid_temperature",
+        "kwargs": {
+          "temperature": 4
+        }
+      }
+    ],
+    "heatershaker": [],
+    "tempdeck": [
+      {
+        "function_name": "start_set_temperature",
+        "kwargs": {
+          "celsius": 3
+        }
+      },
+      {
+        "function_name": "await_temperature",
+        "kwargs": {
+          "awaiting_temperature": null
+        }
+      }
+    ],
+    "magdeck": [
+      {
+        "function_name": "engage",
+        "kwargs": {
+          "height": 4
+        }
+      }
+    ]
+  }
+}

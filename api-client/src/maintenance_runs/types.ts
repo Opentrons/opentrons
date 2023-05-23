@@ -81,3 +81,7 @@ export interface MaintenanceRunError {
 export interface CreateMaintenanceRunData {
   labwareOffsets?: LabwareOffsetCreateData[]
 }
+
+export interface LabwareDefinitionSummary {
+  definitionUri: string
+}

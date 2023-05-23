@@ -105,8 +105,8 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       {instrument != null ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
-          marginTop={SPACING.spacing5}
+          gridGap={SPACING.spacing8}
+          marginTop={SPACING.spacing24}
         >
           <InfoItem
             label={t('last_calibrated')}
@@ -125,7 +125,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
           />
         </Flex>
       ) : null}
-      <Flex gridGap={SPACING.spacing3}>
+      <Flex gridGap={SPACING.spacing8}>
         <MediumButton
           buttonType="secondary"
           flex="1"
@@ -160,9 +160,9 @@ interface InfoItemProps extends StyleProps {
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       backgroundColor={COLORS.lightGreyPressed}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight36}
       {...props}

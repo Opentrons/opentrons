@@ -86,15 +86,14 @@ function Input(props: InputFieldProps): JSX.Element {
   const INPUT_FIELD = css`
     display: flex;
     background-color: ${COLORS.white};
-    border-radius: ${SPACING.spacing2};
-    padding: ${SPACING.spacing3};
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+    border-radius: ${SPACING.spacing4};
+    padding: ${SPACING.spacing8};
+    border: 1px ${BORDERS.styleSolid}
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${COLORS.darkGreyEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
     }
 
     & input {
@@ -103,22 +102,21 @@ function Input(props: InputFieldProps): JSX.Element {
       border: none;
       flex: 1 1 auto;
       width: 100%;
-      height: ${SPACING.spacing4};
+      height: ${SPACING.spacing16};
     }
     & input:focus {
       outline: none;
     }
 
     &:hover {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      border: 1px ${BORDERS.styleSolid}
         ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
     }
     &:focus {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${COLORS.darkGreyDisabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {
@@ -151,12 +149,12 @@ function Input(props: InputFieldProps): JSX.Element {
       <Flex
         color={COLORS.darkGreyEnabled}
         fontSize={TYPOGRAPHY.fontSizeLabel}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
-        <Flex paddingBottom={SPACING.spacing2}>{props.caption}</Flex>
+        <Flex paddingBottom={SPACING.spacing4}>{props.caption}</Flex>
         {props.secondaryCaption != null ? (
-          <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
+          <Flex paddingBottom={SPACING.spacing4}>{props.secondaryCaption}</Flex>
         ) : null}
         <Flex color={COLORS.errorEnabled}>{props.error}</Flex>
       </Flex>

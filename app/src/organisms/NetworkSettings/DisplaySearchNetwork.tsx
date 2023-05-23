@@ -9,6 +9,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -20,6 +21,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       height="17.5rem"
       backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}
+      borderRadius={BORDERS.size3}
       width="100%"
       data-testid="Display-Search-Network-text"
     >
@@ -31,7 +33,8 @@ export function DisplaySearchNetwork(): JSX.Element {
         <StyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginTop={SPACING.spacingXXL}
+          lineHeight="2.72375rem"
+          marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
         </StyledText>

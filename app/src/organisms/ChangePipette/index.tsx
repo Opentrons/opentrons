@@ -181,8 +181,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
       <InProgressModal>
         <StyledText
           css={TYPOGRAPHY.h1Default}
-          marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing3}
+          marginTop={SPACING.spacing24}
+          marginBottom={SPACING.spacing8}
         >
           {t('moving_gantry')}
         </StyledText>

@@ -7,7 +7,7 @@ import pytest
 from decoy import Decoy, matchers
 from pydantic import BaseModel
 
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.resources import ModelUtils
@@ -41,7 +41,7 @@ from opentrons.protocol_engine.execution import (
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out StateStore."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
