@@ -18,9 +18,10 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
-import { getRobotModelByName } from '../../redux/discovery'
+import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
+import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
 import { RobotBusyStatusAction } from '.'
 
 import type { Robot } from '../../redux/discovery/types'
@@ -55,6 +56,7 @@ export function AvailableRobotOption(
   )
 
   const { data: runsData } = useAllRunsQuery(
+    { pageLength: 0 },
     {
       onSuccess: data => {
         if (data?.links?.current != null)
@@ -64,7 +66,10 @@ export function AvailableRobotOption(
         }
       },
     },
-    { hostname: ip }
+    {
+      hostname: ip,
+      requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
+    }
   )
   const robotHasCurrentRun = runsData?.links?.current != null
 
@@ -76,7 +81,7 @@ export function AvailableRobotOption(
         isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
       >
         <img
-          src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+          src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
           css={css`
             width: 4rem;
             height: 3.5625rem;

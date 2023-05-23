@@ -21,6 +21,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
+  NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -66,15 +67,15 @@ function RowModule({
   setShowMultipleModulesModal,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const attachedModuleMatch = !!module.attachedModuleMatch
+  const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
+    module.moduleDef.moduleType
+  )
+  const isModuleReady =
+    isNonConnectingModule || module.attachedModuleMatch != null
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={
-        attachedModuleMatch
-          ? `${COLORS.successEnabled}${COLORS.opacity20HexCode}`
-          : COLORS.warningBackgroundMed
-      }
+      backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
       borderRadius={BORDERS.size3}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
       gridGap={SPACING.spacing24}
@@ -109,14 +110,25 @@ function RowModule({
           />
         ) : null}
       </Flex>
-      <Chip
-        text={
-          attachedModuleMatch ? t('module_connected') : t('module_disconnected')
-        }
-        type={attachedModuleMatch ? 'success' : 'warning'}
-        background={false}
-        iconName="connection-status"
-      />
+      {isNonConnectingModule ? (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+        >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('n_a')}
+          </StyledText>
+        </Flex>
+      ) : (
+        <Chip
+          text={
+            isModuleReady ? t('module_connected') : t('module_disconnected')
+          }
+          type={isModuleReady ? 'success' : 'warning'}
+          background={false}
+          iconName="connection-status"
+        />
+      )}
     </Flex>
   )
 }

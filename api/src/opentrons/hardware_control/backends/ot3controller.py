@@ -25,7 +25,7 @@ from typing import (
     Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.config import ot3_pipette_config, gripper_config, feature_flags as ff
 from .ot3utils import (
     UpdateProgress,
     axis_convert,
@@ -124,7 +124,6 @@ from opentrons.hardware_control.types import (
     OT3SubSystem,
 )
 from opentrons.hardware_control.errors import (
-    MustHomeError,
     InvalidPipetteName,
     InvalidPipetteModel,
     FirmwareUpdateRequired,
@@ -414,12 +413,6 @@ class OT3Controller:
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
-        for node in nodes:
-            if not (
-                node in self._motor_status.keys()
-                and self._motor_status[node].encoder_ok
-            ):
-                raise MustHomeError(f"Axis {node} has invalid encoder position")
         response = await update_motor_position_estimation(self._messenger, nodes)
         self._handle_motor_status_response(response)
 
@@ -501,16 +494,8 @@ class OT3Controller:
         for axis, pos in response.items():
             self._position.update({axis: pos[0]})
             self._encoder_position.update({axis: pos[1]})
-            # if an axis has already been homed, we're not clearing the motor ok status flag
-            # TODO: (2023-01-10) This is just a temp fix so we're not blocking hardware testing,
-            # we should port the encoder position over to use as motor position if encoder status is ok
-            already_homed = (
-                self._motor_status[axis].motor_ok
-                if axis in self._motor_status.keys()
-                else False
-            )
             self._motor_status.update(
-                {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
+                {axis: MotorStatus(motor_ok=pos[2], encoder_ok=pos[3])}
             )
 
     @requires_update
@@ -532,16 +517,21 @@ class OT3Controller:
         """
         group = create_move_group(origin, moves, self._motor_nodes(), stop_condition)
         move_group, _ = group
-        runner = MoveGroupRunner(move_groups=[move_group])
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
     def _build_home_pipettes_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
 
         distances_pipette = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -566,11 +556,13 @@ class OT3Controller:
         return None
 
     def _build_home_gantry_z_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
 
         distances_gantry = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -614,7 +606,9 @@ class OT3Controller:
         return None
 
     @requires_update
-    async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
+    async def home(
+        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+    ) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
@@ -631,8 +625,8 @@ class OT3Controller:
             return {}
 
         maybe_runners = (
-            self._build_home_gantry_z_runner(checked_axes),
-            self._build_home_pipettes_runner(checked_axes),
+            self._build_home_gantry_z_runner(checked_axes, gantry_load),
+            self._build_home_pipettes_runner(checked_axes, gantry_load),
         )
         coros = [
             runner.run(can_messenger=self._messenger)
@@ -644,7 +638,7 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )

@@ -18,6 +18,7 @@ import {
   TextSize,
   UpdateChannel,
 } from '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
 import { useLights } from '../../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '..'
@@ -77,6 +78,9 @@ const mockUpdateChannel = UpdateChannel as jest.MockedFunction<
   typeof UpdateChannel
 >
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
+const mockGetBuildrootUpdateAvailable = getBuildrootUpdateAvailable as jest.MockedFunction<
+  typeof getBuildrootUpdateAvailable
+>
 
 const render = () => {
   return renderWithProviders(
@@ -212,6 +216,12 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Enable Developer Tools')
     fireEvent.click(button)
     expect(mockToggleDevtools).toHaveBeenCalled()
+  })
+
+  it('should return an update available with correct text', () => {
+    mockGetBuildrootUpdateAvailable.mockReturnValue('upgrade')
+    const [{ getByText }] = render()
+    getByText('Update available')
   })
 
   // The following cases will be activate when RobotSettings PRs are ready

@@ -35,11 +35,21 @@ def test_ensure_mount(input_value: Union[str, Mount], expected: Mount) -> None:
 
 def test_ensure_mount_input_invalid() -> None:
     """It should raise if given invalid mount input."""
-    with pytest.raises(ValueError, match="must be 'left' or 'right'"):
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="must be 'left' or 'right'"
+    ):
         subject.ensure_mount("oh no")
 
-    with pytest.raises(TypeError, match="'left', 'right', or an opentrons.types.Mount"):
+    with pytest.raises(
+        subject.PipetteMountTypeError,
+        match="'left', 'right', or an opentrons.types.Mount",
+    ):
         subject.ensure_mount(42)  # type: ignore[arg-type]
+
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="Use the left or right mounts instead"
+    ):
+        subject.ensure_mount(Mount.EXTENSION)
 
 
 @pytest.mark.parametrize(

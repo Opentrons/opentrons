@@ -192,7 +192,6 @@ function PrepareToRun({
 
   const { play } = useRunControls(runId)
 
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
@@ -258,7 +257,6 @@ function PrepareToRun({
   const onPlay = (): void => {
     if (isReadyToRun) {
       play()
-      history.push(`/protocols/${runId}/run`)
     } else {
       setShowSnackbar(true)
     }
@@ -486,7 +484,11 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
+      marginTop={SPACING.spacing40}
+    >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />

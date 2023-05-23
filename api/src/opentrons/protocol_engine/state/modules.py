@@ -64,6 +64,8 @@ from .module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    MagneticBlockSubState,
+    MagneticBlockId,
     ModuleSubStateType,
 )
 
@@ -270,6 +272,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_open=live_data is not None and live_data["lid"] == "open",
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
+            )
+        elif ModuleModel.is_magnetic_block(actual_model):
+            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
+                module_id=MagneticBlockId(module_id)
             )
 
     def _update_module_calibration(

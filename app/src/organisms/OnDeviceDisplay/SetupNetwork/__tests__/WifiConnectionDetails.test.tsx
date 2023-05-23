@@ -72,7 +72,6 @@ describe('WifiConnectionDetails', () => {
   it('should render title and description', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Connect via Wi-Fi')
-    getByText('Connection status:')
     getByText('Connected')
     getByText('mockWifi')
     getByText('IP Address: 127.0.0.100')

@@ -1,7 +1,6 @@
 """Request and response models for /instruments endpoints."""
 from __future__ import annotations
 
-import enum
 from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic
 from datetime import datetime
@@ -9,7 +8,6 @@ from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
 
-from opentrons.types import Mount
 from opentrons.calibration_storage.types import SourceType
 from opentrons.protocol_engine.types import Vec3f
 from opentrons_shared_data.pipette.dev_types import (
@@ -26,21 +24,6 @@ InstrumentModelT = TypeVar(
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
 InstrumentType = Literal["pipette", "gripper"]
-
-
-# TODO (spp, 2023-01-03): use MountType from opentrons.types once it has extension type
-class MountType(enum.Enum):
-    """Available mount types."""
-
-    LEFT = "left"
-    RIGHT = "right"
-    EXTENSION = "extension"
-
-    @staticmethod
-    def from_hw_mount(mount: Mount) -> MountType:
-        """Convert from Mount to MountType."""
-        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
-        return mount_map[mount]
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):

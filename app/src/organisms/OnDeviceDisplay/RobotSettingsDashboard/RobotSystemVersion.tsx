@@ -37,7 +37,7 @@ export function RobotSystemVersion({
   isUpdateAvailable,
   setCurrentOption,
 }: RobotSystemVersionProps): JSX.Element {
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     'device_settings',
     'shared',
     'device_details',
@@ -86,7 +86,7 @@ export function RobotSystemVersion({
                 lineHeight="1.875rem"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
-                {t('app_settings:update_available')}
+                {i18n.format(t('app_settings:update_available'), 'capitalize')}
               </StyledText>
             </Flex>
           ) : null}

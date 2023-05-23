@@ -28,7 +28,6 @@ USB_PORTS_TO_TEST = [
     "usb-8",
     "usb-9",
 ]
-# TODO: work with EEs to get Aux-Port tests implemented
 AUX_PORT_TESTS = [
     "aux-1-door-switch",
     "aux-1-sync",
@@ -47,15 +46,6 @@ AUX_CAN_TESTS = [
     "aux-1-pcan",
     "aux-2-pcan",
 ]
-COLORS_BY_SIGNAL = {
-    "none": {"1": "BLUE", "2": "BLUE"},  # shared
-    "door": {"1": "WHITE", "2": "WHITE"},  # shared
-    "estop-signal": {"1": "RED", "2": "RED"},  # shared
-    "sync": {"1": "Status is OFF", "2": "Status is OFF"},  # shared
-    "estop-detect": {"1": "YELLOW", "2": "CYAN"},
-    "presence": {"1": "PURPLE", "2": "ORANGE"},
-    "id": {"1": "GREEN", "2": "Deck-Lights OFF"},
-}
 
 ALLOWED_SECURITY_TYPES = {
     nmcli.SECURITY_TYPES.NONE.value: nmcli.SECURITY_TYPES.NONE,
@@ -151,27 +141,13 @@ async def _test_usb_a_ports(api: OT3API, report: CSVReport, section: str) -> Non
 
 
 async def _test_aux(api: OT3API, report: CSVReport, section: str) -> None:
-    # TODO: work with EEs to get Aux-Port tests implemented
-    #       - can analyzer
-    #       - door switch detection
-    def _get_color(t: str) -> str:
-        side = "1" if "1" in t else "2"
-        signal = [s for s in COLORS_BY_SIGNAL.keys() if s in t]
-        assert signal, f'no signals found matching test: "{t}"'
-        return COLORS_BY_SIGNAL[signal[0]][side]
+    # FIXME: add Aux GPIO tests once testing PCBA arrives
+    for t in AUX_PORT_TESTS:
+        print(f"FIXME: skipping {t}")
+        report(section, t, [CSVResult.PASS])
 
+    # PCAN
     if not api.is_simulator:
-        ui.get_user_ready("connect buttons to both Aux ports (1 and 2)")
-    for test_name in AUX_PORT_TESTS:
-        if api.is_simulator:
-            result = CSVResult.PASS
-        else:
-            color = _get_color(test_name)
-            inp = ui.get_user_answer(f"does {test_name.upper()} show {color}")
-            result = CSVResult.from_bool(inp)
-        report(section, test_name, [result])
-    if not api.is_simulator:
-        ui.get_user_ready("disconnect buttons")
         ui.get_user_ready("prepare CAN analyzer and PCAN software")
     for test_name in AUX_CAN_TESTS:
         if api.is_simulator:
@@ -229,8 +205,5 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     await _test_usb_a_ports(api, report, section)
 
     # AUX
-    # ui.print_header("AUX")
-    # await _test_aux(api, report, section)
-    # FIXME: add the Aux port tests back once the new tests are complete
-    for t in AUX_PORT_TESTS:
-        report(section, t, [CSVResult.PASS])
+    ui.print_header("AUX")
+    await _test_aux(api, report, section)
