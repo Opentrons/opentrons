@@ -156,7 +156,7 @@ export function RobotSettingButton({
         {isUpdateAvailable ?? false ? (
           <InlineNotification
             type="alert"
-            heading={i18n.format(t('update_available_short'), 'capitalize')}
+            heading={i18n.format(t('update_available'), 'capitalize')}
             hug={true}
           />
         ) : null}
