@@ -20,6 +20,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 
 async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("CALIBRATE PIPETTE")
+    await api.home()
     if not api.is_simulator:
         ui.get_user_ready("calibrating pipette to slot #5")
     try:
@@ -34,6 +35,7 @@ async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
 async def _check_belt_accuracy(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("CHECK BELT ACCURACY")
     for slot in [1, 3, 10, 12]:
+        await api.home()
         if not api.is_simulator:
             ui.get_user_ready(f"about to find offset of slot #{slot}")
         await api.add_tip(mount, api.config.calibration.probe_length)
@@ -54,6 +56,7 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     await api.reset_instrument_offset(mount)
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip, "no pipette found"
+    await api.home()
     if not api.is_simulator:
         ui.get_user_ready("about to probe deck slots #3, #10, and #12")
     try:
