@@ -729,6 +729,7 @@ def test_get_display_name() -> None:
 
 def test_get_fixed_trash_id() -> None:
     """It should return the ID of the labware loaded into the fixed trash slot."""
+    # OT-2 fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -741,9 +742,24 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     assert subject.get_fixed_trash_id() == "abc123"
 
+    # OT-3 fixed trash slot:
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="trash-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+                definitionUri="trash-definition-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+    )
+    assert subject.get_fixed_trash_id() == "abc123"
+
+    # Nothing in the fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -756,7 +772,6 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_fixed_trash_id()
 
