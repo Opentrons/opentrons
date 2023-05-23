@@ -32,7 +32,6 @@ import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/C
 const FETCH_WIFI_LIST_MS = 5000
 
 export function ConnectViaWifi(): JSX.Element {
-  const [isSearching, setIsSearching] = React.useState<boolean>(true)
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const [
     showSelectAuthenticationType,
@@ -81,7 +80,6 @@ export function ConnectViaWifi(): JSX.Element {
       return (
         <DisplayWifiList
           list={list}
-          isSearching={isSearching}
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
           setSelectedSsid={setSelectedSsid}
@@ -154,12 +152,6 @@ export function ConnectViaWifi(): JSX.Element {
       return null
     }
   }
-
-  React.useEffect(() => {
-    if (list != null && list.length > 0) {
-      setIsSearching(false)
-    }
-  }, [list])
 
   React.useEffect(() => {
     setCurrentRequestState(requestState)

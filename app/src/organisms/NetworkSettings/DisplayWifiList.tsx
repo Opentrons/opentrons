@@ -58,7 +58,6 @@ const NETWORK_ROW_STYLE = css`
 
 interface DisplayWifiListProps {
   list: WifiNetwork[]
-  isSearching: boolean
   setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
@@ -68,18 +67,30 @@ interface DisplayWifiListProps {
 
 export function DisplayWifiList({
   list,
-  isSearching,
   setShowSelectAuthenticationType,
   setChangeState,
   setSelectedSsid,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [isSearching, setIsSearching] = React.useState<boolean>(false)
+
   const handleClick = (nw: WifiNetwork): void => {
     setShowSelectAuthenticationType(true)
     setSelectedSsid(nw.ssid)
     setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
   }
   const hasSsid = list != null && list.length > 0
+
+  // ToDo (kj:05/23/2023) This spinner part will be fixed later (talked with the designer)
+  React.useEffect(() => {
+    setIsSearching(true)
+    const checkUpdateTimer = setTimeout(() => {
+      setIsSearching(false)
+    }, 3000)
+    return () => {
+      clearTimeout(checkUpdateTimer)
+    }
+  }, [list])
 
   return (
     <>
@@ -171,11 +182,11 @@ const HeaderWithIPs = ({
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_END} flex="1">
-        {isSearching && !hasSsid ? (
+        {isSearching ? (
           <Icon
             name="ot-spinner"
             spin
-            size="3.3125rem"
+            size="3rem"
             data-testid="wifi_list_search_spinner"
           />
         ) : null}

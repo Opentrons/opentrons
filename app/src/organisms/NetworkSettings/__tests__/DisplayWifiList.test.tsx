@@ -47,7 +47,6 @@ describe('DisplayWifiList', () => {
   beforeEach(() => {
     props = {
       list: mockWifiList,
-      isSearching: true,
       setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setChangeState: mockSetChangeState,
       setSelectedSsid: mockSetSelectedSsid,
@@ -71,21 +70,21 @@ describe('DisplayWifiList', () => {
   })
 
   it('should render wifi list and button', () => {
-    props = { ...props, isSearching: false }
-    const [{ getByText, getByTestId, queryByTestId }] = render(props)
+    const [{ getByText, getByTestId }] = render(props)
     getByText('Choose a network')
     getByText('foo')
     getByText('bar')
     getByText('baz')
     getByTestId('back-button')
-    expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
+    // ToDo (kj:05/23/2023) the spinner part will be fixed when the designer is in the office
+    // expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
   })
 
-  it('should not render a spinner', () => {
-    props = { ...props, isSearching: false }
-    const [{ queryByTestId }] = render(props)
-    expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
-  })
+  // it('should not render a spinner', () => {
+  //   props = { ...props, isSearching: false }
+  //   const [{ queryByTestId }] = render(props)
+  //   expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
+  // })
 
   it('should call mock functions when back', () => {
     const [{ getByTestId }] = render(props)

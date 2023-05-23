@@ -16,6 +16,7 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   BORDERS,
+  POSITION_STICKY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -76,6 +77,7 @@ const TitleHeader = (): JSX.Element => {
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
       marginBottom="1.5625rem"
+      position={POSITION_STICKY}
     >
       <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
         {t('connect_via', { type: t('wifi') })}
