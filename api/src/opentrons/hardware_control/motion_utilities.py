@@ -229,20 +229,10 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
         # primary_cp_right = get_critical_point(OT3Mount.RIGHT)
         # primary_z_right = _z_for_mount(OT3Mount.RIGHT)
         # TODO (tz, 5-23-23): change this to ambiguous values
-        primary_cp_left = get_critical_point(OT3Mount.RIGHT)
-        primary_z_left = _z_for_mount(OT3Mount.RIGHT)
+        primary_cp_left = get_critical_point(OT3Mount.LEFT)
+        primary_z_left = _z_for_mount(OT3Mount.LEFT)
         target_position = OrderedDict(
             (
-                # right mount
-                (
-                    _x_for_mount(OT3Mount.RIGHT),
-                    abs_position.x - right_offset.x - primary_cp_left.x,
-                ),
-                (
-                    _y_for_mount(OT3Mount.RIGHT),
-                    abs_position.y - right_offset.y - primary_cp_left.y,
-                ),
-                (primary_z_left, abs_position.z - right_offset.z - primary_cp_left.z),
                 # left mount
                 (
                     _x_for_mount(OT3Mount.LEFT),
@@ -253,6 +243,8 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
                     abs_position.y - left_offset.y - primary_cp_left.y,
                 ),
                 (primary_z_left, abs_position.z - left_offset.z - primary_cp_left.z),
+                # right z mount
+                (primary_z_left, abs_position.z - right_offset.z - primary_cp_left.z),
             )
         )
     else:
