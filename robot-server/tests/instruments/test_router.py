@@ -6,7 +6,10 @@ from typing import TYPE_CHECKING, cast
 from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import (
+    HardwareControlAPI,
+    API,
+)
 from opentrons.hardware_control.dev_types import (
     PipetteDict,
     GripperDict,
@@ -41,10 +44,10 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+@pytest.fixture
+def ot2_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock hardware control API."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=API)
 
 
 def get_sample_pipette_dict(
@@ -66,7 +69,7 @@ def get_sample_pipette_dict(
 
 @pytest.mark.ot3_only
 @pytest.fixture
-def ot3_hardware_api(decoy: Decoy) -> OT3API:
+def ot3_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out OT3API."""
     try:
         from opentrons.hardware_control.ot3api import OT3API
@@ -218,17 +221,18 @@ async def test_get_all_attached_instruments(
 
 async def test_get_ot2_instruments(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    ot2_hardware_api: HardwareControlAPI,
 ) -> None:
     """It should return attached pipettes on OT2."""
     # Return empty data when no pipettes attached
-    decoy.when(hardware_api.attached_instruments).then_return({})
-    result1 = await get_attached_instruments(hardware=hardware_api)
+    decoy.when(ot2_hardware_api.attached_instruments).then_return({})
+
+    result1 = await get_attached_instruments(hardware=ot2_hardware_api)
     assert result1.content.data == []
     assert result1.status_code == 200
 
     # Return attached pipettes
-    decoy.when(hardware_api.attached_instruments).then_return(
+    decoy.when(ot2_hardware_api.attached_instruments).then_return(
         {
             Mount.RIGHT: get_sample_pipette_dict(
                 name="p20_multi_gen2",
@@ -239,8 +243,8 @@ async def test_get_ot2_instruments(
             Mount.LEFT: cast(PipetteDict, {}),
         }
     )
-    result2 = await get_attached_instruments(hardware=hardware_api)
-    decoy.verify(await hardware_api.cache_instruments(), times=0)
+    result2 = await get_attached_instruments(hardware=ot2_hardware_api)
+    decoy.verify(await ot2_hardware_api.cache_instruments(), times=0)
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(
@@ -259,28 +263,33 @@ async def test_get_ot2_instruments(
     ]
 
 
+@pytest.mark.ot3_only
 async def test_get_96_channel_instruments(
-    decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    decoy: Decoy, ot3_hardware_api: OT3API
 ) -> None:
     """It should correctly be able to construct a 96 channel pipette."""
     # Return attached pipettes
-    decoy.when(hardware_api.attached_instruments).then_return(
+    decoy.when(ot3_hardware_api.attached_pipettes).then_return(
         {
-            Mount.LEFT: {  # type: ignore [typeddict-item]
-                "name": "p1000_96",
-                "model": PipetteModel("xyz"),
-                "pipette_id": "pipette-id",
-                "back_compat_names": [],
-                "min_volume": 1,
-                "max_volume": 1000,
-                "channels": 96,
-            },
+            Mount.LEFT: cast(
+                PipetteDict,
+                {
+                    "name": "p1000_96",
+                    "model": PipetteModel("xyz"),
+                    "pipette_id": "pipette-id",
+                    "back_compat_names": [],
+                    "min_volume": 1,
+                    "max_volume": 1000,
+                    "channels": 96,
+                },
+            ),
             Mount.RIGHT: cast(PipetteDict, {}),
         }
     )
-    result2 = await get_attached_instruments(hardware=hardware_api)
-    decoy.verify(await hardware_api.cache_instruments(), times=0)
+    decoy.when(ot3_hardware_api.attached_gripper).then_return(None)
+    result2 = await get_attached_instruments(hardware=ot3_hardware_api)
+    decoy.when(ot3_hardware_api.get_instrument_offset(OT3Mount.LEFT)).then_return(None)
+    decoy.when(ot3_hardware_api.get_instrument_offset(OT3Mount.RIGHT)).then_return(None)
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(

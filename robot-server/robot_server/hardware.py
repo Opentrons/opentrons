@@ -200,6 +200,7 @@ async def get_deck_type() -> DeckType:
 
 async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
     """Tasks to run on an initialized OT-2 before it is ready to use."""
+
     async def _blink() -> None:
         while True:
             await hardware.set_lights(button=True)
@@ -247,8 +248,8 @@ async def _postinit_ot3_tasks(
 
     update_handles = [
         await update_manager.start_update_process(str(uuid4()), subsystem, utc_now())
-        for subsystem, subsystem_State in hardware.subsystems.items()
-        if not subsystem.ok or subsystem.fw_update_needed
+        for subsystem, subsystem_state in hardware.attached_subsystems.items()
+        if not subsystem_state.ok or subsystem_state.fw_update_needed
     ]
 
     async def _until_update_finishes(handle: UpdateProcessHandle) -> None:
@@ -265,7 +266,7 @@ async def _postinit_ot3_tasks(
                 await asyncio.sleep(1)
 
     await asyncio.gather(*(_until_update_finishes(handle) for handle in update_handles))
-    await api_instance.cache_instruments()
+    await hardware.cache_instruments()
     if not ff.disable_home_on_boot():
         log.info("Homing Z axes")
         try:

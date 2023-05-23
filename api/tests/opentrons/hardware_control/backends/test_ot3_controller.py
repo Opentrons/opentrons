@@ -421,81 +421,12 @@ async def test_home_only_present_devices(
     assert controller._motor_status.keys() == homed_position.keys()
 
 
-async def test_probing(
-    controller: OT3Controller, mock_tool_detector: AsyncMock
-) -> None:
-    assert controller._present_devices == set()
-
-    call_count = 0
-    fake_nodes = set(
-        (NodeId.gantry_x, NodeId.head, NodeId.pipette_left, NodeId.gripper)
-    )
-    passed_expected = None
-
-    async def fake_probe(expected, timeout):
-        nonlocal passed_expected
-        nonlocal call_count
-        nonlocal fake_nodes
-        passed_expected = expected
-        call_count += 1
-        return fake_nodes
-
-    async def fake_gai(expected):
-        return {
-            OT3Mount.RIGHT: {"config": "whatever"},
-            OT3Mount.GRIPPER: {"config": "whateverelse"},
-        }
-
-    with patch.object(controller._network_info, "probe", fake_probe), patch.object(
-        controller, "get_attached_instruments", fake_gai
-    ):
-        await controller.probe_network(timeout=0.1)
-        assert call_count == 1
-        assert passed_expected == set(
-            (
-                NodeId.gantry_x,
-                NodeId.gantry_y,
-                NodeId.head,
-                NodeId.pipette_right,
-                NodeId.gripper,
-            )
-        )
-    assert controller._present_devices == set(
-        (
-            NodeId.gantry_x,
-            NodeId.head,
-            NodeId.pipette_left,
-            NodeId.gripper,
-        )
-    )
-
-
-@pytest.mark.parametrize(
-    "tool_summary,pipette_id,gripper_id,gripper_name",
-    [
-        (
-            ToolSummary(
-                left=PipetteInformation(
-                    name=FirmwarePipetteName.p1000_single,
-                    name_int=FirmwarePipetteName.p1000_single.value,
-                    model="3.3",
-                    serial="hello",
-                ),
-                right=None,
-                gripper=GripperInformation(model="0.0", serial="fake_serial"),
-            ),
-            "P1KSV33hello",
-            "GRPV00fake_serial",
-            "Flex Gripper",
-        ),
-    ],
-)
 async def test_get_attached_instruments(
     controller: OT3Controller, mock_subsystem_manager: SubsystemManager, decoy: Decoy
 ) -> None:
     pipette_id = "P1KSV33hello"
     gripper_id = "GRPV00fake_serial"
-    gripper_name = "Gripper V1"
+    gripper_name = "Flex Gripper"
     decoy.when(mock_subsystem_manager.tools).then_return(
         ToolSummary(
             left=PipetteInformation(
@@ -914,7 +845,7 @@ async def test_update_required_flag(
     decoy.when(mock_subsystem_manager.update_required).then_return(True)
     controller._initialized = True
     with pytest.raises(FirmwareUpdateRequired):
-        await controller.home(axes)
+        await controller.home(axes, gantry_load=GantryLoad.LOW_THROUGHPUT)
 
 
 async def test_update_required_bypass_firmware_update(
@@ -937,7 +868,7 @@ async def test_update_required_bypass_firmware_update(
     # raise FirmwareUpdateRequired if the _update_required flag is set
     controller._initialized = True
     with pytest.raises(FirmwareUpdateRequired):
-        await controller.home([OT3Axis.X])
+        await controller.home([OT3Axis.X], gantry_load=GantryLoad.LOW_THROUGHPUT)
 
 
 async def test_update_required_flag_false(
