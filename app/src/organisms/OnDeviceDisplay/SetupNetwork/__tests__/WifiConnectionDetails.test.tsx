@@ -84,15 +84,13 @@ describe('WifiConnectionDetails', () => {
 
   it('should render network details when tapping view network details', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('View network details')
-    button.click()
+    getByText('View network details').click()
     getByText('mock NetworkDetailsModal')
   })
 
   it('when clicking Check for updates button, should call mock function', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('Continue')
-    button.click()
+    getByText('Continue').click()
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
   })
 })

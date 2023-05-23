@@ -18,9 +18,9 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { MediumButton } from '../../../atoms/buttons'
-import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { getLocalRobot } from '../../../redux/discovery'
 import { getNetworkInterfaces } from '../../../redux/networking'
+import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
