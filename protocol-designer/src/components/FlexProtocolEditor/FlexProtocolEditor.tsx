@@ -158,48 +158,64 @@ const initialFormValues: InitialValues = {
   },
 }
 
-const getInitialValues = (formProps: any): InitialValues => {
-  if (formProps) {
-    if (formProps.formValues) {
-      const { protocolName, author, description } = formProps.formValues
-      initialFormValues.fields.name = protocolName || ''
-      initialFormValues.fields.author = author || ''
-      initialFormValues.fields.description = description || ''
+const getInitialValues = (values: any): InitialValues => {
+  if (Boolean(values)) {
+    // Matching the form values
+    initialFormValues.fields.name = values.formValues.protocolName
+    initialFormValues.fields.author = values.formValues.author
+    initialFormValues.fields.description = values.formValues.description
+
+    // Matching the pipette values
+    initialFormValues.pipettesByMount.right.pipetteName =
+      values.instruments.right?.pipetteSpecs.name
+    initialFormValues.pipettesByMount.left.pipetteName =
+      values.instruments.left?.pipetteSpecs.name
+
+    // Matching the tip rack
+    initialFormValues.pipettesByMount.right.tiprackDefURI = values.instruments
+      .right?.tiprackModel
+      ? [values.instruments.right.tiprackModel]
+      : []
+    initialFormValues.pipettesByMount.left.tiprackDefURI = values.instruments
+      .left?.tiprackModel
+      ? [values.instruments.left.tiprackModel]
+      : []
+
+    // Matching the module values
+    if (values.modules.heaterShakerModuleType) {
+      initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck = true
+      initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].model =
+        values.modules.heaterShakerModuleType.model
+      initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].slot =
+        values.modules.heaterShakerModuleType.slot
     }
 
-    if (Boolean(formProps.instruments)) {
-      const { left, right } = formProps.instruments
-      if (Boolean(left)) {
-        initialFormValues.pipettesByMount.left.pipetteName =
-          left.pipetteSpecs?.name || ''
-        initialFormValues.pipettesByMount.left.tiprackDefURI =
-          left?.tiprackModel || []
-      }
-      if (Boolean(right)) {
-        initialFormValues.pipettesByMount.right.pipetteName =
-          right.pipetteSpecs?.name || ''
-        initialFormValues.pipettesByMount.right.tiprackDefURI =
-          right?.tiprackModel || []
-      }
+    if (values.modules.magneticModuleType) {
+      initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE].onDeck = true
+      initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE].model =
+        values.modules.magneticModuleType.model
+      initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE].slot =
+        values.modules.magneticModuleType.slot
     }
 
-    if (Boolean(formProps.modules)) {
-      if (formProps.modules.magneticModuleType !== null) {
-        initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE] =
-          formProps.modules.magneticModuleType
-      }
-      if (formProps.modules.temperatureModuleType !== null) {
-        initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE] =
-          formProps.modules.temperatureModuleType
-      }
-      if (formProps.modules.thermocyclerModuleType !== null) {
-        initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE] =
-          formProps.modules.thermocyclerModuleType
-      }
-      if (formProps.modules.heaterShakerModuleType !== null) {
-        initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE] =
-          formProps.modules.heaterShakerModuleType
-      }
+    if (values.modules.temperatureModuleType) {
+      initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].onDeck = true
+      initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].model =
+        values.modules.temperatureModuleType.model
+      initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].slot =
+        values.modules.temperatureModuleType.slot
+    }
+
+    if (values.modules.thermocyclerModuleType) {
+      initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].onDeck = true
+      initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].model =
+        values.modules.thermocyclerModuleType.model
+      initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].slot =
+        values.modules.thermocyclerModuleType.slot
+    }
+
+    if (!initialFormValues.modulesByType[GRIPPER_MODULE_TYPE].onDeck) {
+      initialFormValues.modulesByType[GRIPPER_MODULE_TYPE].onDeck = false
     }
 
     return initialFormValues
@@ -258,7 +274,7 @@ function FlexProtocolEditor({
   const [redirectToDetails, setRedirectToDetails] = useState(false)
   const dispatch = useDispatch()
   const [isEdit, setEdit] = useState(false)
-  //On Redirction if page tab edit set to true
+  // On Redirction if page tab edit set to true
   useEffect(() => {
     if (isEditValue) {
       setEdit(isEditValue)
@@ -269,7 +285,7 @@ function FlexProtocolEditor({
   // Next button click
   const handleNext = ({ selectedTab }: selectedTabProps): any => {
     if (isEdit) {
-      //Redirect back to file details page
+      // Redirect back to file details page
       setRedirectToDetails(true)
       return <FlexFileDetails />
     } else {

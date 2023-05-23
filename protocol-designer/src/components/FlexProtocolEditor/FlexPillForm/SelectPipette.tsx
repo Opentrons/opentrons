@@ -31,21 +31,16 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
     values.pipettesByMount[pipetteName].pipetteName
   )
   if (pipetteSlot.left === pipetteName) {
-    console.log('TR==>', is96ChannelSelected)
     changeIs96Selected(is96ChannelSelected)
   }
-  // changeIs96Selected(
-  //   checkSelectedPipette(values.pipettesByMount[pipetteName].pipetteName)
-  // )
-  // console.log('Is==>', is96ChannelSelected, '==>', changeIs96Selected)
   const className = cx({ disable_mount_option: is96ChannelSelected })
 
-  const dynamicPipetteDisable = cx({
-    [styles.pb_10]: pipetteName === pipetteSlot.left || !is96ChannelSelected,
-    [styles.disable_mount_option]: !(
-      pipetteName === pipetteSlot.left || !is96ChannelSelected
-    ),
-  })
+  // const dynamicPipetteDisable = cx({
+  //   [styles.pb_10]: pipetteName === pipetteSlot.left || !is96ChannelSelected,
+  //   [styles.disable_mount_option]: !(
+  //     pipetteName === pipetteSlot.left || !is96ChannelSelected
+  //   ),
+  // })
 
   const pipetteHeaderText =
     pipetteSlot.left === pipetteName
