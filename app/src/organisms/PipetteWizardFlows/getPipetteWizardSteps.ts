@@ -51,20 +51,24 @@ export const getPipetteWizardSteps = (
       } else {
         //  pipette needs to be detached before attached 96 channel
         if (!isGantryEmpty) {
+          let detachMount: PipetteMount = LEFT
+          if (mount === LEFT) {
+            detachMount = RIGHT
+          }
           return [
             {
               section: SECTIONS.BEFORE_BEGINNING,
-              mount: RIGHT,
+              mount: detachMount,
               flowType: flowType,
             },
             {
               section: SECTIONS.DETACH_PIPETTE,
-              mount: RIGHT,
+              mount: detachMount,
               flowType: FLOWS.DETACH,
             },
             {
               section: SECTIONS.RESULTS,
-              mount: RIGHT,
+              mount: detachMount,
               flowType: FLOWS.DETACH,
             },
             {

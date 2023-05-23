@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { waitFor } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { CalibrationErrorModal } from '../CalibrationErrorModal'
-import { waitFor } from '@testing-library/dom'
 
 const render = (props: React.ComponentProps<typeof CalibrationErrorModal>) => {
   return renderWithProviders(<CalibrationErrorModal {...props} />, {
