@@ -53,7 +53,7 @@ describe('RobotSystemVersion', () => {
       isUpdateAvailable: true,
     }
     const [{ getByText, getByRole }] = render(props)
-    getByText('A software update is available.')
+    getByText('Update available')
     getByRole('button', { name: 'View software update' })
   })
 
