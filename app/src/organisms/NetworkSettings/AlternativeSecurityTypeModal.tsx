@@ -11,11 +11,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons'
+import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
 
 interface AlternativeSecurityTypeModalProps {
   setShowAlternativeSecurityTypeModal: (

@@ -103,11 +103,11 @@ export function DisplayWifiList({
               height="5rem"
               key={nw.ssid}
               backgroundColor={COLORS.light1}
-              marginBottom={SPACING.spacing3}
-              borderRadius={BORDERS.size_three}
+              marginBottom={SPACING.spacing8}
+              borderRadius={BORDERS.size3}
               css={NETWORK_ROW_STYLE}
               flexDirection={DIRECTION_ROW}
-              padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+              padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing4}
               onClick={() => handleClick(nw)}
@@ -124,10 +124,10 @@ export function DisplayWifiList({
         onClick={() => setChangeState({ type: JOIN_OTHER, ssid: null })}
         height="5rem"
         backgroundColor={COLORS.light1}
-        borderRadius={BORDERS.size_four}
+        borderRadius={BORDERS.size4}
         color={COLORS.black}
         css={NETWORK_ROW_STYLE}
-        padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+        padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing4}

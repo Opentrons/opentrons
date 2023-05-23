@@ -15,8 +15,8 @@ const mockSetSelectedAuthType = jest.fn()
 const mockSetChangeState = jest.fn()
 
 jest.mock('../SetWifiCred')
-jest.mock('../../../../redux/networking')
-jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../redux/networking')
+jest.mock('../../../redux/discovery/selectors')
 jest.mock('../AlternativeSecurityTypeModal')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
