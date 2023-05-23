@@ -662,20 +662,17 @@ async def _determine_transform_matrix(
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
     slot_a, slot_b, slot_c = 12, 3, 10
-    offset_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
+    point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_a
     )
-    point_a = nominal_point_a - offset_a
     await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
-    offset_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
+    point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_b
     )
-    point_b = nominal_point_b - offset_b
     await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
-    offset_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
+    point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_c
     )
-    point_c = nominal_point_c - offset_c
     expected = (
         (nominal_point_a.x, nominal_point_a.y, nominal_point_a.z),
         (nominal_point_b.x, nominal_point_b.y, nominal_point_b.z),
@@ -686,11 +683,7 @@ async def _determine_transform_matrix(
         (point_b.x, point_b.y, point_b.z),
         (point_c.x, point_c.y, point_c.z),
     )
-    attitude = solve_attitude(expected, actual)
-    return [
-        [c * -1 for c in r]
-        for r in attitude
-    ]
+    return solve_attitude(expected, actual)
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
