@@ -17,10 +17,10 @@ The OT-2 runs a `Jupyter Notebook <https://jupyter.org>`_ server on port 48888, 
 .. note::
     The Jupyter Notebook server only supports versions 2.13 and earlier of the Python API. Use the Opentrons App to run protocols that require functionality added in newer versions.
 
-To access the OT-2’s Jupyter Notebook, either:
+Access the OT-2’s Jupyter Notebook one of two ways:
 
-- go to the **Advanced** tab of Robot Settings and click the **Launch Jupyter Notebook** button, or
-- if you know your robot's IP address, navigate directly to ``http://<robot-ip>:48888`` in your web browser.
+- Go to the **Advanced** tab of Robot Settings and click the **Launch Jupyter Notebook** button.
+- If you know your robot's IP address, navigate directly to ``http://<robot-ip>:48888`` in your web browser.
 
 Once you've launched Jupyter Notebook, you can create a notebook file or edit an existing one. These notebook files are stored on the OT-2 itself. If you want to save code from a notebook to your computer, go to **File > Download As** in the notebook interface.
 
