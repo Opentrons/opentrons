@@ -33,12 +33,13 @@ from robot_server.instruments.instrument_models import (
     Pipette,
     PipetteData,
     InstrumentCalibrationData,
+    BadInstrument,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
 )
 from robot_server.subsystems.models import SubSystem
-from opentrons.hardware_control.types import SubSystem as HWSubSystem
+from opentrons.hardware_control.types import SubSystem as HWSubSystem, SubSystemState
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -305,4 +306,98 @@ async def test_get_96_channel_instruments(
             ),
             subsystem=SubSystem.pipette_left,
         )
+    ]
+
+
+@pytest.mark.ot3_only
+async def test_get_instrument_not_ok(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+) -> None:
+    """It should return a BadInstrument if an instrument needs an update."""
+    left_pipette_dict = get_sample_pipette_dict(
+        name="p10_multi",
+        model=PipetteModel("abc"),
+        pipette_id="my-pipette-id",
+        subsystem=SubSystem.pipette_left,
+    )
+
+    decoy.when(ot3_hardware_api.attached_gripper).then_return(
+        cast(
+            GripperDict,
+            {
+                "model": GripperModel.v1,
+                "gripper_id": "GripperID321",
+                "display_name": "my-special-gripper",
+                "state": GripperJawState.UNHOMED,
+                "calibration_offset": GripperCalibrationOffset(
+                    offset=Point(x=1, y=2, z=3),
+                    source=SourceType.default,
+                    status=CalibrationStatus(markedBad=False),
+                    last_modified=None,
+                ),
+                "subsystem": HWSubSystem.gripper,
+            },
+        )
+    )
+    decoy.when(ot3_hardware_api.attached_pipettes).then_return(
+        {
+            Mount.LEFT: left_pipette_dict,
+        }
+    )
+    decoy.when(ot3_hardware_api.attached_subsystems).then_return(
+        {
+            HWSubSystem.pipette_left: SubSystemState(
+                ok=True,
+                current_fw_version=10,
+                next_fw_version=11,
+                fw_update_needed=True,
+                current_fw_sha="some-sha",
+                pcba_revision="A1",
+                update_state=None,
+            ),
+            HWSubSystem.pipette_right: SubSystemState(
+                ok=False,
+                current_fw_version=11,
+                next_fw_version=11,
+                fw_update_needed=True,
+                current_fw_sha="some-other-sha",
+                pcba_revision="A1",
+                update_state=None,
+            ),
+            HWSubSystem.gripper: SubSystemState(
+                ok=False,
+                current_fw_version=11,
+                next_fw_version=11,
+                fw_update_needed=True,
+                current_fw_sha="some-other-sha",
+                pcba_revision="A1",
+                update_state=None,
+            ),
+        }
+    )
+    response = await get_attached_instruments(ot3_hardware_api)
+    assert response.status_code == 200
+    assert response.content.data == [
+        BadInstrument(
+            subsystem=SubSystem.pipette_left,
+            status="/subsystems/status/pipette_left",
+            update="/subsystems/updates/pipette_left",
+            ok=True,
+            requiresUpdate=True,
+        ),
+        BadInstrument(
+            subsystem=SubSystem.pipette_right,
+            status="/subsystems/status/pipette_right",
+            update="/subsystems/updates/pipette_right",
+            ok=False,
+            requiresUpdate=True,
+        ),
+        BadInstrument(
+            subsystem=SubSystem.gripper,
+            status="/subsystems/status/gripper",
+            update="/subsystems/updates/gripper",
+            ok=False,
+            requiresUpdate=True,
+        ),
     ]

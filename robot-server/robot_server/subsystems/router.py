@@ -48,6 +48,16 @@ if TYPE_CHECKING:
 subsystems_router = APIRouter()
 
 
+def status_route_for(subsystem: SubSystem) -> str:
+    """Get the status route for a subsystem prefilled with its route parameters."""
+    return f"/subsystems/status/{subsystem.value}"
+
+
+def update_route_for(subsystem: SubSystem) -> str:
+    """Get the update route for a subsystem prefilled with its route parameters."""
+    return f"/subsystems/updates/{subsystem.value}"
+
+
 def _error_str(maybe_err: Optional[Exception]) -> Optional[str]:
     if maybe_err:
         return str(maybe_err)

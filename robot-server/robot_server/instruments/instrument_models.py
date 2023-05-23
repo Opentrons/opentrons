@@ -92,4 +92,27 @@ class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
     data: GripperData
 
 
-AttachedInstrument = Union[Pipette, Gripper]
+class BadInstrument(BaseModel):
+    """Represents something that is physically connected but broken in some way. Must be updated."""
+
+    subsystem: SubSystem = Field(
+        ..., description="The hardware subsystem for this instrument"
+    )
+    status: str = Field(
+        ...,
+        description="A route on this server to more information about the status of the hardware",
+    )
+    update: str = Field(
+        ..., description="A route on this server to begin an update of the instrument"
+    )
+    ok: bool = Field(
+        ...,
+        description="If the instrument is not OK, a previous update was interrupted. It must be updated again.",
+    )
+    requiresUpdate: bool = Field(
+        ...,
+        description="If the instrument needs an update, that update must be done before use.",
+    )
+
+
+AttachedItem = Union[Pipette, Gripper, BadInstrument]
