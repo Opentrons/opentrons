@@ -22,18 +22,18 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 
+import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../redux/types'
 import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
-import type { AuthType } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 
 interface SelectAuthenticationTypeProps {
   ssid: string
   fromWifiList?: boolean
-  selectedAuthType: AuthType
+  selectedAuthType: WifiSecurityType
   setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
-  setSelectedAuthType: (authType: AuthType) => void
+  setSelectedAuthType: (authType: WifiSecurityType) => void
   setChangeState: (changeState: NetworkChangeState) => void
 }
 
