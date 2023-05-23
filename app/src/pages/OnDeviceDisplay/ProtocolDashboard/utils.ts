@@ -11,10 +11,12 @@ export function sortProtocols(
     const aName = a.metadata.protocolName ?? a.files[0].name
     const bName = b.metadata.protocolName ?? b.files[0].name
     const aLastRun = new Date(
-      runs.find(run => run.protocolId === a.id)?.completedAt ?? 0
+      runs.find(run => run.protocolId === a.id)?.completedAt ??
+        new Date(-8640000000000000)
     )
     const bLastRun = new Date(
-      runs.find(run => run.protocolId === b.id)?.completedAt ?? 0
+      runs.find(run => run.protocolId === b.id)?.completedAt ??
+        new Date(-8640000000000000)
     )
     const aDate = new Date(a.createdAt)
     const bDate = new Date(b.createdAt)
