@@ -7,6 +7,7 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.config.defaults_ot3 import DEFAULT_MACHINE_TRANSFORM
 from opentrons_shared_data.deck import get_calibration_square_position_in_slot
 from opentrons.hardware_control.ot3_calibration import (
+    CalibrationStructureNotFoundError,
     calibrate_belts,
     calibrate_pipette,
     find_calibration_structure_position,
@@ -21,8 +22,13 @@ async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("CALIBRATE PIPETTE")
     if not api.is_simulator:
         ui.get_user_ready("calibrating pipette to slot #5")
-    await calibrate_pipette(api, mount, slot=5)
-    await api.home_z(mount)
+    try:
+        await calibrate_pipette(api, mount, slot=5)
+    except CalibrationStructureNotFoundError as e:
+        if not api.is_simulator:
+            raise e
+    finally:
+        await api.home_z(mount)
 
 
 async def _check_belt_accuracy(api: OT3API, mount: types.OT3Mount) -> None:
@@ -32,7 +38,12 @@ async def _check_belt_accuracy(api: OT3API, mount: types.OT3Mount) -> None:
             ui.get_user_ready(f"about to find offset of slot #{slot}")
         await api.add_tip(mount, api.config.calibration.probe_length)
         nominal_pos = types.Point(*get_calibration_square_position_in_slot(slot))
-        slot_offset = await find_calibration_structure_position(api, mount, nominal_pos)
+        try:
+            slot_offset = await find_calibration_structure_position(api, mount, nominal_pos)
+        except CalibrationStructureNotFoundError as e:
+            if not api.is_simulator:
+                raise e
+            slot_offset = types.Point()
         await api.remove_tip(mount)
         print(f"Slot #{slot}: {slot_offset}")
         await api.home_z(mount)
@@ -45,10 +56,13 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     assert pip, "no pipette found"
     if not api.is_simulator:
         ui.get_user_ready("about to probe deck slots #3, #10, and #12")
-    attitude = await calibrate_belts(api, mount, pip.pipette_id)
-    await api.home_z(mount)
-    if api.is_simulator:
+    try:
+        attitude = await calibrate_belts(api, mount, pip.pipette_id)
+    except CalibrationStructureNotFoundError as e:
+        if not api.is_simulator:
+            raise e
         attitude = DEFAULT_MACHINE_TRANSFORM
+    await api.home_z(mount)
     print("attitude:")
     print(attitude)
 
