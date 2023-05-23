@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { SecondaryButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { FlexProtocolEditorComponent } from './FlexProtocolEditor'
 import { StyledText } from './StyledText'

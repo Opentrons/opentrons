@@ -215,7 +215,7 @@ const FileProtocolInformation = (): JSX.Element => {
 
 export const FlexHeadingButtonGroup = (props: {
   protocolCancelClickProps: any
-}) => {
+}): JSX.Element => {
   const { protocolCancelClickProps } = props
   return (
     <div className={styles.right_buttons}>

@@ -37,7 +37,6 @@ import { FlexModules } from './FlexModules'
 import { connect, useDispatch } from 'react-redux'
 import { actions as navActions } from '../../navigation'
 import { reduce } from 'lodash'
-import { PipetteOnDeck } from '../../step-forms'
 import assert from 'assert'
 import {
   ModuleCreationArgs,
@@ -261,7 +260,7 @@ function FlexProtocolEditor({
   const [redirectToDetails, setRedirectToDetails] = useState(false)
   const dispatch = useDispatch()
   const [isEdit, setEdit] = useState(false)
-  //On Redirction if page tab edit set to true
+  // On Redirction if page tab edit set to true
   useEffect(() => {
     if (isEditValue) {
       setEdit(isEditValue)
@@ -272,7 +271,7 @@ function FlexProtocolEditor({
   // Next button click
   const handleNext = ({ selectedTab }: selectedTabProps): any => {
     if (isEdit) {
-      //Redirect back to file details page
+      // Redirect back to file details page
       setRedirectToDetails(true)
       return <FlexFileDetails />
     } else {
