@@ -93,7 +93,7 @@ class ModuleOffsetModel(BaseModel):
         ...,
         description=(
             "The slot this module was calibrated in."
-            " For historical reasons, this is specified as an OT-2-style integer like `5`"
+            " For historical reasons, this is specified as an OT-2-style integer like `5`,"
             " not an OT-3-style string like `'C2'`."
         ),
     )
