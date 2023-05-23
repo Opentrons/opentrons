@@ -316,10 +316,6 @@ async def _main() -> None:
                     current_position = await hw_api.current_position_ot3(mount, refresh=True)
                     print(f"pos: {current_position}")
                     print(f"{tiprack_loc}")
-                    # # Move to safe height
-                    # await hw_api.move_to(mount, Point(current_position[OT3Axis.X] + x_offset,
-                    #                                     current_position[OT3Axis.Y] + y_offset,
-                    #                                     home_pos[OT3Axis.by_mount(mount)]))
                     # Move to safe height
                     await hw_api.move_to(mount, Point(tiprack_loc[OT3Axis.X] + x_offset,
                                                         tiprack_loc[OT3Axis.Y] + y_offset,
@@ -333,10 +329,6 @@ async def _main() -> None:
                     tip_home_pos = await hw_api.current_position_ot3(mount,
                                                                     refresh=True,
                                                                     critical_point = CriticalPoint.TIP)
-                    # await hw_api.move_to(mount, Point(current_position[OT3Axis.X],
-                    #                                     current_position[OT3Axis.Y],
-                    #                                 current_position[OT3Axis.by_mount(mount)]))
-                    # position = await hw_api.current_position_ot3(mount, refresh=True)
                 if args.lp_method == 'push_air':
                     # Move the plunger to the top position
                     await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
@@ -428,7 +420,8 @@ async def _main() -> None:
                 test_data["end_zenc_pos(mm)"] = end_enc_pos[OT3Axis.by_mount(mount)]
                 test_data["end_pmotor_pos(mm)"] = end_motor_pos[OT3Axis.of_main_tool_actuator(mount)]
                 test_data["end_penc_pos(mm)"] = end_enc_pos[OT3Axis.of_main_tool_actuator(mount)]
-                print(test_data)
+                # print(test_data)
+                # print("True Liquid Height: ",true_liquid_height)
                 d_str = f"{elasped_time}, \
                             {tip_measurement}, \
                             Tip, \
@@ -449,11 +442,18 @@ async def _main() -> None:
                             {args.mount_speed}, \
                             {args.plunger_speed}, \
                             {args.sensor_threshold}, \n"
-                print(d_str)
+                # print(d_str)
+                init_ls = true_liquid_height[OT3Axis.by_mount(mount)]
+                triggered_ls = liquid_height_pos[1][OT3Axis.by_mount(mount)]
+                delta = init_ls - triggered_ls
+                print("True Liquid Height: ", true_liquid_height[OT3Axis.by_mount(mount)])
+                print("Triggered LS Height: ", liquid_height_pos[1][OT3Axis.by_mount(mount)])
+                print("Liquid Surface Depth: ", delta)
+
                 data.append_data_to_file(test_n, test_f, d_str)
                 # Blow out a bit
-                # await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2)
-                await move_plunger_relative_ot3(hw_api, mount, 0.25, None, speed = 2)
+                await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2)
+                # await move_plunger_relative_ot3(hw_api, mount, 0.25, None, speed = 2)
                 print(liquid_height_pos)
                 current_position = await hw_api.current_position_ot3(mount, refresh=True)
                 # Move to home position as fast as possible
@@ -509,7 +509,7 @@ if __name__ == "__main__":
     parser.add_argument("--min_z_distance", type=float, default = 5)
     parser.add_argument("--mount_speed", type=float, default =11.3)
     parser.add_argument("--plunger_speed", type=float, default = 21.3)
-    parser.add_argument("--sensor_threshold", type=float, default = 110, help = "Threshold in Pascals")
+    parser.add_argument("--sensor_threshold", type=int, default = 50, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
     parser.add_argument("--log_pressure", action="store_true")
     parser.add_argument(
