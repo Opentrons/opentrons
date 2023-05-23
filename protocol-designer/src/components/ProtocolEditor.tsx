@@ -21,7 +21,10 @@ import { connect } from 'react-redux'
 import { selectors } from '../navigation'
 import { BaseState } from '../types'
 import { RobotDataFields, selectors as fileSelectors } from '../file-data'
-import { OT3_STANDARD_DECKID } from '@opentrons/shared-data'
+import {
+  OT2_STANDARD_DECKID,
+  OT3_STANDARD_DECKID,
+} from '@opentrons/shared-data'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
@@ -32,12 +35,15 @@ export interface Props {
 }
 
 function ProtocolEditorComponent(props: Props): JSX.Element {
-  const { page, robot } = props
-  console.log(`Selected page name is ${page} and robot name is ${robot}`)
+  const {
+    page,
+    robot: { deckId },
+  } = props
   const pages = ['landing-page', 'new-flex-file-form']
   const conditionalStyle = pages.includes(page)
     ? cx(styles.flex_main_page_content, MAIN_CONTENT_FORCED_SCROLL_CLASSNAME)
     : cx(styles.main_page_content, MAIN_CONTENT_FORCED_SCROLL_CLASSNAME)
+  const notLandingPage = page !== 'landing-page'
   return (
     <div>
       <ComputingSpinner />
@@ -45,15 +51,18 @@ function ProtocolEditorComponent(props: Props): JSX.Element {
       {showGateModal ? <GateModal /> : null}
       <PrereleaseModeIndicator />
       <div className={styles.wrapper}>
-        {page !== 'landing-page' && (
+        {notLandingPage && (
           <>
             <ConnectedNav />
-            {robot?.deckId !== OT3_STANDARD_DECKID && <ConnectedSidebar />}
+            {deckId === OT3_STANDARD_DECKID && page !== 'file-detail' && (
+              <ConnectedSidebar />
+            )}
+            {deckId === OT2_STANDARD_DECKID && <ConnectedSidebar />}
           </>
         )}
 
         <div className={styles.main_page_wrapper}>
-          {page !== 'landing-page' && <ConnectedTitleBar />}
+          {notLandingPage && <ConnectedTitleBar />}
 
           <div id="main-page" className={conditionalStyle}>
             <AnnouncementModal />

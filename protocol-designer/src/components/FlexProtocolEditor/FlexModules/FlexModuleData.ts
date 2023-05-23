@@ -41,6 +41,7 @@ export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
       value: '1',
     },
   ],
+  magneticBlockType: [],
 }
 
 const ALL_MODULE_SLOTS: DropdownOption[] = [

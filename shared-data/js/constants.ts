@@ -1,3 +1,5 @@
+import type { ModuleType } from './types'
+
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
 
@@ -69,6 +71,8 @@ export const MAGNETIC_BLOCK_TYPE: 'magneticBlockType' = 'magneticBlockType'
 export const GRIPPER_MODULE_TYPE: 'gripperModuleType' = 'gripperModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
+
+export const NON_CONNECTING_MODULE_TYPES: ModuleType[] = [MAGNETIC_BLOCK_TYPE]
 
 export const TEMPERATURE_MODULE_MODELS = [
   TEMPERATURE_MODULE_V1,

@@ -9,7 +9,7 @@ import { StyledText } from '../../atoms/text'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import { GripperWizardFlowType } from '../GripperWizardFlows/types'
+import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {
   attachedGripper: InstrumentData | null

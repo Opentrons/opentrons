@@ -38,7 +38,6 @@ from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
-    MustHomeError,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
@@ -253,7 +252,7 @@ async def test_home_execute(
     assert not controller._motor_status
 
     commanded_homes = set(axes)
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     all_calls = list(chain([args[0][0] for args in mock_move_group_run.call_args_list]))
     for command in all_calls:
         for group in command._move_groups:
@@ -277,7 +276,7 @@ async def test_home_prioritize_mount(
     # nothing has been homed
     assert not controller._motor_status
 
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     has_xy = len({OT3Axis.X, OT3Axis.Y} & set(axes)) > 0
     has_mount = len(set(OT3Axis.mount_axes()) & set(axes)) > 0
     run = mock_move_group_run.call_args_list[0][0][0]._move_groups
@@ -302,7 +301,7 @@ async def test_home_build_runners(
     mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
     assert not controller._motor_status
 
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     has_pipette = len(set(OT3Axis.pipette_axes()) & set(axes)) > 0
     has_gantry = len(set(OT3Axis.gantry_axes()) & set(axes)) > 0
 
@@ -348,7 +347,7 @@ async def test_home_only_present_devices(
 
     # nothing has been homed
     assert not controller._motor_status
-    await controller.home(axes)
+    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
 
     for call in mock_move_group_run.call_args_list:
         # pull the bound-self argument that is the runner instance out of
@@ -437,7 +436,7 @@ async def test_probing(
             ),
             "P1KSV33hello",
             "GRPV00fake_serial",
-            "Gripper V1",
+            "Flex Gripper",
         ),
     ],
 )
@@ -703,9 +702,6 @@ async def test_update_motor_estimation(
         fake_umpe,
     ):
         nodes = [axis_to_node(a) for a in axes]
-        if len(nodes) > 0:
-            with pytest.raises(MustHomeError):
-                await controller.update_motor_estimation(axes)
         for node in nodes:
             controller._motor_status.update(
                 {node: MotorStatus(motor_ok=False, encoder_ok=True)}
@@ -845,7 +841,7 @@ async def test_update_required_flag(
         controller._initialized = True
         controller._check_updates = True
         with pytest.raises(FirmwareUpdateRequired):
-            await controller.home(axes)
+            await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
 
 
 async def test_update_required_bypass_firmware_update(controller: OT3Controller):

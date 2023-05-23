@@ -1,20 +1,24 @@
 import React, { useState } from 'react'
-import { SecondaryButton } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { FlexProtocolEditorComponent } from './FlexProtocolEditor'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 import { UpdateConfirmation } from './FlexUpdateConfirmation'
+import { actions as navActions } from '../../navigation'
+import { useDispatch } from 'react-redux'
+import { FlexHeadingButtonGroup } from './FlexFileDetails'
 
 function FlexFormComponent(): JSX.Element {
+  const dispatch = useDispatch()
   const [showConfirmation, setShowConfirmation] = useState(false)
 
-  const handleCancelClick = (): any => {
+  const handleCancelClick = (): void => {
     setShowConfirmation(false)
   }
 
-  const handleConfirmClick = (): any => {
+  const handleConfirmClick = (): void => {
     // handle the update action here
+    dispatch(navActions.navigateToPage('landing-page'))
     setShowConfirmation(false)
   }
 
@@ -41,15 +45,9 @@ function FlexFormComponent(): JSX.Element {
       <div className={styles.flex_header}>
         <div className={styles.flex_title}>
           <StyledText as="h1">{i18n.t('flex.header.title')}</StyledText>
-          <SecondaryButton
-            className={styles.cancel_button}
-            tabIndex={0}
-            onClick={() => protocolCancelClick()}
-          >
-            <StyledText as="h3">
-              {i18n.t('flex.header.cancel_button')}
-            </StyledText>
-          </SecondaryButton>
+          <FlexHeadingButtonGroup
+            protocolCancelClickProps={protocolCancelClick}
+          />
         </div>
         <StyledText as="h5" className={styles.right_end}>
           {i18n.t('flex.header.required_fields')}

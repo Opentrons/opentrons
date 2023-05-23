@@ -45,6 +45,7 @@ from opentrons.hardware_control.types import (  # noqa: E402
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_pipette,
     calibrate_belts,
+    delete_belt_calibration_data,
     calibrate_gripper_jaw,
     calibrate_module,
     find_calibration_structure_height,
@@ -53,7 +54,7 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     find_axis_center,
     gripper_pin_offsets_mean,
 )
-from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
+from opentrons.hardware_control import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 
@@ -88,6 +89,13 @@ if ff.enable_ot3_hardware_controller():
 
     HCApi: Union[Type[OT3API], Type["API"]] = OT3API
 
+    def build_thread_manager() -> ThreadManager[Union["API", OT3API]]:
+        return ThreadManager(
+            OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
+            update_firmware=update_firmware,
+        )
+
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
         @wraps(fn)
         def synchronizer(*args: Any, **kwargs: Any) -> Any:
@@ -101,6 +109,13 @@ else:
     from opentrons.hardware_control.api import API
 
     HCApi = API
+
+    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
+        return ThreadManager(
+            API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
+            update_firmware=update_firmware,
+        )
 
 
 logging.basicConfig(level=logging.INFO)
@@ -116,11 +131,7 @@ def build_api() -> ThreadManager[HardwareControlAPI]:
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logging.getLogger().addHandler(stream_handler)
-    tm = ThreadManager(
-        HCApi.build_hardware_controller,
-        use_usb_bus=ff.rear_panel_integration(),
-        update_firmware=update_firmware,
-    )
+    tm = build_thread_manager()
     logging.getLogger().removeHandler(stream_handler)
     tm.managed_thread_ready_blocking()
     return tm
@@ -148,6 +159,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             ),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
             "calibrate_belts": wrap_async_util_fn(calibrate_belts, api),
+            "delete_belt_calibration_data": delete_belt_calibration_data,
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper_jaw, api),
             "calibrate_module": wrap_async_util_fn(calibrate_module, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,
