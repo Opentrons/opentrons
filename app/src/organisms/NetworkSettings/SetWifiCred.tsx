@@ -20,6 +20,8 @@ import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { TertiaryButton } from '../../atoms/buttons'
 
+import type { WifiSecurityType } from '@opentrons/api-client'
+
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: ${SPACING.spacing5};
   padding-bottom: ${SPACING.spacing5};
@@ -30,7 +32,7 @@ const SSID_INPUT_FIELD_STYLE = css`
 
 interface SetWifiCredProps {
   ssid: string
-  authType: 'wpa-psk' | 'none'
+  authType: WifiSecurityType
   setShowSelectAuthenticationType: (isShow: boolean) => void
   password: string
   setPassword: (password: string) => void

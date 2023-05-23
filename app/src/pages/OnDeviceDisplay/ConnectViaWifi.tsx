@@ -23,12 +23,13 @@ import {
   WifiConnectionDetails,
 } from '../../organisms/NetworkSettings'
 
+import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
-export type AuthType = 'wpa-psk' | 'none'
+const FETCH_WIFI_LIST_MS = 5000
 
 export function ConnectViaWifi(): JSX.Element {
   const [isSearching, setIsSearching] = React.useState<boolean>(true)
@@ -37,16 +38,17 @@ export function ConnectViaWifi(): JSX.Element {
     showSelectAuthenticationType,
     setShowSelectAuthenticationType,
   ] = React.useState<boolean>(false)
-  const [selectedAuthType, setSelectedAuthType] = React.useState<AuthType>(
-    'wpa-psk'
-  )
+  const [
+    selectedAuthType,
+    setSelectedAuthType,
+  ] = React.useState<WifiSecurityType>('wpa-psk')
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const list = useWifiList(robotName)
+  const list = useWifiList(robotName, FETCH_WIFI_LIST_MS)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -173,7 +175,7 @@ export function ConnectViaWifi(): JSX.Element {
         setChangeState({ type: CONNECT, ssid: selectedSsid, network })
       }
     }
-  }, [selectedSsid, selectedAuthType])
+  }, [selectedSsid, selectedAuthType, list])
 
   return (
     <>
