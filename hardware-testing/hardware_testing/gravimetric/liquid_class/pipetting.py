@@ -255,7 +255,13 @@ def _pipette_with_liquid_settings(
         # blow-out any remaining air in pipette (any reason why not?)
         callbacks.on_blowing_out()
         _do_user_pause(ctx, inspect, "about to blow-out")
-        pipette.blow_out()
+        # FIXME: using the HW-API to specify that we want to blow-out the full
+        #        available blow-out volume
+        hw_api = ctx._core.get_hardware()
+        hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+        # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
+        max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
+        hw_api.blow_out(hw_mount, max_blow_out_volume)
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
