@@ -349,6 +349,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
+    ui.get_user_ready(f"is 132? {tipracks[0].highest_z}")
     liquid_tracker = LiquidTracker()
     initialize_liquid_from_deck(ctx, liquid_tracker)
 
@@ -431,7 +432,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                         f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
                     )
                     tip_iter = 0
-                if (volume > 500 and not (trial+1 == cfg.trials):
+                if (volume > 500 and not (trial+1 == cfg.trials)):
                     first_trial = True
                     ui.get_user_ready(
                         f"Refill the dye for the {reservoir} in slot {cfg.reservoir_slot}"
