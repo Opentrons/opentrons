@@ -161,7 +161,7 @@ export function registerUsb(dispatch: Dispatch): (action: Action) => unknown {
           ipcMain.handle('usb:request', () =>
             Promise.resolve({
               status: 400,
-              statusText: 'Bad Request',
+              statusText: 'USB robot disconnected',
             })
           )
         }
