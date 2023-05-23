@@ -75,7 +75,9 @@ export const PipetteWizardFlows = (
           ),
     []
   )
-
+  const requiredPipette = props.pipetteInfo?.find(
+    pipette => pipette.mount === mount
+  )
   const host = useHost()
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
@@ -140,18 +142,21 @@ export const PipetteWizardFlows = (
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => handleClose(),
+    onError: () => handleClose(),
   })
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      chainRunCommands(
-        [{ commandType: 'home' as const, params: {} }],
-        true
-      ).then(() => {
-        deleteMaintenanceRun(maintenanceRunId)
-      })
+      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunId)
+        })
+        .catch(error => {
+          console.error(error)
+          handleClose()
+        })
     }
   }
   const {
@@ -253,6 +258,7 @@ export const PipetteWizardFlows = (
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
         hasCalData={hasCalData}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {

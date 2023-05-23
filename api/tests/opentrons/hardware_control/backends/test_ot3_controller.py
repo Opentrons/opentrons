@@ -38,7 +38,6 @@ from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
-    MustHomeError,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
@@ -437,7 +436,7 @@ async def test_probing(
             ),
             "P1KSV33hello",
             "GRPV00fake_serial",
-            "Gripper V1",
+            "Flex Gripper",
         ),
     ],
 )
@@ -703,9 +702,6 @@ async def test_update_motor_estimation(
         fake_umpe,
     ):
         nodes = [axis_to_node(a) for a in axes]
-        if len(nodes) > 0:
-            with pytest.raises(MustHomeError):
-                await controller.update_motor_estimation(axes)
         for node in nodes:
             controller._motor_status.update(
                 {node: MotorStatus(motor_ok=False, encoder_ok=True)}

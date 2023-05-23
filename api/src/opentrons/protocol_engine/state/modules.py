@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, add
+from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -669,16 +669,6 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-
-        # add the calibrated module offset if there is one
-        module = self.get(module_id)
-        offset: Optional[ModuleOffsetVector] = None
-        if module.serialNumber is not None:
-            offset = self._state.module_offset_by_serial.get(module.serialNumber)
-
-        if offset is not None:
-            module_offset = array((offset.x, offset.y, offset.z, 1))
-            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],

@@ -55,7 +55,7 @@ from .robot_calibration import (
     RobotCalibrationProvider,
     RobotCalibration,
 )
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
@@ -79,7 +79,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[RobotCalibration],
 ):
     """This API is the primary interface to the hardware controller.
 

@@ -99,7 +99,11 @@ async function usbListener(
       data,
       headers: { ...config.headers, ...formHeaders },
     })
-    return { data: response.data }
+    return {
+      data: response.data,
+      status: response.status,
+      statusText: response.statusText,
+    }
   } catch (e) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     usbLog.debug(`usbListener error ${e?.message ?? 'unknown'}`)
