@@ -14,7 +14,6 @@ import {
   ModuleType,
   ModuleModel,
   OT3_STANDARD_MODEL,
-  GRIPPER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
