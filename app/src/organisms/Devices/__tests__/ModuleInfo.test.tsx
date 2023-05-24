@@ -6,7 +6,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ModuleInfo } from '../ModuleInfo'
 import { useRunHasStarted } from '../hooks'
-import { screen } from '@testing-library/react'
 
 jest.mock('../hooks')
 
@@ -89,8 +88,8 @@ describe('ModuleInfo', () => {
       ...props,
       moduleModel: 'magneticBlockV1',
     }
-    const { getByText } = render(props)
+    const { getByText, queryByText } = render(props)
     getByText('No USB required')
-    expect(screen.queryByText('Connected')).toBeNull()
+    expect(queryByText('Connected')).toBeNull()
   })
 })
