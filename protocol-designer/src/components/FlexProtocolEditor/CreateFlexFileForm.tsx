@@ -6,7 +6,7 @@ import styles from './FlexComponents.css'
 import { UpdateConfirmation } from './FlexUpdateConfirmation'
 import { actions as navActions } from '../../navigation'
 import { useDispatch } from 'react-redux'
-import { FlexHeadingButtonGroup } from './FlexFileDetails'
+import { FlexHeadingButtonGroup } from './FlexButtonsGroup'
 
 function FlexFormComponent(): JSX.Element {
   const dispatch = useDispatch()

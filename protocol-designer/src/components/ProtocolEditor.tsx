@@ -85,8 +85,6 @@ function mapStateToProps(state: BaseState): Props {
   }
 }
 
-export const ProtocolEditorOne = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
+export const ProtocolEditor = connect(mapStateToProps)(
+  DragDropContext(MouseBackEnd)(ProtocolEditorComponent)
 )
-
-export const ProtocolEditor = connect(mapStateToProps)(ProtocolEditorOne)
