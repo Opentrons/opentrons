@@ -142,9 +142,11 @@ def _load_labware(
     for ls in tiprack_load_settings:
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
-
+    tiprack_namespace = "custom_beta"
+    if ctx.is_simulating():
+        tiprack_namespace = "opentrons"
     tipracks = [
-        ctx.load_labware(ls[1], location=ls[0], namespace="custom_beta")
+        ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
     ]
     _apply_labware_offsets(cfg, tipracks, photoplate, reservoir)
@@ -236,10 +238,10 @@ def _run_trial(
 
     channel_count = 96
     # RUN INIT
-
-    num_dispenses = ceil(volume / TARGET_END_PHOTOPLATE_VOLUME)
+    target_volume = 250 if volume > 800 else TARGET_END_PHOTOPLATE_VOLUME
+    num_dispenses = ceil(volume / target_volume)
     volume_to_dispense = volume / num_dispenses
-    photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME - volume_to_dispense, 0)
+    photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
 
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
     if do_jog:
@@ -340,8 +342,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     total_photoplates = 0
     for vol in test_volumes:
+        target_volume = 250 if vol > 800 else TARGET_END_PHOTOPLATE_VOLUME
         total_photoplates = total_photoplates + (
-            ceil(vol / TARGET_END_PHOTOPLATE_VOLUME) * cfg.trials
+            ceil(vol / target_volume) * cfg.trials
         )
     ui.print_header("PREPARE")
     ui.get_user_ready(
