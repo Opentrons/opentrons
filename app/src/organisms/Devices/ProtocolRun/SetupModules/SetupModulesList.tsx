@@ -243,7 +243,11 @@ export const ModulesListItem = ({
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <StyledText as="p" marginLeft={SPACING.spacing20}>
+      <StyledText
+        as="p"
+        marginLeft={SPACING.spacing20}
+        color={COLORS.darkGreyEnabled}
+      >
         {t('no_usb_connection_required')}
       </StyledText>
     )
