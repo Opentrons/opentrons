@@ -151,7 +151,7 @@ def clean_server_state() -> Iterator[None]:
     async def _clean_server_state() -> None:
         port = "31950"
         async with RobotClient.make(
-            host="http://localhost", port=port, version="*"
+            base_url=f"http://localhost:{port}", version="*"
         ) as robot_client:
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
@@ -169,7 +169,7 @@ def ot3_clean_server_state() -> Iterator[None]:
     async def _clean_server_state() -> None:
         port = "31960"
         async with RobotClient.make(
-            host="http://localhost", port=port, version="*"
+            base_url=f"http://localhost:{port}", version="*"
         ) as robot_client:
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
@@ -192,3 +192,8 @@ async def _delete_all_protocols(robot_client: RobotClient) -> None:
     protocol_ids = [p["id"] for p in response.json()["data"]]
     for protocol_id in protocol_ids:
         await robot_client.delete_protocol(protocol_id)
+
+
+@pytest.fixture
+def ot2_session_server_base_url() -> str:
+    return f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}"
