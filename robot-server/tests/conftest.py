@@ -1,12 +1,7 @@
 import asyncio
-import signal
-import subprocess
-import time
-import sys
 import json
 import os
 import pathlib
-import requests
 import tempfile
 from datetime import datetime, timezone
 from mock import MagicMock
@@ -209,60 +204,6 @@ def ot3_clean_server_state() -> Iterator[None]:
 
     yield
     asyncio.run(_clean_server_state())
-
-
-@pytest.fixture(scope="session")
-def run_server(
-    request_session: requests.Session, server_temp_directory: str
-) -> Iterator["subprocess.Popen[Any]"]:
-    """Run the robot server in a background process."""
-    # In order to collect coverage we run using `coverage`.
-    # `-a` is to append to existing `.coverage` file.
-    # `--source` is the source code folder to collect coverage stats on.
-    with subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "coverage",
-            "run",
-            "-a",
-            "--source",
-            "robot_server",
-            "-m",
-            "uvicorn",
-            "robot_server:app",
-            "--host",
-            "localhost",
-            "--port",
-            "31950",
-        ],
-        env={
-            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
-            "OT_API_CONFIG_DIR": server_temp_directory,
-        },
-        stdin=subprocess.DEVNULL,
-        # The server will log to its stdout or stderr.
-        # Let it inherit our stdout and stderr so pytest captures its logs.
-        stdout=None,
-        stderr=None,
-    ) as proc:
-        # Wait for a bit to get started by polling /hcpealth
-        from requests.exceptions import ConnectionError
-
-        while True:
-            try:
-                request_session.get("http://localhost:31950/health")
-            except ConnectionError:
-                pass
-            else:
-                break
-            time.sleep(0.5)
-        request_session.post(
-            "http://localhost:31950/robot/home", json={"target": "robot"}
-        )
-        yield proc
-        proc.send_signal(signal.SIGTERM)
-        proc.wait()
 
 
 async def _delete_all_runs(robot_client: RobotClient) -> None:
