@@ -30,28 +30,6 @@ stages:
       save:
         json:
           run_id: data.id
-      json:
-        data:
-          id: !anystr
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          status: idle
-          current: True
-          actions: []
-          errors: []
-          pipettes: []
-          modules: []
-          labware:
-            - id: !anystr
-              loadName: !anystr
-              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-              location: !anydict
-          labwareOffsets: []
-          liquids:
-            - id: waterId
-              displayName: Water
-              description: Liquid H2O
-              displayColor: '#7332a8'
-          protocolId: '{protocol_id}'
 
   - name: Fetch run labware definitions
     request:
