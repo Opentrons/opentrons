@@ -187,12 +187,18 @@ const FileProtocolInformation = (): JSX.Element => {
       {Boolean(showConfirmation) && (
         <>
           <UpdateConfirmation
-            confirmationTitle={'Cancel Create Protocol?'}
-            confirmationMessage={
-              'Are you sure you want to cancel creating a protocol? Progress will be lost, You can’t undo this change.'
-            }
-            cancelButtonName={'Go back'}
-            continueButtonName={'Cancel New Protocol'}
+            confirmationTitle={i18n.t(
+              'flex.cancel_create_protocol.confirmation_title'
+            )}
+            confirmationMessage={i18n.t(
+              'flex.cancel_create_protocol.confirmation_message'
+            )}
+            cancelButtonName={i18n.t(
+              'flex.cancel_create_protocol.cancel_button_name'
+            )}
+            continueButtonName={i18n.t(
+              'flex.cancel_create_protocol.continue_button_name'
+            )}
             handleCancelClick={handleCancelClick}
             handleConfirmClick={handleConfirmClick}
           />

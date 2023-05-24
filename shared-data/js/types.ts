@@ -210,7 +210,6 @@ export type ModuleModel =
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
   | MagneticBlockModel
-  | GripperModel
 
 export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
 
@@ -389,7 +388,6 @@ export interface ProtocolMetadata {
   category?: string | null
   subcategory?: string | null
   tags?: string[]
-  deckId?: string | null
   [key: string]: unknown
 }
 export interface PendingProtocolAnalysis {
