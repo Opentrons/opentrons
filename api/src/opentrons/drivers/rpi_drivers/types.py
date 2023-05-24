@@ -14,6 +14,8 @@ class PinDir(enum.Enum):
 
 REV_OG_USB_PORTS = {"3": 1, "5": 2}
 REV_A_USB_HUB = 3
+OT3_USB_PORT_GROUP_LEFT = 4
+OT3_USB_PORT_GROUP_RIGHT = 3
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,7 @@ class USBPort:
     port_number: int
     device_path: str = ""
     hub: Optional[int] = None
+    port_group: str = ""
 
     @classmethod
     def build(cls, port_path: str, board_revision: BoardRevision) -> "USBPort":
@@ -41,14 +44,20 @@ class USBPort:
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
         hub, port, name = cls.find_hub(port_nodes)
-        hub, port = cls.map_to_revision(
+        hub, port_group, port = cls.map_to_revision(
             board_revision,
             (
                 hub,
                 port,
             ),
         )
-        return cls(name=name, port_number=port, device_path=device_path, hub=hub)
+        return cls(
+            name=name,
+            port_number=port,
+            device_path=device_path,
+            hub=hub,
+            port_group=port_group,
+        )
 
     @staticmethod
     def find_hub(port_nodes: List[str]) -> Tuple[Optional[int], int, str]:
@@ -103,18 +112,27 @@ class USBPort:
     @staticmethod
     def map_to_revision(
         board_revision: BoardRevision, port_info: Tuple[Optional[int], int]
-    ) -> Tuple[Optional[int], int]:
+    ) -> Tuple[Optional[int], str, int]:
         hub, port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
-                return REV_OG_USB_PORTS.get(str(hub), hub), port
+                return REV_OG_USB_PORTS.get(str(hub), hub), "MAIN", port
             else:
-                return hub, REV_OG_USB_PORTS.get(str(port), port)
+                return hub, "MAIN", REV_OG_USB_PORTS.get(str(port), port)
+        elif board_revision == BoardRevision.B2:
+            # what will hub look like??
+            if hub == OT3_USB_PORT_GROUP_LEFT:
+                port_group = "LEFT"
+            elif hub == OT3_USB_PORT_GROUP_RIGHT:
+                port_group = "RIGHT"
+            else:
+                port_group = "UNKNOWN"
+            return None, port_group, port
         else:
             if hub and hub == REV_A_USB_HUB:
-                return None, port
+                return None, "MAIN", port
             else:
-                return hub, port
+                return hub, "MAIN", port
 
     def __hash__(self) -> int:
         """

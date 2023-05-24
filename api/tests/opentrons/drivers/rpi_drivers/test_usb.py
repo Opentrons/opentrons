@@ -68,6 +68,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         name=expected_name,
         port_number=1,
         device_path="1.0/tty/ttyACM1/dev",
+        port_group="MAIN",
     )
 
     # TODO(mc, 2022-03-01): figure out why this section of the test doesn't
@@ -85,4 +86,5 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=3,
             hub=2,
             device_path="1.0/tty/ttyACM2/dev",
+            port_group="MAIN",
         )
