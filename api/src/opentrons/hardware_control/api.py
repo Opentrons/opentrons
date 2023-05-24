@@ -351,6 +351,10 @@ class API(
         """The status bar does not exist on OT-2!"""
         return None
 
+    def get_status_bar_state(self) -> StatusBarState:
+        """There is no status bar on OT-2, return IDLE at all times."""
+        return StatusBarState.IDLE
+
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
         """Delay execution by pausing and sleeping."""
