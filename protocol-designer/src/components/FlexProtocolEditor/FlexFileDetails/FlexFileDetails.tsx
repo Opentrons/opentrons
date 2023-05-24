@@ -136,7 +136,7 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         className={`${styles.heading_container} ${styles.margin_bottom}`}
                       >
                         <StyledText as="h3" className={styles.margin_bottom}>
-                          {i18n.t('flex.file_tab.additional_items')}
+                          {i18n.t('flex.file_tab.modules')}
                         </StyledText>
                         <Flex>
                           <EditButton
