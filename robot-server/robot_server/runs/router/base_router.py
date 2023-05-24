@@ -245,8 +245,15 @@ async def get_run(
 
 @base_router.get(
     path="/runs/{runId}/labware-definitions",
-    summary="Get a run's labware definition",
-    description="Get a specific run's labware definition by its unique identifier.",
+    summary="Get the definitions of a run's loaded labware",
+    description=(
+        "Get the definitions of all the labware that the given run has loaded so far."
+        "\n\n"
+        "When the run is first created, this list will be empty."
+        " As it executes and goes through `loadLabware` commands, those commands'"
+        " `result.definition`s will be added to this list."
+        " Repeated definitions will be deduplicated."
+    ),
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
