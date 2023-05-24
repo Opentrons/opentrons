@@ -85,7 +85,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   )
 
   let iconName: IconName | null = null
-  let tooltipTranslationKey = ''
+  let tooltipTranslationKey = null
   if (wifi?.ipAddress != null) {
     iconName = 'wifi'
     tooltipTranslationKey = 'device_settings:wifi'
@@ -142,7 +142,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
               </Btn>
             ) : null}
             <Tooltip tooltipProps={tooltipProps} width="auto">
-              {t(tooltipTranslationKey)}
+              {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
             </Tooltip>
           </Flex>
         </Flex>
