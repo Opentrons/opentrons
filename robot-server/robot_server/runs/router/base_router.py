@@ -249,7 +249,7 @@ async def get_run(
     description="Get a specific run's labware definition by its unique identifier.",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped]]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
 )
 async def get_run_labware_definition(
