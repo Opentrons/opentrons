@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import uuid
+import socket
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
@@ -117,9 +118,7 @@ class Proxy:
         )
 
         client_host = (
-            "127.0.0.1" 
-            if self._settings.use_local_host 
-            else socket.gethostname()
+            "127.0.0.1" if self._settings.use_local_host else socket.gethostname()
         )
 
         self._cons.append(connection)
