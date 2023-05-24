@@ -45,7 +45,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
 
   let connectionStatus = t('no_usb_port_yet')
   if (moduleModel === MAGNETIC_BLOCK_V1) {
-    connectionStatus = t('no_usb_needed')
+    connectionStatus = t('no_usb_required')
   }
   if (usbPort === null && hubPort === null && isAttached) {
     connectionStatus = t('usb_connected_no_port_info')

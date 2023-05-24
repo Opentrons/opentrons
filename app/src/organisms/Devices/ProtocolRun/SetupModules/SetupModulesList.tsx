@@ -244,7 +244,7 @@ export const ModulesListItem = ({
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
       <StyledText as="p" marginLeft={SPACING.spacing20}>
-        {t('no_usb_required')}
+        {t('no_usb_connection_required')}
       </StyledText>
     )
   }
@@ -294,7 +294,7 @@ export const ModulesListItem = ({
         </StyledText>
         <Flex width="15%">
           {moduleModel === MAGNETIC_BLOCK_V1 ? (
-            <StyledText as="p"> {t('na')}</StyledText>
+            <StyledText as="p"> {t('n_a')}</StyledText>
           ) : (
             <StatusLabel
               id={location}
