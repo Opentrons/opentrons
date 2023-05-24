@@ -135,7 +135,7 @@ async def get_run_loaded_labware_definitions(
     runId: str,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[SimpleBody[ResponseList[SD_LabwareDefinition]]]:
-    """Get a run's labware definition by its ID.
+    """Get a run's loaded labware definition by the run ID.
 
     Args:
         runId: Run ID pulled from URL.
