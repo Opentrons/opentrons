@@ -167,6 +167,8 @@ class RunDataManager:
         Raises:
             RunNotCurrentError: The given run identifier is not the current run.
         """
+        # The database doesn't store runs' loaded labware definitions in a way that we
+        # can query quickly. Avoid it by only supporting this on in-memory runs.
         if run_id != self._engine_store.current_run_id:
             raise RunNotCurrentError(
                 f"Cannot get load labware definitions of {run_id} because it is not the current run."
