@@ -2,3 +2,4 @@
 *.json
 # ...unless specifically allowed.
 !test.json
+!test-flex.json

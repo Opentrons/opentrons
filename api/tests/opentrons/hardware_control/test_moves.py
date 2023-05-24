@@ -93,8 +93,8 @@ async def test_home(ot3_hardware, mock_home):
         assert dfm_mock.call_count == 2
         dfm_mock.assert_called_with(
             mock_home.return_value,
-            ot3_hardware._transforms.deck_calibration.attitude,
-            ot3_hardware._transforms.carriage_offset,
+            ot3_hardware._robot_calibration.deck_calibration.attitude,
+            ot3_hardware._robot_calibration.carriage_offset,
         )
     assert ot3_hardware._current_position[OT3Axis.X] == 20
 

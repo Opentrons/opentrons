@@ -6,7 +6,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
@@ -82,7 +82,7 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock HardwareControlAPI."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
