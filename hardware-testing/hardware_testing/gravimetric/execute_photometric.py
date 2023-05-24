@@ -286,6 +286,7 @@ def _run_trial(
             blank=blank,
             inspect=inspect,
             mix=mix,
+            added_blow_out=(i + 1) == num_dispenses,
         )
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         ui.get_user_ready("Cover and replace the photoplate in slot 3")
