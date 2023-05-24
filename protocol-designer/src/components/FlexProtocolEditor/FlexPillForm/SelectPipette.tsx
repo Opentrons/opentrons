@@ -38,9 +38,9 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
       ? i18n.t('flex.pipette_selection.choose_first_pipette')
       : i18n.t('flex.pipette_selection.choose_second_pipette')
   return (
-    <div className={styles.pipette_form}>
+    <div>
       <Flex className={styles.pb_10}>
-        <StyledText as={'h1'}>{pipetteHeaderText}</StyledText>
+        <StyledText as={'h2'}>{pipetteHeaderText}</StyledText>
       </Flex>
       {
         <>
