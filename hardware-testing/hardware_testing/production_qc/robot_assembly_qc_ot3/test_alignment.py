@@ -2,7 +2,11 @@
 from typing import List, Union
 from typing_extensions import Final
 
-from opentrons.config.defaults_ot3 import DEFAULT_MACHINE_TRANSFORM
+try:
+    from opentrons.config.defaults_ot3 import DEFAULT_MACHINE_TRANSFORM
+except ImportError as e:
+    print(e)
+    from opentrons.config.defaults_ot3 import DEFAULT_DECK_TRANSFORM
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     find_calibration_structure_height,
