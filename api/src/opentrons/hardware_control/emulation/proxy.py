@@ -117,6 +117,8 @@ class Proxy:
             identifier=str(uuid.uuid1()), reader=reader, writer=writer
         )
 
+        log.info(f"Using Local Host: {self._settings.use_local_host}")
+
         client_host = (
             "127.0.0.1" if self._settings.use_local_host else socket.gethostname()
         )
