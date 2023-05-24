@@ -57,7 +57,7 @@ stages:
 
   - name: Fetch run labware definitions
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/labware-definitions'
+      url: '{host:s}:{port:d}/runs/{run_id}/loaded_labware_definitions'
       method: GET
     response:
       strict:

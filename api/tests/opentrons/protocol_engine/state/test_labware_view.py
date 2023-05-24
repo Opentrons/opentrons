@@ -945,8 +945,8 @@ def test_get_all_labware_definition(
             )
         },
         definitions_by_uri={
-                "opentrons_96_tiprack_300ul": tip_rack_def,
-                "falcon-definition": falcon_tuberack_def,
+            "opentrons_96_tiprack_300ul": tip_rack_def,
+            "falcon-definition": falcon_tuberack_def,
         },
     )
 

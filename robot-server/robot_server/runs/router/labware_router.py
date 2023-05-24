@@ -116,7 +116,7 @@ async def add_labware_definition(
 
 
 @labware_router.get(
-    path="/runs/{runId}/labware-definitions",
+    path="/runs/{runId}/loaded_labware_definitions",
     summary="Get the definitions of a run's loaded labware",
     description=(
         "Get the definitions of all the labware that the given run has loaded so far."
