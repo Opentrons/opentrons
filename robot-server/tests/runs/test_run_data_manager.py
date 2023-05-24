@@ -815,7 +815,7 @@ async def test_get_current_run_labware_definition(
     """It should get the current run labware definition from the engine."""
     decoy.when(mock_engine_store.current_run_id).then_return("run-id")
     decoy.when(
-        mock_engine_store.engine.state_view.labware.get_all_labware_definition()
+        mock_engine_store.engine.state_view.labware.get_loaded_labware_definitions()
     ).then_return(
         [
             LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
@@ -823,7 +823,7 @@ async def test_get_current_run_labware_definition(
         ]
     )
 
-    result = subject.get_run_labware_definition(run_id="run-id")
+    result = subject.get_run_loaded_labware_definitions(run_id="run-id")
 
     assert result == [
         LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]

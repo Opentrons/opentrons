@@ -263,7 +263,9 @@ async def get_run_labware_definition(
         run_data_manager: Current and historical run data management.
     """
     try:
-        labware_definitions = run_data_manager.get_run_labware_definition(run_id=runId)
+        labware_definitions = run_data_manager.get_run_loaded_labware_definitions(
+            run_id=runId
+        )
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 

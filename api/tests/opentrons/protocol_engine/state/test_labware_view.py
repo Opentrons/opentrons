@@ -936,23 +936,31 @@ def test_get_all_labware_definition(
 ) -> None:
     """It should return the labware definition list."""
     subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="opentrons_96_tiprack_300ul",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        },
         definitions_by_uri={
-            "some-tip-rack-uri": tip_rack_def,
-            "falcon-definition": falcon_tuberack_def,
+                "opentrons_96_tiprack_300ul": tip_rack_def,
+                "falcon-definition": falcon_tuberack_def,
         },
     )
 
-    result = subject.get_all_labware_definition()
+    result = subject.get_loaded_labware_definitions()
 
-    assert result == [tip_rack_def, falcon_tuberack_def]
+    assert result == [tip_rack_def]
 
 
 def test_get_all_labware_definition_empty() -> None:
     """It should return the labware definition list."""
     subject = get_labware_view(
-        definitions_by_uri={},
+        labware_by_id={},
     )
 
-    result = subject.get_all_labware_definition()
+    result = subject.get_loaded_labware_definitions()
 
     assert result == []

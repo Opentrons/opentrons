@@ -297,7 +297,7 @@ async def test_get_run_labware_definition(
 ) -> None:
     """It should wrap the run's labware defintion in a response."""
     decoy.when(
-        mock_run_data_manager.get_run_labware_definition(run_id="run-id")
+        mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
     ).then_return(
         [
             LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
