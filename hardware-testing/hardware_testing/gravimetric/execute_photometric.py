@@ -31,7 +31,7 @@ from .tips import get_tips
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
-TARGET_END_PHOTOPLATE_VOLUME = 250
+TARGET_END_PHOTOPLATE_VOLUME = 200
 
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
