@@ -304,7 +304,7 @@ class LabwareView(HasState[LabwareState]):
             ) from e
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
-        """Get all the labware definitions."""
+        """Get all loaded labware definitions."""
         loaded_labware = self._state.labware_by_id.values()
         return [
             self.get_definition_by_uri(LabwareUri(labware.definitionUri))

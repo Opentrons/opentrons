@@ -934,7 +934,7 @@ def test_get_edge_path_type(
 def test_get_all_labware_definition(
     tip_rack_def: LabwareDefinition, falcon_tuberack_def: LabwareDefinition
 ) -> None:
-    """It should return the labware definition list."""
+    """It should return the loaded labware definition list."""
     subject = get_labware_view(
         labware_by_id={
             "labware-id": LoadedLabware(
@@ -956,7 +956,7 @@ def test_get_all_labware_definition(
 
 
 def test_get_all_labware_definition_empty() -> None:
-    """It should return the labware definition list."""
+    """It should return an empty list."""
     subject = get_labware_view(
         labware_by_id={},
     )

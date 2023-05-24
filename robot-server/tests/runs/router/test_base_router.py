@@ -37,9 +37,7 @@ from robot_server.runs.router.base_router import (
     get_runs,
     remove_run,
     update_run,
-    get_run_labware_definition,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 
 @pytest.fixture
@@ -289,30 +287,6 @@ async def test_get_run() -> None:
     result = await get_run(run_data=run_data)
 
     assert result.content.data == run_data
-    assert result.status_code == 200
-
-
-async def test_get_run_labware_definition(
-    mock_run_data_manager: RunDataManager, decoy: Decoy
-) -> None:
-    """It should wrap the run's labware defintion in a response."""
-    decoy.when(
-        mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
-    ).then_return(
-        [
-            LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-            LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
-        ]
-    )
-
-    result = await get_run_labware_definition(
-        runId="run-id", run_data_manager=mock_run_data_manager
-    )
-
-    assert result.content.data.__root__ == [
-        LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-        LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
-    ]
     assert result.status_code == 200
 
 

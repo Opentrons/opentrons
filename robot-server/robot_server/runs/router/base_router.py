@@ -22,7 +22,6 @@ from robot_server.service.json_api import (
     MultiBodyMeta,
     ResourceLink,
     PydanticResponse,
-    ResponseList,
 )
 
 from robot_server.protocols import (
@@ -31,8 +30,6 @@ from robot_server.protocols import (
     ProtocolNotFoundError,
     get_protocol_store,
 )
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
@@ -239,46 +236,6 @@ async def get_run(
     """
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=run_data),
-        status_code=status.HTTP_200_OK,
-    )
-
-
-@base_router.get(
-    path="/runs/{runId}/labware-definitions",
-    summary="Get the definitions of a run's loaded labware",
-    description=(
-        "Get the definitions of all the labware that the given run has loaded so far."
-        "\n\n"
-        "When the run is first created, this list will be empty."
-        " As it executes and goes through `loadLabware` commands, those commands'"
-        " `result.definition`s will be added to this list."
-        " Repeated definitions will be deduplicated."
-    ),
-    responses={
-        status.HTTP_200_OK: {"model": SimpleBody[Run]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
-    },
-)
-async def get_run_labware_definition(
-    runId: str,
-    run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleBody[ResponseList[LabwareDefinition]]]:
-    """Get a run's labware definition by its ID.
-
-    Args:
-        runId: Run ID pulled from URL.
-        run_data_manager: Current and historical run data management.
-    """
-    try:
-        labware_definitions = run_data_manager.get_run_loaded_labware_definitions(
-            run_id=runId
-        )
-    except RunNotCurrentError as e:
-        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
-
-    labware_definitions_result = ResponseList.construct(__root__=labware_definitions)
-    return await PydanticResponse.create(
-        content=SimpleBody.construct(data=labware_definitions_result),
         status_code=status.HTTP_200_OK,
     )
 
