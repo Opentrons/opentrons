@@ -54,7 +54,7 @@ def run_server(
     ) as dev_server:
         dev_server.start()
 
-        # Wait for a bit to get started by polling /hcpealth
+        # Wait for a bit to get started by polling /health
         from requests.exceptions import ConnectionError
 
         while True:
@@ -91,7 +91,7 @@ def ot3_run_server(
     ) as dev_server:
         dev_server.start()
 
-        # Wait for a bit to get started by polling /hcpealth
+        # Wait for a bit to get started by polling /health
         from requests.exceptions import ConnectionError
 
         while True:
