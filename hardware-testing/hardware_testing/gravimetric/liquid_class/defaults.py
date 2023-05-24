@@ -432,7 +432,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=2,
                         trailing_air_gap=5,
                     ),
                 ),
@@ -442,7 +442,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=2,
                         trailing_air_gap=3.5,
                     ),
                 ),
@@ -452,7 +452,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=2,
                         trailing_air_gap=2,
                     ),
                 ),
