@@ -39,8 +39,7 @@ describe('ConnectViaUSB', () => {
 
   it('should call a mock function when tapping back button', () => {
     const [{ getByRole }] = render()
-    const button = getByRole('button')
-    button.click()
+    getByRole('button').click()
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 

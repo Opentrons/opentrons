@@ -213,6 +213,7 @@
   "software_update_error": "Software update error",
   "some_robot_controls_are_not_available": "Some robot controls are not available when run is in progress",
   "subnet_mask": "Subnet Mask",
+  "successfully_connected_to_network": "Successfully connected to {{ssid}}!",
   "successfully_connected": "Successfully connected!",
   "supported_protocol_api_versions": "Supported Protocol API Versions",
   "switch_to_usb_description": "If your network uses a different authentication method, connect to the Opentrons App and finish Wi-Fi setup there.",
