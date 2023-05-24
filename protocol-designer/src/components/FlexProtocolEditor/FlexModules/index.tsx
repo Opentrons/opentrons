@@ -128,40 +128,39 @@ function FlexModulesComponent(): JSX.Element {
                 </div>
 
                 {/* Deck Map Selecetion */}
-                {moduleType !== GRIPPER_MODULE_TYPE &&
-                  modulesByType[moduleType].onDeck && (
-                    <>
-                      <FormGroup label="Model" className={styles.model_options}>
-                        <DropdownField
-                          tabIndex={i}
-                          name={`${moduleTypeAccessor}.model`}
-                          options={MODELS_FOR_FLEX_MODULE_TYPE[moduleType]}
-                          value={selectedModel}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                        />
-                      </FormGroup>
-
-                      <FormGroup
-                        label="Position"
-                        {...targetProps}
-                        className={styles.model_options}
-                      >
-                        <DropdownField
-                          tabIndex={1}
-                          name={`modulesByType.${moduleType}.slot`}
-                          options={getAllFlexModuleSlotsByType(moduleType)}
-                          value={modulesByType[moduleType].slot}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                        />
-                      </FormGroup>
-                      <ConnectedSlotMap
-                        fieldName={`modulesByType.${moduleType}.slot`}
-                        robotType={OT3_STANDARD_MODEL}
+                {modulesByType[moduleType].onDeck && (
+                  <>
+                    <FormGroup label="Model" className={styles.model_options}>
+                      <DropdownField
+                        tabIndex={i}
+                        name={`${moduleTypeAccessor}.model`}
+                        options={MODELS_FOR_FLEX_MODULE_TYPE[moduleType]}
+                        value={selectedModel}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
                       />
-                    </>
-                  )}
+                    </FormGroup>
+
+                    <FormGroup
+                      label="Position"
+                      {...targetProps}
+                      className={styles.model_options}
+                    >
+                      <DropdownField
+                        tabIndex={1}
+                        name={`modulesByType.${moduleType}.slot`}
+                        options={getAllFlexModuleSlotsByType(moduleType)}
+                        value={modulesByType[moduleType].slot}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                    </FormGroup>
+                    <ConnectedSlotMap
+                      fieldName={`modulesByType.${moduleType}.slot`}
+                      robotType={OT3_STANDARD_MODEL}
+                    />
+                  </>
+                )}
               </div>
             )
           })}

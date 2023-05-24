@@ -16,8 +16,6 @@ import {
   THERMOCYCLER_MODULE_V2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
-  GRIPPER_V1,
-  GRIPPER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 interface Props {
@@ -25,16 +23,8 @@ interface Props {
   model: ModuleModel
 }
 
-export type NewModuleType =
-  | typeof MAGNETIC_MODULE_TYPE
-  | typeof TEMPERATURE_MODULE_TYPE
-  | typeof THERMOCYCLER_MODULE_TYPE
-  | typeof HEATERSHAKER_MODULE_TYPE
-  | typeof MAGNETIC_BLOCK_TYPE
-  | typeof GRIPPER_MODULE_TYPE
-
 type ModuleImg = {
-  [type in NewModuleType]: {
+  [type in ModuleType]: {
     [model in ModuleModel]?: string
   }
 }
@@ -57,9 +47,6 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [MAGNETIC_BLOCK_TYPE]: {
     [MAGNETIC_BLOCK_V1]: require('../../../images/modules/mag_block.png'),
-  },
-  [GRIPPER_MODULE_TYPE]: {
-    [GRIPPER_V1]: require('../../../images/modules/heatershaker.png'), // need to add gripper image here
   },
 }
 

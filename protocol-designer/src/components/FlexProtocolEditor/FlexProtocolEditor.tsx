@@ -12,17 +12,15 @@ import {
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_V1,
-  MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
   ModuleModel,
   SPAN7_8_10_11_SLOT,
-  MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V2,
-  GRIPPER_V1,
-  GRIPPER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -71,11 +69,10 @@ export interface InitialValues {
   mountSide: string
   pipettesByMount: FormPipettesByMount
   modulesByType: {
-    magneticModuleType: FormModule
+    magneticBlockType: FormModule
     temperatureModuleType: FormModule
     thermocyclerModuleType: FormModule
     heaterShakerModuleType: FormModule
-    gripperModuleType: FormModule
   }
 }
 
@@ -99,13 +96,9 @@ const validationSchema = Yup.object().shape({
       //   1,
       //   'Select at least one tip rack for first pipette'
       // ),
-    }),
-    right: Yup.object().shape({
-      pipetteName: Yup.string().required('Second pipette is required'),
-      // tiprackDefURI: Yup.array().min(
-      //   1,
-      //   'Select at least one tip rack for second pipette'
-      // ),
+      tiprackDefURI: Yup.string().required(
+        'Select at least one tip rack for first pipette'
+      ),
     }),
   }),
 })
@@ -137,9 +130,9 @@ const initialFormValues: InitialValues = {
       model: HEATERSHAKER_MODULE_V1,
       slot: '1',
     },
-    [MAGNETIC_MODULE_TYPE]: {
+    [MAGNETIC_BLOCK_TYPE]: {
       onDeck: false,
-      model: MAGNETIC_MODULE_V1,
+      model: MAGNETIC_BLOCK_V1,
       slot: '4',
     },
     [TEMPERATURE_MODULE_TYPE]: {
@@ -151,11 +144,6 @@ const initialFormValues: InitialValues = {
       onDeck: false,
       model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
-    },
-    [GRIPPER_MODULE_TYPE]: {
-      onDeck: false,
-      model: GRIPPER_V1,
-      slot: '',
     },
   },
 }
@@ -193,10 +181,10 @@ const getInitialValues = (values: any): InitialValues => {
     }
 
     if (values.modules.magneticModuleType) {
-      initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE].onDeck = true
-      initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE].model =
+      initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].onDeck = true
+      initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].model =
         values.modules.magneticModuleType.model
-      initialFormValues.modulesByType[MAGNETIC_MODULE_TYPE].slot =
+      initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].slot =
         values.modules.magneticModuleType.slot
     }
 
@@ -214,10 +202,6 @@ const getInitialValues = (values: any): InitialValues => {
         values.modules.thermocyclerModuleType.model
       initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].slot =
         values.modules.thermocyclerModuleType.slot
-    }
-
-    if (!initialFormValues.modulesByType[GRIPPER_MODULE_TYPE].onDeck) {
-      initialFormValues.modulesByType[GRIPPER_MODULE_TYPE].onDeck = false
     }
 
     return initialFormValues
@@ -261,11 +245,6 @@ const SelectComponent = (selectedTab: number): JSX.Element | null => {
   }
 }
 
-// type PipetteFieldsData = Omit<
-//   PipetteOnDeck,
-//   'id' | 'spec' | 'tiprackLabwareDef'
-// >
-
 function FlexProtocolEditor({
   isEditValue,
   tabIdValue,
@@ -307,6 +286,7 @@ function FlexProtocolEditor({
         : selectedTab
     setTab(setTabNumber)
   }
+  const notOnFirstPage = selectedTab !== 0
 
   const nextButton =
     selectedTab === navPillTabListLength
@@ -317,27 +297,7 @@ function FlexProtocolEditor({
       ? i18n.t('flex.round_tabs.update')
       : i18n.t('flex.round_tabs.next')
 
-  interface FormikErrors {
-    pipette?: string
-    tiprack?: string
-  }
-
-  const validateFields = (values: InitialValues): FormikErrors => {
-    const { pipettesByMount } = values
-    const errors: FormikErrors = {}
-    if (!pipettesByMount.left.pipetteName) {
-      errors.pipette = `${i18n.t('flex.errors.first_pipette_not_selected')}`
-    }
-
-    if (!pipettesByMount.left.tiprackDefURI.length) {
-      errors.tiprack = `${i18n.t('flex.errors.tiprack_not_selected')}`
-    }
-
-    return errors
-  }
-
   const handleSubmit = ({ values }: any): void => {
-    console.log('***Final OT3 JSON Data ***', values)
     const newProtocolFields = values.fields
 
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
@@ -409,10 +369,11 @@ function FlexProtocolEditor({
             enableReinitialize
             initialValues={getInitialValues(formProps)}
             validateOnChange={true}
-            validate={validateFields}
-            validationSchema={validationSchema}
-            onSubmit={(values, actions) => {
-              selectedTab === 3 && handleSubmit({ values })
+            validationSchema={notOnFirstPage && validationSchema}
+            onSubmit={values => {
+              selectedTab === 2
+                ? handleSubmit({ values })
+                : handleNext({ selectedTab })
             }}
           >
             {(props: {
@@ -425,7 +386,7 @@ function FlexProtocolEditor({
                   {SelectComponent(selectedTab)}
                 </section>
                 <div className={styles.flex_round_tabs_button_wrapper}>
-                  {selectedTab !== 0 && !isEdit && (
+                  {notOnFirstPage && !isEdit && (
                     <NewPrimaryBtn
                       tabIndex={5}
                       onClick={() => handlePrevious({ selectedTab })}
@@ -437,11 +398,11 @@ function FlexProtocolEditor({
                     </NewPrimaryBtn>
                   )}
                   <NewPrimaryBtn
+                    disabled={notOnFirstPage && !props.isValid}
                     tabIndex={4}
                     type="submit"
-                    onClick={() => handleNext({ selectedTab })}
                     className={
-                      selectedTab !== 0
+                      notOnFirstPage
                         ? styles.flex_round_tabs_button_50p
                         : styles.flex_round_tabs_button_100p
                     }

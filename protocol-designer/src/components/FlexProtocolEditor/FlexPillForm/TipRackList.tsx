@@ -113,7 +113,7 @@ export const TipRackOptions = ({
       </Flex>
       {pipetteName === pipetteSlot.left && (
         <StyledText as="label" className={styles.error_text}>
-          {errors.tiprack ? errors.tiprack : ''}
+          {errors?.pipettesByMount?.left?.tiprackDefURI}
         </StyledText>
       )}
     </>

@@ -11,7 +11,7 @@ import { TipRackOptions } from './TipRackList'
 
 interface SelectPipetteOptionProps {
   pipetteName: string
-  changeIs96Selected: any
+  changeIs96Selected: (arg: boolean) => unknown
   isLeft96ChannelSelected: boolean
 }
 
@@ -26,7 +26,6 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   isLeft96ChannelSelected,
 }) => {
   const { values, errors } = useFormikContext<formikContextProps>()
-
   const is96ChannelSelected = checkSelectedPipette(
     values.pipettesByMount[pipetteName].pipetteName
   )
@@ -34,13 +33,6 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
     changeIs96Selected(is96ChannelSelected)
   }
   const className = cx({ disable_mount_option: is96ChannelSelected })
-
-  // const dynamicPipetteDisable = cx({
-  //   [styles.pb_10]: pipetteName === pipetteSlot.left || !is96ChannelSelected,
-  //   [styles.disable_mount_option]: !(
-  //     pipetteName === pipetteSlot.left || !is96ChannelSelected
-  //   ),
-  // })
 
   const pipetteHeaderText =
     pipetteSlot.left === pipetteName
@@ -73,7 +65,8 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
           </Flex>
           {pipetteName === pipetteSlot.left && (
             <StyledText as="label" className={styles.error_text}>
-              {errors.pipette && errors.pipette}
+              {errors?.pipettesByMount?.left?.pipetteName &&
+                errors.pipettesByMount.left.pipetteName}
             </StyledText>
           )}
           {/* Pipette Mount Selection here */}
