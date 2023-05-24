@@ -86,7 +86,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
               <Icon
                 aria-label="network icon"
                 name={icon}
-                size="40px"
+                size="2.5rem"
                 color={COLORS.darkBlack70}
               />
             )}
@@ -102,8 +102,8 @@ export function Navigation(props: NavigationProps): JSX.Element {
           >
             <Icon
               name="overflow-btn-touchscreen"
-              height="60px"
-              width="48px"
+              height="3.75rem"
+              width="3rem"
               color={COLORS.darkBlack70}
             />
           </IconButton>
@@ -122,7 +122,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
 const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
   <TouchNavLink to={props.to}>
     {props.name}
-    <Box width="2.5rem" height="5px" borderRadius="2px" />
+    <Box width="2.5rem" height="0.3125rem" borderRadius="0.125rem" />
   </TouchNavLink>
 )
 

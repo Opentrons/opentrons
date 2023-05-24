@@ -43,6 +43,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             size="2.5rem"
           />
           <StyledText
+            as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginLeft={SPACING.spacing12}
           >
@@ -59,6 +60,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             aria-label="restart_icon"
           />
           <StyledText
+            as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginLeft={SPACING.spacing12}
           >
@@ -75,6 +77,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             aria-label="light_icon"
           />
           <StyledText
+            as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginLeft={SPACING.spacing12}
           >
