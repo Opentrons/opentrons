@@ -20,9 +20,15 @@ async def _exercise_pipette(api: OT3API, mount: types.OT3Mount) -> None:
         except ValueError:
             _value = None  # type: ignore[assignment]
         if _inp[0] == "a":
+            try:
+                await api.prepare_for_aspirate(mount)
+            except Exception as e:
+                print(e)
             await api.aspirate(mount, _value)
         elif _inp[0] == "d":
             await api.dispense(mount, _value)
+        elif _inp[0] == "b":
+            await api.blow_out(mount, _value)
         elif _inp[0] == "t":
             pipette = api.hardware_pipettes[mount.to_mount()]
             assert pipette is not None
