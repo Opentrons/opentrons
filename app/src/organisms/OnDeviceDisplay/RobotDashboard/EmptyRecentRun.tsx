@@ -29,7 +29,7 @@ export function EmptyRecentRun(): JSX.Element {
     >
       <img
         src={abstractImage}
-        title={t('no_recent_runs')}
+        alt={t('no_recent_runs')}
         width="284px"
         height="166px"
       />
