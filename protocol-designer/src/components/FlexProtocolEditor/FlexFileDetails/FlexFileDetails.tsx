@@ -108,7 +108,6 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         <StyledText as="h3">
                           {i18n.t('flex.file_tab.pipette')}
                         </StyledText>
-
                         <Flex>
                           {Object.keys(props.instruments).length !== 1 && (
                             <SecondaryButton
@@ -116,6 +115,7 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                                 e.preventDefault()
                                 props.swapPipettes()
                               }}
+                              className={styles.margin_right}
                             >
                               {i18n.t('flex.file_tab.swap_pipette')}
                             </SecondaryButton>
@@ -241,7 +241,7 @@ const NoFileSelection = (): JSX.Element => {
         <div className={styles.line_separator} />
         <div>
           <StyledText as="h4" className={styles.bold_text}>
-            Please select JSON file to display
+            {i18n.t('flex.file_tab.invalid_json')}
           </StyledText>
         </div>
       </div>
@@ -289,7 +289,7 @@ const FileProtocolNameAndDescription = (props: {
         <StyledText as="h4" className={styles.bold_text}>
           {i18n.t('flex.file_tab.date_created')}
         </StyledText>
-        <StyledText as="h5" className={styles.desc_margin}>
+        <StyledText as="h5" className={styles.created_margin}>
           {nameDescriptionData.created &&
             format(nameDescriptionData.created, DATE_ONLY_FORMAT)}
         </StyledText>
@@ -298,7 +298,7 @@ const FileProtocolNameAndDescription = (props: {
         <StyledText as="h4" className={styles.bold_text}>
           {i18n.t('flex.file_tab.last_exported')}
         </StyledText>
-        <StyledText as="h5" className={styles.desc_margin}>
+        <StyledText as="h5" className={styles.other_margin}>
           {nameDescriptionData.lastModified &&
             format(nameDescriptionData.lastModified, DATETIME_FORMAT)}
         </StyledText>
