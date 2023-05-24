@@ -1,3 +1,4 @@
+import asyncio
 import json
 import time
 from pathlib import Path
@@ -9,6 +10,7 @@ import requests
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 from .dev_server import DevServer
+from .robot_client import RobotClient
 
 
 # Must match our Tavern config in common.yaml.
@@ -139,3 +141,54 @@ def set_disable_fast_analysis(
     yield None
     data["value"] = None
     request_session.post(url, json=data)
+
+
+@pytest.fixture()
+def clean_server_state() -> Iterator[None]:
+    # async fn that does the things below
+    # make a robot client
+    # delete protocols
+    async def _clean_server_state() -> None:
+        port = "31950"
+        async with RobotClient.make(
+            host="http://localhost", port=port, version="*"
+        ) as robot_client:
+            await _delete_all_runs(robot_client)
+            await _delete_all_protocols(robot_client)
+
+    yield
+    asyncio.run(_clean_server_state())
+
+
+# TODO(jbl 2023-05-01) merge this with ot3_run_server, along with clean_server_state and run_server
+@pytest.fixture()
+def ot3_clean_server_state() -> Iterator[None]:
+    # async fn that does the things below
+    # make a robot client
+    # delete protocols
+    async def _clean_server_state() -> None:
+        port = "31960"
+        async with RobotClient.make(
+            host="http://localhost", port=port, version="*"
+        ) as robot_client:
+            await _delete_all_runs(robot_client)
+            await _delete_all_protocols(robot_client)
+
+    yield
+    asyncio.run(_clean_server_state())
+
+
+async def _delete_all_runs(robot_client: RobotClient) -> None:
+    """Delete all runs on the robot server."""
+    response = await robot_client.get_runs()
+    run_ids = [r["id"] for r in response.json()["data"]]
+    for run_id in run_ids:
+        await robot_client.delete_run(run_id)
+
+
+async def _delete_all_protocols(robot_client: RobotClient) -> None:
+    """Delete all protocols on the robot server"""
+    response = await robot_client.get_protocols()
+    protocol_ids = [p["id"] for p in response.json()["data"]]
+    for protocol_id in protocol_ids:
+        await robot_client.delete_protocol(protocol_id)
