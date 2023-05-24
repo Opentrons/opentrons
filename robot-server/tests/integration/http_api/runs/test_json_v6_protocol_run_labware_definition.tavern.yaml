@@ -1,4 +1,4 @@
-test_name: Upload and run a JSONv6 protocol.
+test_name: Get the definitions of a run's loaded labware
 
 marks:
   - usefixtures:
