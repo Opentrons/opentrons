@@ -143,7 +143,10 @@ def _load_labware(
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
 
-    tipracks = [ctx.load_labware(ls[1], location=ls[0]) for ls in tiprack_load_settings]
+    tipracks = [
+        ctx.load_labware(ls[1], location=ls[0], namespace="custom_beta")
+        for ls in tiprack_load_settings
+    ]
     _apply_labware_offsets(cfg, tipracks, photoplate, reservoir)
     return photoplate, reservoir, tipracks
 
@@ -234,12 +237,12 @@ def _run_trial(
     channel_count = 96
     # RUN INIT
 
-    num_dispenses = ceil(volume/TARGET_END_PHOTOPLATE_VOLUME)
-    volume_to_dispense = volume/num_dispenses
+    num_dispenses = ceil(volume / TARGET_END_PHOTOPLATE_VOLUME)
+    volume_to_dispense = volume / num_dispenses
     photoplate_preped_vol = max(TARGET_END_PHOTOPLATE_VOLUME - volume_to_dispense, 0)
 
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
-    if (do_jog):
+    if do_jog:
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
         height_below_top = source.depth - _liquid_height
         print(f"liquid is {height_below_top} mm below top of reservoir")
@@ -247,8 +250,9 @@ def _run_trial(
             source, _liquid_height, name="Dye"
         )
         reservoir_volume = liquid_tracker.get_volume(source)
-        print(f"software thinks there is {reservoir_volume} uL of liquid in the reservoir")
-
+        print(
+            f"software thinks there is {reservoir_volume} uL of liquid in the reservoir"
+        )
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(
@@ -336,14 +340,14 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     total_photoplates = 0
     for vol in test_volumes:
-        total_photoplates = total_photoplates + (ceil(vol/TARGET_END_PHOTOPLATE_VOLUME) * cfg.trials)
+        total_photoplates = total_photoplates + (
+            ceil(vol / TARGET_END_PHOTOPLATE_VOLUME) * cfg.trials
+        )
     ui.print_header("PREPARE")
     ui.get_user_ready(
         f"Is there 1 {cfg.photoplate} on the deck and {total_photoplates-1} ready?"
     )
-    ui.get_user_ready(
-        f"Is there {total_photoplates} {cfg.photoplate} covers ready?"
-    )
+    ui.get_user_ready(f"Is there {total_photoplates} {cfg.photoplate} covers ready?")
     ui.get_user_ready(
         f"Is there {(cfg.trials*(len(test_volumes)-1)) + 1}  extra full {cfg.tip_volume}ul tipracks?"
     )
@@ -401,7 +405,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
-            first_trial = True;
+            first_trial = True
             for trial in range(cfg.trials):
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
@@ -428,19 +432,23 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 )
                 _drop_tip(ctx, pipette, cfg)
                 tip_iter += 1
-                if tip_iter >= len(tips[0]) and not ((trial+1) == cfg.trials and volume == test_volumes[-1]):
+                if tip_iter >= len(tips[0]) and not (
+                    (trial + 1) == cfg.trials and volume == test_volumes[-1]
+                ):
                     ui.get_user_ready(
                         f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
                     )
                     tip_iter = 0
-                if (volume > 500 and not (trial+1 == cfg.trials)):
+                if volume > 500 and not (trial + 1 == cfg.trials):
                     first_trial = True
                     ui.get_user_ready(
                         f"Refill the dye for the {reservoir} in slot {cfg.reservoir_slot}"
                     )
+                # else:
+                #    first_trial = False
             if volume != test_volumes[-1]:
                 ui.get_user_ready(
-                            f"Replace the reservoir in slots {cfg.reservoir_slot} with new reservoir and fill with the next dye"
+                    f"Replace the reservoir in slots {cfg.reservoir_slot} with new reservoir and fill with the next dye"
                 )
 
     finally:
