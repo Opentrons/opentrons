@@ -73,7 +73,7 @@ export function PinnedProtocolCarousel(props: {
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing8}
       ref={swipe.ref}
-      marginRight={`-${SPACING.spacing40}`}
+      marginRight={pinnedProtocols.length < 3 ? '0' : `-${SPACING.spacing40}`}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
