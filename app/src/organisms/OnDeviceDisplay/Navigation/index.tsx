@@ -12,7 +12,6 @@ import {
   DIRECTION_ROW,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_START,
   truncateString,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
@@ -25,7 +24,6 @@ import { useNetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
-import type { IconName } from '@opentrons/components'
 import type { RouteProps } from '../../../App/types'
 
 interface NavigationProps {
