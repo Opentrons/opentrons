@@ -80,10 +80,15 @@ export function Navigation(props: NavigationProps): JSX.Element {
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
             <NavigationLink
               to="/dashboard"
-              name={truncateString(robotName, 12)}
+              name={truncateString(robotName, 15)}
             />
             {icon && (
-              <Icon name={icon} size="40px" color={COLORS.darkBlack70} />
+              <Icon
+                aria-label="network icon"
+                name={icon}
+                size="40px"
+                color={COLORS.darkBlack70}
+              />
             )}
           </Flex>
           {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
