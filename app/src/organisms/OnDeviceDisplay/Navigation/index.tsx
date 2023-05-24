@@ -133,6 +133,7 @@ const TouchNavLink = styled(NavLink)`
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
+  white-space: nowrap;
   &.active {
     color: ${COLORS.black};
   }
