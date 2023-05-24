@@ -24,8 +24,13 @@ import { reduce } from 'lodash'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
 interface formikContextProps {
-  pipettesByMount: any
-  tiprack: any
+  pipettesByMount: {
+    [key: string]: {
+      pipetteName: string
+      tiprackDefURI: []
+    }
+  }
+  pipette: any
   isLeft96ChannelSelected: boolean
 }
 

@@ -16,7 +16,11 @@ interface SelectPipetteOptionProps {
 }
 
 interface formikContextProps {
-  pipettesByMount: any
+  pipettesByMount: {
+    [key: string]: {
+      pipetteName: string
+    }
+  }
   pipette: any
 }
 
@@ -26,8 +30,10 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   isLeft96ChannelSelected,
 }) => {
   const { values, errors } = useFormikContext<formikContextProps>()
+  const { pipettesByMount } = values
+  const { pipettesByMount: pipettesByMountError = {} } = errors
   const is96ChannelSelected = checkSelectedPipette(
-    values.pipettesByMount[pipetteName].pipetteName
+    pipettesByMount[pipetteName].pipetteName
   )
   if (pipetteSlot.left === pipetteName) {
     changeIs96Selected(is96ChannelSelected)
@@ -60,13 +66,13 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
           >
             <RadioSelect
               pipetteName={`pipettesByMount.${pipetteName}.pipetteName`}
-              pipetteType={values.pipettesByMount[pipetteName].pipetteName}
+              pipetteType={pipettesByMount[pipetteName].pipetteName}
             />
           </Flex>
           {pipetteName === pipetteSlot.left && (
             <StyledText as="label" className={styles.error_text}>
-              {errors?.pipettesByMount?.left?.pipetteName &&
-                errors.pipettesByMount.left.pipetteName}
+              {pipettesByMountError.left?.pipetteName &&
+                pipettesByMountError.left.pipetteName}
             </StyledText>
           )}
           {/* Pipette Mount Selection here */}
