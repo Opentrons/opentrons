@@ -35,9 +35,7 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   const is96ChannelSelected = checkSelectedPipette(
     pipettesByMount[pipetteName].pipetteName
   )
-  if (pipetteSlot.left === pipetteName) {
-    changeIs96Selected(is96ChannelSelected)
-  }
+
   const className = cx({ disable_mount_option: is96ChannelSelected })
 
   const pipetteHeaderText =
@@ -45,9 +43,9 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
       ? i18n.t('flex.pipette_selection.choose_first_pipette')
       : i18n.t('flex.pipette_selection.choose_second_pipette')
   return (
-    <div className={styles.pipette_form}>
+    <div>
       <Flex className={styles.pb_10}>
-        <StyledText as={'h1'}>{pipetteHeaderText}</StyledText>
+        <StyledText as={'h2'}>{pipetteHeaderText}</StyledText>
       </Flex>
       {
         <>

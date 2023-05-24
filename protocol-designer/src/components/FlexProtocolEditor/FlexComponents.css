@@ -42,10 +42,6 @@
   justify-content: space-between;
 }
 
-.pipette_form {
-  padding: 0px 5rem 0px 5rem;
-}
-
 .cancel_button {
   width: 109px;
   height: 25px;
@@ -63,7 +59,7 @@
 
 .flex_round_tabs_button_wrapper {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .flex_round_tabs_button_100p {

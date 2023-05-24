@@ -39,7 +39,7 @@ function ProtocolEditorComponent(props: Props): JSX.Element {
     page,
     robot: { deckId },
   } = props
-  const pages = ['landing-page', 'new-flex-file-form']
+  const pages = ['landing-page', 'new-flex-file-form', 'file-detail']
   const conditionalStyle = pages.includes(page)
     ? cx(styles.flex_main_page_content, MAIN_CONTENT_FORCED_SCROLL_CLASSNAME)
     : cx(styles.main_page_content, MAIN_CONTENT_FORCED_SCROLL_CLASSNAME)

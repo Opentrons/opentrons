@@ -12,7 +12,7 @@ export const navPillsNameTabList: NavPillTab[] = [
     navPillPage: [0],
   },
   {
-    name: i18n.t('flex.pipettes_selection.name'),
+    name: i18n.t('flex.instrument_selection.name'),
     navPillPage: [1],
   },
   {

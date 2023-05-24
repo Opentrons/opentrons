@@ -38,7 +38,7 @@ const Template: Story<
         onClick={() => setStep('pipette')}
       >
         <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
-          {'Pipette Selection'}
+          {'Instrument Selection'}
         </Text>
       </RoundTab>
 

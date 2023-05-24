@@ -50,18 +50,35 @@
   margin-bottom: 10px !important;
 }
 
+.margin_right {
+  margin-right: 5px;
+}
+
 .name_margin {
-  margin-left: 50px;
+  margin-left: 64px;
 }
 
 .desc_margin {
+  margin-left: 26px;
+}
+
+.other_margin {
   margin-left: 11px;
 }
 
+.created_margin {
+  margin-left: 15px;
+}
+
 .author_margin {
-  margin-left: 42px;
+  margin-left: 57px;
 }
 
 .card_width {
-  width: 50%;
+  width: 21rem;
+}
+
+.card_content {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

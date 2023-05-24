@@ -26,13 +26,13 @@
     "organization_author": "Organization/Author",
     "protocol_description": "Description"
   },
-  "pipettes_selection": {
-    "name": "Pipette Selection",
+  "instrument_selection": {
+    "name": "Instrument Selection",
     "heading": "Pipettes"
   },
   "modules_selection": {
     "name": "Module Selection",
-    "heading": "Additional items?"
+    "heading": "Modules"
   },
   "pipette_selection": {
     "pipette_96_selection_note": "Note: 96-channel take up both mounts and requires a tiprack adapter",
@@ -51,6 +51,7 @@
     "subheading": "Opentrons Flex Protocol",
     "export": "Export Protocol",
     "close_export": "Close Protocol",
+    "invalid_json": "Please select valid JSON file to display",
     "name_desc_title": "Name and Description",
     "name": "Name : ",
     "author": "Author : ",
@@ -59,7 +60,7 @@
     "last_exported": "Last Exported : ",
     "pipette": "Pipettes",
     "swap_pipette": "Swap Pipette",
-    "additional_items": "Additional Items?",
+    "modules": "Modules",
     "add_items": "Add Items",
     "edit": "Edit",
     "left": "Left mount -",

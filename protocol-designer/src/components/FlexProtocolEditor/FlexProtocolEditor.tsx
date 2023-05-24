@@ -150,34 +150,36 @@ const initialFormValues: InitialValues = {
 
 const getInitialValues = (values: any): InitialValues => {
   if (Boolean(values)) {
+    const { formValues, instruments, modules } = values
     // Matching the form values
-    initialFormValues.fields.name = values.formValues.protocolName
-    initialFormValues.fields.author = values.formValues.author
-    initialFormValues.fields.description = values.formValues.description
+    initialFormValues.fields = {
+      name: formValues.protocolName,
+      ...formValues,
+    }
 
     // Matching the pipette values
     initialFormValues.pipettesByMount.right.pipetteName =
-      values.instruments.right?.pipetteSpecs.name
+      instruments.right?.pipetteSpecs.name
     initialFormValues.pipettesByMount.left.pipetteName =
-      values.instruments.left?.pipetteSpecs.name
+      instruments.left?.pipetteSpecs.name
 
     // Matching the tip rack
-    initialFormValues.pipettesByMount.right.tiprackDefURI = values.instruments
-      .right?.tiprackModel
-      ? [values.instruments.right.tiprackModel]
+    initialFormValues.pipettesByMount.right.tiprackDefURI = instruments.right
+      ?.tiprackModel
+      ? [instruments.right.tiprackModel]
       : []
-    initialFormValues.pipettesByMount.left.tiprackDefURI = values.instruments
-      .left?.tiprackModel
-      ? [values.instruments.left.tiprackModel]
+    initialFormValues.pipettesByMount.left.tiprackDefURI = instruments.left
+      ?.tiprackModel
+      ? [instruments.left.tiprackModel]
       : []
 
     // Matching the module values
-    if (values.modules.heaterShakerModuleType) {
+    if (modules.heaterShakerModuleType) {
       initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck = true
       initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].model =
-        values.modules.heaterShakerModuleType.model
+        modules.heaterShakerModuleType.model
       initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].slot =
-        values.modules.heaterShakerModuleType.slot
+        modules.heaterShakerModuleType.slot
     }
 
     if (values.modules.magneticModuleType) {
@@ -188,20 +190,20 @@ const getInitialValues = (values: any): InitialValues => {
         values.modules.magneticModuleType.slot
     }
 
-    if (values.modules.temperatureModuleType) {
+    if (modules.temperatureModuleType) {
       initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].onDeck = true
       initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].model =
-        values.modules.temperatureModuleType.model
+        modules.temperatureModuleType.model
       initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].slot =
-        values.modules.temperatureModuleType.slot
+        modules.temperatureModuleType.slot
     }
 
-    if (values.modules.thermocyclerModuleType) {
+    if (modules.thermocyclerModuleType) {
       initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].onDeck = true
       initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].model =
-        values.modules.thermocyclerModuleType.model
+        modules.thermocyclerModuleType.model
       initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].slot =
-        values.modules.thermocyclerModuleType.slot
+        modules.thermocyclerModuleType.slot
     }
 
     return initialFormValues
@@ -406,6 +408,11 @@ function FlexProtocolEditor({
                         ? styles.flex_round_tabs_button_50p
                         : styles.flex_round_tabs_button_100p
                     }
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      width: '50%',
+                    }}
                   >
                     <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>
