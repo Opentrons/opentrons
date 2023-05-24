@@ -1,8 +1,18 @@
 diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index beae5cc110..b9c706a5e0 100644
+index 89696c5b2a..3537595feb 100644
 --- a/api/src/opentrons/config/defaults_ot3.py
 +++ b/api/src/opentrons/config/defaults_ot3.py
-@@ -101,10 +101,10 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
+@@ -98,18 +98,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+ 
+ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
+     high_throughput={
+-        OT3AxisKind.X: 1000,
+-        OT3AxisKind.Y: 1000,
++        OT3AxisKind.X: 500,
++        OT3AxisKind.Y: 500,
+         OT3AxisKind.Z: 120,
+         OT3AxisKind.P: 30,
+         OT3AxisKind.Z_G: 150,
          OT3AxisKind.Q: 10,
      },
      low_throughput={
@@ -44,3 +54,45 @@ index 5f96add2a4..047dc58add 100644
  
      def add_tip(self, tip_length: float) -> None:
          """
+diff --git a/api/src/opentrons/hardware_control/ot3api.py b/api/src/opentrons/hardware_control/ot3api.py
+index 9ebddc9c72..b5d9120580 100644
+--- a/api/src/opentrons/hardware_control/ot3api.py
++++ b/api/src/opentrons/hardware_control/ot3api.py
+@@ -1396,15 +1396,15 @@ class OT3API(
+         instrument = self._pipette_handler.get_pipette(checked_mount)
+         if instrument.current_volume > 0:
+             raise RuntimeError("cannot position plunger while holding liquid")
+-        target_pos = target_position_from_plunger(
++        target_pos_a = target_position_from_plunger(
+             OT3Mount.from_mount(mount),
+-            instrument.plunger_positions.bottom,
++            instrument.plunger_positions.bottom+1,
+             self._current_position,
+         )
+         pip_ax = OT3Axis.of_main_tool_actuator(mount)
+         current_pos = self._current_position[pip_ax]
+         if instrument.has_tip:
+-            if current_pos > target_pos[pip_ax]:
++            if current_pos > target_pos_a[pip_ax]:
+                 # using slower aspirate flow-rate, to avoid pulling droplets up
+                 speed = self._pipette_handler.plunger_speed(
+                     instrument, instrument.aspirate_flow_rate, "aspirate"
+@@ -1419,7 +1419,17 @@ class OT3API(
+             max_speeds = self.config.motion_settings.default_max_speed
+             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+         await self._move(
+-            target_pos,
++            target_pos_a,
++            speed=(speed * rate),
++            acquire_lock=acquire_lock,
++        )
++        target_pos_b = target_position_from_plunger(
++            OT3Mount.from_mount(mount),
++            instrument.plunger_positions.bottom,
++            self._current_position,
++        )
++        await self._move(
++            target_pos_b,
+             speed=(speed * rate),
+             acquire_lock=acquire_lock,
+         )
