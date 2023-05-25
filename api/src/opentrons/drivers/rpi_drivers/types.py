@@ -93,7 +93,7 @@ class USBPort:
         """
         if len(port_nodes) > 2:
             port_info = port_nodes[2].split(".")
-            hub: Optional[int] = int(port_info[1])  # also port_group
+            hub: Optional[int] = int(port_info[1])
             port = int(port_info[2])
             hub_port: Optional[int] = int(port_info[3])
             name = port_nodes[2]
