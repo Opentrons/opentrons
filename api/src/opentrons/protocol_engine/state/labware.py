@@ -61,6 +61,19 @@ _MAGDECK_HALF_MM_LABWARE = {
 
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
 
+_RIGHT_SIDE_SLOTS = {
+    # OT-2:
+    DeckSlotName.FIXED_TRASH,
+    DeckSlotName.SLOT_9,
+    DeckSlotName.SLOT_6,
+    DeckSlotName.SLOT_3,
+    # OT-3:
+    DeckSlotName.SLOT_A3,
+    DeckSlotName.SLOT_B3,
+    DeckSlotName.SLOT_C3,
+    DeckSlotName.SLOT_D3,
+}
+
 
 class LabwareLoadParams(NamedTuple):
     """Parameters required to load a labware in Protocol Engine."""
@@ -408,12 +421,7 @@ class LabwareView(HasState[LabwareState]):
 
         left_path_criteria = mount is MountType.RIGHT and well_name in left_column
         right_path_criteria = mount is MountType.LEFT and well_name in right_column
-        labware_right_side = labware_slot.to_ot2_equivalent() in [
-            DeckSlotName.SLOT_3,
-            DeckSlotName.SLOT_6,
-            DeckSlotName.SLOT_9,
-            DeckSlotName.FIXED_TRASH,
-        ]
+        labware_right_side = labware_slot in _RIGHT_SIDE_SLOTS
 
         if left_path_criteria and (next_to_module or labware_right_side):
             return EdgePathType.LEFT
