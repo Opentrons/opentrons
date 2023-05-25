@@ -86,7 +86,7 @@ def test_get_definition(subject: LabwareCore) -> None:
     """It should get the labware's definition as a dictionary."""
     assert subject.get_definition() == cast(
         LabwareDefDict,
-        {"namespace": "hello", "parameters": {"loadName": "world"}, "ordering": []},
+        {"namespace": "hello", "parameters": {"loadName": "world"}, "ordering": [], "allowedRoles": [], "stackingOverlapWithLabware": {}, "stackingOverlapWithModule": {}},
     )
     assert subject.get_parameters() == cast(LabwareParamsDict, {"loadName": "world"})
 
