@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons.types import MountType, Point
+from opentrons.types import MountType, Point, Mount
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
@@ -17,11 +17,13 @@ from opentrons.protocol_engine.commands.command import (
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
     from ...state import StateView
+    from ...execution import MovementHandler
 
 
 # Question (spp): Does this offset work for gripper mount too?
 # These offsets are based on testing attach flows with 8/1 channel pipettes
-_INSTRUMENT_ATTACH_OFFSET = Point(y=10, z=400)
+_INSTRUMENT_ATTACH_POINT = Point(x=-13.775, y=84)
+_INSTRUMENT_ATTACH_Z_HEIGHT = 400
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -50,10 +52,12 @@ class MoveToMaintenancePositionImplementation(
         self,
         hardware_api: HardwareControlAPI,
         state_view: StateView,
+        movement: MovementHandler,
         **kwargs: object,
     ) -> None:
         self._state_view = state_view
         self._hardware_api = hardware_api
+        self._movement = movement
 
     async def execute(
         self, params: MoveToMaintenancePositionParams
@@ -61,14 +65,26 @@ class MoveToMaintenancePositionImplementation(
         """Move the requested mount to a maintenance deck slot."""
         hardware_mount = params.mount.to_hw_mount()
 
-        calibration_coordinates = self._state_view.labware.get_calibration_coordinates(
-            offset=_INSTRUMENT_ATTACH_OFFSET
+        current_position = await self._hardware_api.gantry_position(Mount.LEFT)
+        max_travel_z = self._hardware_api.get_instrument_max_height(Mount.LEFT)
+        way_points = self._state_view.motion.get_movement_waypoints_to_coords(
+            origin=current_position,
+            dest=_INSTRUMENT_ATTACH_POINT,
+            max_travel_z=max_travel_z,
+            direct=False,
+            additional_min_travel_z=None,
         )
 
-        # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
+        for waypoint in way_points:
+            await self._hardware_api.move_to(
+                mount=Mount.LEFT,
+                abs_position=waypoint.position,
+                critical_point=CriticalPoint.MOUNT,
+            )
+
         await self._hardware_api.move_to(
             mount=hardware_mount,
-            abs_position=calibration_coordinates,
+            abs_position=Point(z=_INSTRUMENT_ATTACH_Z_HEIGHT),
             critical_point=CriticalPoint.MOUNT,
         )
 
