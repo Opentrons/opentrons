@@ -14,7 +14,7 @@ import type { RunLabwareInfo, RunModuleInfo, LabwareAnimationParams } from './'
 export function getModuleRenderComponents(
   moduleRenderInfo: RunModuleInfo[],
   movedLabwareId: string,
-  labwareAnimationParams:  LabwareAnimationParams
+  labwareAnimationParams: LabwareAnimationParams
 ): JSX.Element[] {
   return map(
     moduleRenderInfo,

@@ -59,7 +59,11 @@ import {
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { LabwareLocation } from '@opentrons/shared-data'
-import type { RunModuleInfo, RunLabwareInfo, LabwareAnimationParams } from '../InterventionModal/utils'
+import type {
+  RunModuleInfo,
+  RunLabwareInfo,
+  LabwareAnimationParams,
+} from '../InterventionModal/utils'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,

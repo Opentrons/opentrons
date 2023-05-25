@@ -20,7 +20,11 @@ import { Divider } from '../../atoms/structure'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
 import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
-import type {  LabwareAnimationParams, RunLabwareInfo, RunModuleInfo } from './utils'
+import type {
+  LabwareAnimationParams,
+  RunLabwareInfo,
+  RunModuleInfo,
+} from './utils'
 
 export interface MoveLabwareInterventionProps {
   robotType: RobotType
