@@ -10,7 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v6.3.1 release of the Opentrons App!
 
-There are no changes to the Opentrons App in v6.3.1, but please update to receive an update for your OT-2 that fixes some issues.
+There are no changes to the Opentrons App in v6.3.1, but it is required for updating the OT-2 software to fix some issues.
 
 ---
 
