@@ -22,7 +22,6 @@ import {
   Link,
   Icon,
   PrimaryButton,
-  MoveLabwareAnimationParams,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -31,7 +30,11 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 
 import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
-import type { RunLabwareInfo, RunModuleInfo } from './utils'
+import type {
+  LabwareAnimationParams,
+  RunLabwareInfo,
+  RunModuleInfo,
+} from './utils'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -94,7 +97,7 @@ export interface InterventionModalProps {
   robotType?: RobotType
   moduleRenderInfo?: RunModuleInfo[] | null
   labwareRenderInfo?: RunLabwareInfo[] | null
-  labwareAnimationParams?: MoveLabwareAnimationParams | null
+  labwareAnimationParams?: LabwareAnimationParams | null
   labwareName?: string
   oldDisplayLocation?: string
   newDisplayLocation?: string

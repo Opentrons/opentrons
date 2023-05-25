@@ -19,15 +19,14 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
-import type { MoveLabwareAnimationParams } from '@opentrons/components'
 import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
-import type { RunLabwareInfo, RunModuleInfo } from './utils'
+import type {  LabwareAnimationParams, RunLabwareInfo, RunModuleInfo } from './utils'
 
 export interface MoveLabwareInterventionProps {
   robotType: RobotType
   moduleRenderInfo: RunModuleInfo[]
   labwareRenderInfo: RunLabwareInfo[]
-  labwareAnimationParams: MoveLabwareAnimationParams
+  labwareAnimationParams: LabwareAnimationParams
   labwareName: string
   movedLabwareId: string
   oldDisplayLocation: string
@@ -48,8 +47,8 @@ export function MoveLabwareInterventionContent({
 }: MoveLabwareInterventionProps): JSX.Element {
   const { t: protocolSetupTranslator } = useTranslation('protocol_setup')
 
-  // the module/labware render info needs to be 'sorted' so that the labware that is being moved comes last in the list
-  // this ensures that the labware being moved is on-top of all other svg layers and so won't have weird visual bugs
+  // the module/labware render info needs to be 'sorted' so that the labware that is being moved comes last in the list.
+  // This ensures that the labware being moved is on-top of all other svg layers and so won't have weird visual bugs
   // where it appears to slide under some labware and over others. This also means that the order in which modules/labware
   // lists are rendered also need to be dynamic based on wether the labware is nested in a module or not
   const movedLabwareIndex = labwareRenderInfo.findIndex(
@@ -106,6 +105,9 @@ export function MoveLabwareInterventionContent({
               deckDef={deckDef}
               deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
               id="InterventionModal_deckMap"
+              animateDeckDependantEvent={
+                newDisplayLocation === 'offDeck' ? 'move' : 'splash'
+              }
             >
               {() => (
                 <>

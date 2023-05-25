@@ -5,6 +5,7 @@ import {
   FilledWells,
   StrokedWells,
   StaticLabware,
+  SplashAnimationParams,
 } from './labwareInternals'
 import styles from './LabwareRender.css'
 
@@ -65,27 +66,31 @@ export interface LabwareRenderProps {
   hover?: boolean
   onLabwareClick?: () => void
   highlightLabware?: boolean
-  moveLabwareAnimationParams?: MoveLabwareAnimationParams | null
+  labwareAnimationParams?: {
+    movementParams: MoveLabwareAnimationParams
+    splashParams: SplashAnimationParams
+  } | null
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   const { gRef } = props
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
+  const { movementParams, splashParams } = props.labwareAnimationParams ?? {}
 
   return (
     <g
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
       ref={gRef}
     >
-      {props.moveLabwareAnimationParams != null ? (
+      {movementParams != null ? (
         <animateTransform
           id="labware-move"
           attributeName="transform"
           type="translate"
           from={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y}`}
-          to={`${props.moveLabwareAnimationParams.xMovement} ${props.moveLabwareAnimationParams.yMovement}`}
-          begin={props.moveLabwareAnimationParams.begin}
-          dur={props.moveLabwareAnimationParams.duration}
+          to={`${movementParams.xMovement} ${movementParams.yMovement}`}
+          begin={movementParams.begin}
+          dur={movementParams.duration}
           calcMode="ease-out"
           fill="freeze"
         />
@@ -98,6 +103,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         hover={props.hover}
         onLabwareClick={props.onLabwareClick}
         highlightLabware={props.highlightLabware}
+        splashAnimationParams={splashParams}
       />
       {props.wellStroke && (
         <StrokedWells

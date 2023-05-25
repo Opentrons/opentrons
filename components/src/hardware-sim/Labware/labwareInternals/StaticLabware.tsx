@@ -9,6 +9,7 @@ import styles from './StaticLabware.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
+import type { SplashAnimationParams } from './LabwareOutline'
 
 export interface StaticLabwareProps {
   definition: LabwareDefinition2
@@ -18,6 +19,7 @@ export interface StaticLabwareProps {
   hover?: boolean
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  splashAnimationParams?: SplashAnimationParams
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -46,6 +48,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
           definition={props.definition}
           hover={props.hover}
           highlight={props.highlightLabware === true}
+          splashAnimationParams={props.splashAnimationParams}
         />
       </g>
       <g>

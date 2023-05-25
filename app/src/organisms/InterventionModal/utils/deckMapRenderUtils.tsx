@@ -9,13 +9,12 @@ import {
 
 import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
 
-import type { MoveLabwareAnimationParams } from '@opentrons/components'
-import type { RunLabwareInfo, RunModuleInfo } from './'
+import type { RunLabwareInfo, RunModuleInfo, LabwareAnimationParams } from './'
 
 export function getModuleRenderComponents(
   moduleRenderInfo: RunModuleInfo[],
   movedLabwareId: string,
-  labwareAnimationParams: MoveLabwareAnimationParams
+  labwareAnimationParams:  LabwareAnimationParams
 ): JSX.Element[] {
   return map(
     moduleRenderInfo,
@@ -41,7 +40,7 @@ export function getModuleRenderComponents(
             <LabwareRender
               definition={nestedLabwareDef}
               highlightLabware={movedLabwareId === nestedLabwareId}
-              moveLabwareAnimationParams={
+              labwareAnimationParams={
                 movedLabwareId === nestedLabwareId
                   ? labwareAnimationParams
                   : null
@@ -60,7 +59,7 @@ export function getModuleRenderComponents(
 export function getLabwareRenderComponents(
   labwareRenderInfo: RunLabwareInfo[],
   movedLabwareId: string,
-  labwareAnimationParams: MoveLabwareAnimationParams
+  labwareAnimationParams: LabwareAnimationParams
 ): JSX.Element[] {
   return map(labwareRenderInfo, ({ x, y, labwareDef, labwareId }) => (
     <React.Fragment
@@ -72,7 +71,7 @@ export function getLabwareRenderComponents(
         <LabwareRender
           definition={labwareDef}
           highlightLabware={movedLabwareId === labwareId}
-          moveLabwareAnimationParams={
+          labwareAnimationParams={
             movedLabwareId === labwareId ? labwareAnimationParams : null
           }
         />

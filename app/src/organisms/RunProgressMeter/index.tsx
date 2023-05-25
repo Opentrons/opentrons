@@ -54,13 +54,12 @@ import {
   getLabwareNameFromRunData,
   getCurrentRunModulesRenderInfo,
   getCurrentRunLabwareRenderInfo,
-  getLabwareMovementAnimationParams,
+  getLabwareAnimationParams,
 } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { MoveLabwareAnimationParams } from '@opentrons/components'
 import type { LabwareLocation } from '@opentrons/shared-data'
-import type { RunModuleInfo, RunLabwareInfo } from '../InterventionModal/utils'
+import type { RunModuleInfo, RunLabwareInfo, LabwareAnimationParams } from '../InterventionModal/utils'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -209,7 +208,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
   let moduleRunRenderInfo: RunModuleInfo[] | null = null
   let labwareRunRenderInfo: RunLabwareInfo[] | null = null
-  let labwareAnimationParams: MoveLabwareAnimationParams | null = null
+  let labwareAnimationParams: LabwareAnimationParams | null = null
   if (
     lastRunCommand?.commandType === 'moveLabware' &&
     runData != null &&
@@ -229,7 +228,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
 
     labwareAnimationParams =
       moduleRunRenderInfo != null && labwareRunRenderInfo != null
-        ? getLabwareMovementAnimationParams(
+        ? getLabwareAnimationParams(
             labwareRunRenderInfo,
             moduleRunRenderInfo,
             lastRunCommand,

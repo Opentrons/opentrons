@@ -5,20 +5,36 @@ import {
   LABWARE_MOVE_TO_OFFDECK_DURATION_MS,
   OT2_STANDARD_SLOT_HEIGHT,
   OT3_STANDARD_SLOT_HEIGHT,
+  SPLASH_IN_DELAY_MS,
+  SPLASH_IN_DURATION_MS,
+  SPLASH_IN_OFFDECK_DELAY_MS,
+  SPLASH_OUT_DELAY_MS,
+  SPLASH_OUT_DURATION_MS,
 } from './animationConstants'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
-import type { MoveLabwareAnimationParams } from '@opentrons/components'
+import type {
+  MoveLabwareAnimationParams,
+  SplashAnimationParams,
+} from '@opentrons/components'
 import type { DeckDefinition } from '@opentrons/shared-data'
 import type { RunLabwareInfo } from './getCurrentRunLabwareRenderInfo'
 import type { RunModuleInfo } from './getCurrentRunModulesRenderInfo'
 
-export function getLabwareMovementAnimationParams(
+export interface LabwareAnimationParams {
+  movementParams: MoveLabwareAnimationParams
+  splashParams: SplashAnimationParams
+}
+
+export function getLabwareAnimationParams(
   runLabwareInfo: RunLabwareInfo[],
   runModuleInfo: RunModuleInfo[],
   command: RunCommandSummary,
   deckDef: DeckDefinition
-): MoveLabwareAnimationParams | null {
+): {
+  movementParams: MoveLabwareAnimationParams
+  splashParams: SplashAnimationParams
+} | null {
   const labwareId = command.params.labwareId
   let labwareFromRun:
     | RunLabwareInfo
@@ -58,16 +74,31 @@ export function getLabwareMovementAnimationParams(
 
   return newPos != null
     ? {
-        xMovement: newPos[0] - currentPos[0],
-        yMovement: newPos[1] - currentPos[1],
-        begin:
-          command.params.newLocation === 'offDeck'
-            ? `${LABWARE_MOVE_TO_OFFDECK_DELAY_MS}ms;labware-move.end+500ms` // these are all a bit placeholder-y for now until the other animations exist to sync off of
-            : `${LABWARE_MOVE_DELAY_MS}ms;splash.end+300ms`,
-        duration:
-          command.params.newLocation === 'offDeck'
-            ? `${LABWARE_MOVE_TO_OFFDECK_DURATION_MS}ms`
-            : `${LABWARE_MOVE_DURATION_MS}ms`,
+        movementParams: {
+          xMovement: newPos[0] - currentPos[0],
+          yMovement: newPos[1] - currentPos[1],
+          begin:
+            command.params.newLocation === 'offDeck'
+              ? `splash-out.end+${LABWARE_MOVE_TO_OFFDECK_DELAY_MS}ms`
+              : `${LABWARE_MOVE_DELAY_MS}ms;deck-in.end+0ms`,
+          duration:
+            command.params.newLocation === 'offDeck'
+              ? `${LABWARE_MOVE_TO_OFFDECK_DURATION_MS}ms`
+              : `${LABWARE_MOVE_DURATION_MS}ms`,
+        },
+        splashParams: {
+          inParams: {
+            begin:
+              command.params.newLocation === 'offDeck'
+                ? `${SPLASH_IN_OFFDECK_DELAY_MS}ms;deck-in.end+${SPLASH_IN_OFFDECK_DELAY_MS}ms`
+                : `labware-move.end+${SPLASH_IN_DELAY_MS}ms`,
+            duration: `${SPLASH_IN_DURATION_MS}ms`,
+          },
+          outParams: {
+            begin: `splash-in.end+${SPLASH_OUT_DELAY_MS}ms`,
+            duration: `${SPLASH_OUT_DURATION_MS}ms`,
+          },
+        },
       }
     : null
 }

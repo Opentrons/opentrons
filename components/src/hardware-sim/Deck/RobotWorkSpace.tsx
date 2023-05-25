@@ -5,6 +5,11 @@ import styles from './RobotWorkSpace.css'
 
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
 
+const DECK_FADE_IN_DELAY_MS = 200
+const DECK_FADE_IN_DURATION_MS = 200
+const DECK_FADE_OUT_DELAY_MS = 1200
+const DECK_FADE_OUT_DURATION_MS = 200
+
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
   getRobotCoordsFromDOMCoords: (
@@ -20,12 +25,20 @@ export interface RobotWorkSpaceProps {
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckLayerBlocklist?: string[]
   id?: string
+  animateDeckDependantEvent?: 'splash' | 'move'
 }
 
 type GetRobotCoordsFromDOMCoords = RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
-  const { children, deckDef, deckLayerBlocklist = [], viewBox, id } = props
+  const {
+    children,
+    deckDef,
+    deckLayerBlocklist = [],
+    viewBox,
+    id,
+    animateDeckDependantEvent,
+  } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
@@ -65,11 +78,40 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
       id={id}
+      opacity="1"
     >
       {deckDef != null && (
         <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
       )}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+      {animateDeckDependantEvent != null ? (
+        <>
+          <animate
+            id="deck-out"
+            attributeName="opacity"
+            from="1"
+            to="0"
+            begin={
+              animateDeckDependantEvent === 'splash'
+                ? `splash-out.end+${DECK_FADE_OUT_DELAY_MS}ms`
+                : `labware-move.end+${DECK_FADE_OUT_DELAY_MS}ms`
+            }
+            dur={`${DECK_FADE_OUT_DURATION_MS}ms`}
+            calcMode="ease-out"
+            fill="freeze"
+          />
+          <animate
+            id="deck-in"
+            attributeName="opacity"
+            from="0"
+            to="1"
+            begin={`deck-out.end+${DECK_FADE_IN_DELAY_MS}ms`}
+            dur={`${DECK_FADE_IN_DURATION_MS}ms`}
+            calcMode="ease-out"
+            fill="freeze"
+          />
+        </>
+      ) : null}
     </svg>
   )
 }
