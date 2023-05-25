@@ -110,7 +110,7 @@ export function SetWifiSsid({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingX="6.34375rem"
-        gridGap={SPACING.spacing12}
+        gridGap={SPACING.spacing8}
       >
         <StyledText
           as="p"
