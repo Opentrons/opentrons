@@ -33,7 +33,8 @@ from robot_server.instruments.instrument_models import (
     Pipette,
     PipetteData,
     InstrumentCalibrationData,
-    BadInstrument,
+    BadPipette,
+    BadGripper,
 )
 from robot_server.instruments.router import (
     get_attached_instruments,
@@ -167,6 +168,7 @@ async def test_get_all_attached_instruments(
 
     assert result.content.data == [
         Pipette.construct(
+            ok=True,
             mount="left",
             instrumentType="pipette",
             instrumentName="p10_multi",
@@ -185,6 +187,7 @@ async def test_get_all_attached_instruments(
             ),
         ),
         Pipette.construct(
+            ok=True,
             mount="right",
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
@@ -203,6 +206,7 @@ async def test_get_all_attached_instruments(
             ),
         ),
         Gripper.construct(
+            ok=True,
             mount="extension",
             instrumentType="gripper",
             instrumentModel=GripperModelStr("gripperV1"),
@@ -249,6 +253,7 @@ async def test_get_ot2_instruments(
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(
+            ok=True,
             mount="right",
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
@@ -294,6 +299,7 @@ async def test_get_96_channel_instruments(
     assert result2.status_code == 200
     assert result2.content.data == [
         Pipette.construct(
+            ok=True,
             mount="left",
             instrumentType="pipette",
             instrumentName="p1000_96",
@@ -314,7 +320,7 @@ async def test_get_instrument_not_ok(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
 ) -> None:
-    """It should return a BadInstrument if an instrument needs an update."""
+    """It should return a BadPipette/BadGripper if an instrument needs an update."""
     left_pipette_dict = get_sample_pipette_dict(
         name="p10_multi",
         model=PipetteModel("abc"),
@@ -379,25 +385,22 @@ async def test_get_instrument_not_ok(
     response = await get_attached_instruments(ot3_hardware_api)
     assert response.status_code == 200
     assert response.content.data == [
-        BadInstrument(
+        BadPipette(
             subsystem=SubSystem.pipette_left,
             status="/subsystems/status/pipette_left",
             update="/subsystems/updates/pipette_left",
-            ok=True,
-            requiresUpdate=True,
+            ok=False,
         ),
-        BadInstrument(
+        BadPipette(
             subsystem=SubSystem.pipette_right,
             status="/subsystems/status/pipette_right",
             update="/subsystems/updates/pipette_right",
             ok=False,
-            requiresUpdate=True,
         ),
-        BadInstrument(
+        BadGripper(
             subsystem=SubSystem.gripper,
             status="/subsystems/status/gripper",
             update="/subsystems/updates/gripper",
             ok=False,
-            requiresUpdate=True,
         ),
     ]

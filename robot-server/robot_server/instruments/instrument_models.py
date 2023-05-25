@@ -39,6 +39,9 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
         None,
         description="The subsystem corresponding to this pipette.",
     )
+    ok: Literal[True] = Field(
+        ..., description="Whether this instrument is OK and ready to go"
+    )
     data: InstrumentDataT
 
 
@@ -92,7 +95,7 @@ class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
     data: GripperData
 
 
-class BadInstrument(BaseModel):
+class _BadInstrument(BaseModel):
     """Represents something that is physically connected but broken in some way. Must be updated."""
 
     subsystem: SubSystem = Field(
@@ -105,14 +108,22 @@ class BadInstrument(BaseModel):
     update: str = Field(
         ..., description="A route on this server to begin an update of the instrument"
     )
-    ok: bool = Field(
+    ok: Literal[False] = Field(
         ...,
         description="If the instrument is not OK, a previous update was interrupted. It must be updated again.",
     )
-    requiresUpdate: bool = Field(
-        ...,
-        description="If the instrument needs an update, that update must be done before use.",
-    )
 
 
-AttachedItem = Union[Pipette, Gripper, BadInstrument]
+class BadGripper(_BadInstrument):
+    """Represents a gripper that is physically connected but not ready to operate."""
+
+    instrumentType: Literal["gripper"] = "gripper"
+
+
+class BadPipette(_BadInstrument):
+    """Represents a pipette that is physically connected but not ready to operate."""
+
+    instrumentType: Literal["pipette"] = "pipette"
+
+
+AttachedItem = Union[Pipette, Gripper, BadPipette, BadGripper]

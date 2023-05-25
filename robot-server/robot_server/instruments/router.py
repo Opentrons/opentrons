@@ -24,7 +24,6 @@ from opentrons.hardware_control import (
 from opentrons.hardware_control.types import (
     OT3Mount,
     SubSystem as HWSubSystem,
-    SubSystemState,
 )
 from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
@@ -36,7 +35,8 @@ from .instrument_models import (
     GripperData,
     Gripper,
     AttachedItem,
-    BadInstrument,
+    BadGripper,
+    BadPipette,
 )
 
 from robot_server.subsystems.models import SubSystem
@@ -57,6 +57,7 @@ def _pipette_dict_to_pipette_res(
     if pipette_dict:
         calibration_data = pipette_offset
         return Pipette.construct(
+            ok=True,
             mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
             instrumentModel=pipette_dict["model"],
@@ -85,6 +86,7 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
     return Gripper.construct(
+        ok=True,
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
         serialNumber=gripper_dict["gripper_id"],
@@ -104,15 +106,23 @@ def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
     )
 
 
-def _subsystem_response_for(
-    subsystem: SubSystem, status: SubSystemState
-) -> BadInstrument:
-    return BadInstrument(
+def _bad_gripper_response() -> BadGripper:
+    return BadGripper(
+        instrumentType="gripper",
+        subsystem=SubSystem.gripper,
+        status=status_route_for(SubSystem.gripper),
+        update=update_route_for(SubSystem.gripper),
+        ok=False,
+    )
+
+
+def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
+    return BadPipette(
+        instrumentType="pipette",
         subsystem=subsystem,
         status=status_route_for(subsystem),
         update=update_route_for(subsystem),
-        ok=status.ok,
-        requiresUpdate=status.fw_update_needed,
+        ok=False,
     )
 
 
@@ -123,7 +133,7 @@ def _get_gripper_instrument_data(
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
     status = hardware.attached_subsystems.get(subsys)
     if status and (status.fw_update_needed or not status.ok):
-        return _subsystem_response_for(SubSystem.from_hw(subsys), status)
+        return _bad_gripper_response()
     if attached_gripper:
         return _gripper_dict_to_gripper_res(gripper_dict=attached_gripper)
     return None
@@ -138,7 +148,7 @@ def _get_pipette_instrument_data(
     subsys = HWSubSystem.of_mount(mount)
     status = hardware.attached_subsystems.get(subsys)
     if status and (status.fw_update_needed or not status.ok):
-        return _subsystem_response_for(SubSystem.from_hw(subsys), status)
+        return _bad_pipette_response(SubSystem.from_hw(subsys))
     if pipette_dict:
         offset = cast(
             Optional[PipetteOffsetByPipetteMount],
