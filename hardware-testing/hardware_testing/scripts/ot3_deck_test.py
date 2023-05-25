@@ -348,7 +348,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     
     test_pip = api.get_attached_instrument(mount)
     test_name = "deck-test"
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_pip["pipette_id"])
+    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_robot)
     header = ["------------------------------------"]
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
@@ -364,37 +364,43 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     txtval = ["------------------------------------"]
     header_str = data.convert_list_to_csv_line(txtval)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
-
-    datalist = []
-    for i in range(3):
-        Toollength = zijulis[whereval] - steplist[0]
-        move = steplist[0]
-        if i%2==0:
+    try:
+        datalist = []
+        for i in range(3):
+            Toollength = zijulis[whereval] - steplist[0]
             move = steplist[0]
-        else:
-            move = -steplist[0]
-
-        while Toollength >= 0:
-            print("Toollength:::::{}".format(Toollength))
-            await api.move_rel(
-                        mount, Point(x=move), speed=steplist[1]
-                    )
-            readval = _reading(hardewar)
-            print("testig=:::::{}".format(readval))
-            txtval = [time.time(),readval]
-            datalist.append(txtval)
-            header_str = data.convert_list_to_csv_line(txtval)
-            data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
-            Toollength = Toollength - steplist[0]
-        else:
-            if mount == OT3Mount.LEFT:
-                await api.move_rel(
-                            mount, Point(z=-5), speed=steplist[1]
-                        )
+            if i%2==0:
+                move = steplist[0]
             else:
+                move = -steplist[0]
+
+            while Toollength >= 0:
+                print("Toollength:::::{}".format(Toollength))
                 await api.move_rel(
-                            mount, Point(y=-5), speed=steplist[1]
+                            mount, Point(x=move), speed=steplist[1]
                         )
+                readval = _reading(hardewar)
+                print("testig=:::::{}".format(readval))
+                txtval = [time.time(),readval]
+                datalist.append(txtval)
+
+                
+                Toollength = Toollength - steplist[0]
+            else:
+                if mount == OT3Mount.LEFT:
+                    await api.move_rel(
+                                mount, Point(z=-5), speed=steplist[1]
+                            )
+                else:
+                    await api.move_rel(
+                                mount, Point(y=-5), speed=steplist[1]
+                            )
+    except Exception as err:
+        print("test err {}".format(err))
+    finally:
+        for ii in datalist:
+            savedata = data.convert_list_to_csv_line(ii)
+            data.append_data_to_file(test_name=test_name, file_name=file_name, data=savedata)
     await api.home()
 
 if __name__ == "__main__":
