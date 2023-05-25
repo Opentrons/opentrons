@@ -56,13 +56,17 @@ async def test_calibration_move_to_location_implementation(
         ]
     )
 
+    decoy.when(await hardware_api.gantry_position(Mount.RIGHT)).then_return(
+        Point(x=6, y=6, z=6)
+    )
+
     result = await subject.execute(params=params)
     assert result == MoveToMaintenancePositionResult()
 
     decoy.verify(
         await hardware_api.move_to(
             mount=Mount.LEFT,
-            abs_position=Point(3, 1, 4),
+            abs_position=Point(3, 1, 3),
             critical_point=CriticalPoint.MOUNT,
         ),
         times=1,
@@ -71,7 +75,7 @@ async def test_calibration_move_to_location_implementation(
     decoy.verify(
         await hardware_api.move_to(
             mount=Mount.LEFT,
-            abs_position=Point(1, 5, 9),
+            abs_position=Point(1, 5, 3),
             critical_point=CriticalPoint.MOUNT,
         ),
         times=1,
@@ -80,7 +84,7 @@ async def test_calibration_move_to_location_implementation(
     decoy.verify(
         await hardware_api.move_to(
             mount=Mount.RIGHT,
-            abs_position=Point(z=400),
+            abs_position=Point(x=6, y=6, z=400),
             critical_point=CriticalPoint.MOUNT,
         ),
         times=1,

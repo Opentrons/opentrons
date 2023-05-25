@@ -78,13 +78,21 @@ class MoveToMaintenancePositionImplementation(
         for waypoint in way_points:
             await self._hardware_api.move_to(
                 mount=Mount.LEFT,
-                abs_position=waypoint.position,
+                abs_position=Point(
+                    x=waypoint.position.x, y=waypoint.position.y, z=current_position.z
+                ),
                 critical_point=CriticalPoint.MOUNT,
             )
 
+        current_position = await self._hardware_api.gantry_position(hardware_mount)
+
         await self._hardware_api.move_to(
             mount=hardware_mount,
-            abs_position=Point(z=_INSTRUMENT_ATTACH_Z_HEIGHT),
+            abs_position=Point(
+                x=current_position.x,
+                y=current_position.y,
+                z=_INSTRUMENT_ATTACH_Z_HEIGHT,
+            ),
             critical_point=CriticalPoint.MOUNT,
         )
 
