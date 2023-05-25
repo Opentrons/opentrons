@@ -1,4 +1,4 @@
-"""Gripper on Robot Force Check."""
+"""Gripper-on-Robot Force Check."""
 import asyncio
 import argparse
 import string
@@ -25,7 +25,7 @@ from hardware_testing.drivers import (
 )
 
 def build_arg_parser():
-    arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Lifetime Test')
+    arg_parser = argparse.ArgumentParser(description='OT-3 Gripper-on-Robot Force Check')
     arg_parser.add_argument('-m', '--mode', choices=['force','pwm'], required=False, help='Sets the test mode', default='force')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Sets the number of testing cycles', default=10)
     arg_parser.add_argument('-f', '--force', type=float, required=False, help='Sets the gripper force in Newtons', default=20)
@@ -83,7 +83,7 @@ class Gripper_Robot_Force_Check:
         self.test_data["Serial Number"] = str(self.gripper_id)
         self.test_data["Input Force"] = str(self.grip_force)
         self.deck_definition = load("ot3_standard", version=3)
-        print(f"\nStarting Gripper on Robot Force Check!\n")
+        print(f"\nStarting Gripper-on-Robot Force Check!\n")
         self.start_time = time.time()
 
     def file_setup(self):
@@ -203,7 +203,7 @@ class Gripper_Robot_Force_Check:
             print("Test Completed!")
 
 if __name__ == '__main__':
-    print("\nOT-3 Gripper on Robot Force Check\n")
+    print("\nOT-3 Gripper-on-Robot Force Check\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
     test = Gripper_Robot_Force_Check(args.simulate, args.mode, args.cycles, args.force, args.pwm, args.time, args.part_number)
