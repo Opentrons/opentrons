@@ -268,4 +268,34 @@ describe('Results', () => {
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })
+  it('renders the correct information when pipette succceeds to attach during run setup', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      requiredPipette: {
+        id: 'mockId',
+        pipetteName: 'p1000_single_gen3',
+        mount: LEFT,
+      },
+    }
+    const { getByText } = render(props)
+    getByText('Flex 1-Channel 1000 μL successfully attached')
+  })
+  it('renders the correct information when attaching wrong pipette for run setup', async () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      requiredPipette: {
+        id: 'mockId',
+        pipetteName: 'p50_multi_gen3',
+        mount: LEFT,
+      },
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Wrong instrument installed')
+    getByText('Install Flex 8-Channel 50 μL instead')
+    getByRole('button', { name: 'Detach and retry' }).click()
+    await act(() => pipettePromise)
+    expect(mockRefetchInstruments).toHaveBeenCalled()
+  })
 })

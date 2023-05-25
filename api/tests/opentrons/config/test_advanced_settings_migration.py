@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 24
+    return 25
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -24,6 +24,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": True,
+        "disableStallDetection": None,
     }
 
 
@@ -294,6 +295,18 @@ def v24_config(v23_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v25_config(v24_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v24_config.copy()
+    r.update(
+        {
+            "_version": 25,
+            "disableStallDetection": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -323,6 +336,7 @@ def v24_config(v23_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v22_config"),
         lazy_fixture("v23_config"),
         lazy_fixture("v24_config"),
+        lazy_fixture("v25_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -410,4 +424,5 @@ def test_ensures_config() -> None:
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": None,
+        "disableStallDetection": None,
     }

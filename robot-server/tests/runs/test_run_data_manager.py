@@ -34,6 +34,8 @@ from robot_server.service.task_runner import TaskRunner
 
 from opentrons.protocol_engine import Liquid
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 
 @pytest.fixture
 def mock_engine_store(decoy: Decoy) -> EngineStore:
@@ -801,3 +803,29 @@ def test_get_command_from_db_command_not_found(
 
     with pytest.raises(CommandNotFoundError):
         subject.get_command("run-id", "command-id")
+
+
+async def test_get_current_run_labware_definition(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    subject: RunDataManager,
+    engine_state_summary: StateSummary,
+    run_resource: RunResource,
+) -> None:
+    """It should get the current run labware definition from the engine."""
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(
+        mock_engine_store.engine.state_view.labware.get_loaded_labware_definitions()
+    ).then_return(
+        [
+            LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
+            LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+        ]
+    )
+
+    result = subject.get_run_loaded_labware_definitions(run_id="run-id")
+
+    assert result == [
+        LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
+        LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+    ]

@@ -24,6 +24,11 @@ import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 
+import {
+  getRobotAddressesByName,
+  HEALTH_STATUS_OK,
+  OPENTRONS_USB,
+} from '../../../redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 
 import { useIsOT3, useIsRobotBusy } from '../hooks'
@@ -58,8 +63,12 @@ export function RobotSettingsNetworking({
 
   const canDisconnect = useCanDisconnect(robotName)
 
-  // TODO(bh, 2023-1-18): get the real OT-3 USB connection info
-  const isOT3ConnectedViaUSB = false
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robotName)
+  )
+  const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
+  const isOT3ConnectedViaUSB =
+    usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
 
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)

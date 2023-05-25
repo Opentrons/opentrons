@@ -36,7 +36,10 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
-import { protocolHasLiquids } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -58,6 +61,7 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 import { ProtocolOverflowMenu } from '../ProtocolsLanding/ProtocolOverflowMenu'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
@@ -212,6 +216,11 @@ export function ProtocolDetails(
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
 
+  const requiredExtensionInstrumentName =
+    mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
+      ? getGripperDisplayName('gripperV1')
+      : null
+
   const requiredModuleDetails =
     mostRecentAnalysis != null
       ? map(
@@ -282,6 +291,7 @@ export function ProtocolDetails(
       <RobotConfigurationDetails
         leftMountPipetteName={leftMountPipetteName}
         rightMountPipetteName={rightMountPipetteName}
+        extensionInstrumentName={requiredExtensionInstrumentName}
         requiredModuleDetails={requiredModuleDetails}
         isLoading={analysisStatus === 'loading'}
         robotType={robotType}

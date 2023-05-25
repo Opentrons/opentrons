@@ -24,6 +24,7 @@
   "move_to_coordinates": "Moving to (X: {{x}}, Y: {{y}}, Z: {{z}})",
   "move_to_slot": "Moving to Slot {{slot_name}}",
   "move_to_well": "Moving to well {{well_name}} of {{labware}} in {{labware_location}}",
+  "notes": "notes",
   "off_deck": "off deck",
   "opening_tc_lid": "Opening Thermocycler lid",
   "perform_manual_step": "Perform manual step on {{robot_name}}",

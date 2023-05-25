@@ -34,12 +34,6 @@ if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mock hardware control API."""
-    return decoy.mock(cls=HardwareControlAPI)
-
-
 def get_sample_pipette_dict(
     name: PipetteName,
     model: PipetteModel,

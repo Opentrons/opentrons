@@ -1,4 +1,5 @@
 export { useAllProtocolsQuery } from './useAllProtocolsQuery'
+export { useAllProtocolIdsQuery } from './useAllProtocolIdsQuery'
 export { useProtocolQuery } from './useProtocolQuery'
 export { useProtocolAnalysesQuery } from './useProtocolAnalysesQuery'
 export { useCreateProtocolMutation } from './useCreateProtocolMutation'

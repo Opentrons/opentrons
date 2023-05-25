@@ -94,22 +94,19 @@ describe('SelectAuthenticationType', () => {
   it('when tapping back button, call a mock function - fromWifiList', () => {
     props.fromWifiList = true
     const [{ getAllByRole }] = render(props)
-    const button = getAllByRole('button')[0]
-    button.click()
+    getAllByRole('button')[0].click()
     expect(props.setChangeState).toHaveBeenCalled()
   })
 
   it('should call call a mock function - wpa when tapping continue button', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('Continue')
-    button.click()
+    getByText('Continue').click()
     expect(mockSetShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
   it('should render AlternativeSecurityTypeModal when tapping need another security type? button', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('Need another security type?')
-    button.click()
+    getByText('Need another security type?').click()
     getByText('mock AlternativeSecurityTypeModal')
   })
 })

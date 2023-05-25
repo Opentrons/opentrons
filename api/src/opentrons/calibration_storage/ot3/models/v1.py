@@ -45,9 +45,9 @@ class TipLengthModel(BaseModel):
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
-class DeckCalibrationModel(BaseModel):
+class BeltCalibrationModel(BaseModel):
     attitude: types.AttitudeMatrix = Field(
-        ..., description="Attitude matrix found from calibration."
+        ..., description="Attitude matrix for belts found from calibration."
     )
     lastModified: datetime = Field(
         ..., description="The last time this deck was calibrated."

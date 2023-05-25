@@ -54,22 +54,19 @@ describe('DisplayConnectionStatus', () => {
 
   it('should call a mock function when tapping view network details button when the connection status is connected', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('View network details')
-    button.click()
+    getByText('View network details').click()
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping view network details button when the connection status is not connected', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('View network details')
-    button.click()
+    getByText('View network details').click()
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call a mock push when tapping continue button', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('Continue')
-    button.click()
+    getByText('Continue').click()
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
   })
 })

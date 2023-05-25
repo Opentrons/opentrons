@@ -25,6 +25,7 @@ import {
 import type { State } from '../types'
 import {
   DiscoveredRobot,
+  DiscoveryClientRobotAddress,
   Robot,
   ReachableRobot,
   UnreachableRobot,
@@ -248,3 +249,16 @@ export const getRobotModelByName = (
     robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
   return robotModelName === 'OT-3' ? 'Opentrons Flex' : robotModelName
 }
+
+export const getRobotAddressesByName: (
+  state: State,
+  robotName: string
+) => DiscoveryClientRobotAddress[] = createSelector(
+  state => state.discovery.robotsByName,
+  (state: State, robotName: string) => robotName,
+  (robotsMap, robotName) => {
+    const robot = robotsMap[robotName]
+    const { addresses } = robot
+    return addresses
+  }
+)
