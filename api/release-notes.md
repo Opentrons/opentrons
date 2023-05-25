@@ -5,6 +5,20 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+## OT-2 Software Changes in 6.3.1
+
+Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.
+
+### Improved Features
+- ``set_block_temperature`` did not support a hold time in API version 2.14; now it does!
+
+### Bug Fixes
+
+- Plates will sometimes get stuck in a Thermocycler GEN2 after a PCR cycle
+- The Thermocycler GEN2 plate eject will sometimes eject plates too energetically
+
+
+---
 
 ## OT-2 Software Changes in 6.3.0
 
