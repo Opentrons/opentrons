@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { RIGHT } from '@opentrons/shared-data'
 import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -11,35 +10,8 @@ import type { PipetteWizardStepProps } from './types'
 export const MountingPlate = (
   props: PipetteWizardStepProps
 ): JSX.Element | null => {
-  const {
-    goBack,
-    proceed,
-    flowType,
-    chainRunCommands,
-    setShowErrorMessage,
-  } = props
+  const { goBack, proceed, flowType } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
-
-  const handleDetachMountingPlate = (): void => {
-    chainRunCommands(
-      [
-        {
-          // @ts-expect-error calibration type not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: RIGHT,
-          },
-        },
-      ],
-      false
-    )
-      .then(() => {
-        proceed()
-      })
-      .catch(error => {
-        setShowErrorMessage(error.message)
-      })
-  }
 
   return (
     <GenericWizardTile
@@ -82,7 +54,7 @@ export const MountingPlate = (
         )
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-      proceed={flowType === FLOWS.ATTACH ? proceed : handleDetachMountingPlate}
+      proceed={proceed}
       back={goBack}
     />
   )

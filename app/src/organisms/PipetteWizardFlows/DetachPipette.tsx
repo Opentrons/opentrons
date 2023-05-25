@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { RIGHT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'
@@ -25,6 +26,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     mount,
     isFetching,
     setFetching,
+    chainRunCommands,
     isOnDevice,
     flowType,
   } = props
@@ -36,6 +38,25 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   }
   const is96ChannelPipette =
     attachedPipettes[mount]?.instrumentName === 'p1000_96'
+  const handle96ChannelProceed = (): void => {
+    chainRunCommands(
+      {
+        // @ts-expect-error calibration type not yet supported
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: RIGHT,
+          maintenancePosition: 'attachPlate',
+        },
+      },
+      true
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(() => {
+        proceed()
+      })
+  }
   const channel = attachedPipettes[mount]?.data.channels
   let bodyText: React.ReactNode = <div></div>
   if (isFetching) {
@@ -98,7 +119,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         <CheckPipetteButton
           isOnDevice={isOnDevice}
           proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-          proceed={proceed}
+          proceed={is96ChannelPipette ? handle96ChannelProceed : proceed}
           setFetching={setFetching}
           isFetching={isFetching}
         />
