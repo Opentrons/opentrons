@@ -1,4 +1,3 @@
-from __future__ import annotations
 import enum
 import logging
 from dataclasses import dataclass
@@ -158,7 +157,7 @@ class Axis(enum.Enum):
     C = P_R  # right pipette plunger
 
     @classmethod
-    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> Axis:
+    def by_mount(cls, mount: Union[top_types.Mount, OT3Mount]) -> "Axis":
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
@@ -169,6 +168,7 @@ class Axis(enum.Enum):
         }
         return bm[mount]
 
+    # TODO (spp, 2023-05-22): remove this
     @classmethod
     def from_axis(cls, axis: Union[Axis, "Axis"]) -> "Axis":
         am = {

@@ -137,7 +137,6 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Mount": Mount,
             "Point": Point,
             "Axis": Axis,
-            "Axis": Axis,
             "OT3Mount": OT3Mount,
             "OT3SubSystem": OT3SubSystem,
             "GripperProbe": GripperProbe,

@@ -23,7 +23,6 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     HardwareAction,
     Axis,
-    Axis,
     OT3Mount,
 )
 from opentrons.hardware_control.errors import (
@@ -50,7 +49,7 @@ PipetteHandlingData = Tuple[Pipette, MountType]
 
 MOD_LOG = logging.getLogger(__name__)
 
-AxisType = TypeVar("AxisType", Axis, Axis)
+AxisType = TypeVar("AxisType", bound=Axis)
 
 
 @dataclass(frozen=True)

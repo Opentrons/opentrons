@@ -5,7 +5,7 @@ from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
 from opentrons.util import linal
-from .types import Axis, Axis, OT3Mount
+from .types import Axis, OT3Mount
 from functools import lru_cache
 
 
@@ -50,42 +50,8 @@ def offset_for_mount(
     }
     return offsets[primary_mount]
 
-# TODO (spp, 2023-05-19): _axis_name & _axis_enum don't seem to be used anywhere. Remove them.
-@overload
-def _axis_name(ax: Axis) -> str:
-    ...
 
-
-@overload
-def _axis_name(ax: Axis) -> Axis:
-    ...
-
-
-# TODO (spp, 2023-05-19): how to update this?
-def _axis_name(ax: Axis) -> Union[str, Axis]:
-    if isinstance(ax, Axis):
-        return ax.name
-    else:
-        return ax
-
-
-@overload
-def _axis_enum(ax: str) -> Axis:
-    ...
-
-
-@overload
-def _axis_enum(ax: Axis) -> Axis:
-    ...
-
-
-def _axis_enum(ax: Union[str, Axis]) -> Axis:
-    if isinstance(ax, Axis):
-        return ax
-    else:
-        return Axis[ax]
-
-
+# TODO (spp, 2023-05-22): I don't think these overloads are required anymore. Remove them.
 @overload
 def target_position_from_absolute(
     mount: Mount,
@@ -246,7 +212,7 @@ def machine_point_from_deck_point(
     return Point(*linal.apply_transform(attitude, deck_point)) + offset
 
 
-AxisType = TypeVar("AxisType", Axis, Axis)
+AxisType = TypeVar("AxisType", bound=Axis)
 
 
 def machine_from_deck(
