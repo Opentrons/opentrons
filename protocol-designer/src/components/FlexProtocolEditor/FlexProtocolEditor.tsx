@@ -403,16 +403,11 @@ function FlexProtocolEditor({
                     disabled={notOnFirstPage && !props.isValid}
                     tabIndex={4}
                     type="submit"
-                    className={
+                    className={`${
                       notOnFirstPage
                         ? styles.flex_round_tabs_button_50p
                         : styles.flex_round_tabs_button_100p
-                    }
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      width: '50%',
-                    }}
+                    } ${styles.common_button}`}
                   >
                     <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>

@@ -160,8 +160,14 @@
 }
 
 .module_section > * {
-  margin-right: 3rem;
+  margin-right: 1.5rem;
   height: 7rem;
+}
+
+.common_button {
+  display: 'flex';
+  justify-content: 'center';
+  width: '50%';
 }
 
 .mini_card {
