@@ -16,4 +16,4 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## Smaller Fun Features
 
-- The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"Flex"` will still work, but it's discouraged because it's not the customer-facing name.
+- The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"OT-3"` will still work, but it's discouraged because it's not the customer-facing name.
