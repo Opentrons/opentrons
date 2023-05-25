@@ -10,12 +10,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.
 
 ### Improved Features
-- ``set_block_temperature`` did not support a hold time in API version 2.14; now it does!
+- Changed the Thermocycler GEN2 plate ejection behavior to prevent plates from getting stuck after PCR cycles or being ejected too forcefully.
 
 ### Bug Fixes
 
-- Plates will sometimes get stuck in a Thermocycler GEN2 after a PCR cycle
-- The Thermocycler GEN2 plate eject will sometimes eject plates too energetically
+- Specifying Python API version 2.14 no longer prevents ``set_block_temperature`` from executing a hold time.
 
 
 ---
