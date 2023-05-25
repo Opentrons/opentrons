@@ -53,7 +53,7 @@ const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
   'loadLiquid',
 ]
 
-function getWarningContent({
+export function getWarningContent({
   noCommands,
   pipettesWithoutStep,
   modulesWithoutStep,

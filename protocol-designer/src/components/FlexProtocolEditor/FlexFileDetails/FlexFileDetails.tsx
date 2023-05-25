@@ -33,6 +33,7 @@ import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
 import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 import { actions as navActions } from '../../../navigation'
 import { UpdateConfirmation } from '../FlexUpdateConfirmation'
+import { FlexHeadingButtonGroup } from '../FlexButtonsGroup'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -216,23 +217,6 @@ const FileProtocolInformation = (): JSX.Element => {
         />
       </div>
     </>
-  )
-}
-
-export const FlexHeadingButtonGroup = (props: {
-  protocolCancelClickProps: any
-}): JSX.Element => {
-  const { protocolCancelClickProps } = props
-  return (
-    <div className={styles.right_buttons}>
-      <SecondaryButton>{i18n.t('flex.file_tab.export')}</SecondaryButton>
-      <SecondaryButton
-        className={styles.close_protocol_button}
-        onClick={e => protocolCancelClickProps(e)}
-      >
-        {i18n.t('flex.file_tab.close_export')}
-      </SecondaryButton>
-    </div>
   )
 }
 
