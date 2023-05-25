@@ -255,11 +255,13 @@ def _robot_type_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> RobotType:
     python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
-    if python_robot_type in (None, "OT-2"):
+    if python_robot_type in {None, "OT-2"}:
         return "OT-2 Standard"
-    elif python_robot_type == "OT-3":
+    # Allow "OT-3" as a deprecated alias of "Flex" to support internal-to-Opentrons Python protocols
+    # that were written before the "Flex" name existed.
+    elif python_robot_type in {"Flex", "OT-3"}:
         return "OT-3 Standard"
     else:
         raise FileIdentificationError(
-            f"robotType must be 'OT-2' or 'OT-3', not {repr(python_robot_type)}."
+            f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
         )
