@@ -364,6 +364,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     txtval = ["------------------------------------"]
     header_str = data.convert_list_to_csv_line(txtval)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+
+    datalist = []
     for i in range(3):
         Toollength = zijulis[whereval] - steplist[0]
         move = steplist[0]
@@ -380,6 +382,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
             readval = _reading(hardewar)
             print("testig=:::::{}".format(readval))
             txtval = [time.time(),readval]
+            datalist.append(txtval)
             header_str = data.convert_list_to_csv_line(txtval)
             data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
             Toollength = Toollength - steplist[0]
