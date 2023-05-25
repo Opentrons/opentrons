@@ -9,7 +9,9 @@ import {
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
+  LEFT,
   LoadedPipette,
+  MotorAxis,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -131,7 +133,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      const axis = mount === 'left' ? 'leftPlunger' : 'rightPlunger'
+      let axes: MotorAxis = mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
+      // TODO: (sb)5/25/23 Stop homing leftZ for 96 once motor is disabled
+      if (attachedPipettes[mount]?.instrumentName === 'p1000_96') {
+        axes = ['leftPlunger', 'leftZ']
+      }
       chainRunCommands(
         [
           {
@@ -146,7 +152,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           {
             commandType: 'home' as const,
             params: {
-              axes: [axis],
+              axes: axes,
             },
           },
           {
