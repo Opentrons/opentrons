@@ -12,6 +12,14 @@ class PinDir(enum.Enum):
     output = enum.auto()
 
 
+class PortGroup(enum.Enum):
+    MAIN = enum.auto()
+    LEFT = enum.auto()
+    RIGHT = enum.auto()
+    FRONT = enum.auto()
+    UNKNOWN = enum.auto()
+
+
 REV_OG_USB_PORTS = {"3": 1, "5": 2}
 REV_A_USB_HUB = 3
 OT3_USB_PORT_GROUP_LEFT = 4
@@ -22,9 +30,9 @@ OT3_USB_PORT_GROUP_RIGHT = 3
 class USBPort:
     name: str
     port_number: int
+    port_group: PortGroup = PortGroup.UNKNOWN
     device_path: str = ""
     hub: Optional[int] = None
-    port_group: str = ""
     hub_port: Optional[int] = None
 
     @classmethod
@@ -126,29 +134,29 @@ class USBPort:
     def map_to_revision(
         board_revision: BoardRevision,
         port_info: Tuple[Optional[int], int, Optional[int]],
-    ) -> Tuple[Optional[int], str, int, Optional[int]]:
+    ) -> Tuple[Optional[int], PortGroup, int, Optional[int]]:
         hub, port, hub_port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
-                return REV_OG_USB_PORTS.get(str(hub), hub), "MAIN", port, None
+                return REV_OG_USB_PORTS.get(str(hub), hub), PortGroup.MAIN, port, None
             else:
-                return hub, "MAIN", REV_OG_USB_PORTS.get(str(port), port), None
+                return hub, PortGroup.MAIN, REV_OG_USB_PORTS.get(str(port), port), None
         elif board_revision == BoardRevision.B2:
             if hub == OT3_USB_PORT_GROUP_LEFT:
-                port_group = "LEFT"
+                port_group = PortGroup.LEFT
             elif hub == OT3_USB_PORT_GROUP_RIGHT:
-                port_group = "RIGHT"
+                port_group = PortGroup.RIGHT
             else:
-                port_group = "UNKNOWN"
+                port_group = PortGroup.UNKNOWN
             if hub_port:
                 return hub, port_group, port, hub_port
             else:
                 return None, port_group, port, None
         else:
             if hub and hub == REV_A_USB_HUB:
-                return None, "MAIN", port, None
+                return None, PortGroup.MAIN, port, None
             else:
-                return hub, "MAIN", port, None
+                return hub, PortGroup.MAIN, port, None
 
     def __hash__(self) -> int:
         """

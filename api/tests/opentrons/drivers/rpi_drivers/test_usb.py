@@ -5,7 +5,7 @@ from typing import Iterator, cast
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
 from opentrons.drivers.rpi_drivers.usb import USBBus
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 fake_bus_og = [
     "/sys/bus/usb/devices/usb1/dev",
@@ -68,7 +68,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         name=expected_name,
         port_number=1,
         device_path="1.0/tty/ttyACM1/dev",
-        port_group="MAIN",
+        port_group=PortGroup.MAIN,
     )
 
     # TODO(mc, 2022-03-01): figure out why this section of the test doesn't
@@ -86,5 +86,5 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=3,
             hub=2,
             device_path="1.0/tty/ttyACM2/dev",
-            port_group="MAIN",
+            port_group=PortGroup.MAIN,
         )
