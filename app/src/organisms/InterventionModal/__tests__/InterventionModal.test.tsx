@@ -69,6 +69,18 @@ describe('InterventionModal', () => {
       oldDisplayLocation: 'Slot 1',
       newDisplayLocation: 'Slot 2',
       deckDef: ot2StandardDeckDef as any,
+      labwareAnimationParams: {
+        movementParams: {
+          xMovement: 42,
+          yMovement: 42,
+          begin: '',
+          duration: '',
+        },
+        splashParams: {
+          inParams: { begin: '', duration: '' },
+          outParams: { begin: '', duration: '' },
+        },
+      },
     }
     const { getByText } = render(props)
     getByText('Move Labware')
