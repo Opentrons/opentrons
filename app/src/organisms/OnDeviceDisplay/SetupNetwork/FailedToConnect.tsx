@@ -92,9 +92,8 @@ export function FailedToConnect({
               alignItems={ALIGN_CENTER}
             >
               <StyledText
-                fontSize="2rem"
+                as="h3"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                lineHeight="2.72375rem"
                 marginTop={SPACING.spacing40}
               >
                 {isInvalidPassword
