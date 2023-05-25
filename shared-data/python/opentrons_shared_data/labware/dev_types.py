@@ -16,6 +16,7 @@ LabwareDisplayCategory = Union[
     Literal["trash"],
     Literal["wellPlate"],
     Literal["aluminumBlock"],
+    Literal["adapter"],
     Literal["other"],
 ]
 
@@ -25,6 +26,13 @@ LabwareFormat = Union[
     Literal["trough"],
     Literal["irregular"],
     Literal["trash"],
+]
+
+LabwareRoles = Union[
+    Literal["labware"],
+    Literal["fixture"],
+    Literal["adapter"],
+    Literal["maintenance"],
 ]
 
 Circular = Literal["circular"]
@@ -120,3 +128,5 @@ class _RequiredLabwareDefinition(TypedDict):
 
 class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     stackingOverlapWithLabware: Dict[str, float]
+    stackingOverlapWithModule: Dict[str, float]
+    allowed_roles: List[LabwareRoles]

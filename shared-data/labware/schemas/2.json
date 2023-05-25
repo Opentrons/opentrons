@@ -40,6 +40,7 @@
         "trash",
         "wellPlate",
         "aluminumBlock",
+        "adapter",
         "other"
       ]
     },
@@ -304,16 +305,24 @@
         }
       }
     },
+    "allowed_roles": {
+      "type": "array",
+      "description": "Allowed behaviors and usage of a labware in a protocol.",
+      "items": {
+        "type": "string",
+        "enum": ["labware", "adapter", "fixture", "maintenance"]
+      }
+    },
     "stackingOverlapWithLabware": {
       "type": "object",
-      "description": "Supported labware that can be stacked upon, with overlap height between both labware",
+      "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
       "additionalProperties": {
         "type": "number"
       }
     },
     "stackingOverlapWithModule": {
       "type": "object",
-      "description": "Supported module that can be stacked upon, with overlap height between labware and module",
+      "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
       "additionalProperties": {
         "type": "number"
       }

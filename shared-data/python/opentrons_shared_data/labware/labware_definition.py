@@ -75,6 +75,13 @@ class DisplayCategory(str, Enum):
     other = "other"
 
 
+class LabwareRole(str, Enum):
+    labware = "labware"
+    fixture = "fixture"
+    adapter = "adapter"
+    maintenance = "maintenance"
+
+
 class Metadata(BaseModel):
     """
     Properties used for search and display
@@ -261,4 +268,18 @@ class LabwareDefinition(BaseModel):
         ...,
         description="Logical well groupings for metadata/display purposes; "
         "changes in groups do not affect protocol execution",
+    )
+    allowed_roles: List[LabwareRole] = Field(
+        default_factory=list,
+        description="Allowed behaviors and usage of a labware in a protocol.",
+    )
+    stackingOverlapWithLabware: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Supported labware that can be stacked upon,"
+        " with overlap height between both labware.",
+    )
+    stackingOverlapWithModule: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Supported module that can be stacked upon,"
+        " with overlap height between labware and module.",
     )
