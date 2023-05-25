@@ -129,4 +129,4 @@ class _RequiredLabwareDefinition(TypedDict):
 class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     stackingOverlapWithLabware: Dict[str, float]
     stackingOverlapWithModule: Dict[str, float]
-    allowed_roles: List[LabwareRoles]
+    allowedRoles: List[LabwareRoles]

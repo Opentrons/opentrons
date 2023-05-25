@@ -305,7 +305,7 @@
         }
       }
     },
-    "allowed_roles": {
+    "allowedRoles": {
       "type": "array",
       "description": "Allowed behaviors and usage of a labware in a protocol.",
       "items": {

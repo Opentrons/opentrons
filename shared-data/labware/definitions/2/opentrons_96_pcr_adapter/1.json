@@ -1009,7 +1009,7 @@
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
-  "allowed_roles": ["adapter"],
+  "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,

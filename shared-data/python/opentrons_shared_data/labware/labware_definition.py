@@ -269,7 +269,7 @@ class LabwareDefinition(BaseModel):
         description="Logical well groupings for metadata/display purposes; "
         "changes in groups do not affect protocol execution",
     )
-    allowed_roles: List[LabwareRole] = Field(
+    allowedRoles: List[LabwareRole] = Field(
         default_factory=list,
         description="Allowed behaviors and usage of a labware in a protocol.",
     )
