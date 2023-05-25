@@ -121,7 +121,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState !== null &&
       currentRequestState.status === RobotApi.PENDING
     ) {
-      return <ConnectingNetwork />
+      return <ConnectingNetwork ssid={changeState.ssid} />
     } else if (
       changeState.ssid != null &&
       currentRequestState !== null &&
@@ -177,7 +177,7 @@ export function ConnectViaWifi(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} OnDevice />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}

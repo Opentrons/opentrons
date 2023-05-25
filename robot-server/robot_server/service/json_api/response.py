@@ -13,7 +13,7 @@ class ResourceModel(BaseModel):
     id: str = Field(..., description="Unique identifier of the resource.")
 
 
-ResponseDataT = TypeVar("ResponseDataT", bound=BaseModel)
+ResponseDataT = TypeVar("ResponseDataT")
 ResponseLinksT = TypeVar("ResponseLinksT")
 
 
@@ -188,3 +188,9 @@ class DeprecatedMultiResponseModel(
         None,
         description=DESCRIPTION_LINKS,
     )
+
+
+class ResponseList(BaseModel, Generic[ResponseDataT]):
+    """A response that returns a list resource."""
+
+    __root__: List[ResponseDataT]

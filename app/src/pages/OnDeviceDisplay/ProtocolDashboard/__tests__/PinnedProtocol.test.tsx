@@ -3,10 +3,10 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import type { ProtocolResource } from '@opentrons/shared-data'
-
 import { i18n } from '../../../../i18n'
 import { PinnedProtocol } from '../PinnedProtocol'
+
+import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -34,10 +34,12 @@ const mockProtocol: ProtocolResource = {
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
 
+const props = { protocol: mockProtocol, longPress: jest.fn() }
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <PinnedProtocol protocol={mockProtocol} />
+      <PinnedProtocol {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -60,6 +62,7 @@ describe('Pinned Protocol', () => {
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     jest.advanceTimersByTime(1005)
+    expect(props.longPress).toHaveBeenCalled()
     getByText('Run protocol')
     // This should ne "Unpin protocol" but I don't know how to pass state into the render
     // call so the longpress modal can see the pinned ids.

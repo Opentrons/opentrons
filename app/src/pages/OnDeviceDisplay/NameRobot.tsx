@@ -160,9 +160,7 @@ export function NameRobot(): JSX.Element {
         <ConfirmRobotName robotName={newName} />
       ) : (
         <>
-          {isInitialSetup ? (
-            <StepMeter totalSteps={5} currentStep={4} OnDevice />
-          ) : null}
+          {isInitialSetup ? <StepMeter totalSteps={5} currentStep={4} /> : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
             marginTop={SPACING.spacing32}

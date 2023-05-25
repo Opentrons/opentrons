@@ -14,23 +14,21 @@ import {
   Icon,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
-// import { PrimaryButton } from '../../atoms/buttons'
-import usbImage from '../../assets/images/on-device-display/usb@x2.png'
+import { MediumButton } from '../../atoms/buttons'
 
-// Note: kj 12/06/2022 The commented-out lines will be activated when the check function is ready
 export function ConnectViaUSB(): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  // const [isConnected, setIsConnected] = React.useState<boolean>(true)
-  // const connectedDescription = t('successfully_connected')
-  // const buttonLabel = t('next_step')
+  // ToDo (kj:05/16/2023) isConnected part will be implemented later
+  const isConnected = false
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} OnDevice />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
@@ -42,99 +40,95 @@ export function ConnectViaUSB(): JSX.Element {
           position={POSITION_RELATIVE}
           marginBottom={SPACING.spacing40}
         >
-          {/* this path is temporary and it will be update soon */}
           <Btn
             position={POSITION_ABSOLUTE}
             left="0"
             onClick={() => history.push('/network-setup')}
           >
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-              <Icon name="chevron-left" size="1.9375rem" />
-              <StyledText
-                fontSize="1.625rem"
-                lineHeight="2.1875rem"
-                fontWeight="700"
-              >
-                {t('shared:back')}
-              </StyledText>
+              <Icon
+                name="back"
+                size="3rem"
+                aria-label="Connect_via_usb_back_button"
+              />
             </Flex>
           </Btn>
           <Flex>
-            <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
-              {t('connect_via', { type: t('usb') })}
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+              {t('usb')}
             </StyledText>
           </Flex>
         </Flex>
-        {/* {isConnected ? (
-          <ConnectedViaDesktopApp
-            description={connectedDescription}
-            buttonLabel={buttonLabel}
-          />
-        ) : ( */}
-        <Flex
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.darkGreyDisabled}
-          flexDirection={DIRECTION_COLUMN}
-          height="26.3125rem"
-        >
-          <img
-            width="322"
-            height="181"
-            alt="connect to a robot via "
-            src={usbImage}
-          />
-          <StyledText
-            marginTop={SPACING.spacing32}
-            marginX={SPACING.spacing40}
-            textAlign={TYPOGRAPHY.textAlignCenter}
+        {isConnected ? (
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              backgroundColor={COLORS.green3}
+              borderRadius={BORDERS.size3}
+              height="18.5rem"
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_CENTER}
+              gridGap={SPACING.spacing32}
+            >
+              <Icon name="ot-check" size="3rem" color={COLORS.green2} />
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing4}
+                alignItems={ALIGN_CENTER}
+              >
+                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {t('successfully_connected')}
+                </StyledText>
+                <StyledText
+                  as="h4"
+                  color={COLORS.darkBlack70}
+                  textAlign={TYPOGRAPHY.textAlignCenter}
+                >
+                  {t('find_your_robot')}
+                </StyledText>
+              </Flex>
+            </Flex>
+            <MediumButton
+              buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+              onClick={() => history.push('/robot-settings/update-robot')}
+            />
+          </Flex>
+        ) : (
+          <Flex
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            backgroundColor={COLORS.darkBlack20}
+            flexDirection={DIRECTION_COLUMN}
+            padding={`${SPACING.spacing48} ${SPACING.spacing80}`}
+            gridGap={SPACING.spacing32}
+            height="25.25rem"
+            borderRadius={BORDERS.size3}
           >
-            {t('connect_via_usb_description')}
-          </StyledText>
-        </Flex>
-        {/* )} */}
+            <Icon name="ot-alert" size="3rem" />
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing4}
+              justifyContent={JUSTIFY_CENTER}
+              alignItems={ALIGN_CENTER}
+            >
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {t('no_connection_found')}
+              </StyledText>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
+                  {t('connect_via_usb_description_1')}
+                </StyledText>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
+                  {t('connect_via_usb_description_2')}
+                </StyledText>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
+                  {t('connect_via_usb_description_3')}
+                </StyledText>
+              </Flex>
+            </Flex>
+          </Flex>
+        )}
       </Flex>
     </>
   )
 }
-
-// interface ConnectedViaDesktopAppProps {
-//   description: string
-//   buttonLabel: string
-// }
-
-// ToDo: kj 12/06/2022 need a function to check the robot has been connected via the desktop app
-// Frank will be able to add that
-/*
-const ConnectedViaDesktopApp = ({
-  description,
-  buttonLabel,
-}: ConnectedViaDesktopAppProps): JSX.Element => (
-  <>
-    <Flex
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.successBackgroundMed}
-      flexDirection={DIRECTION_COLUMN}
-      height="20.4375rem"
-    >
-      <Icon name="ot-check" size="4.375rem" color={COLORS.successEnabled} />
-      <StyledText
-        marginTop={SPACING.spacing40}
-        textAlign={TYPOGRAPHY.textAlignCenter}
-        color={COLORS.black}
-        fontSize="1.625rem"
-        lineHeight="2.1875rem"
-        fontWeight="700"
-      >
-        {description}
-      </StyledText>
-    </Flex>
-    <PrimaryButton marginTop={SPACING.spacing24} height="4.4375rem" width="100%">
-      <StyledText fontSize="1.5rem" lineHeight="1.375rem" fontWeight="500">
-        {buttonLabel}
-      </StyledText>
-    </PrimaryButton>
-  </>
-)
-*/

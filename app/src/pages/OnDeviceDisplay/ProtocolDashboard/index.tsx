@@ -15,6 +15,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   useLongPress,
+  POSITION_STICKY,
+  POSITION_STATIC,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
@@ -33,7 +35,7 @@ import { LongPressModal } from './LongPressModal'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 
-import imgSrc from '../../../assets/images/on-device-display/abstract@x2.png'
+import imgSrc from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
 import type { Dispatch } from '../../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
@@ -45,6 +47,11 @@ export function ProtocolDashboard(): JSX.Element {
   const runs = useAllRunsQuery()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
+  const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
+  const [
+    longPressModalIsOpened,
+    setLongPressModalOpened,
+  ] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data != null ? protocols.data?.data : []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
@@ -92,7 +99,6 @@ export function ProtocolDashboard(): JSX.Element {
 
   const runData = runs.data?.data != null ? runs.data?.data : []
   const sortedProtocols = sortProtocols(sortBy, unpinnedProtocols, runData)
-
   const handleProtocolsBySortKey = (
     sortKey: ProtocolsOnDeviceSortKey
   ): void => {
@@ -129,34 +135,46 @@ export function ProtocolDashboard(): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="25rem"
       paddingX={SPACING.spacing40}
+      paddingBottom={SPACING.spacing40}
     >
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation
+        routes={onDeviceDisplayRoutes}
+        setNavMenuIsOpened={setNavMenuIsOpened}
+        longPressModalIsOpened={longPressModalIsOpened}
+      />
       {pinnedProtocols.length > 0 && (
-        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing16}>
+        <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing32}>
           <StyledText
-            fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            marginBottom="0.5rem"
+            as="p"
+            marginBottom={SPACING.spacing8}
+            color={COLORS.darkBlack70}
           >
             {t('pinned_protocols')}
           </StyledText>
-          <PinnedProtocolCarousel pinnedProtocols={pinnedProtocols} />
+          <PinnedProtocolCarousel
+            pinnedProtocols={pinnedProtocols}
+            longPress={setLongPressModalOpened}
+          />
         </Flex>
       )}
       {sortedProtocols.length > 0 ? (
         <>
           <Flex
-            alignItems="center"
+            alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.white}
             flexDirection={DIRECTION_ROW}
             paddingBottom={SPACING.spacing16}
             paddingTop={SPACING.spacing16}
-            position="sticky"
-            top="0px"
+            position={
+              navMenuIsOpened || longPressModalIsOpened
+                ? POSITION_STATIC
+                : POSITION_STICKY
+            }
+            top="7.75rem"
+            zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
             width="100%"
           >
-            <Flex width="32.3125rem">
+            <Flex width="30.75rem">
               <SmallButton
                 buttonText={t('protocol_name_title')}
                 buttonType={
@@ -175,7 +193,7 @@ export function ProtocolDashboard(): JSX.Element {
                 onClick={handleSortByName}
               />
             </Flex>
-            <Flex justifyContent="center" width="12rem">
+            <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
               <SmallButton
                 buttonText={t('last_run')}
                 buttonType={
@@ -194,7 +212,7 @@ export function ProtocolDashboard(): JSX.Element {
                 onClick={handleSortByLastRun}
               />
             </Flex>
-            <Flex justifyContent="center" width="17rem">
+            <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
               <SmallButton
                 buttonText={t('date_added')}
                 buttonType={
@@ -225,6 +243,7 @@ export function ProtocolDashboard(): JSX.Element {
                   key={protocol.id}
                   lastRun={lastRun}
                   protocol={protocol}
+                  longPress={setLongPressModalOpened}
                 />
               )
             })}
@@ -239,22 +258,23 @@ export function ProtocolDashboard(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               height="27.25rem"
               justifyContent={JUSTIFY_CENTER}
+              borderRadius={BORDERS.size3}
             >
-              <img title={t('nothing_here_yet')} src={imgSrc} />
+              <img
+                title={t('nothing_here_yet')}
+                src={imgSrc}
+                width="284px"
+                height="166px"
+              />
               <StyledText
-                fontSize={TYPOGRAPHY.fontSize32}
+                as="h3"
                 fontWeight={TYPOGRAPHY.fontWeightBold}
-                lineHeight={TYPOGRAPHY.lineHeight42}
                 marginTop={SPACING.spacing16}
                 marginBottom={SPACING.spacing8}
               >
                 {t('nothing_here_yet')}
               </StyledText>
-              <StyledText
-                fontSize={TYPOGRAPHY.fontSize28}
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                lineHeight={TYPOGRAPHY.lineHeight36}
-              >
+              <StyledText as="h4" color={COLORS.darkBlack70}>
                 {t('send_a_protocol_to_store')}
               </StyledText>
             </Flex>
@@ -267,9 +287,10 @@ export function ProtocolDashboard(): JSX.Element {
 
 export function ProtocolCard(props: {
   protocol: ProtocolResource
+  longPress: React.Dispatch<React.SetStateAction<boolean>>
   lastRun?: string
 }): JSX.Element {
-  const { protocol, lastRun } = props
+  const { protocol, lastRun, longPress } = props
   const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
@@ -284,25 +305,27 @@ export function ProtocolCard(props: {
     }
   }
 
+  React.useEffect(() => {
+    if (longpress.isLongPressed) {
+      longPress(true)
+    }
+  }, [longpress.isLongPressed, longPress])
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.size4}
-      fontSize={TYPOGRAPHY.fontSize22}
-      lineHeight={TYPOGRAPHY.lineHeight28}
       marginBottom={SPACING.spacing8}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
-      <Flex width="30.8125rem" overflowWrap="anywhere">
-        <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {protocolName}
-        </StyledText>
+      <Flex width="30.75rem" overflowWrap="anywhere">
+        <StyledText as="p">{protocolName}</StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
-        <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+        <StyledText as="p" color={COLORS.darkBlack70}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -311,8 +334,8 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
-        <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
-          {format(new Date(protocol.createdAt), 'Pp')}
+        <StyledText as="p" color={COLORS.darkBlack70}>
+          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
         </StyledText>
         {longpress.isLongPressed && (
           <LongPressModal longpress={longpress} protocolId={protocol.id} />

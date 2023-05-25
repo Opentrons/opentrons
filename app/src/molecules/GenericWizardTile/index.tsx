@@ -57,6 +57,16 @@ const HEADER_STYLE = css`
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 `
+
+const TILE_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 30rem;
+  }
+`
 export interface GenericWizardTileProps {
   rightHandBody: React.ReactNode
   bodyText: React.ReactNode
@@ -103,12 +113,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height={isOnDevice ? '30rem' : '24.625rem'}
-      padding={SPACING.spacing32}
-    >
+    <Flex css={TILE_CONTAINER_STYLE}>
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}

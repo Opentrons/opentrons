@@ -127,7 +127,6 @@ export function RunningProtocol(): JSX.Element {
                 ? Number(currentRunCommandIndex) + 1
                 : 1
             }
-            OnDevice
           />
         ) : null}
         {showConfirmCancelRunModal ? (

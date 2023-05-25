@@ -48,13 +48,14 @@ from .types import (
 )
 from .errors import (
     MustHomeError,
+    NotSupportedByHardware,
 )
 from . import modules
 from .robot_calibration import (
     RobotCalibrationProvider,
     RobotCalibration,
 )
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
@@ -78,7 +79,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[RobotCalibration],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -571,9 +572,17 @@ class API(
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home the entire robot and initialize current position."""
+        # Should we assert/ raise an error or just remove non-ot2 axes and log warning?
+        # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
+        # can still explicitly specify an OT3 axis even when working on an OT2.
+        # Adding this check in order to prevent misuse of axes types.
+        if axes and any(axis not in Axis.ot2_axes() for axis in axes):
+            raise NotSupportedByHardware(
+                f"At least one axis in {axes} is not supported on the OT2."
+            )
         self._reset_last_mount()
         # Initialize/update current_position
-        checked_axes = axes or [ax for ax in Axis]
+        checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}

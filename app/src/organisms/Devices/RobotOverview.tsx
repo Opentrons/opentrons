@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
 import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
@@ -76,7 +76,7 @@ export function RobotOverview({
         >
           <Flex>
             <img
-              src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+              src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
               style={{
                 width: '6rem',
                 height: '5.4375rem',

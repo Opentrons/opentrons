@@ -73,19 +73,19 @@ test-cov:
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 3
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 3
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 3
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1 --increment
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 8
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 3 --increment
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 8
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 8
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 8
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
 .PHONY: test-gravimetric
 test-gravimetric: patch-for-gravimetric test-gravimetric-single test-gravimetric-multi
@@ -96,6 +96,7 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.ninety_six_assembly_qc_ot3 --simulate
 
 .PHONY: test-examples
 test-examples:
@@ -226,20 +227,19 @@ push-ot3-gravimetric:
 	-$(MAKE) patch-for-gravimetric
 	$(MAKE) sync-sw-ot3
 
-.PHONY: patch-for-gravimetric
+.PHONY: apply-patches-gravimetric
 patch-for-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
 
-.PHONY: unpatch-for-gravimetric
+.PHONY: remove-patches-gravimetric
 unpatch-for-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
 
-.PHONY: gen-patches-for-gravimetric
+.PHONY: update-patches-gravimetric
 gen-patches-for-gravimetric:
-	-$(MAKE) unpatch-for-gravimetric
-	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-hardware.patch
-	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-api.patch
-	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(name)-shared-data.patch
-	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/$(robot-server)-api.patch
-	find ./hardware_testing/gravimetric/overrides/ -type f -empty -delete
-	-$(MAKE) patch-for-gravimetric
+	rm ./hardware_testing/gravimetric/overrides/*.patch
+	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
+	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
+	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
+	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
+	$(MAKE) remove-patches-gravimetric

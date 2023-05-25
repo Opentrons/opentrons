@@ -19,6 +19,7 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
+from .._types import OffDeckType
 
 
 class AbstractProtocol(
@@ -72,7 +73,7 @@ class AbstractProtocol(
     def move_labware(
         self,
         labware_core: LabwareCoreType,
-        new_location: Union[DeckSlotName, ModuleCoreType],
+        new_location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,

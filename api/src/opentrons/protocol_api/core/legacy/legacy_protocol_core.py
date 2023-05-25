@@ -17,6 +17,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ..._liquid import Liquid
+from ..._types import OffDeckType
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -75,7 +76,7 @@ class LegacyProtocolCore(
         self._equipment_broker = equipment_broker or EquipmentBroker()
 
         self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
-            mount: None for mount in Mount
+            mount: None for mount in Mount.ot2_mounts()  # Legacy core works only on OT2
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
@@ -222,7 +223,9 @@ class LegacyProtocolCore(
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,
-        new_location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore],
+        new_location: Union[
+            DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType
+        ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
