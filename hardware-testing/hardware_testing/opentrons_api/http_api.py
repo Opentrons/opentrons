@@ -1,6 +1,6 @@
 """Module to handle Opentrons Protocol Engine HTTP API."""
 from time import sleep
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 import requests
 
 from hardware_testing.opentrons_api.types import Point
@@ -54,6 +54,9 @@ class OpentronsHTTPAPI:
     def run_id(self) -> Optional[str]:
         """The current run id."""
         return self._run_id
+
+    def get_health(self) -> Dict[str, Any]:
+        return requests.get(headers=HEADERS, url=f'{self._base_url}/health').json()
 
     def create_run(self) -> Optional[str]:
         """Create a run and return the run_id."""
@@ -337,3 +340,15 @@ class OpentronsHTTPAPI:
             msg = f"Failed to {lid_state} lid: {error_type} - {error_details}"
             raise RuntimeError(msg)
         return True
+
+    def get_instruments(self) -> List[Dict[str, Any]]:
+        return requests.get(f'{self._base_url}/instruments', headers=HEADERS).json()['data']
+
+    def get_subsystems(self) -> List[Dict[str, Any]]:
+        return requests.get(f'{self._base_url}/subsystems/status', headers=HEADERS).json()['data']
+
+    def update_subsystem(self, subsystem: str) -> str:
+        return requests.post(f'{self._base_url}/subsystems/updates/{subsystem}', headers=HEADERS).json()['data']['id']
+
+    def get_update_status(self, update_id: str) -> Dict[str, Any]:
+        return requests.get(f'{self._base_url}/subsystems/updates/all/{update_id}', headers=HEADERS).json()['data']
