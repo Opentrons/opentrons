@@ -7,7 +7,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point
-from opentrons.hardware_control.types import CriticalPoint, Axis
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -72,7 +72,6 @@ class MoveToMaintenancePositionImplementation(
             critical_point=CriticalPoint.MOUNT,
         )
 
-        await self._hardware_api.disengage_axes([Axis.Z, Axis.A])
         return MoveToMaintenancePositionResult()
 
 
