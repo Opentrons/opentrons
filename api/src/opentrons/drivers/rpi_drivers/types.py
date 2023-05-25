@@ -25,6 +25,7 @@ class USBPort:
     device_path: str = ""
     hub: Optional[int] = None
     port_group: str = ""
+    hub_port: Optional[int] = None
 
     @classmethod
     def build(cls, port_path: str, board_revision: BoardRevision) -> "USBPort":
@@ -43,12 +44,13 @@ class USBPort:
         """
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
-        hub, port, name = cls.find_hub(port_nodes)
-        hub, port_group, port = cls.map_to_revision(
+        hub, port, hub_port, name = cls.find_hub(port_nodes)
+        hub, port_group, port, hub_port = cls.map_to_revision(
             board_revision,
             (
                 hub,
                 port,
+                hub_port,
             ),
         )
         return cls(
@@ -57,10 +59,13 @@ class USBPort:
             device_path=device_path,
             hub=hub,
             port_group=port_group,
+            hub_port=hub_port,
         )
 
     @staticmethod
-    def find_hub(port_nodes: List[str]) -> Tuple[Optional[int], int, str]:
+    def find_hub(
+        port_nodes: List[str],
+    ) -> Tuple[Optional[int], int, Optional[int], str]:
         """
         Find Hub.
 
@@ -78,16 +83,24 @@ class USBPort:
         :param port_nodes: A list of unique port id(s)
         :returns: Tuple of the port number, hub and name
         """
-        if len(port_nodes) > 1:
-            port_info = port_nodes[1].split(".")
-            hub: Optional[int] = int(port_info[1])
+        if len(port_nodes) > 2:
+            port_info = port_nodes[2].split(".")
+            hub: Optional[int] = int(port_info[1])  # also port_group
             port = int(port_info[2])
+            hub_port: Optional[int] = int(port_info[3])
+            name = port_nodes[2]
+        elif len(port_nodes) > 1:
+            port_info = port_nodes[1].split(".")
+            hub = int(port_info[1])
+            port = int(port_info[2])
+            hub_port = None
             name = port_nodes[1]
         else:
             port = int(port_nodes[0].split(".")[1])
             hub = None
+            hub_port = None
             name = port_nodes[0]
-        return hub, port, name
+        return hub, port, hub_port, name
 
     @staticmethod
     def get_unique_nodes(full_name: str) -> List[str]:
@@ -111,28 +124,31 @@ class USBPort:
 
     @staticmethod
     def map_to_revision(
-        board_revision: BoardRevision, port_info: Tuple[Optional[int], int]
-    ) -> Tuple[Optional[int], str, int]:
-        hub, port = port_info
+        board_revision: BoardRevision,
+        port_info: Tuple[Optional[int], int, Optional[int]],
+    ) -> Tuple[Optional[int], str, int, Optional[int]]:
+        hub, port, hub_port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
-                return REV_OG_USB_PORTS.get(str(hub), hub), "MAIN", port
+                return REV_OG_USB_PORTS.get(str(hub), hub), "MAIN", port, None
             else:
-                return hub, "MAIN", REV_OG_USB_PORTS.get(str(port), port)
+                return hub, "MAIN", REV_OG_USB_PORTS.get(str(port), port), None
         elif board_revision == BoardRevision.B2:
-            # what will hub look like??
             if hub == OT3_USB_PORT_GROUP_LEFT:
                 port_group = "LEFT"
             elif hub == OT3_USB_PORT_GROUP_RIGHT:
                 port_group = "RIGHT"
             else:
                 port_group = "UNKNOWN"
-            return None, port_group, port
+            if hub_port:
+                return hub, port_group, port, hub_port
+            else:
+                return None, port_group, port, None
         else:
             if hub and hub == REV_A_USB_HUB:
-                return None, "MAIN", port
+                return None, "MAIN", port, None
             else:
-                return hub, "MAIN", port
+                return hub, "MAIN", port, None
 
     def __hash__(self) -> int:
         """
