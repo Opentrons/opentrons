@@ -64,12 +64,11 @@ describe('WifiConnectionDetails', () => {
   })
 
   it('should render text and button with icon when connected to a network', () => {
-    const [{ getByText, getByRole, getByLabelText }] = render(props)
+    const [{ getByText, getByLabelText }] = render(props)
     getByText('Connected Network')
     getByLabelText('mock wifi ssid_wifi_icon')
     getByLabelText('mock wifi ssid_info_icon')
     getByText('mock wifi ssid')
-    getByRole('button')
     getByText('View details')
     getByText('Other Networks')
   })

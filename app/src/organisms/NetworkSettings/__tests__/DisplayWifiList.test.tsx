@@ -50,6 +50,7 @@ describe('DisplayWifiList', () => {
       setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setChangeState: mockSetChangeState,
       setSelectedSsid: mockSetSelectedSsid,
+      isHeader: true,
     }
     mockDisplaySearchNetwork.mockReturnValue(
       <div>mock DisplaySearchNetwork</div>

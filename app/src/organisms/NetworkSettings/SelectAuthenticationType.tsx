@@ -15,7 +15,7 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   DISPLAY_FLEX,
-  JUSTIFY_START,
+  // JUSTIFY_START,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'

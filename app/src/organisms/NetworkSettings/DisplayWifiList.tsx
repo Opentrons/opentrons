@@ -103,7 +103,6 @@ export function DisplayWifiList({
         ? list.map(nw => (
             <Btn
               display={DISPLAY_FLEX}
-              // width="59rem"
               width="100%"
               height="5rem"
               key={nw.ssid}
