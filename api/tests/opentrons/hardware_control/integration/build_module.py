@@ -30,7 +30,14 @@ async def build_module(
     module = await module_cls.build(
         port=f"socket://127.0.0.1:{port}",
         execution_manager=execution_manager,
-        usb_port=USBPort(name="", port_number=1, port_group=PortGroup.UNKNOWN, device_path="", hub=1, hub_port=None),
+        usb_port=USBPort(
+            name="",
+            port_number=1,
+            port_group=PortGroup.UNKNOWN,
+            device_path="",
+            hub=1,
+            hub_port=None,
+        ),
         hw_control_loop=asyncio.get_running_loop(),
         poll_interval_seconds=poll_interval_seconds,
     )
