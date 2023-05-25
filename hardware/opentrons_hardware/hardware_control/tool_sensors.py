@@ -89,7 +89,6 @@ async def liquid_probe(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
-        acceleration={head_node: mount_speed, tool: plunger_speed},
         stop_condition=MoveStopCondition.sync_line,
     )
 
