@@ -63,6 +63,7 @@ interface DisplayWifiListProps {
   ) => void
   setChangeState: (changeState: NetworkChangeState) => void
   setSelectedSsid: (selectedSsid: string) => void
+  isHeader?: boolean
 }
 
 export function DisplayWifiList({
@@ -70,6 +71,7 @@ export function DisplayWifiList({
   setShowSelectAuthenticationType,
   setChangeState,
   setSelectedSsid,
+  isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isSearching, setIsSearching] = React.useState<boolean>(false)
@@ -94,12 +96,15 @@ export function DisplayWifiList({
 
   return (
     <>
-      <HeaderWithIPs isSearching={isSearching} hasSsid={hasSsid} />
+      {isHeader ? (
+        <HeaderWithIPs isSearching={isSearching} hasSsid={hasSsid} />
+      ) : null}
       {list != null && list.length > 0
         ? list.map(nw => (
             <Btn
               display={DISPLAY_FLEX}
-              width="59rem"
+              // width="59rem"
+              width="100%"
               height="5rem"
               key={nw.ssid}
               backgroundColor={COLORS.light1}

@@ -83,6 +83,7 @@ export function ConnectViaWifi(): JSX.Element {
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
           setSelectedSsid={setSelectedSsid}
+          isHeader
         />
       )
     } else if (changeState.type === JOIN_OTHER && changeState.ssid === null) {

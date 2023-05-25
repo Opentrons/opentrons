@@ -15,6 +15,9 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   DISPLAY_FLEX,
+  JUSTIFY_START,
+  POSITION_RELATIVE,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -22,6 +25,7 @@ import { RadioButton, SmallButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
+import { useIsFinishedUnboxing } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../redux/types'
@@ -57,6 +61,7 @@ export function SelectAuthenticationType({
     showAlternativeSecurityTypeModal,
     setShowAlternativeSecurityTypeModal,
   ] = React.useState<boolean>(false)
+  const isInitialSetup = useIsFinishedUnboxing()
 
   const handleClickBack = (): void => {
     if (fromWifiList != null) {
@@ -105,26 +110,36 @@ export function SelectAuthenticationType({
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          // justifyContent={JUSTIFY_SPACE_BETWEEN}
+          justifyContent={
+            isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
+          }
+          position={POSITION_RELATIVE}
           alignItems={ALIGN_CENTER}
           marginBottom="2.2625rem"
         >
-          <Btn onClick={handleClickBack}>
-            <Flex flexDirection={DIRECTION_ROW}>
-              <Icon name="back" marginRight={SPACING.spacing4} size="3rem" />
-            </Flex>
-          </Btn>
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            {t('select_a_security_type')}
-          </StyledText>
-          <SmallButton
-            buttonType="primary"
-            buttonCategory="rounded"
-            buttonText={i18n.format(t('continue'), 'capitalize')}
-            onClick={() => {
-              setShowSelectAuthenticationType(false)
-            }}
-          />
+          <Flex position={POSITION_ABSOLUTE} left="0">
+            <Btn onClick={handleClickBack}>
+              <Flex flexDirection={DIRECTION_ROW}>
+                <Icon name="back" marginRight={SPACING.spacing4} size="3rem" />
+              </Flex>
+            </Btn>
+          </Flex>
+          <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+              {t('select_a_security_type')}
+            </StyledText>
+          </Flex>
+          <Flex position={POSITION_ABSOLUTE} right="0">
+            <SmallButton
+              buttonType="primary"
+              buttonCategory="rounded"
+              buttonText={i18n.format(t('continue'), 'capitalize')}
+              onClick={() => {
+                setShowSelectAuthenticationType(false)
+              }}
+            />
+          </Flex>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
           <Flex
