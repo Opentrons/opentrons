@@ -201,7 +201,6 @@ Once you are inside the repository for the first time, you should do two things:
 2. Tell `pyenv` to use Python 3.7
 3. If you aren't seeing `python --version` for an M1 Mac outputing the right value, try running `pyenv init` then run `pyenv local 3.7.15` and see if it works this time when you select `python -version`.
 
-
 ```shell
 # confirm Node v16
 node --version
