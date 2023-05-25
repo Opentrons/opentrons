@@ -5735,7 +5735,7 @@
         "max": 100
       },
       "quirks": ["pickupTipShake"],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_single_v3.1": {
@@ -5930,7 +5930,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_single_v3.3": {
@@ -6125,7 +6125,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_single_v3.4": {
@@ -6320,7 +6320,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p50_single_v3.0": {
@@ -6486,7 +6486,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v3.1": {
@@ -6653,7 +6653,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v3.3": {
@@ -6822,7 +6822,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v3.4": {
@@ -6991,7 +6991,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v4.3": {
@@ -7160,7 +7160,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.0": {
@@ -7355,7 +7355,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.82,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.1": {
@@ -7550,7 +7550,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.82,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.3": {
@@ -7745,7 +7745,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.82,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.4": {
@@ -7940,7 +7940,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.82,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.0": {
@@ -8107,7 +8107,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.1": {
@@ -8274,7 +8274,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.3": {
@@ -8443,7 +8443,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.4": {
@@ -8612,7 +8612,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p1000_96_v1": {
