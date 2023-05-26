@@ -46,6 +46,7 @@ describe('WifiConnectionDetails', () => {
     props = {
       ssid: 'mock wifi ssid',
       authType: 'WPA-2',
+      setShowInterfaceTitle: jest.fn(),
     }
     mockGetLocalRobot.mockReturnValue({
       name: ROBOT_NAME,
@@ -81,7 +82,9 @@ describe('WifiConnectionDetails', () => {
   })
 
   it('should not render text and button when not connected to a network', () => {
-    props = {}
+    props = {
+      setShowInterfaceTitle: jest.fn(),
+    }
     const [{ queryByText }] = render(props)
     expect(queryByText('Connected Network')).not.toBeInTheDocument()
     expect(queryByText('mock wifi ssid')).not.toBeInTheDocument()

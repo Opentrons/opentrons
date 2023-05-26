@@ -47,10 +47,12 @@ const FETCH_WIFI_LIST_MS = 5000
 interface WifiConnectionDetailsProps {
   ssid?: string
   authType?: string
+  setShowInterfaceTitle: (showInterfaceTitle: boolean) => void
 }
 export function WifiConnectionDetails({
   ssid,
   authType,
+  setShowInterfaceTitle,
 }: WifiConnectionDetailsProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const [
@@ -111,6 +113,7 @@ export function WifiConnectionDetails({
   }
 
   const renderScreen = (): JSX.Element | null => {
+    changeState.type != null && setShowInterfaceTitle(false)
     if (changeState.type == null) {
       return null
     } else if (changeState.type === JOIN_OTHER && changeState.ssid === null) {
@@ -132,7 +135,6 @@ export function WifiConnectionDetails({
           setChangeState={setChangeState}
         />
       )
-      // This condition might be changed for manual connect
     } else if (changeState.ssid != null && currentRequestState === null) {
       return (
         <SetWifiCred
@@ -155,10 +157,12 @@ export function WifiConnectionDetails({
       currentRequestState !== null &&
       currentRequestState.status === RobotApi.SUCCESS
     ) {
+      setShowInterfaceTitle(true)
       return (
         <WifiConnectionDetails
           ssid={changeState.ssid}
           authType={selectedAuthType}
+          setShowInterfaceTitle={setShowInterfaceTitle}
         />
       )
     } else if (
@@ -186,8 +190,6 @@ export function WifiConnectionDetails({
   }, [requestState])
 
   React.useEffect(() => {
-    // TODO kj 01/30/2023 This authType None will be fixed in a following PR
-    // a user selects none as authType
     if (selectedSsid !== '' && selectedAuthType === 'none') {
       const network = list.find((nw: WifiNetwork) => nw.ssid === selectedSsid)
       if (network != null) {
@@ -213,88 +215,92 @@ export function WifiConnectionDetails({
           securityType={authType}
         />
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        {renderScreen()}
-        {ssid != null ? (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            marginBottom={SPACING.spacing40}
-          >
+      {changeState.type == null ? (
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          {ssid != null ? (
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing8}
+              marginBottom={SPACING.spacing40}
+            >
+              <StyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                color={COLORS.darkBlack70}
+              >
+                {t('connected_network')}
+              </StyledText>
+              <Btn
+                display={DISPLAY_FLEX}
+                width="100%"
+                padding={SPACING.spacing24}
+                backgroundColor={COLORS.green3}
+                borderRadius={BORDERS.size3}
+                onClick={() => setShowNetworkDetailModal(true)}
+                alignItems={ALIGN_CENTER}
+              >
+                <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+                  <Flex gridGap={SPACING.spacing8} width="34.8125rem">
+                    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
+                      <Icon
+                        name="wifi"
+                        size="2.5rem"
+                        aria-label={`${ssid}_wifi_icon`}
+                      />
+                      <Flex
+                        flexDirection={DIRECTION_COLUMN}
+                        gridGap={SPACING.spacing2}
+                      >
+                        <StyledText
+                          as="h4"
+                          textAlign={TYPOGRAPHY.textAlignLeft}
+                        >
+                          {ssid}
+                        </StyledText>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                  <Flex
+                    alignItems={ALIGN_CENTER}
+                    flexDirection={DIRECTION_ROW}
+                    gridGap={SPACING.spacing12}
+                  >
+                    <Icon
+                      size="2.5rem"
+                      name="info"
+                      aria-label={`${ssid}_info_icon`}
+                    />
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                      color={COLORS.darkBlack70}
+                    >
+                      {t('view_details')}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+              </Btn>
+            </Flex>
+          ) : null}
+          {ssid != null ? (
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkBlack70}
             >
-              {t('connected_network')}
+              {t('other_networks')}
             </StyledText>
-            <Btn
-              display={DISPLAY_FLEX}
-              width="100%"
-              padding={SPACING.spacing24}
-              backgroundColor={COLORS.green3}
-              borderRadius={BORDERS.size3}
-              onClick={() => setShowNetworkDetailModal(true)}
-              alignItems={ALIGN_CENTER}
-            >
-              <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
-                <Flex gridGap={SPACING.spacing8} width="34.8125rem">
-                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
-                    <Icon
-                      name="wifi"
-                      size="2.5rem"
-                      aria-label={`${ssid}_wifi_icon`}
-                    />
-                    <Flex
-                      flexDirection={DIRECTION_COLUMN}
-                      gridGap={SPACING.spacing2}
-                    >
-                      <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
-                        {ssid}
-                      </StyledText>
-                    </Flex>
-                  </Flex>
-                </Flex>
-                <Flex
-                  alignItems={ALIGN_CENTER}
-                  flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing12}
-                >
-                  <Icon
-                    size="2.5rem"
-                    name="info"
-                    aria-label={`${ssid}_info_icon`}
-                  />
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={COLORS.darkBlack70}
-                  >
-                    {t('view_details')}
-                  </StyledText>
-                </Flex>
-              </Flex>
-            </Btn>
-          </Flex>
-        ) : null}
-        {ssid != null ? (
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={COLORS.darkBlack70}
-          >
-            {t('other_networks')}
-          </StyledText>
-        ) : null}
-        {changeState.type == null ? (
+          ) : null}
           <DisplayWifiList
             list={list}
             setShowSelectAuthenticationType={setShowSelectAuthenticationType}
             setChangeState={setChangeState}
             setSelectedSsid={setSelectedSsid}
           />
-        ) : null}
-      </Flex>
+        </Flex>
+      ) : (
+        renderScreen()
+      )}
     </>
   )
 }

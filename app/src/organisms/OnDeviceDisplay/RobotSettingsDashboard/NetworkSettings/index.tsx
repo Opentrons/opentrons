@@ -28,7 +28,7 @@ import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
 import type { ChipType } from '../../../../atoms/Chip'
 import type { SettingOption } from '../../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
-export type ConnectionType = 'wifi' | 'ethernet' // TODO (kj: 04/05/2023) add 'usb' as options once implemented
+export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 
 interface NetworkSettingsProps {
   networkConnection: NetworkConnection
@@ -44,6 +44,9 @@ export function NetworkSettings({
     showDetailsTab,
     setShowDetailsTab,
   ] = React.useState<ConnectionType | null>(null)
+  const [showInterfaceTitle, setShowInterfaceTitle] = React.useState<boolean>(
+    true
+  )
   const {
     isWifiConnected,
     isEthernetConnected,
@@ -64,6 +67,8 @@ export function NetworkSettings({
     screenTitle = 'wifi'
   } else if (showDetailsTab === 'ethernet') {
     screenTitle = 'ethernet'
+  } else if (showDetailsTab === 'usb') {
+    screenTitle = 'usb'
   }
 
   const handleChipType = (isConnected: boolean): ChipType => {
@@ -71,7 +76,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.successBackgroundMed : COLORS.medGreyEnabled
+    isConnected ? COLORS.green3 : COLORS.light1
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
@@ -91,6 +96,7 @@ export function NetworkSettings({
           <WifiConnectionDetails
             ssid={activeSsid}
             authType={connectedWifiAuthType}
+            setShowInterfaceTitle={setShowInterfaceTitle}
           />
         )
       case 'ethernet':
@@ -103,7 +109,6 @@ export function NetworkSettings({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
           >
-            {/* wifi */}
             <NetworkSettingButton
               buttonTitle={t('wifi')}
               buttonBackgroundColor={handleButtonBackgroundColor(
@@ -112,11 +117,9 @@ export function NetworkSettings({
               iconName="wifi"
               chipType={handleChipType(isWifiConnected)}
               chipText={handleChipText(isWifiConnected)}
-              chipIconName="ot-check"
               networkName={activeSsid}
               displayDetailsTab={() => setShowDetailsTab('wifi')}
             />
-            {/* ethernet */}
             <NetworkSettingButton
               buttonTitle={t('ethernet')}
               buttonBackgroundColor={handleButtonBackgroundColor(
@@ -125,10 +128,8 @@ export function NetworkSettings({
               iconName="ethernet"
               chipType={handleChipType(isEthernetConnected)}
               chipText={handleChipText(isEthernetConnected)}
-              chipIconName="ot-check"
               displayDetailsTab={() => setShowDetailsTab('ethernet')}
             />
-            {/* usb hard-coded */}
             <NetworkSettingButton
               buttonTitle={t('usb')}
               buttonBackgroundColor={handleButtonBackgroundColor(
@@ -137,7 +138,6 @@ export function NetworkSettings({
               iconName="usb"
               chipType={handleChipType(isUsbConnected)}
               chipText={handleChipText(isUsbConnected)}
-              chipIconName="ot-check"
               displayDetailsTab={() => console.log('Not Implemented')}
             />
           </Flex>
@@ -147,18 +147,22 @@ export function NetworkSettings({
 
   return (
     <>
-      <Flex
-        padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_START}
-      >
-        <Btn onClick={handleNavigate}>
-          <Icon name="chevron-left" size="2.5rem" />
-        </Btn>
-        <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
-          {t(screenTitle)}
-        </StyledText>
-      </Flex>
+      {showInterfaceTitle ? (
+        <Flex
+          padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_START}
+        >
+          <Btn onClick={handleNavigate}>
+            <Icon name="back" size="3rem" />
+          </Btn>
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+            {t(screenTitle)}
+          </StyledText>
+        </Flex>
+      ) : (
+        <Flex paddingTop={SPACING.spacing32}></Flex>
+      )}
       {renderScreen()}
     </>
   )
@@ -170,7 +174,6 @@ interface NetworkSettingButtonProps {
   iconName: IconName
   chipType: ChipType
   chipText: string
-  chipIconName: IconName
   networkName?: string
   displayDetailsTab: () => void
 }
@@ -180,7 +183,6 @@ function NetworkSettingButton({
   iconName,
   chipType,
   chipText,
-  chipIconName,
   networkName,
   displayDetailsTab,
 }: NetworkSettingButtonProps): JSX.Element {
@@ -220,7 +222,12 @@ function NetworkSettingButton({
             </Flex>
           </Flex>
           <Flex alignItems={ALIGN_CENTER} width="15.1875rem">
-            <Chip type={chipType} text={chipText} iconName={chipIconName} />
+            <Chip
+              type={chipType}
+              text={chipText}
+              iconName="connection-status"
+              background={false}
+            />
           </Flex>
           <Flex justifyContent="flex-end" alignSelf="stretch">
             <Btn onClick={() => console.log('setup')}>

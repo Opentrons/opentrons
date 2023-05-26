@@ -64,7 +64,6 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
 }
 
-// ToDo (kj:02/09/2023) replace hard-coded values when the DS is out
 export function Chip({
   background,
   iconName,

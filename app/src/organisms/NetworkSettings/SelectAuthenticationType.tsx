@@ -15,7 +15,6 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   DISPLAY_FLEX,
-  // JUSTIFY_START,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
@@ -110,7 +109,6 @@ export function SelectAuthenticationType({
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          // justifyContent={JUSTIFY_SPACE_BETWEEN}
           justifyContent={
             isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
           }

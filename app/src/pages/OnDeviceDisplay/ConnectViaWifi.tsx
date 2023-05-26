@@ -132,6 +132,7 @@ export function ConnectViaWifi(): JSX.Element {
         <WifiConnectionDetails
           ssid={changeState.ssid}
           authType={selectedAuthType}
+          // setShowInterfaceTitle={setShowInterfaceTitle}
         />
       )
     } else if (
