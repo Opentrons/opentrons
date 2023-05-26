@@ -239,7 +239,8 @@ class Thermocycler(mod_abc.AbstractModule):
             raise RuntimeError("Lid must be open")
         await self.wait_for_is_running()
         await self._driver.jog_lid(20)
-        await self._wait_for_lid_status(ThermocyclerLidStatus.IN_BETWEEN)
+        # There is NO WAIT for the updated lid stats, because it will always
+        # remain at "open"
 
     async def return_from_raise_plate(self) -> None:
         """Move lid an extra bit."""
