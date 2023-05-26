@@ -14,7 +14,6 @@ There are no changes to the Opentrons App in v6.3.1, but it is required for upda
 
 ---
 
-
 ## Opentrons App Changes in 6.3.0
 
 Welcome to the v6.3.0 release of the Opentrons App!
