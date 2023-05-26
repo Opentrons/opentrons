@@ -5,17 +5,6 @@ marks:
       - ot2_server_base_url
 
 stages:
-  - name: Delete all runs # Ensure there is no active run
-    request:
-      url: '{ot2_server_base_url}/runs'
-      method: GET
-    response:
-      status_code: 200
-      verify_response_with:
-        - function: 'tests.integration.fixtures:delete_all_runs'
-          extra_kwargs:
-            host: '{host:s}'
-            port: '{port:d}'
   - name: Get tempModule id
     request:
       url: '{ot2_server_base_url}/modules'
