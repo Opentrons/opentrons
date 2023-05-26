@@ -1,16 +1,9 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  ALIGN_FLEX_END,
-} from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { TertiaryButton } from '../../../atoms/buttons'
 import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
 import { getDevtoolsEnabled } from '../../../redux/config'
@@ -148,15 +141,6 @@ export function RobotSettingsDashboard(): JSX.Element {
           />
         </Flex>
       )}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        padding={SPACING.spacing40}
-        width="fit-content"
-      >
-        <Link to="menu">
-          <TertiaryButton>To ODD Menu</TertiaryButton>
-        </Link>
-      </Flex>
     </Flex>
   )
 }

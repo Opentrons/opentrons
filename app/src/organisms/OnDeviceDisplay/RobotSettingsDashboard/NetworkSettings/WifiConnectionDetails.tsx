@@ -71,7 +71,7 @@ export function WifiConnectionDetails({
   const subnetMask = wifi?.subnetMask != null ? wifi.subnetMask : noData
   const macAddress = wifi?.macAddress != null ? wifi.macAddress : noData
 
-  // ToDo (kj:05/24/2023) need to refactor
+  // ToDo (kj:05/24/2023) need to refactor this component
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const [
     showSelectAuthenticationType,
