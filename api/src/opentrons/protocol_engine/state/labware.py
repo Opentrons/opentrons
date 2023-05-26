@@ -209,6 +209,7 @@ class LabwareView(HasState[LabwareState]):
         """
         self._state = state
 
+    # This is a comment.
     def some_crazy_untested_function(self, s: str) -> str:
         """This is a docstring."""
         if s[0] == "x":
