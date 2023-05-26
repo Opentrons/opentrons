@@ -219,6 +219,21 @@ async def update_pickup_tip_speed(api, mount, speed) -> None:
     pipette.pick_up_configurations = config_model
     print(pipette.pick_up_configurations)
 
+async def move_to_point(api, mount, point, cp):
+    home_pos = api.get_instrument_max_height(mount, cp)
+    pos = await api.current_position_ot3(mount, refresh=True, critical_point = cp)
+    await api.move_to(mount,
+                    Point(pos[OT3Axis.X],
+                        pos[OT3Axis.Y],
+                        home_pos))
+    await api.move_to(mount,
+                    Point(point.x,
+                        point.y,
+                        home_pos))
+    await api.move_to(mount,
+                    Point(point.x,
+                        point.y,
+                        point.z))
 
 async def _main() -> None:
     today = datetime.date.today()
@@ -241,16 +256,24 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     tip_length = {"T1K": 85.7, "T200": 48.35, "T50": 47.9}
-    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.RIGHT]["pipette_id"]
+    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.LEFT]["pipette_id"]
     dial_data = {
-        "Ch1": None,
-        "Ch2": None,
-        "Ch3": None,
-        "Ch4": None,
-        "Ch5": None,
-        "Ch6": None,
-        "Ch7": None,
-        "Ch8": None,
+        "Ch1": None, "Ch2": None, "Ch3": None, "Ch4": None, "Ch5": None, "Ch6": None,
+        "Ch7": None, "Ch8": None, "Ch9": None, "Ch10": None, "Ch11": None, "Ch12": None,
+        "Ch13": None, "Ch14": None, "Ch15": None, "Ch16": None, "Ch17": None, "Ch18": None,
+        "Ch19": None, "Ch20": None, "Ch21": None, "Ch22": None, "Ch23": None, "Ch24": None,
+        "Ch25": None, "Ch26": None, "Ch27": None, "Ch28": None, "Ch29": None, "Ch30": None,
+        "Ch31": None, "Ch32": None, "Ch33": None, "Ch34": None, "Ch35": None, "Ch36": None,
+        "Ch37": None, "Ch38": None, "Ch39": None, "Ch40": None, "Ch41": None, "Ch42": None,
+        "Ch43": None, "Ch44": None, "Ch45": None, "Ch46": None, "Ch47": None, "Ch48": None,
+        "Ch49": None, "Ch50": None, "Ch51": None, "Ch52": None, "Ch53": None, "Ch54": None,
+        "Ch55": None, "Ch56": None, "Ch57": None, "Ch58": None, "Ch59": None, "Ch60": None,
+        "Ch61": None, "Ch62": None, "Ch63": None, "Ch64": None, "Ch65": None, "Ch66": None,
+        "Ch67": None, "Ch68": None, "Ch69": None, "Ch70": None, "Ch71": None, "Ch72": None,
+        "Ch73": None, "Ch74": None, "Ch75": None, "Ch76": None, "Ch77": None, "Ch78": None,
+        "Ch79": None, "Ch80": None, "Ch81": None, "Ch82": None, "Ch83": None, "Ch84": None,
+        "Ch85": None, "Ch86": None, "Ch87": None, "Ch88": None, "Ch89": None, "Ch90": None,
+        "Ch91": None, "Ch92": None, "Ch93": None, "Ch94": None, "Ch95": None, "Ch96": None,
         "Motor Current": None,
         "Trial": None,
         "pipette_model": None,
@@ -272,47 +295,26 @@ async def _main() -> None:
     plunger_pos = get_plunger_positions_ot3(hw_api, mount)
     home_position = await hw_api.current_position_ot3(mount)
     start_time = time.perf_counter()
-    if args.tip_size == "T1K":
-        home_with_tip_position = 164.3  # T1K
-    if args.tip_size == "T200":
-        home_with_tip_position = 201.64999999999998  # T1K
-    elif args.tip_size == "T50":
-        home_with_tip_position = 192.1  # T50
-
-    # if args.fg_jog:
-    #     cp = CriticalPoint.NOZZLE
-    #     await hw_api.move_to(
-    #         mount,
-    #         Point(
-    #             slot_loc["D2"][0],
-    #             slot_loc["D2"][1],
-    #             home_position[OT3Axis.by_mount(mount)],
-    #         ),
-    #     )
-    #     current_position = await hw_api.current_position_ot3(mount)
-    #     print("Move to Force Gauge")
-    #     fg_loc = await jog(hw_api, current_position, cp)
-    #     fg_loc = [fg_loc[OT3Axis.X], fg_loc[OT3Axis.Y], fg_loc[OT3Axis.by_mount(mount)]]
-    #     await hw_api.move_to(
-    #         mount,
-    #         Point(fg_loc[0], fg_loc[1], home_position[OT3Axis.by_mount(mount)]),
-    #         critical_point=CriticalPoint.TIP,
-    #     )
-    #     await hw_api.home_z(mount, allow_home_other=False)
+    # if args.tip_size == "T1K":
+    #     home_with_tip_position = 164.3  # T1K
+    # if args.tip_size == "T200":
+    #     home_with_tip_position = 201.64999999999998  # T1K
+    # elif args.tip_size == "T50":
+    #     home_with_tip_position = 192.1  # T50
 
     if args.tiprack:
-        await hw_api.move_to(
-            mount,
-            Point(
-                slot_loc["B2"][0],
-                slot_loc["B2"][1],
-                home_position[OT3Axis.by_mount(mount)],
-            ),
-        )
         cp = CriticalPoint.NOZZLE
+        tiprack_loc = Point(
+                        slot_loc["B2"][0],
+                        slot_loc["B2"][1],
+                        home_position[OT3Axis.by_mount(mount)])
         print("Move to Tiprack")
+        await move_to_point(hw_api, mount, tiprack_loc, cp)
         current_position = await hw_api.current_position_ot3(mount)
         tiprack_loc = await jog(hw_api, current_position, cp)
+        tiprack_loc = Point(tiprack_loc[OT3Axis.X],
+                            tiprack_loc[OT3Axis.Y],
+                            tiprack_loc[OT3Axis.by_mount(mount)])
         # Start recording the encoder
         init_tip_loc = await hw_api.encoder_current_position_ot3(
             mount, CriticalPoint.NOZZLE
@@ -329,97 +331,78 @@ async def _main() -> None:
         final_tip_loc = await hw_api.pick_up_tip(
             mount, tip_length=tip_length[args.tip_size]
         )
+        # move_to_point(hw_api, mount, tiprack_loc, cp)
         await home_ot3(hw_api, [OT3Axis.by_mount(mount)])
         home_with_tip_position = await hw_api.current_position_ot3(
             mount, critical_point=CriticalPoint.TIP
         )
-        await hw_api.move_to(
-            mount,
-            Point(
-                current_position[OT3Axis.X],
-                current_position[OT3Axis.Y],
-                home_with_tip_position[OT3Axis.by_mount(mount)],
-            ),
-            critical_point=CriticalPoint.TIP,
-        )
-
+        # await hw_api.move_to(
+        #     mount,
+        #     Point(
+        #         current_position[OT3Axis.X],
+        #         current_position[OT3Axis.Y],
+        #         home_with_tip_position[OT3Axis.by_mount(mount)],
+        #     ),
+        #     critical_point=CriticalPoint.TIP,
+        # )
         encoder_end = final_tip_loc[OT3Axis.by_mount(mount)]
         # final_tip_loc = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
         print(f"End Encoder: {final_tip_loc}")
         final_tip_loc = final_tip_loc[OT3Axis.by_mount(mount)]
-        location = "Tiprack"
-        tip_count = 1
-        test_details = [
-            start_time,
-            m_current,
-            location,
-            init_tip_loc,
-            final_tip_loc,
-            tip_count,
-        ]
-        enc_record(file_name, test_details)
-        tiprack_loc = [
-            tiprack_loc[OT3Axis.X],
-            tiprack_loc[OT3Axis.Y],
-            tiprack_loc[OT3Axis.by_mount(mount)],
-        ]
 
-    if args.dial_indicator:
-        await hw_api.move_to(
-            mount,
-            Point(
-                slot_loc["C2"][0],
-                slot_loc["C2"][1],
-                home_with_tip_position[OT3Axis.by_mount(mount)],
-            ),
-        )
-        cp = CriticalPoint.TIP
-        print("Move to Tiprack")
-        current_position = await hw_api.current_position_ot3(mount)
-        dial_loc = await jog(hw_api, current_position, cp)
-        dial_loc = [
-            dial_loc[OT3Axis.X],
-            dial_loc[OT3Axis.Y],
-            dial_loc[OT3Axis.by_mount(mount)],
-        ]
-        tip_offset = 0
-        measurements = ""
-        tips = 8
-        trial = 1
-        for tip in range(1, tips + 1):
-
-            await hw_api.move_to(
-                mount,
-                Point(
-                    dial_loc[0],
-                    dial_loc[1] + tip_offset,
-                    dial_loc[2],
-                ),
-            )
-            await asyncio.sleep(1)
-            tip_measurement = gauge.read()
-            await asyncio.sleep(2)
-            measurements += str(tip_measurement) + ","
-
-            await hw_api.move_to(
-                mount,
-                Point(
-                    dial_loc[0],
-                    dial_loc[1] + tip_offset,
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-            )
-            tip_offset += 9
-            await hw_api.move_to(
-                mount,
-                Point(
-                    dial_loc[0],
-                    dial_loc[1] + tip_offset,
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-            )
-        d_str = f"{measurements} {pipette_model} , {trial}, {m_current} \n"
-        data.append_data_to_file(test_n, test_f, d_str)
+    # if args.dial_indicator:
+    #     cp = CriticalPoint.TIP
+    #     dial_loc = Point(
+    #                     slot_loc["C2"][0],
+    #                     slot_loc["C2"][1],
+    #                     home_with_tip_position[OT3Axis.by_mount(mount)])
+    #     print("Move to Tiprack")
+    #     await move_to_point(hw_api, mount, dial_loc, cp)
+    #     print("Move to Tiprack")
+    #     current_position = await hw_api.current_position_ot3(mount)
+    #     dial_loc = await jog(hw_api, current_position, cp)
+    #     dial_loc = [
+    #         dial_loc[OT3Axis.X],
+    #         dial_loc[OT3Axis.Y],
+    #         dial_loc[OT3Axis.by_mount(mount)],
+    #     ]
+    #     tip_offset = 0
+    #     measurements = ""
+    #     tips = 96
+    #     trial = 1
+    #     for tip in range(1, tips + 1):
+    #         await hw_api.move_to(
+    #             mount,
+    #             Point(
+    #                 dial_loc[0],
+    #                 dial_loc[1] + tip_offset,
+    #                 dial_loc[2],
+    #             ),
+    #         )
+    #         await asyncio.sleep(1)
+    #         tip_measurement = gauge.read()
+    #         await asyncio.sleep(2)
+    #         measurements += str(tip_measurement) + ","
+    #
+    #         await hw_api.move_to(
+    #             mount,
+    #             Point(
+    #                 dial_loc[0],
+    #                 dial_loc[1] + tip_offset,
+    #                 home_with_tip_position[OT3Axis.by_mount(mount)],
+    #             ),
+    #         )
+    #         tip_offset += 9
+    #         await hw_api.move_to(
+    #             mount,
+    #             Point(
+    #                 dial_loc[0],
+    #                 dial_loc[1] + tip_offset,
+    #                 home_with_tip_position[OT3Axis.by_mount(mount)],
+    #             ),
+    #         )
+    #     d_str = f"{measurements} {pipette_model} , {trial}, {m_current} \n"
+    #     data.append_data_to_file(test_n, test_f, d_str)
 
     if args.trough:
         await hw_api.move_to(
@@ -486,27 +469,10 @@ async def _main() -> None:
             # -----------------------Tiprack------------------------------------
             m_current = float(input("motor_current in amps: "))
             pick_up_speed = float(input("pick up tip speed in mm/s: "))
+            cp = CriticalPoint.NOZZLE
             # Move over to the TipRack location and
-            await hw_api.move_to(
-                mount,
-                Point(
-                    tiprack_loc[0] + x_offset,
-                    tiprack_loc[1] + y_offset,
-                    home_position[OT3Axis.by_mount(mount)],
-                ),
-            )
-
-            # Move Pipette to top of Tip Rack Location
-            await hw_api.move_to(
-                mount,
-                Point(
-                    tiprack_loc[0] + x_offset,
-                    tiprack_loc[1] + y_offset,
-                    tiprack_loc[2],
-                ),
-                speed=65,
-            )
-            location = "Tiprack"
+            print("Move to Tiprack")
+            await move_to_point(hw_api, mount, tiprack_loc, cp)
 
             # Start recording the encoder
             init_tip_loc = await hw_api.encoder_current_position_ot3(
@@ -521,18 +487,6 @@ async def _main() -> None:
             final_tip_loc = await hw_api.pick_up_tip(
                 mount, tip_length=tip_length[args.tip_size]
             )
-            await hw_api.move_to(
-                mount,
-                Point(
-                    tiprack_loc[0] + x_offset,
-                    tiprack_loc[1] + y_offset,
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-                critical_point=CriticalPoint.TIP,
-            )
-            # home_with_tip_position = await hw_api.current_position_ot3(
-            #     mount, critical_point=CriticalPoint.TIP
-            # )
             encoder_end = final_tip_loc[OT3Axis.by_mount(mount)]
             # final_tip_loc = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
             print(f"End Encoder: {final_tip_loc}")
@@ -548,157 +502,159 @@ async def _main() -> None:
             enc_record(file_name, test_details)
             # Home Z
             await hw_api.home([OT3Axis.by_mount(mount)])
+            cp = CriticalPoint.TIP
+            current_position = await hw_api.current_position_ot3(mount, cp)
             # --------------------------Dial Indicator-----------------------
             # Move over to the dial indicator
-            await hw_api.move_to(
-                mount,
-                Point(
-                    dial_loc[0],
-                    dial_loc[1],
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-            )
-            tip_offset = 0
-            measurements = ""
-            tips = 8
-            for t in range(1, tips + 1):
-                # Move over to the dial indicator
-                await hw_api.move_to(
-                    mount,
-                    Point(dial_loc[0], dial_loc[1] + tip_offset, dial_loc[2]),
-                )
-                await asyncio.sleep(3)
-                tip_measurement = gauge.read()
-                measurements += str(tip_measurement) + ","
-                await asyncio.sleep(1)
-                # Move over to the dial indicator
-                await hw_api.move_to(
-                    mount,
-                    Point(
-                        dial_loc[0],
-                        dial_loc[1] + tip_offset,
-                        home_with_tip_position[OT3Axis.by_mount(mount)],
-                    ),
-                )
-                tip_offset += 9
-                await hw_api.move_to(
-                    mount,
-                    Point(
-                        dial_loc[0],
-                        dial_loc[1] + tip_offset,
-                        home_with_tip_position[OT3Axis.by_mount(mount)],
-                    ),
-                )
-            d_str = f"{measurements} {pipette_model} , {trial}, {m_current} \n"
-            data.append_data_to_file(test_n, test_f, d_str)
-            # -----------------------Aspirate-----------------------------------
-            await hw_api.move_to(
-                mount,
-                Point(
-                    trough_loc[0],
-                    trough_loc[1],
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-            )
-            # Move to offset from trough
-            await hw_api.move_to(
-                mount, Point(trough_loc[0], trough_loc[1], trough_loc[2])
-            )
-            # Move the plunger to the top position
-            await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
-            # Liquid Probe
-            liquid_height, enc_liquid_height = await hw_api.liquid_probe(
-                mount, probe_settings=liquid_probe_settings
-            )
-
-            liquid_height = await hw_api.current_position_ot3(
-                mount, critical_point=CriticalPoint.TIP
-            )
-            # await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2) # P50S
-            await move_plunger_relative_ot3(
-                hw_api, mount, 0.25, None, speed=2
-            )  # P1KS
-            await hw_api.move_to(
-                mount, Point(trough_loc[0], trough_loc[1], trough_loc[2])
-            )
-            # Prepare to aspirate before descending to trough well
-            await hw_api.prepare_for_aspirate(mount)
-            # Descend to aspirate depth
-            await hw_api.move_to(
-                mount,
-                Point(
-                    liquid_height[OT3Axis.X],
-                    liquid_height[OT3Axis.Y],
-                    liquid_height[OT3Axis.by_mount(mount)] - aspirate_depth,
-                ),
-                speed=5,
-                critical_point=CriticalPoint.TIP,
-            )
-            # Aspirate
-            await hw_api.aspirate(mount, volume=50)
-            cur_pos = await hw_api.current_position_ot3(
-                mount, critical_point=CriticalPoint.TIP
-            )
-            z_pos = cur_pos[OT3Axis.by_mount(mount)]
-            # Retract from liquid with retract speed
-            await hw_api.move_to(
-                mount,
-                Point(trough_loc[0], trough_loc[1], z_pos + liquid_retract_dist),
-                speed=liquid_retract_speed,
-                critical_point=CriticalPoint.TIP,
-            )
-            await hw_api.move_to(
-                mount,
-                Point(
-                    trough_loc[0],
-                    trough_loc[1],
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-                critical_point=CriticalPoint.TIP,
-            )
-            await countdown(count_time=leak_test_time)
-            # input("Check to see if the pipette is leaking")
-            await hw_api.move_to(
-                mount,
-                Point(trough_loc[0], trough_loc[1], trough_loc[2]),
-                critical_point=CriticalPoint.TIP,
-            )
-            await hw_api.move_to(
-                mount,
-                Point(
-                    trough_loc[0],
-                    trough_loc[1],
-                    liquid_height[OT3Axis.by_mount(mount)] - dispense_depth,
-                ),
-                speed=5,
-                critical_point=CriticalPoint.TIP,
-            )
-            await hw_api.dispense(mount)
-            await hw_api.blow_out(mount)
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         dial_loc[0],
+            #         dial_loc[1],
+            #         home_with_tip_position[OT3Axis.by_mount(mount)],
+            #     ),
+            # )
+            # tip_offset = 0
+            # measurements = ""
+            # tips = 8
+            # for t in range(1, tips + 1):
+            #     # Move over to the dial indicator
+            #     await hw_api.move_to(
+            #         mount,
+            #         Point(dial_loc[0], dial_loc[1] + tip_offset, dial_loc[2]),
+            #     )
+            #     await asyncio.sleep(3)
+            #     tip_measurement = gauge.read()
+            #     measurements += str(tip_measurement) + ","
+            #     await asyncio.sleep(1)
+            #     # Move over to the dial indicator
+            #     await hw_api.move_to(
+            #         mount,
+            #         Point(
+            #             dial_loc[0],
+            #             dial_loc[1] + tip_offset,
+            #             home_with_tip_position[OT3Axis.by_mount(mount)],
+            #         ),
+            #     )
+            #     tip_offset += 9
+            #     await hw_api.move_to(
+            #         mount,
+            #         Point(
+            #             dial_loc[0],
+            #             dial_loc[1] + tip_offset,
+            #             home_with_tip_position[OT3Axis.by_mount(mount)],
+            #         ),
+            #     )
+            # d_str = f"{measurements} {pipette_model} , {trial}, {m_current} \n"
+            # data.append_data_to_file(test_n, test_f, d_str)
+            # # -----------------------Aspirate-----------------------------------
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         trough_loc[0],
+            #         trough_loc[1],
+            #         home_with_tip_position[OT3Axis.by_mount(mount)],
+            #     ),
+            # )
+            # # Move to offset from trough
+            # await hw_api.move_to(
+            #     mount, Point(trough_loc[0], trough_loc[1], trough_loc[2])
+            # )
+            # # Move the plunger to the top position
+            # await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
+            # # Liquid Probe
+            # liquid_height, enc_liquid_height = await hw_api.liquid_probe(
+            #     mount, probe_settings=liquid_probe_settings
+            # )
+            #
+            # liquid_height = await hw_api.current_position_ot3(
+            #     mount, critical_point=CriticalPoint.TIP
+            # )
+            # # await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2) # P50S
+            # await move_plunger_relative_ot3(
+            #     hw_api, mount, 0.25, None, speed=2
+            # )  # P1KS
+            # await hw_api.move_to(
+            #     mount, Point(trough_loc[0], trough_loc[1], trough_loc[2])
+            # )
+            # # Prepare to aspirate before descending to trough well
+            # await hw_api.prepare_for_aspirate(mount)
+            # # Descend to aspirate depth
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         liquid_height[OT3Axis.X],
+            #         liquid_height[OT3Axis.Y],
+            #         liquid_height[OT3Axis.by_mount(mount)] - aspirate_depth,
+            #     ),
+            #     speed=5,
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # # Aspirate
+            # await hw_api.aspirate(mount, volume=50)
+            # cur_pos = await hw_api.current_position_ot3(
+            #     mount, critical_point=CriticalPoint.TIP
+            # )
+            # z_pos = cur_pos[OT3Axis.by_mount(mount)]
+            # # Retract from liquid with retract speed
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(trough_loc[0], trough_loc[1], z_pos + liquid_retract_dist),
+            #     speed=liquid_retract_speed,
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         trough_loc[0],
+            #         trough_loc[1],
+            #         home_with_tip_position[OT3Axis.by_mount(mount)],
+            #     ),
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # await countdown(count_time=leak_test_time)
+            # # input("Check to see if the pipette is leaking")
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(trough_loc[0], trough_loc[1], trough_loc[2]),
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         trough_loc[0],
+            #         trough_loc[1],
+            #         liquid_height[OT3Axis.by_mount(mount)] - dispense_depth,
+            #     ),
+            #     speed=5,
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # await hw_api.dispense(mount)
+            # await hw_api.blow_out(mount)
             # --------------------Drop Tip--------------------------------------
-            current_position = await hw_api.current_position_ot3(
-                mount, critical_point=CriticalPoint.TIP
-            )
-            await hw_api.move_to(
-                mount,
-                Point(
-                    trough_loc[0],
-                    trough_loc[1],
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-                critical_point=CriticalPoint.TIP,
-            )
-            # Move to trash slot
-            await hw_api.move_to(
-                mount,
-                Point(
-                    slot_loc["A3"][0] + 50,
-                    slot_loc["A3"][1],
-                    home_with_tip_position[OT3Axis.by_mount(mount)],
-                ),
-                critical_point=CriticalPoint.TIP,
-            )
-            await hw_api.drop_tip(mount)
+            # current_position = await hw_api.current_position_ot3(
+            #     mount, critical_point=CriticalPoint.TIP
+            # )
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         trough_loc[0],
+            #         trough_loc[1],
+            #         home_with_tip_position[OT3Axis.by_mount(mount)],
+            #     ),
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # # Move to trash slot
+            # await hw_api.move_to(
+            #     mount,
+            #     Point(
+            #         slot_loc["A3"][0] + 50,
+            #         slot_loc["A3"][1],
+            #         home_with_tip_position[OT3Axis.by_mount(mount)],
+            #     ),
+            #     critical_point=CriticalPoint.TIP,
+            # )
+            # await hw_api.drop_tip(mount)
 
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     except KeyboardInterrupt:
@@ -727,13 +683,13 @@ if __name__ == "__main__":
     parser.add_argument("--fg_jog", action="store_true")
     parser.add_argument("--trough", action="store_true")
     parser.add_argument("--tiprack", action="store_true")
-    parser.add_argument("--mount", type=str, choices=["left", "right"], default="right")
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
     parser.add_argument("--fg", action="store_true")
     parser.add_argument("--dial_indicator", action="store_true")
-    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
     parser.add_argument("--max_z_distance", type=float, default=40)
     parser.add_argument("--min_z_distance", type=float, default=5)
     parser.add_argument("--mount_speed", type=float, default=5)
