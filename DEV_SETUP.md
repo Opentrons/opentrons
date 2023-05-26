@@ -199,7 +199,7 @@ Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
 2. Tell `pyenv` to use Python 3.7
-3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `pyenv init` and then `pyenv local 3.7.15`. Then check `python --version` again.
+3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.7.15`. Then check `python --version` again.
 
 ```shell
 # confirm Node v16
