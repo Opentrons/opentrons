@@ -30,7 +30,6 @@ from ..types import (
     LabwareLocation,
     LabwareOffsetVector,
     ExperimentalOffsetData,
-    ModuleModel,
 )
 
 if TYPE_CHECKING:
