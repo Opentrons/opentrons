@@ -210,8 +210,9 @@ class LabwareView(HasState[LabwareState]):
         self._state = state
 
     def some_crazy_untested_function(self, s: str) -> str:
+        """This is a docstring."""
         if s[0] == "x":
-            return labware_id[-1]
+            return s[-1]
         elif s[-1] == "x":
             return s[0]
         else:
