@@ -218,17 +218,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     if(len(test_pip) == 0):
         print(f"No pipette recognized on {mount.name} mount\n")
         sys.exit()
-    # if('p1000' in test_pip['name']):
-    #     tip_len = 95.6
-    # elif('p50' in test_pip['name']):
-    #     tip_len = 58.35
 
     print(f"\nTest pipette: {test_pip['name']}\n")
-
-    # if args.check_tip:
-    #     check_tip_presence = True
-    # else:
-    #     check_tip_presence = False
 
     if "single" in test_pip['name']:
         multi_pip = False
@@ -427,9 +418,6 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         if tip_presence_eject_flag == True:
                             await api.home()
                             sys.exit()
-
-                        # await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
-                        #             calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]+5))
 
                     ### adjust row increment
                     print("Moving to next row...\n")
