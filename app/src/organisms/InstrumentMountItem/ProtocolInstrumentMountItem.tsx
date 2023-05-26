@@ -23,6 +23,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
+import { useTakeoverModal } from '../TakeoverModal'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 
@@ -66,7 +67,7 @@ export function ProtocolInstrumentMountItem(
 ): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
-
+  const { setMaintenanceInProgress } = useTakeoverModal()
   const [
     showPipetteWizardFlow,
     setShowPipetteWizardFlow,
@@ -76,10 +77,12 @@ export function ProtocolInstrumentMountItem(
     speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: React.MouseEventHandler = () => {
+    setMaintenanceInProgress()
     setFlowType(FLOWS.CALIBRATE)
     setShowPipetteWizardFlow(true)
   }
   const handleAttach: React.MouseEventHandler = () => {
+    setMaintenanceInProgress()
     setFlowType(FLOWS.ATTACH)
     setShowPipetteWizardFlow(true)
   }

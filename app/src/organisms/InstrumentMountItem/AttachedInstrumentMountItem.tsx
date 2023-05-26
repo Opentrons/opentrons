@@ -56,6 +56,7 @@ export function AttachedInstrumentMountItem(
         attachedGripper: attachedInstrument,
         closeFlow: () => setWizardProps(null),
       })
+      setMaintenanceInProgress()
     } else {
       history.push(`/instruments/${mount}`)
     }
@@ -95,7 +96,7 @@ export function AttachedInstrumentMountItem(
                 history.push(`/instruments/${mount}`)
               },
             })
-            // setMaintenanceInProgress(true)
+            setMaintenanceInProgress()
             setShowChoosePipetteModal(false)
           }}
           setSelectedPipette={setSelectedPipette}

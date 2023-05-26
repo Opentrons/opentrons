@@ -5,15 +5,9 @@ import {
 } from './TakeoverModalContext'
 
 export function useTakeoverModal(): TakeoverModalContextType {
-  const {
-    isMaintanenceInProgress,
-    setMaintenanceInProgress,
-    closeAndTerminate,
-  } = React.useContext(TakeoverModalContext)
+  const { setMaintenanceInProgress } = React.useContext(TakeoverModalContext)
 
   return {
-    isMaintanenceInProgress,
     setMaintenanceInProgress,
-    closeAndTerminate,
   }
 }
