@@ -113,7 +113,8 @@
         "magneticModuleType": "MAG",
         "temperatureModuleType": "TEMP",
         "thermocyclerModuleType": "THERMO",
-        "heaterShakerModuleType": "HS"
+        "heaterShakerModuleType": "HS",
+        "magneticBlockType": "MAG"
       },
       "magnetAction": {
         "label": "Magnet action",

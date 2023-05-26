@@ -25,6 +25,9 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { PauseInterventionContent } from './PauseInterventionContent'
+
+import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -43,8 +46,8 @@ const MODAL_STYLE = {
   position: POSITION_RELATIVE,
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
-  width: '100%',
-  margin: SPACING.spacing5,
+  maxWidth: '47rem',
+  margin: SPACING.spacing24,
   border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
@@ -55,7 +58,7 @@ const HEADER_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${String(SPACING.spacing6)}`,
+  padding: `0px ${SPACING.spacing32}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
@@ -67,8 +70,8 @@ const CONTENT_STYLE = {
   display: DISPLAY_FLEX,
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
-  gridGap: SPACING.spacing5,
-  padding: `${String(SPACING.spacing6)}`,
+  gridGap: SPACING.spacing24,
+  padding: `${SPACING.spacing32}`,
   borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
     BORDERS.radiusSoftCorners
   )}`,
@@ -80,14 +83,26 @@ const FOOTER_STYLE = {
   justifyContent: JUSTIFY_SPACE_BETWEEN,
 } as const
 
+export type InterventionCommandType = WaitForResumeRunTimeCommand
+
 export interface InterventionModalProps {
   robotName: string
+  command: InterventionCommandType
 }
 
 export function InterventionModal({
   robotName,
+  command,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
+
+  let modalContent: JSX.Element
+
+  switch (command.commandType) {
+    case 'pause': // legacy pause command
+    case 'waitForResume':
+      modalContent = <PauseInterventionContent command={command} />
+  }
 
   return (
     <Flex
@@ -113,14 +128,14 @@ export function InterventionModal({
             </StyledText>
           </Box>
           <Box {...CONTENT_STYLE}>
-            Content Goes Here
+            {modalContent}
             <Box {...FOOTER_STYLE}>
               <StyledText>
                 <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>
                   {t('protocol_info:intervention_modal_learn_more')}
                   <Icon
                     name="open-in-new"
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     size="0.5rem"
                   />
                 </Link>

@@ -2,8 +2,12 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 
 import {
+  getGripperDisplayName,
+  getPipetteModelSpecs,
+  GripperModel,
   LEFT,
   NINETY_SIX_CHANNEL,
+  PipetteModel,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
@@ -54,11 +58,20 @@ export function AttachedInstrumentMountItem(
       history.push(`/instruments/${mount}`)
     }
   }
+
+  const displayName =
+    attachedInstrument?.mount !== 'extension'
+      ? getPipetteModelSpecs(
+          attachedInstrument?.instrumentModel as PipetteModel
+        )?.displayName
+      : getGripperDisplayName(
+          attachedInstrument?.instrumentModel as GripperModel
+        )
   return (
     <>
       <LabeledMount
         mount={mount}
-        instrumentName={attachedInstrument?.instrumentModel ?? null}
+        instrumentName={displayName ?? null}
         handleClick={handleClick}
       />
       {showChoosePipetteModal ? (
@@ -71,10 +84,13 @@ export function AttachedInstrumentMountItem(
                   : (mount as Mount),
               flowType: FLOWS.ATTACH,
               selectedPipette,
-              setSelectedPipette,
               closeFlow: () => {
                 setWizardProps(null)
+                setSelectedPipette(SINGLE_MOUNT_PIPETTES)
                 setShowChoosePipetteModal(false)
+              },
+              onComplete: () => {
+                history.push(`/instruments/${mount}`)
               },
             })
             setShowChoosePipetteModal(false)

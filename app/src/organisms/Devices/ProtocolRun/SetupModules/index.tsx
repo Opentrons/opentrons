@@ -35,7 +35,7 @@ export const SetupModules = ({
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <>
-      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing6}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
         {toggleGroup}
         {selectedValue === t('list_view') ? (
           <SetupModulesList robotName={robotName} runId={runId} />
@@ -48,7 +48,7 @@ export const SetupModules = ({
           disabled={missingModuleIds.length > 0 || runHasStarted}
           onClick={expandLabwarePositionCheckStep}
           id="ModuleSetup_proceedToLabwarePositionCheck"
-          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >
           {t('proceed_to_labware_position_check')}

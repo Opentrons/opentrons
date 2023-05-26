@@ -21,6 +21,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
+  NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -66,19 +67,19 @@ function RowModule({
   setShowMultipleModulesModal,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const attachedModuleMatch = !!module.attachedModuleMatch
+  const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
+    module.moduleDef.moduleType
+  )
+  const isModuleReady =
+    isNonConnectingModule || module.attachedModuleMatch != null
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={
-        attachedModuleMatch
-          ? `${COLORS.successEnabled}${COLORS.opacity20HexCode}`
-          : COLORS.warningBackgroundMed
-      }
-      borderRadius={BORDERS.size_three}
+      backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
+      borderRadius={BORDERS.size3}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
-      gridGap={SPACING.spacing5}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      gridGap={SPACING.spacing24}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       onClick={() =>
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }
@@ -104,19 +105,30 @@ function RowModule({
         {isDuplicateModuleModel ? (
           <Icon
             name="information"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
             size="1.5rem"
           />
         ) : null}
       </Flex>
-      <Chip
-        text={
-          attachedModuleMatch ? t('module_connected') : t('module_disconnected')
-        }
-        type={attachedModuleMatch ? 'success' : 'warning'}
-        background={false}
-        iconName="connection-status"
-      />
+      {isNonConnectingModule ? (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+        >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('n_a')}
+          </StyledText>
+        </Flex>
+      ) : (
+        <Chip
+          text={
+            isModuleReady ? t('module_connected') : t('module_disconnected')
+          }
+          type={isModuleReady ? 'success' : 'warning'}
+          background={false}
+          iconName="connection-status"
+        />
+      )}
     </Flex>
   )
 }
@@ -244,8 +256,8 @@ export function ProtocolSetupModules({
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing24}
+        marginTop={SPACING.spacing32}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
@@ -258,15 +270,15 @@ export function ProtocolSetupModules({
             message={t('module_mismatch_body')}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <Flex
             color={COLORS.darkBlack70}
             fontSize={TYPOGRAPHY.fontSize22}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            gridGap={SPACING.spacing5}
+            gridGap={SPACING.spacing24}
             lineHeight={TYPOGRAPHY.lineHeight28}
           >
-            <Flex paddingLeft={SPACING.spacing5} width="22.75rem">
+            <Flex paddingLeft={SPACING.spacing24} width="22.75rem">
               <StyledText>{'Module Name'}</StyledText>
             </Flex>
             <Flex width="13.8125rem" paddingLeft="0.9375rem">

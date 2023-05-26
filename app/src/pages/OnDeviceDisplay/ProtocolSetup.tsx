@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   SPACING,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -40,6 +41,8 @@ import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { Snackbar } from '../../atoms/Snackbar'
 import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -52,7 +55,6 @@ import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -81,9 +83,9 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size_four}
-        gridGap={SPACING.spacing4}
-        padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+        borderRadius={BORDERS.size4}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
         {status !== 'general' ? (
           <Icon
@@ -102,7 +104,7 @@ function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon marginLeft={SPACING.spacing3} name="more" size="3rem" />
+        <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
       </Flex>
     </Btn>
   )
@@ -168,7 +170,7 @@ function PrepareToRun({
   runId,
   setSetupScreen,
 }: PrepareToRunProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
@@ -186,15 +188,10 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const [showSnackbar, setShowSnackbar] = React.useState<boolean>(false)
 
   const { play } = useRunControls(runId)
 
-  const onPlay = (): void => {
-    play()
-    history.push(`/protocols/${runId}/run`)
-  }
-
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
@@ -209,6 +206,12 @@ function PrepareToRun({
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
+
+  // const protocolAnalysisLoading =
+  //   mostRecentAnalysis == null ||
+  //   attachedInstruments == null ||
+  //   (protocolHasModules && attachedModules == null) ||
+  //   allPipettesCalibrationData == null
 
   if (
     mostRecentAnalysis == null ||
@@ -250,6 +253,14 @@ function PrepareToRun({
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
+
+  const onPlay = (): void => {
+    if (isReadyToRun) {
+      play()
+    } else {
+      setShowSnackbar(true)
+    }
+  }
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
@@ -300,13 +311,18 @@ function PrepareToRun({
       {/* Protocol Setup Header */}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginBottom={SPACING.spacingXXL}
+        gridGap={SPACING.spacing24}
+        paddingBottom={SPACING.spacing40}
+        paddingTop={SPACING.spacing32}
+        position={POSITION_STICKY}
+        top={0}
+        backgroundColor={COLORS.white}
+        overflowY="hidden"
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap="0.25rem"
+            gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
             <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
@@ -321,16 +337,24 @@ function PrepareToRun({
               {truncateString(protocolName as string, 100)}
             </StyledText>
           </Flex>
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
+            <PlayButton
+              disabled={
+                mostRecentAnalysis == null ||
+                attachedInstruments == null ||
+                (protocolHasModules && attachedModules == null) ||
+                allPipettesCalibrationData == null
+              }
+              onPlay={onPlay}
+            />
           </Flex>
         </Flex>
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
@@ -364,14 +388,32 @@ function PrepareToRun({
           title={t('liquids')}
           status="general"
           detail={
-            liquidsInProtocol.length < 0
+            liquidsInProtocol.length > 0
               ? t('initial_liquids_num', {
-                  num: liquidsInProtocol.length,
+                  count: liquidsInProtocol.length,
                 })
               : t('liquids_not_in_setup')
           }
         />
       </Flex>
+      {showSnackbar && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position={POSITION_STICKY}
+          bottom={SPACING.spacing40}
+          zIndex={1000}
+        >
+          <Snackbar
+            message={i18n.format(
+              t('complete_setup_before_proceeding'),
+              'capitalize'
+            )}
+            onClose={() => setShowSnackbar(false)}
+          />
+        </Flex>
+      )}
       {LPCWizard}
       {showConfirmCancelModal ? (
         <ConfirmCancelRunModal
@@ -424,7 +466,14 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding="2rem 2.5rem">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      padding={
+        setupScreen === 'prepare to run'
+          ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+          : `${SPACING.spacing32} ${SPACING.spacing40}`
+      }
+    >
       {setupComponentByScreen[setupScreen]}
     </Flex>
   )
@@ -435,18 +484,22 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
+      marginTop={SPACING.spacing40}
+    >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
           <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
         </Flex>
-        <Flex gridGap={SPACING.spacing5}>
+        <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
           <PlayButton disabled onPlay={() => {}} />
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />

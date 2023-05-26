@@ -25,7 +25,7 @@ export function Welcome(): JSX.Element {
       padding="4.71875rem 3.75rem"
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
-      gridGap="0.75rem"
+      gridGap={SPACING.spacing12}
     >
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
@@ -49,7 +49,7 @@ export function Welcome(): JSX.Element {
           {t('welcome_description')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacingXXL}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing40}>
         <SmallButton
           buttonType="primary"
           buttonText={t('shared:get_started')}

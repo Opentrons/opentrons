@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -50,46 +49,46 @@ describe('ConnectedResult', () => {
 
   it('should render a failure screen - incorrect password', () => {
     props.type = null
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Oops! Incorrect password for mockWifi.')
-    getByRole('button', { name: 'Try again' })
-    getByRole('button', { name: 'Change network' })
+    const [{ getByText }] = render(props)
+    getByText('Oops! Incorrect password for mockWifi')
+    getByText('Try again')
+    getByText('Change network')
   })
 
   it('should render a failure screen - other error cases', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Failed to connect to mockWifi.')
-    getByRole('button', { name: 'Try again' })
-    getByRole('button', { name: 'Change network' })
+    const [{ getByText }] = render(props)
+    getByText('Failed to connect to mockWifi')
+    getByText('Try again')
+    getByText('Change network')
   })
 
   it('should call mock function when tapping change network - incorrect password', () => {
     props.type = null
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Change network' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    const button = getByText('Change network')
+    button.click()
     expect(props.setChangeState).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping change network - other error cases', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Change network' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    const button = getByText('Change network')
+    button.click()
     expect(props.setChangeState).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping try again - incorrect password', () => {
     props.type = null
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Try again' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    const button = getByText('Try again')
+    button.click()
     expect(props.setCurrentRequestState).toHaveBeenCalled()
   })
 
   it('should call mock function when tapping try again - other error cases', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Try again' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    const button = getByText('Try again')
+    button.click()
     expect(props.onConnect).toHaveBeenCalled()
   })
 })

@@ -1,5 +1,4 @@
 import { css } from 'styled-components'
-import { spacing1, spacingXXS } from './spacing'
 import {
   blueEnabled,
   medGreyEnabled,
@@ -12,25 +11,25 @@ export const radiusRoundEdge = '20px'
 export const styleSolid = 'solid'
 
 // touch screen
-export const size_one = radiusSoftCorners
-export const size_two = '8px'
-export const size_three = '12px'
-export const size_four = '16px'
-export const size_five = '40px'
-export const size_six = '60px'
+export const size1 = radiusSoftCorners
+export const size2 = '8px'
+export const size3 = '12px'
+export const size4 = '16px'
+export const size5 = '40px'
+export const size6 = '60px'
 
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};
-  border-bottom-width: ${spacing1};
+  border-bottom-width: 2px;
   border-bottom-color: ${blueEnabled};
 `
 
-export const activeLineBorder = `${spacingXXS} ${styleSolid} ${blueEnabled}`
-export const lineBorder = `${spacingXXS} ${styleSolid} ${medGreyEnabled}`
-export const transparentLineBorder = `${spacingXXS} ${styleSolid} ${transparent}`
+export const activeLineBorder = `1px ${styleSolid} ${blueEnabled}`
+export const lineBorder = `1px ${styleSolid} ${medGreyEnabled}`
+export const transparentLineBorder = `1px ${styleSolid} ${transparent}`
 export const cardOutlineBorder = css`
   border-style: ${styleSolid};
-  border-width: ${spacingXXS};
+  border-width: 1px;
   border-color: ${medGreyEnabled};
   border-radius: ${radiusSoftCorners};
   &:hover {

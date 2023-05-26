@@ -55,7 +55,7 @@ export const AboutPipetteSlideout = (
         </StyledText>
         <StyledText
           as="p"
-          paddingTop={SPACING.spacing2}
+          paddingTop={SPACING.spacing4}
           data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
         >
           {pipetteId}

@@ -1,4 +1,8 @@
-import { checkModuleCompatibility } from '@opentrons/shared-data'
+import {
+  NON_CONNECTING_MODULE_TYPES,
+  checkModuleCompatibility,
+  getModuleType,
+} from '@opentrons/shared-data'
 
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../redux/modules/types'
@@ -61,6 +65,8 @@ export function getUnmatchedModulesForProtocol(
   } = protocolModulesInfo.reduce<UnmatchedModuleResults>(
     (acc, module) => {
       const { model, compatibleWith } = module.moduleDef
+      // Skip matching any modules that don't require an electronic robot connection
+      if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model))) return acc
       // for this required module, find a remaining (unmatched) attached module of the requested model
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
         attachedModule => {

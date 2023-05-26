@@ -1,5 +1,11 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
+import {
+  getGripperDisplayName,
+  getPipetteModelSpecs,
+  GripperModel,
+  PipetteModel,
+} from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { BackButton } from '../../atoms/buttons/BackButton'
@@ -12,16 +18,21 @@ export const InstrumentDetail = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
     (attachedInstruments?.data ?? []).find(i => i.mount === mount) ?? null
+
+  const displayName =
+    instrument?.mount !== 'extension'
+      ? getPipetteModelSpecs(instrument?.instrumentModel as PipetteModel)
+          ?.displayName
+      : getGripperDisplayName(instrument?.instrumentModel as GripperModel)
+
   return (
     <Flex
-      padding={`${String(SPACING.spacing6)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
+      padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       flexDirection={DIRECTION_COLUMN}
       height="100%"
     >
-      <BackButton>{instrument?.instrumentModel}</BackButton>
-      {instrument != null ? <InstrumentInfo instrument={instrument} /> : null}
+      <BackButton>{displayName}</BackButton>
+      <InstrumentInfo instrument={instrument} />
     </Flex>
   )
 }

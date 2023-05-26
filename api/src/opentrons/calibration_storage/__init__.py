@@ -12,13 +12,18 @@ from .ot2.tip_length import (
     _save_custom_tiprack_definition,
 )
 from .ot2.pipette_offset import get_all_pipette_offset_calibrations
+from .ot3.deck_attitude import (
+    save_robot_belt_attitude,
+    get_robot_belt_attitude,
+    delete_robot_belt_attitude,
+)
+from .ot2.deck_attitude import (
+    save_robot_deck_attitude,
+    get_robot_deck_attitude,
+    delete_robot_deck_attitude,
+)
 
 if config.feature_flags.enable_ot3_hardware_controller():
-    from .ot3.deck_attitude import (
-        save_robot_deck_attitude,
-        get_robot_deck_attitude,
-        delete_robot_deck_attitude,
-    )
     from .ot3.pipette_offset import (
         save_pipette_calibration,
         clear_pipette_offset_calibrations,
@@ -41,11 +46,6 @@ if config.feature_flags.enable_ot3_hardware_controller():
         delete_module_offset_file,
     )
 else:
-    from .ot2.deck_attitude import (
-        save_robot_deck_attitude,
-        get_robot_deck_attitude,
-        delete_robot_deck_attitude,
-    )
     from .ot2.pipette_offset import (
         save_pipette_calibration,
         clear_pipette_offset_calibrations,
@@ -67,6 +67,9 @@ __all__ = [
     "save_robot_deck_attitude",
     "get_robot_deck_attitude",
     "delete_robot_deck_attitude",
+    "save_robot_belt_attitude",
+    "get_robot_belt_attitude",
+    "delete_robot_belt_attitude",
     # pipette calibration functions
     "save_pipette_calibration",
     "get_pipette_offset",

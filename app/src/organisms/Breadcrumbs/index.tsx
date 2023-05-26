@@ -24,7 +24,9 @@ import {
 } from '../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocol } from '../../redux/protocol-storage'
+import { appShellRequestor } from '../../redux/shell/remote'
 
 import type { DesktopRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
@@ -41,7 +43,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       color={isLastCrumb ? COLORS.darkGreyEnabled : COLORS.blueEnabled}
     >
       <Box
-        paddingRight={SPACING.spacing2}
+        paddingRight={SPACING.spacing4}
         textTransform={TYPOGRAPHY.textTransformNone}
         css={TYPOGRAPHY.labelRegular}
       >
@@ -69,7 +71,6 @@ const CrumbLinkInactive = styled(Flex)`
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
-
   const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
 
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
@@ -123,15 +124,13 @@ function BreadcrumbsComponent(): JSX.Element | null {
       borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
-      padding={`${String(SPACING.spacing2)} 0 ${String(
-        SPACING.spacing2
-      )} ${String(SPACING.spacing3)}`}
+      padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 
         return (
-          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing2}>
+          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing4}>
             <CrumbLink
               as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
               to={crumb.linkPath}
@@ -153,7 +152,10 @@ export function Breadcrumbs(): JSX.Element | null {
   const robot = useRobot(robotName)
 
   return (
-    <ApiHostProvider hostname={robot?.ip ?? null}>
+    <ApiHostProvider
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
       <BreadcrumbsComponent />
     </ApiHostProvider>
   )

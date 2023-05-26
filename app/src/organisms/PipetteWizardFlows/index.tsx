@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import startCase from 'lodash/startCase'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
   RIGHT,
+  LoadedPipette,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -22,7 +21,9 @@ import { WizardHeader } from '../../molecules/WizardHeader'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import { usePipetteFlowWizardHeaderText } from './hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
+import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
@@ -43,30 +44,39 @@ interface PipetteWizardFlowsProps {
   mount: PipetteMount
   selectedPipette: SelectablePipettes
   closeFlow: () => void
-  setSelectedPipette: React.Dispatch<React.SetStateAction<SelectablePipettes>>
+  onComplete?: () => void
+  pipetteInfo?: LoadedPipette[]
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const {
-    flowType,
-    mount,
-    closeFlow,
-    selectedPipette,
-    setSelectedPipette,
-  } = props
+  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
+
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
-  const pipetteWizardSteps = getPipetteWizardSteps(
-    flowType,
-    mount,
-    selectedPipette,
-    isGantryEmpty,
-    attachedPipettes
+  const pipetteWizardSteps = React.useMemo(
+    () =>
+      props.pipetteInfo == null
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            attachedPipettes
+          )
+        : getPipetteWizardStepsForProtocol(
+            attachedPipettes,
+            props.pipetteInfo,
+            mount
+          ),
+    []
+  )
+  const requiredPipette = props.pipetteInfo?.find(
+    pipette => pipette.mount === mount
   )
   const host = useHost()
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
@@ -78,9 +88,20 @@ export const PipetteWizardFlows = (
   )
   const hasCalData =
     attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
+
+  const wizardTitle = usePipetteFlowWizardHeaderText({
+    flowType,
+    mount,
+    selectedPipette,
+    hasCalData,
+    isGantryEmpty,
+    attachedPipettes,
+    pipetteInfo: props.pipetteInfo ?? null,
+  })
+
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== pipetteWizardSteps.length - 1 ? 0 : currentStepIndex
+      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
   const {
@@ -104,11 +125,10 @@ export const PipetteWizardFlows = (
     null
   )
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
-        currentStepIndex !== pipetteWizardSteps.length - 1
+        currentStepIndex !== totalStepCount
           ? currentStepIndex + 1
           : currentStepIndex
       )
@@ -117,23 +137,26 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
+    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
     onSuccess: () => handleClose(),
+    onError: () => handleClose(),
   })
 
   const handleCleanUpAndClose = (): void => {
-    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
     setIsExiting(true)
     if (maintenanceRunId == null) handleClose()
     else {
-      chainRunCommands(
-        [{ commandType: 'home' as const, params: {} }],
-        true
-      ).then(() => {
-        deleteMaintenanceRun(maintenanceRunId)
-      })
+      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunId)
+        })
+        .catch(error => {
+          console.error(error)
+          handleClose()
+        })
     }
   }
   const {
@@ -215,7 +238,11 @@ export const PipetteWizardFlows = (
     modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <DetachProbe {...currentStep} {...calibrateBaseProps} />
+      <DetachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        proceed={errorMessage != null ? handleCleanUpAndClose : proceed}
+      />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
@@ -231,6 +258,7 @@ export const PipetteWizardFlows = (
         isFetching={isFetchingPipettes}
         setFetching={setIsFetchingPipettes}
         hasCalData={hasCalData}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
@@ -275,52 +303,17 @@ export const PipetteWizardFlows = (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
-  let wizardTitle: string = 'unknown page'
-  switch (flowType) {
-    case FLOWS.CALIBRATE: {
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(
-          t(hasCalData ? 'recalibrate_pipette' : 'calibrate_pipette', {
-            mount: mount,
-          })
-        )
-      } else {
-        wizardTitle = t('calibrate_96_channel')
-      }
-      break
-    }
-    case FLOWS.ATTACH: {
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(t('attach_pipette', { mount: mount }))
-      } else {
-        wizardTitle = isGantryEmpty
-          ? t('attach_96_channel')
-          : t('attach_96_channel_plus_detach', {
-              pipetteName:
-                attachedPipettes[LEFT]?.displayName ??
-                attachedPipettes[RIGHT]?.displayName,
-            })
-      }
-      break
-    }
-    case FLOWS.DETACH: {
-      if (selectedPipette === SINGLE_MOUNT_PIPETTES) {
-        wizardTitle = startCase(t('detach_pipette', { mount: mount }))
-      } else {
-        wizardTitle = t('detach_96_channel')
-      }
-      break
-    }
-  }
-
   const is96ChannelUnskippableStep =
     currentStep.section === SECTIONS.CARRIAGE ||
     currentStep.section === SECTIONS.MOUNTING_PLATE ||
     (selectedPipette === NINETY_SIX_CHANNEL &&
       currentStep.section === SECTIONS.DETACH_PIPETTE)
 
+  const isCalibrationErrorExiting =
+    currentStep.section === SECTIONS.ATTACH_PROBE && errorMessage != null
+
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal) {
+  if (isRobotMoving || showUnskippableStepModal || isCalibrationErrorExiting) {
     exitWizardButton = undefined
   } else if (is96ChannelUnskippableStep) {
     exitWizardButton = () => setIsUnskippableStep(true)
@@ -328,11 +321,16 @@ export const PipetteWizardFlows = (
     exitWizardButton = handleCleanUpAndClose
   }
 
+  const progressBarForCalError =
+    currentStep.section === SECTIONS.DETACH_PROBE && errorMessage != null
+
   const wizardHeader = (
     <WizardHeader
       exitDisabled={isRobotMoving || isFetchingPipettes}
       title={wizardTitle}
-      currentStep={currentStepIndex}
+      currentStep={
+        progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
+      }
       totalSteps={totalStepCount}
       onExit={exitWizardButton}
     />

@@ -1,6 +1,7 @@
 import type {
   CompletedProtocolAnalysis,
   LoadedPipette,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import {
   AllPipetteOffsetCalibrations,
@@ -11,7 +12,7 @@ import {
 } from '@opentrons/api-client'
 
 export function getProtocolUsesGripper(
-  analysis: CompletedProtocolAnalysis
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): boolean {
   return (
     analysis?.commands.some(

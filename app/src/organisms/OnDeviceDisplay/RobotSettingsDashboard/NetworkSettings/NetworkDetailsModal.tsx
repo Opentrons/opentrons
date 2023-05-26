@@ -52,7 +52,7 @@ export function NetworkDetailsModal({
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         width="100%"
       >
         <ListItem itemName={t('ip_address')} itemValue={ipAddress} />
@@ -75,23 +75,15 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       backgroundColor={COLORS.grey3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
     >
-      <StyledText
-        fontSize={TYPOGRAPHY.fontSize22}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}
       </StyledText>
-      <StyledText
-        fontSize={TYPOGRAPHY.fontSize22}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
+      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {itemValue}
       </StyledText>
     </Flex>

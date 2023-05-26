@@ -7,6 +7,10 @@ import {
   useModuleRenderInfoForProtocolById,
   useRobot,
 } from '.'
+import {
+  NON_CONNECTING_MODULE_TYPES,
+  getModuleType,
+} from '@opentrons/shared-data'
 
 interface UnmatchedModuleResults {
   missingModuleIds: string[]
@@ -35,6 +39,8 @@ export function useUnmatchedModulesForProtocol(
     moduleRenderInfoById,
     (acc, { moduleDef }, id) => {
       const { model, compatibleWith } = moduleDef
+      // Skip matching any modules that don't require an electronic robot connection
+      if (NON_CONNECTING_MODULE_TYPES.includes(getModuleType(model))) return acc
       // for this required module, find a remaining (unmatched) attached module of the requested model
       const moduleTypeMatchIndex = acc.remainingAttachedModules.findIndex(
         attachedModule => {

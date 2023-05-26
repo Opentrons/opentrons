@@ -1,6 +1,9 @@
 """Test gantry movement handler with hardware API."""
+from __future__ import annotations
+
 import pytest
 from decoy import Decoy
+from typing import TYPE_CHECKING
 
 from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
@@ -14,7 +17,7 @@ from opentrons.motion_planning import Waypoint
 
 from opentrons.protocol_engine.state import StateView, PipetteLocationData
 from opentrons.protocol_engine.types import MotorAxis, DeckPoint, CurrentWell
-from opentrons.protocol_engine.errors import MustHomeError
+from opentrons.protocol_engine.errors import MustHomeError, InvalidAxisForRobotType
 
 from opentrons.protocol_engine.execution.gantry_mover import (
     HardwareGantryMover,
@@ -22,6 +25,9 @@ from opentrons.protocol_engine.execution.gantry_mover import (
     create_gantry_mover,
     VIRTUAL_MAX_OT3_HEIGHT,
 )
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
@@ -274,8 +280,10 @@ async def test_home(
     decoy: Decoy,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwareGantryMover,
+    mock_state_view: StateView,
 ) -> None:
     """It should home a set of axes."""
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
     await hardware_subject.home(
         axes=[
             MotorAxis.X,
@@ -307,6 +315,64 @@ async def test_home(
 
     await hardware_subject.home(axes=[])
     decoy.verify(await mock_hardware_api.home(axes=[]), times=1)
+
+
+async def test_ot2_home_fails_with_ot3_axes(
+    decoy: Decoy,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwareGantryMover,
+    mock_state_view: StateView,
+) -> None:
+    """It should raise an error when homing axes that don't exist on OT2."""
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
+    with pytest.raises(InvalidAxisForRobotType):
+        await hardware_subject.home(
+            axes=[
+                MotorAxis.LEFT_PLUNGER,
+                MotorAxis.RIGHT_PLUNGER,
+                MotorAxis.EXTENSION_Z,
+                MotorAxis.EXTENSION_JAW,
+            ]
+        )
+
+
+@pytest.mark.ot3_only
+async def test_home_on_ot3(
+    decoy: Decoy,
+    ot3_hardware_api: OT3API,
+    mock_state_view: StateView,
+) -> None:
+    """Test homing all OT3 axes."""
+    subject = HardwareGantryMover(
+        state_view=mock_state_view, hardware_api=ot3_hardware_api
+    )
+    decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
+    await subject.home(
+        axes=[
+            MotorAxis.X,
+            MotorAxis.Y,
+            MotorAxis.LEFT_Z,
+            MotorAxis.RIGHT_Z,
+            MotorAxis.LEFT_PLUNGER,
+            MotorAxis.RIGHT_PLUNGER,
+            MotorAxis.EXTENSION_JAW,
+            MotorAxis.EXTENSION_Z,
+        ]
+    )
+    decoy.verify(
+        await ot3_hardware_api.home(
+            axes=[
+                HardwareAxis.X,
+                HardwareAxis.Y,
+                HardwareAxis.Z,
+                HardwareAxis.A,
+                HardwareAxis.B,
+                HardwareAxis.C,
+                HardwareAxis.G,
+                HardwareAxis.Z_G,
+            ]
+        ),
+    )
 
 
 # TODO(mc, 2022-12-01): this is overly complicated

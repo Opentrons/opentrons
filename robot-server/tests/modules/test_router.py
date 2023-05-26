@@ -23,12 +23,6 @@ _HTTP_API_VERSION: Final = 3
 
 
 @pytest.fixture()
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mock hardware control API."""
-    return decoy.mock(cls=HardwareControlAPI)
-
-
-@pytest.fixture()
 def magnetic_module(decoy: Decoy) -> MagDeck:
     """Get a mock magnetic module control interface."""
     return decoy.mock(cls=MagDeck)

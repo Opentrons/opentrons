@@ -222,3 +222,7 @@ class PipetteNotReadyToAspirateError(ProtocolEngineError):
 
 class InvalidPipettingVolumeError(ProtocolEngineError):
     """Raised when pipetting a volume larger than the pipette volume."""
+
+
+class InvalidAxisForRobotType(ProtocolEngineError):
+    """Raised when attempting to use an axis that is not present on the given type of robot."""
