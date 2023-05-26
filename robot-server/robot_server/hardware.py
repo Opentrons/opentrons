@@ -266,6 +266,7 @@ async def _postinit_ot3_tasks(
                 return
             elif progress.progress > 99:
                 log.info(f"Update complete for {handle.process_details.subsystem}")
+                return
             else:
                 await asyncio.sleep(1)
 
