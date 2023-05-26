@@ -279,6 +279,18 @@ def _connect_to_fixture(pipp: str=""):
 
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     #path = '/data/testing_data/calibrated_slot_locations.json'
+    mount_options = {
+        "left": types.OT3Mount.LEFT,
+        "right": types.OT3Mount.RIGHT,
+        "gripper": types.OT3Mount.GRIPPER,
+    }
+    print("1、 Z to XY \n 2、Y to XZ")
+    mountval = input("Select the surface to be test:\n\t>> ")
+    if mountval == 1:
+        mount = mount_options["left"]
+    elif mountval == 2:
+        mount = mount_options["right"]
+
     slot_loc = {
         "A1": (13.42, 394.92, 200),
         "A2": (177.32, 394.92, 200),
@@ -423,6 +435,6 @@ if __name__ == "__main__":
     # parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
     # parser.add_argument("--check_tip", action="store_true")
     args = parser.parse_args()
-    mount = mount_options[args.mount]
+    #mount = mount_options[args.mount]
 
-    asyncio.run(_main(args.simulate, mount))
+    asyncio.run(_main(args.simulate))
