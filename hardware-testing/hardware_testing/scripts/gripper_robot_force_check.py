@@ -28,7 +28,7 @@ def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper-on-Robot Force Check')
     arg_parser.add_argument('-m', '--mode', choices=['force','pwm'], required=False, help='Sets the test mode', default='force')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Sets the number of testing cycles', default=10)
-    arg_parser.add_argument('-f', '--force', type=float, required=False, help='Sets the gripper force in Newtons', default=20)
+    arg_parser.add_argument('-f', '--force', type=int, required=False, help='Sets the gripper force in Newtons', default=20)
     arg_parser.add_argument('-p', '--pwm', type=int, required=False, help='Sets the gripper PWM duty cycle in percentage', default=25)
     arg_parser.add_argument('-t', '--time', type=int, required=False, help='Sets the gripper hold time in seconds', default=10)
     arg_parser.add_argument('-n', '--part_number', type=str, required=False, help='Sets the gripper part number', default="DVT-00")
@@ -38,7 +38,7 @@ def build_arg_parser():
 
 class Gripper_Robot_Force_Check:
     def __init__(
-        self, simulate: bool, mode: str, cycles: int, force: float, pwm: int, time: float, part_number: str
+        self, simulate: bool, mode: str, cycles: int, force: int, pwm: int, time: float, part_number: str
     ) -> None:
         self.simulate = simulate
         self.mode = mode
@@ -63,6 +63,7 @@ class Gripper_Robot_Force_Check:
             "Part Number":"None",
             "Serial Number":"None",
             "Input Force":"None",
+            "Input PWM":"None",
             "Output Force":"None",
         }
         self.force_gauge = None
@@ -81,7 +82,6 @@ class Gripper_Robot_Force_Check:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Part Number"] = str(self.part_number)
         self.test_data["Serial Number"] = str(self.gripper_id)
-        self.test_data["Input Force"] = str(self.grip_force)
         self.deck_definition = load("ot3_standard", version=3)
         print(f"\nStarting Gripper-on-Robot Force Check!\n")
         self.start_time = time.time()
@@ -91,8 +91,10 @@ class Gripper_Robot_Force_Check:
         self.test_name = class_name.lower()
         if self.mode == "force":
             self.test_tag = f"force_{self.grip_force}"
+            self.test_data["Input Force"] = str(self.grip_force)
         else:
             self.test_tag = f"pwm_{self.grip_pwm}"
+            self.test_data["Input PWM"] = str(self.grip_pwm)
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
