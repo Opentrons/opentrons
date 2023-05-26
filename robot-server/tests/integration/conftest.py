@@ -2,7 +2,7 @@ import asyncio
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, Generator, Iterator
 
 import pytest
 import requests
@@ -45,7 +45,7 @@ def request_session() -> requests.Session:
 
 
 @pytest.fixture(scope="session")
-def run_server(
+def _run_server(
     request_session: requests.Session,
     server_temp_directory: str,
 ) -> Iterator[None]:
@@ -81,7 +81,7 @@ def run_server(
 
 
 @pytest.fixture(scope="session")
-def ot3_run_server(
+def _ot3_run_server(
     request_session: requests.Session,
     server_temp_directory: str,
 ) -> Iterator[None]:
@@ -117,18 +117,6 @@ def ot3_run_server(
         yield
 
 
-@pytest.fixture(scope="session")
-def session_server_host(run_server: object) -> str:
-    """Return the host of the running session-scoped dev server."""
-    return _SESSION_SERVER_HOST
-
-
-@pytest.fixture(scope="session")
-def session_server_port(run_server: object) -> str:
-    """Return the port of the running session-scoped dev server."""
-    return _SESSION_SERVER_PORT
-
-
 @pytest.fixture
 def set_disable_fast_analysis(
     request_session: requests.Session,
@@ -143,12 +131,8 @@ def set_disable_fast_analysis(
     request_session.post(url, json=data)
 
 
-@pytest.fixture()
-def clean_server_state() -> Iterator[None]:
-    # async fn that does the things below
-    # make a robot client
-    # delete protocols
-    async def _clean_server_state() -> None:
+def _clean_server_state() -> None:
+    async def _clean_server_state_async() -> None:
         port = "31950"
         async with RobotClient.make(
             base_url=f"http://localhost:{port}", version="*"
@@ -156,17 +140,15 @@ def clean_server_state() -> Iterator[None]:
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
 
-    yield
-    asyncio.run(_clean_server_state())
+    asyncio.run(_clean_server_state_async())
 
 
 # TODO(jbl 2023-05-01) merge this with ot3_run_server, along with clean_server_state and run_server
-@pytest.fixture()
-def ot3_clean_server_state() -> Iterator[None]:
+def _ot3_clean_server_state() -> None:
     # async fn that does the things below
     # make a robot client
     # delete protocols
-    async def _clean_server_state() -> None:
+    async def _clean_server_state_async() -> None:
         port = "31960"
         async with RobotClient.make(
             base_url=f"http://localhost:{port}", version="*"
@@ -174,8 +156,7 @@ def ot3_clean_server_state() -> Iterator[None]:
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
 
-    yield
-    asyncio.run(_clean_server_state())
+    asyncio.run(_clean_server_state_async())
 
 
 async def _delete_all_runs(robot_client: RobotClient) -> None:
@@ -195,5 +176,12 @@ async def _delete_all_protocols(robot_client: RobotClient) -> None:
 
 
 @pytest.fixture
-def ot2_session_server_base_url() -> str:
-    return f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}"
+def ot2_server_base_url(_run_server: None) -> Generator[str, None, None]:
+    yield f"{_SESSION_SERVER_HOST}:{_SESSION_SERVER_PORT}"
+    _clean_server_state()
+
+
+@pytest.fixture
+def ot3_server_base_url(_ot3_run_server: None) -> Generator[str, None, None]:
+    yield f"{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}"
+    _ot3_clean_server_state()
