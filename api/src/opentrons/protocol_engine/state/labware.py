@@ -209,6 +209,14 @@ class LabwareView(HasState[LabwareState]):
         """
         self._state = state
 
+    def some_crazy_untested_function(self, s: str) -> str:
+        if s[0] == "x":
+            return labware_id[-1]
+        elif s[-1] == "x":
+            return s[0]
+        else:
+            return s + s
+
     def get(self, labware_id: str) -> LoadedLabware:
         """Get labware data by the labware's unique identifier."""
         try:
