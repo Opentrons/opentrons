@@ -36,7 +36,7 @@ const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
 ]
 
 interface FlexHeadingButtonGroupProps {
-  protocolCancelClickProps: (e: MouseEvent) => unknown
+  protocolCancelClickProps: (event: any) => unknown
   fileData?: ProtocolFile | null
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
@@ -163,7 +163,6 @@ const mapStateToProps = (
 ): FlexHeadingButtonGroupProps => {
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const fileData = fileDataSelectors.createFile(state)
-
   return {
     ...ownProps,
     fileData,
@@ -180,25 +179,11 @@ const mergeProps = (
     dispatch: ThunkDispatch<any>
   }
 ): FlexHeadingButtonGroupProps => {
-  const {
-    fileData,
-    pipettesOnDeck,
-    modulesOnDeck,
-    savedStepForms,
-    protocolCancelClickProps,
-    page,
-  } = stateProps
-
   const { dispatch } = dispatchProps
 
   return {
+    ...stateProps,
     onDownload: () => dispatch(loadFileActions.saveProtocolFile()),
-    fileData,
-    pipettesOnDeck,
-    modulesOnDeck,
-    savedStepForms,
-    protocolCancelClickProps,
-    page,
   }
 }
 

@@ -40,6 +40,12 @@
   color: red !important;
 }
 
+.close_protocol_button:hover {
+  background-color: var(--c-red);
+  color: var(--c-white) !important;
+  opacity: 1 !important;
+}
+
 .export_protocol_button:hover {
   background-color: var(--c-blue);
   color: var(--c-white);

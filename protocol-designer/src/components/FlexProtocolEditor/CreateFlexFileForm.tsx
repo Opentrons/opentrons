@@ -52,6 +52,7 @@ function FlexFormComponent(): JSX.Element {
         <div className={styles.flex_title}>
           <StyledText as="h1">{i18n.t('flex.header.title')}</StyledText>
           <FlexHeadingButtonGroup
+            // @ts-ignore
             protocolCancelClickProps={protocolCancelClick}
           />
         </div>

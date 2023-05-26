@@ -179,10 +179,6 @@ const FileProtocolInformation = (): JSX.Element => {
     setShowConfirmation(false)
   }
 
-  function protocolCancelClick(e: { preventDefault: () => void }): any {
-    e.preventDefault()
-    setShowConfirmation(true)
-  }
   return (
     <>
       {Boolean(showConfirmation) && (
@@ -213,7 +209,8 @@ const FileProtocolInformation = (): JSX.Element => {
           </StyledText>
         </div>
         <FlexHeadingButtonGroup
-          protocolCancelClickProps={protocolCancelClick}
+          // @ts-ignore
+          protocolCancelClickProps={setShowConfirmation}
         />
       </div>
     </>
