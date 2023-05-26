@@ -103,7 +103,7 @@ export function ManualIpHostnameItem({
           size={TYPOGRAPHY.lineHeight20}
           color={COLORS.darkBlackEnabled}
           onClick={remove}
-          marginLeft={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
           data-testid="close-button"
         >
           <Icon name="close" css={CLOSE_ICON_STYLE} />

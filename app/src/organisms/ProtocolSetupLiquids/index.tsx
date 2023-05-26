@@ -16,8 +16,8 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { MICRO_LITERS, RunTimeCommand } from '@opentrons/shared-data'
-import { BackButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
@@ -41,14 +41,13 @@ export function ProtocolSetupLiquids({
   )
   return (
     <>
-      <Flex>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('liquids')}
-        </BackButton>
-      </Flex>
+      <ODDBackButton
+        label={t('liquids')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginTop="2.375rem"
       >
         {liquidsInLoadOrder?.map(liquid => (
@@ -78,27 +77,27 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.light_one}
-      borderRadius={BORDERS.size_four}
+      backgroundColor={COLORS.light1}
+      borderRadius={BORDERS.size4}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
       width="100%"
     >
       <Flex
         alignItems={ALIGN_CENTER}
         width="100%"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
         onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
-          borderRadius={BORDERS.size_two}
-          padding={SPACING.spacing4}
+          borderRadius={BORDERS.size2}
+          padding={SPACING.spacing16}
           backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
         >
           <Icon
             name="circle"
@@ -121,12 +120,12 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={COLORS.darkBlack_twenty}
+            backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
-            padding={`${SPACING.spacing3} 0.75rem`}
+            padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}

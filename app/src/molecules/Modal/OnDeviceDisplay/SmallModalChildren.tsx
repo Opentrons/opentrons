@@ -26,7 +26,7 @@ export function SmallModalChildren(
     <Modal onOutsideClick={handleCloseMaxPinsAlert} modalSize="small">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         width="100%"
       >
         <StyledText
@@ -39,7 +39,7 @@ export function SmallModalChildren(
           {header}
         </StyledText>
         <StyledText
-          color={COLORS.darkBlack_ninety}
+          color={COLORS.darkBlack90}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -50,11 +50,11 @@ export function SmallModalChildren(
 
         <Flex
           backgroundColor={COLORS.blueEnabled}
-          borderRadius={BORDERS.size_three}
+          borderRadius={BORDERS.size3}
           flexDirection={DIRECTION_COLUMN}
-          marginTop={SPACING.spacing6}
+          marginTop={SPACING.spacing32}
           onClick={handleCloseMaxPinsAlert}
-          padding={SPACING.spacing4}
+          padding={SPACING.spacing16}
         >
           <StyledText
             color={COLORS.white}

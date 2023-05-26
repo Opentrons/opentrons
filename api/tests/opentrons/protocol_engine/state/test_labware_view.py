@@ -489,28 +489,28 @@ def test_get_default_magnet_height(
     assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
-def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the deck definition from the state."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
-    assert subject.get_deck_definition() == standard_deck_def
+    assert subject.get_deck_definition() == ot2_standard_deck_def
 
 
-def test_get_slot_definition(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should return a deck slot's definition."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
 
     assert result["id"] == "6"
-    assert result == standard_deck_def["locations"]["orderedSlots"][5]
+    assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
 
 
 def test_get_slot_definition_raises_with_bad_slot_name(
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
 ) -> None:
     """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     with pytest.raises(errors.SlotDoesNotExistError):
         # note: normally the typechecker should catch this, but clients may
@@ -518,19 +518,19 @@ def test_get_slot_definition_raises_with_bad_slot_name(
         subject.get_slot_definition(42)  # type: ignore[arg-type]
 
 
-def test_get_slot_position(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the absolute location of a deck slot's origin."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+    slot_pos = ot2_standard_deck_def["locations"]["orderedSlots"][2]["position"]
     result = subject.get_slot_position(DeckSlotName.SLOT_3)
 
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
-def test_get_slot_center_position(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_slot_center_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the absolute location of a deck slot's center."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     expected_center = Point(x=196.5, y=43.0, z=0.0)
     result = subject.get_slot_center_position(DeckSlotName.SLOT_2)
@@ -929,3 +929,38 @@ def test_get_edge_path_type(
     )
 
     assert result == expected_result
+
+
+def test_get_all_labware_definition(
+    tip_rack_def: LabwareDefinition, falcon_tuberack_def: LabwareDefinition
+) -> None:
+    """It should return the loaded labware definition list."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="opentrons_96_tiprack_300ul",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        },
+        definitions_by_uri={
+            "opentrons_96_tiprack_300ul": tip_rack_def,
+            "falcon-definition": falcon_tuberack_def,
+        },
+    )
+
+    result = subject.get_loaded_labware_definitions()
+
+    assert result == [tip_rack_def]
+
+
+def test_get_all_labware_definition_empty() -> None:
+    """It should return an empty list."""
+    subject = get_labware_view(
+        labware_by_id={},
+    )
+
+    result = subject.get_loaded_labware_definitions()
+
+    assert result == []

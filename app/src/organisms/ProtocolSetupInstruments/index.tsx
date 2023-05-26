@@ -14,13 +14,14 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { BackButton } from '../../atoms/buttons'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { isGripperInCommands } from '../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -39,10 +40,9 @@ export function ProtocolSetupInstruments({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const usesGripper =
-    mostRecentAnalysis?.commands.some(
-      c =>
-        c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper'
-    ) ?? false
+    mostRecentAnalysis != null
+      ? isGripperInCommands(mostRecentAnalysis?.commands ?? [])
+      : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper'
@@ -53,17 +53,16 @@ export function ProtocolSetupInstruments({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
-      <Flex alignItems={ALIGN_CENTER}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('instruments')}
-        </BackButton>
-      </Flex>
+      <ODDBackButton
+        label={t('instruments')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        paddingX={SPACING.spacing5}
+        paddingX={SPACING.spacing24}
       >
         <ColumnLabel>{t('location')}</ColumnLabel>
         <ColumnLabel>
@@ -84,6 +83,7 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
+            mostRecentAnalysis={mostRecentAnalysis}
             attachedCalibrationData={
               attachedPipetteMatch != null
                 ? allPipettesCalibrationData?.data.find(
@@ -116,5 +116,5 @@ const ColumnLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `

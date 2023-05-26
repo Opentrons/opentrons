@@ -1,5 +1,0 @@
-export { LargeButton } from './LargeButton'
-export { MediumButton } from './MediumButton'
-export { RadioButton } from './RadioButton'
-export { SmallButton } from './SmallButton'
-export { TabbedButton } from './TabbedButton'

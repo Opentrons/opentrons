@@ -22,15 +22,15 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
-  padding: ${SPACING.spacing5};
-  border-radius: ${BORDERS.size_three};
+  padding: ${SPACING.spacing24};
+  border-radius: ${BORDERS.size3};
   background-color: ${({ isAttached }) =>
-    isAttached ? COLORS.green_three : COLORS.light_one};
+    isAttached ? COLORS.green3 : COLORS.light1};
   &:hover,
   &:active,
   &:focus {
     background-color: ${({ isAttached }) =>
-      isAttached ? COLORS.green_three_pressed : COLORS.light_one_pressed};
+      isAttached ? COLORS.green3Pressed : COLORS.light1Pressed};
   }
 `
 interface LabeledMountProps {
@@ -53,7 +53,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
         <Flex
           flex="1 0 auto"
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
         >
           <StyledText
             flex="2"
@@ -68,7 +68,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           <StyledText
             flex="5"
             as="h4"
-            color={COLORS.darkBlack_seventy}
+            color={COLORS.darkBlack70}
             textAlign={TYPOGRAPHY.textAlignLeft}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSize28}
@@ -76,7 +76,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
             {instrumentName == null ? t('empty') : instrumentName}
           </StyledText>
         </Flex>
-        <Icon name="more" size="1.5rem" />
+        <Icon name="more" size="3rem" />
       </Flex>
     </MountButton>
   )

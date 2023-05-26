@@ -38,7 +38,7 @@ describe('SubmitPrimaryButton', () => {
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)

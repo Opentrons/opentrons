@@ -45,7 +45,7 @@ export function CheckPipettesButton(
       .catch(() => {})
   }
   const icon = (
-    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
+    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing8} />
   )
 
   let body
@@ -65,7 +65,7 @@ export function CheckPipettesButton(
           name="ot-spinner"
           height={SIZE_1}
           spin
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
         />
         <StyledText>
           {direction === DETACH

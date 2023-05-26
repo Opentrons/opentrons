@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import * as Networking from '../../../../redux/networking'
 import { SetWifiCred } from '../SetWifiCred'
+import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
@@ -17,6 +17,7 @@ const mockSetChangeState = jest.fn()
 jest.mock('../SetWifiCred')
 jest.mock('../../../../redux/networking')
 jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../AlternativeSecurityTypeModal')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -36,6 +37,9 @@ const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedF
   typeof Networking.getNetworkInterfaces
 >
 const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
+const mockAlternativeSecurityTypeModal = AlternativeSecurityTypeModal as jest.MockedFunction<
+  typeof AlternativeSecurityTypeModal
+>
 
 const render = (
   props: React.ComponentProps<typeof SelectAuthenticationType>
@@ -66,6 +70,9 @@ describe('SelectAuthenticationType', () => {
       ethernet: null,
     })
     mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
+    mockAlternativeSecurityTypeModal.mockReturnValue(
+      <div>mock AlternativeSecurityTypeModal</div>
+    )
   })
 
   afterEach(() => {
@@ -73,48 +80,33 @@ describe('SelectAuthenticationType', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Connect to mockWifi')
-    getByRole('button', { name: 'Back' })
-    getByRole('button', { name: 'Next' })
-    getByText('Select authentication method for your selected network.')
-    getByRole('button', { name: 'WPA2 Personal' })
-    getByRole('button', { name: 'None' })
-    getByText('MAC Address:')
-    getByText('WI:FI:00:00:00:00')
-    getByText(
-      'If your network uses a different authentication method, connect to the Opentrons App and finish Wi-Fi setup there.'
-    )
-    getByRole('button', { name: 'Connect via USB' })
-  })
-
-  it('when tapping back button, call a mock function', () => {
-    // ToDo need to update this later PR-#11917
-    // const [{ getByRole }] = render(props)
-    // const button = getByRole('button', { name: 'Back' })
-    // fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    getByText('Select a security type')
+    getByText('Continue')
+    getByText('WPA2 Personal')
+    getByText('Most labs use this method')
+    getByText('None')
+    getByText('Not recommended')
+    getByText('Your MAC Address is WI:FI:00:00:00:00')
+    getByText('Need another security type?')
   })
 
   it('when tapping back button, call a mock function - fromWifiList', () => {
-    // ToDo need to update this later
     props.fromWifiList = true
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Back' })
-    fireEvent.click(button)
+    const [{ getAllByRole }] = render(props)
+    getAllByRole('button')[0].click()
     expect(props.setChangeState).toHaveBeenCalled()
   })
 
-  it('when tapping next button, call a mock function - wpa', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Next' })
-    fireEvent.click(button)
+  it('should call call a mock function - wpa when tapping continue button', () => {
+    const [{ getByText }] = render(props)
+    getByText('Continue').click()
     expect(mockSetShowSelectAuthenticationType).toHaveBeenCalled()
   })
 
-  it('when tapping connect via usb button, call a mock function', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Connect via USB' })
-    fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/network-setup/usb')
+  it('should render AlternativeSecurityTypeModal when tapping need another security type? button', () => {
+    const [{ getByText }] = render(props)
+    getByText('Need another security type?').click()
+    getByText('mock AlternativeSecurityTypeModal')
   })
 })

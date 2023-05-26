@@ -21,6 +21,7 @@ from .exceptions import (
     PipetteNotLoadedError,
     ModuleNotLoadedError,
     ModuleNotOnDeckError,
+    ModuleNotConnectedError,
     SlotDoesNotExistError,
     FailedToPlanMoveError,
     MustHomeError,
@@ -33,6 +34,7 @@ from .exceptions import (
     RobotDoorOpenError,
     PipetteMovementRestrictedByHeaterShakerError,
     HeaterShakerLabwareLatchNotOpenError,
+    HeaterShakerLabwareLatchStatusUnknown,
     EngageHeightOutOfRangeError,
     NoTargetTemperatureSetError,
     InvalidTargetSpeedError,
@@ -45,6 +47,7 @@ from .exceptions import (
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
+    InvalidAxisForRobotType,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -71,6 +74,7 @@ __all__ = [
     "PipetteNotLoadedError",
     "ModuleNotLoadedError",
     "ModuleNotOnDeckError",
+    "ModuleNotConnectedError",
     "SlotDoesNotExistError",
     "FailedToPlanMoveError",
     "MustHomeError",
@@ -83,6 +87,7 @@ __all__ = [
     "RobotDoorOpenError",
     "PipetteMovementRestrictedByHeaterShakerError",
     "HeaterShakerLabwareLatchNotOpenError",
+    "HeaterShakerLabwareLatchStatusUnknown",
     "EngageHeightOutOfRangeError",
     "NoTargetTemperatureSetError",
     "InvalidTargetTemperatureError",
@@ -95,7 +100,7 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
-    "FirmwareUpdateRequired",
+    "InvalidAxisForRobotType",
     # error occurrence models
     "ErrorOccurrence",
 ]

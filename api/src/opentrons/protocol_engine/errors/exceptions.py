@@ -102,6 +102,10 @@ class ModuleNotOnDeckError(ProtocolEngineError):
     """Raised when trying to use a module that is loaded off the deck."""
 
 
+class ModuleNotConnectedError(ProtocolEngineError):
+    """Raised when trying to use a module that is not connected to the robot electrically."""
+
+
 class SlotDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a deck slot that does not exist."""
 
@@ -154,6 +158,10 @@ class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
 
 class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
     """Raised when Heater-Shaker latch is not open when it is expected to be so."""
+
+
+class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
+    """Raised when Heater-Shaker latch has not been set before moving to it."""
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
@@ -214,3 +222,7 @@ class PipetteNotReadyToAspirateError(ProtocolEngineError):
 
 class InvalidPipettingVolumeError(ProtocolEngineError):
     """Raised when pipetting a volume larger than the pipette volume."""
+
+
+class InvalidAxisForRobotType(ProtocolEngineError):
+    """Raised when attempting to use an axis that is not present on the given type of robot."""

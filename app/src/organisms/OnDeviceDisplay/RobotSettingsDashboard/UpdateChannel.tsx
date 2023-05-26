@@ -23,7 +23,7 @@ import {
 } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface LabelProps {
   isSelected?: boolean
@@ -34,8 +34,8 @@ const SettingButton = styled.input`
 `
 
 const SettingButtonLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing5};
-  border-radius: ${BORDERS.size_four};
+  padding: ${SPACING.spacing24};
+  border-radius: ${BORDERS.size4};
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
@@ -78,7 +78,7 @@ export function UpdateChannel({
           {t('app_settings:update_channel')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
+      <Flex marginTop={SPACING.spacing40}>
         <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
@@ -89,8 +89,8 @@ export function UpdateChannel({
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing5}
+        gridGap={SPACING.spacing8}
+        marginTop={SPACING.spacing24}
       >
         {modifiedChannelOptions.map(radio => (
           <React.Fragment key={`channel_setting_${radio.label}`}>
@@ -114,14 +114,12 @@ export function UpdateChannel({
               </StyledText>
               {radio.label === 'Alpha' ? (
                 <StyledText
-                  marginTop={SPACING.spacing2}
+                  marginTop={SPACING.spacing4}
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={
-                    radio.value === channel
-                      ? COLORS.white
-                      : COLORS.darkBlack_seventy
+                    radio.value === channel ? COLORS.white : COLORS.darkBlack70
                   }
                 >
                   {t('alpha_description')}

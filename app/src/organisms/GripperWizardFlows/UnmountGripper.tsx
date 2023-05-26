@@ -21,32 +21,40 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 export const UnmountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const {
-    proceed,
-    attachedGripper,
-    isRobotMoving,
-    goBack,
-    chainRunCommands,
-  } = props
+  const { proceed, isRobotMoving, goBack, chainRunCommands } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+
+  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    refetchInterval: 3000,
+  })
+  const isGripperStillAttached = (instrumentsQueryData?.data ?? []).some(
+    i => i.mount === 'extension'
+  )
+
   const [
     showGripperStillDetected,
     setShowGripperStillDetected,
   ] = React.useState(false)
   const handleContinue = (): void => {
-    if (attachedGripper == null) {
-      chainRunCommands(
-        [{ commandType: 'home' as const, params: {} }],
-        true
-      ).then(() => {
-        proceed()
+    refetch()
+      .then(() => {
+        if (!isGripperStillAttached) {
+          chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
+            .then(() => {
+              proceed()
+            })
+            .catch(() => {
+              // TODO(BC, 2023-05-18): set fatal error here if home fails
+            })
+        } else {
+          setShowGripperStillDetected(true)
+        }
       })
-    } else {
-      setShowGripperStillDetected(true)
-    }
+      .catch(() => {
+        setShowGripperStillDetected(true)
+      })
   }
-  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
-  useInstrumentsQuery({ refetchInterval: 3000 })
 
   if (isRobotMoving)
     return (
@@ -71,9 +79,7 @@ export const UnmountGripper = (
         </Link>
         <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={() => {
-            handleContinue()
-          }}
+          onClick={handleContinue}
         >
           {t('shared:try_again')}
         </PrimaryButton>

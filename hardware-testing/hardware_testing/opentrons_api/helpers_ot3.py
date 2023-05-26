@@ -5,7 +5,7 @@ from datetime import datetime
 from math import pi
 from subprocess import run
 from time import time
-from typing import List, Optional, Dict, Tuple, Union
+from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
 
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -16,6 +16,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
+from opentrons.config.advanced_settings import set_adv_setting
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
@@ -128,16 +129,20 @@ async def build_async_ot3_hardware_api(
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
     loop: Optional[asyncio.AbstractEventLoop] = None,
+    stall_detection_enable: bool = True,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
+    await set_adv_setting(
+        "disableStallDetection", False if stall_detection_enable else True
+    )
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     kwargs = {"config": config}
     if is_simulating:
-        builder = OT3API.build_hardware_simulator
-        # TODO (andy s): add ability to simulate:
-        #                - gripper
-        #                - 96-channel
-        #                - modules
+        # This Callable type annotation works around mypy complaining about slight mismatches
+        # between the signatures of build_hardware_simulator() and build_hardware_controller().
+        builder: Callable[
+            ..., Coroutine[None, None, OT3API]
+        ] = OT3API.build_hardware_simulator
         sim_pips = _create_attached_instruments_dict(
             pipette_left, pipette_right, gripper
         )
@@ -146,7 +151,15 @@ async def build_async_ot3_hardware_api(
         builder = OT3API.build_hardware_controller
         stop_server_ot3()
         restart_canbus_ot3()
-    return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+        kwargs["use_usb_bus"] = True  # type: ignore[assignment]
+    try:
+        return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+    except Exception as e:
+        if is_simulating:
+            raise e
+        print(e)
+        kwargs["use_usb_bus"] = False  # type: ignore[assignment]
+        return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -414,6 +427,35 @@ async def move_plunger_absolute_ot3(
             await _move_coro
 
 
+async def move_tip_motor_relative_ot3(
+    api: OT3API,
+    distance: float,
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+) -> None:
+    """Move 96ch tip-motor (Q) to an absolute position."""
+    if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
+        raise RuntimeError("No pipette found on LEFT mount")
+    if distance < 0:
+        action = "home"
+    else:
+        action = "clamp"
+    _move_coro = api._backend.tip_action(
+        axes=[OT3Axis.Q],
+        distance=distance,
+        speed=speed if speed else 5,
+        tip_action=action,
+    )
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with api._backend.restore_current():
+            await api._backend.set_active_current(
+                {OT3Axis.Q: motor_current}  # type: ignore[dict-item]
+            )
+            await _move_coro
+
+
 async def move_plunger_relative_ot3(
     api: OT3API,
     mount: OT3Mount,
@@ -440,7 +482,7 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
     """Get the endstop's position per mount."""
-    transforms = api._transforms
+    transforms = api._robot_calibration
     machine_pos_per_axis = api._backend.home_position()
     deck_pos_per_axis = deck_from_machine(
         machine_pos_per_axis,
@@ -619,37 +661,16 @@ class SensorResponseBad(Exception):
     pass
 
 
-async def get_capacitance_ot3(
-    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
-) -> float:
-    """Get the capacitance reading from the pipette."""
-    if api.is_simulator:
-        return 0.0
-    node_id = sensor_node_for_mount(mount)
-    if not channel or channel == "rear":
-        capacitive = sensor_types.CapacitiveSensor.build(SensorId.S0, node_id)
-    elif channel == "front":
-        capacitive = sensor_types.CapacitiveSensor.build(SensorId.S1, node_id)
-    else:
-        raise ValueError(f"unexpected channel for capacitance sensor: {channel}")
-    s_driver = sensor_driver.SensorDriver()
-    data = await s_driver.read(
-        api._backend._messenger, capacitive, offset=False, timeout=1  # type: ignore[union-attr]
-    )
-    if data is None:
-        raise SensorResponseBad("no response from sensor")
-    return data.to_float()  # type: ignore[union-attr]
-
-
 async def _get_temp_humidity(
-    messenger: CanMessenger, mount: OT3Mount
+    messenger: CanMessenger,
+    mount: OT3Mount,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Tuple[float, float]:
     node_id = sensor_node_for_mount(mount)
-    # FIXME: allow SensorId to specify which sensor on the device to read from
-    environment = sensor_types.EnvironmentSensor.build(SensorId.S0, node_id)
+    environment = sensor_types.EnvironmentSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        messenger, environment, offset=False, timeout=1  # type: ignore[union-attr]
+        messenger, environment, offset=False, timeout=2  # type: ignore[union-attr]
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")
@@ -657,17 +678,21 @@ async def _get_temp_humidity(
 
 
 async def get_temperature_humidity_ot3(
-    api: OT3API, mount: OT3Mount
+    api: OT3API,
+    mount: OT3Mount,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette."""
     if api.is_simulator:
         return 25.0, 50.0
     messenger = api._backend._messenger  # type: ignore[union-attr]
-    return await _get_temp_humidity(messenger, mount)
+    return await _get_temp_humidity(messenger, mount, sensor_id)
 
 
 def get_temperature_humidity_outside_api_ot3(
-    mount: OT3Mount, is_simulating: bool = False
+    mount: OT3Mount,
+    is_simulating: bool = False,
+    sensor_id: SensorId = SensorId.S0,
 ) -> Tuple[float, float]:
     """Get the temperature/humidity reading from the pipette outside of a protocol."""
     settings = DriverSettings(
@@ -684,7 +709,7 @@ def get_temperature_humidity_outside_api_ot3(
         async with build.driver(settings) as driver:
             messenger = CanMessenger(driver=driver)
             messenger.start()
-            ret = await _get_temp_humidity(messenger, mount)
+            ret = await _get_temp_humidity(messenger, mount, sensor_id)
             await messenger.stop()
             return ret
 
@@ -694,22 +719,34 @@ def get_temperature_humidity_outside_api_ot3(
     return task.result()
 
 
+async def get_capacitance_ot3(
+    api: OT3API, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+) -> float:
+    """Get the capacitance reading from the pipette."""
+    if api.is_simulator:
+        return 0.0
+    node_id = sensor_node_for_mount(mount)
+    capacitive = sensor_types.CapacitiveSensor.build(sensor_id, node_id)
+    s_driver = sensor_driver.SensorDriver()
+    data = await s_driver.read(
+        api._backend._messenger, capacitive, offset=False, timeout=2  # type: ignore[union-attr]
+    )
+    if data is None:
+        raise SensorResponseBad("no response from sensor")
+    return data.to_float()  # type: ignore[union-attr]
+
+
 async def get_pressure_ot3(
-    api: OT3API, mount: OT3Mount, channel: Optional[str] = None
+    api: OT3API, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
 ) -> float:
     """Get the pressure reading from the pipette."""
     if api.is_simulator:
         return 0.0
     node_id = sensor_node_for_mount(mount)
-    if not channel or channel == "rear":
-        pressure = sensor_types.PressureSensor.build(SensorId.S0, node_id)
-    elif channel == "front":
-        pressure = sensor_types.PressureSensor.build(SensorId.S1, node_id)
-    else:
-        raise ValueError(f"unexpected channel for pressure sensor: {channel}")
+    pressure = sensor_types.PressureSensor.build(sensor_id, node_id)
     s_driver = sensor_driver.SensorDriver()
     data = await s_driver.read(
-        api._backend._messenger, pressure, offset=False, timeout=1  # type: ignore[union-attr]
+        api._backend._messenger, pressure, offset=False, timeout=2  # type: ignore[union-attr]
     )
     if data is None:
         raise SensorResponseBad("no response from sensor")

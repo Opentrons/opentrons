@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, add
+from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -29,6 +29,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
 from opentrons.types import DeckSlotName, MountType
+from ..errors import ModuleNotConnectedError
 
 from ..types import (
     LoadedModule,
@@ -39,6 +40,7 @@ from ..types import (
     DeckSlotLocation,
     ModuleDimensions,
     LabwareOffsetVector,
+    HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
     ModuleLocation,
     DeckType,
@@ -62,6 +64,8 @@ from .module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    MagneticBlockSubState,
+    MagneticBlockId,
     ModuleSubStateType,
 )
 
@@ -98,7 +102,7 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
 class HardwareModule:
     """Data describing an actually connected module."""
 
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
@@ -221,7 +225,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _add_module_substate(
         self,
         module_id: str,
-        serial_number: str,
+        serial_number: Optional[str],
         definition: ModuleDefinition,
         slot_name: Optional[DeckSlotName],
         requested_model: Optional[ModuleModel],
@@ -243,12 +247,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
+            if live_data is None:
+                labware_latch_status = HeaterShakerLatchStatus.UNKNOWN
+            elif live_data["labwareLatchStatus"] == "idle_closed":
+                labware_latch_status = HeaterShakerLatchStatus.CLOSED
+            else:
+                labware_latch_status = HeaterShakerLatchStatus.OPEN
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=(
-                    live_data is not None
-                    and live_data["labwareLatchStatus"] == "idle_closed"
-                ),
+                labware_latch_status=labware_latch_status,
                 is_plate_shaking=(
                     live_data is not None and live_data["targetSpeed"] is not None
                 ),
@@ -266,6 +273,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
             )
+        elif ModuleModel.is_magnetic_block(actual_model):
+            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
+                module_id=MagneticBlockId(module_id)
+            )
 
     def _update_module_calibration(
         self, module_id: str, module_offset: ModuleOffsetVector
@@ -273,6 +284,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
+            assert (
+                module_serial is not None
+            ), "Expected a module SN and got None instead."
             self._state.module_offset_by_serial[module_serial] = module_offset
 
     def _handle_heater_shaker_commands(
@@ -298,42 +312,42 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=None,
             )
         elif isinstance(command.result, heater_shaker.SetAndWaitForShakeSpeedResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=True,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.DeactivateShakerResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=False,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.OpenLabwareLatchResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=False,
+                labware_latch_status=HeaterShakerLatchStatus.OPEN,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.CloseLabwareLatchResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=True,
+                labware_latch_status=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
@@ -602,7 +616,12 @@ class ModuleView(HasState[ModuleState]):
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
         """
-        return self.get(module_id).serialNumber
+        module = self.get(module_id)
+        if module.serialNumber is None:
+            raise ModuleNotConnectedError(
+                f"Expected a connected module and got a {module.model.name}"
+            )
+        return module.serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
@@ -617,7 +636,16 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_offset(
+    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
+        """Get the stored module calibration offset."""
+        module_serial = self.get(module_id).serialNumber
+        if module_serial is not None:
+            offset = self._state.module_offset_by_serial.get(module_serial)
+            if offset:
+                return offset
+        return ModuleOffsetVector(x=0, y=0, z=0)
+
+    def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
@@ -641,17 +669,24 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-
-        # add the calibrated module offset if there is one
-        module_serial = self.get_serial_number(module_id)
-        offset = self._state.module_offset_by_serial.get(module_serial)
-        if offset is not None:
-            module_offset = array((offset.x, offset.y, offset.z, 1))
-            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
             z=xformed[2],
+        )
+
+    def get_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
+        """Get the module's offset vector computed with slot transform and calibrated module offsets."""
+        offset_vector = self.get_nominal_module_offset(module_id, deck_type)
+
+        # add the calibrated module offset if there is one
+        cal_offset = self.get_module_calibration_offset(module_id)
+        return LabwareOffsetVector(
+            x=offset_vector.x + cal_offset.x,
+            y=offset_vector.y + cal_offset.y,
+            z=offset_vector.z + cal_offset.z,
         )
 
     def get_overall_height(self, module_id: str) -> float:
@@ -881,7 +916,7 @@ class ModuleView(HasState[ModuleState]):
         hs_restrictors = [
             HeaterShakerMovementRestrictors(
                 plate_shaking=substate.is_plate_shaking,
-                latch_closed=substate.is_labware_latch_closed,
+                latch_status=substate.labware_latch_status,
                 deck_slot=self.get_location(substate.module_id).slotName.as_int(),
             )
             for substate in hs_substates

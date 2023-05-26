@@ -71,17 +71,24 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONY: test-gravimetric-single
+test-gravimetric-single:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 1 --increment
+
+.PHONY: test-gravimetric-multi
+test-gravimetric-multi:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
+
 .PHONY: test-gravimetric
-test-gravimetric:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 200 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --tip 1000 --trials 3 --starting-tip A1 --increment
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 3 --starting-tip A1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 3 --starting-tip A1
+test-gravimetric: patch-for-gravimetric test-gravimetric-single test-gravimetric-multi
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -89,6 +96,7 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.pipette_assembly_qc_ot3 --operator test --simulate
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.ninety_six_assembly_qc_ot3 --simulate
 
 .PHONY: test-examples
 test-examples:
@@ -213,3 +221,25 @@ sync-fw-ot3:
 
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3
+
+.PHONY: push-ot3-gravimetric
+push-ot3-gravimetric:
+	-$(MAKE) patch-for-gravimetric
+	$(MAKE) sync-sw-ot3
+
+.PHONY: apply-patches-gravimetric
+patch-for-gravimetric:
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
+
+.PHONY: remove-patches-gravimetric
+unpatch-for-gravimetric:
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
+
+.PHONY: update-patches-gravimetric
+gen-patches-for-gravimetric:
+	rm ./hardware_testing/gravimetric/overrides/*.patch
+	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
+	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
+	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
+	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
+	$(MAKE) remove-patches-gravimetric

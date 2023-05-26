@@ -20,14 +20,14 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/OnDeviceDisplay/constants'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const BUTTON_STYLE = css`
   &:focus-visible {
@@ -35,7 +35,7 @@ const BUTTON_STYLE = css`
   }
 
   &:active {
-    color: ${COLORS.darkBlack_forty};
+    color: ${COLORS.darkBlack40};
   }
 `
 
@@ -46,7 +46,7 @@ interface BrightnessTileProps {
 const BrightnessTile = styled(Box)`
   width: 100%;
   height: 8.75rem;
-  border-radius: ${BORDERS.size_two};
+  border-radius: ${BORDERS.size2};
   background: ${(props: BrightnessTileProps) =>
     props.isActive ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
 `
@@ -103,7 +103,7 @@ export function TouchscreenBrightness({
         marginTop="7.625rem"
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
       >
         <Btn
           disabled={brightness === LOWEST_BRIGHTNESS}
@@ -115,7 +115,7 @@ export function TouchscreenBrightness({
         </Btn>
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           width="43.5rem"
         >
           {brightnessLevel.map(level => (

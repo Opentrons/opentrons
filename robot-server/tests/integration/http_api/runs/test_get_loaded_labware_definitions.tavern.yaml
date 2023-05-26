@@ -1,0 +1,75 @@
+test_name: Get the definitions of a run's loaded labware
+
+marks:
+  - usefixtures:
+      - run_server
+      - clean_server_state
+
+stages:
+  - name: Upload simple JSONv6 protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple_v6.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+
+  - name: Issue a play action
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      json:
+        data:
+          actionType: play
+      method: POST
+    response:
+      status_code: 201
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Fetch run labware definitions
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/loaded_labware_definitions'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - metadata:
+              displayName: 'Opentrons Fixed Trash'
+          - metadata:
+              displayName: 'Foo 8 Well Plate 33uL'
+          - metadata:
+              displayName: 'Foo 8 Well Plate 33uL'
+          - metadata:
+              displayName: 'Opentrons 96 Tip Rack 10 µL'

@@ -13,6 +13,7 @@ from mock import MagicMock
 from pathlib import Path
 from typing import Any, Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
+from decoy import Decoy
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -51,6 +52,14 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
+
+
+@pytest.fixture()
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Return a mock in the shape of a HardwareControlAPI."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    return decoy.mock(cls=API)
 
 
 @pytest.fixture(autouse=True)
@@ -174,6 +183,24 @@ def clean_server_state() -> Iterator[None]:
     # delete protocols
     async def _clean_server_state() -> None:
         port = "31950"
+        async with RobotClient.make(
+            host="http://localhost", port=port, version="*"
+        ) as robot_client:
+            await _delete_all_runs(robot_client)
+            await _delete_all_protocols(robot_client)
+
+    yield
+    asyncio.run(_clean_server_state())
+
+
+# TODO(jbl 2023-05-01) merge this with ot3_run_server, along with clean_server_state and run_server
+@pytest.fixture()
+def ot3_clean_server_state() -> Iterator[None]:
+    # async fn that does the things below
+    # make a robot client
+    # delete protocols
+    async def _clean_server_state() -> None:
+        port = "31960"
         async with RobotClient.make(
             host="http://localhost", port=port, version="*"
         ) as robot_client:

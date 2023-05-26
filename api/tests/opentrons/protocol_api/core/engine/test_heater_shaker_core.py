@@ -224,3 +224,14 @@ def test_get_labware_latch_status(
     )
     result = subject.get_labware_latch_status()
     assert result == HeaterShakerLabwareLatchStatus.OPENING
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: HeaterShakerModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

@@ -3,6 +3,7 @@ import pytest
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
     LegacyProtocolCore,
@@ -25,10 +26,13 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
-def protocol_context(hardware: ThreadManagedHardware) -> LegacyProtocolCore:
+def protocol_context(
+    hardware: ThreadManagedHardware, deck_definition_name: str
+) -> LegacyProtocolCore:
     """Protocol context implementation fixture."""
     return LegacyProtocolCore(
         sync_hardware=hardware.sync,
+        deck_layout=Deck(deck_type=deck_definition_name),
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
     )
@@ -37,10 +41,12 @@ def protocol_context(hardware: ThreadManagedHardware) -> LegacyProtocolCore:
 @pytest.fixture
 def simulating_protocol_context(
     hardware: ThreadManagedHardware,
+    deck_definition_name: str,
 ) -> LegacyProtocolCoreSimulator:
     """Protocol context simulation fixture."""
     return LegacyProtocolCoreSimulator(
         sync_hardware=hardware.sync,
+        deck_layout=Deck(deck_type=deck_definition_name),
         api_version=MAX_SUPPORTED_VERSION,
         labware_offset_provider=NullLabwareOffsetProvider(),
     )

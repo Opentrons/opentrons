@@ -20,7 +20,7 @@ export function SearchNetwork(): JSX.Element {
       height="22rem"
       backgroundColor="#D6D6D6"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       width="100%"
     >
       <Flex
@@ -32,7 +32,7 @@ export function SearchNetwork(): JSX.Element {
           fontSize="2rem"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight="2.72375rem"
-          marginTop={SPACING.spacingXXL}
+          marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
         </StyledText>
