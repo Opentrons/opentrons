@@ -73,7 +73,7 @@ test_name: Upload, analyze and analyze using "slow analysis"
 marks:
   - usefixtures:
       - ot2_server_base_url
-      - set_disable_fast_analysis
+      - ot2_server_set_disable_fast_analysis
 
 stages:
   - name: Upload simple Python protocol
