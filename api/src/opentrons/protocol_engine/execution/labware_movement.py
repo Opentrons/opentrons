@@ -105,16 +105,6 @@ class LabwareMovementHandler:
 
         gripper_mount = OT3Mount.GRIPPER
 
-        is_tc2 = False
-
-        if isinstance(current_location, ModuleLocation):
-            module_id = current_location.moduleId
-            if (
-                self._state_store.modules.get_connected_model(module_id)
-                == ModuleModel.THERMOCYCLER_MODULE_V2
-            ):
-                is_tc2 = True
-
         # Retract all mounts
         await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
