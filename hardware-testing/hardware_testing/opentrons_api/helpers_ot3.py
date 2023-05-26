@@ -561,6 +561,14 @@ async def update_pick_up_current(
     }
     pipette.pick_up_configurations.press_fit = config_model
 
+async def update_96_pick_up_current(
+    api: OT3API, mount: OT3Mount, current: float = 0.125
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette.pick_up_configurations
+    config_model.pick_up_motor_actions = current
+    pipette.pick_up_configurations = config_model
 
 async def update_drop_tip_current(
     api: OT3API, mount: OT3Mount, current: float = 1.0
