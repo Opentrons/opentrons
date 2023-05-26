@@ -34,32 +34,41 @@ _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 TARGET_END_PHOTOPLATE_VOLUME = 200
 
 _DYE_MAP = {
-    'HV': {'min': 200.1, 'max': 350},
-    'A': {'min': 50, 'max': 200},
-    'B': {'min': 10, 'max': 49.99},
-    'C': {'min': 2, 'max': 9.999},
-    'D': {'min': 1, 'max': 1.999},
+    "HV": {"min": 200.1, "max": 350},
+    "A": {"min": 50, "max": 200},
+    "B": {"min": 10, "max": 49.99},
+    "C": {"min": 2, "max": 9.999},
+    "D": {"min": 1, "max": 1.999},
 }
 _MIN_START_VOLUME_UL = 30000
 _MIN_END_VOLUME_UL = 10000
 _MAX_VOLUME_UL = 165000
 
+
 def _get_dye_type(volume: float) -> str:
     dye_type = None
     for dye in _DYE_MAP.keys():
-        if (volume >= _DYE_MAP[dye]['min'] and volume <= _DYE_MAP[dye]['max']):
+        if volume >= _DYE_MAP[dye]["min"] and volume <= _DYE_MAP[dye]["max"]:
             dye_type = dye
             break
-    assert dye_type is not None, (
-        f"volume {volume} is outside of the available dye range"
-    )
+    assert (
+        dye_type is not None
+    ), f"volume {volume} is outside of the available dye range"
     return dye_type
 
-def _setup_dye(volume: float, cfg: config.PhotometricConfig) :
-    dye_required = max(_MIN_START_VOLUME_UL, volume*96+_MIN_END_VOLUME_UL)
+
+def _setup_dye(volume: float, cfg: config.PhotometricConfig):
+    if volume == 250:
+        # this is actually the 1000ul test
+        dye_required = (volume * 4 * 96) + _MIN_END_VOLUME_UL
+    else:
+        dye_required = max(
+            _MIN_START_VOLUME_UL, volume * 96 * cfg.trials + _MIN_END_VOLUME_UL
+        )
     ui.get_user_ready(
         f"Place the {_get_dye_type(volume)} reservoir in slot {cfg.reservoir_slot} and fill to {dye_required}ul of {_get_dye_type(volume)} dye"
     )
+
 
 def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
     # update this regularly, because the script may exit early
@@ -230,11 +239,13 @@ def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
         f"\td: {round(d * 100.0, 2)}%"
     )
 
-def _dispense_volumes(volume:float) -> Tuple[float, float, int]:
+
+def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
     target_volume = 250 if volume > 800 else TARGET_END_PHOTOPLATE_VOLUME
     num_dispenses = ceil(volume / target_volume)
     volume_to_dispense = volume / num_dispenses
     return target_volume, volume_to_dispense, num_dispenses
+
 
 def _run_trial(
     ctx: ProtocolContext,
@@ -376,11 +387,13 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     total_photoplates = 0
     for vol in test_volumes:
         target_volume, volume_to_dispense, _ = _dispense_volumes(vol)
-        total_photoplates = total_photoplates + (
-            ceil(vol / target_volume) * cfg.trials
-        )
-        dye_required = vol*96*cfg.trials
-        dye_types_req[_get_dye_type(volume_to_dispense)]+=dye_required
+        total_photoplates = total_photoplates + (ceil(vol / target_volume) * cfg.trials)
+        dye_required = vol * 96 * (cfg.trials if vol < 1000 else 3)
+        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_required
+
+    trial_total = len(test_volumes) * cfg.trials
+    if cfg.trials > 3 and 1000 in test_volumes:
+        trial_total = trial_total - cfg.trials + 3
 
     ui.print_header("PREPARE")
     ui.get_user_ready(
@@ -388,14 +401,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     )
     ui.get_user_ready(f"Is there {total_photoplates} {cfg.photoplate} covers ready?")
     ui.get_user_ready(
-        f"Is there {(cfg.trials*(len(test_volumes)-1))}  extra full {cfg.tip_volume}ul tipracks?"
+        f"Is there {trial_total-cfg.trials}  extra full {cfg.tip_volume}ul tipracks?"
     )
     for dye in dye_types_req.keys():
         if dye_types_req[dye] > 0:
-            dye_req = max(_MIN_START_VOLUME_UL, dye_types_req[dye]+_MIN_END_VOLUME_UL)
-            ui.get_user_ready(
-                f"Is there {dye_req}ul of dye type {dye}?"
-            )
+            dye_req = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
+            ui.get_user_ready(f"Is there {dye_req}ul of dye type {dye}?")
 
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
@@ -418,7 +429,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(
         test_volumes
     )
-    trial_total = len(test_volumes) * cfg.trials
+
     assert (
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
@@ -449,9 +460,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
-            first_trial = True
+            do_jog = True
             for trial in range(cfg.trials):
                 trial_count += 1
+                if trial >= 3 and volume == 1000:
+                    # we only do 3 1000ul tests
+                    break
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
                 next_tip: Well = tips[0][tip_iter]
@@ -470,8 +484,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     liquid_tracker=liquid_tracker,
                     blank=False,
                     inspect=cfg.inspect,
-                    do_jog=first_trial,
-                    cfg = cfg,
+                    do_jog=do_jog,
+                    cfg=cfg,
                     mix=cfg.mix,
                     stable=True,
                 )
@@ -480,12 +494,11 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     (trial + 1) == cfg.trials and volume == test_volumes[-1]
                 ):
                     ui.get_user_ready(
-                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume} tipracks"
+                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume}uL tipracks"
                     )
                     tip_iter = 0
-                else:
-                    first_trial = False
-
+                if volume < 250:
+                    do_jog = False
 
     finally:
         # FIXME: instead keep motors engaged, and move to an ATTACH position

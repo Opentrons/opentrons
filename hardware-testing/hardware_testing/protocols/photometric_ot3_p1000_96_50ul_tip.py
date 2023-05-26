@@ -6,7 +6,7 @@ metadata = {"protocolName": "photometric-ot3-p1000-96-50ul-tip"}
 requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
 
 SLOTS_TIPRACK = {
-    50: [7, 8, 9],
+    50: [5, 6, 8, 9, 11],
 }
 SLOT_PLATE = 3
 SLOT_RESERVOIR = 2
