@@ -199,17 +199,22 @@ class SubsystemManager:
             force=force,
         )
 
-        if not firmware_updates:
+        subsystems_updatable = set(
+            target_to_subsystem(target) for target in firmware_updates.keys()
+        )
+        updating_subsystems = subsystems_to_update.intersection(subsystems_updatable)
+
+        if not updating_subsystems:
             log.info("No firmware updates required for specified subsystems.")
             return
 
         log.info("Firmware updates are available.")
-        updating_subsystems = {
-            target_to_subsystem(target) for target in firmware_updates
-        }
+
         update_details = {
-            target: update_info.filepath
-            for target, update_info in firmware_updates.items()
+            target: firmware_updates[target].filepath
+            for target in (
+                subsystem_to_target(subsystem) for subsystem in updating_subsystems
+            )
         }
 
         with ExitStack() as update_tracker_stack:

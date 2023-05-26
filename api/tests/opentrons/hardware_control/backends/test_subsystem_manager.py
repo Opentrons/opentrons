@@ -966,3 +966,52 @@ async def test_update_process_fails_if_subsytem_is_not_ok_afterward(
             assert status.subsystem in subject.get_update_progress()
 
     assert subject.get_update_progress() == {}
+
+
+async def test_updates_update_no_more_than_speciied(
+    subject: SubsystemManager,
+    update_bag: FirmwareUpdate,
+    network_info: network.NetworkInfo,
+    decoy: Decoy,
+    tool_detection_controller: ToolDetectionController,
+) -> None:
+    """Even if more subsystems require updates, only arguments should be updated."""
+    targets: Set[FirmwareTarget] = {
+        NodeId.pipette_right,
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        USBTarget.rear_panel,
+        NodeId.head,
+    }
+    network_info_value = default_network_info_for(targets)
+    decoy.when(network_info.device_info).then_return(network_info_value)
+    decoy.when(network_info.targets).then_return(targets)
+
+    decoy.when(
+        update_bag.update_checker(matchers.Anything(), matchers.Anything(), False)
+    ).then_return(
+        {
+            NodeId.pipette_right: (1, "/some/path"),
+            NodeId.gantry_x: (1, "/some/other/path"),
+        }
+    )
+    decoy.when(update_bag.update_checker(matchers.Anything(), set(), True)).then_return(
+        {}
+    )
+
+    updater = prep_mock_update(
+        update_bag,
+        decoy,
+        {NodeId.pipette_right: "/some/path"},
+    )
+    decoy.when(updater.run_updates()).then_return(_quick_update({NodeId.pipette_right}))
+    tool_struct = await tool_detection_controller.add_detection_on_next_check(targets)
+    await tool_detection_controller.add_resolution(tool_struct, network_info_value)
+
+    await subject.start()
+
+    async for status in subject.update_firmware({SubSystem.pipette_right}):
+        assert status.subsystem == SubSystem.pipette_right
+        assert status.subsystem in subject.get_update_progress()
+
+    assert subject.get_update_progress() == {}
