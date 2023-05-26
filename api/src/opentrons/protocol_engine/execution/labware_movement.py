@@ -130,10 +130,6 @@ class LabwareMovementHandler:
                 additional_offset_vector=experimental_offset_data.pickUpOffset,
             )
 
-            # If this is a TC, add an offset
-            if is_tc2:
-                labware_pickup_offset.z += 3.5
-
             waypoints_to_labware = self._get_gripper_movement_waypoints(
                 labware_id=labware_id,
                 location=current_location,
