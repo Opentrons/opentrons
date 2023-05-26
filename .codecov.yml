@@ -12,9 +12,12 @@ ignore:
   - '**/*.mk'
   - '**/*.stories.tsx'
 
-comment:
-  # add flags to `layout` configuration to show up in the PR comment
-  layout: 'reach, diff, flags, files'
+comment: false
+
+coverage:
+  status:
+    project: false
+    patch: false
 
 flag_management:
   default_rules:
