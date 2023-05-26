@@ -55,6 +55,9 @@ log = logging.getLogger(__name__)
 
 _hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
 _init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
+_postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
+    "hardware_postinit_task"
+)
 _event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
     "hardware_event_unsubscribe"
 )
@@ -80,8 +83,9 @@ async def clean_up_hardware(app_state: AppState) -> None:
     initialize_task = _init_task_accessor.get_from(app_state)
     thread_manager = _hw_api_accessor.get_from(app_state)
     unsubscribe_from_events = _event_unsubscribe_accessor.get_from(app_state)
-
+    postinit_task = _postinit_task_accessor.get_from(app_state)
     _init_task_accessor.set_on(app_state, None)
+    _postinit_task_accessor.set_on(app_state, None)
     _hw_api_accessor.set_on(app_state, None)
     _event_unsubscribe_accessor.set_on(app_state, None)
 
@@ -89,6 +93,10 @@ async def clean_up_hardware(app_state: AppState) -> None:
         initialize_task.cancel()
         # Ignore exceptions, since they've already been logged.
         await asyncio.gather(initialize_task, return_exceptions=True)
+
+    if postinit_task is not None:
+        postinit_task.cancel()
+        await asyncio.gather(postinit_task, return_exceptions=True)
 
     if unsubscribe_from_events is not None:
         unsubscribe_from_events()
@@ -115,6 +123,7 @@ async def get_thread_manager(
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
     initialize_task = _init_task_accessor.get_from(app_state)
+    postinit_task = _postinit_task_accessor.get_from(app_state)
     hardware_api = _hw_api_accessor.get_from(app_state)
 
     if initialize_task is None or hardware_api is None or not initialize_task.done():
@@ -127,6 +136,12 @@ async def get_thread_manager(
 
     if initialize_task.exception():
         exc = initialize_task.exception()
+        raise HardwareFailedToInitialize(detail=str(exc)).as_error(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        ) from exc
+
+    if postinit_task and postinit_task.done() and postinit_task.exception():
+        exc = postinit_task.exception()
         raise HardwareFailedToInitialize(detail=str(exc)).as_error(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) from exc
@@ -368,9 +383,14 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
             except ImportError:
                 pass
         if should_use_ot3():
-            await _postinit_ot3_tasks(hardware, app_state)
+            _postinit_task_accessor.set_on(
+                app_state, asyncio.create_task(_postinit_ot3_tasks(hardware, app_state))
+            )
+
         else:
-            await _postinit_ot2_tasks(hardware)
+            _postinit_task_accessor.set_on(
+                app_state, asyncio.create_task(_postinit_ot2_tasks(hardware))
+            )
 
         log.info("Opentrons hardware API initialized")
 
