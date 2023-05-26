@@ -73,12 +73,10 @@ export function SetWifiCred({
     <>
       <Flex
         flexDirection={DIRECTION_ROW}
-        // justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         marginBottom={SPACING.spacing48}
         justifyContent={isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN}
         position={POSITION_RELATIVE}
-        // alignItems={ALIGN_CENTER}
       >
         <Flex position={POSITION_ABSOLUTE} left="0">
           <Btn
