@@ -52,6 +52,7 @@ export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
   const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
+
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
 
@@ -154,6 +155,7 @@ export const PipetteWizardFlows = (
         })
     }
   }
+
   const {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,

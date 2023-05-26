@@ -92,10 +92,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const handleChangePipette = (): void => {
     if (isOT3PipetteAttached && isOt3) {
       setPipetteWizardFlow(FLOWS.DETACH)
-    } else if (!isOT3PipetteAttached && isOt3) {
-      setShowAttachPipette(true)
     } else {
-      setChangePipette(true)
+      setShowAttachPipette(true)
     }
   }
   const handleCalibrate = (): void => {
