@@ -40,6 +40,12 @@
   color: red !important;
 }
 
+.export_protocol_button:hover {
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  opacity: 1 !important;
+}
+
 .line_separator {
   border-bottom: 1px solid var(--c-light-gray);
   margin: 30px 0 30px;
