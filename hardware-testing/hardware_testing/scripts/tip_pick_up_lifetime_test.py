@@ -218,10 +218,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     if(len(test_pip) == 0):
         print(f"No pipette recognized on {mount.name} mount\n")
         sys.exit()
-    if('p1000' in test_pip['name']):
-        tip_len = 85
-    elif('p50' in test_pip['name']):
-        tip_len = 57
+    # if('p1000' in test_pip['name']):
+    #     tip_len = 95.6
+    # elif('p50' in test_pip['name']):
+    #     tip_len = 58.35
 
     print(f"\nTest pipette: {test_pip['name']}\n")
 
@@ -335,11 +335,22 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         continue
                     print("=================================\n")
                     print(f"Tip rack in slot {key}, Column: {col+1}, Row: {row+1}\n")
+                    if "1" in key:
+                        tip_len = 95.6
+                    elif "2" in key:
+                        tip_len = 58.35
+                    elif "3" in key:
+                        tip_len = 57.9
+                    print(f"Tip length: {tip_len} mm\n")
+                    if row > 0:
+                        await api.move_rel(mount, delta=Point(y=-9))
                     await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
                                 calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]+5))
                     await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
                                 calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]))
+                    start_pos = await api.gantry_position(mount)
                     for pick_up in range(PICKUPS_PER_TIP):
+                        await api.move_to(mount, start_pos)
                         if col == start_col -1 and row == start_row -1 and pick_up < start_tip_nums -1:
                             continue
                         print("= = = = = = = = = = = = = = = = =\n")
@@ -417,11 +428,16 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                             await api.home()
                             sys.exit()
 
+                        # await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
+                        #             calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]+5))
+
                     ### adjust row increment
                     print("Moving to next row...\n")
-                    await api.move_rel(mount, delta=Point(z=5))
+                    # await api.move_rel(mount, delta=Point(z=5))
 
                 ### adjust column increment
+                await api.move_to(mount, Point(calibrated_slot_loc[key][0]+9*col,
+                            calibrated_slot_loc[key][1]-9*row, calibrated_slot_loc[key][2]+5))
                 print("Moving to next column...\n")
 
             # release start

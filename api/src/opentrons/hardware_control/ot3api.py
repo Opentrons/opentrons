@@ -1513,7 +1513,7 @@ class OT3API(
             blowout_spec.instr.ready_to_aspirate = False
 
     async def _force_pick_up_tip(
-        self, mount: OT3Mount, pipette_spec: PickUpTipSpec
+        self, mount: OT3Mount, pipette_spec: PickUpTipSpec, tip_length: float,
     ) -> None:
         for press in pipette_spec.presses:
             start_pos = await self.gantry_position(mount)
@@ -1529,7 +1529,8 @@ class OT3API(
                 mount, press.relative_up, self._current_position
             )
             await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
-            await self.move_to(mount, top_types.Point(start_pos[0], start_pos[1], start_pos[2]+5)) # self._move(target_up)
+            tip_return_height = tip_length - (tip_length * 0.71) - 6
+            await self.move_to(mount, top_types.Point(start_pos[0], start_pos[1], start_pos[2]+tip_return_height)) # self._move(target_up)
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
@@ -1577,7 +1578,7 @@ class OT3API(
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
-            await self._force_pick_up_tip(realmount, spec)
+            await self._force_pick_up_tip(realmount, spec, tip_length)
 
         # we expect a stall has happened during pick up, so we want to
         # update the motor estimation
