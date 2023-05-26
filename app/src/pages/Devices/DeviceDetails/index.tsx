@@ -32,6 +32,7 @@ export function DeviceDetails(): JSX.Element | null {
   if (robot == null && isScanning) return null
 
   return robot != null ? (
+    // TODO: substitute wrapped AppApiHostProvider that registers/authorizes
     <ApiHostProvider
       key={robot.name}
       hostname={robot.ip ?? null}
