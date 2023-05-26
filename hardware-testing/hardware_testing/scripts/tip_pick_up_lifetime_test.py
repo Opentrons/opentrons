@@ -326,11 +326,14 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         continue
                     print("=================================\n")
                     print(f"Tip rack in slot {key}, Column: {col+1}, Row: {row+1}\n")
-                    if "1" in key:
-                        tip_len = 95.6
-                    elif "2" in key:
-                        tip_len = 58.35
-                    elif "3" in key:
+                    if 'p1000' in test_pip['name']:
+                        if "1" in key:
+                            tip_len = 95.6
+                        elif "2" in key:
+                            tip_len = 58.35
+                        elif "3" in key:
+                            tip_len = 57.9
+                    else:
                         tip_len = 57.9
                     print(f"Tip length: {tip_len} mm\n")
                     if row > 0:
