@@ -27,6 +27,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '../../../redux/networking'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -40,6 +41,7 @@ jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/networking')
 jest.mock('../../../redux/config')
 jest.mock('../useCreateRunFromProtocol')
 jest.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
@@ -83,6 +85,9 @@ const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunc
 >
 const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jest.MockedFunction<
   typeof useTrackCreateProtocolRunEvent
+>
+const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
+  typeof getNetworkInterfaces
 >
 
 const render = (
@@ -158,6 +163,9 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         expect.any(String)
       )
       .mockReturnValue([])
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, expect.any(String))
+      .mockReturnValue({ wifi: null, ethernet: null })
   })
   afterEach(() => {
     jest.resetAllMocks()
