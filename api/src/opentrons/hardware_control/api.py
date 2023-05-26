@@ -347,7 +347,7 @@ class API(
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
-    async def set_status_bar_state(self, _: StatusBarState) -> None:
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
         """The status bar does not exist on OT-2!"""
         return None
 
