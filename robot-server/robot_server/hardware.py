@@ -44,6 +44,7 @@ from .subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
     UpdateProcessHandle,
 )
+from .subsystems.models import SubSystem
 from .service.task_runner import TaskRunner, get_task_runner
 
 if TYPE_CHECKING:
@@ -237,17 +238,20 @@ async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
 
 
 async def _postinit_ot3_tasks(
-    hardware: ThreadManagedHardware, app_state: AppState
+    hardware_tm: ThreadManagedHardware, app_state: AppState
 ) -> None:
     """Tasks to run on an initialized OT-3 before it is ready to use."""
+    hardware = cast("OT3API", hardware_tm)
     update_manager = await get_firmware_update_manager(
         app_state=app_state,
-        thread_manager=hardware,
+        thread_manager=hardware_tm,
         task_runner=get_task_runner(app_state),
     )
 
     update_handles = [
-        await update_manager.start_update_process(str(uuid4()), subsystem, utc_now())
+        await update_manager.start_update_process(
+            str(uuid4()), SubSystem.from_hw(subsystem), utc_now()
+        )
         for subsystem, subsystem_state in hardware.attached_subsystems.items()
         if not subsystem_state.ok or subsystem_state.fw_update_needed
     ]
