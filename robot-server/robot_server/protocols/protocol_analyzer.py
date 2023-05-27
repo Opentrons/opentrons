@@ -43,3 +43,10 @@ class ProtocolAnalyzer:
             errors=result.state_summary.errors,
             liquids=result.state_summary.liquids,
         )
+
+
+def another_untested_function(x: str) -> str:
+    if x:
+        return x + x
+    else:
+        return "blah"
