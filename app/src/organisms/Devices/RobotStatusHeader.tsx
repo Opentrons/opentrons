@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
@@ -23,9 +24,11 @@ import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
+import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 
-import type { StyleProps } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { Dispatch, State } from '../../redux/types'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {
@@ -41,6 +44,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   ])
   const history = useHistory()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const dispatch = useDispatch<Dispatch>()
 
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
@@ -76,6 +80,28 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       </Flex>
     ) : null
 
+  const { ethernet, wifi } = useSelector((state: State) =>
+    getNetworkInterfaces(state, name)
+  )
+
+  let iconName: IconName | null = null
+  let tooltipTranslationKey = null
+  if (wifi?.ipAddress != null) {
+    iconName = 'wifi'
+    tooltipTranslationKey = 'device_settings:wifi'
+  } else if (ethernet?.ipAddress != null) {
+    iconName = 'ethernet'
+    tooltipTranslationKey = 'device_settings:ethernet'
+  } else if (local != null && local) {
+    iconName = 'usb'
+    tooltipTranslationKey = 'device_settings:wired_usb'
+  }
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(name))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -84,6 +110,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing2}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
@@ -97,25 +124,25 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
             >
               {name}
             </StyledText>
-            <Btn
-              {...targetProps}
-              marginRight={SPACING.spacing8}
-              onClick={() =>
-                history.push(`/devices/${name}/robot-settings/networking`)
-              }
-            >
-              <Icon
-                // local boolean corresponds to a wired usb connection for OT-2
-                // TODO(bh, 2022-10-19): for OT-3, determine what robot data looks like for wired usb and ethernet connections
-                name={local != null && local ? 'usb' : 'wifi'}
-                color={COLORS.darkGreyEnabled}
-                size="1.25rem"
-              />
-            </Btn>
+            {iconName != null ? (
+              <Btn
+                {...targetProps}
+                marginRight={SPACING.spacing8}
+                onClick={() =>
+                  history.push(`/devices/${name}/robot-settings/networking`)
+                }
+              >
+                <Icon
+                  aria-label={iconName}
+                  paddingTop={SPACING.spacing4}
+                  name={iconName}
+                  color={COLORS.darkGreyEnabled}
+                  size="1.25rem"
+                />
+              </Btn>
+            ) : null}
             <Tooltip tooltipProps={tooltipProps} width="auto">
-              {local != null && local
-                ? t('device_settings:wired_usb')
-                : t('device_settings:wifi')}
+              {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
             </Tooltip>
           </Flex>
         </Flex>

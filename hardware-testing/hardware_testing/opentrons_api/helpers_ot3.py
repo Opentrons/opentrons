@@ -5,7 +5,7 @@ from datetime import datetime
 from math import pi
 from subprocess import run
 from time import time
-from typing import List, Optional, Dict, Tuple, Union
+from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
 
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -138,7 +138,11 @@ async def build_async_ot3_hardware_api(
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     kwargs = {"config": config}
     if is_simulating:
-        builder = OT3API.build_hardware_simulator
+        # This Callable type annotation works around mypy complaining about slight mismatches
+        # between the signatures of build_hardware_simulator() and build_hardware_controller().
+        builder: Callable[
+            ..., Coroutine[None, None, OT3API]
+        ] = OT3API.build_hardware_simulator
         sim_pips = _create_attached_instruments_dict(
             pipette_left, pipette_right, gripper
         )
