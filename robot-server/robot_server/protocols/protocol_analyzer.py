@@ -46,6 +46,7 @@ class ProtocolAnalyzer:
 
 
 def another_untested_function(x: str) -> str:
+    """Docstring."""
     if x:
         return x + x
     else:
