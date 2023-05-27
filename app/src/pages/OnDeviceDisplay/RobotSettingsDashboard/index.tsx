@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
