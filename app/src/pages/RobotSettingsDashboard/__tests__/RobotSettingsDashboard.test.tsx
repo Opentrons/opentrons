@@ -26,7 +26,7 @@ import { RobotSettingsDashboard } from '..'
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/config')
-jest.mock('../../OnDeviceDisplay/hooks/useNetworkConnection')
+jest.mock('../hooks')
 jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
 jest.mock(
   '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
