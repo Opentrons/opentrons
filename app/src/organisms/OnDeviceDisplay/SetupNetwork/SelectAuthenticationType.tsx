@@ -25,7 +25,7 @@ import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
-import type { AuthType } from '../../../pages/OnDeviceDisplay/ConnectViaWifi'
+import type { AuthType } from '../../../pages/ConnectViaWifi'
 
 interface SelectAuthenticationTypeProps {
   ssid: string

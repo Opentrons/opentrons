@@ -11,7 +11,7 @@ import { MediumButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ProtocolSetupLabwarePositionCheckProps {
   runId: string

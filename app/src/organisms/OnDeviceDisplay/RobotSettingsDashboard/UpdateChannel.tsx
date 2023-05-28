@@ -23,7 +23,7 @@ import {
 } from '../../../redux/config'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { SettingOption } from '../../../pages/RobotSettingsDashboard/RobotSettingButton'
 
 interface LabelProps {
   isSelected?: boolean
