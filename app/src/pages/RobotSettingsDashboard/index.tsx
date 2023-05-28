@@ -18,7 +18,7 @@ import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
 import { useLights } from '../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
-import { useNetworkConnection } from '../OnDeviceDisplay/hooks'
+import { useNetworkConnection } from './hooks'
 import { RobotSettingButton } from './RobotSettingButton'
 import { RobotSettingsContent } from './RobotSettingsContent'
 

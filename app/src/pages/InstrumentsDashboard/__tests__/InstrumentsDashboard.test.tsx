@@ -11,7 +11,7 @@ import { formatTimestamp } from '../../../organisms/Devices/utils'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '..'
-import { InstrumentDetail } from '../../OnDeviceDisplay/InstrumentDetail'
+import { InstrumentDetail } from '../../InstrumentDetail'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')

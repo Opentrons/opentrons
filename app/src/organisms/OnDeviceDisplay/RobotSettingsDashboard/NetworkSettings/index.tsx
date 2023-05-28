@@ -24,7 +24,7 @@ import { EthernetConnectionDetails } from './EthernetConnectionDetails'
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
+import type { NetworkConnection } from '../../../../pages/RobotSettingsDashboard/hooks'
 import type { ChipType } from '../../../../atoms/Chip'
 import type { SettingOption } from '../../../../pages/RobotSettingsDashboard/RobotSettingButton'
 

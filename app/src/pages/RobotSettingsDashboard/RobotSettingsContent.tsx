@@ -11,7 +11,7 @@ import {
   UpdateChannel,
 } from '../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 
-import type { NetworkConnection } from '../OnDeviceDisplay/hooks'
+import type { NetworkConnection } from './hooks'
 import type { SettingOption } from './RobotSettingButton'
 
 interface RobotSettingsContentProps {
