@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -142,7 +142,16 @@ const selectComponent = (selectedTab: number): JSX.Element | null => {
 
 function FlexProtocolEditor(): JSX.Element {
   const [selectedTab, setTab] = useState<number>(0)
-  // Next button click
+  const [disableNextButton, setDisableNextButton] = useState<boolean>(false)
+
+  useEffect(() => {
+    const initialValues = getInitialValues
+    const errors = validateFields(initialValues)
+    const isValid = Object.keys(errors).length === 0
+
+    setDisableNextButton(!isValid)
+  }, [selectedTab])
+
   const handleNext = ({ selectedTab }: Props): void => {
     const setTabNumber =
       selectedTab >= 0 && selectedTab < navPillTabListLength
@@ -151,7 +160,6 @@ function FlexProtocolEditor(): JSX.Element {
     setTab(setTabNumber)
   }
 
-  // Previous button click
   const handlePrevious = ({ selectedTab }: Props): void => {
     const setTabNumber =
       selectedTab > 0 && selectedTab <= navPillTabListLength
@@ -214,58 +222,49 @@ function FlexProtocolEditor(): JSX.Element {
         borderRadius={selectedTab === 1 ? '0' : BORDERS.radiusSoftCorners}
         padding={SPACING.spacing4}
       >
-        {
-          <Formik
-            enableReinitialize
-            initialValues={getInitialValues}
-            validateOnChange={true}
-            validate={validateFields}
-            onSubmit={(values, actions) => {
-              console.log({ values })
-            }}
-          >
-            {(props: {
-              errors: any
-              isValid: any
-              handleSubmit: () => void
-            }) => (
-              <form onSubmit={props.handleSubmit}>
-                <section className={styles.editor_form}>
-                  {selectComponent(selectedTab)}
-                </section>
-                <div className={styles.flex_round_tabs_button_wrapper}>
-                  {selectedTab !== 0 && (
-                    <NewPrimaryBtn
-                      tabIndex={5}
-                      onClick={() => handlePrevious({ selectedTab })}
-                      className={styles.flex_round_tabs_button_50p}
-                    >
-                      <StyledText as="h3">
-                        {i18n.t('flex.round_tabs.previous')}
-                      </StyledText>
-                    </NewPrimaryBtn>
-                  )}
+        <Formik
+          enableReinitialize
+          initialValues={getInitialValues}
+          validateOnChange={true}
+          validate={validateFields}
+          onSubmit={(values, actions) => {
+            console.log({ values })
+          }}
+        >
+          {(props: { errors: any; isValid: any; handleSubmit: () => void }) => (
+            <form onSubmit={props.handleSubmit}>
+              <section className={styles.editor_form}>
+                {selectComponent(selectedTab)}
+              </section>
+              <div className={styles.flex_round_tabs_button_wrapper}>
+                {selectedTab !== 0 && (
                   <NewPrimaryBtn
-                    tabIndex={4}
-                    type="submit"
-                    onClick={() => handleNext({ selectedTab })}
-                    className={
-                      selectedTab !== 0
-                        ? styles.flex_round_tabs_button_50p
-                        : styles.flex_round_tabs_button_100p
-                    }
-                    // disabled={
-                    //   !Boolean(props.isValid) ||
-                    //   !(Object.values(props.errors).length === 0)
-                    // }
+                    tabIndex={5}
+                    onClick={() => handlePrevious({ selectedTab })}
+                    className={styles.flex_round_tabs_button_50p}
                   >
-                    <StyledText as="h3">{nextButton}</StyledText>
+                    <StyledText as="h3">
+                      {i18n.t('flex.round_tabs.previous')}
+                    </StyledText>
                   </NewPrimaryBtn>
-                </div>
-              </form>
-            )}
-          </Formik>
-        }
+                )}
+                <NewPrimaryBtn
+                  tabIndex={4}
+                  type="submit"
+                  onClick={() => handleNext({ selectedTab })}
+                  className={
+                    selectedTab !== 0
+                      ? styles.flex_round_tabs_button_50p
+                      : styles.flex_round_tabs_button_100p
+                  }
+                  disabled={selectedTab === 1 && disableNextButton}
+                >
+                  <StyledText as="h3">{nextButton}</StyledText>
+                </NewPrimaryBtn>
+              </div>
+            </form>
+          )}
+        </Formik>
       </Box>
     </Flex>
   )

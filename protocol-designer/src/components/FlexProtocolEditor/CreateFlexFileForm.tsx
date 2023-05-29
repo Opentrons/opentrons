@@ -16,7 +16,6 @@ function FlexFormComponent(props: PageProps): JSX.Element {
   }
 
   const handleConfirmClick = (): any => {
-    // handle the update action here
     props.setPageProps(selectPageForms.defaultLandingPage)
     setShowConfirmation(false)
   }

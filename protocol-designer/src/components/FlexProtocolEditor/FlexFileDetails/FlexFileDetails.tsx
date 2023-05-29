@@ -10,7 +10,7 @@ import cx from 'classnames'
 import { format } from 'date-fns'
 import { Formik, FormikProps } from 'formik'
 import { mapValues } from 'lodash'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import {
@@ -34,6 +34,9 @@ import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import { FilePage } from '../../FilePage'
 import { InstrumentGroup } from '../instrument/InstrumentGroup'
+import { PageProps } from '../../LandingPage'
+import { selectPageForms } from '../constant'
+import { UpdateConfirmation } from '../FlexUpdateConfirmation'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -142,22 +145,59 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   )
 }
 
-const FileProtocolInformation = (): JSX.Element => {
+const FileProtocolInformation = (props: PageProps): JSX.Element => {
+  const [showConfirmation, setShowConfirmation] = useState(false)
+
+  const handleCancelClick = (): any => {
+    props.setPageProps(selectPageForms.defaultLandingPage)
+    setShowConfirmation(false)
+  }
+
+  const handleConfirmClick = (): any => {
+    // TODO // handle the export action here
+
+    props.setPageProps(selectPageForms.defaultLandingPage)
+    setShowConfirmation(false)
+  }
+
+  function protocolCancelClick(): void {
+    setShowConfirmation(true)
+  }
+
   return (
-    <div className={styles.heading_container}>
-      <div className={styles.pd_file_tab_header}>
-        <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
-        <StyledText as="h5" className={styles.pd_file_tab_sub_header}>
-          {i18n.t('flex.file_tab.subheading')}
-        </StyledText>
+    <>
+      {Boolean(showConfirmation) && (
+        <>
+          <UpdateConfirmation
+            confirmationTitle={'Close Protocol?'}
+            confirmationMessage={
+              'Are you sure you want to close this protocol? If you have not exported this file, you’ll lose all information'
+            }
+            cancelButtonName={'Close without exporting'}
+            continueButtonName={'Export and close'}
+            handleCancelClick={handleCancelClick}
+            handleConfirmClick={handleConfirmClick}
+          />
+        </>
+      )}
+      <div className={styles.heading_container}>
+        <div className={styles.pd_file_tab_header}>
+          <StyledText as="h2">{i18n.t('flex.file_tab.heading')}</StyledText>
+          <StyledText as="h5" className={styles.pd_file_tab_sub_header}>
+            {i18n.t('flex.file_tab.subheading')}
+          </StyledText>
+        </div>
+        <div className={styles.right_buttons}>
+          <SecondaryButton>{i18n.t('flex.file_tab.export')}</SecondaryButton>
+          <SecondaryButton
+            className={styles.close_protocol_button}
+            onClick={() => protocolCancelClick()}
+          >
+            {i18n.t('flex.file_tab.close_export')}
+          </SecondaryButton>
+        </div>
       </div>
-      <div className={styles.right_buttons}>
-        <SecondaryButton>{i18n.t('flex.file_tab.export')}</SecondaryButton>
-        <SecondaryButton className={styles.close_protocol_button}>
-          {i18n.t('flex.file_tab.close_export')}
-        </SecondaryButton>
-      </div>
-    </div>
+    </>
   )
 }
 
