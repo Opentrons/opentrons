@@ -140,20 +140,22 @@ function FlexModulesComponent(): JSX.Element {
                       />
                     </FormGroup>
 
-                    <FormGroup
-                      label="Position"
-                      {...targetProps}
-                      className={styles.model_options}
-                    >
-                      <DropdownField
-                        tabIndex={1}
-                        name={`modulesByType.${moduleType}.slot`}
-                        options={getAllFlexModuleSlotsByType(moduleType)}
-                        value={modulesByType[moduleType].slot}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                    </FormGroup>
+                    <div {...targetProps}>
+                      <FormGroup
+                        label="Position"
+                        className={styles.model_options}
+                      >
+                        <DropdownField
+                          tabIndex={1}
+                          name={`modulesByType.${moduleType}.slot`}
+                          options={getAllFlexModuleSlotsByType(moduleType)}
+                          value={modulesByType[moduleType].slot}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                      </FormGroup>
+                    </div>
+
                     <ConnectedSlotMap
                       fieldName={`modulesByType.${moduleType}.slot`}
                       robotType={OT3_STANDARD_MODEL}

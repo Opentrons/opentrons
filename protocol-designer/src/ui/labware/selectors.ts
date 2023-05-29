@@ -26,18 +26,7 @@ export const getLabwareNicknamesById: Selector<
         displayLabware[id]?.nickname || getLabwareDisplayName(labwareEntity.def)
     )
 )
-export const getLabwareNicknamesByIdForOT3: Selector<
-  Record<string, string>
-> = createSelector(
-  stepFormSelectors.getLabwareEntitiesForOT3,
-  labwareIngredSelectors.getLabwareNameInfo,
-  (labwareEntities, displayLabware): Record<string, string> =>
-    mapValues(
-      labwareEntities,
-      (labwareEntity: LabwareEntity, id: string): string =>
-        displayLabware[id]?.nickname || getLabwareDisplayName(labwareEntity.def)
-    )
-)
+
 export const _sortLabwareDropdownOptions = (options: Options): Options =>
   options.sort((a, b) => {
     // special case for fixed trash (always at the bottom of the list)

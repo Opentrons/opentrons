@@ -52,9 +52,9 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
-  'opentrons_ot3_96_tiprack_200ul',
-  'opentrons_ot3_96_tiprack_1000ul',
-  'opentrons_ot3_96_tiprack_50ul',
+  // 'opentrons_ot3_96_tiprack_200ul',
+  // 'opentrons_ot3_96_tiprack_1000ul',
+  // 'opentrons_ot3_96_tiprack_50ul',
 ]
 
 // NOTE:in PD we do not want to list calibration blocks
