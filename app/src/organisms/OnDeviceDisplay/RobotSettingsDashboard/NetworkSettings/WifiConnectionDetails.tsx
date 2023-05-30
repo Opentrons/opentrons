@@ -133,6 +133,7 @@ export function WifiConnectionDetails({
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setSelectedAuthType={setSelectedAuthType}
           setChangeState={setChangeState}
+          setShowInterfaceTitle={setShowInterfaceTitle}
         />
       )
     } else if (changeState.ssid != null && currentRequestState === null) {
