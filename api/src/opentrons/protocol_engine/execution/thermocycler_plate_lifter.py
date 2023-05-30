@@ -65,10 +65,9 @@ class ThermocyclerPlateLifter:
         the gripper/OT3 nor does it have any plate lifting mechanism so we no-op for it.
         """
         thermocycler_hardware = self._get_tc_hardware(labware_location=labware_location)
-        # TODO (spp, 2023-02-09): replace with a park/fast-home action
-        await self._movement.home(axes=None)
         if thermocycler_hardware is not None:
             try:
+                await self._movement.home(axes=None)
                 await thermocycler_hardware.lift_plate()
                 await thermocycler_hardware.raise_plate()
                 yield
