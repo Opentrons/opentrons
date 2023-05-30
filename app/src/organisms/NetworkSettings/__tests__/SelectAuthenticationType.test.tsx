@@ -7,6 +7,7 @@ import { i18n } from '../../../i18n'
 import * as Networking from '../../../redux/networking'
 import { SetWifiCred } from '../SetWifiCred'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
+import { useIsFinishedUnboxing } from '../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
@@ -18,6 +19,7 @@ jest.mock('../SetWifiCred')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../AlternativeSecurityTypeModal')
+jest.mock('../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -39,6 +41,9 @@ const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedF
 const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
 const mockAlternativeSecurityTypeModal = AlternativeSecurityTypeModal as jest.MockedFunction<
   typeof AlternativeSecurityTypeModal
+>
+const mockUseIsFinishedUnboxing = useIsFinishedUnboxing as jest.MockedFunction<
+  typeof useIsFinishedUnboxing
 >
 
 const render = (
@@ -73,6 +78,7 @@ describe('SelectAuthenticationType', () => {
     mockAlternativeSecurityTypeModal.mockReturnValue(
       <div>mock AlternativeSecurityTypeModal</div>
     )
+    mockUseIsFinishedUnboxing.mockReturnValue(true)
   })
 
   afterEach(() => {

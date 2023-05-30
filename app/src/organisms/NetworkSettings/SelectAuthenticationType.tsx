@@ -39,7 +39,7 @@ interface SelectAuthenticationTypeProps {
   ) => void
   setSelectedAuthType: (authType: WifiSecurityType) => void
   setChangeState: (changeState: NetworkChangeState) => void
-  setShowInterfaceTitle: (showInterfaceTitle: boolean) => void
+  setShowInterfaceTitle?: (showInterfaceTitle: boolean) => void
 }
 
 export function SelectAuthenticationType({
@@ -70,7 +70,8 @@ export function SelectAuthenticationType({
     if (fromWifiList != null) {
       // back to wifi list
       setChangeState({ type: null })
-      if (!isInitialSetup) setShowInterfaceTitle(true)
+      if (!isInitialSetup && setShowInterfaceTitle != null)
+        setShowInterfaceTitle(true)
     } else {
       // back to set wifi ssid
       // Note: This will be updated by PR-#11917
