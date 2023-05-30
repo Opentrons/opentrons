@@ -34,7 +34,7 @@ class DropTipParams(PipetteIdMixin):
             " a safe default depending on its hardware."
         ),
     )
-    randomizeDropLocation: bool = Field(
+    randomizeDropLocation: Optional[bool] = Field(
         False,
         description=(
             "Whether to randomize the location where tip is dropped within the labware."
@@ -73,6 +73,9 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
         home_after = params.homeAfter
 
         if params.randomizeDropLocation:
+            # TODO (spp, 2023-05-30): we might make this cycle through pre-defined
+            #  locations to drop tip instead of a completely random location.
+            #  That would make sw as well as hw testing more robust.
             drop_tip_well_location = (
                 self._state_view.labware.get_random_drop_tip_location(
                     labware_id=labware_id,

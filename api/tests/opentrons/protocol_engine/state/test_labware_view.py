@@ -997,7 +997,6 @@ def test_get_random_drop_tip_location(
         print(drop_location[i])
         assert not all(drop_location[i] == another_loc for another_loc in drop_location)
         # trash's well A1 dimensions:
-        # "yDimension": 78
         # "xDimension": 225
         assert -84 <= drop_location[i].offset.x < 84
         assert drop_location[i].offset.y == 0

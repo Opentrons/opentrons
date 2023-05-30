@@ -623,7 +623,7 @@ class LabwareView(HasState[LabwareState]):
     def get_random_drop_tip_location(
         self, labware_id: str, well_name: str
     ) -> DropTipWellLocation:
-        """Get a random x, y location within 3/4th area of the well top center plane."""
+        """Get a random location along the x-axis within 3/4th length of the well top plane."""
         well_dims = self.get_well_size(labware_id=labware_id, well_name=well_name)
         random_offset_in_well = WellOffset(
             x=random.randrange(
