@@ -19,6 +19,7 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
      */
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
+      theme={'hg-theme-default oddTheme1'}
       onChange={onChange}
       layoutName="default"
       autoUseTouchEvents={true}

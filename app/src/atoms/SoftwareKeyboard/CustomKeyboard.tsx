@@ -60,6 +60,7 @@ export function CustomKeyboard({
   return (
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
+      theme={'hg-theme-default oddTheme1'}
       onChange={onChange}
       onKeyPress={onKeyPress}
       layoutName={layoutName}
