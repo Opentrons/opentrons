@@ -337,6 +337,7 @@ def _run_trial(
             mix=mix,
             added_blow_out=(i + 1) == num_dispenses,
         )
+        pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         ui.get_user_ready("Cover and replace the photoplate in slot 3")
     _drop_tip(ctx, pipette, cfg)
