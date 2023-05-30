@@ -52,6 +52,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
+  const is96Channel =
+    instrument?.instrumentModel.startsWith('p1000_96') ?? false
+
   const handleDetach: React.MouseEventHandler = () => {
     setODDMaintenanceFlowInProgress()
     if (instrument != null) {
@@ -66,10 +69,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 history.goBack()
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.DETACH,
             }
       )

@@ -15,26 +15,46 @@ export const InstrumentsDashboard = (): JSX.Element => {
     | null
   >(null)
 
+  const ninetySixChannel =
+    (attachedInstruments?.data ?? []).find(i =>
+      i.instrumentModel.startsWith('p1000_96')
+    ) ?? null
+
   return (
     <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <AttachedInstrumentMountItem
-          mount="left"
-          attachedInstrument={
-            (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
-            null
-          }
-          setWizardProps={setWizardProps}
-        />
-        <AttachedInstrumentMountItem
-          mount="right"
-          attachedInstrument={
-            (attachedInstruments?.data ?? []).find(i => i.mount === 'right') ??
-            null
-          }
-          setWizardProps={setWizardProps}
-        />
+        {ninetySixChannel != null ? (
+          <AttachedInstrumentMountItem
+            mount="left"
+            attachedInstrument={
+              (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
+              null
+            }
+            setWizardProps={setWizardProps}
+          />
+        ) : (
+          <>
+            <AttachedInstrumentMountItem
+              mount="left"
+              attachedInstrument={
+                (attachedInstruments?.data ?? []).find(
+                  i => i.mount === 'left'
+                ) ?? null
+              }
+              setWizardProps={setWizardProps}
+            />
+            <AttachedInstrumentMountItem
+              mount="right"
+              attachedInstrument={
+                (attachedInstruments?.data ?? []).find(
+                  i => i.mount === 'right'
+                ) ?? null
+              }
+              setWizardProps={setWizardProps}
+            />
+          </>
+        )}
         <AttachedInstrumentMountItem
           mount="extension"
           attachedInstrument={
