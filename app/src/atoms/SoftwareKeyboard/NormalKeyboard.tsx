@@ -40,7 +40,7 @@ const customDisplay = {
   '{numbers}': '123',
   '{shift}': '⬆︎',
   '{space}': 'space',
-  '{backspace}': 'del',
+  '{backspace}': '⌫',
   '{abc}': 'ABC',
   '{symbols}': '#+=',
 }
@@ -50,33 +50,33 @@ export function NormalKeyboard({
   keyboardRef,
 }: NormalKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
-  // const onKeyPress = (button: string): void => {
-  //   if (button === '{shift}' || button === '{lock}') handleShift()
-  //   if (button === '{numbers}' || button === '{abc}' || button === '{symbols}')
-  //     handleNumber()
-  //   if (button === '{symbols}' || button === '{abc}') handleSymbol()
-  // }
-
-  const onKeyPress = (button: string): void => {
-    if (button === '{shift}' || button === '{lock}') {
-      handleShift()
-    } else if (button === '{numbers}' || button === '{abc}') {
-      handleNumber()
-    } else if (button === '{symbols}' || button === '{abc}') {
-      handleSymbol()
+  const handleShift = (button: string): void => {
+    switch (button) {
+      case '{shift}':
+        setLayoutName(layoutName === 'default' ? 'shift' : 'default')
+        break
+      case '{numbers}':
+        setLayoutName('numbers')
+        break
+      case '{symbols}':
+        setLayoutName('symbols')
+        break
+      case '{abc}':
+        setLayoutName('default')
+        break
+      default:
+        break
     }
   }
 
-  const handleShift = (): void => {
-    setLayoutName(layoutName === 'default' ? 'shift' : 'default')
-  }
-
-  const handleNumber = (): void => {
-    setLayoutName(layoutName === 'default' ? 'numbers' : 'default')
-  }
-
-  const handleSymbol = (): void => {
-    setLayoutName(layoutName === 'default' ? 'symbols' : 'default')
+  const onKeyPress = (button: string): void => {
+    if (
+      button === '{numbers}' ||
+      button === '{abc}' ||
+      button === '{shift}' ||
+      button === '{symbols}'
+    )
+      handleShift(button)
   }
 
   return (
