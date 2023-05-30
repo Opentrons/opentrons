@@ -12,10 +12,9 @@ from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 GRIPPER_REGEX_STRING = (
     "^"  # start of string
     "GRPV"  # The characters GRPV
-    "(?P<model>\d{2})"  # "model" group contains exactly 2 digits
-    "(?P<code>[\w\d]{0,12})"  # "code" group contains 0 to 12 inclusive alphanumeric characters
+    r"(?P<model>\d{2})"  # "model" group contains exactly 2 digits
+    r"(?P<code>[\w\d]{0,12})"  # "code" group contains 0 to 12 inclusive alphanumeric characters
     "$"  # end of string
-
 )
 
 SERIAL_RE = re.compile(GRIPPER_REGEX_STRING)
