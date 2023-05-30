@@ -6,6 +6,7 @@ from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
     NoTargetTemperatureSetError,
+    InvalidHoldTimeError,
 )
 
 # TODO(mc, 2022-04-25): move to module definition
@@ -78,6 +79,28 @@ class ThermocyclerModuleSubState:
             "Thermocycler max block volume must be between"
             f" {BLOCK_VOL_MIN} and {BLOCK_VOL_MAX}, but got {volume}."
         )
+
+    @staticmethod
+    def validate_hold_time(hold_time: float) -> int:
+        """Validate a given temperature hold time.
+
+        Args:
+            hold_time: The requested hold time in seconds.
+
+        Raises:
+            InvalidHoldTimeError: The given time is invalid
+
+        Returns:
+            The validated time in seconds
+        """
+        # TODO (spp, 2023-05-26): check if float values are accepted.
+        #  Validate max number that firmware can accept.
+        if hold_time < 0:
+            raise InvalidHoldTimeError(
+                "Thermocycler target temperature hold time must be a positive integer,"
+                f" but received {hold_time}."
+            )
+        return int(hold_time)
 
     @staticmethod
     def validate_target_lid_temperature(celsius: float) -> float:
