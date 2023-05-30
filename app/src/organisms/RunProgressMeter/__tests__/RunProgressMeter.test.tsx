@@ -131,7 +131,10 @@ describe('RunProgressMeter', () => {
 
   it('should render an intervention modal when lastRunCommand is a move labware command', async () => {
     mockUseAllCommandsQuery.mockReturnValue({
-      data: { data: [mockMoveLabwareCommandFromSlot], meta: { totalLength: 1 } },
+      data: {
+        data: [mockMoveLabwareCommandFromSlot],
+        meta: { totalLength: 1 },
+      },
     } as any)
     mockUseRunQuery.mockReturnValue({ data: { data: mockRunData } } as any)
     mockUseCommandQuery.mockReturnValue({ data: null } as any)
