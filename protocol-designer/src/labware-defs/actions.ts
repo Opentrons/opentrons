@@ -252,3 +252,16 @@ interface DismissLabwareUploadMessage {
 export const dismissLabwareUploadMessage = (): DismissLabwareUploadMessage => ({
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE',
 })
+
+export interface RemoveCustomTiprackFile {
+  type: 'REMOVE_CUSTOM_TIPRACK_FILE'
+  payload: string
+}
+export const removeCustomTiprackFile = (
+  customTipRackValue: string
+): RemoveCustomTiprackFile => {
+  return {
+    type: 'REMOVE_CUSTOM_TIPRACK_FILE',
+    payload: customTipRackValue,
+  }
+}

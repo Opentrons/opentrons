@@ -41,6 +41,11 @@ export const blockedTipRackListForFlex: string[] = [
   'Opentrons 96 Filter Tip Rack 200 µL',
 ]
 
+export const blockedTipRackListForOt2: string[] = [
+  'Opentrons Flex 96 Tip Rack 1000 µL',
+  'Opentrons Flex 96 Tip Rack 200 µL',
+  'Opentrons Flex 96 Tip Rack 50 µL',
+]
 // Custom tiprack option object
 export const customTiprackOption: {
   name: string
