@@ -34,13 +34,13 @@ describe('MountingPlate', () => {
       isOnDevice: false,
     }
   })
-  it('returns the correct information, buttons work as expected for attach flow', () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+  it('returns the correct information, buttons work as expected for attach flow', async () => {
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Attach Mounting Plate')
     getByText(
       'Attach the mounting plate by aligning the pins on the plate to the slots on the gantry carriage. You may need to adjust the position of the right pipette mount to achieve proper alignment.'
     )
-    getByAltText('Attach mounting plate')
+    getByTestId('Pipette_Attach_Plate_96.webm')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
@@ -54,12 +54,12 @@ describe('MountingPlate', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Loosen Screws and Detach Mounting Plate')
     getByText(
       'Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.'
     )
-    getByAltText('Detach mounting plate')
+    getByTestId('Pipette_Detach_Plate_96.webm')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.chainRunCommands).toHaveBeenCalledWith(

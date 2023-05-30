@@ -4,10 +4,9 @@ import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
+import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
@@ -73,7 +72,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           }`
         )
       }
-      //  TODO(Jr, 11/8/22): replace image with correct one!
       rightHandBody={
         isFetching ? (
           <Skeleton
@@ -82,11 +80,10 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : is96ChannelPipette ? (
-          <img
-            src={detach96Pipette}
-            width="100%"
-            alt={'Unscrew 96 channel pipette'}
-          />
+          getPipetteAnimations96({
+            section: pipetteWizardStep.section,
+            flowType: flowType,
+          })
         ) : (
           getPipetteAnimations({ pipetteWizardStep, channel })
         )
