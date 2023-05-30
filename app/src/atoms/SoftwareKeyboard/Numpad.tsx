@@ -1,6 +1,9 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
 
+const customDisplay = {
+  '{backspace}': '⌫',
+}
 interface NumpadProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<null>
@@ -22,6 +25,7 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
       theme={'hg-theme-default oddTheme1'}
       onChange={onChange}
       layoutName="default"
+      display={customDisplay}
       autoUseTouchEvents={true}
       useButtonTag={true}
       {...keyboardNumpad}
