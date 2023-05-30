@@ -303,6 +303,7 @@ def test_drop_tip(
             wellName="A2",
             wellLocation=DropTipWellLocation(),
             homeAfter=True,
+            randomizeDropLocation=True,
         )
     )
     response = commands.DropTipResult(position=DeckPoint(x=4, y=5, z=6))
@@ -315,6 +316,7 @@ def test_drop_tip(
         well_name="A2",
         well_location=DropTipWellLocation(),
         home_after=True,
+        randomize_drop_location=True,
     )
 
     assert result == response
