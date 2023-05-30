@@ -51,7 +51,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       borderRadius={BORDERS.size3}
       boxShadow={BORDERS.shadowSmall}
       backgroundColor={COLORS.darkBlack100}
-      maxWidth="29.25rem"
+      maxWidth="max-content"
       padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       data-testid="Snackbar"
       {...styleProps}
