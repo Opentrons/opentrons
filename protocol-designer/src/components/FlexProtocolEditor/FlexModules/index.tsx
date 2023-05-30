@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -57,8 +57,14 @@ function FlexModulesComponent(): JSX.Element {
   } = useFormikContext<FormValues>()
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(modulesByType)
-
   const [selectedModules, setSelectedModules] = useState<string[]>([])
+  useEffect(() => {
+    setSelectedModules(
+      Object.keys(modulesByType).filter(
+        key => modulesByType[key].onDeck === true
+      )
+    )
+  }, [modulesByType])
   const toggleModuleSelection = (moduleType: string): void => {
     setSelectedModules([...selectedModules, moduleType])
     if (selectedModules.includes(moduleType)) {

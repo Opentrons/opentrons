@@ -47,6 +47,7 @@ import {
   mapStateToProps as newModalFileMapStateToProps,
 } from '../modals/NewFileModal'
 import { FlexFileDetails } from './FlexFileDetails'
+import { CreateFlexFileForm } from './CreateFlexFileForm'
 type Props = React.ComponentProps<typeof FlexProtocolEditor>
 export interface FormModule {
   onDeck: boolean
@@ -267,17 +268,11 @@ function FlexProtocolEditor({
 
   // Next button click
   const handleNext = ({ selectedTab }: selectedTabProps): any => {
-    if (isEdit) {
-      // Redirect back to file details page
-      setRedirectToDetails(true)
-      return <FlexFileDetails />
-    } else {
-      const setTabNumber =
-        selectedTab >= 0 && selectedTab <= navPillTabListLength
-          ? selectedTab + 1
-          : selectedTab
-      setTab(setTabNumber)
-    }
+    const setTabNumber =
+      selectedTab >= 0 && selectedTab <= navPillTabListLength
+        ? selectedTab + 1
+        : selectedTab
+    setTab(setTabNumber)
   }
 
   // Previous button click
@@ -301,7 +296,6 @@ function FlexProtocolEditor({
 
   const handleSubmit = ({ values }: any): void => {
     const newProtocolFields = values.fields
-
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount: string): PipetteFieldsData[] => {
@@ -343,81 +337,92 @@ function FlexProtocolEditor({
           ]
         : acc
     }, [])
-
-    onSave({ modules, newProtocolFields, pipettes })
-    dispatch(navActions.navigateToPage('liquids'))
+    onSave({ modules, newProtocolFields, pipettes: [] })
+    if (isEdit) {
+      setRedirectToDetails(true)
+    } else {
+      dispatch(navActions.navigateToPage('liquids'))
+    }
   }
 
   return redirectToDetails ? (
     <FlexFileDetails />
   ) : (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex>
-        <FlexRoundTab
-          setCurrentTab={setTab}
-          currentTab={selectedTab}
-          isEdit={isEditValue}
-        />
-      </Flex>
-      <Box
-        backgroundColor={COLORS.white}
-        border={BORDERS.lineBorder}
-        // remove left upper corner border radius when first tab is active
-        borderRadius={selectedTab === 1 ? '0' : BORDERS.radiusSoftCorners}
-        padding={SPACING.spacing4}
-      >
-        {
-          <Formik
-            enableReinitialize
-            initialValues={getInitialValues(formProps)}
-            validateOnChange={true}
-            validationSchema={notOnFirstPage && validationSchema}
-            onSubmit={values => {
-              selectedTab === 2
-                ? handleSubmit({ values })
-                : handleNext({ selectedTab })
-            }}
-          >
-            {(props: {
-              errors: any
-              isValid: any
-              handleSubmit: () => void
-            }) => (
-              <form onSubmit={props.handleSubmit}>
-                <section className={styles.editor_form}>
-                  {SelectComponent(selectedTab)}
-                </section>
-                <div className={styles.flex_round_tabs_button_wrapper}>
-                  {notOnFirstPage && !isEdit && (
+    <>
+      <CreateFlexFileForm />
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex>
+          <FlexRoundTab
+            setCurrentTab={setTab}
+            currentTab={selectedTab}
+            isEdit={isEditValue}
+          />
+        </Flex>
+        <Box
+          backgroundColor={COLORS.white}
+          border={BORDERS.lineBorder}
+          // remove left upper corner border radius when first tab is active
+          borderRadius={selectedTab === 1 ? '0' : BORDERS.radiusSoftCorners}
+          padding={SPACING.spacing4}
+        >
+          {
+            <Formik
+              enableReinitialize
+              initialValues={getInitialValues(formProps)}
+              validateOnChange={true}
+              validationSchema={notOnFirstPage && validationSchema}
+              onSubmit={values => {
+                selectedTab === 2 || isEdit
+                  ? handleSubmit({ values })
+                  : handleNext({ selectedTab })
+              }}
+            >
+              {(props: {
+                errors: any
+                isValid: any
+                handleSubmit: () => void
+              }) => (
+                <form onSubmit={props.handleSubmit}>
+                  <section className={styles.editor_form}>
+                    {SelectComponent(selectedTab)}
+                  </section>
+                  <div className={styles.flex_round_tabs_button_wrapper}>
+                    {notOnFirstPage && !isEdit && (
+                      <NewPrimaryBtn
+                        tabIndex={5}
+                        onClick={() => handlePrevious({ selectedTab })}
+                        className={styles.flex_round_tabs_button_50p}
+                      >
+                        <StyledText as="h3">
+                          {i18n.t('flex.round_tabs.previous')}
+                        </StyledText>
+                      </NewPrimaryBtn>
+                    )}
                     <NewPrimaryBtn
-                      tabIndex={5}
-                      onClick={() => handlePrevious({ selectedTab })}
-                      className={styles.flex_round_tabs_button_50p}
+                      disabled={notOnFirstPage && !props.isValid}
+                      tabIndex={4}
+                      type="submit"
+                      className={`${styles.common_button} ${
+                        notOnFirstPage
+                          ? styles.flex_round_tabs_button_50p
+                          : styles.flex_round_tabs_button_100p
+                      }`}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        width: '50%',
+                      }}
                     >
-                      <StyledText as="h3">
-                        {i18n.t('flex.round_tabs.previous')}
-                      </StyledText>
+                      <StyledText as="h3">{nextButton}</StyledText>
                     </NewPrimaryBtn>
-                  )}
-                  <NewPrimaryBtn
-                    disabled={notOnFirstPage && !props.isValid}
-                    tabIndex={4}
-                    type="submit"
-                    className={`${
-                      notOnFirstPage
-                        ? styles.flex_round_tabs_button_50p
-                        : styles.flex_round_tabs_button_100p
-                    } ${styles.common_button}`}
-                  >
-                    <StyledText as="h3">{nextButton}</StyledText>
-                  </NewPrimaryBtn>
-                </div>
-              </form>
-            )}
-          </Formik>
-        }
-      </Box>
-    </Flex>
+                  </div>
+                </form>
+              )}
+            </Formik>
+          }
+        </Box>
+      </Flex>
+    </>
   )
 }
 

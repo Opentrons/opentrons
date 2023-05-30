@@ -30,9 +30,9 @@ import { StyledText } from '../StyledText'
 import flexStyles from '../FlexComponents.css'
 import styles from '../FlexFileDetails/FlexFileDetails.css'
 import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
-import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 import { actions as navActions } from '../../../navigation'
 import { UpdateConfirmation } from '../FlexUpdateConfirmation'
+import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -363,7 +363,6 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
                       {i18n.t(
                         `modules.module_display_names.${moduleType.type}`
                       )}
-                      - Slot {moduleType.slot}
                     </StyledText>
                   </Flex>
                 </Flex>

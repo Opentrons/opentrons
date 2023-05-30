@@ -19,9 +19,9 @@ import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
 import { FlexFileDetails } from '../components/FlexProtocolEditor/FlexFileDetails'
 import { LandingPageComponent } from '../components/LandingPage'
-import { CreateFlexFileForm } from '../components/FlexProtocolEditor'
 import { OT2_STANDARD_DECKID } from '@opentrons/shared-data'
 import { selectors as fileSelectors, RobotDataFields } from '../file-data'
+import { FlexProtocolEditorComponent } from '../components/FlexProtocolEditor/FlexProtocolEditor'
 
 interface Props {
   page: Page
@@ -52,7 +52,15 @@ function MainPanelComponent(props: Props): JSX.Element {
     case 'settings-app':
       return <SettingsPage />
     case 'new-flex-file-form':
-      return <CreateFlexFileForm />
+      return (
+        <FlexProtocolEditorComponent
+          FlexFileDetails={{
+            isEditValue: false,
+            tabIdValue: undefined,
+            formProps: undefined,
+          }}
+        />
+      )
     default: {
       const startTerminalItemSelected =
         selectedTerminalItemId === START_TERMINAL_ITEM_ID
