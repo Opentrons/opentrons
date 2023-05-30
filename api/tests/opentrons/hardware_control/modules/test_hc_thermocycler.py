@@ -117,7 +117,7 @@ async def test_raise_plate(
     assert subject_v2.lid_status == "open"
 
     await subject_v2.raise_plate()
-    assert subject_v2.lid_status == "in_between"
+    assert subject_v2.lid_status == "open"
     await subject_v2.return_from_raise_plate()
     assert subject_v2.lid_status == "open"
 
