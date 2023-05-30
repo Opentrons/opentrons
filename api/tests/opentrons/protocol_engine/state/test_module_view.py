@@ -1395,12 +1395,12 @@ def test_thermocycler_validate_target_block_temperature(
 
 @pytest.mark.parametrize(
     argnames=["input_time", "validated_time"],
-    argvalues=[(0.0, 0), (0.123, 0), (123.456, 123), (1234567, 1234567), (450, 450)],
+    argvalues=[(0.0, 0.0), (0.123, 0.123), (123.456, 123.456), (1234567, 1234567)],
 )
 def test_thermocycler_validate_hold_time(
     module_view_with_thermocycler: ModuleView,
     input_time: float,
-    validated_time: int,
+    validated_time: float,
 ) -> None:
     """It should return a valid hold time."""
     subject = module_view_with_thermocycler.get_thermocycler_module_substate(

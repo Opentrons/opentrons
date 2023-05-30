@@ -81,7 +81,7 @@ class ThermocyclerModuleSubState:
         )
 
     @staticmethod
-    def validate_hold_time(hold_time: float) -> int:
+    def validate_hold_time(hold_time: float) -> float:
         """Validate a given temperature hold time.
 
         Args:
@@ -93,14 +93,12 @@ class ThermocyclerModuleSubState:
         Returns:
             The validated time in seconds
         """
-        # TODO (spp, 2023-05-26): check if float values are accepted.
-        #  Validate max number that firmware can accept.
         if hold_time < 0:
             raise InvalidHoldTimeError(
-                "Thermocycler target temperature hold time must be a positive integer,"
+                "Thermocycler target temperature hold time must be a positive number,"
                 f" but received {hold_time}."
             )
-        return int(hold_time)
+        return hold_time
 
     @staticmethod
     def validate_target_lid_temperature(celsius: float) -> float:

@@ -77,7 +77,7 @@ class SetTargetBlockTemperatureImpl(
             )
         else:
             target_volume = None
-        hold_time: Optional[int]
+        hold_time: Optional[float]
         if params.holdTimeSeconds is not None:
             hold_time = thermocycler_state.validate_hold_time(params.holdTimeSeconds)
         else:
