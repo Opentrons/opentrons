@@ -45,6 +45,8 @@ class DeactivateShakerImpl(
             module_id=params.moduleId
         )
 
+        hs_module_substate.raise_if_labware_latch_not_closed()
+
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
             hs_module_substate.module_id

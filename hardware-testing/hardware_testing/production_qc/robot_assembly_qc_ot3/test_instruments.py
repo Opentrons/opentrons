@@ -217,6 +217,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     report(section, "gripper-id", [gripper_id, user_id, result])
 
     # NO-SKIP
+    # FIXME: DVT units had encoders added, so change this test to use them
     async def _z_is_hitting_endstop() -> bool:
         if api.is_simulator:
             return True
@@ -306,11 +307,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     if not api.is_simulator:
         ui.get_user_ready("attach a gripper")
     await _test_gripper(api, report, section)
-    while not api.is_simulator and await _has_gripper(api):
-        ui.get_user_ready("remove the gripper")
+    # while not api.is_simulator and await _has_gripper(api):
+    #     ui.get_user_ready("remove the gripper")
 
     print("moving back near home position")
-    await api.home([OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G, OT3Axis.G])
+    await api.home([OT3Axis.Z_L, OT3Axis.Z_R])
     await api.move_rel(
         OT3Mount.LEFT,
         RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,

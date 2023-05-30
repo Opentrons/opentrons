@@ -164,11 +164,12 @@ def _save_config_data(data: str, filename: Union[str, Path]) -> None:
         log.exception("Write failed with exception:")
 
 
-def default_deck_calibration() -> List[List[float]]:
-    if ff.enable_ot3_hardware_controller():
-        return defaults_ot3.DEFAULT_DECK_TRANSFORM
-    else:
-        return defaults_ot2.DEFAULT_DECK_CALIBRATION_V2
+def default_ot2_deck_calibration() -> List[List[float]]:
+    return defaults_ot2.DEFAULT_DECK_CALIBRATION_V2
+
+
+def default_ot3_deck_calibration() -> List[List[float]]:
+    return defaults_ot3.DEFAULT_BELT_ATTITUDE
 
 
 def default_pipette_offset() -> List[float]:

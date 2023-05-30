@@ -183,7 +183,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         disabled={isRunLogLoading}
         onClick={onDownloadClick}
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {t('download_run_log')}
           {isRunLogLoading ? (
             <Icon

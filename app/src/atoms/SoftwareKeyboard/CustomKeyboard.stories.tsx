@@ -20,7 +20,7 @@ const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <form id="test_form">
         <InputField
           value={value}

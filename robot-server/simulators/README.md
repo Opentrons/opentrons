@@ -10,6 +10,7 @@ The file is made up of the following keys:values which are all optional.
 
 ```
 {
+  "machine": "OT-2 Standard" # or "OT-3 Standard"; OT-2 is the default
   "attached_instruments": {
     "right": {
         # Definition of right pipette
@@ -18,6 +19,9 @@ The file is made up of the following keys:values which are all optional.
     "left": {
         # Definition of left pipette
         ...
+    },
+    "gripper": {
+        # Definition of gripper, if machine is OT-3 Standard
     }
   },
 }
@@ -74,7 +78,7 @@ See [pipette](../../api/src/opentrons/config/pipette_config.py) for available fi
 
 ### Configs
 
-This is the same format as `robot_settings.json` as defined in [robot_configs](../../api/src/opentrons/config/robot_configs.py).
+This is the same format as `robot_settings.json` as defined in [robot_configs](../../api/src/opentrons/config/robot_configs.py) if this is an OT-2. If this is an OT-3, it is the OT-3 variant.
 
 ```
 {

@@ -103,7 +103,7 @@ export function InstrumentsAndModules({
       <StyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
@@ -112,26 +112,26 @@ export function InstrumentsAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
         {currentRunId != null && !isRunTerminal && (
           <Flex
-            paddingBottom={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            paddingX={SPACING.spacing2}
+            paddingX={SPACING.spacing4}
             width="100%"
           >
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex gridGap={SPACING.spacing3} width="100%">
+          <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
@@ -174,7 +174,7 @@ export function InstrumentsAndModules({
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               {!Boolean(is96ChannelAttached) ? (
                 <PipetteCard
@@ -213,10 +213,10 @@ export function InstrumentsAndModules({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingSM}
+            gridGap={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             minHeight={SIZE_3}
-            padding={SPACING.spacingSM}
+            padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText

@@ -14,6 +14,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
 interface Props {
@@ -42,6 +44,9 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [HEATERSHAKER_MODULE_TYPE]: {
     [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heatershaker.png'),
+  },
+  [MAGNETIC_BLOCK_TYPE]: {
+    [MAGNETIC_BLOCK_V1]: require('../../images/modules/mag_block.png'),
   },
 }
 

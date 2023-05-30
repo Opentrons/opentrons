@@ -34,47 +34,47 @@ from .command_fixtures import (
 
 @pytest.fixture
 def subject(
-    standard_deck_def: DeckDefinitionV3,
-    fixed_trash_def: LabwareDefinition,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    ot2_fixed_trash_def: LabwareDefinition,
 ) -> LabwareStore:
     """Get a LabwareStore test subject."""
     return LabwareStore(
-        deck_definition=standard_deck_def,
+        deck_definition=ot2_standard_deck_def,
         deck_fixed_labware=[
             DeckFixedLabware(
                 labware_id="fixedTrash",
                 location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
-                definition=fixed_trash_def,
+                definition=ot2_fixed_trash_def,
             )
         ],
     )
 
 
 def test_initial_state(
-    standard_deck_def: DeckDefinitionV3,
-    fixed_trash_def: LabwareDefinition,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    ot2_fixed_trash_def: LabwareDefinition,
     subject: LabwareStore,
 ) -> None:
     """It should create the labware store with preloaded fixed labware."""
     expected_trash_uri = uri_from_details(
-        namespace=fixed_trash_def.namespace,
-        version=fixed_trash_def.version,
-        load_name=fixed_trash_def.parameters.loadName,
+        namespace=ot2_fixed_trash_def.namespace,
+        version=ot2_fixed_trash_def.version,
+        load_name=ot2_fixed_trash_def.parameters.loadName,
     )
 
     assert subject.state == LabwareState(
-        deck_definition=standard_deck_def,
+        deck_definition=ot2_standard_deck_def,
         labware_by_id={
             "fixedTrash": LoadedLabware(
                 id="fixedTrash",
-                loadName=fixed_trash_def.parameters.loadName,
+                loadName=ot2_fixed_trash_def.parameters.loadName,
                 definitionUri=expected_trash_uri,
                 location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
                 offsetId=None,
             )
         },
         labware_offsets_by_id={},
-        definitions_by_uri={expected_trash_uri: fixed_trash_def},
+        definitions_by_uri={expected_trash_uri: ot2_fixed_trash_def},
     )
 
 

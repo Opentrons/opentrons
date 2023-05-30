@@ -20,7 +20,7 @@ export const SubmitPrimaryButton = (
   const SUBMIT_INPUT_STYLE = css`
     background-color: ${COLORS.blueEnabled};
     border-radius: ${BORDERS.radiusSoftCorners};
-    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    padding: ${SPACING.spacing8} ${SPACING.spacing16};
     color: ${COLORS.white};
     ${TYPOGRAPHY.pSemiBold}
     width: 100%;

@@ -22,12 +22,12 @@ export function EmptyRecentRun(): JSX.Element {
       width="100%"
       height="27.25rem"
       backgroundColor={`${COLORS.darkBlackEnabled}${COLORS.opacity15HexCode}`}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.size3}
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       padding="5.25rem 3.75rem"
     >
-      <Flex marginBottom={SPACING.spacing4}>
+      <Flex marginBottom={SPACING.spacing16}>
         <img
           src={abstractImage}
           alt="There is no recent run protocol"
@@ -37,7 +37,7 @@ export function EmptyRecentRun(): JSX.Element {
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         <StyledText

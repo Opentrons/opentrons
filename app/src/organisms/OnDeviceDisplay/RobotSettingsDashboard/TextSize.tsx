@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface RectProps {
   isActive: boolean
@@ -28,7 +28,7 @@ interface RectProps {
 const TextSizeTile = styled(Box)`
   width: 10.5625rem;
   height: 6.25rem;
-  border-radius: ${BORDERS.size_two};
+  border-radius: ${BORDERS.size2};
   background: ${(props: RectProps) =>
     props.isActive ? COLORS.highlightPurple1 : COLORS.highlightPurple2};
 `

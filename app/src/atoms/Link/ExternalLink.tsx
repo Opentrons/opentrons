@@ -18,7 +18,7 @@ export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (
   <Link external {...props} css={TYPOGRAPHY.linkPSemiBold}>
     {props.children}
     <Icon
-      size={SPACING.spacing3}
+      size={SPACING.spacing8}
       marginLeft="0.4375rem"
       name="open-in-new"
       aria-label="open_in_new_icon"

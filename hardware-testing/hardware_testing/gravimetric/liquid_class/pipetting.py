@@ -91,13 +91,11 @@ def _get_approach_submerge_retract_heights(
     blank: bool,
     channel_count: int,
 ) -> Tuple[float, float, float]:
-    # the actual volume of liquid moved depends on how many channels are being tested
-    if aspirate:
-        aspirate *= channel_count
-    elif dispense:
-        dispense *= channel_count
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
-        pipette, well, aspirate=aspirate, dispense=dispense
+        well,
+        aspirate=aspirate,
+        dispense=dispense,
+        channels=channel_count,
     )
     if blank:
         # force the pipette to move above the well
@@ -241,7 +239,9 @@ def _pipette_with_liquid_settings(
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
         # update liquid-height tracker
-        liquid_tracker.update_affected_wells(pipette, well, aspirate=aspirate)
+        liquid_tracker.update_affected_wells(
+            well, aspirate=aspirate, channels=channel_count
+        )
         # delay
         ctx.delay(liquid_class.aspirate.delay)
 
@@ -258,7 +258,9 @@ def _pipette_with_liquid_settings(
         callbacks.on_dispensing()
         _dispense_with_added_blow_out()
         # update liquid-height tracker
-        liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
+        liquid_tracker.update_affected_wells(
+            well, dispense=dispense, channels=channel_count
+        )
         # delay
         ctx.delay(liquid_class.dispense.delay)
         _do_user_pause(ctx, inspect, "about to retract")
@@ -304,7 +306,7 @@ def aspirate_with_liquid_class(
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), tip_volume, int(aspirate_volume)
+        int(pipette.max_volume), pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -338,7 +340,7 @@ def dispense_with_liquid_class(
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), tip_volume, int(dispense_volume)
+        int(pipette.max_volume), pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
