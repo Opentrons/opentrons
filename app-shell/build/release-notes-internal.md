@@ -3,9 +3,9 @@ For more details about this release, please see the full [technical changelog][]
 
 ---
 
-# Internal Release 0.9.0
+# Internal Release 0.10.0
 
-This is 0.9.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.10.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
@@ -13,9 +13,8 @@ This is still pretty early in the process, so some things are known not to work,
 - Gripper calibration occasionally seems like it "skipped a step", going straight from front to rear calibration. If this happens, exit and rerun. This is because of a server error that isn't getting properly reported. We're working on both fixing the error and its reporting, but in the meantime exiting and rerunning the process should fix it. This is RQA-844.
 
 ## New Stuff In This Release
-- USB connectivity improvements: the app will display a nice big icon in the network settings page for a USB robot, USB robots will disappear properly when disconnected, things of this nature.
-- 96-channel detach improvements
-- Visual fixes and improvements
+- Magnetic block support in the protocol setup phase!
+- Better handling of unplugging a USB-connected robot
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 - Attach, detach, and calibration flows for anything from the protocol setup page
