@@ -302,4 +302,11 @@ describe('useLPCDisabledReason', () => {
       'Labware Position Check requires that the protocol has at least one pipette that picks up a tip'
     )
   })
+  it('renders disabled reason as null if only runId is present', () => {
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(null)
+  })
 })

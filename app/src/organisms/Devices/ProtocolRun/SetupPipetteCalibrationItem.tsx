@@ -154,7 +154,7 @@ export function SetupPipetteCalibrationItem({
               {...targetProps}
               onClick={() => setShowFlexPipetteFlow(true)}
             >
-              {t('calibrate_now_cta')}
+              {t('calibrate_now')}
             </TertiaryButton>
           ) : (
             <RRDLink
@@ -165,7 +165,7 @@ export function SetupPipetteCalibrationItem({
                 id="PipetteCalibration_calibratePipetteButton"
                 {...targetProps}
               >
-                {t('calibrate_now_cta')}
+                {t('calibrate_now')}
               </TertiaryButton>
             </RRDLink>
           )}
