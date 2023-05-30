@@ -188,3 +188,9 @@ class DeprecatedMultiResponseModel(
         None,
         description=DESCRIPTION_LINKS,
     )
+
+
+class ResponseList(BaseModel, Generic[ResponseDataT]):
+    """A response that returns a list resource."""
+
+    __root__: List[ResponseDataT]
