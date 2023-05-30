@@ -246,7 +246,7 @@ class Thermocycler(mod_abc.AbstractModule):
         # remain at "open"
 
     async def return_from_raise_plate(self) -> None:
-        """Move lid an extra bit."""
+        """Return lid back to normal open position."""
         await self.wait_for_is_running()
         await self._driver.jog_lid(-_TC_PLATE_LIFT_RETURN_DEGREES)
         await self.open()
