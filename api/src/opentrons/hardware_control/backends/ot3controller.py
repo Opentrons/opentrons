@@ -846,11 +846,13 @@ class OT3Controller:
         nodes = {axis_to_node(ax) for ax in axes}
         await set_enable_motor(self._messenger, nodes)
 
+    @requires_update
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
         if rails is not None:
             await set_deck_light(1 if rails else 0, self._usb_messenger)
 
+    @requires_update
     async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
         return {
