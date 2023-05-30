@@ -498,6 +498,9 @@ class OT3API(
     async def set_status_bar_state(self, state: StatusBarState) -> None:
         await self._status_bar_controller.set_status_bar_state(state)
 
+    def get_status_bar_state(self) -> StatusBarState:
+        return self._status_bar_controller.get_current_state()
+
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
         """Delay execution by pausing and sleeping."""
