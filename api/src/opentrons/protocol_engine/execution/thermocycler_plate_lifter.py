@@ -56,7 +56,9 @@ class ThermocyclerPlateLifter:
         """Lift plate if moving labware from Thermocycler Gen2.
 
         The 'lift_plate' function unsticks the plate, but does not leave the plate lifted.
-        In order to
+        In order to leave the plate in a "lifted" position when picking up with the gripper,
+        we need to use another function of the TC that will move the lid motor without returning
+        it until the plate has been moved.
 
         If we are moving labware from TC Gen2, then there is a chance that the labware
         will need unsticking so it can be picked up. TC gen1 is neither compatible with
