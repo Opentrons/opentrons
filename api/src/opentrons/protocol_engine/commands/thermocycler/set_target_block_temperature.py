@@ -28,8 +28,8 @@ class SetTargetBlockTemperatureParams(BaseModel):
     holdTimeSeconds: Optional[float] = Field(
         None,
         description="Amount of time, in seconds, to hold the temperature for."
-        "If specified, a waitForBlockTemperature command will block until"
-        "the given hold time has elapsed.",
+        " If specified, a waitForBlockTemperature command will block until"
+        " the given hold time has elapsed.",
     )
 
 
