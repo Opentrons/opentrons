@@ -99,8 +99,8 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
         exclude:
-          - os: 'macos-11'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
-          - os: 'windows-2022'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
+          - os: format('macos-11{0}', ${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}})
+          - os: format('windows-2022{0}'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}})
 
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
@@ -198,8 +198,8 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         exclude:
-          - os: 'macos-11'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
-          - os: 'windows-2022'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
+          - os: format('macos-11{0}',${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}})
+          - os: format('windows-2022{0}', ${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}})
 
     name: 'opentrons app backend unit tests and build for OT3'
     runs-on: ${{ matrix.os }}
