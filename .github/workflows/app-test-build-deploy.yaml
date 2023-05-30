@@ -98,6 +98,10 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+        exclude:
+          - os: 'macos-11'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
+          - os: 'windows-2022'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
+
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
     steps:
@@ -193,6 +197,10 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        exclude:
+          - os: 'macos-11'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
+          - os: 'windows-2022'${{!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release') || null}}
+
     name: 'opentrons app backend unit tests and build for OT3'
     runs-on: ${{ matrix.os }}
     steps:
@@ -272,7 +280,7 @@ jobs:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-test-backend']
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && (!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release'))
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'
@@ -293,7 +301,7 @@ jobs:
     name: 'Deploy built OT3 app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-ot3']
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && (!startsWith(github.ref, 'refs/tags') || !startsWith(github.ref, 'refs/heads/edge') || !startsWith(github.ref, 'refs/heads/internal-release') || !startsWith(github.ref, 'refs/heads/release'))
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'
