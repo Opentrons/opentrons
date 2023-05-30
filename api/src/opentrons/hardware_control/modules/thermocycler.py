@@ -30,6 +30,9 @@ V2_MODULE_STRING = "thermocyclerModuleV2"
 
 DFU_PID = "df11"
 
+_TC_PLATE_LIFT_OPEN_DEGREES = 20
+_TC_PLATE_LIFT_RETURN_DEGREES = 23
+
 
 class ThermocyclerError(Exception):
     pass
@@ -238,14 +241,14 @@ class Thermocycler(mod_abc.AbstractModule):
         if not self.lid_status == ThermocyclerLidStatus.OPEN:
             raise RuntimeError("Lid must be open")
         await self.wait_for_is_running()
-        await self._driver.jog_lid(20)
+        await self._driver.jog_lid(_TC_PLATE_LIFT_OPEN_DEGREES)
         # There is NO WAIT for the updated lid stats, because it will always
         # remain at "open"
 
     async def return_from_raise_plate(self) -> None:
         """Move lid an extra bit."""
         await self.wait_for_is_running()
-        await self._driver.jog_lid(-23)
+        await self._driver.jog_lid(-_TC_PLATE_LIFT_RETURN_DEGREES)
         await self.open()
         await self._wait_for_lid_status(ThermocyclerLidStatus.OPEN)
 
