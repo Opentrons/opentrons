@@ -204,7 +204,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
     expect(labwareInfo.x).toEqual(0) // taken from deckDef fixture
     expect(labwareInfo.y).toEqual(0)
     expect(labwareInfo.labwareDef.metadata.displayName).toEqual(
-      'mock labware display name'
+      'NEST 96 Well Plate 100 µL PCR Full Skirt'
     )
     expect(labwareInfo.labwareId).toEqual('mockLabwareID2')
   })
