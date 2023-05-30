@@ -2,7 +2,7 @@
 
 Opentrons robot HTTP API client for [React][] apps
 
-[react]: https://reactjs.org/
+[react]: https://react.dev/
 
 ## Getting Started
 

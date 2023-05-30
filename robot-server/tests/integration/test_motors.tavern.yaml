@@ -2,11 +2,11 @@
 test_name: Get engaged motors
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Get status of all motors
     request:
-      url: "{host:s}:{port:d}/motors/engaged"
+      url: "{ot2_server_base_url}/motors/engaged"
       method: GET
     response:
       status_code: 200
@@ -27,11 +27,11 @@ stages:
 test_name: Disengage motors
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Disengae motors
     request:
-      url: "{host:s}:{port:d}/motors/disengage"
+      url: "{ot2_server_base_url}/motors/disengage"
       method: POST
       json:
         axes:
@@ -43,7 +43,7 @@ stages:
         message: !re_search "Disengaged axes"
   - name: Verify disengaged motors
     request:
-      url: "{host:s}:{port:d}/motors/engaged"
+      url: "{ot2_server_base_url}/motors/engaged"
       method: GET
     response:
       status_code: 200

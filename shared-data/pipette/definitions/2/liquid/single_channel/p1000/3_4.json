@@ -7,7 +7,7 @@
       "defaultBlowOutFlowRate": 80,
       "defaultTipLength": 57.9,
       "defaultTipOverlap": 10.5,
-      "defaultReturnTipHeight": 0.83,
+      "defaultReturnTipHeight": 0.71,
       "aspirate": {
         "default": [
           [0.0671, 16.2577, -0.6170],
@@ -82,7 +82,7 @@
       "defaultBlowOutFlowRate": 80,
       "defaultTipLength": 58.35,
       "defaultTipOverlap": 10.5,
-      "defaultReturnTipHeight": 0.83,
+      "defaultReturnTipHeight": 0.71,
       "aspirate": {
         "default": [
           [0.1983, -15.5377, 4.4239],
@@ -157,7 +157,7 @@
       "defaultBlowOutFlowRate": 80,
       "defaultTipLength": 95.6,
       "defaultTipOverlap": 10.5,
-      "defaultReturnTipHeight": 0.83,
+      "defaultReturnTipHeight": 0.82,
       "aspirate": {
         "default": [
           [4.1286, 0.3769, 9.3332],
