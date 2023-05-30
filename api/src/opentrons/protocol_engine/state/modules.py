@@ -81,6 +81,7 @@ class SlotTransit(NamedTuple):
 
 
 # FIXME(mm, 2023-05-10): This needs to be updated for OT-3 slots. RLAB-339.
+# TODO
 _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),

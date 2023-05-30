@@ -59,6 +59,7 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
+# TODO
 _INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
 
 _RIGHT_SIDE_SLOTS = {
@@ -616,6 +617,10 @@ class LabwareView(HasState[LabwareState]):
 
     def get_calibration_coordinates(self, offset: Point) -> Point:
         """Get calibration critical point and target position."""
+        # TODO: Will this work on an OT-3 with the new deck definition?
+        # Do we need to switch depending on robot type here, or can we get away with hard-coding
+        # the OT-3 slot?
+        # See also Tamar's todo below.
         target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
         # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
         # https://opentrons.atlassian.net/browse/RCORE-382
