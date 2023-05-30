@@ -209,14 +209,29 @@ describe('getCurrentRunLabwareRenderInfo', () => {
     expect(labwareInfo.labwareId).toEqual('mockLabwareID2')
   })
 
-  it('does not add labware to results array if the labwares slot does not have a mating surface vector', () => {
+  it('does not add labware to results array if the labware is on deck and the slot does not have a mating surface vector', () => {
     mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(false)
     const res = getCurrentRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
       deckDefFixture as any
     )
-    expect(res).toHaveLength(0)
+    expect(res).toHaveLength(1) // the offdeck labware still gets added because the mating surface doesn't exist for offdeck labware
+  })
+
+  it('does add offdeck labware to the results array', () => {
+    const res = getCurrentRunLabwareRenderInfo(
+      mockRunData,
+      mockLabwareDefinitionsByUri,
+      deckDefFixture as any
+    )
+    expect(res).toHaveLength(2)
+    const labwareInfo = res.find(
+      labware => labware.labwareId === 'mockLabwareID3'
+    )
+    expect(labwareInfo).toBeTruthy()
+    expect(labwareInfo?.x).toEqual(0)
+    expect(labwareInfo?.y).toEqual(-90.5)
   })
 
   it('defaults labware x, y coordinates to 0,0 if slot position not found in deck definition', () => {
