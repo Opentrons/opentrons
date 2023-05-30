@@ -127,14 +127,17 @@ class LabwareMovementHandler:
                 labware_offset_vector=labware_pickup_offset,
             )
 
-            for waypoint in waypoints_to_labware:
-                if waypoint == waypoints_to_labware[-1]:
-                    # TODO: We do this to have the gripper move to location with
-                    #  closed grip and open right before picking up the labware to
-                    #  avoid collisions as much as possible.
-                    #  See https://opentrons.atlassian.net/browse/RLAB-214
-                    await ot3api.home_gripper_jaw()
+            for waypoint in waypoints_to_labware[:-1]:
                 await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
+
+            # TODO: We do this to have the gripper move to location with
+            #  closed grip and open right before picking up the labware to
+            #  avoid collisions as much as possible.
+            #  See https://opentrons.atlassian.net/browse/RLAB-214
+            await ot3api.home_gripper_jaw()
+            await ot3api.move_to(
+                mount=gripper_mount, abs_position=waypoints_to_labware[-1]
+            )
 
             await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
 
