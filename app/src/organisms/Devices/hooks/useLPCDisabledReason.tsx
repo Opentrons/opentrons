@@ -25,7 +25,7 @@ export function useLPCDisabledReason(
     hasMissingModulesForOdd,
     hasMissingPipCalForOdd,
   } = props
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'shared'])
   const runHasStarted = useRunHasStarted(runId)
   const { complete } = useRunCalibrationStatus(robotName ?? '', runId)
   const unmatchedModuleResults = useUnmatchedModulesForProtocol(
@@ -80,13 +80,15 @@ export function useLPCDisabledReason(
     )
   } else if (runHasStarted) {
     lpcDisabledReason = t(
-      robotName != null ? 'labware_position_check_not_available' : 'robot_busy'
+      robotName != null
+        ? 'labware_position_check_not_available'
+        : 'shared:robot_is_busy'
     )
   } else if (robotProtocolAnalysis == null) {
     lpcDisabledReason = t(
       robotName != null
         ? 'labware_position_check_not_available_analyzing_on_robot'
-        : 'robot_analyzing'
+        : 'shared:robot_is_analyzing'
     )
   } else if (
     isEmpty(protocolData?.pipettes) ||
