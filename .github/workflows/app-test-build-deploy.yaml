@@ -301,7 +301,7 @@ jobs:
     name: 'Deploy built OT3 app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-ot3']
-    if: (github.event_name != 'pull_request') && !startsWith(github.ref, 'refs/tags') && !startsWith(github.ref, 'refs/heads/edge')  !startsWith(github.ref, 'refs/heads/internal-release') && !startsWith(github.ref, 'refs/heads/release') && !endsWith(github.ref, 'app-build')
+    if: (github.event_name != 'pull_request') && !startsWith(github.ref, 'refs/tags') && !startsWith(github.ref, 'refs/heads/edge') && !startsWith(github.ref, 'refs/heads/internal-release') && !startsWith(github.ref, 'refs/heads/release') && !endsWith(github.ref, 'app-build')
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'
