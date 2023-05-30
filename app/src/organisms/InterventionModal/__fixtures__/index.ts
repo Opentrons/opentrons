@@ -78,6 +78,15 @@ export const mockMoveLabwareCommandFromModule = {
   },
 } as any
 
+export const mockMoveLabwareCommandToOffDeck = {
+  commandType: 'moveLabware',
+  params: {
+    labwareId: 'offDeckMove',
+    newLocation: 'offDeck',
+  },
+  strategy: 'manualMoveWithPause',
+} as any
+
 export const mockLabwareOnModule: LoadedLabware = {
   id: 'mockLabwareID',
   loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',

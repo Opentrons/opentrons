@@ -2,17 +2,24 @@ import deepClone from 'lodash/cloneDeep'
 
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
+import deckDefFixtureFlex from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import {
+  mockLabwareDefinition,
   mockLabwareDefinitionsByUri,
   mockLabwareOnSlot,
   mockModule,
+  mockMoveLabwareCommandFromSlot,
+  mockMoveLabwareCommandToOffDeck,
   mockRunData,
   mockThermocyclerModule,
 } from '../__fixtures__'
 import {
+  OT2_STANDARD_SLOT_HEIGHT,
+  OT3_STANDARD_SLOT_HEIGHT,
   getCurrentRunLabwareRenderInfo,
   getCurrentRunModulesRenderInfo,
+  getLabwareAnimationParams,
   getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
@@ -337,5 +344,90 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     expect(res[0].x).toEqual(0)
     expect(res[0].y).toEqual(0)
+  })
+})
+
+describe('getLabwareAnimationParams', () => {
+  it('returns null if it does not find the command specified labware in the labware or module render arrays', () => {
+    const res = getLabwareAnimationParams(
+      [{ labwareId: 'no-match' }] as any,
+      [{ nestedLabwareId: 'no-match' }] as any,
+      { params: { labwareId: 'match' } } as any,
+      deckDefFixture as any
+    )
+
+    expect(res).toEqual(null)
+  })
+
+  it('returns expected animation params', () => {
+    const res = getLabwareAnimationParams(
+      [
+        {
+          x: 0,
+          y: 0,
+          labwareDef: mockLabwareDefinition,
+          labwareId: 'mockLabwareID2',
+        },
+      ],
+      [],
+      mockMoveLabwareCommandFromSlot,
+      deckDefFixture as any
+    )
+
+    expect(res).toBeTruthy()
+    expect(res?.movementParams.xMovement).toEqual(132.5)
+    expect(res?.movementParams.yMovement).toEqual(90.5)
+    expect(res?.movementParams.begin).toEqual('800ms;deck-in.end+0ms')
+    expect(res?.movementParams.duration).toEqual('800ms')
+    expect(res?.splashParams.inParams.begin).toEqual('labware-move.end+300ms')
+    expect(res?.splashParams.inParams.duration).toEqual('300ms')
+    expect(res?.splashParams.outParams.begin).toEqual('splash-in.end+300ms')
+    expect(res?.splashParams.outParams.duration).toEqual('300ms')
+  })
+
+  it('returns expected animation params given a move to offdeck - OT2', () => {
+    const res = getLabwareAnimationParams(
+      [
+        {
+          x: 0,
+          y: 0,
+          labwareDef: mockLabwareDefinition,
+          labwareId: 'offDeckMove',
+        },
+      ],
+      [],
+      mockMoveLabwareCommandToOffDeck,
+      deckDefFixture as any
+    )
+
+    expect(res).toBeTruthy()
+    expect(res?.movementParams.xMovement).toEqual(0)
+    expect(res?.movementParams.yMovement).toEqual(0 - OT2_STANDARD_SLOT_HEIGHT)
+    expect(res?.movementParams.begin).toEqual('splash-out.end+500ms')
+    expect(res?.movementParams.duration).toEqual('800ms')
+    expect(res?.splashParams.inParams.begin).toEqual('800ms;deck-in.end+800ms')
+    expect(res?.splashParams.inParams.duration).toEqual('300ms')
+    expect(res?.splashParams.outParams.begin).toEqual('splash-in.end+300ms')
+    expect(res?.splashParams.outParams.duration).toEqual('300ms')
+  })
+
+  it('returns expected animation params given a move to offdeck - OT3', () => {
+    const res = getLabwareAnimationParams(
+      [
+        {
+          x: 0,
+          y: 0,
+          labwareDef: mockLabwareDefinition,
+          labwareId: 'offDeckMove',
+        },
+      ],
+      [],
+      mockMoveLabwareCommandToOffDeck,
+      deckDefFixtureFlex as any
+    )
+
+    expect(res).toBeTruthy()
+    expect(res?.movementParams.xMovement).toEqual(0)
+    expect(res?.movementParams.yMovement).toEqual(0 - OT3_STANDARD_SLOT_HEIGHT)
   })
 })
