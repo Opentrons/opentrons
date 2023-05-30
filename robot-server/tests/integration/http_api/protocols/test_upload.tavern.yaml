@@ -2,12 +2,11 @@ test_name: Upload, analyze, delete basic_transfer_standalone protocol.
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -38,7 +37,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:
@@ -51,13 +50,13 @@ stages:
             result: ok
   - name: Delete the protocol
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200
   - name: Get protocol with id to verify it is deleted
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -73,14 +72,13 @@ test_name: Upload, analyze and analyze using "slow analysis"
 
 marks:
   - usefixtures:
-      - run_server
-      - set_disable_fast_analysis
-      - clean_server_state
+      - ot2_server_base_url
+      - ot2_server_set_disable_fast_analysis
 
 stages:
   - name: Upload simple Python protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/simple.py'
@@ -95,7 +93,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:

@@ -2,11 +2,11 @@
 test_name: Get calibration status
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Get the status
     request:
-      url: "{host:s}:{port:d}/calibration/status"
+      url: "{ot2_server_base_url}/calibration/status"
       method: GET
     response:
       status_code: 200
