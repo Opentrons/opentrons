@@ -8,8 +8,11 @@ import { InterventionModal } from '..'
 import {
   mockPauseCommandWithoutStartTime,
   mockPauseCommandWithStartTime,
-  mockMoveLabwareCommand,
+  mockMoveLabwareCommandFromSlot,
+  mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
+  mockModuleRenderInfo,
+  mockLabwareRenderInfo,
 } from '../__fixtures__'
 
 const ROBOT_NAME = 'Otie'
@@ -58,13 +61,13 @@ describe('InterventionModal', () => {
     expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 
-  it('renders a move labware intervention modal given a move labware command', () => {
+  it('renders a move labware intervention modal given a move labware command - slot starting point', () => {
     props = {
       ...props,
-      command: mockMoveLabwareCommand,
+      command: mockMoveLabwareCommandFromSlot,
       robotType: OT2_STANDARD_MODEL,
-      moduleRenderInfo: [],
-      labwareRenderInfo: [],
+      moduleRenderInfo: mockModuleRenderInfo,
+      labwareRenderInfo: mockLabwareRenderInfo,
       labwareName: LABWARE_NAME,
       oldDisplayLocation: 'Slot 1',
       newDisplayLocation: 'Slot 2',
@@ -88,5 +91,37 @@ describe('InterventionModal', () => {
     getByText('Mock 96 Well Plate')
     getByText('Labware Location')
     getByText('Slot 1 → Slot 2')
+  })
+
+  it('renders a move labware intervention modal given a move labware command - module starting point', () => {
+    props = {
+      ...props,
+      command: mockMoveLabwareCommandFromModule,
+      robotType: OT2_STANDARD_MODEL,
+      moduleRenderInfo: mockModuleRenderInfo,
+      labwareRenderInfo: mockLabwareRenderInfo,
+      labwareName: LABWARE_NAME,
+      oldDisplayLocation: 'Slot 3',
+      newDisplayLocation: 'Slot 2',
+      deckDef: ot2StandardDeckDef as any,
+      labwareAnimationParams: {
+        movementParams: {
+          xMovement: 42,
+          yMovement: 42,
+          begin: '',
+          duration: '',
+        },
+        splashParams: {
+          inParams: { begin: '', duration: '' },
+          outParams: { begin: '', duration: '' },
+        },
+      },
+    }
+    const { getByText } = render(props)
+    getByText('Move Labware')
+    getByText('Labware Name')
+    getByText('Mock 96 Well Plate')
+    getByText('Labware Location')
+    getByText('Slot 3 → Slot 2')
   })
 })

@@ -4,7 +4,7 @@ import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
 
 import {
-  mockLabwareDefinitions,
+  mockLabwareDefinitionsByUri,
   mockLabwareOnSlot,
   mockModule,
   mockRunData,
@@ -196,7 +196,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
   it('returns run labware render info', () => {
     const res = getCurrentRunLabwareRenderInfo(
       mockRunData,
-      mockLabwareDefinitions,
+      mockLabwareDefinitionsByUri,
       deckDefFixture as any
     )
     const labwareInfo = res[0]
@@ -213,7 +213,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
     mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(false)
     const res = getCurrentRunLabwareRenderInfo(
       mockRunData,
-      mockLabwareDefinitions,
+      mockLabwareDefinitionsByUri,
       deckDefFixture as any
     )
     expect(res).toHaveLength(0)
@@ -230,7 +230,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
     }
     const res = getCurrentRunLabwareRenderInfo(
       { labware: [mockBadSlotLabware] } as any,
-      mockLabwareDefinitions,
+      mockLabwareDefinitionsByUri,
       deckDefFixture as any
     )
 
@@ -254,7 +254,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
     const res = getCurrentRunModulesRenderInfo(
       mockRunData,
       deckDefFixture as any,
-      mockLabwareDefinitions
+      mockLabwareDefinitionsByUri
     )
     const moduleInfo = res[0]
     expect(moduleInfo).toBeTruthy()
@@ -275,7 +275,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
     const res = getCurrentRunModulesRenderInfo(
       mockRunDataNoNesting,
       deckDefFixture as any,
-      mockLabwareDefinitions
+      mockLabwareDefinitionsByUri
     )
 
     const moduleInfo = res[0]
@@ -292,7 +292,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
     const res = getCurrentRunModulesRenderInfo(
       mockRunDataWithTC,
       deckDefFixture as any,
-      mockLabwareDefinitions
+      mockLabwareDefinitionsByUri
     )
 
     expect(res[0].x).toEqual(0)
@@ -317,7 +317,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
     const res = getCurrentRunModulesRenderInfo(
       mockRunDataWithBadModuleSlot,
       deckDefFixture as any,
-      mockLabwareDefinitions
+      mockLabwareDefinitionsByUri
     )
 
     expect(res[0].x).toEqual(0)

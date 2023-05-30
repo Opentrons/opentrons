@@ -22,7 +22,7 @@ import {
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
 import {
-  mockMoveLabwareCommand,
+  mockMoveLabwareCommandFromSlot,
   mockPauseCommandWithStartTime,
   mockRunData,
 } from '../../InterventionModal/__fixtures__'
@@ -131,7 +131,7 @@ describe('RunProgressMeter', () => {
 
   it('should render an intervention modal when lastRunCommand is a move labware command', async () => {
     mockUseAllCommandsQuery.mockReturnValue({
-      data: { data: [mockMoveLabwareCommand], meta: { totalLength: 1 } },
+      data: { data: [mockMoveLabwareCommandFromSlot], meta: { totalLength: 1 } },
     } as any)
     mockUseRunQuery.mockReturnValue({ data: { data: mockRunData } } as any)
     mockUseCommandQuery.mockReturnValue({ data: null } as any)
