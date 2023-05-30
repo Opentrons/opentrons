@@ -2,8 +2,7 @@ test_name: Make sure the server normalizes deck slots according to its robot typ
 
 marks:
   - usefixtures:
-    - run_server
-    - clean_server_state
+    - ot2_server_base_url
   - parametrize:
       key:
         - input_slot_1
@@ -20,7 +19,7 @@ stages:
   - name: Create a run with a labware offset, and make sure it normalizes the offset's deck slot
     request:
       method: POST
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       json:
         data:
           labwareOffsets:
@@ -49,7 +48,7 @@ stages:
   - name: Add a labware offset to the run, and make sure it normalizes the offset's deck slot
     request:
       method: POST
-      url: '{host:s}:{port:d}/runs/{run_id}/labware_offsets'
+      url: '{ot2_server_base_url}/runs/{run_id}/labware_offsets'
       json:
         data:
           definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
@@ -74,7 +73,7 @@ stages:
   - name: Run a loadModule command, and make sure it normalizes the deck slot
     request:
       method: POST
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       params:
         waitUntilComplete: 'true'
       json:
@@ -107,7 +106,7 @@ stages:
   - name: Load a labware on the module, and make sure the 1st labware offset applies to it
     request:
       method: POST
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       params:
         waitUntilComplete: 'true'
       json:
@@ -145,7 +144,7 @@ stages:
   - name: Load a labware on the deck, and make sure it normalizes the deck slot, and make sure the 2nd labware offset applies to it
     request:
       method: POST
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       params:
         waitUntilComplete: 'true'
       json:
@@ -183,7 +182,7 @@ stages:
   - name: Make sure the run summary shows the normalized deck slots
     request:
       method: GET
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
     response:
       status_code: 200
       strict:

@@ -45,6 +45,7 @@ interface SetupInstrumentCalibrationItemProps {
   mount: Mount
   robotName: string
   runId: string
+  instrumentsRefetch?: () => void
 }
 
 export function SetupPipetteCalibrationItem({
@@ -52,6 +53,7 @@ export function SetupPipetteCalibrationItem({
   mount,
   robotName,
   runId,
+  instrumentsRefetch,
 }: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const deviceDetailsUrl = `/devices/${robotName}`
@@ -194,6 +196,7 @@ export function SetupPipetteCalibrationItem({
               : SINGLE_MOUNT_PIPETTES
           }
           pipetteInfo={mostRecentAnalysis?.pipettes}
+          onComplete={instrumentsRefetch}
         />
       )}
       <SetupCalibrationItem

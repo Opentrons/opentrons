@@ -81,6 +81,7 @@ def _main(args: argparse.Namespace, opentrons_api: OpentronsHTTPAPI) -> None:
     # Setup the run
     opentrons_api.cancel_run(run_id)
     opentrons_api.create_run()
+    opentrons_api.home()
     module_id = opentrons_api.load_module(args.model, args.slot)
     opentrons_api.load_labware(module_id, args.model)
     opentrons_api.load_pipette(args.mount)

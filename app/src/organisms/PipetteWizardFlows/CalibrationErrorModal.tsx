@@ -14,12 +14,20 @@ interface CalibrationErrorModalProps {
     continuePastCommandFailure: boolean
   ) => Promise<any>
   mount: PipetteMount
+  setShowErrorMessage: (message: string) => void
 }
 
 export function CalibrationErrorModal(
   props: CalibrationErrorModalProps
 ): JSX.Element {
-  const { proceed, isOnDevice, errorMessage, chainRunCommands, mount } = props
+  const {
+    proceed,
+    isOnDevice,
+    errorMessage,
+    chainRunCommands,
+    mount,
+    setShowErrorMessage,
+  } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const handleProceed = (): void => {
     chainRunCommands(
@@ -33,9 +41,11 @@ export function CalibrationErrorModal(
         },
       ],
       false
-    ).then(() => {
-      proceed()
-    })
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(error => setShowErrorMessage(error.message))
   }
   return (
     <SimpleWizardBody

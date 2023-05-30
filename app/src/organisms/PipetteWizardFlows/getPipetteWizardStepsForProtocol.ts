@@ -73,11 +73,6 @@ export const getPipetteWizardStepsForProtocol = (
         },
         { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
         {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount: mount,
-          flowType: FLOWS.ATTACH,
-        },
-        {
           section: SECTIONS.MOUNT_PIPETTE,
           mount: mount,
           flowType: FLOWS.ATTACH,
@@ -113,11 +108,6 @@ export const getPipetteWizardStepsForProtocol = (
           flowType: FLOWS.DETACH,
         },
         { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.DETACH },
-        {
-          section: SECTIONS.BEFORE_BEGINNING,
-          mount: mount,
-          flowType: FLOWS.ATTACH,
-        },
         {
           section: SECTIONS.MOUNT_PIPETTE,
           mount: mount,
@@ -160,21 +150,11 @@ export const getPipetteWizardStepsForProtocol = (
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.DETACH_PIPETTE,
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -226,11 +206,6 @@ export const getPipetteWizardStepsForProtocol = (
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -280,11 +255,6 @@ export const getPipetteWizardStepsForProtocol = (
         flowType: FLOWS.DETACH,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
