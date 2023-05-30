@@ -27,10 +27,8 @@
 }
 
 .flex_main_page_content {
-  position: absolute;
-  top: 3rem;
+  top: 10rem;
   bottom: 0;
-  width: calc(100% - 3.9875rem);
-  padding: 0 22.8125rem;
-  overflow-y: auto;
+  margin: 0 auto;
+  width: 60rem;
 }
