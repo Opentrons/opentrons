@@ -71,7 +71,7 @@ describe('DisplayWifiList', () => {
 
   it('should render wifi list and button', () => {
     const [{ getByText, getByTestId }] = render(props)
-    getByText('Choose a network')
+    getByText('Select a network')
     getByText('foo')
     getByText('bar')
     getByText('baz')

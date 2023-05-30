@@ -178,7 +178,7 @@ const HeaderWithIPs = ({
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} flex="2">
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {hasSsid ? t('choose_a_network') : t('select_a_network')}
+          {t('select_a_network')}
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_END} flex="1">
