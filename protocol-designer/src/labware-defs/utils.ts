@@ -1,7 +1,6 @@
 import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
-  PD_DO_NOT_LIST,
   LabwareDefinition2,
   PD_DO_NOT_LIST_OT3,
 } from '@opentrons/shared-data'
@@ -18,7 +17,6 @@ const definitionsContext = require.context(
 )
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
-  console.log('PD_DO_NOT_LIST', PD_DO_NOT_LIST)
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
   // also, more convenient & performant to make a map {labwareDefURI: def} not an array
   if (!_definitions) {
