@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any
+from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -1163,6 +1163,24 @@ async def test_move_to_plunger_bottom(
     mock_move.assert_called_once_with(
         target_pos, speed=expected_speed_moving_up, acquire_lock=True
     )
+
+
+async def test_move_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+    mock_check_motor: Mock,
+):
+
+    await ot3_hardware.move_axes(position={OT3Axis.X: 13})
+    mock_check_motor.return_value = True
+
+    mock_move.reset_mock()
+    target_pos = OrderedDict()
+    target_pos[OT3Axis.X] = 13
+    target_pos[OT3Axis.Y] = 493.8
+    target_pos[OT3Axis.Z_L] = 253.475
+    print(target_pos)
+    mock_move.assert_called_once_with(target_position=target_pos, speed=None)
 
 
 async def test_move_gripper_mount_without_gripper_attached(

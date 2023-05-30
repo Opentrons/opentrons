@@ -18,6 +18,7 @@ from typing import (
     Any,
     TypeVar,
     Tuple,
+    Mapping,
 )
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
@@ -152,7 +153,7 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[OT3Transforms],
+    HardwareControlInterface[OT3Transforms, OT3Axis],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -813,6 +814,22 @@ class OT3API(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
+    async def current_axes_effector_positions(
+        self,
+        refresh: bool = False,
+    ) -> Dict[OT3Axis, float]:
+        """Return the current axes effectors position (in deck coords)."""
+        if refresh:
+            await self.refresh_positions()
+        print(self._current_position)
+        valid_motor = self._current_position and self._backend.check_motor_status(
+            list(self._current_position.keys())
+        )
+        if not valid_motor:
+            raise MustHomeError("Current position is invalid; please home motors.")
+
+        return self._current_position
+
     async def refresh_positions(self) -> None:
         """Request and update both the motor and encoder positions from backend."""
         async with self._motion_lock:
@@ -975,6 +992,47 @@ class OT3API(
             max_speeds=checked_max,
             expect_stalls=_expect_stalls,
         )
+
+    async def move_axes(  # noqa: C901
+        self,
+        position: Mapping[OT3Axis, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[OT3Axis, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        assert position, "move_axes requires a none empty position"
+        for axis in position.keys():
+            if not self._backend.axis_is_present(axis):
+                # create a custom error
+                raise ValueError(f"{axis} is not present")
+        absolute_positions: "OrderedDict[OT3Axis, float]" = OrderedDict()
+        current_position = await self.current_axes_effector_positions()
+        if OT3Axis.X in position:
+            absolute_positions[OT3Axis.X] = position[OT3Axis.X]
+        else:
+            absolute_positions[OT3Axis.X] = current_position[OT3Axis.X]
+        if OT3Axis.Y in position:
+            absolute_positions[OT3Axis.Y] = position[OT3Axis.Y]
+        else:
+            absolute_positions[OT3Axis.Y] = current_position[OT3Axis.Y]
+
+        have_z = False
+        for axis in [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]:
+            if axis in position:
+                have_z = True
+                absolute_positions[axis] = position[axis]
+
+        if not have_z:
+            absolute_positions[OT3Axis.Z_L] = current_position[OT3Axis.Z_L]
+        for axis, position_value in position.items():
+            if axis not in absolute_positions:
+                absolute_positions[axis] = position_value
+        print(absolute_positions)
+        print(speed)
+        await self._move(target_position=absolute_positions, speed=speed)
 
     async def move_rel(
         self,
