@@ -432,8 +432,8 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,
-                        trailing_air_gap=5,
+                        leading_air_gap=3.2,
+                        trailing_air_gap=2,
                     ),
                 ),
                 50: AspirateSettings(  # 50uL
@@ -442,7 +442,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=2,
+                        leading_air_gap=3.2,
                         trailing_air_gap=3.5,
                     ),
                 ),
