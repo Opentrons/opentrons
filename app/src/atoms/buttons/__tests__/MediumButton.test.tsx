@@ -88,6 +88,8 @@ describe('MediumButton', () => {
       buttonCategory: 'rounded',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.borderRadiusSize5}`
+    )
   })
 })

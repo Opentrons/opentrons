@@ -182,7 +182,9 @@ export function Toast(props: ToastProps): JSX.Element {
       css={showODDStyle ? ODD_ANIMATION : DESKTOP_ANIMATION}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      borderRadius={showODDStyle ? BORDERS.borderRadiusSize3 : BORDERS.radiusSoftCorners}
+      borderRadius={
+        showODDStyle ? BORDERS.borderRadiusSize3 : BORDERS.radiusSoftCorners
+      }
       borderColor={toastStyleByType[type].color}
       borderWidth={showODDStyle ? BORDERS.borderRadiusSize1 : '1px'}
       border={BORDERS.styleSolid}

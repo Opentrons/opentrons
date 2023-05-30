@@ -165,7 +165,7 @@ const HeaderWithIPs = (): JSX.Element => {
           {t('connect_via', { type: t('wifi') })}
         </StyledText>
       </Flex>
-      <Box flex="1"/>
+      <Box flex="1" />
     </Flex>
   )
 }

@@ -85,7 +85,9 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
           borderRadius={
-            isError ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}` : 0
+            isError
+              ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
+              : 0
           }
         >
           {children}
