@@ -294,8 +294,8 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size3};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `
 
