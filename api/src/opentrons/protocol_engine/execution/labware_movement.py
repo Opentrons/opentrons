@@ -12,6 +12,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons.protocol_engine.types import ModuleModel
 
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
@@ -34,6 +35,8 @@ from ..types import (
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+
+_ADDITIONAL_TC2_PICKUP_OFFSET = 3.5
 
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
@@ -102,6 +105,16 @@ class LabwareMovementHandler:
                 "No gripper found for performing labware movements."
             )
 
+        is_tc2_pickup = False
+
+        if isinstance(current_location, ModuleLocation):
+            module_id = current_location.moduleId
+            if (
+                self._state_store.modules.get_connected_model(module_id)
+                == ModuleModel.THERMOCYCLER_MODULE_V2
+            ):
+                is_tc2_pickup = True
+
         gripper_mount = OT3Mount.GRIPPER
 
         # Retract all mounts
@@ -117,6 +130,7 @@ class LabwareMovementHandler:
                     labware_id
                 ),
                 additional_offset_vector=experimental_offset_data.pickUpOffset,
+                is_pickup_from_tc2=is_tc2_pickup,
             )
 
             waypoints_to_labware = self._get_gripper_movement_waypoints(
@@ -209,6 +223,7 @@ class LabwareMovementHandler:
         use_current_offset: bool,
         current_offset_vector: Optional[LabwareOffsetVector],
         additional_offset_vector: Optional[LabwareOffsetVector],
+        is_pickup_from_tc2: bool = False,
     ) -> LabwareOffsetVector:
         """Calculate the final labware offset vector to use in labware movement."""
         _current_offset_vector = current_offset_vector or LabwareOffsetVector(
@@ -217,6 +232,10 @@ class LabwareMovementHandler:
         _additional_offset_vector = additional_offset_vector or LabwareOffsetVector(
             x=0, y=0, z=0
         )
+        if is_pickup_from_tc2:
+            # TODO (fps, 2022-05-30): Remove this once RLAB-295 is merged
+            _additional_offset_vector.z += _ADDITIONAL_TC2_PICKUP_OFFSET
+
         if not use_current_offset:
             return _additional_offset_vector
         else:
