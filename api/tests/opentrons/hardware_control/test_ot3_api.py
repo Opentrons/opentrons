@@ -1165,22 +1165,21 @@ async def test_move_to_plunger_bottom(
     )
 
 
+@pytest.mark.parametrize("input_position, expected_move_pos", [({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475})])
 async def test_move_axes(
     ot3_hardware: ThreadManager[OT3API],
     mock_move: AsyncMock,
     mock_check_motor: Mock,
+    input_position: Dict[OT3Axis, float],
+    expected_move_pos: OrderedDict[OT3Axis, float]
 ):
 
-    await ot3_hardware.move_axes(position={OT3Axis.X: 13})
+    await ot3_hardware.move_axes(position=input_position)
     mock_check_motor.return_value = True
 
     mock_move.reset_mock()
-    target_pos = OrderedDict()
-    target_pos[OT3Axis.X] = 13
-    target_pos[OT3Axis.Y] = 493.8
-    target_pos[OT3Axis.Z_L] = 253.475
-    print(target_pos)
-    mock_move.assert_called_once_with(target_position=target_pos, speed=None)
+    print(expected_move_pos)
+    mock_move.assert_called_once_with(target_position=expected_move_pos, speed=None)
 
 
 async def test_move_gripper_mount_without_gripper_attached(
