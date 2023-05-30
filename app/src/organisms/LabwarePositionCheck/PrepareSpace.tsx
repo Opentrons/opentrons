@@ -15,6 +15,7 @@ import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.j
 
 import { getIsOnDevice } from '../../redux/config'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { useProtocolMetadata } from '../Devices/hooks'
 
 import type { CheckLabwareStep } from './types'
 
@@ -42,9 +43,12 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const { location, moduleId, labwareDef, protocolData, header, body } = props
+
+  const { robotType } = useProtocolMetadata()
   const isOnDevice = useSelector(getIsOnDevice)
 
-  if (protocolData == null) return null
+  if (protocolData == null || robotType == null) return null
+  const deckDef = robotType === 'OT-3 Standard' ? ot3DeckDef : ot2DeckDef
   return (
     <GenericWizardTile
       header={header}
@@ -52,15 +56,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       rightHandBody={
         <RobotWorkSpace
           height={isOnDevice ? '80%' : '100%'}
-          deckDef={
-            protocolData.labware.some(
-              l =>
-                l.loadName === 'opentrons_1_trash_850ml_fixed' ||
-                l.loadName === 'opentrons_1_trash_1100ml_fixed'
-            )
-              ? (ot3DeckDef as any)
-              : (ot2DeckDef as any)
-          }
+          deckDef={deckDef as any}
           viewBox={DECK_MAP_VIEWBOX}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
           id="LabwarePositionCheck_deckMap"
