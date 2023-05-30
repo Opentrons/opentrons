@@ -19,17 +19,27 @@ describe('Numpad', () => {
     }
   })
   it('should render the numpad keys', () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: '1' })
-    getByRole('button', { name: '2' })
-    getByRole('button', { name: '3' })
-    getByRole('button', { name: '4' })
-    getByRole('button', { name: '5' })
-    getByRole('button', { name: '6' })
-    getByRole('button', { name: '7' })
-    getByRole('button', { name: '8' })
-    getByRole('button', { name: '9' })
-    getByRole('button', { name: '0' })
+    const { getAllByRole } = render(props)
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
+      '7',
+      '8',
+      '9',
+      '4',
+      '5',
+      '6',
+      '1',
+      '2',
+      '3',
+      '0',
+      '.',
+      'backspace',
+    ]
+
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
   })
 
   it('should call mock function when clicking num key', () => {

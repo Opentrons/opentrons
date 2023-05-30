@@ -2,11 +2,11 @@
 test_name: GET Health
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Health GET request returns correct info
     request:
-      url: "{host:s}:{port:d}/health"
+      url: "{ot2_server_base_url}/health"
       method: GET
     response:
       status_code: 200
