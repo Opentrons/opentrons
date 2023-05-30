@@ -33,7 +33,7 @@ describe('Numpad', () => {
       '3',
       '0',
       '.',
-      'backspace',
+      '⌫',
     ]
 
     buttons.forEach((button, index) => {

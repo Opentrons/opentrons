@@ -29,7 +29,7 @@ const customDisplay = {
   '{tab}': 'tab ⇥',
   '{backspace}': '⌫',
   '{capslock}': 'caps lock ⇪',
-  '{shift}': '⇧',
+  '{shift}': '⬆︎',
   '{controlleft}': 'ctrl ⌃',
   '{controlright}': 'ctrl ⌃',
   '{altleft}': 'alt ⌥',
@@ -37,6 +37,7 @@ const customDisplay = {
   '{metaleft}': 'cmd ⌘',
   '{metaright}': 'cmd ⌘',
   '{abc}': 'ABC',
+  '{space}': 'space',
 }
 
 export function CustomKeyboard({
