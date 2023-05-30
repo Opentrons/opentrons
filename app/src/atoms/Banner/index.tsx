@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -12,8 +13,8 @@ import {
   BORDERS,
   Btn,
   SIZE_1,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import type { StyleProps } from '@opentrons/components'
 
 export type BannerType =
@@ -29,13 +30,17 @@ export interface BannerProps extends StyleProps {
   /** Banner contents */
   children?: React.ReactNode
   /** optional handler to show close button/clear alert  */
-  onCloseClick?: (() => unknown) | React.MouseEventHandler<HTMLButtonElement>
+  onCloseClick?: (() => void) | React.MouseEventHandler<HTMLButtonElement>
   /** Override the default Alert Icon */
   icon?: IconProps
   /** some banner onCloseClicks fire events, this allows a spinner after click but before event finishes */
   isCloseActionLoading?: boolean
   /** Override the Exit icon */
   closeButton?: React.ReactNode
+  /** Icon margin right for large banners */
+  iconMarginRight?: string
+  /** Icon margin left for large banners */
+  iconMarginLeft?: string
 }
 
 const BANNER_PROPS_BY_TYPE: Record<
@@ -75,30 +80,45 @@ export function Banner(props: BannerProps): JSX.Element {
     onCloseClick,
     icon,
     children,
-    isCloseActionLoading,
+    isCloseActionLoading = false,
     padding,
     closeButton,
+    iconMarginLeft,
+    iconMarginRight,
+    size,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
-
   const iconProps = {
     ...(icon ?? bannerProps.icon),
-    size: SPACING.spacing4,
-    marginRight: SPACING.spacing3,
+    size: size ?? SIZE_1,
+    marginRight: iconMarginRight ?? SPACING.spacing8,
+    marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
+  const BANNER_STYLE = css`
+    border: 1px ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color};
+    font-size: ${TYPOGRAPHY.fontSizeP};
+    font-weight: ${TYPOGRAPHY.fontWeightRegular};
+    border-radius: ${SPACING.spacing4};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: 1.25rem;
+      font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+      border: none;
+      background-color: ${COLORS.yellow3};
+      border-radius: ${BORDERS.size3};
+      line-height: 1.5rem;
+    }
+  `
   return (
     <Flex
-      fontSize={TYPOGRAPHY.fontSizeP}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
-      borderRadius={SPACING.spacing2}
       backgroundColor={BANNER_PROPS_BY_TYPE[type].backgroundColor}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color}`}
+      css={BANNER_STYLE}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      padding={padding ?? SPACING.spacing3}
+      padding={padding ?? SPACING.spacing8}
       onClick={e => e.stopPropagation()}
       data-testid={`Banner_${type}`}
       {...styleProps}
@@ -111,19 +131,20 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex flex="1" alignItems={ALIGN_CENTER}>
         {props.children}
       </Flex>
-      {onCloseClick && !isCloseActionLoading ? (
+      {onCloseClick != null && !(isCloseActionLoading ?? false) ? (
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
-              width={SPACING.spacing5}
-              height={SPACING.spacing5}
+              width={SPACING.spacing24}
+              height={SPACING.spacing24}
+              marginTop="0.375rem"
               name="close"
               aria-label="close_icon"
             />
           )}
         </Btn>
       ) : null}
-      {isCloseActionLoading && (
+      {(isCloseActionLoading ?? false) && (
         <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
       )}
     </Flex>

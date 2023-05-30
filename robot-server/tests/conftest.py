@@ -1,22 +1,19 @@
-import signal
-import subprocess
-import time
-import sys
-import tempfile
-import os
 import json
+import os
 import pathlib
-import requests
-import pytest
-
+import tempfile
 from datetime import datetime, timezone
-from fastapi import routing
 from mock import MagicMock
-from starlette.testclient import TestClient
-from typing import Any, Callable, Generator, Iterator, cast
-from typing_extensions import NoReturn
 from pathlib import Path
-from sqlalchemy.engine import Engine
+from typing import Callable, Generator, Iterator, cast
+from typing_extensions import NoReturn
+from decoy import Decoy
+
+from sqlalchemy.engine import Engine as SQLEngine
+
+import pytest
+from fastapi import routing
+from starlette.testclient import TestClient
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -36,7 +33,8 @@ from robot_server import app
 from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
-from robot_server.persistence.database import create_sql_engine
+from robot_server.persistence import get_sql_engine, create_sql_engine
+from robot_server.health.router import ComponentVersions, get_versions
 
 test_router = routing.APIRouter()
 
@@ -47,6 +45,14 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
+
+
+@pytest.fixture()
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Return a mock in the shape of a HardwareControlAPI."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    return decoy.mock(cls=API)
 
 
 @pytest.fixture(autouse=True)
@@ -91,9 +97,19 @@ def hardware() -> MagicMock:
 
 
 @pytest.fixture
-def override_hardware(hardware: MagicMock) -> Iterator[None]:
+def versions() -> MagicMock:
+    m = MagicMock(spec=get_versions)
+    m.return_value = ComponentVersions(
+        api_version="someTestApiVersion",
+        system_version="someTestSystemVersion",
+    )
+    return m
+
+
+@pytest.fixture
+def _override_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
     async def get_hardware_override() -> HardwareControlAPI:
-        """Override for get_hardware dependency"""
+        """Override for the get_hardware() FastAPI dependency."""
         return hardware
 
     app.dependency_overrides[get_hardware] = get_hardware_override
@@ -102,14 +118,42 @@ def override_hardware(hardware: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
-def api_client(override_hardware: None) -> TestClient:
+def _override_sql_engine_with_mock() -> Iterator[None]:
+    async def get_sql_engine_override() -> SQLEngine:
+        """Override for the get_sql_engine() FastAPI dependency."""
+        return MagicMock(spec=SQLEngine)
+
+    app.dependency_overrides[get_sql_engine] = get_sql_engine_override
+    yield
+    del app.dependency_overrides[get_sql_engine]
+
+
+@pytest.fixture
+def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
+    async def get_version_override() -> ComponentVersions:
+        """Override for the get_versions() FastAPI dependency."""
+        return cast(ComponentVersions, await versions())
+
+    app.dependency_overrides[get_versions] = get_version_override
+    yield
+    del app.dependency_overrides[get_versions]
+
+
+@pytest.fixture
+def api_client(
+    _override_hardware_with_mock: None,
+    _override_sql_engine_with_mock: None,
+    _override_version_with_mock: None,
+) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return client
 
 
 @pytest.fixture
-def api_client_no_errors(override_hardware: None) -> TestClient:
+def api_client_no_errors(
+    _override_hardware_with_mock: None, _override_sql_engine_with_mock: None
+) -> TestClient:
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
@@ -118,72 +162,11 @@ def api_client_no_errors(override_hardware: None) -> TestClient:
 
 
 @pytest.fixture(scope="session")
-def request_session() -> requests.Session:
-    session = requests.Session()
-    session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
-    return session
-
-
-@pytest.fixture(scope="session")
 def server_temp_directory() -> Iterator[str]:
     new_dir = tempfile.mkdtemp()
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
     yield new_dir
-
-
-@pytest.fixture(scope="session")
-def run_server(
-    request_session: requests.Session, server_temp_directory: str
-) -> Iterator["subprocess.Popen[Any]"]:
-    """Run the robot server in a background process."""
-    # In order to collect coverage we run using `coverage`.
-    # `-a` is to append to existing `.coverage` file.
-    # `--source` is the source code folder to collect coverage stats on.
-    with subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "coverage",
-            "run",
-            "-a",
-            "--source",
-            "robot_server",
-            "-m",
-            "uvicorn",
-            "robot_server:app",
-            "--host",
-            "localhost",
-            "--port",
-            "31950",
-        ],
-        env={
-            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
-            "OT_API_CONFIG_DIR": server_temp_directory,
-        },
-        stdin=subprocess.DEVNULL,
-        # The server will log to its stdout or stderr.
-        # Let it inherit our stdout and stderr so pytest captures its logs.
-        stdout=None,
-        stderr=None,
-    ) as proc:
-        # Wait for a bit to get started by polling /hcpealth
-        from requests.exceptions import ConnectionError
-
-        while True:
-            try:
-                request_session.get("http://localhost:31950/health")
-            except ConnectionError:
-                pass
-            else:
-                break
-            time.sleep(0.5)
-        request_session.post(
-            "http://localhost:31950/robot/home", json={"target": "robot"}
-        )
-        yield proc
-        proc.send_signal(signal.SIGTERM)
-        proc.wait()
 
 
 @pytest.fixture
@@ -243,32 +226,6 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
         hardware=hardware,
         motion_lock=ThreadedAsyncLock(),
     )
-
-
-@pytest.fixture
-def set_disable_fast_analysis(
-    request_session: requests.Session,
-) -> Iterator[None]:
-    """For integration tests that need to set then clear the
-    enableHttpProtocolSessions feature flag"""
-    url = "http://localhost:31950/settings"
-    data = {"id": "disableFastProtocolUpload", "value": True}
-    request_session.post(url, json=data)
-    yield None
-    data["value"] = None
-    request_session.post(url, json=data)
-
-
-@pytest.fixture
-def set_enable_load_liquid(request_session: requests.Session) -> Iterator[None]:
-    """For integration tests that need to set then clear the
-    enableLoadLiquid feature flag"""
-    url = "http://localhost:31950/settings"
-    data = {"id": "enableLoadLiquid", "value": True}
-    request_session.post(url, json=data)
-    yield None
-    data["value"] = None
-    request_session.post(url, json=data)
 
 
 @pytest.fixture
@@ -401,7 +358,7 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
 
 
 @pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[Engine, None, None]:
+def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
     sql_engine = create_sql_engine(db_file_path)

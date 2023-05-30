@@ -3,7 +3,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_ADD_CUSTOM_LABWARE,
+} from '../../../redux/analytics'
 import { AddCustomLabwareSlideout } from '..'
 
 jest.mock('../../../redux/custom-labware')
@@ -33,8 +36,6 @@ describe('AddCustomLabwareSlideout', () => {
   const props: React.ComponentProps<typeof AddCustomLabwareSlideout> = {
     isExpanded: true,
     onCloseClick: jest.fn(() => null),
-    onSuccess: jest.fn(() => null),
-    onFailure: jest.fn(() => null),
   }
   beforeEach(() => {
     mockTrackEvent = jest.fn()
@@ -48,7 +49,7 @@ describe('AddCustomLabwareSlideout', () => {
     const btn = getByRole('button', { name: 'Choose File' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'addCustomLabware',
+      name: ANALYTICS_ADD_CUSTOM_LABWARE,
       properties: {},
     })
   })

@@ -19,9 +19,9 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
-import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/deprecatedHooks/useLabwareOffsetForLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string
@@ -49,7 +49,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
       backgroundColor={hover ? COLORS.blueEnabled : '#000000B3'}
       borderRadius="0 0 0.4rem 0.4rem"
       fontSize={TYPOGRAPHY.fontSizeCaption}
-      padding={SPACING.spacing2}
+      padding={SPACING.spacing4}
       color={COLORS.white}
       id={`LabwareInfoOverlay_slot_${labwareId}_offsetBox`}
     >
@@ -57,7 +57,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_FLEX_START}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
       >
         <StyledText
           as="h6"

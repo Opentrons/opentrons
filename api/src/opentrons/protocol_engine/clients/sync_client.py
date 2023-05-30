@@ -1,5 +1,6 @@
 """Synchronous ProtocolEngine client module."""
-from typing import cast, List, Optional
+from typing import cast, List, Optional, Union, Dict
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -18,6 +19,10 @@ from ..types import (
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
+    DropTipWellLocation,
+    LabwareOffsetVector,
+    MotorAxis,
+    Liquid,
 )
 from .transports import AbstractSyncTransport
 
@@ -41,11 +46,30 @@ class SyncClient:
             definition=definition,
         )
 
+    def add_liquid(
+        self, name: str, color: Optional[str], description: Optional[str]
+    ) -> Liquid:
+        """Add a liquid to the engine."""
+        return self._transport.call_method("add_liquid", name=name, color=color, description=description)  # type: ignore[no-any-return]
+
     def reset_tips(self, labware_id: str) -> None:
         """Reset a labware's tip tracking state.."""
         self._transport.call_method(
             "reset_tips",
             labware_id=labware_id,
+        )
+
+    def set_pipette_movement_speed(
+        self, pipette_id: str, speed: Optional[float]
+    ) -> None:
+        """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+        None will use the hardware API's default.
+        """
+        self._transport.call_method(
+            "set_pipette_movement_speed",
+            pipette_id=pipette_id,
+            speed=speed,
         )
 
     def load_labware(
@@ -70,33 +94,43 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_id: str,
         new_location: LabwareLocation,
         strategy: LabwareMovementStrategy,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[LabwareOffsetVector],
+        drop_offset: Optional[LabwareOffsetVector],
     ) -> commands.MoveLabwareResult:
         """Execute a MoveLabware command and return the result."""
         request = commands.MoveLabwareCreate(
             params=commands.MoveLabwareParams(
-                labwareId=labware_id, newLocation=new_location, strategy=strategy
+                labwareId=labware_id,
+                newLocation=new_location,
+                strategy=strategy,
+                usePickUpLocationLpcOffset=use_pick_up_location_lpc_offset,
+                useDropLocationLpcOffset=use_drop_location_lpc_offset,
+                pickUpOffset=pick_up_offset,
+                dropOffset=drop_offset,
             )
         )
         result = self._transport.execute_command(request=request)
 
         return cast(commands.MoveLabwareResult, result)
 
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_pipette(
         self,
-        pipette_name: PipetteNameType,
+        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
         mount: MountType,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
         request = commands.LoadPipetteCreate(
-            params=commands.LoadPipetteParams(
-                pipetteName=pipette_name,
-                mount=mount,
-            )
+            params=commands.LoadPipetteParams(mount=mount, pipetteName=pipette_name)
         )
         result = self._transport.execute_command(request=request)
 
@@ -108,6 +142,9 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
     ) -> commands.MoveToWellResult:
         """Execute a MoveToWell command and return the result."""
         request = commands.MoveToWellCreate(
@@ -116,6 +153,9 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -128,6 +168,7 @@ class SyncClient:
         coordinates: DeckPoint,
         minimum_z_height: Optional[float],
         force_direct: bool,
+        speed: Optional[float],
     ) -> commands.MoveToCoordinatesResult:
         """Execute a MoveToCoordinates command and return the result."""
         request = commands.MoveToCoordinatesCreate(
@@ -136,6 +177,7 @@ class SyncClient:
                 coordinates=coordinates,
                 minimumZHeight=minimum_z_height,
                 forceDirect=force_direct,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -180,7 +222,8 @@ class SyncClient:
         pipette_id: str,
         labware_id: str,
         well_name: str,
-        well_location: WellLocation,
+        well_location: DropTipWellLocation,
+        home_after: Optional[bool],
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -189,6 +232,7 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                homeAfter=home_after,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -218,6 +262,24 @@ class SyncClient:
 
         return cast(commands.AspirateResult, result)
 
+    def aspirate_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.AspirateInPlaceResult:
+        """Execute an ``AspirateInPlace`` command and return the result."""
+        request = commands.AspirateInPlaceCreate(
+            params=commands.AspirateInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.AspirateInPlaceResult, result)
+
     def dispense(
         self,
         pipette_id: str,
@@ -225,6 +287,7 @@ class SyncClient:
         well_name: str,
         well_location: WellLocation,
         volume: float,
+        flow_rate: float,
     ) -> commands.DispenseResult:
         """Execute a ``Dispense`` command and return the result."""
         request = commands.DispenseCreate(
@@ -234,13 +297,28 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.DispenseResult, result)
+
+    def dispense_in_place(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+    ) -> commands.DispenseInPlaceResult:
+        """Execute a ``DispenseInPlace`` command and return the result."""
+        request = commands.DispenseInPlaceCreate(
+            params=commands.DispenseInPlaceParams(
+                pipetteId=pipette_id,
+                volume=volume,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.DispenseInPlaceResult, result)
 
     def blow_out(
         self,
@@ -248,6 +326,7 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        flow_rate: float,
     ) -> commands.BlowOutResult:
         """Execute a ``BlowOut`` command and return the result."""
         request = commands.BlowOutCreate(
@@ -256,13 +335,26 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
-                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
-                # https://github.com/Opentrons/opentrons/issues/10810
-                flowRate=2.0,
+                flowRate=flow_rate,
             )
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.BlowOutResult, result)
+
+    def blow_out_in_place(
+        self,
+        pipette_id: str,
+        flow_rate: float,
+    ) -> commands.BlowOutInPlaceResult:
+        """Execute a ``BlowOutInPlace`` command and return the result."""
+        request = commands.BlowOutInPlaceCreate(
+            params=commands.BlowOutInPlaceParams(
+                pipetteId=pipette_id,
+                flowRate=flow_rate,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.BlowOutInPlaceResult, result)
 
     def touch_tip(
         self,
@@ -270,6 +362,8 @@ class SyncClient:
         labware_id: str,
         well_name: str,
         well_location: WellLocation,
+        radius: float,
+        speed: float,
     ) -> commands.TouchTipResult:
         """Execute a ``Touch Tip`` command and return the result."""
         request = commands.TouchTipCreate(
@@ -278,6 +372,8 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                radius=radius,
+                speed=speed,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -577,3 +673,21 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.temperature_module.DeactivateTemperatureResult, result)
+
+    def home(self, axes: Optional[List[MotorAxis]]) -> commands.HomeResult:
+        """Execute a `home` command and return the result."""
+        request = commands.HomeCreate(params=commands.HomeParams(axes=axes))
+        result = self._transport.execute_command(request=request)
+        return cast(commands.HomeResult, result)
+
+    def load_liquid(
+        self, labware_id: str, liquid_id: str, volume_by_well: Dict[str, float]
+    ) -> commands.LoadLiquidResult:
+        """Execute a load_liquid command and return the result."""
+        request = commands.LoadLiquidCreate(
+            params=commands.LoadLiquidParams(
+                labwareId=labware_id, liquidId=liquid_id, volumeByWell=volume_by_well
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.LoadLiquidResult, result)

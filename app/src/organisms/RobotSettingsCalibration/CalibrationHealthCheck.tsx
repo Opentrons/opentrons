@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Box,
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -11,6 +10,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   TOOLTIP_LEFT,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { Portal } from '../../App/portal'
@@ -18,7 +18,10 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
+} from '../../redux/analytics'
 import * as Calibration from '../../redux/calibration'
 import * as Config from '../../redux/config'
 import * as Pipettes from '../../redux/pipettes'
@@ -41,7 +44,6 @@ interface CalibrationHealthCheckProps {
   dispatchRequests: DispatchRequestsType
   isPending: boolean
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 const attachedPipetteCalPresent: (
@@ -60,7 +62,6 @@ export function CalibrationHealthCheck({
   dispatchRequests,
   isPending,
   robotName,
-  updateRobotStatus,
 }: CalibrationHealthCheckProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -76,7 +77,7 @@ export function CalibrationHealthCheck({
 
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const attachedPipettes = useAttachedPipettes()
-  const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations()
 
   const { isRunRunning: isRunning } = useRunStatuses()
 
@@ -128,13 +129,37 @@ export function CalibrationHealthCheck({
   const handleHealthCheckClick = (): void => {
     handleHealthCheck(null)
     doTrackEvent({
-      name: 'calibrationHealthCheckButtonClicked',
+      name: ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
       properties: {},
     })
   }
 
   return (
-    <>
+    <Flex
+      paddingY={SPACING.spacing24}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {t('calibration_health_check_title')}
+        </StyledText>
+        <StyledText as="p">
+          {t('calibration_health_check_description')}
+        </StyledText>
+      </Flex>
+      <TertiaryButton
+        {...targetProps}
+        onClick={handleHealthCheckClick}
+        disabled={calCheckButtonDisabled}
+      >
+        {t('health_check')}
+      </TertiaryButton>
+      {calCheckButtonDisabled && (
+        <Tooltip tooltipProps={tooltipProps}>
+          {t('fully_calibrate_before_checking_health')}
+        </Tooltip>
+      )}
       <Portal level="top">
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal
@@ -144,30 +169,6 @@ export function CalibrationHealthCheck({
           />
         ) : null}
       </Portal>
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('calibration_health_check_description')}
-            </StyledText>
-          </Box>
-          <TertiaryButton
-            {...targetProps}
-            onClick={handleHealthCheckClick}
-            disabled={calCheckButtonDisabled}
-          >
-            {t('health_check')}
-          </TertiaryButton>
-          {calCheckButtonDisabled && (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('fully_calibrate_before_checking_health')}
-            </Tooltip>
-          )}
-        </Flex>
-      </Box>
-    </>
+    </Flex>
   )
 }

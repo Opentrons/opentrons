@@ -17,7 +17,7 @@ export function ScrollableAlertModal(props: Props): JSX.Element {
       alertOverlay
     >
       <div className={styles.scrollable_modal_scroll}>{props.children}</div>
-      {props.buttons && <BottomButtonBar buttons={props.buttons} />}
+      {props.buttons != null && <BottomButtonBar buttons={props.buttons} />}
     </AlertModal>
   )
 }

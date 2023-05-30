@@ -6,6 +6,10 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 labware_name = "corning_96_wellplate_360ul_flat"
 
 
+# labware._core.get_geometry() is an implementation detail and is not present in ProtocolContexts
+# backed by Protocol Engine.
+# TODO(mm, 2022-04-28): Make sure this logic is tested elsewhere, then delete this test.
+@pytest.mark.apiv2_non_pe_only
 def test_load_to_slot(
     ctx: papi.ProtocolContext, deck_definition: DeckDefinitionV3
 ) -> None:
@@ -21,13 +25,9 @@ def test_load_to_slot(
     ][0]
     labware = ctx.load_labware(labware_name, "1")
 
-    assert labware._implementation.get_geometry().offset == types.Point(
-        *slot_1["position"]
-    )
+    assert labware._core.get_geometry().offset == types.Point(*slot_1["position"])  # type: ignore[attr-defined]
     other = ctx.load_labware(labware_name, 2)
-    assert other._implementation.get_geometry().offset == types.Point(
-        *slot_2["position"]
-    )
+    assert other._core.get_geometry().offset == types.Point(*slot_2["position"])  # type: ignore[attr-defined]
 
 
 def test_loaded(ctx: papi.ProtocolContext) -> None:
@@ -48,7 +48,7 @@ def test_get_mixed_case_labware_def() -> None:
 def test_load_label(ctx: papi.ProtocolContext) -> None:
     labware = ctx.load_labware(labware_name, "1", "my cool labware")
     assert "my cool labware" in str(labware)
-    assert labware._implementation.get_user_display_name() == "my cool labware"
+    assert labware._core.get_user_display_name() == "my cool labware"
 
 
 def test_deprecated_load(ctx: papi.ProtocolContext) -> None:

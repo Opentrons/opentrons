@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { Icon, FONT_BODY_1_DARK } from '@opentrons/components'
+import { Icon, FONT_BODY_1_DARK, SPACING } from '@opentrons/components'
 import { SECURITY_NONE } from '../../../../../redux/networking'
 
 import type { StyledComponent } from 'styled-components'
@@ -41,7 +41,7 @@ const StyledName: StyledComponent<
   overflow: hidden;
   text-overflow: ellipsis;
   ${({ padLeft }: { padLeft: boolean }) => `
-    padding-left: ${padLeft ? '0.75rem' : '0.25rem'};
+    padding-left: ${padLeft ? SPACING.spacing12 : SPACING.spacing4};
   `}
 `
 
@@ -82,7 +82,7 @@ const renderSignalIcon = (signal: number): JSX.Element => {
   } else if (signal <= SIGNAL_LEVEL_HIGH) {
     iconName = 'ot-wifi-2'
   } else {
-    iconName = 'ot-wifi-3'
+    iconName = 'wifi'
   }
 
   return <StyledIcon name={iconName} />

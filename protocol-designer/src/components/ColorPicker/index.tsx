@@ -39,7 +39,6 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
             color={props.value}
             onChange={(color, event) => {
               props.onChange(color.hex)
-              setShowColorPicker(showColorPicker => !showColorPicker)
             }}
             triangle="top-right"
           />

@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { css } from 'styled-components'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,7 +13,6 @@ import {
   TYPOGRAPHY,
   COLOR_WARNING_DARK,
 } from '@opentrons/components'
-import { css } from 'styled-components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const
@@ -69,8 +70,8 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
-      opacity={props.disabled ? 0.5 : ''}
+      color={props.error != null ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
+      opacity={props.disabled ?? false ? 0.5 : ''}
     >
       <Input {...props} />
     </Flex>
@@ -79,21 +80,20 @@ export function InputField(props: InputFieldProps): JSX.Element {
 
 function Input(props: InputFieldProps): JSX.Element {
   const error = props.error != null
-  const value = props.isIndeterminate ? '' : props.value ?? ''
-  const placeHolder = props.isIndeterminate ? '-' : props.placeholder
+  const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
+  const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
 
   const INPUT_FIELD = css`
     display: flex;
     background-color: ${COLORS.white};
-    border-radius: ${SPACING.spacing2};
-    padding: ${SPACING.spacing3};
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+    border-radius: ${SPACING.spacing4};
+    padding: ${SPACING.spacing8};
+    border: 1px ${BORDERS.styleSolid}
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${COLORS.darkGreyEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
     }
 
     & input {
@@ -102,22 +102,21 @@ function Input(props: InputFieldProps): JSX.Element {
       border: none;
       flex: 1 1 auto;
       width: 100%;
-      height: ${SPACING.spacing4};
+      height: ${SPACING.spacing16};
     }
     & input:focus {
       outline: none;
     }
 
     &:hover {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      border: 1px ${BORDERS.styleSolid}
         ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
     }
     &:focus {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${COLORS.darkGreyDisabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {
@@ -135,7 +134,7 @@ function Input(props: InputFieldProps): JSX.Element {
           value={value}
           placeholder={placeHolder}
         />
-        {props.units && (
+        {props.units != null && (
           <Flex
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
@@ -150,12 +149,12 @@ function Input(props: InputFieldProps): JSX.Element {
       <Flex
         color={COLORS.darkGreyEnabled}
         fontSize={TYPOGRAPHY.fontSizeLabel}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
-        <Flex paddingBottom={SPACING.spacing2}>{props.caption}</Flex>
-        {props.secondaryCaption ? (
-          <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
+        <Flex paddingBottom={SPACING.spacing4}>{props.caption}</Flex>
+        {props.secondaryCaption != null ? (
+          <Flex paddingBottom={SPACING.spacing4}>{props.secondaryCaption}</Flex>
         ) : null}
         <Flex color={COLORS.errorEnabled}>{props.error}</Flex>
       </Flex>

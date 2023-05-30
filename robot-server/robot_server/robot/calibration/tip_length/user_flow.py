@@ -3,8 +3,11 @@ from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -42,7 +45,7 @@ class TipCalibrationUserFlow:
         hardware: HardwareControlAPI,
         mount: Mount,
         has_calibration_block: bool,
-        tip_rack: LabwareDefinition,
+        tip_rack: Optional[LabwareDefinition] = None,
     ):
         self._hardware = hardware
         self._mount = mount
@@ -56,7 +59,7 @@ class TipCalibrationUserFlow:
         self._tip_origin_pt: Optional[Point] = None
         self._nozzle_height_at_reference: Optional[float] = None
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
         self._tip_rack = self._get_tip_rack_lw(tip_rack)
         self._initialize_deck()
 
@@ -235,11 +238,16 @@ class TipCalibrationUserFlow:
             await self.return_tip()
         await self._hardware.home()
 
-    def _get_tip_rack_lw(self, tip_rack_def: LabwareDefinition) -> labware.Labware:
+    def _get_tip_rack_lw(
+        self, tip_rack_def: Optional[LabwareDefinition]
+    ) -> labware.Labware:
+        position = self._deck.position_for(TIP_RACK_SLOT)
+        if tip_rack_def is None:
+            pip_vol = self._hw_pipette.config.max_volume
+            tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
+            return labware.load(tr_load_name, position)
         try:
-            return labware.load_from_definition(
-                tip_rack_def, self._deck.position_for(TIP_RACK_SLOT)
-            )
+            return labware.load_from_definition(tip_rack_def, position)
         except Exception:
             raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
 
@@ -276,6 +284,6 @@ class TipCalibrationUserFlow:
             await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()

@@ -6,7 +6,8 @@ from .initiator import (
 from .downloader import FirmwareUpdateDownloader
 from .hex_file import from_hex_file_path, from_hex_file, HexRecordProcessor
 from .eraser import FirmwareUpdateEraser
-from .run import run_update
+from .run import RunUpdate
+from .utils import check_firmware_updates
 
 __all__ = [
     "FirmwareUpdateDownloader",
@@ -15,5 +16,6 @@ __all__ = [
     "from_hex_file_path",
     "from_hex_file",
     "HexRecordProcessor",
-    "run_update",
+    "RunUpdate",
+    "check_firmware_updates",
 ]

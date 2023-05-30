@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+
 import {
   Flex,
   SPACING,
@@ -16,7 +17,10 @@ import {
   Btn,
   BORDERS,
   WELL_LABEL_OPTIONS,
+  SIZE_AUTO,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
@@ -25,35 +29,38 @@ import {
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
   ModuleType,
-  TC_MODULE_LOCATION,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
 import { ToggleButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
-import { SecureLabwareModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
+import { SecureLabwareModal } from './SecureLabwareModal'
+
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import type { ModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import { LabwareSetupItem } from './types'
+import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 const LabwareRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
-  grip-gap: ${SPACING.spacing3};
   border-style: ${BORDERS.styleSolid};
-  border-width: ${SPACING.spacingXXS};
+  border-width: 1px;
   border-color: ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
+  isOt3: boolean
 }
 
 export function LabwareListItem(
@@ -67,6 +74,7 @@ export function LabwareListItem(
     moduleModel,
     moduleLocation,
     extraAttentionModules,
+    isOt3,
   } = props
   const { t } = useTranslation('protocol_setup')
   const [
@@ -75,7 +83,8 @@ export function LabwareListItem(
   ] = React.useState<ModuleType | null>(null)
   const labwareDisplayName = getLabwareDisplayName(definition)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-
+  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
   let slotInfo: JSX.Element | null =
     initialLocation === 'offDeck'
       ? null
@@ -85,7 +94,6 @@ export function LabwareListItem(
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
-  let isLatchClosed: boolean = false
   let latchCommand:
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand
@@ -103,7 +111,7 @@ export function LabwareListItem(
     )
     let moduleSlotName = moduleLocation.slotName
     if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-      moduleSlotName = TC_MODULE_LOCATION
+      moduleSlotName = isOt3 ? TC_MODULE_LOCATION_OT3 : TC_MODULE_LOCATION_OT2
     }
     slotInfo = t('module_slot_location', {
       slotName: moduleSlotName,
@@ -112,29 +120,44 @@ export function LabwareListItem(
     switch (moduleTypeNeedsAttention) {
       case MAGNETIC_MODULE_TYPE:
       case THERMOCYCLER_MODULE_TYPE:
-        extraAttentionText = (
-          <Btn
-            color={COLORS.darkGreyEnabled}
-            marginTop={SPACING.spacing3}
-            onClick={() => setSecureLabwareModalType(moduleType)}
-          >
-            <Flex flexDirection={DIRECTION_ROW}>
-              <Icon
-                name="information"
-                size="0.75rem"
-                marginTop={SPACING.spacingXS}
-              />
-              <StyledText marginLeft={SPACING.spacing2} as="p">
-                {t('secure_labware_instructions')}
-              </StyledText>
-            </Flex>
-          </Btn>
-        )
+        if (moduleModel !== THERMOCYCLER_MODULE_V2) {
+          extraAttentionText = (
+            <Btn
+              css={css`
+                color: ${COLORS.darkGreyEnabled};
+
+                &:hover {
+                  color: ${COLORS.darkBlackEnabled};
+                }
+              `}
+              onClick={() => setSecureLabwareModalType(moduleType)}
+            >
+              <Flex flexDirection={DIRECTION_ROW}>
+                <Icon
+                  name="information"
+                  size="0.75rem"
+                  marginTop={SPACING.spacing4}
+                />
+                <StyledText
+                  marginLeft={SPACING.spacing4}
+                  as="p"
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                >
+                  {t('secure_labware_instructions')}
+                </StyledText>
+              </Flex>
+            </Btn>
+          )
+        }
         break
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={COLORS.darkGreyEnabled}>
+          <StyledText
+            as="p"
+            color={COLORS.darkGreyEnabled}
+            marginRight={SPACING.spacing16}
+          >
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -147,10 +170,20 @@ export function LabwareListItem(
           matchingHeaterShaker != null &&
           matchingHeaterShaker.moduleType === HEATERSHAKER_MODULE_TYPE
         ) {
-          isLatchClosed =
-            matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
-            matchingHeaterShaker.data.labwareLatchStatus === 'closing'
-
+          if (
+            (!isLatchClosed &&
+              (matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'closing')) ||
+            (isLatchClosed &&
+              (matchingHeaterShaker.data.labwareLatchStatus === 'idle_open' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'opening'))
+          ) {
+            setIsLatchClosed(
+              matchingHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+                matchingHeaterShaker.data.labwareLatchStatus === 'closing'
+            )
+            setIsLatchLoading(false)
+          }
           latchCommand = {
             commandType: isLatchClosed
               ? 'heaterShaker/openLabwareLatch'
@@ -164,6 +197,7 @@ export function LabwareListItem(
     }
   }
   const toggleLatch = (): void => {
+    setIsLatchLoading(true)
     createLiveCommand({
       command: latchCommand,
     }).catch((e: Error) => {
@@ -172,6 +206,18 @@ export function LabwareListItem(
       )
     })
   }
+  const commandType = isLatchClosed
+    ? 'heaterShaker/openLabwareLatch'
+    : 'heaterShaker/closeLabwareLatch'
+  let hsLatchText: string = t('secure')
+  if (commandType === 'heaterShaker/closeLabwareLatch' && isLatchLoading) {
+    hsLatchText = t('closing')
+  } else if (
+    commandType === 'heaterShaker/openLabwareLatch' &&
+    isLatchLoading
+  ) {
+    hsLatchText = t('opening')
+  }
   return (
     <LabwareRow>
       <Flex>
@@ -179,7 +225,8 @@ export function LabwareListItem(
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_CENTER}
-          marginLeft={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
+          marginRight={SPACING.spacing24}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {labwareDisplayName}
@@ -192,7 +239,7 @@ export function LabwareListItem(
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
           <StyledText as="p">{slotInfo}</StyledText>
@@ -200,27 +247,29 @@ export function LabwareListItem(
         </Flex>
         {isHeaterShakerInProtocol ? (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="h6" minWidth="4.62rem">
+            <StyledText as="h6" minWidth="6.2rem">
               {t('labware_latch')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
+              marginTop="3px"
             >
               <ToggleButton
                 label={`heater_shaker_${
                   moduleLocation?.slotName ?? ''
                 }_latch_toggle`}
-                disabled={!isCorrectHeaterShakerAttached}
+                size={SIZE_AUTO}
+                disabled={!isCorrectHeaterShakerAttached || isLatchLoading}
                 toggledOn={isLatchClosed}
                 onClick={toggleLatch}
-                display="flex"
+                display={DISPLAY_FLEX}
                 alignItems={ALIGN_CENTER}
               />
-              {isLatchClosed ? (
-                <StyledText as="p">{t('secure')}</StyledText>
-              ) : null}
+              <StyledText as="p" width="4rem">
+                {hsLatchText}
+              </StyledText>
             </Flex>
           </Flex>
         ) : null}
@@ -247,7 +296,9 @@ function StandaloneLabware(props: {
   const { definition } = props
   return (
     <LabwareThumbnail
-      viewBox={` 0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+      viewBox={` 0 0 ${String(definition.dimensions.xDimension)} ${String(
+        definition.dimensions.yDimension
+      )}`}
     >
       <LabwareRender
         definition={definition}

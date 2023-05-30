@@ -21,9 +21,6 @@ import os
 import sys
 import json
 import pkgutil
-# This load means sphinx docs builds must be run in a virtualenv with the
-# newly-built module
-_package_json = json.loads(pkgutil.get_data('opentrons', 'package.json'))
 
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../sphinxext'))
@@ -66,16 +63,20 @@ master_doc = 'index'
 # General information about the project.
 project = 'OT-2 Hardware Control API'
 copyright = '2020, Opentrons'
-author = _package_json['author']['name']
+author = 'Opentrons Labworks'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-#
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
+import python_build_utils
+sys.path = sys.path[:-1]
+_vers = python_build_utils.get_version('api', 'robot-stack')
+
 # The short X.Y version.
-version = '.'.join(_package_json['version'].split('.')[:2])
+version = '.'.join(_vers.split('.')[:2])
 # The full version, including alpha/beta/rc tags.
-release = _package_json['version']
+release = _vers
 
 # setup the code block substitution extension to auto-update apiLevel
 extensions += ['sphinx-prompt', 'sphinx_substitution_extensions']
@@ -320,7 +321,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'OT2HardwareControl.tex',
      'OT-2 Hardware Control API Documentation',
-     _package_json['author']['name'], 'howto'),
+     'Opentrons Labworks', 'howto'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

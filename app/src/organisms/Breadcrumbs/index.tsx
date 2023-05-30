@@ -24,9 +24,11 @@ import {
 } from '../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
 import { getIsOnDevice } from '../../redux/config'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocol } from '../../redux/protocol-storage'
+import { appShellRequestor } from '../../redux/shell/remote'
 
-import type { NavRouteParams } from '../../App/types'
+import type { DesktopRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
 
 interface CrumbNameProps {
@@ -41,7 +43,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
       color={isLastCrumb ? COLORS.darkGreyEnabled : COLORS.blueEnabled}
     >
       <Box
-        paddingRight={SPACING.spacing2}
+        paddingRight={SPACING.spacing4}
         textTransform={TYPOGRAPHY.textTransformNone}
         css={TYPOGRAPHY.labelRegular}
       >
@@ -69,8 +71,7 @@ const CrumbLinkInactive = styled(Flex)`
 function BreadcrumbsComponent(): JSX.Element | null {
   const { t } = useTranslation('top_navigation')
   const isOnDevice = useSelector(getIsOnDevice)
-
-  const { protocolKey, robotName, runId } = useParams<NavRouteParams>()
+  const { protocolKey, robotName, runId } = useParams<DesktopRouteParams>()
 
   const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
 
@@ -88,7 +89,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
 
   // determines whether a crumb is displayed for a path, and the displayed name
   const crumbNameByPath: { [index: string]: string | null } = {
-    '/devices': !isOnDevice ? t('devices') : null,
+    '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
     [`/devices/${robotName}/robot-settings`]: t('robot_settings'),
     [`/devices/${robotName}/protocol-runs/${runId}`]: runCreatedAtTimestamp,
@@ -120,16 +121,16 @@ function BreadcrumbsComponent(): JSX.Element | null {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
+      borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}
+      padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
     >
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 
         return (
-          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing2}>
+          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing4}>
             <CrumbLink
               as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
               to={crumb.linkPath}
@@ -147,11 +148,14 @@ function BreadcrumbsComponent(): JSX.Element | null {
 }
 
 export function Breadcrumbs(): JSX.Element | null {
-  const { robotName } = useParams<NavRouteParams>()
+  const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
 
   return (
-    <ApiHostProvider hostname={robot?.ip ?? null}>
+    <ApiHostProvider
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
       <BreadcrumbsComponent />
     </ApiHostProvider>
   )

@@ -5,18 +5,11 @@ import {
   Flex,
   SPACING,
   JUSTIFY_CENTER,
-  Box,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../hooks'
-
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import { useModuleRenderInfoForProtocolById } from '../hooks'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -35,39 +28,6 @@ export const ProtocolRunModuleControls = ({
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
-  const { protocolData } = useProtocolDetailsForRun(runId)
-  const { createCommand } = useCreateCommandMutation()
-  const loadCommands: LoadModuleRunTimeCommand[] =
-    protocolData !== null
-      ? protocolData?.commands.filter(
-          (command: RunTimeCommand): command is LoadModuleRunTimeCommand =>
-            command.commandType === 'loadModule'
-        )
-      : []
-
-  React.useEffect(() => {
-    if (protocolData != null) {
-      const setupLoadCommands = loadCommands.map(command => {
-        const commandWithModuleId = {
-          ...command,
-          params: {
-            ...command.params,
-            moduleId: command.result?.moduleId,
-          },
-        }
-        return commandWithModuleId
-      })
-
-      setupLoadCommands.forEach(loadCommand => {
-        createCommand({
-          runId: runId,
-          command: loadCommand,
-        }).catch((e: Error) => {
-          console.error(`error issuing command to robot: ${e.message}`)
-        })
-      })
-    }
-  }, [])
 
   // split modules in half and map into each column separately to avoid
   // the need for hardcoded heights without limitation, array will be split equally
@@ -81,23 +41,27 @@ export const ProtocolRunModuleControls = ({
       <StyledText
         as="p"
         color={COLORS.darkGreyEnabled}
-        marginY={SPACING.spacing4}
+        marginY={SPACING.spacing16}
       >
         {t('connect_modules_to_see_controls')}
       </StyledText>
     </Flex>
   ) : (
     <Flex
-      gridGap={SPACING.spacing3}
-      paddingTop={SPACING.spacing4}
-      paddingBottom={SPACING.spacing3}
-      paddingX={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
+      paddingTop={SPACING.spacing16}
+      paddingBottom={SPACING.spacing8}
+      paddingX={SPACING.spacing16}
     >
-      <Box flex="50%">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        flex="50%"
+        gridGap={SPACING.spacing8}
+      >
         {leftColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
             <ModuleCard
-              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              key={`moduleCard_${String(module.moduleDef.moduleType)}_${index}`}
               robotName={robotName}
               runId={runId}
               module={module.attachedModuleMatch}
@@ -106,12 +70,16 @@ export const ProtocolRunModuleControls = ({
             />
           ) : null
         )}
-      </Box>
-      <Box flex="50%">
+      </Flex>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        flex="50%"
+        gridGap={SPACING.spacing8}
+      >
         {rightColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
             <ModuleCard
-              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              key={`moduleCard_${String(module.moduleDef.moduleType)}_${index}`}
               robotName={robotName}
               runId={runId}
               module={module.attachedModuleMatch}
@@ -120,7 +88,7 @@ export const ProtocolRunModuleControls = ({
             />
           ) : null
         )}
-      </Box>
+      </Flex>
     </Flex>
   )
 }

@@ -5,7 +5,6 @@ the root of the project.
 """
 import pytest
 
-
 # Options must be added at the root level for pytest to properly
 # pick them up. Technically, the main conftest that we use in
 # tests/opentrons is not the root level.

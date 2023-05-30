@@ -7,8 +7,7 @@ import { i18n } from '../../../../i18n'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
-import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
-
+import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import type { PipetteInfo } from '../../hooks'
 
 jest.mock('../../hooks')
@@ -41,7 +40,7 @@ const PIPETTE_INFO = {
 
 const render = () => {
   return renderWithProviders(
-    <SetupPipetteCalibration robotName={ROBOT_NAME} runId={RUN_ID} />,
+    <SetupInstrumentCalibration robotName={ROBOT_NAME} runId={RUN_ID} />,
     {
       i18nInstance: i18n,
     }
@@ -50,12 +49,10 @@ const render = () => {
 
 describe('SetupPipetteCalibration', () => {
   beforeEach(() => {
-    when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        left: PIPETTE_INFO,
-        right: null,
-      })
+    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+      left: PIPETTE_INFO,
+      right: null,
+    })
     when(mockSetupPipetteCalibrationItem).mockReturnValue(
       <div>Mock SetupPipetteCalibrationItem</div>
     )
@@ -66,19 +63,17 @@ describe('SetupPipetteCalibration', () => {
 
   it('renders required pipettes title', () => {
     const { getByText } = render()
-    getByText('Required Pipettes')
+    getByText('Required Instrument Calibrations')
   })
   it('renders one SetupPipetteCalibrationItem when protocol run requires one pipette', () => {
     const { getAllByText } = render()
     expect(getAllByText('Mock SetupPipetteCalibrationItem')).toHaveLength(1)
   })
   it('renders two SetupPipetteCalibrationItems when protocol run requires two pipettes', () => {
-    when(mockUseRunPipetteInfoByMount)
-      .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
-        left: PIPETTE_INFO,
-        right: PIPETTE_INFO,
-      })
+    when(mockUseRunPipetteInfoByMount).calledWith(RUN_ID).mockReturnValue({
+      left: PIPETTE_INFO,
+      right: PIPETTE_INFO,
+    })
     const { getAllByText } = render()
     expect(getAllByText('Mock SetupPipetteCalibrationItem')).toHaveLength(2)
   })

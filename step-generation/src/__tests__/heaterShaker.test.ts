@@ -4,10 +4,10 @@ import {
 } from '@opentrons/shared-data'
 import { heaterShaker } from '../commandCreators'
 import { getModuleState } from '../robotStateSelectors'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 
 import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 
 jest.mock('../robotStateSelectors')
 
@@ -97,13 +97,6 @@ describe('heaterShaker compound command creator', () => {
         },
       },
       {
-        commandType: 'heaterShaker/waitForTemperature',
-        key: expect.any(String),
-        params: {
-          moduleId: 'heaterShakerId',
-        },
-      },
-      {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         key: expect.any(String),
         params: {
@@ -161,18 +154,91 @@ describe('heaterShaker compound command creator', () => {
         },
       },
       {
-        commandType: 'heaterShaker/waitForTemperature',
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        key: expect.any(String),
+        params: {
+          moduleId: 'heaterShakerId',
+          rpm: 444,
+        },
+      },
+    ])
+  })
+  it('should not call deactivateShaker when it is not shaking but call activate temperature when setting target temp', () => {
+    heaterShakerArgs = {
+      ...heaterShakerArgs,
+      rpm: null,
+      targetTemperature: 80,
+    }
+
+    const state = getInitialRobotStateStandard(invariantContext)
+
+    robotState = {
+      ...state,
+      modules: {
+        ...state.modules,
+        [HEATER_SHAKER_ID]: {
+          slot: HEATER_SHAKER_SLOT,
+          moduleState: {
+            type: 'heaterShakerModuleType',
+            targetSpeed: null,
+          },
+        } as any,
+      },
+    }
+
+    const result = heaterShaker(heaterShakerArgs, invariantContext, robotState)
+
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'heaterShaker/closeLabwareLatch',
         key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
       },
       {
-        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        commandType: 'heaterShaker/setTargetTemperature',
+        key: expect.any(String),
+        params: {
+          celsius: 80,
+          moduleId: 'heaterShakerId',
+        },
+      },
+    ])
+  })
+  it('should call to open latch last', () => {
+    heaterShakerArgs = {
+      ...heaterShakerArgs,
+      latchOpen: true,
+    }
+
+    const state = getInitialRobotStateStandard(invariantContext)
+
+    robotState = {
+      ...state,
+      modules: {
+        ...state.modules,
+        [HEATER_SHAKER_ID]: {
+          slot: HEATER_SHAKER_SLOT,
+        } as any,
+      },
+    }
+
+    const result = heaterShaker(heaterShakerArgs, invariantContext, robotState)
+
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'heaterShaker/deactivateHeater',
         key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
-          rpm: 444,
+        },
+      },
+      {
+        commandType: 'heaterShaker/openLabwareLatch',
+        key: expect.any(String),
+        params: {
+          moduleId: 'heaterShakerId',
         },
       },
     ])

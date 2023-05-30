@@ -13,16 +13,17 @@ from opentrons.hardware_control.modules.heater_shaker import (
 
 from opentrons.protocol_engine.types import (
     HeaterShakerMovementRestrictors,
+    HeaterShakerLatchStatus,
     ModuleLocation,
     DeckSlotLocation,
 )
 from opentrons.protocol_engine.errors import (
     PipetteMovementRestrictedByHeaterShakerError,
     HeaterShakerLabwareLatchNotOpenError,
+    HeaterShakerLabwareLatchStatusUnknown,
     WrongModuleTypeError,
 )
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
-    raise_if_movement_restricted,
     HeaterShakerMovementFlagger,
 )
 from opentrons.protocol_engine.state import StateStore
@@ -31,6 +32,7 @@ from opentrons.protocol_engine.state.module_substates.heater_shaker_module_subst
     HeaterShakerModuleSubState,
 )
 from opentrons.types import DeckSlotName
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 @pytest.fixture
@@ -94,18 +96,19 @@ def subject(
     ],
 )
 async def test_raises_when_moving_to_restricted_slots_while_shaking(
+    subject: HeaterShakerMovementFlagger,
     destination_slot: int,
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=True, latch_closed=True, deck_slot=5
+            plate_shaking=True, latch_status=HeaterShakerLatchStatus.CLOSED, deck_slot=5
         )
     ]
 
     with expected_raise:
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -114,38 +117,54 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
 
 
 @pytest.mark.parametrize(
-    argnames=["destination_slot", "expected_raise"],
+    argnames=["robot_type", "destination_slot", "expected_raise"],
     argvalues=[
         [
+            "OT-2 Standard",
             4,
             pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
-        ],  # east
+        ],  # east on OT2
         [
+            "OT-2 Standard",
             6,
             pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
-        ],  # west
+        ],  # west on OT2
         [
+            "OT-2 Standard",
             5,
             pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
-        ],  # h/s
-        [8, does_not_raise()],  # north
-        [2, does_not_raise()],  # south
-        [3, does_not_raise()],  # non-adjacent
+        ],  # to h/s on OT2
+        ["OT-2 Standard", 8, does_not_raise()],  # north on OT2
+        ["OT-2 Standard", 2, does_not_raise()],  # south on OT2
+        ["OT-2 Standard", 3, does_not_raise()],  # non-adjacent
+        [
+            "OT-3 Standard",
+            5,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # to h/s on OT3
+        ["OT-3 Standard", 4, does_not_raise()],  # east on OT3
+        ["OT-3 Standard", 6, does_not_raise()],  # west on OT3
+        ["OT-3 Standard", 8, does_not_raise()],  # north on OT3
+        ["OT-3 Standard", 2, does_not_raise()],  # south on OT3
     ],
 )
-async def test_raises_when_moving_to_restricted_slots_while_latch_open(
+async def test_raises_when_moving_to_restricted_slots_while_latch_open2(
+    decoy: Decoy,
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    robot_type: RobotType,
     destination_slot: int,
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=False, deck_slot=5
+            plate_shaking=False, latch_status=HeaterShakerLatchStatus.OPEN, deck_slot=5
         )
     ]
-
+    decoy.when(state_store.config.robot_type).then_return(robot_type)
     with expected_raise:
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -192,7 +211,10 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
         [7, False, does_not_raise()],  # non-adjacent
     ],
 )
-async def test_raises_on_restricted_movement_with_multi_channel(
+def test_raises_on_restricted_movement_with_multi_channel(
+    decoy: Decoy,
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
     destination_slot: int,
     is_tiprack: bool,
     expected_raise: ContextManager[Any],
@@ -200,17 +222,41 @@ async def test_raises_on_restricted_movement_with_multi_channel(
     """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=True, deck_slot=5
+            plate_shaking=False,
+            latch_status=HeaterShakerLatchStatus.CLOSED,
+            deck_slot=5,
         )
     ]
-
+    decoy.when(state_store.config.robot_type).then_return("OT-2 Standard")
     with expected_raise:
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=True,
             destination_is_tip_rack=is_tiprack,
         )
+
+
+def test_does_not_raise_on_movement_with_multi_channel_on_ot3(
+    decoy: Decoy,
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+) -> None:
+    """It should not raise when pipetting with multichannel around a H/S on OT3."""
+    heater_shaker_data = [
+        HeaterShakerMovementRestrictors(
+            plate_shaking=False,
+            latch_status=HeaterShakerLatchStatus.CLOSED,
+            deck_slot=5,
+        )
+    ]
+    decoy.when(state_store.config.robot_type).then_return("OT-3 Standard")
+    subject.raise_if_movement_restricted(
+        hs_movement_restrictors=heater_shaker_data,
+        destination_slot=6,
+        is_multi_channel=True,
+        destination_is_tip_rack=False,
+    )
 
 
 @pytest.mark.parametrize(
@@ -225,17 +271,20 @@ async def test_raises_on_restricted_movement_with_multi_channel(
     ],
 )
 async def test_does_not_raise_when_idle_and_latch_closed(
+    subject: HeaterShakerMovementFlagger,
     destination_slot: int,
 ) -> None:
     """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
     heater_shaker_data = [
         HeaterShakerMovementRestrictors(
-            plate_shaking=False, latch_closed=True, deck_slot=5
+            plate_shaking=False,
+            latch_status=HeaterShakerLatchStatus.CLOSED,
+            deck_slot=5,
         )
     ]
 
     with does_not_raise():
-        raise_if_movement_restricted(
+        subject.raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -243,10 +292,25 @@ async def test_does_not_raise_when_idle_and_latch_closed(
         )
 
 
+@pytest.mark.parametrize(
+    argnames=["latch_status", "expected_raise_cm"],
+    argvalues=[
+        (
+            HeaterShakerLatchStatus.CLOSED,
+            pytest.raises(HeaterShakerLabwareLatchNotOpenError),
+        ),
+        (
+            HeaterShakerLatchStatus.UNKNOWN,
+            pytest.raises(HeaterShakerLabwareLatchStatusUnknown),
+        ),
+    ],
+)
 async def test_raises_depending_on_heater_shaker_substate_latch_status(
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
     decoy: Decoy,
+    latch_status: HeaterShakerLatchStatus,
+    expected_raise_cm: ContextManager[Any],
 ) -> None:
     """It should flag movement depending on engine's h/s state."""
     decoy.when(
@@ -254,13 +318,13 @@ async def test_raises_depending_on_heater_shaker_substate_latch_status(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=True,
+            labware_latch_status=latch_status,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
     )
 
-    with pytest.raises(HeaterShakerLabwareLatchNotOpenError):
+    with expected_raise_cm:
         await subject.raise_if_labware_latched_on_heater_shaker(
             labware_parent=ModuleLocation(moduleId="module-id")
         )
@@ -320,7 +384,7 @@ async def test_raises_depending_on_heater_shaker_latch_status(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -354,7 +418,7 @@ async def test_raises_if_hardware_module_has_gone_missing(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         ),
@@ -383,7 +447,7 @@ async def test_passes_if_virtual_module_latch_open(
     ).then_return(
         HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         ),

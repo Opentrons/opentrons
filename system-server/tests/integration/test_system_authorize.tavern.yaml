@@ -1,0 +1,183 @@
+---
+test_name: POST System Authorize
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: POST /system/register
+    request:
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'agent-system-authorize-test'
+        agentId: 'agent_id-1'
+        subject: 'subject-1'
+    response:
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          issued_token: "token"
+  - name: POST /system/authorize with invalid token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: 'not-a-valid-token'
+    response:
+      status_code: 401
+  - name: POST /system/authorize with valid token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          auth_token: "token"
+  - name: POST /system/authorize with the same token, get a new auth token
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+      verify_response_with:
+        function: tests.integration.testing_utils:token_does_not_match
+        extra_kwargs:
+          token: '{auth_token:s}'
+      json:
+        token: !anystr
+  - name: GET /system/authorize with invalid token fails
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: GET 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 403
+  - name: GET /system/authorize with valid token fails 
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: GET 
+      headers: 
+        authenticationBearer: "{auth_token:s}"
+    response:
+      status_code: 200
+---
+test_name: GET System Connected
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: Register User
+    request:
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'get-system-connected-test'
+        agentId: 'id1'
+        subject: 'sub1'
+    response:
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          issued_token: "token"
+  - name: Get empty connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        connections: []
+  - name: Authorize User
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+  - name: Get single-entry connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        connections:
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id1'
+  - name: Register second user
+    request:
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'get-system-connected-test'
+        agentId: 'id2'
+        subject: 'sub1'
+    response:
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          second_token: "token"
+  - name: Authorize second user
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{second_token:s}"
+    response:
+      status_code: 201
+  - name: Get two-entry connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:list_any_order
+      json:
+        connections:
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id2'
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id1'
+  - name: Re-authorize first user
+    request:
+      url: "{host:s}:{port:d}/system/authorize"
+      method: POST 
+      headers: 
+        authenticationBearer: "{issued_token:s}"
+    response:
+      status_code: 201
+  - name: Get two-entry connection list
+    request:
+      url: "{host:s}:{port:d}/system/connected"
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:list_any_order
+      json:
+        connections:
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id2'
+          - subject: "sub1"
+            agent: "get-system-connected-test"
+            agentId: 'id1'

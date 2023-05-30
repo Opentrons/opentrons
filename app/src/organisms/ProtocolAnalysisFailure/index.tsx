@@ -10,6 +10,7 @@ import {
   Btn,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
+  PrimaryButton,
   WRAP_REVERSE,
 } from '@opentrons/components'
 
@@ -17,7 +18,6 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { Dispatch } from '../../redux/types'
 import { analyzeProtocol } from '../../redux/protocol-storage'
@@ -50,9 +50,9 @@ export function ProtocolAnalysisFailure(
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
-    <Banner type="warning" marginRight={SPACING.spacing5}>
+    <Banner type="warning" marginRight={SPACING.spacing24}>
       <Flex
-        columnGap={SPACING.spacing3}
+        columnGap={SPACING.spacing8}
         flex="1"
         flexWrap={WRAP_REVERSE}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -101,7 +101,7 @@ export function ProtocolAnalysisFailure(
               <PrimaryButton
                 onClick={handleClickHideDetails}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>

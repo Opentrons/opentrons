@@ -11,21 +11,21 @@ const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing1};
-  margin: ${SPACING.spacing4} 0;
+  border-spacing: 0 ${SPACING.spacing2};
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
   background-color: ${COLORS.fundamentalsBackground};
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
 `
 
 const OffsetTableDatum = styled('td')`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   white-space: break-spaces;
   text-overflow: wrap;
 `
@@ -55,7 +55,9 @@ export function LabwareOffsetTable(
             <OffsetTableDatum>
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null
-                ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
+                ? ` - ${String(
+                    getModuleDisplayName(offset.location.moduleModel)
+                  )}`
                 : null}
             </OffsetTableDatum>
             <OffsetTableDatum>

@@ -34,13 +34,13 @@ export function SetupDeckCalibration({
   )
 
   const calibrateNowButton = (
-    <Link to={`/devices/${robotName}/robot-settings/calibration`}>
+    <Link to={`/devices/${robotName}/robot-settings/calibration/dashboard`}>
       <TertiaryButton>{t('calibrate_now_cta')}</TertiaryButton>
     </Link>
   )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}

@@ -12,8 +12,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const DROP_ZONE_STYLES = css`
@@ -22,7 +22,7 @@ const DROP_ZONE_STYLES = css`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   width: 100%;
-  padding: ${SPACING.spacing6};
+  padding: ${SPACING.spacing32};
   border: 2px dashed ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
@@ -102,12 +102,12 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      gridGap={SPACING.spacing5}
+      gridGap={SPACING.spacing24}
     >
       <StyledText
         as="p"
         textAlign={TYPOGRAPHY.textAlignCenter}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
       >
         {props.uploadText}
       </StyledText>
@@ -130,7 +130,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           width={SIZE_3}
           color={COLORS.darkGreyEnabled}
           name="upload"
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         />
         {props.dragAndDropText}
         <input

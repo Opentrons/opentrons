@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { LabwareListItem } from './LabwareListItem'
-import type { LabwareSetupItem } from './types'
+import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 
 interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]
+  isOt3: boolean
 }
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems } = props
+  const { labwareItems, isOt3 } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -20,7 +21,7 @@ export function OffDeckLabwareList(
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        margin={`${SPACING.spacing4} ${SPACING.spacing4} ${SPACING.spacing3}`}
+        margin={`${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing8}`}
       >
         {t('additional_off_deck_labware')}
       </StyledText>
@@ -30,6 +31,7 @@ export function OffDeckLabwareList(
           attachedModuleInfo={{}}
           extraAttentionModules={[]}
           {...labwareItem}
+          isOt3={isOt3}
         />
       ))}
     </>

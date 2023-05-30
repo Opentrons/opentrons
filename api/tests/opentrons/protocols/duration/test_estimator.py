@@ -15,7 +15,7 @@ from opentrons.protocols.duration.estimator import (
     THERMO_HIGH_THRESH,
     THERMO_LOW_THRESH,
 )
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location, Point
 
 

@@ -80,7 +80,7 @@ describe('NetworkOptionLabel presentational component', () => {
   it('renders high signal icon when props.signal is "high"', () => {
     props = { ...props, signal: 76 }
     const wrapper = render()
-    const icon = wrapper.find('Icon[name="ot-wifi-3"]')
+    const icon = wrapper.find('Icon[name="wifi"]')
     expect(icon).toHaveLength(1)
   })
 })

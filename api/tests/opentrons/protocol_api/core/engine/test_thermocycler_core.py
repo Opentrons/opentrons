@@ -4,7 +4,11 @@ from decoy import Decoy
 
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import Thermocycler, TemperatureStatus
+from opentrons.hardware_control.modules import (
+    Thermocycler,
+    TemperatureStatus,
+    ModuleType,
+)
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -52,6 +56,7 @@ def test_create(
     )
 
     assert result.module_id == "1234"
+    assert result.MODULE_TYPE == ModuleType.THERMOCYCLER
 
 
 def test_open_lid(
@@ -320,3 +325,14 @@ def test_cycle_counting(
     assert subject.get_current_cycle_index() is None
     assert subject.get_total_step_count() is None
     assert subject.get_current_step_index() is None
+
+
+def test_get_serial_number(
+    decoy: Decoy, subject: ThermocyclerModuleCore, mock_engine_client: EngineClient
+) -> None:
+    """It should return a serial number."""
+    decoy.when(mock_engine_client.state.modules.get_serial_number("1234")).then_return(
+        "abc"
+    )
+
+    assert subject.get_serial_number() == "abc"

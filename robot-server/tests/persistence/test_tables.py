@@ -3,7 +3,7 @@
 
 from typing import List, cast
 import sqlalchemy
-from robot_server.persistence.tables import add_tables_to_db
+from robot_server.persistence._tables import add_tables_to_db
 
 
 # The statements that we expect to emit when we create a fresh database.

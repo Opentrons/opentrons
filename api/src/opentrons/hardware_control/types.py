@@ -1,26 +1,25 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar
+from typing import (
+    NamedTuple,
+    Optional,
+    cast,
+    Tuple,
+    Union,
+    List,
+    Callable,
+    Dict,
+    TypeVar,
+)
 from typing_extensions import Literal
 from opentrons import types as top_types
+from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
 
 
 MODULE_LOG = logging.getLogger(__name__)
 
 MachineType = Literal["ot2", "ot3"]
-
-
-class OutOfBoundsMove(RuntimeError):
-    def __init__(self, message: str):
-        self.message = message
-        super().__init__()
-
-    def __str__(self) -> str:
-        return f"OutOfBoundsMove: {self.message}"
-
-    def __repr__(self) -> str:
-        return f"<{str(self.__class__)}: {self.message}>"
 
 
 class MotionChecks(enum.Enum):
@@ -30,19 +29,24 @@ class MotionChecks(enum.Enum):
     BOTH = 3
 
 
+# TODO (spp, 2023-05-11): merge OT3Axis into this and make Axis the only type.
+#  Use Z_L, Z_R, etc as the axes with aliases for Z, A, B, C
 class Axis(enum.Enum):
-    X = 0
-    Y = 1
-    Z = 2
-    A = 3
-    B = 4
-    C = 5
+    X = 0  # Gantry X
+    Y = 1  # Gantry Y
+    Z = 2  # left pipette mount Z
+    A = 3  # right pipette mount Z
+    B = 4  # left pipette plunger
+    C = 5  # right pipette plunger
+    Z_G = 6  # Gripper Z
+    G = 7  # Gripper Jaws
 
     @classmethod
     def by_mount(cls, mount: top_types.Mount) -> "Axis":
         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
+    # TODO (spp, 2023-5-4): deprecate this method & create a replacement called 'pipette_mount_axes'
     @classmethod
     def mount_axes(cls) -> Tuple["Axis", "Axis"]:
         """The axes which are used for moving pipettes up and down."""
@@ -67,11 +71,18 @@ class Axis(enum.Enum):
             cls.A: top_types.Mount.RIGHT,
             cls.B: top_types.Mount.LEFT,
             cls.C: top_types.Mount.RIGHT,
+            cls.Z_G: top_types.Mount.EXTENSION,
+            cls.G: top_types.Mount.EXTENSION,
         }[inst]
 
     @classmethod
     def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
         return cls.B, cls.C
+
+    @classmethod
+    def ot2_axes(cls) -> List["Axis"]:
+        """Returns only OT2 axes."""
+        return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.G]]
 
     def __str__(self) -> str:
         return self.name
@@ -84,13 +95,18 @@ class OT3Mount(enum.Enum):
 
     @classmethod
     def from_mount(
-        cls, mount: Union[top_types.Mount, top_types.MountType, "OT3Mount"]
+        cls,
+        mount: Union[
+            top_types.Mount, top_types.MountType, top_types.OT3MountType, "OT3Mount"
+        ],
     ) -> "OT3Mount":
+        if mount == top_types.Mount.EXTENSION or mount == top_types.MountType.EXTENSION:
+            return OT3Mount.GRIPPER
         return cls[mount.name]
 
     def to_mount(self) -> top_types.Mount:
         if self.value == self.GRIPPER.value:
-            raise KeyError("Gripper mount is not representable")
+            return top_types.Mount.EXTENSION
         return top_types.Mount[self.name]
 
 
@@ -111,6 +127,8 @@ class OT3AxisKind(enum.Enum):
     #: Plunger axis (of the left and right pipettes)
     Z_G = 4
     #: Gripper Z axis
+    Q = 5
+    #: High-throughput tip grabbing axis
     OTHER = 5
     #: The internal axes of high throughput pipettes, for instance
 
@@ -137,6 +155,7 @@ class OT3Axis(enum.Enum):
         bm = {
             top_types.Mount.LEFT: cls.Z_L,
             top_types.Mount.RIGHT: cls.Z_R,
+            top_types.Mount.EXTENSION: cls.Z_G,
             OT3Mount.LEFT: cls.Z_L,
             OT3Mount.RIGHT: cls.Z_R,
             OT3Mount.GRIPPER: cls.Z_G,
@@ -152,6 +171,8 @@ class OT3Axis(enum.Enum):
             Axis.A: cls.Z_R,
             Axis.B: cls.P_L,
             Axis.C: cls.P_R,
+            Axis.Z_G: cls.Z_G,
+            Axis.G: cls.G,
         }
         try:
             return am[axis]  # type: ignore
@@ -166,6 +187,8 @@ class OT3Axis(enum.Enum):
             OT3Axis.Z_R: Axis.A,
             OT3Axis.P_L: Axis.B,
             OT3Axis.P_R: Axis.C,
+            OT3Axis.Z_G: Axis.Z_G,
+            OT3Axis.G: Axis.G,
         }
         return am[self]
 
@@ -237,6 +260,22 @@ class OT3Axis(enum.Enum):
             cls.G: OT3Mount.GRIPPER,
         }[inst]
 
+    @classmethod
+    def home_order(
+        cls,
+    ) -> Tuple[
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+        "OT3Axis",
+    ]:
+        return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
+
     def __str__(self) -> str:
         return self.name
 
@@ -273,9 +312,87 @@ class OT3SubSystem(enum.Enum):
     pipette_left = 3
     pipette_right = 4
     gripper = 5
+    rear_panel = 6
 
     def __str__(self) -> str:
         return self.name
+
+
+class PipetteSubType(enum.Enum):
+    """Pipette type to map from lower level PipetteType."""
+
+    pipette_single = 1
+    pipette_multi = 2
+    pipette_96 = 3
+
+    def __str__(self) -> str:
+        return self.name
+
+    @classmethod
+    def from_channels(cls, channels: PipetteChannelType) -> "PipetteSubType":
+        pipette_subtype_lookup = {
+            PipetteChannelType.SINGLE_CHANNEL: cls.pipette_single,
+            PipetteChannelType.EIGHT_CHANNEL: cls.pipette_multi,
+            PipetteChannelType.NINETY_SIX_CHANNEL: cls.pipette_96,
+        }
+        return pipette_subtype_lookup[channels]
+
+
+class UpdateState(enum.Enum):
+    """Update state to map from lower level FirmwareUpdateStatus"""
+
+    queued = enum.auto()
+    updating = enum.auto()
+    done = enum.auto()
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class UpdateStatus(NamedTuple):
+    subsystem: OT3SubSystem
+    state: UpdateState
+    progress: int
+
+
+@dataclass
+class InstrumentUpdateStatus:
+    mount: OT3Mount
+    status: UpdateState
+    progress: int
+
+    def update(self, status: UpdateState, progress: int) -> None:
+        self.status = status
+        self.progress = progress
+
+
+@dataclass
+class InstrumentFWInfo:
+    mount: OT3Mount
+    update_required: bool
+    current_version: int
+    next_version: Optional[int]
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: mount={self.mount} needs_update={self.update_required} version={self.current_version} -> {self.next_version}>"
+
+
+_subsystem_mount_lookup = {
+    OT3Mount.LEFT: OT3SubSystem.pipette_left,
+    OT3Mount.RIGHT: OT3SubSystem.pipette_right,
+    OT3Mount.GRIPPER: OT3SubSystem.gripper,
+}
+
+
+def mount_to_subsystem(mount: OT3Mount) -> OT3SubSystem:
+    return _subsystem_mount_lookup[mount]
+
+
+def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
+    mount_lookup = {
+        subsystem: mount for mount, subsystem in _subsystem_mount_lookup.items()
+    }
+    return mount_lookup[subsystem]
 
 
 BCAxes = Union[Axis, OT3Axis]
@@ -290,6 +407,12 @@ class CurrentConfig:
 
     def as_tuple(self) -> Tuple[float, float]:
         return self.hold_current, self.run_current
+
+
+@dataclass(frozen=True)
+class MotorStatus:
+    motor_ok: bool
+    encoder_ok: bool
 
 
 class DoorState(enum.Enum):
@@ -388,7 +511,7 @@ class CriticalPoint(enum.Enum):
     the critical point under consideration is the XY center of the pipette.
     This changes nothing for single pipettes, but makes multipipettes
     move their centers - so between channels 4 and 5 - to the specified
-    point.
+    point. This is the same as the GRIPPER_JAW_CENTER for grippers.
     """
 
     FRONT_NOZZLE = enum.auto()
@@ -410,7 +533,7 @@ class CriticalPoint(enum.Enum):
     front calibration pin slot.
     """
 
-    GRIPPER_BACK_CALIBRATION_PIN = enum.auto()
+    GRIPPER_REAR_CALIBRATION_PIN = enum.auto()
     """
     The center of the bottom face of a calibration pin inserted in the gripper's
     back calibration pin slot.
@@ -432,6 +555,7 @@ class HardwareAction(enum.Enum):
     DISPENSE = enum.auto()
     BLOWOUT = enum.auto()
     PREPARE_ASPIRATE = enum.auto()
+    LIQUID_PROBE = enum.auto()
 
     def __str__(self) -> str:
         return self.name
@@ -440,6 +564,28 @@ class HardwareAction(enum.Enum):
 class PauseType(enum.Enum):
     PAUSE = 0
     DELAY = 1
+
+
+class StatusBarState(enum.Enum):
+    IDLE = 0
+    RUNNING = 1
+    PAUSED = 2
+    HARDWARE_ERROR = 3
+    SOFTWARE_ERROR = 4
+    CONFIRMATION = 5
+    RUN_COMPLETED = 6
+    UPDATING = 7
+    ACTIVATION = 8
+    DISCO = 9
+    OFF = 10
+
+    def transient(self) -> bool:
+        return self.value in {
+            StatusBarState.CONFIRMATION.value,
+            StatusBarState.RUN_COMPLETED.value,
+            StatusBarState.ACTIVATION.value,
+            StatusBarState.DISCO.value,
+        }
 
 
 @dataclass
@@ -459,22 +605,6 @@ class AionotifyEvent:
         return cls(flags=Flag, name=name)
 
 
-class ExecutionCancelledError(RuntimeError):
-    pass
-
-
-class MustHomeError(RuntimeError):
-    pass
-
-
-class NoTipAttachedError(RuntimeError):
-    pass
-
-
-class TipAttachedError(RuntimeError):
-    pass
-
-
 class GripperJawState(enum.Enum):
     UNHOMED = enum.auto()
     #: the gripper must be homed before it can do anything
@@ -488,45 +618,45 @@ class GripperJawState(enum.Enum):
     HOLDING_OPENED = enum.auto()
     #: the gripper is holding itself open but not quite at its homed position
 
-    @property
-    def ready_for_grip(self) -> bool:
-        return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
+
+class InstrumentProbeType(enum.Enum):
+    PRIMARY = enum.auto()
+    SECONDARY = enum.auto()
 
 
-class InvalidMoveError(ValueError):
-    pass
+class GripperProbe(enum.Enum):
+    FRONT = enum.auto()
+    REAR = enum.auto()
+
+    @classmethod
+    def to_type(cls, gp: "GripperProbe") -> InstrumentProbeType:
+        if gp == cls.FRONT:
+            return InstrumentProbeType.SECONDARY
+        else:
+            return InstrumentProbeType.PRIMARY
 
 
-class GripperNotAttachedError(Exception):
-    """An error raised if a gripper is accessed that is not attached"""
+class EarlyLiquidSenseTrigger(RuntimeError):
+    """Error raised if sensor threshold reached before minimum probing distance."""
 
-    pass
-
-
-class InvalidPipetteName(KeyError):
-    """Raised for an invalid pipette."""
-
-    def __init__(self, name: int, mount: OT3Mount) -> None:
-        self.name = name
-        self.mount = mount
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: name={self.name} mount={self.mount}>"
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}: Pipette name key {self.name} on mount {self.mount.name} is not valid"
+    def __init__(
+        self, triggered_at: Dict[OT3Axis, float], min_z_pos: Dict[OT3Axis, float]
+    ) -> None:
+        """Initialize EarlyLiquidSenseTrigger error."""
+        super().__init__(
+            f"Liquid threshold triggered early at z={triggered_at}mm, "
+            f"minimum z position = {min_z_pos}"
+        )
 
 
-class InvalidPipetteModel(KeyError):
-    """Raised for a pipette with an unknown model."""
+class LiquidNotFound(RuntimeError):
+    """Error raised if liquid sensing move completes without detecting liquid."""
 
-    def __init__(self, name: str, model: str, mount: OT3Mount) -> None:
-        self.name = name
-        self.model = model
-        self.mount = mount
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: name={self.name}, model={self.model}, mount={self.mount}>"
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
+    def __init__(
+        self, position: Dict[OT3Axis, float], max_z_pos: Dict[OT3Axis, float]
+    ) -> None:
+        """Initialize LiquidNotFound error."""
+        super().__init__(
+            f"Liquid threshold not found, current_position = {position}"
+            f"position at max travel allowed = {max_z_pos}"
+        )

@@ -1,6 +1,5 @@
-import json
 import os
-import sys
+
 from pathlib import Path
 import logging
 import asyncio
@@ -25,28 +24,16 @@ from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 
-version = sys.version_info[0:2]
-if version < (3, 7):
-    raise RuntimeError(
-        "opentrons requires Python 3.7 or above, this is {0}.{1}".format(
-            version[0], version[1]
-        )
-    )
+from ._version import version
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+__version__ = version
 
-try:
-    with open(os.path.join(HERE, "package.json")) as pkg:
-        package_json = json.load(pkg)
-        __version__ = package_json.get("version")
-except (FileNotFoundError, OSError):
-    __version__ = "unknown"
-
-from opentrons import config  # noqa: E402
 
 LEGACY_MODULES = ["robot", "reset", "instruments", "containers", "labware", "modules"]
 
-__all__ = ["version", "HERE", "config"]
+
+__all__ = ["version", "__version__", "HERE", "config"]
 
 
 def __getattr__(attrname: str) -> None:
@@ -129,6 +116,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
         )
     else:
@@ -155,7 +143,7 @@ async def initialize() -> ThreadManagedHardware:
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
-    log.info(f"API server version: {__version__}")
+    log.info(f"API server version: {version}")
     log.info(f"Robot Name: {name()}")
 
     hardware = await _create_thread_manager()
@@ -173,12 +161,20 @@ async def initialize() -> ThreadManagedHardware:
     blink_task = asyncio.create_task(_blink())
 
     try:
+
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
-            await hardware.home_z()
+            try:
+                await hardware.home_z()
+            except Exception:
+                # If this is a flex, and the estop is asserted, we'll get an error
+                # here; make sure that it doesn't prevent things from actually
+                # starting.
+                log.error(
+                    "Exception homing z on startup, ignoring to allow server to start"
+                )
 
         await hardware.set_lights(button=True)
-
         return hardware
     finally:
         blink_task.cancel()

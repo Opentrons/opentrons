@@ -2,11 +2,11 @@ test_name: Verify protocol key.
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -25,6 +25,7 @@ stages:
             - name: basic_transfer_standalone.py
               role: main
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          robotType: OT-2 Standard
           metadata:
             apiLevel: '2.6'
             protocolName: basic_transfer_standalone
@@ -36,7 +37,7 @@ stages:
           key: protocol_key
   - name: Verify the key in GET /protocols
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -49,7 +50,7 @@ stages:
 
   - name: Verify the key in GET /protocols/{protocol_id}
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -65,11 +66,11 @@ test_name: Protocols may have a duplicate key.
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -94,12 +95,12 @@ stages:
             protocolName: basic_transfer_standalone
             author: engineer@opentrons.com
           key: duplicate_key
-  - name: Upload basic_transfer_standalone protocol with key
+  - name: Upload basic_transfer_with_config protocol with same key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/basic_transfer_with_config.py'
       data:
         key: duplicate_key
     response:
@@ -114,16 +115,14 @@ stages:
           id: !anystr
           protocolType: python
           files:
-            - name: basic_transfer_standalone.py
+            - name: basic_transfer_with_config.py
               role: main
           metadata:
             apiLevel: '2.6'
-            protocolName: basic_transfer_standalone
-            author: engineer@opentrons.com
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -133,4 +132,76 @@ stages:
           - id: '{protocol_id1}'
             key: duplicate_key
           - id: '{protocol_id2}'
+            key: duplicate_key
+
+---
+test_name: Protocols sources not get duplicated.
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: Upload basic_transfer_standalone protocol with key
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: duplicate_key
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id1: data.id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          metadata:
+            apiLevel: '2.6'
+            protocolName: basic_transfer_standalone
+            author: engineer@opentrons.com
+          key: duplicate_key
+  - name: Upload basic_transfer_standalone protocol with same key
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+      data:
+        key: duplicate_key
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id2: data.id
+      # 200 instead of 201 because a new resource should not get created
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: basic_transfer_standalone.py
+              role: main
+          metadata:
+            apiLevel: '2.6'
+          key: duplicate_key
+  - name: Get protocols and validate id and key
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          - id: '{protocol_id1}'
             key: duplicate_key

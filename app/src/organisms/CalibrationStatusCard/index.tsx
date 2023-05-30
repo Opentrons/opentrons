@@ -20,6 +20,8 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 
+import { useCalibrationTaskList } from '../Devices/hooks'
+
 export interface CalibrationStatusCardProps {
   robotName: string
   setShowHowCalibrationWorksModal: (
@@ -32,6 +34,25 @@ export function CalibrationStatusCard({
   setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
+  const { taskListStatus } = useCalibrationTaskList()
+
+  // start off assuming we are missing calibrations
+  let statusLabelBackgroundColor: string = COLORS.errorEnabled
+  let statusLabelIconColor: string = COLORS.errorEnabled
+  let statusLabelText = t('missing_calibration_data')
+
+  // if the tasklist is empty, though, all calibrations are good
+  if (taskListStatus === 'complete') {
+    statusLabelBackgroundColor = COLORS.successEnabled
+    statusLabelIconColor = COLORS.successEnabled
+    statusLabelText = t('calibration_complete')
+    // if we have tasks and they are all marked bad, then we should
+    // strongly suggest they re-do those calibrations
+  } else if (taskListStatus === 'bad') {
+    statusLabelBackgroundColor = COLORS.warningEnabled
+    statusLabelIconColor = COLORS.warningEnabled
+    statusLabelText = t('calibration_recommended')
+  }
 
   return (
     <Flex
@@ -39,23 +60,25 @@ export function CalibrationStatusCard({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing3}
-        marginRight={SPACING.spacingXXL}
+        gridGap={SPACING.spacing8}
+        marginRight={SPACING.spacing40}
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <StyledText css={TYPOGRAPHY.h2SemiBold}>
             {t('calibration_status')}
           </StyledText>
           <StatusLabel
-            status={t('missing_calibration_data')}
-            backgroundColor={`${COLORS.errorEnabled}${COLORS.opacity12HexCode}`}
-            iconColor={COLORS.errorEnabled}
+            status={statusLabelText}
+            backgroundColor={`${String(statusLabelBackgroundColor)}${String(
+              COLORS.opacity12HexCode
+            )}`}
+            iconColor={statusLabelIconColor}
             textColor={COLORS.darkBlackEnabled}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             iconSize="0.313rem"

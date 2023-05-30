@@ -1359,7 +1359,8 @@
           "offset": { "x": 2, "y": 3, "z": 10 }
         },
         "minimumZHeight": 35,
-        "forceDirect": true
+        "forceDirect": true,
+        "speed": 12.3
       }
     },
     {

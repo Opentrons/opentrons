@@ -1,8 +1,9 @@
 """Test dispense commands."""
 from decoy import Decoy
 
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
+from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
 from opentrons.protocol_engine.execution import MovementHandler, PipettingHandler
+from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.dispense import (
     DispenseParams,
@@ -32,15 +33,6 @@ async def test_dispense_implementation(
         flowRate=1.23,
     )
 
-    async def _rehearse_dispense(*args: object, **kwargs: object) -> None:
-        decoy.when(
-            await pipetting.dispense_in_place(
-                pipette_id="pipette-id-abc123",
-                volume=50,
-                flow_rate=1.23,
-            )
-        ).then_return(42)
-
     decoy.when(
         await movement.move_to_well(
             pipette_id="pipette-id-abc123",
@@ -48,8 +40,16 @@ async def test_dispense_implementation(
             well_name="A3",
             well_location=well_location,
         )
-    ).then_do(_rehearse_dispense)
+    ).then_return(Point(x=1, y=2, z=3))
+
+    decoy.when(
+        await pipetting.dispense_in_place(
+            pipette_id="pipette-id-abc123",
+            volume=50,
+            flow_rate=1.23,
+        )
+    ).then_return(42)
 
     result = await subject.execute(data)
 
-    assert result == DispenseResult(volume=42)
+    assert result == DispenseResult(volume=42, position=DeckPoint(x=1, y=2, z=3))

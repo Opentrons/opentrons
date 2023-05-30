@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -8,11 +9,12 @@ import {
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
+  useIsOT3,
   usePipetteOffsetCalibrations,
-  useRobot,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
@@ -22,14 +24,16 @@ import type { FormattedPipetteOffsetCalibration } from '..'
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
 >
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
   typeof PipetteOffsetCalibrationItems
 >
-
+const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
+  typeof useAttachedPipettesFromInstrumentsQuery
+>
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 const mockUpdateRobotStatus = jest.fn()
 
@@ -43,9 +47,7 @@ const render = (
       formattedPipetteOffsetCalibrations={
         mockFormattedPipetteOffsetCalibrations
       }
-      pipetteOffsetCalBannerType="''"
       robotName="otie"
-      showPipetteOffsetCalibrationBanner={false}
       updateRobotStatus={mockUpdateRobotStatus}
       {...props}
     />,
@@ -57,12 +59,16 @@ const render = (
 
 describe('RobotSettingsPipetteOffsetCalibration', () => {
   beforeEach(() => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
       mockPipetteOffsetCalibration3,
     ])
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: null,
+      right: null,
+    })
     mockPipetteOffsetCalibrationItems.mockReturnValue(
       <div>PipetteOffsetCalibrationItems</div>
     )
@@ -70,13 +76,25 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
-  it('renders a title and description - Pipette Offset Calibrations', () => {
+  it('renders a title - Pipette Offset Calibrations', () => {
     const [{ getByText }] = render()
     getByText('Pipette Offset Calibrations')
+    getByText('PipetteOffsetCalibrationItems')
+  })
+
+  it('renders an OT-3 title and description - Pipette Calibrations', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+      left: mockAttachedPipetteInformation,
+      right: null,
+    })
+    const [{ getByText }] = render()
+    getByText('Pipette Calibrations')
     getByText(
-      'Pipette offset calibration measures a pipette’s position relative to the pipette mount and the deck. You can recalibrate a pipette’s offset if its currently attached to this robot.'
+      `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut divots on deck slots.`
     )
     getByText('PipetteOffsetCalibrationItems')
   })
@@ -85,21 +103,5 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     mockUsePipetteOffsetCalibrations.mockReturnValue(null)
     const [{ getByText }] = render()
     getByText('Not calibrated yet')
-  })
-
-  it('renders the error banner when error props provided', () => {
-    const [{ getByText }] = render({
-      showPipetteOffsetCalibrationBanner: true,
-      pipetteOffsetCalBannerType: 'error',
-    })
-    getByText('Pipette Offset calibration missing')
-  })
-
-  it('renders the warning banner when warning props provided', () => {
-    const [{ getByText }] = render({
-      showPipetteOffsetCalibrationBanner: true,
-      pipetteOffsetCalBannerType: 'warning',
-    })
-    getByText('Pipette Offset calibration recommended')
   })
 })

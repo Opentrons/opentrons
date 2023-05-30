@@ -1,5 +1,5 @@
 import nodeFetch from 'node-fetch'
-import { isError } from 'lodash'
+import isError from 'lodash/isError'
 
 import * as Fixtures from '../__fixtures__'
 import { createHealthPoller } from '../health-poller'

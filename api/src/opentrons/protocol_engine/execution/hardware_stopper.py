@@ -3,13 +3,17 @@ import logging
 from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
+
+from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
-from ..types import MotorAxis, WellLocation
-from ..errors import PipetteNotAttachedError
+from ..types import MotorAxis
+from ..errors import HardwareNotSupportedError
 
 from .movement import MovementHandler
-from .pipetting import PipettingHandler
-
+from .gantry_mover import HardwareGantryMover
+from .tip_handler import TipHandler, HardwareTipHandler
+from ...hardware_control.types import OT3Mount
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +30,7 @@ class HardwareStopper:
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
         movement: Optional[MovementHandler] = None,
-        pipetting: Optional[PipettingHandler] = None,
+        tip_handler: Optional[TipHandler] = None,
     ) -> None:
         """Hardware stopper initializer."""
         self._hardware_api = hardware_api
@@ -34,39 +38,51 @@ class HardwareStopper:
         self._movement_handler = movement or MovementHandler(
             hardware_api=hardware_api,
             state_store=state_store,
+            gantry_mover=HardwareGantryMover(
+                hardware_api=hardware_api,
+                state_view=state_store,
+            ),
         )
-
-        self._pipetting_handler = pipetting or PipettingHandler(
+        self._tip_handler = tip_handler or HardwareTipHandler(
             hardware_api=hardware_api,
-            state_store=state_store,
-            movement_handler=self._movement_handler,
+            state_view=state_store,
         )
 
     async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
-        attached_tip_racks = self._state_store.pipettes.get_attached_tip_labware_by_id()
+        attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
-        if attached_tip_racks:
+        if attached_tips:
             await self._hardware_api.stop(home_after=False)
+            # TODO: Update this once gripper MotorAxis is available in engine.
+            try:
+                ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+                if (
+                    not self._state_store.config.use_virtual_gripper
+                    and ot3api.has_gripper()
+                ):
+                    await ot3api.home_z(mount=OT3Mount.GRIPPER)
+            except HardwareNotSupportedError:
+                pass
             await self._movement_handler.home(
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
 
-        for pipette_id, tiprack_id in attached_tip_racks.items():
+        for pipette_id, tip in attached_tips:
             try:
-                await self._pipetting_handler.add_tip(
-                    pipette_id=pipette_id,
-                    labware_id=tiprack_id,
-                )
+                await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
                 # TODO: Add ability to drop tip onto custom trash as well.
-                await self._pipetting_handler.drop_tip(
+                await self._movement_handler.move_to_well(
                     pipette_id=pipette_id,
                     labware_id=FIXED_TRASH_ID,
                     well_name="A1",
-                    well_location=WellLocation(),
+                )
+                await self._tip_handler.drop_tip(
+                    pipette_id=pipette_id,
+                    home_after=False,
                 )
 
-            except PipetteNotAttachedError:
+            except HwPipetteNotAttachedError:
                 # this will happen normally during protocol analysis, but
                 # should not happen during an actual run
                 log.debug(f"Pipette ID {pipette_id} no longer attached.")

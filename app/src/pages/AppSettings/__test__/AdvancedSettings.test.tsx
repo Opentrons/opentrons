@@ -16,7 +16,11 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+} from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
@@ -132,10 +136,12 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Tip Length Calibration Method')
     getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
+    getByText('OT-2 Advanced Settings')
+    getByText('Tip Length Calibration Method')
+    getByText('USB-to-Ethernet Adapter Information')
   })
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
@@ -159,7 +165,7 @@ describe('AdvancedSettings', () => {
     const btn = getByRole('button', { name: 'Add labware source folder' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'changeCustomLabwareSourceFolder',
+      name: ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
       properties: {},
     })
   })
@@ -245,19 +251,21 @@ describe('AdvancedSettings', () => {
 
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Show Link to Get Labware Offset Data')
+    getByText('Show Labware Offset data code snippets')
     getByText(
-      'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
+      'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
     )
     getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
   })
 
   it('does not render the allow sending all protocols to ot-3 section when feature flag is off', () => {
     const [{ queryByText, queryByRole }] = render()
-    expect(queryByText('Allow Sending All Protocols to OT-3')).toBeNull()
+    expect(
+      queryByText('Allow Sending All Protocols to Opentrons Flex')
+    ).toBeNull()
     expect(
       queryByText(
-        'Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+        'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
       )
     ).toBeNull()
     expect(
@@ -270,9 +278,9 @@ describe('AdvancedSettings', () => {
       .calledWith('enableExtendedHardware')
       .mockReturnValue(true)
     const [{ getByText, getByRole }] = render()
-    getByText('Allow Sending All Protocols to OT-3')
+    getByText('Allow Sending All Protocols to Opentrons Flex')
     getByText(
-      'Enable the "Send to OT-3" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+      'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the Opentrons Flex.'
     )
     getByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
   })
@@ -320,7 +328,7 @@ describe('AdvancedSettings', () => {
     const button = getByRole('button', { name: 'Add override path' })
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'changePathToPythonDirectory',
+      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
       properties: {},
     })
   })

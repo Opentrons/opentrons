@@ -31,6 +31,9 @@ PipetteName = Literal[
     "p1000_single_gen2",
     "p1000_single_gen3",
     "p1000_multi_gen3",
+    # TODO (tz, 11-23-22): remove when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    "p1000_96",
 ]
 
 
@@ -55,6 +58,7 @@ class PipetteNameType(str, Enum):
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
     P1000_SINGLE_GEN3 = "p1000_single_gen3"
     P1000_MULTI_GEN3 = "p1000_multi_gen3"
+    P1000_96 = "p1000_96"
 
 
 # Generic NewType for models because we get new ones frequently and theres
@@ -76,9 +80,9 @@ ConfigUnit = Literal[
 
 Quirk = NewType("Quirk", str)
 
-ChannelCount = Literal[1, 8]
+ChannelCount = Literal[1, 8, 96]
 
-UlPerMmAction = Literal["aspirate", "dispense"]
+UlPerMmAction = Literal["aspirate", "dispense", "blowout"]
 
 
 class PipetteConfigElement(TypedDict):

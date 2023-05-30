@@ -4,8 +4,7 @@ import {
   Text,
   BORDER_SOLID_LIGHT,
   FONT_WEIGHT_SEMIBOLD,
-  SPACING_2,
-  SPACING_3,
+  SPACING,
 } from '@opentrons/components'
 
 export interface TipLengthCalibrationInfoBoxProps {
@@ -19,11 +18,15 @@ export function TipLengthCalibrationInfoBox(
   const { title, children } = props
 
   return (
-    <Box border={BORDER_SOLID_LIGHT} margin={SPACING_3} paddingY={SPACING_3}>
+    <Box
+      border={BORDER_SOLID_LIGHT}
+      margin={SPACING.spacing16}
+      paddingY={SPACING.spacing16}
+    >
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        paddingLeft={SPACING_3}
-        paddingBottom={SPACING_2}
+        paddingLeft={SPACING.spacing16}
+        paddingBottom={SPACING.spacing8}
       >
         {title}
       </Text>

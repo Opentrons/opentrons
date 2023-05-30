@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
-import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
+import { ModuleInfo } from '../ModuleInfo'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
@@ -40,7 +40,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
             strong: (
               <StyledText
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                paddingBottom={SPACING.spacingSM}
+                paddingBottom={SPACING.spacing12}
               />
             ),
             block: <span />,
@@ -52,7 +52,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
         data-testid="heater_shaker_svg_and_info"
       >
         {() => (
-          <React.Fragment key={`Power_on_${moduleDef.model}`}>
+          <React.Fragment key={`Power_on_${String(moduleDef.model)}`}>
             <Module
               x={0}
               y={0}

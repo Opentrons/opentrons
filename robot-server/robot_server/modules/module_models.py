@@ -47,7 +47,7 @@ class UsbPort(BaseModel):
     )
 
 
-class GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
+class _GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     """Base module response."""
 
     id: str = Field(
@@ -82,7 +82,7 @@ class TemperatureModuleData(BaseModel):
 
 
 class TemperatureModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.TEMPERATURE],
         Literal[ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2],
         TemperatureModuleData,
@@ -113,7 +113,7 @@ class MagneticModuleData(BaseModel):
 
 
 class MagneticModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.MAGNETIC],
         Literal[ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2],
         MagneticModuleData,
@@ -204,7 +204,7 @@ class ThermocyclerModuleData(BaseModel):
 
 
 class ThermocyclerModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.THERMOCYCLER],
         Literal[ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2],
         ThermocyclerModuleData,
@@ -264,7 +264,7 @@ class HeaterShakerModuleData(BaseModel):
 
 
 class HeaterShakerModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.HEATER_SHAKER],
         Literal[ModuleModel.HEATER_SHAKER_MODULE_V1],
         HeaterShakerModuleData,

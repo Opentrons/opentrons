@@ -27,7 +27,7 @@ async def test_health(
         "systemVersion": version_dict["openembedded_version"],
         "bootId": "dummy-boot-id-abc123",
         "capabilities": {
-            "openembeddedUpdate": "/server/update/begin",
+            "systemUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
         "serialNumber": "unknown",

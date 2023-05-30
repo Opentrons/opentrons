@@ -1,20 +1,21 @@
 """Protocol API module implementation logic."""
+from __future__ import annotations
+
 from typing import Optional, List
 
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
-    ModuleType,
     TemperatureStatus,
     MagneticStatus,
     ThermocyclerStep,
     SpeedStatus,
+    module_model_from_string,
 )
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
@@ -22,23 +23,22 @@ from opentrons.protocol_engine.errors.exceptions import (
     NoMagnetEngageHeightError,
 )
 
-from opentrons.protocol_api import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
+from ... import validation
 from ..module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
-from .labware import LabwareCore
 from .exceptions import InvalidMagnetEngageHeightError
 
 
-class ModuleCore(AbstractModuleCore[LabwareCore]):
+class ModuleCore(AbstractModuleCore):
     """Module core logic implementation for Python protocols.
-
     Args:
         module_id: ProtocolEngine ID of the loaded modules.
     """
@@ -65,40 +65,84 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """The module's unique ProtocolEngine ID."""
         return self._module_id
 
-    @property
-    def geometry(self) -> ModuleGeometry:
-        """Get the module's geometry interface."""
-        raise NotImplementedError("geometry not implemented")
-
     def get_model(self) -> ModuleModel:
         """Get the module's model identifier."""
-        raise NotImplementedError("get_model not implemented")
-
-    def get_type(self) -> ModuleType:
-        """Get the module's general type identifier."""
-        raise NotImplementedError("get_type not implemented")
-
-    def get_requested_model(self) -> ModuleModel:
-        """Get the model identifier the module was requested as.
-
-        This may differ from the actual model returned by `get_model`.
-        """
-        raise NotImplementedError("get_requested_model not implemented")
+        return module_model_from_string(
+            self._engine_client.state.modules.get_connected_model(self.module_id)
+        )
 
     def get_serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
-        raise NotImplementedError("get_serial_number not implemented")
+        return self._engine_client.state.modules.get_serial_number(self.module_id)
 
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
         return self._engine_client.state.modules.get_location(self.module_id).slotName
 
-    def add_labware_core(self, labware_core: LabwareCore) -> Labware:
-        """Add a labware to the module."""
-        return Labware(implementation=labware_core, api_version=self._api_version)
+    def get_deck_slot_id(self) -> str:
+        slot_name = self.get_deck_slot()
+        return validation.ensure_deck_slot_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
+
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
 
 
-class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCore]):
+class NonConnectedModuleCore(AbstractModuleCore):
+    """Not connected module core logic implementation for Python protocols.
+
+    Args:
+        module_id: ProtocolEngine ID of the loaded modules.
+    """
+
+    def __init__(
+        self,
+        module_id: str,
+        engine_client: ProtocolEngineClient,
+        api_version: APIVersion,
+    ) -> None:
+        self._module_id = module_id
+        self._engine_client = engine_client
+        self._api_version = api_version
+
+    @property
+    def api_version(self) -> APIVersion:
+        """Get the api version protocol module target."""
+        return self._api_version
+
+    @property
+    def module_id(self) -> str:
+        """The module's unique ProtocolEngine ID."""
+        return self._module_id
+
+    def get_model(self) -> ModuleModel:
+        """Get the module's model identifier."""
+        return module_model_from_string(
+            self._engine_client.state.modules.get_connected_model(self.module_id)
+        )
+
+    def get_deck_slot(self) -> DeckSlotName:
+        """Get the module's deck slot."""
+        return self._engine_client.state.modules.get_location(self.module_id).slotName
+
+    def get_display_name(self) -> str:
+        """Get the module's display name."""
+        return self._engine_client.state.modules.get_definition(
+            self.module_id
+        ).displayName
+
+    def get_deck_slot_id(self) -> str:
+        slot_name = self.get_deck_slot()
+        return validation.ensure_deck_slot_string(
+            slot_name, robot_type=self._engine_client.state.config.robot_type
+        )
+
+
+class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore):
     """Temperature Module core logic implementation for Python protocols."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
@@ -111,9 +155,8 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
 
     def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
-
         Specifying a value for ``celsius`` that is different than
-        the module's current target temperature may beahave unpredictably.
+        the module's current target temperature may behave unpredictably.
         """
         self._engine_client.temperature_module_wait_for_target_temperature(
             module_id=self.module_id, celsius=celsius
@@ -136,7 +179,7 @@ class TemperatureModuleCore(ModuleCore, AbstractTemperatureModuleCore[LabwareCor
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
-class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
+class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore):
     """Magnetic Module control interface via a ProtocolEngine."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
@@ -147,19 +190,21 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         height_from_home: Optional[float] = None,
     ) -> None:
         """Raise the module's magnets.
-
         Only one of `height_from_base` or `height_from_home` may be specified.
-
         Args:
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        if height_from_home is not None:
-            raise NotImplementedError(
-                "MagneticModuleCore.engage with height_from_home not implemented"
-            )
 
-        assert height_from_base is not None, "Expected engage height"
+        # This core will only be used in apiLevels >=2.14, where
+        # MagneticModuleContext.engage(height=...) is no longer available.
+        # So these asserts should always pass.
+        assert (
+            height_from_home is None
+        ), "Expected engage height to be specified from base."
+        assert (
+            height_from_base is not None
+        ), "Expected engage height to be specified from base."
 
         self._engine_client.magnetic_module_engage(
             module_id=self._module_id, engage_height=height_from_base
@@ -169,7 +214,6 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         self, offset: float = 0, preserve_half_mm: bool = False
     ) -> None:
         """Raise the module's magnets up to its loaded labware.
-
         Args:
             offset: Offset from the labware's default engage height.
             preserve_half_mm: For labware whose definitions
@@ -209,7 +253,7 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
-class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
+class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
     """Core control interface for an attached Thermocycler Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.Thermocycler]
@@ -352,7 +396,7 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
         self._step_count = None
 
 
-class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
+class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore):
     """Core control interface for an attached Heater-Shaker Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
@@ -416,3 +460,7 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
     def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
         """Get the module's labware latch status."""
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
+
+
+class MagneticBlockCore(NonConnectedModuleCore, AbstractMagneticBlockCore):
+    """Magnetic Block control interface via a ProtocolEngine."""

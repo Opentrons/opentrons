@@ -23,14 +23,14 @@ const StyledTable = styled.table`
 `
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
 `
 const StyledTableRow = styled.tr`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};
 `
 const StyledTableCell = styled.td`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   text-overflow: wrap;
 `
 
@@ -66,7 +66,7 @@ export function TipLengthCalibrationItems({
         mount: formattedPipetteOffsetCalibrations.find(
           p => p.serialNumber === tipLength.pipette
         )?.mount,
-        tiprack: tipLength.uri,
+        tiprackDefURI: tipLength.uri,
         lastCalibrated: tipLength.lastCalibrated,
       }
     }
@@ -95,9 +95,9 @@ export function TipLengthCalibrationItems({
           <StyledTableRow key={index}>
             <StyledTableCell>
               <StyledText as="p">
-                {calibration.tiprack &&
+                {calibration.tiprackDefURI &&
                   getDisplayNameForTipRack(
-                    calibration.tiprack,
+                    calibration.tiprackDefURI,
                     customLabwareDefs
                   )}
               </StyledText>
@@ -108,7 +108,9 @@ export function TipLengthCalibrationItems({
             </StyledTableCell>
             <StyledTableCell>
               <StyledText as="p">
-                {formatLastCalibrated(calibration.lastCalibrated)}
+                {calibration.lastCalibrated !== undefined
+                  ? formatLastCalibrated(calibration.lastCalibrated)
+                  : 'Not calibrated'}
               </StyledText>
             </StyledTableCell>
             <StyledTableCell>
@@ -122,6 +124,7 @@ export function TipLengthCalibrationItems({
                     : checkMountWithAttachedPipettes(calibration.serialNumber)
                 }
                 updateRobotStatus={updateRobotStatus}
+                tiprackDefURI={calibration.tiprackDefURI}
               />
             </StyledTableCell>
           </StyledTableRow>

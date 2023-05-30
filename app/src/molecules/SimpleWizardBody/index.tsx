@@ -1,65 +1,142 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
+  JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  RESPONSIVENESS,
+  ALIGN_CENTER,
+  StyleProps,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
+import { Skeleton } from '../../atoms/Skeleton'
 
-interface Props {
+interface Props extends StyleProps {
   iconColor: string
-  children: React.ReactNode
   header: string
-  subHeader?: string
   isSuccess: boolean
+  children?: React.ReactNode
+  subHeader?: string
+  isPending?: boolean
 }
+const BACKGROUND_SIZE = '47rem'
+
+const HEADER_STYLE = css`
+  ${TYPOGRAPHY.h1Default};
+  margin-top: ${SPACING.spacing24};
+  margin-bottom: ${SPACING.spacing8};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+`
+const SUBHEADER_STYLE = css`
+  ${TYPOGRAPHY.pRegular};
+  margin-left: 6.25rem;
+  margin-right: 6.25rem;
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  height: 1.75rem;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: ${TYPOGRAPHY.fontSize28};
+    line-height: ${TYPOGRAPHY.lineHeight36};
+    margin-left: 4.5rem;
+    margin-right: 4.5rem;
+  }
+`
+const BUTTON_STYLE = css`
+  justify-content: ${JUSTIFY_FLEX_END};
+  padding-right: ${SPACING.spacing32};
+  padding-bottom: ${SPACING.spacing32};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding-bottom: ${SPACING.spacing32};
+  }
+`
+const WIZARD_CONTAINER_STYLE = css`
+  min-height: 394px;
+  flex-direction: ${DIRECTION_COLUMN}
+  justify-content: ${JUSTIFY_SPACE_BETWEEN}
+  height: 'auto'
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 472px;
+  }
+`
+const FLEX_SPACING_STYLE = css`
+  height: 1.75rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 0rem;
+  }
+`
 
 export function SimpleWizardBody(props: Props): JSX.Element {
-  const { iconColor, children, header, subHeader, isSuccess } = props
+  const {
+    iconColor,
+    children,
+    header,
+    subHeader,
+    isSuccess,
+    isPending,
+    ...styleProps
+  } = props
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       <Flex
         alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        height="100%"
-        marginBottom="5.6875rem"
-        marginTop="6.8125rem"
+        flex="1 0 auto"
       >
-        <Icon
-          name={isSuccess ? 'ot-check' : 'ot-alert'}
-          size="2.5rem"
-          color={iconColor}
-          aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
-        />
-        <StyledText
-          css={TYPOGRAPHY.h1Default}
-          marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing3}
-        >
-          {header}
-        </StyledText>
-        {subHeader != null ? (
-          <StyledText
-            as="p"
-            marginX="6.25rem"
-            textAlign={ALIGN_CENTER}
-            height="1.75rem"
+        {isPending ? (
+          <Flex
+            gridGap={SPACING.spacing24}
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
           >
-            {subHeader}
-          </StyledText>
+            <Skeleton
+              width="6.25rem"
+              height="6.25rem"
+              backgroundSize={BACKGROUND_SIZE}
+            />
+            <Skeleton
+              width="18rem"
+              height="1.125rem"
+              backgroundSize={BACKGROUND_SIZE}
+            />
+          </Flex>
         ) : (
-          <Flex height="1.75rem" />
+          <>
+            <Icon
+              name={isSuccess ? 'ot-check' : 'ot-alert'}
+              size={isOnDevice ? '3.75rem' : '2.5rem'}
+              color={iconColor}
+              aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
+            />
+            <StyledText css={HEADER_STYLE}>{header}</StyledText>
+            {subHeader != null ? (
+              <StyledText css={SUBHEADER_STYLE}>{subHeader}</StyledText>
+            ) : (
+              <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
+            )}
+          </>
         )}
       </Flex>
       <Flex
-        paddingX={SPACING.spacing6}
-        paddingBottom={SPACING.spacing6}
-        justifyContent={JUSTIFY_FLEX_END}
+        position={POSITION_ABSOLUTE}
+        bottom={0}
+        right={0}
+        css={BUTTON_STYLE}
       >
         {children}
       </Flex>

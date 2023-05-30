@@ -1,16 +1,26 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
-import re
-from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Any, Mapping, Union
+from typing import (
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Union,
+    Tuple,
+    NamedTuple,
+    cast,
+)
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
@@ -38,9 +48,8 @@ from ..actions import (
     AddLabwareDefinitionAction,
 )
 from .abstract_store import HasState, HandlesActions
+from .move_types import EdgePathType
 
-
-_TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.
@@ -49,6 +58,16 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
+
+_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
+
+
+class LabwareLoadParams(NamedTuple):
+    """Parameters required to load a labware in Protocol Engine."""
+
+    load_name: str
+    namespace: str
+    version: int
 
 
 @dataclass
@@ -212,6 +231,25 @@ class LabwareView(HasState[LabwareState]):
             "There is no labware loaded on this Module"
         )
 
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_by_slot(
+        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+    ) -> Optional[LoadedLabware]:
+        """Get the labware located in a given slot, if any."""
+        loaded_labware = reversed(list(self._state.labware_by_id.values()))
+
+        for labware in loaded_labware:
+            if (
+                isinstance(labware.location, DeckSlotLocation)
+                and labware.location.slotName == slot_name
+                and labware.id in allowed_ids
+            ):
+                return labware
+
+        return None
+
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""
         return self.get_definition_by_uri(
@@ -265,6 +303,26 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
+    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+        """Get all loaded labware definitions."""
+        loaded_labware = self._state.labware_by_id.values()
+        return [
+            self.get_definition_by_uri(LabwareUri(labware.definitionUri))
+            for labware in loaded_labware
+        ]
+
+    def find_custom_labware_load_params(self) -> List[LabwareLoadParams]:
+        """Find all load labware parameters for custom labware definitions in state."""
+        return [
+            LabwareLoadParams(
+                load_name=definition.parameters.loadName,
+                namespace=definition.namespace,
+                version=definition.version,
+            )
+            for definition in self._state.definitions_by_uri.values()
+            if definition.namespace != OPENTRONS_NAMESPACE
+        ]
+
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
         return self.get(labware_id).location
@@ -304,14 +362,65 @@ class LabwareView(HasState[LabwareState]):
                 f"{well_name} does not exist in {labware_id}."
             ) from e
 
-    def get_wells(self, labware_id: str) -> List[str]:
-        """Get labware wells as a list of well names."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells = list()
-        for col in definition.ordering:
-            for well_name in col:
-                wells.append(well_name)
-        return wells
+    def get_well_size(
+        self, labware_id: str, well_name: str
+    ) -> Tuple[float, float, float]:
+        """Get a well's size in x, y, z dimensions based on its shape.
+
+        Args:
+            labware_id: Labware identifier.
+            well_name: Name of well in labware.
+
+        Returns:
+            A tuple of dimensions in x, y, and z. If well is circular,
+            the x and y dimensions will both be set to the diameter.
+        """
+        well_definition = self.get_well_definition(labware_id, well_name)
+
+        if well_definition.diameter is not None:
+            x_size = y_size = well_definition.diameter
+        else:
+            # If diameter is None we know these values will be floats
+            x_size = cast(float, well_definition.xDimension)
+            y_size = cast(float, well_definition.yDimension)
+
+        return x_size, y_size, well_definition.depth
+
+    def get_well_radial_offsets(
+        self, labware_id: str, well_name: str, radius_percentage: float
+    ) -> Tuple[float, float]:
+        """Get x and y radius offsets modified by radius percentage."""
+        x_size, y_size, z_size = self.get_well_size(labware_id, well_name)
+        return (x_size / 2.0) * radius_percentage, (y_size / 2.0) * radius_percentage
+
+    def get_edge_path_type(
+        self,
+        labware_id: str,
+        well_name: str,
+        mount: MountType,
+        labware_slot: DeckSlotName,
+        next_to_module: bool,
+    ) -> EdgePathType:
+        """Get the recommended edge path type based on well column, labware position and any neighboring modules."""
+        labware_definition = self.get_definition(labware_id)
+        left_column = labware_definition.ordering[0]
+        right_column = labware_definition.ordering[-1]
+
+        left_path_criteria = mount is MountType.RIGHT and well_name in left_column
+        right_path_criteria = mount is MountType.LEFT and well_name in right_column
+        labware_right_side = labware_slot in [
+            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_6,
+            DeckSlotName.SLOT_9,
+            DeckSlotName.FIXED_TRASH,
+        ]
+
+        if left_path_criteria and (next_to_module or labware_right_side):
+            return EdgePathType.LEFT
+        elif right_path_criteria and next_to_module:
+            return EdgePathType.RIGHT
+        else:
+            return EdgePathType.DEFAULT
 
     def validate_liquid_allowed_in_labware(
         self, labware_id: str, wells: Mapping[str, Any]
@@ -330,38 +439,26 @@ class LabwareView(HasState[LabwareState]):
             )
         return list(wells)
 
-    def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
-        """Get well columns."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells_by_cols = defaultdict(list)
-        for i, col in enumerate(definition.ordering):
-            wells_by_cols[f"{i+1}"] = col
-        return wells_by_cols
-
-    def get_well_rows(self, labware_id: str) -> Dict[str, List[str]]:
-        """Get well rows."""
-        definition = self.get_definition(labware_id=labware_id)
-        wells_by_rows = defaultdict(list)
-        pattern = re.compile(WELL_NAME_PATTERN, re.X)
-        for col in definition.ordering:
-            for well_name in col:
-                match = pattern.match(well_name)
-                assert match, f"Well name did not match pattern {pattern}"
-                wells_by_rows[match.group(1)].append(well_name)
-        return wells_by_rows
-
-    def get_tip_length(self, labware_id: str) -> float:
-        """Get the tip length of a tip rack."""
+    def get_tip_length(self, labware_id: str, overlap: float = 0) -> float:
+        """Get the nominal tip length of a tip rack."""
         definition = self.get_definition(labware_id)
         if definition.parameters.tipLength is None:
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {labware_id} has no tip length defined."
             )
-        return definition.parameters.tipLength
 
-    def get_definition_uri(self, labware_id: str) -> str:
+        return definition.parameters.tipLength - overlap
+
+    def get_tip_drop_z_offset(
+        self, labware_id: str, length_scale: float, additional_offset: float
+    ) -> float:
+        """Get the tip drop offset from the top of the well."""
+        tip_length = self.get_tip_length(labware_id)
+        return -tip_length * length_scale + additional_offset
+
+    def get_definition_uri(self, labware_id: str) -> LabwareUri:
         """Get a labware's definition URI."""
-        return self.get(labware_id).definitionUri
+        return LabwareUri(self.get(labware_id).definitionUri)
 
     def get_uri_from_definition(
         self,
@@ -493,6 +590,10 @@ class LabwareView(HasState[LabwareState]):
             "No labware loaded into fixed trash location by this deck type."
         )
 
+    def is_fixed_trash(self, labware_id: str) -> bool:
+        """Check if labware is fixed trash."""
+        return self.get_fixed_trash_id() == labware_id
+
     def raise_if_labware_in_location(
         self, location: Union[DeckSlotLocation, ModuleLocation]
     ) -> None:
@@ -502,6 +603,18 @@ class LabwareView(HasState[LabwareState]):
                 raise errors.LocationIsOccupiedError(
                     f"Labware {labware.loadName} is already present at {location}."
                 )
+
+    def get_calibration_coordinates(self, offset: Point) -> Point:
+        """Get calibration critical point and target position."""
+        target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
+        # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
+        # https://opentrons.atlassian.net/browse/RCORE-382
+
+        return Point(
+            x=target_center.x,
+            y=target_center.y + offset.y,
+            z=offset.z,
+        )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

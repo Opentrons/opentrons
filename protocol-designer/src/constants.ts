@@ -13,6 +13,8 @@ import {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   THERMOCYCLER_MODULE_V2,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
 import type { DeckSlot, WellVolumes } from './types'
@@ -128,46 +130,10 @@ export const MODELS_FOR_MODULE_TYPE: Record<
       value: HEATERSHAKER_MODULE_V1,
     },
   ],
-}
-
-export const MODELS_FOR_MODULE_TYPE_NO_FF: Record<
-  ModuleType,
-  Array<{
-    name: string
-    value: ModuleModel
-    disabled?: boolean
-  }>
-> = {
-  [MAGNETIC_MODULE_TYPE]: [
+  [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
-      value: MAGNETIC_MODULE_V1,
-    },
-    {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
-      value: MAGNETIC_MODULE_V2,
-    },
-  ],
-  [TEMPERATURE_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
-      value: TEMPERATURE_MODULE_V1,
-    },
-    {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
-      value: TEMPERATURE_MODULE_V2,
-    },
-  ],
-  [THERMOCYCLER_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
-      value: THERMOCYCLER_MODULE_V1,
-    },
-  ],
-  [HEATERSHAKER_MODULE_TYPE]: [
-    {
-      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
-      value: HEATERSHAKER_MODULE_V1,
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_BLOCK_V1}`),
+      value: MAGNETIC_BLOCK_V1,
     },
   ],
 }
@@ -177,6 +143,7 @@ export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
   [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_V1,
+  [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_V1,
 }
 // Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

@@ -41,6 +41,8 @@ async def _await_one_result(callback: WaitableCallback) -> ToolDetectionResult:
     async for response, _ in callback:
         if isinstance(response, message_definitions.PushToolsDetectedNotification):
             return _handle_detection_result(response)
+        if isinstance(response, message_definitions.ErrorMessage):
+            log.error(f"Recieved error message {str(response)}")
     raise RuntimeError("Messenger closed before a tool was found")
 
 
@@ -109,6 +111,8 @@ class OneshotToolDetector:
                     )
                     seen.add(node)
                     break
+                elif isinstance(response, message_definitions.ErrorMessage):
+                    log.error(f"Recieved error message {str(response)}")
 
     @staticmethod
     async def _handle_gripper_info(

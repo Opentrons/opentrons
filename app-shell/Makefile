@@ -19,7 +19,7 @@ ui_dir := ../app
 noop := cd .
 
 # build and publish options
-dist_files := "dist/**/Opentrons-v*"
+dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Opentrons-OT3-*")
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
@@ -31,10 +31,15 @@ ssh_opts ?= $(default_ssh_opts)
 # if no build number -> dev
 # if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
-# only copy update files publish directory on tagged builds
-publish_update := $(filter v%,$(OT_TAG))
+# only copy update files publish directory on tagged builds that match the provided OPENTRONS_PROJECT
+# environment variable (i.e. if OT_TAG is vxxx and OPENTRONS_PROJECT is robot-stack, or OT_TAG is ot3@xxx
+# and OPENTRONS_PROJECT is ot3)
+_publish_ot2 := $(and $(filter v%,$(OT_TAG)), $(filter robot-stack,$(OPENTRONS_PROJECT)))
+_publish_ot3 := $(and $(filter ot3@%,$(OT_TAG)), $(filter ot3,$(OPENTRONS_PROJECT)))
+publish_update := $(or $(_publish_ot2),$(_publish_ot3))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
+OPENTRONS_PROJECT ?= $(if $(filter ot3@%,$(publish_update)),ot3,robot-stack)
 
 # set this to anything on command-line invocations of this makefile to skip bundling
 # standalone python, as is necessary for on-device app builds:
@@ -43,6 +48,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
+	--config.electronVersion=21.3.1 \
 	--publish never
 
 
@@ -122,22 +128,22 @@ dist-ot3: package-deps
 	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
 	cd dist/linux-arm64-unpacked
 
-.PHONY: push-ot3
-push-ot3: dist-ot3
-	ssh $(ssh_opts) root@$(host) "systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
-	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
-	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app"
-
 # Aliases matching github actions OS names for easier calling in
 # workflows
 .PHONY: dist-macos-latest
 dist-macos-latest: dist-osx
+
+.PHONY: dist-macos-11
+dist-macos-11: dist-osx
 
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
 .PHONY: dist-ubuntu-22.04
 dist-ubuntu-22.04: dist-linux
+
+.PHONY: dist-windows-2019
+dist-windows-2019: dist-win
 
 .PHONY: dist-windows-2022
 dist-windows-2022: dist-win
@@ -147,7 +153,7 @@ dist-windows-2022: dist-win
 .PHONY: _dist-collect-artifacts
 _dist-collect-artifacts:
 	shx mkdir -p dist/publish
-	shx cp $(dist_files) $(publish_dir)
+	shx cp $(call dist_files,$(OPENTRONS_PROJECT)) $(publish_dir)
 	$(and $(publish_update),shx cp $(update_files) $(publish_dir) || $(noop))
 
 # development

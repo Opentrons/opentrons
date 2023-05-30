@@ -1,16 +1,66 @@
 For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
-[technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+[technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
 
-# OT-2 Software Changes in 6.1.0
+## OT-2 Software Changes in 6.3.0
+
+Welcome to the v6.3.0 release of the OT-2 software!
+
+### Improved Features
+
+- The `/calibrations` endpoint now accepts `DELETE` requests.
+
+### Bug Fixes
+
+- Fixed a problem where labware offsets would sometimes be ignored for labware atop a Temperature Module.
+- Calls to the `/commands` endpoint with `waitUntilComplete=true` no longer time out after 30 seconds if you don't specify a timeout interval.
+- Fixed improper pagination and cursor placement for the `/commands` endpoint.
+
+### Known Issues
+
+- Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+    - JSON protocols created or modified with Protocol Designer v6.0.0 or higher
+    - Python protocols specifying an `apiLevel` of 2.14
+
+---
+## OT-2 Software Changes in 6.2.1
+
+Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresses a few problems.
+
+### Bug Fixes
+
+- When you upload a protocol or set up a run, the OT-2 is now less likely to show connection errors.
+- When you upload a protocol file larger than 2 megabytes, you will no longer get an error saying "Protocol run could not be created on the robot."
+- When you run a Thermocycler GEN2 for 50 days without a power cycle, it will no longer miscalculate hold times.
+- When you upload a Python protocol that aspirates or dispenses with an effective volume of 0 µL, it will no longer get stuck analyzing forever.
+
+---
+
+## OT-2 Software Changes in 6.2.0
+
+Welcome to the v6.2.0 release of the OT-2 software! This release focuses on adding support for the Thermocycler Module GEN2.
+
+### New Features
+
+- Thermocycler GEN2 support
+    - Lid temperature is now available when querying module status
+    - Pipettes properly move to avoid the GEN2 module
+
+### Bug Fixes
+
+- Fixed a bug that could cause hardware modules to become unresponsive
+
+---
+
+## OT-2 Software Changes in 6.1.0
 
 Welcome to the v6.1.0 release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
 
-## New Features
+### New Features
 
 - Heater-Shaker support
   - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
@@ -18,7 +68,7 @@ Welcome to the v6.1.0 release of the OT-2 software! This release adds support fo
   - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
   - The OT-2 can update the firmware on an attached Heater-Shaker
 
-## Bug Fixes
+### Bug Fixes
 
 - Improved tip pickup and drop behavior
 - Fixed issues when running Thermocycler profiles

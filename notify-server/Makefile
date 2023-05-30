@@ -15,15 +15,20 @@ SHX := npx shx
 # Path of source package
 SRC_PATH = notify_server
 
-# Find the version of the wheel from package.json using a helper script. We
+ot_project := $(OPENTRONS_PROJECT)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
+project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+
+
+# Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,notify-server,notify_server,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,notify-server,$(project_rs_default),notify_server,$(BUILD_NUMBER))
 
-# Find the version of the sdist from package.json using a helper script. We
+# Find the version of the sdist from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,notify-server,notify_server)
+sdist_file = dist/$(call python_get_sdistname,notify-server,$(project_ot3_default),notify_server)
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -72,6 +77,7 @@ clean:
 teardown:
 	$(pipenv) --rm
 
+$(wheel_file): export OPENTRONS_PROJECT=$(project_rs_default)
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel --universal
@@ -81,6 +87,7 @@ $(wheel_file): setup.py $(ot_sources)
 .PHONY: wheel
 wheel: $(wheel_file)
 
+$(sdist_file): export OPENTRONS_PROJECT=$(project_ot3_default)
 $(sdist_file): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py sdist

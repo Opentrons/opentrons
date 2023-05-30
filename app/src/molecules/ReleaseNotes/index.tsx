@@ -21,7 +21,7 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
 
   return (
     <div className={styles.release_notes}>
-      {source ? (
+      {source != null ? (
         renderer.processSync(source).contents
       ) : (
         <p>{DEFAULT_RELEASE_NOTES}</p>

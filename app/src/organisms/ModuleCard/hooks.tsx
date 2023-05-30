@@ -1,13 +1,9 @@
 import * as React from 'react'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
 import { useHoverTooltip } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
-  getLoadedLabwareFromCommands,
   getRobotTypeFromLoadedLabware,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -15,11 +11,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
   HeaterShakerCloseLatchCreateCommand,
@@ -38,13 +33,15 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
-  const { protocolData } = useProtocolDetailsForRun(currentRunId)
-  if (protocolData == null) return false
-  const loadedLabware = getLoadedLabwareFromCommands(protocolData.commands)
-  const robotType = getRobotTypeFromLoadedLabware(loadedLabware)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(currentRunId)
+  if (robotProtocolAnalysis == null) return false
+  const robotType = getRobotTypeFromLoadedLabware(robotProtocolAnalysis.labware)
 
   const deckDef = getDeckDefFromRobotType(robotType)
-  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
+  const protocolModulesInfo = getProtocolModulesInfo(
+    robotProtocolAnalysis,
+    deckDef
+  )
   return protocolModulesInfo.some(
     module => module.moduleDef.model === 'heaterShakerModuleV1'
   )
@@ -106,23 +103,17 @@ type deactivateCommandTypes =
 
 export function useModuleOverflowMenu(
   module: AttachedModule,
-  runId: string | null = null,
   handleAboutClick: () => void,
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
   handleSlideoutClick: (isSecondary: boolean) => void,
-  isLoadedInRun: boolean,
   isDisabled: boolean,
   isIncompatibleWithOT3: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const { isRunTerminal, isRunIdle } = useRunStatuses()
-  const currentRunId = useCurrentRunId()
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -131,8 +122,8 @@ export function useModuleOverflowMenu(
   const labwareLatchBtn = (
     <>
       <MenuItem
-        key={`hs_labware_latch_${module.moduleModel}`}
-        data-testid={`hs_labware_latch_${module.moduleModel}`}
+        key={`hs_labware_latch_${String(module.moduleModel)}`}
+        data-testid={`hs_labware_latch_${String(module.moduleModel)}`}
         onClick={toggleLatch}
         disabled={isLatchDisabled || isDisabled}
         {...targetProps}
@@ -154,9 +145,9 @@ export function useModuleOverflowMenu(
 
   const aboutModuleBtn = (
     <MenuItem
-      key={`about_module_${module.moduleModel}`}
-      id={`about_module_${module.moduleModel}`}
-      data-testid={`about_module_${module.moduleModel}`}
+      key={`about_module_${String(module.moduleModel)}`}
+      id={`about_module_${String(module.moduleModel)}`}
+      data-testid={`about_module_${String(module.moduleModel)}`}
       disabled={isIncompatibleWithOT3}
       onClick={() => handleAboutClick()}
     >
@@ -166,8 +157,8 @@ export function useModuleOverflowMenu(
 
   const attachToDeckBtn = (
     <MenuItem
-      key={`hs_attach_to_deck_${module.moduleModel}`}
-      data-testid={`hs_attach_to_deck_${module.moduleModel}`}
+      key={`hs_attach_to_deck_${String(module.moduleModel)}`}
+      data-testid={`hs_attach_to_deck_${String(module.moduleModel)}`}
       onClick={() => handleWizardClick()}
       whiteSpace="nowrap"
     >
@@ -178,9 +169,9 @@ export function useModuleOverflowMenu(
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
-        key={`test_shake_${module.moduleModel}`}
-        id={`test_shake_${module.moduleModel}`}
-        data-testid={`test_shake_${module.moduleModel}`}
+        key={`test_shake_${String(module.moduleModel)}`}
+        id={`test_shake_${String(module.moduleModel)}`}
+        data-testid={`test_shake_${String(module.moduleModel)}`}
         disabled={isDisabled}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
@@ -191,7 +182,7 @@ export function useModuleOverflowMenu(
     ) : (
       <MenuItem
         onClick={() => handleTestShakeClick()}
-        key={`hs_test_shake_btn_${module.moduleModel}`}
+        key={`hs_test_shake_btn_${String(module.moduleModel)}`}
         disabled={isDisabled}
       >
         {t('heater_shaker:test_shake')}
@@ -210,27 +201,16 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId: isRunIdle ? moduleIdFromRun : module.id,
+        moduleId: module.id,
       },
     }
-    if (isRunIdle && currentRunId != null && isLoadedInRun) {
-      createCommand({
-        runId: currentRunId,
-        command: deactivateCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
-        )
-      })
-    } else if (isRunTerminal || currentRunId == null) {
-      createLiveCommand({
-        command: deactivateCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
-        )
-      })
-    }
+    createLiveCommand({
+      command: deactivateCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${deactivateCommand.commandType}: ${e.message}`
+      )
+    })
   }
 
   const lidCommand: TCOpenLidCreateCommand | TCCloseLidCreateCommand = {
@@ -262,7 +242,7 @@ export function useModuleOverflowMenu(
 
   const thermoSetBlockTempBtn = (
     <MenuItem
-      key={`thermocycler_block_temp_command_btn_${module.moduleModel}`}
+      key={`thermocycler_block_temp_command_btn_${String(module.moduleModel)}`}
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
       whiteSpace="nowrap"

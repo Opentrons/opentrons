@@ -149,3 +149,6 @@ storybook-static/
 # api client type caches
 api-client/lib
 react-api-client/lib
+
+#tarball of source files to send to ODD when pushing
+opentrons-robot-app.tar.gz

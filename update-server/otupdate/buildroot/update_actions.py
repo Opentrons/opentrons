@@ -14,7 +14,12 @@ import subprocess
 import tempfile
 from typing import Callable, Generator, Optional
 
+from otupdate.common.constants import MODEL_OT2
+
 from otupdate.common.file_actions import (
+    InvalidPKGName,
+    InvalidRobotType,
+    load_version_file,
     unzip_update,
     hash_file,
     HashMismatch,
@@ -22,10 +27,12 @@ from otupdate.common.file_actions import (
 )
 from otupdate.common.update_actions import UpdateActionsInterface, Partition
 
+UPDATE_PKG_BR = ["ot2-system.zip", "system-update.zip"]
+UPDATE_PKG_VERSION_FILE = "VERSION.json"
 ROOTFS_SIG_NAME = "rootfs.ext4.hash.sig"
 ROOTFS_HASH_NAME = "rootfs.ext4.hash"
 ROOTFS_NAME = "rootfs.ext4"
-UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME]
+UPDATE_FILES = [ROOTFS_NAME, ROOTFS_SIG_NAME, ROOTFS_HASH_NAME, UPDATE_PKG_VERSION_FILE]
 LOG = logging.getLogger(__name__)
 
 
@@ -58,6 +65,13 @@ class OT2UpdateActions(UpdateActionsInterface):
         Will also raise an exception if validation fails
         """
 
+        # make sure we have the correct file
+        filename = os.path.basename(filepath)
+        if filename not in UPDATE_PKG_BR:
+            msg = f"invalid filename {filepath} {filename}"
+            LOG.error(msg)
+            raise InvalidPKGName(msg)
+
         def zip_callback(progress):
             progress_callback(progress / 2.0)
 
@@ -68,6 +82,14 @@ class OT2UpdateActions(UpdateActionsInterface):
 
         def hash_callback(progress):
             progress_callback(progress / 2.0 + 0.5)
+
+        version_file = str(files.get("VERSION.json"))
+        version_dict = load_version_file(version_file)
+        robot_type = version_dict.get("robot_type", MODEL_OT2)
+        if robot_type != MODEL_OT2:
+            msg = f"Invalid robot_type: expected {MODEL_OT2} != packaged {robot_type}"
+            LOG.error(msg)
+            raise InvalidRobotType(msg)
 
         rootfs = files.get(ROOTFS_NAME)
         assert rootfs

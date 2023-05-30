@@ -1,10 +1,15 @@
 """Move to well command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin, WellLocationMixin
+from ..types import DeckPoint
+from .pipetting_common import (
+    PipetteIdMixin,
+    WellLocationMixin,
+    MovementMixin,
+    DestinationPositionResult,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -13,13 +18,13 @@ if TYPE_CHECKING:
 MoveToWellCommandType = Literal["moveToWell"]
 
 
-class MoveToWellParams(PipetteIdMixin, WellLocationMixin):
+class MoveToWellParams(PipetteIdMixin, WellLocationMixin, MovementMixin):
     """Payload required to move a pipette to a specific well."""
 
     pass
 
 
-class MoveToWellResult(BaseModel):
+class MoveToWellResult(DestinationPositionResult):
     """Result data from the execution of a MoveToWell command."""
 
     pass
@@ -33,14 +38,17 @@ class MoveToWellImplementation(AbstractCommandImpl[MoveToWellParams, MoveToWellR
 
     async def execute(self, params: MoveToWellParams) -> MoveToWellResult:
         """Move the requested pipette to the requested well."""
-        await self._movement.move_to_well(
+        x, y, z = await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+            force_direct=params.forceDirect,
+            minimum_z_height=params.minimumZHeight,
+            speed=params.speed,
         )
 
-        return MoveToWellResult()
+        return MoveToWellResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class MoveToWell(BaseCommand[MoveToWellParams, MoveToWellResult]):

@@ -18,7 +18,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.state import LabwareView
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.protocol_api.labware_offset_provider import (
+from opentrons.protocol_api.core.legacy.labware_offset_provider import (
     LabwareOffsetProvider,
     ProvidedLabwareOffset,
 )

@@ -7,20 +7,21 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useIsOT3 } from '../../hooks'
-import { DisplayRobotName } from '../AdvancedTab/DisplayRobotName'
-import { DisableHoming } from '../AdvancedTab/DisableHoming'
-import { FactoryReset } from '../AdvancedTab/FactoryReset'
-import { LegacySettings } from '../AdvancedTab/LegacySettings'
-import { OpenJupyterControl } from '../AdvancedTab/OpenJupyterControl'
-import { RobotInformation } from '../AdvancedTab/RobotInformation'
-import { RobotServerVersion } from '../AdvancedTab/RobotServerVersion'
-import { ShortTrashBin } from '../AdvancedTab/ShortTrashBin'
-import { Troubleshooting } from '../AdvancedTab/Troubleshooting'
-import { UpdateRobotSoftware } from '../AdvancedTab/UpdateRobotSoftware'
-import { UsageSettings } from '../AdvancedTab/UsageSettings'
-import { UseOlderAspirateBehavior } from '../AdvancedTab/UseOlderAspirateBehavior'
-import { UseOlderProtocol } from '../AdvancedTab/UseOlderProtocol'
-
+import {
+  DisableHoming,
+  DisplayRobotName,
+  FactoryReset,
+  LegacySettings,
+  OpenJupyterControl,
+  RobotInformation,
+  RobotServerVersion,
+  ShortTrashBin,
+  Troubleshooting,
+  UpdateRobotSoftware,
+  UsageSettings,
+  UseOlderAspirateBehavior,
+  UseOlderProtocol,
+} from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
 import { ShellUpdateState } from '../../../../redux/shell/types'

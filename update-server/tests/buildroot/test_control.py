@@ -27,6 +27,7 @@ async def test_health(
         "systemVersion": version_dict["buildroot_version"],
         "bootId": "dummy-boot-id-abc123",
         "capabilities": {
+            "systemUpdate": "/server/update/begin",
             "buildrootUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },

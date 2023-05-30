@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
+import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
@@ -80,10 +81,32 @@ describe('RobotConfigurationDetails', () => {
   afterEach(() => {
     resetAllWhenMocks()
   })
-  it('renders a robot section showing the intended robot model for a protocol', () => {
+  it('renders a robot section showing the intended robot model for an OT-2 protocol', () => {
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
+    }
     const { getByText } = render(props)
     getByText('robot')
     getByText('OT-2')
+  })
+
+  it('renders a robot section showing the intended robot model for an OT-3 protocol', () => {
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT3_STANDARD_MODEL,
+    }
+    const { getByText } = render(props)
+    getByText('robot')
+    getByText('Opentrons Flex')
   })
 
   it('renders left mount pipette when there is a pipette only in the left mount', () => {
@@ -91,7 +114,9 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -105,7 +130,9 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -127,8 +154,10 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
+      extensionInstrumentName: null,
       requiredModuleDetails: mockRequiredModuleDetails,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
 
     const { getByText } = render(props)
@@ -141,7 +170,9 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: true,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getAllByText, getByText } = render(props)
     getByText('right mount')

@@ -12,6 +12,7 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
 
+from ..resources import pipette_data_provider
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
 from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
@@ -159,6 +160,26 @@ class ResetTipsAction:
     labware_id: str
 
 
+@dataclass(frozen=True)
+class SetPipetteMovementSpeedAction:
+    """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+    None will use the hardware API's default.
+    """
+
+    pipette_id: str
+    speed: Optional[float]
+
+
+@dataclass(frozen=True)
+class AddPipetteConfigAction:
+    """Adds a pipette's static config to the state store."""
+
+    pipette_id: str
+    serial_number: str
+    config: pipette_data_provider.LoadedStaticPipetteData
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -174,4 +195,6 @@ Action = Union[
     AddModuleAction,
     AddLiquidAction,
     ResetTipsAction,
+    SetPipetteMovementSpeedAction,
+    AddPipetteConfigAction,
 ]

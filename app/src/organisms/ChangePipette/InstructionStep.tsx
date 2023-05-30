@@ -29,24 +29,30 @@ export function InstructionStep(props: Props): JSX.Element {
 
   const display =
     displayCategory === 'GEN2'
-      ? require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-      : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
+      ? require(`../../assets/images/change-pip/${direction}-${String(
+          mount
+        )}-${channelsKey}-GEN2-${diagram}@3x.png`)
+      : require(`../../assets/images/change-pip/${direction}-${String(
+          mount
+        )}-${channelsKey}-${diagram}@3x.png`)
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_EVENLY}>
-      <Box marginRight={SPACING.spacingXXL} width="18.6875rem">
+      <Box marginRight={SPACING.spacing40} width="18.6875rem">
         {children}
       </Box>
       <Box
-        marginTop={diagram === 'tab' ? '4.1875rem' : '0.75rem'}
-        marginLeft={diagram === 'tab' ? '1.5625rem' : SPACING.spacingXXL}
-        marginRight={SPACING.spacing6}
+        marginTop={diagram === 'tab' ? '4.1875rem' : SPACING.spacing12}
+        marginLeft={diagram === 'tab' ? '1.5625rem' : SPACING.spacing40}
+        marginRight={SPACING.spacing32}
       >
         <img
           src={display}
           height={diagram === 'tab' ? '100%' : '245px'}
           width={diagram === 'tab' ? '240px' : '200px'}
-          alt={`${direction}-${mount}-${channelsKey}-${displayCategory}-${diagram}`}
+          alt={`${direction}-${String(mount)}-${channelsKey}-${String(
+            displayCategory
+          )}-${diagram}`}
         />
       </Box>
     </Flex>

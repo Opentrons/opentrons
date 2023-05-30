@@ -5,12 +5,13 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 import type { CalibrationPanelProps } from './types'
@@ -53,20 +54,20 @@ export function TipConfirmation(props: CalibrationPanelProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
-      minHeight="32rem"
+      padding={SPACING.spacing32}
+      minHeight="25rem"
     >
-      <StyledText as="h1" marginBottom={SPACING.spacing4}>
+      <StyledText as="h1" marginBottom={SPACING.spacing16}>
         {t('did_pipette_pick_up_tip')}
       </StyledText>
 
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
       >
         <NeedHelpLink />
-        <Flex gridGap={SPACING.spacing3}>
+        <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton
             onClick={invalidateTip}
             css={CAPITALIZE_FIRST_LETTER_STYLE}

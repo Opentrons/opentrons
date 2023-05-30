@@ -31,13 +31,11 @@ def enable_ot3_hardware_controller() -> bool:
     return advs.get_setting_with_env_overload("enableOT3HardwareController")
 
 
-def enable_protocol_engine_papi_core() -> bool:
-    """Whether to use the ProtocolEngine core to execute Protocol API v2 protocols."""
+def rear_panel_integration() -> bool:
+    """Whether to enable usb connected rear_panel for the OT-3."""
 
-    return advs.get_setting_with_env_overload("enableProtocolEnginePAPICore")
+    return advs.get_setting_with_env_overload("rearPanelIntegration")
 
 
-def enable_load_liquid() -> bool:
-    """Whether to enable loadLiquid command."""
-
-    return advs.get_setting_with_env_overload("enableLoadLiquid")
+def stall_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableStallDetection")

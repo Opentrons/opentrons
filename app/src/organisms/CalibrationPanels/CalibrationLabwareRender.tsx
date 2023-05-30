@@ -33,7 +33,11 @@ export function CalibrationLabwareRender(
 
   // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
   return isTiprack ? (
-    <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}>
+    <g
+      transform={`translate(${String(slotDef.position[0])}, ${String(
+        slotDef.position[1]
+      )})`}
+    >
       <LabwareRender definition={labwareDef} />
       <RobotCoordsForeignDiv
         width={labwareDef.dimensions.xDimension}
@@ -61,7 +65,9 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_right': {
       return (
         <g
-          transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}
+          transform={`translate(${String(slotDef.position[0])}, ${String(
+            slotDef.position[1]
+          )})`}
         >
           <rect
             width={labwareDef.dimensions.xDimension}
@@ -109,7 +115,9 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_left': {
       return (
         <g
-          transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}
+          transform={`translate(${String(slotDef.position[0])}, ${String(
+            slotDef.position[1]
+          )})`}
         >
           <rect
             width={labwareDef.dimensions.xDimension}

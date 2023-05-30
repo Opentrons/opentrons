@@ -161,7 +161,8 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.7
-- Node.js v14
+- Node.js v16
+- [Yarn 1][yarn]
 
 See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 
@@ -422,8 +423,7 @@ An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, an
 [commit-message-how-to]: https://chris.beams.io/posts/git-commit/
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
-[yarn]: https://yarnpkg.com/
-[yarn-install]: https://yarnpkg.com/en/docs/install
+[yarn]: https://classic.yarnpkg.com/
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
 [lerna]: https://github.com/lerna/lerna

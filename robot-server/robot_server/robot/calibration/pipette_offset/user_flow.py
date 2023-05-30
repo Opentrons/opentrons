@@ -21,9 +21,11 @@ from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
 )
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
-from opentrons.hardware_control.instruments.ot2 import instrument_calibration
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
@@ -89,7 +91,7 @@ class PipetteOffsetCalibrationUserFlow:
             )
         self._hw_pipette = pip
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
 
         self._saved_offset_this_session = False
 
@@ -140,9 +142,7 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
 
-        self._hw_pipette.update_pipette_offset(
-            instrument_calibration.load_pipette_offset(pip_id=None, mount=self._mount)
-        )
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._default_tipracks = util.get_default_tipracks(
             self.hw_pipette.config.default_tipracks
         )
@@ -307,7 +307,7 @@ class PipetteOffsetCalibrationUserFlow:
         try:
             return load_tip_length_calibration(
                 self._hw_pipette.pipette_id,
-                self._tip_rack._implementation.get_definition(),
+                self._tip_rack._core.get_definition(),
             ).tipLength
         except TipLengthCalNotFound:
             return None
@@ -441,7 +441,7 @@ class PipetteOffsetCalibrationUserFlow:
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )
             tiprack_hash = helpers.hash_labware_def(
-                self._tip_rack._implementation.get_definition()
+                self._tip_rack._core.get_definition()
             )
             offset = self._cal_ref_point - cur_pt
             save_pipette_calibration(
@@ -515,7 +515,7 @@ class PipetteOffsetCalibrationUserFlow:
             await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()
 

@@ -6,6 +6,7 @@ import {
   SPACING,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 interface StepMeterProps {
@@ -15,7 +16,7 @@ interface StepMeterProps {
 
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const { totalSteps, currentStep } = props
-  const progress = currentStep || 0
+  const progress = currentStep != null ? currentStep : 0
   const percentComplete = `${
     //    this logic puts a cap at 100% percentComplete which we should never run into
     currentStep != null && currentStep > totalSteps
@@ -25,8 +26,11 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
 
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
-    height: ${SPACING.spacing2};
+    height: ${SPACING.spacing4};
     background-color: ${COLORS.medGreyEnabled};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      height: ${SPACING.spacing12};
+    }
   `
   const StepMeterBar = css`
     position: ${POSITION_ABSOLUTE};

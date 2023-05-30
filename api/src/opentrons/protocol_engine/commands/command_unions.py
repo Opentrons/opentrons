@@ -25,6 +25,22 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
@@ -55,6 +71,14 @@ from .drop_tip import (
     DropTipCreate,
     DropTipResult,
     DropTipCommandType,
+)
+
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
 )
 
 from .home import (
@@ -177,13 +201,25 @@ from .blow_out import (
     BlowOutResult,
 )
 
+from .blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlace,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceCommandType,
+    BlowOutInPlaceResult,
+)
+
 Command = Union[
     Aspirate,
+    AspirateInPlace,
+    Comment,
     Custom,
     Dispense,
     DispenseInPlace,
     BlowOut,
+    BlowOutInPlace,
     DropTip,
+    DropTipInPlace,
     Home,
     LoadLabware,
     LoadLiquid,
@@ -220,17 +256,23 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
+    calibration.CalibrateGripper,
     calibration.CalibratePipette,
-    calibration.MoveToLocation,
+    calibration.CalibrateModule,
+    calibration.MoveToMaintenancePosition,
 ]
 
 CommandParams = Union[
     AspirateParams,
+    AspirateInPlaceParams,
+    CommentParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
     BlowOutParams,
+    BlowOutInPlaceParams,
     DropTipParams,
+    DropTipInPlaceParams,
     HomeParams,
     LoadLabwareParams,
     LoadLiquidParams,
@@ -268,17 +310,23 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
+    calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
-    calibration.MoveToLocationParams,
+    calibration.CalibrateModuleParams,
+    calibration.MoveToMaintenancePositionParams,
 ]
 
 CommandType = Union[
     AspirateCommandType,
+    AspirateInPlaceCommandType,
+    CommentCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
     BlowOutCommandType,
+    BlowOutInPlaceCommandType,
     DropTipCommandType,
+    DropTipInPlaceCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
     LoadLiquidCommandType,
@@ -315,17 +363,23 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
-    calibration.MoveToLocationCommandType,
+    calibration.CalibrateModuleCommandType,
+    calibration.MoveToMaintenancePositionCommandType,
 ]
 
 CommandCreate = Union[
     AspirateCreate,
+    AspirateInPlaceCreate,
+    CommentCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
     BlowOutCreate,
+    BlowOutInPlaceCreate,
     DropTipCreate,
+    DropTipInPlaceCreate,
     HomeCreate,
     LoadLabwareCreate,
     LoadLiquidCreate,
@@ -362,17 +416,23 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
+    calibration.CalibrateGripperCreate,
     calibration.CalibratePipetteCreate,
-    calibration.MoveToLocationCreate,
+    calibration.CalibrateModuleCreate,
+    calibration.MoveToMaintenancePositionCreate,
 ]
 
 CommandResult = Union[
     AspirateResult,
+    AspirateInPlaceResult,
+    CommentResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
     BlowOutResult,
+    BlowOutInPlaceResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
     LoadLabwareResult,
     LoadLiquidResult,
@@ -409,6 +469,8 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
-    calibration.MoveToLocationResult,
+    calibration.CalibrateModuleResult,
+    calibration.MoveToMaintenancePositionResult,
 ]

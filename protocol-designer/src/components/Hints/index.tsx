@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
+import {
+  AlertModal,
+  DeprecatedCheckboxField,
+  OutlineButton,
+} from '@opentrons/components'
 import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import { TerminalItemId } from '../../steplist'
@@ -169,7 +173,7 @@ class HintsComponent extends React.Component<Props, State> {
             {this.renderHintContents(hintKey)}
           </div>
           <div>
-            <CheckboxField
+            <DeprecatedCheckboxField
               className={styles.dont_show_again}
               label={i18n.t('alert.hint.dont_show_again')}
               onChange={this.toggleRememberDismissal}

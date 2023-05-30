@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useTrackEvent } from '../../redux/analytics'
+
 import {
   Flex,
   COLORS,
@@ -12,10 +12,15 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
+import { Portal } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { Portal } from '../../App/portal'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_DELETE_PROTOCOL_FROM_APP,
+} from '../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
   analyzeProtocol,
@@ -23,19 +28,27 @@ import {
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
+import { getIsOT3Protocol } from './utils'
 
 import type { StyleProps } from '@opentrons/components'
+import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { Dispatch } from '../../redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
-  protocolKey: string
-  handleRunProtocol: () => void
+  handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  storedProtocolData: StoredProtocolData
 }
 
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
-  const { protocolKey, handleRunProtocol } = props
+  const {
+    storedProtocolData,
+    handleRunProtocol,
+    handleSendProtocolToOT3,
+  } = props
+  const { protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -51,9 +64,11 @@ export function ProtocolOverflowMenu(
     cancel: cancelDeleteProtocol,
   } = useConditionalConfirm(() => {
     dispatch(removeProtocol(protocolKey))
-    trackEvent({ name: 'deleteProtocolFromApp', properties: {} })
+    trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
   const sendAllProtocolsToOT3 = useSelector(getSendAllProtocolsToOT3)
+
+  const isOT3Protocol = getIsOT3Protocol(storedProtocolData?.mostRecentAnalysis)
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -64,13 +79,17 @@ export function ProtocolOverflowMenu(
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    handleRunProtocol()
+    trackEvent({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { sourceLocation: 'ProtocolsLanding' },
+    })
+    handleRunProtocol(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickSendToOT3: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('TODO(bh, 2022-10-12): implement send to ot-3')
+    handleSendProtocolToOT3(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -112,7 +131,7 @@ export function ProtocolOverflowMenu(
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
-            {t('run_now')}
+            {t('start_setup')}
           </MenuItem>
           <MenuItem
             onClick={handleClickReanalyze}
@@ -120,10 +139,11 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-          {sendAllProtocolsToOT3 ? (
+
+          {sendAllProtocolsToOT3 || isOT3Protocol ? (
             <MenuItem
               onClick={handleClickSendToOT3}
-              data-testid="ProtocolOverflowMenu_reanalyze"
+              data-testid="ProtocolOverflowMenu_sendToOT3"
             >
               {t('send_to_ot3')}
             </MenuItem>

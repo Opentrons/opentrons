@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { useProtocolDetailsForRun } from '../../hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 
@@ -11,9 +11,10 @@ import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
 jest.mock('../../hooks')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 
 describe('useHeaterShakerModuleIdsFromRun', () => {
@@ -28,41 +29,39 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
   })
 
   it('should return a heater shaker module id from protocol analysis load command result', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: {
-        pipettes: {},
-        labware: {},
-        modules: {
-          heatershaker_id: {
-            model: HEATERSHAKER_MODULE_V1,
-          },
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      pipettes: {},
+      labware: {},
+      modules: {
+        heatershaker_id: {
+          model: HEATERSHAKER_MODULE_V1,
         },
-        labwareDefinitions: {},
-        commands: [
-          {
-            id: 'mock_command_1',
-            createdAt: '2022-07-27T22:26:33.846399+00:00',
-            commandType: 'loadModule',
-            key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
-            status: 'succeeded',
-            params: {
-              model: HEATERSHAKER_MODULE_V1,
-              location: {
-                slotName: '1',
-              },
-              moduleId: 'heatershaker_id',
-            },
-            result: {
-              moduleId: 'heatershaker_id',
-              definition: {},
-              model: HEATERSHAKER_MODULE_V1,
-              serialNumber: 'fake-serial-number-1',
-            },
-            startedAt: '2022-07-27T22:26:33.875106+00:00',
-            completedAt: '2022-07-27T22:26:33.878079+00:00',
-          },
-        ],
       },
+      labwareDefinitions: {},
+      commands: [
+        {
+          id: 'mock_command_1',
+          createdAt: '2022-07-27T22:26:33.846399+00:00',
+          commandType: 'loadModule',
+          key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
+          status: 'succeeded',
+          params: {
+            model: HEATERSHAKER_MODULE_V1,
+            location: {
+              slotName: '1',
+            },
+            moduleId: 'heatershaker_id',
+          },
+          result: {
+            moduleId: 'heatershaker_id',
+            definition: {},
+            model: HEATERSHAKER_MODULE_V1,
+            serialNumber: 'fake-serial-number-1',
+          },
+          startedAt: '2022-07-27T22:26:33.875106+00:00',
+          completedAt: '2022-07-27T22:26:33.878079+00:00',
+        },
+      ],
     } as any)
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
@@ -77,63 +76,61 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
   })
 
   it('should return two heater shaker module ids if two modules are loaded in the protocol', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: {
-        pipettes: {},
-        labware: {},
-        modules: {
-          heatershaker_id: {
-            model: HEATERSHAKER_MODULE_V1,
-          },
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      pipettes: {},
+      labware: {},
+      modules: {
+        heatershaker_id: {
+          model: HEATERSHAKER_MODULE_V1,
         },
-        labwareDefinitions: {},
-        commands: [
-          {
-            id: 'mock_command_1',
-            createdAt: '2022-07-27T22:26:33.846399+00:00',
-            commandType: 'loadModule',
-            key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
-            status: 'succeeded',
-            params: {
-              model: HEATERSHAKER_MODULE_V1,
-              location: {
-                slotName: '1',
-              },
-              moduleId: 'heatershaker_id_1',
-            },
-            result: {
-              moduleId: 'heatershaker_id_1',
-              definition: {},
-              model: HEATERSHAKER_MODULE_V1,
-              serialNumber: 'fake-serial-number-1',
-            },
-            startedAt: '2022-07-27T22:26:33.875106+00:00',
-            completedAt: '2022-07-27T22:26:33.878079+00:00',
-          },
-          {
-            id: 'mock_command_2',
-            createdAt: '2022-07-27T22:26:33.846399+00:00',
-            commandType: 'loadModule',
-            key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
-            status: 'succeeded',
-            params: {
-              model: HEATERSHAKER_MODULE_V1,
-              location: {
-                slotName: '1',
-              },
-              moduleId: 'heatershaker_id_2',
-            },
-            result: {
-              moduleId: 'heatershaker_id_2',
-              definition: {},
-              model: 'heaterShakerModuleV1_2',
-              serialNumber: 'fake-serial-number-2',
-            },
-            startedAt: '2022-07-27T22:26:33.875106+00:00',
-            completedAt: '2022-07-27T22:26:33.878079+00:00',
-          },
-        ],
       },
+      labwareDefinitions: {},
+      commands: [
+        {
+          id: 'mock_command_1',
+          createdAt: '2022-07-27T22:26:33.846399+00:00',
+          commandType: 'loadModule',
+          key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
+          status: 'succeeded',
+          params: {
+            model: HEATERSHAKER_MODULE_V1,
+            location: {
+              slotName: '1',
+            },
+            moduleId: 'heatershaker_id_1',
+          },
+          result: {
+            moduleId: 'heatershaker_id_1',
+            definition: {},
+            model: HEATERSHAKER_MODULE_V1,
+            serialNumber: 'fake-serial-number-1',
+          },
+          startedAt: '2022-07-27T22:26:33.875106+00:00',
+          completedAt: '2022-07-27T22:26:33.878079+00:00',
+        },
+        {
+          id: 'mock_command_2',
+          createdAt: '2022-07-27T22:26:33.846399+00:00',
+          commandType: 'loadModule',
+          key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
+          status: 'succeeded',
+          params: {
+            model: HEATERSHAKER_MODULE_V1,
+            location: {
+              slotName: '1',
+            },
+            moduleId: 'heatershaker_id_2',
+          },
+          result: {
+            moduleId: 'heatershaker_id_2',
+            definition: {},
+            model: 'heaterShakerModuleV1_2',
+            serialNumber: 'fake-serial-number-2',
+          },
+          startedAt: '2022-07-27T22:26:33.875106+00:00',
+          completedAt: '2022-07-27T22:26:33.878079+00:00',
+        },
+      ],
     } as any)
 
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (

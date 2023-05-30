@@ -6,19 +6,29 @@ from fastapi import Depends, status
 from typing import Callable, Union
 from typing_extensions import Literal
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import IS_ROBOT, ARCHITECTURE, SystemArchitecture
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
+from opentrons.protocol_engine import DeckType
 
 from notify_server.clients import publisher
 from notify_server.settings import Settings as NotifyServerSettings
 from notify_server.models import event, topics
 from notify_server.models.hardware_event import DoorStatePayload
 
-from .app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from .errors import ErrorDetails
 from .settings import get_settings
 
@@ -33,7 +43,7 @@ _event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
 
 
 class HardwareNotYetInitialized(ErrorDetails):
-    """An error when accessing the HardwareAPI before it's initialized."""
+    """An error when accessing the hardware API before it's initialized."""
 
     id: Literal["HardwareNotYetInitialized"] = "HardwareNotYetInitialized"
     title: str = "Hardware Not Yet Initialized"
@@ -41,14 +51,17 @@ class HardwareNotYetInitialized(ErrorDetails):
 
 
 class HardwareFailedToInitialize(ErrorDetails):
-    """An error if the HardwareAPI fails to initialize."""
+    """An error if the hardware API fails to initialize."""
 
     id: Literal["HardwareFailedToInitialize"] = "HardwareFailedToInitialize"
     title: str = "Hardware Failed to Initialize"
 
 
-def initialize_hardware(app_state: AppState) -> None:
-    """Initialize the HardwareAPI singleton, attaching it to global state."""
+def start_initializing_hardware(app_state: AppState) -> None:
+    """Initialize the hardware API singleton, attaching it to global state.
+
+    Returns immediately while the hardware API initializes in the background.
+    """
     initialize_task = _init_task_accessor.get_from(app_state)
 
     if initialize_task is None:
@@ -56,7 +69,7 @@ def initialize_hardware(app_state: AppState) -> None:
         _init_task_accessor.set_on(app_state, initialize_task)
 
 
-async def cleanup_hardware(app_state: AppState) -> None:
+async def clean_up_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
     initialize_task = _init_task_accessor.get_from(app_state)
     thread_manager = _hw_api_accessor.get_from(app_state)
@@ -68,6 +81,7 @@ async def cleanup_hardware(app_state: AppState) -> None:
 
     if initialize_task is not None:
         initialize_task.cancel()
+        # Ignore exceptions, since they've already been logged.
         await asyncio.gather(initialize_task, return_exceptions=True)
 
     if unsubscribe_from_events is not None:
@@ -77,6 +91,8 @@ async def cleanup_hardware(app_state: AppState) -> None:
         thread_manager.clean_up()
 
 
+# TODO(mm, 2022-10-18): Deduplicate this background initialization infrastructure
+# with similar code used for initializing the persistence layer.
 async def get_thread_manager(
     app_state: AppState = Depends(get_app_state),
 ) -> ThreadManagedHardware:
@@ -131,6 +147,16 @@ async def get_hardware(
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
     return thread_manager.wrapped()
+
+
+async def get_robot_type() -> RobotType:
+    """Return what kind of robot this server is running on."""
+    return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
+
+
+async def get_deck_type() -> DeckType:
+    """Return what kind of deck the robot that this server is running on has."""
+    return DeckType(guess_deck_type_from_global_config())
 
 
 async def _initialize_hardware_api(app_state: AppState) -> None:
@@ -189,6 +215,10 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
         log.info("Opentrons hardware API initialized")
 
     except Exception:
+        # If something went wrong, log it here, in case the robot is powered off
+        # ungracefully before our cleanup code has a chance to run and receive
+        # the exception.
+        #
         # todo(mm, 2021-10-22): Logging this exception should be the responsibility
         # of calling code, but currently, nothing catches exceptions raised from
         # this background initialization task. Once that's fixed, this log.error()

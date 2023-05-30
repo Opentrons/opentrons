@@ -7,9 +7,6 @@ from numpy import float64
 from typing import Callable
 from logging.config import dictConfig
 
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    EnableMotorRequest,
-)
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -68,7 +65,6 @@ async def run(args: argparse.Namespace) -> None:
 
     messenger = CanMessenger(driver=driver)
     messenger.start()
-    await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     pick_up_tip_runner = MoveGroupRunner(
         move_groups=[
@@ -78,7 +74,7 @@ async def run(args: argparse.Namespace) -> None:
                         velocity_mm_sec=float64(5.5),
                         duration_sec=float64(2.5),
                         stop_condition=MoveStopCondition.none,
-                        action=PipetteTipActionType.pick_up,
+                        action=PipetteTipActionType.clamp,
                     )
                 }
             ]
@@ -92,7 +88,7 @@ async def run(args: argparse.Namespace) -> None:
                         velocity_mm_sec=float64(-5.5),
                         duration_sec=float64(6),
                         stop_condition=MoveStopCondition.limit_switch,
-                        action=PipetteTipActionType.drop,
+                        action=PipetteTipActionType.home,
                     )
                 }
             ]
@@ -190,7 +186,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "HT_tip_handling.log",
+            "filename": "/var/log/HT_tip_handling.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

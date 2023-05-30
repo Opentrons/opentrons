@@ -19,9 +19,10 @@ describe('ExitModal', () => {
       goBack: jest.fn(),
       proceed: jest.fn(),
       flowType: FLOWS.CALIBRATE,
+      isOnDevice: false,
     }
   })
-  it('returns the correct information for exit modal for calibration flow ', () => {
+  it('returns the correct information for exit modal for calibration flow', () => {
     const { getByText, getByRole } = render(props)
     getByText('Pipette Calibration progress will be lost')
     getByText(
@@ -35,7 +36,7 @@ describe('ExitModal', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('returns the correct information for exit modal for attach flow ', () => {
+  it('returns the correct information for exit modal for attach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -53,7 +54,7 @@ describe('ExitModal', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('returns the correct information for exit modal for detach flow ', () => {
+  it('returns the correct information for exit modal for detach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -68,6 +69,21 @@ describe('ExitModal', () => {
     fireEvent.click(back)
     expect(props.goBack).toHaveBeenCalled()
     fireEvent.click(exit)
+    expect(props.proceed).toHaveBeenCalled()
+  })
+  it('renders the correct buttons for on device display', () => {
+    props = {
+      ...props,
+      isOnDevice: true,
+    }
+    const { getByText, getByLabelText } = render(props)
+    getByText('Pipette Calibration progress will be lost')
+    getByText(
+      'Are you sure you want to exit before completing Pipette Calibration?'
+    )
+    getByLabelText('SmallButton_primary').click()
+    expect(props.goBack).toHaveBeenCalled()
+    getByLabelText('SmallButton_alert').click()
     expect(props.proceed).toHaveBeenCalled()
   })
 })

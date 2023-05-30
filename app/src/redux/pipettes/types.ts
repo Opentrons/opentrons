@@ -1,6 +1,7 @@
 import type {
   LabwareDefinition2,
   PipetteChannels,
+  PipetteModel,
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
 import type { RobotApiRequestMeta } from '../robot-api/types'
@@ -42,7 +43,7 @@ export interface ProtocolPipette extends StatePipette {
 export interface AttachedPipette {
   id: string
   name: string
-  model: string
+  model: PipetteModel
   tip_length: number
   mount_axis: string
   plunger_axis: string
@@ -118,7 +119,7 @@ export type FetchPipettesResponsePipette =
   | {
       id: string
       name: string
-      model: string
+      model: PipetteModel
       tip_length: number
       mount_axis: string
       plunger_axis: string

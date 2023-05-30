@@ -12,6 +12,7 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
   ALIGN_START,
+  PrimaryButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
 } from '@opentrons/components'
@@ -19,7 +20,6 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
-import { PrimaryButton } from '../../atoms/buttons'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -51,15 +51,15 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   return (
     <Banner
       type="error"
-      marginBottom={SPACING.spacing4}
-      paddingRight={SPACING.spacing4}
-      marginRight={SPACING.spacing5}
+      marginBottom={SPACING.spacing16}
+      paddingRight={SPACING.spacing16}
+      marginRight={SPACING.spacing24}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {t('module_error')}
 
         <Flex flexDirection={DIRECTION_ROW}>
-          <StyledText as="p" marginRight={SPACING.spacing2}>
+          <StyledText as="p" marginRight={SPACING.spacing4}>
             {t('view')}
           </StyledText>
           <Btn
@@ -90,7 +90,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
               {errorDetails != null ? (
                 <StyledText as="p">{errorDetails}</StyledText>
               ) : null}
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <StyledText as="p" marginBottom={SPACING.spacing16}>
                 {t('module_error_contact_support')}
               </StyledText>
             </Flex>
@@ -98,7 +98,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
               <PrimaryButton
                 onClick={() => setShowErrorDetails(false)}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>

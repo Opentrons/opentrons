@@ -16,7 +16,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
-  TC_MODULE_LOCATION,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -24,15 +23,19 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { useFeatureFlag } from '../../redux/config'
+import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
+import { getSlotsForThermocycler } from './utils'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName } from '@opentrons/shared-data'
+import type { PipetteName, RobotType } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
+  extensionInstrumentName: string | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
   isLoading: boolean
+  robotType: RobotType | null
 }
 
 export const RobotConfigurationDetails = (
@@ -41,8 +44,10 @@ export const RobotConfigurationDetails = (
   const {
     leftMountPipetteName,
     rightMountPipetteName,
+    extensionInstrumentName,
     requiredModuleDetails,
     isLoading,
+    robotType,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const enableExtendedHardware = useFeatureFlag('enableExtendedHardware')
@@ -93,31 +98,33 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
-  // TODO(bh, 2022-10-18): insert gripper display name
-  // const extensionMountDisplayName = 'Gripper GEN1'
-  const extensionMountDisplayName = null
   const extensionMountItem =
-    extensionMountDisplayName != null ? (
-      <InstrumentContainer displayName={extensionMountDisplayName} />
+    extensionInstrumentName != null ? (
+      <InstrumentContainer displayName={extensionInstrumentName} />
     ) : (
       emptyText
     )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing5}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
-        // TODO(bh, 2022-10-18): read intended robot from protocol
-        item={isLoading ? loadingText : <StyledText as="p">OT-2</StyledText>}
+        item={
+          isLoading ? (
+            loadingText
+          ) : (
+            <StyledText as="p">{getRobotTypeDisplayName(robotType)}</StyledText>
+          )
+        }
       />
-      <Divider marginY="0.75rem" width="100%" />
+      <Divider marginY={SPACING.spacing12} width="100%" />
       {leftAndRightMountsItem ?? (
         <>
           <RobotConfigurationDetailsItem
             label={t('left_mount')}
             item={isLoading ? loadingText : leftMountItem}
           />
-          <Divider marginY="0.75rem" width="100%" />
+          <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
             item={isLoading ? loadingText : rightMountItem}
@@ -126,7 +133,7 @@ export const RobotConfigurationDetails = (
       )}
       {enableExtendedHardware ? (
         <>
-          <Divider marginY="0.75rem" width="100%" />
+          <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('shared:extension_mount')}
             item={isLoading ? loadingText : extensionMountItem}
@@ -137,13 +144,13 @@ export const RobotConfigurationDetails = (
         ? requiredModuleDetails.map((module, index) => {
             return (
               <React.Fragment key={index}>
-                <Divider marginY="0.75rem" width="100%" />
+                <Divider marginY={SPACING.spacing12} width="100%" />
                 <RobotConfigurationDetailsItem
                   label={t('run_details:module_slot_number', {
                     slot_number:
                       getModuleType(module.params.model) ===
                       THERMOCYCLER_MODULE_TYPE
-                        ? TC_MODULE_LOCATION
+                        ? getSlotsForThermocycler(robotType)
                         : module.params.location.slotName,
                   })}
                   item={
@@ -151,7 +158,7 @@ export const RobotConfigurationDetails = (
                       <ModuleIcon
                         key={index}
                         moduleType={getModuleType(module.params.model)}
-                        marginRight={SPACING.spacing2}
+                        marginRight={SPACING.spacing4}
                         alignSelf={ALIGN_CENTER}
                         color={COLORS.darkGreyEnabled}
                         height={SIZE_1}
@@ -191,7 +198,7 @@ export const RobotConfigurationDetailsItem = (
         as="label"
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginRight={SPACING.spacing4}
+        marginRight={SPACING.spacing16}
         color={COLORS.darkGreyEnabled}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"

@@ -1,6 +1,7 @@
 # Uncomment to enable logging during tests
 from __future__ import annotations
 import asyncio
+import contextlib
 import inspect
 import io
 import json
@@ -47,15 +48,13 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    ProtocolContext,
-    Labware,
-    create_protocol_context,
-)
-from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
-
+from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocols.api_support import deck_type
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
+
+from .protocol_engine_in_thread import protocol_engine_in_thread
 
 
 if TYPE_CHECKING:
@@ -117,14 +116,6 @@ async def enable_ot3_hardware_controller(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
-@pytest.fixture
-async def enable_load_liquid() -> AsyncGenerator[None, None]:
-    """Fixture enabling load-liquid support."""
-    await config.advanced_settings.set_adv_setting("enableLoadLiquid", True)
-    yield
-    await config.advanced_settings.set_adv_setting("enableLoadLiquid", False)
-
-
 @pytest.fixture()
 def protocol_file() -> str:
     return "testosaur_v2.py"
@@ -168,6 +159,7 @@ async def machine_variant_ffs(
     )
 
 
+@contextlib.asynccontextmanager
 async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
@@ -175,7 +167,7 @@ async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        for m in hw_sim.attached_modules:
+        for m in hw_sim.wrapped().attached_modules:
             await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
@@ -185,10 +177,11 @@ async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
 async def ot2_hardware(
     virtual_smoothie_env: None,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
-    async for hw in _build_ot2_hw():
+    async with _build_ot2_hw() as hw:
         yield hw
 
 
+@contextlib.asynccontextmanager
 async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     from opentrons.hardware_control.ot3api import OT3API
 
@@ -198,7 +191,7 @@ async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
         yield hw_sim
     finally:
         config.robot_configs.clear()
-        for m in hw_sim.attached_modules:
+        for m in hw_sim.wrapped().attached_modules:
             await m.cleanup()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
@@ -212,7 +205,7 @@ async def ot3_hardware(
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
-    async for hw in _build_ot3_hw():
+    async with _build_ot3_hw() as hw:
         yield hw
 
 
@@ -238,11 +231,19 @@ async def robot_model(
 
 
 @pytest.fixture
-def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
+def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
-        return load_deck("ot3_standard", DEFAULT_DECK_DEFINITION_VERSION)
-    else:
-        return load_deck("ot2_standard", DEFAULT_DECK_DEFINITION_VERSION)
+        return deck_type.STANDARD_OT3_DECK
+    elif robot_model == "OT-2 Standard":
+        # There are two OT-2 deck definitions (standard and short-trash),
+        # but RobotModel does not draw such a distinction. We assume here that it's
+        # sufficient to run OT-2 tests with the standard deck definition only.
+        return deck_type.STANDARD_OT2_DECK
+
+
+@pytest.fixture
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+    return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
@@ -257,7 +258,7 @@ async def hardware(
         robot_model
     ]
 
-    async for hw in hw_builder():
+    async with hw_builder() as hw:
         decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
             robot_model == "OT-3 Standard"
         )
@@ -265,15 +266,48 @@ async def hardware(
         yield hw
 
 
-@pytest.fixture()
-def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
-    c = create_protocol_context(
-        api_version=MAX_SUPPORTED_VERSION, hardware_api=hardware
+def _make_ot2_non_pe_ctx(
+    hardware: ThreadManagedHardware, deck_type: str
+) -> ProtocolContext:
+    """Return a ProtocolContext configured for an OT-2 and not backed by Protocol Engine."""
+    return create_protocol_context(
+        api_version=APIVersion(2, 13), hardware_api=hardware, deck_type=deck_type
     )
-    yield c
-    # Manually clean up all the modules.
-    for m in c.loaded_modules.items():
-        m[1]._module.cleanup()
+
+
+@contextlib.contextmanager
+def _make_ot3_pe_ctx(
+    hardware: ThreadManagedHardware,
+    deck_type: str,
+) -> Generator[ProtocolContext, None, None]:
+    """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
+    with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
+        yield create_protocol_context(
+            api_version=APIVersion(2, 14),
+            hardware_api=hardware,
+            deck_type=deck_type,
+            protocol_engine=engine,
+            protocol_engine_loop=loop,
+        )
+
+
+@pytest.fixture()
+def ctx(
+    request: pytest.FixtureRequest,
+    robot_model: RobotModel,
+    hardware: ThreadManagedHardware,
+    deck_definition_name: str,
+) -> Generator[ProtocolContext, None, None]:
+    if robot_model == "OT-2 Standard":
+        yield _make_ot2_non_pe_ctx(hardware=hardware, deck_type=deck_definition_name)
+    elif robot_model == "OT-3 Standard":
+        if request.node.get_closest_marker("apiv2_non_pe_only"):
+            pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
+        else:
+            with _make_ot3_pe_ctx(
+                hardware=hardware, deck_type=deck_definition_name
+            ) as ctx:
+                yield ctx
 
 
 @pytest.fixture()
@@ -629,27 +663,37 @@ def minimal_labware_def2() -> LabwareDefinition:
 
 
 @pytest.fixture()
-def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
-    return LabwareImplementation(
+def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
+    return LegacyLabwareCore(
         definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LabwareImplementation:
-    return LabwareImplementation(
+def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LegacyLabwareCore:
+    return LegacyLabwareCore(
         definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw(min_lw_impl: LabwareImplementation) -> Labware:
-    return Labware(implementation=min_lw_impl)
+def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
+    return Labware(
+        core=min_lw_impl,
+        api_version=APIVersion(2, 13),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
+    )
 
 
 @pytest.fixture()
-def min_lw2(min_lw2_impl: LabwareImplementation) -> Labware:
-    return Labware(implementation=min_lw2_impl)
+def min_lw2(min_lw2_impl: LegacyLabwareCore) -> Labware:
+    return Labware(
+        core=min_lw2_impl,
+        api_version=APIVersion(2, 13),
+        protocol_core=None,  # type: ignore[arg-type]
+        core_map=None,  # type: ignore[arg-type]
+    )
 
 
 @pytest.fixture()

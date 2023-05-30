@@ -17,12 +17,12 @@ const id = 'Tooltip_123'
 const tooltipRef = jest.fn()
 const tooltipStyle = {
   position: POSITION_ABSOLUTE,
-  left: SPACING.spacing2,
+  left: SPACING.spacing4,
 } as const
 const arrowRef = jest.fn()
 const arrowStyle = {
   position: POSITION_ABSOLUTE,
-  left: SPACING.spacing3,
+  left: SPACING.spacing8,
 } as const
 
 const MockTooltipProps = {
@@ -56,8 +56,10 @@ describe('Tooltip', () => {
     expect(tooltip).toBeInTheDocument()
     expect(tooltip).toHaveStyle('position: absolute')
     expect(tooltip).toHaveStyle('left: 0.25rem')
-    expect(tooltip).toHaveStyle(`background: ${COLORS.darkBlackEnabled}`)
-    expect(tooltip).toHaveStyle(`color: ${COLORS.white}`)
+    expect(tooltip).toHaveStyle(
+      `background: ${String(COLORS.darkBlackEnabled)}`
+    )
+    expect(tooltip).toHaveStyle(`color: ${String(COLORS.white)}`)
     expect(tooltip).toHaveStyle('width: 8.75rem')
     expect(tooltip).toHaveStyle('font-size: 0.625rem')
     expect(tooltip).toHaveAttribute('role', 'tooltip')

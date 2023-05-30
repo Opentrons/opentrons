@@ -1,7 +1,7 @@
 """ update-server implementation for openembedded systems """
 import asyncio
 import logging
-import json
+
 from aiohttp import web
 from typing import Optional, Mapping, Any
 
@@ -14,7 +14,12 @@ from otupdate.common import (
     update,
 )
 
-from otupdate.openembedded.updater import RootFSInterface, PartitionManager, Updater
+from otupdate.openembedded.update_actions import (
+    RootFSInterface,
+    PartitionManager,
+    OT3UpdateActions,
+)
+from otupdate.common.file_actions import load_version_file
 from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 
 OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
@@ -33,16 +38,6 @@ async def log_error_middleware(request, handler):
     return resp
 
 
-def get_version_dict(version_file: Optional[str]) -> Mapping[str, str]:
-    version = {}
-    if version_file:
-        try:
-            version = json.load(open(version_file))
-        except Exception:
-            logging.exception("Could not load version, using defaults")
-    return version
-
-
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
     system_version_file: Optional[str] = None,
@@ -54,7 +49,7 @@ async def get_app(
     if not system_version_file:
         system_version_file = OE_BUILTIN_VERSION_FILE
 
-    version = get_version_dict(system_version_file)
+    version = load_version_file(system_version_file)
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
@@ -66,7 +61,7 @@ async def get_app(
 
     rfs = RootFSInterface()
     part_mgr = PartitionManager()
-    updater = Updater(rfs, part_mgr)
+    updater = OT3UpdateActions(rfs, part_mgr)
     app[FILE_ACTIONS_VARNAME] = updater
 
     name_management.install_name_synchronizer(name_synchronizer, app)
@@ -97,8 +92,8 @@ async def get_app(
         + "\n\t".join(
             [
                 f"Device name: {await name_synchronizer.get_name()}",
-                "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
+                "Openembedded version:         "
+                f'{version.get("openembedded_version", "unknown")}',
                 "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
                 "API version:               "
                 f'{version.get("opentrons_api_version", "unknown")}',
@@ -122,7 +117,7 @@ def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
         "apiServerVersion": version_dict.get("opentrons_api_version", "unknown"),
         "systemVersion": version_dict.get("openembedded_version", "unknown"),
         "capabilities": {
-            "openembeddedUpdate": "/server/update/begin",
+            "systemUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
         "robotModel": constants.MODEL_OT3,

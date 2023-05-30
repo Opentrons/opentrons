@@ -9,7 +9,7 @@ import {
   useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '.'
-
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedModule } from '../../../redux/modules/types'
 
@@ -23,10 +23,9 @@ export function useModuleRenderInfoForProtocolById(
 ): {
   [moduleId: string]: ModuleRenderInfoForProtocol
 } {
-  const {
-    protocolData: robotProtocolAnalysis,
-    robotType,
-  } = useProtocolDetailsForRun(runId)
+  const { robotType } = useProtocolDetailsForRun(runId)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()

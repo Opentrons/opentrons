@@ -11,7 +11,7 @@ import { CustomKeyboard } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/SoftwareKeyboard/CustomKeyboard',
+  title: 'Odd/Atoms/SoftwareKeyboard/CustomKeyboard',
   component: CustomKeyboard,
 } as Meta
 
@@ -20,7 +20,7 @@ const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <form id="test_form">
         <InputField
           value={value}

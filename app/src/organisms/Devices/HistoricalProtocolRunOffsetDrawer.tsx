@@ -13,11 +13,13 @@ import {
 import {
   getLabwareDefURI,
   getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { useProtocolDetailsForRun, useDeckCalibrationData } from './hooks'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useDeckCalibrationData } from './hooks'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import type { RunData } from '@opentrons/api-client'
 
@@ -52,18 +54,18 @@ export function HistoricalProtocolRunOffsetDrawer(
     deckCalibrationData != null && 'lastModified' in deckCalibrationData
       ? deckCalibrationData.lastModified
       : null
-  const protocolDetails = useProtocolDetailsForRun(run.id)
+  const protocolDetails = useMostRecentCompletedAnalysis(run.id)
 
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
         backgroundColor={COLORS.fundamentalsBackground}
         width="100%"
-        padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing7}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
       >
         <Box
           backgroundColor={COLORS.white}
-          padding={SPACING.spacing5}
+          padding={SPACING.spacing24}
           textAlign="center"
         >
           <StyledText as="label">{t('no_offsets_available')}</StyledText>
@@ -82,10 +84,10 @@ export function HistoricalProtocolRunOffsetDrawer(
     <Box
       backgroundColor={COLORS.fundamentalsBackground}
       width="100%"
-      padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing7}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
     >
       {isOutOfDate ? (
-        <Banner type="warning" marginTop={SPACING.spacing3}>
+        <Banner type="warning" marginTop={SPACING.spacing8}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('data_out_of_date')}
@@ -124,9 +126,13 @@ export function HistoricalProtocolRunOffsetDrawer(
         </StyledText>
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
-        const definition = Object.values(
-          protocolDetails.protocolData?.labwareDefinitions ?? {}
-        ).find(def => getLabwareDefURI(def) === offset.definitionUri)
+        const labwareDefinitions =
+          protocolDetails?.commands != null
+            ? getLoadedLabwareDefinitionsByUri(protocolDetails?.commands)
+            : {}
+        const definition = Object.values(labwareDefinitions).find(
+          def => getLabwareDefURI(def) === offset.definitionUri
+        )
         const labwareName =
           definition != null
             ? getLabwareDisplayName(definition)
@@ -136,14 +142,16 @@ export function HistoricalProtocolRunOffsetDrawer(
           <Flex
             key={index}
             justifyContent={JUSTIFY_FLEX_START}
-            padding={SPACING.spacing3}
+            padding={SPACING.spacing8}
             backgroundColor={COLORS.white}
-            marginY={SPACING.spacing3}
+            marginY={SPACING.spacing8}
           >
             <StyledText width="23.5%" as="label">
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null &&
-                ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
+                ` - ${String(
+                  getModuleDisplayName(offset.location.moduleModel)
+                )}`}
             </StyledText>
             <StyledText
               as="label"

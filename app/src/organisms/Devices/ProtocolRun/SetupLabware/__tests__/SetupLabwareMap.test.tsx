@@ -19,7 +19,6 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
-import { useFeatureFlag } from '../../../../../redux/config'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import {
   useLabwareRenderInfoForRunById,
@@ -28,7 +27,6 @@ import {
 } from '../../../hooks'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 
-jest.mock('../../../../../redux/config')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -45,11 +43,8 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
-jest.mock('../../../../ProtocolSetup/hooks')
 jest.mock('../../LabwareInfoOverlay')
-jest.mock(
-  '../../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-)
+jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../hooks')
 
@@ -76,9 +71,6 @@ const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jes
 >
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -133,7 +125,6 @@ const render = (props: React.ComponentProps<typeof SetupLabwareMap>) => {
 
 describe('SetupLabwareMap', () => {
   beforeEach(() => {
-    when(mockUseFeatureFlag).mockReturnValue(false)
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
@@ -223,7 +214,6 @@ describe('SetupLabwareMap', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       commands: [],
-      extraAttentionModules: [],
     })
 
     expect(mockModule).not.toHaveBeenCalled()
@@ -297,7 +287,6 @@ describe('SetupLabwareMap', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       commands: [],
-      extraAttentionModules: [],
     })
 
     getByText('mock module viz magneticModuleType')

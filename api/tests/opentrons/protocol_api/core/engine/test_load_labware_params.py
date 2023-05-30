@@ -1,0 +1,118 @@
+"""Tests for Protocol API engine parameter validation."""
+import pytest
+from typing import List, Optional
+
+from opentrons.protocol_api.core.engine import load_labware_params as subject
+from opentrons.protocol_engine.state.labware import LabwareLoadParams
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "load_name",
+        "namespace",
+        "version",
+        "custom_labware_params",
+        "expected_namespace",
+        "expected_version",
+    ],
+    argvalues=[
+        ("hello", "world", 123, [], "world", 123),
+        ("hello", "world", None, [], "world", 1),
+        ("hello", None, 123, [], OPENTRONS_NAMESPACE, 123),
+        ("hello", None, None, [], OPENTRONS_NAMESPACE, 1),
+        (
+            "hello",
+            "world",
+            None,
+            [
+                LabwareLoadParams("hello", "world", 123),
+                LabwareLoadParams("hello", "foo", 123),
+            ],
+            "world",
+            123,
+        ),
+        (
+            "hello",
+            None,
+            123,
+            [
+                LabwareLoadParams("hello", "world", 123),
+                LabwareLoadParams("hello", "world", 456),
+            ],
+            "world",
+            123,
+        ),
+        (
+            "hello",
+            None,
+            None,
+            [
+                LabwareLoadParams("hello", "world", 123),
+                LabwareLoadParams("goodbye", "world", 123),
+            ],
+            "world",
+            123,
+        ),
+    ],
+)
+def test_resolve_load_labware_params(
+    load_name: str,
+    namespace: Optional[str],
+    version: Optional[int],
+    custom_labware_params: List[LabwareLoadParams],
+    expected_namespace: str,
+    expected_version: int,
+) -> None:
+    """It should get a namespace and version based on custom labware available or defaults."""
+    result = subject.resolve(load_name, namespace, version, custom_labware_params)
+
+    assert result == (expected_namespace, expected_version)
+
+
+@pytest.mark.parametrize(
+    "load_name",
+    [
+        "opentrons_24_aluminumblock_generic_2ml_screwcap",
+        "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
+    ],
+)
+@pytest.mark.parametrize("namespace", [OPENTRONS_NAMESPACE, None])
+@pytest.mark.parametrize(
+    ("version", "expected_version"),
+    [
+        (None, 2),
+        (0, 0),
+        (1, 1),
+        (2, 2),
+        (123456, 123456),
+    ],
+)
+def test_aluminumblock_generic_screwcap_or_pcr_strip_versioning(
+    load_name: str,
+    namespace: Optional[str],
+    version: Optional[int],
+    expected_version: int,
+) -> None:
+    """It should default to version 2 for these labware."""
+    result = subject.resolve(
+        load_name=load_name,
+        namespace=namespace,
+        version=version,
+        custom_load_labware_params=[],
+    )
+    assert result == (OPENTRONS_NAMESPACE, expected_version)
+
+
+def test_resolve_load_labware_params_raises() -> None:
+    """It should raise if multiple custom labware params are provided."""
+    with pytest.raises(subject.AmbiguousLoadLabwareParamsError):
+        subject.resolve(
+            load_name="hello",
+            namespace="world",
+            version=None,
+            custom_load_labware_params=[
+                LabwareLoadParams("hello", "world", 123),
+                LabwareLoadParams("hello", "world", 456),
+            ],
+        )

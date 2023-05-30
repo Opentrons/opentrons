@@ -1,112 +1,158 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getAttachedPipettes } from '../../redux/pipettes'
+import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  RIGHT,
+  LoadedPipette,
+} from '@opentrons/shared-data'
+import {
   useHost,
-  useCreateRunMutation,
-  useStopRunMutation,
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
+
 import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
+import { getIsOnDevice } from '../../redux/config'
+import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
+import { usePipetteFlowWizardHeaderText } from './hooks'
 import { getPipetteWizardSteps } from './getPipetteWizardSteps'
+import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProtocol'
 import { FLOWS, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { AttachProbe } from './AttachProbe'
 import { DetachProbe } from './DetachProbe'
 import { Results } from './Results'
 import { ExitModal } from './ExitModal'
+import { MountPipette } from './MountPipette'
+import { DetachPipette } from './DetachPipette'
+import { Carriage } from './Carriage'
+import { MountingPlate } from './MountingPlate'
+import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { State } from '../../redux/types'
-import type { PipetteWizardFlow } from './types'
+import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
-  robotName: string
+  selectedPipette: SelectablePipettes
   closeFlow: () => void
+  onComplete?: () => void
+  pipetteInfo?: LoadedPipette[]
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, robotName } = props
+  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
+  const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-  const attachedPipette = useSelector((state: State) =>
-    getAttachedPipettes(state, robotName)
+
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
+  const isGantryEmpty =
+    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
+  const pipetteWizardSteps = React.useMemo(
+    () =>
+      memoizedPipetteInfo == null
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
+        : getPipetteWizardStepsForProtocol(
+            attachedPipettes,
+            memoizedPipetteInfo,
+            mount
+          ),
+    []
   )
-  const pipetteWizardSteps = getPipetteWizardSteps(flowType, mount)
+  const requiredPipette = memoizedPipetteInfo?.find(
+    pipette => pipette.mount === mount
+  )
   const host = useHost()
-  const [runId, setRunId] = React.useState<string>('')
+  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
+  const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
+    false
+  )
+  const hasCalData =
+    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
+  const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
+  const wizardTitle = usePipetteFlowWizardHeaderText({
+    flowType,
+    mount,
+    selectedPipette,
+    hasCalData,
+    isGantryEmpty,
+    attachedPipettes: memoizedAttachedPipettes,
+    pipetteInfo: memoizedPipetteInfo,
+  })
 
   const goBack = (): void => {
     setCurrentStepIndex(
-      currentStepIndex !== pipetteWizardSteps.length - 1
-        ? currentStepIndex - 1
-        : currentStepIndex
+      currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
-  const { chainRunCommands, isCommandMutationLoading } = useChainRunCommands(
-    runId
-  )
+  const {
+    chainRunCommands,
+    isCommandMutationLoading,
+  } = useChainMaintenanceCommands(maintenanceRunId)
 
-  const { createRun, isLoading: isCreateLoading } = useCreateRunMutation(
+  const {
+    createMaintenanceRun,
+    isLoading: isCreateLoading,
+  } = useCreateMaintenanceRunMutation(
     {
       onSuccess: response => {
-        setRunId(response.data.id)
+        setMaintenanceRunId(response.data.id)
       },
     },
     host
   )
-  const { stopRun, isLoading: isStopLoading } = useStopRunMutation({
-    onSuccess: () => {
-      if (currentStep.section === SECTIONS.DETACH_PROBE) {
-        proceed()
-      } else {
-        closeFlow()
-      }
-    },
-  })
 
-  const [isBetweenCommands, setIsBetweenCommands] = React.useState<boolean>(
-    false
+  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
+    null
   )
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-
   const proceed = (): void => {
-    if (
-      !(
-        isCommandMutationLoading ||
-        isStopLoading ||
-        isBetweenCommands ||
-        isExiting
-      )
-    ) {
+    if (!isCommandMutationLoading) {
       setCurrentStepIndex(
-        currentStepIndex !== pipetteWizardSteps.length - 1
+        currentStepIndex !== totalStepCount
           ? currentStepIndex + 1
           : currentStepIndex
       )
     }
   }
+  const handleClose = (): void => {
+    setIsExiting(false)
+    closeFlow()
+    if (onComplete != null) onComplete()
+  }
+
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
+    onSuccess: () => handleClose(),
+    onError: () => handleClose(),
+  })
+
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    chainRunCommands([
-      {
-        commandType: 'home' as const,
-        params: {},
-      },
-    ]).then(() => {
-      setIsExiting(false)
-      if (runId !== '') stopRun(runId)
-    })
+    if (maintenanceRunId == null) handleClose()
+    else {
+      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunId)
+        })
+        .catch(error => {
+          console.error(error)
+          handleClose()
+        })
+    }
   }
   const {
     confirm: confirmExit,
@@ -117,49 +163,64 @@ export const PipetteWizardFlows = (
   const [isRobotMoving, setIsRobotMoving] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    if (
-      isCommandMutationLoading ||
-      isStopLoading ||
-      isBetweenCommands ||
-      isExiting
-    ) {
-      const timer = setTimeout(() => setIsRobotMoving(true), 700)
-      return () => clearTimeout(timer)
+    if (isCommandMutationLoading || isExiting) {
+      setIsRobotMoving(true)
     } else {
       setIsRobotMoving(false)
     }
-  }, [isCommandMutationLoading, isStopLoading, isBetweenCommands, isExiting])
+  }, [isCommandMutationLoading, isExiting])
 
   const calibrateBaseProps = {
     chainRunCommands,
     isRobotMoving,
     proceed,
-    runId,
+    maintenanceRunId,
     goBack,
-    attachedPipette,
-    setIsBetweenCommands,
-    isBetweenCommands,
+    attachedPipettes,
+    setShowErrorMessage,
+    errorMessage,
+    selectedPipette,
+    isOnDevice,
   }
   const exitModal = (
-    <ExitModal goBack={cancelExit} proceed={confirmExit} flowType={flowType} />
+    <ExitModal
+      isRobotMoving={isRobotMoving}
+      goBack={cancelExit}
+      proceed={handleCleanUpAndClose}
+      flowType={flowType}
+      isOnDevice={isOnDevice}
+    />
+  )
+  const [
+    showUnskippableStepModal,
+    setIsUnskippableStep,
+  ] = React.useState<boolean>(false)
+  const unskippableModal = (
+    <UnskippableModal
+      goBack={() => setIsUnskippableStep(false)}
+      isOnDevice={isOnDevice}
+    />
   )
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-
+  if (isExiting) {
+    modalContent = <InProgressModal description={t('stand_back')} />
+  }
   if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
     modalContent = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createRun={createRun}
+        createMaintenanceRun={createMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <AttachProbe
@@ -170,51 +231,131 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
       <DetachProbe
         {...currentStep}
         {...calibrateBaseProps}
-        handleCleanUp={handleCleanUpAndClose}
+        proceed={errorMessage != null ? handleCleanUpAndClose : proceed}
       />
     )
   } else if (currentStep.section === SECTIONS.RESULTS) {
     onExit = confirmExit
-    modalContent = modalContent = showConfirmExit ? (
+    modalContent = showConfirmExit ? (
       exitModal
     ) : (
-      <Results {...currentStep} {...calibrateBaseProps} proceed={closeFlow} />
+      <Results
+        {...currentStep}
+        {...calibrateBaseProps}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
+        hasCalData={hasCalData}
+        requiredPipette={requiredPipette}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.MOUNT_PIPETTE) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <MountPipette
+        {...currentStep}
+        {...calibrateBaseProps}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
+    onExit = confirmExit
+    modalContent = (
+      <DetachPipette
+        {...currentStep}
+        {...calibrateBaseProps}
+        isFetching={isFetchingPipettes}
+        setFetching={setIsFetchingPipettes}
+      />
+    )
+    if (showConfirmExit) {
+      modalContent = exitModal
+    } else if (showUnskippableStepModal) {
+      modalContent = unskippableModal
+    }
+  } else if (currentStep.section === SECTIONS.CARRIAGE) {
+    onExit = confirmExit
+    modalContent = showUnskippableStepModal ? (
+      unskippableModal
+    ) : (
+      <Carriage {...currentStep} {...calibrateBaseProps} />
+    )
+  } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
+    onExit = confirmExit
+    modalContent = showUnskippableStepModal ? (
+      unskippableModal
+    ) : (
+      <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
+  const is96ChannelUnskippableStep =
+    currentStep.section === SECTIONS.CARRIAGE ||
+    currentStep.section === SECTIONS.MOUNTING_PLATE ||
+    (selectedPipette === NINETY_SIX_CHANNEL &&
+      currentStep.section === SECTIONS.DETACH_PIPETTE)
 
-  let wizardTitle: string = 'unknown page'
-  switch (flowType) {
-    case FLOWS.CALIBRATE: {
-      wizardTitle = t('calibrate_pipette')
-      break
-    }
-  }
+  const isCalibrationErrorExiting =
+    currentStep.section === SECTIONS.ATTACH_PROBE && errorMessage != null
+
   let exitWizardButton = onExit
-  if (isRobotMoving) {
+  if (isRobotMoving || showUnskippableStepModal || isCalibrationErrorExiting) {
     exitWizardButton = undefined
-  } else if (showConfirmExit) exitWizardButton = handleCleanUpAndClose
+  } else if (is96ChannelUnskippableStep) {
+    exitWizardButton = () => setIsUnskippableStep(true)
+  } else if (showConfirmExit || errorMessage != null) {
+    exitWizardButton = handleCleanUpAndClose
+  }
+
+  const progressBarForCalError =
+    currentStep.section === SECTIONS.DETACH_PROBE && errorMessage != null
+
+  const wizardHeader = (
+    <WizardHeader
+      exitDisabled={isRobotMoving || isFetchingPipettes}
+      title={wizardTitle}
+      currentStep={
+        progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
+      }
+      totalSteps={totalStepCount}
+      onExit={exitWizardButton}
+    />
+  )
 
   return (
     <Portal level="top">
-      <ModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={wizardTitle}
-            currentStep={currentStepIndex}
-            totalSteps={totalStepCount}
-            onExit={exitWizardButton}
-          />
-        }
-      >
-        {modalContent}
-      </ModalShell>
+      {isOnDevice ? (
+        <ModalShell>
+          {wizardHeader}
+          {modalContent}
+        </ModalShell>
+      ) : (
+        <ModalShell
+          width="47rem"
+          height={
+            //  changing modal height for now on BeforeBeginning 96 channel attach flow
+            //  until we do design qa to normalize the modal sizes
+            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+            selectedPipette === NINETY_SIX_CHANNEL &&
+            flowType === FLOWS.ATTACH
+              ? '70%'
+              : 'auto'
+          }
+          header={wizardHeader}
+        >
+          {modalContent}
+        </ModalShell>
+      )}
     </Portal>
   )
 }

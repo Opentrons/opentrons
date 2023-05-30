@@ -68,7 +68,7 @@ class BadChunkSizeException(HexFileException):
 
 def from_hex_file_path(file_path: Path) -> Iterable[HexRecord]:
     """A generator that processes a hex file at file_path."""
-    with file_path.open() as hex_file:
+    with open(file_path) as hex_file:
         return from_hex_file(hex_file)
 
 

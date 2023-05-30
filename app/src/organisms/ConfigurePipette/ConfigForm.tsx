@@ -5,7 +5,6 @@ import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 import forOwn from 'lodash/forOwn'
 import keys from 'lodash/keys'
-import pick from 'lodash/pick'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
 import { Box } from '@opentrons/components'
@@ -42,7 +41,6 @@ export interface ConfigFormProps {
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
   groupLabels: string[]
   formId: string
-  __showHiddenFields: boolean
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -83,15 +81,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   getVisibleFields: () => PipetteSettingsFieldsMap = () => {
-    if (this.props.__showHiddenFields) {
-      return omit(this.props.settings, [QUIRK_KEY])
-    }
-
-    return pick(this.props.settings, [
-      ...PLUNGER_KEYS,
-      ...POWER_KEYS,
-      ...TIP_KEYS,
-    ])
+    return omit(this.props.settings, [QUIRK_KEY])
   }
 
   getUnknownKeys: () => string[] = () => {
@@ -195,7 +185,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
     const quirkFields = this.getKnownQuirks()
     const quirksPresent = quirkFields.length > 0
-    const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
+    const unknownFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
     const initialValues = this.getInitialValues()
 
     return (
@@ -233,19 +223,13 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   />
                   <ConfigFormGroup
                     groupLabel={this.props.groupLabels[1]}
-                    formFields={tipFields}
+                    formFields={[...tipFields, ...unknownFields]}
                   />
                   {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                  {this.props.__showHiddenFields && (
-                    <ConfigFormGroup
-                      groupLabel={this.props.groupLabels[2]}
-                      formFields={devFields}
-                    />
-                  )}
                 </FormColumn>
                 <FormColumn>
                   <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[3]}
+                    groupLabel={this.props.groupLabels[2]}
                     formFields={powerFields}
                   />
                 </FormColumn>

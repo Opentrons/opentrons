@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   AlertModal,
   OutlineButton,
   SidePanel,
@@ -142,9 +142,9 @@ function getWarningContent({
 export const v6WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v6_protocol_6_10.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v6_protocol_6_10.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v6_protocol_6_10.body3`)}
+      {i18n.t(`alert.hint.export_v6_protocol_6_20.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v6_protocol_6_20.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v6_protocol_6_20.body3`)}
     </p>
   </div>
 )
@@ -202,7 +202,7 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v6_protocol_6_10',
+      hintKey: 'export_v6_protocol_6_20',
       content: v6WarningContent,
     }
   }
@@ -261,7 +261,7 @@ export function FileSidebar(props: Props): JSX.Element {
           </OutlineButton>
 
           <div className={styles.button}>
-            <PrimaryButton
+            <DeprecatedPrimaryButton
               onClick={() => {
                 if (hasWarning) {
                   resetScrollElements()
@@ -274,7 +274,7 @@ export function FileSidebar(props: Props): JSX.Element {
               disabled={!canDownload}
             >
               Export
-            </PrimaryButton>
+            </DeprecatedPrimaryButton>
           </div>
         </div>
       </SidePanel>

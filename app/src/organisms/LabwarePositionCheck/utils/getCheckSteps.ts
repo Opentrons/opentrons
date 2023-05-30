@@ -21,7 +21,6 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { LabwareOffsetLocation } from '@opentrons/api-client'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -33,33 +32,34 @@ interface LPCArgs {
 
 const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
-const PICK_UP_TIP_LOCATION: LabwareOffsetLocation = { slotName: '2' }
-
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
   if (checkTipRacksSectionSteps.length < 1) return []
-
+  const allButLastTiprackCheckSteps = checkTipRacksSectionSteps.slice(
+    0,
+    checkTipRacksSectionSteps.length - 1
+  )
   const lastTiprackCheckStep =
     checkTipRacksSectionSteps[checkTipRacksSectionSteps.length - 1]
+
   const pickUpTipSectionStep: PickUpTipStep = {
     section: SECTIONS.PICK_UP_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: PICK_UP_TIP_LOCATION,
+    location: lastTiprackCheckStep.location,
   }
-
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
   const returnTipSectionStep: ReturnTipStep = {
     section: SECTIONS.RETURN_TIP,
     labwareId: lastTiprackCheckStep.labwareId,
     pipetteId: lastTiprackCheckStep.pipetteId,
-    location: PICK_UP_TIP_LOCATION,
+    location: lastTiprackCheckStep.location,
   }
 
   return [
     { section: SECTIONS.BEFORE_BEGINNING },
-    ...checkTipRacksSectionSteps,
+    ...allButLastTiprackCheckSteps,
     pickUpTipSectionStep,
     ...checkLabwareSectionSteps,
     returnTipSectionStep,
@@ -73,7 +73,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     primaryPipetteId,
     commands,
     labware,
-    modules,
+    modules = [],
   } = args
 
   const labwareLocationCombos = getLabwareLocationCombos(

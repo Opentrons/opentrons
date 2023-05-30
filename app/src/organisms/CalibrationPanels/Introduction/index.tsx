@@ -7,10 +7,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_CENTER,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
@@ -18,6 +19,7 @@ import { ChooseTipRack } from '../ChooseTipRack'
 import { TRASH_BIN_LOAD_NAME } from '../constants'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
 import { Body } from './Body'
+import { InvalidationWarning } from './InvalidationWarning'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from '../types'
@@ -32,6 +34,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     sessionType,
     instruments,
     supportedCommands,
+    calInvalidationHandler,
   } = props
   const { t } = useTranslation('robot_calibration')
 
@@ -92,6 +95,13 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
 
   const proceed = (): void => {
     if (
+      (sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
+        sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION) &&
+      calInvalidationHandler !== undefined
+    ) {
+      calInvalidationHandler()
+    }
+    if (
       supportedCommands?.includes(Sessions.sharedCalCommands.LOAD_LABWARE) ??
       false
     ) {
@@ -118,20 +128,24 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <Flex gridGap={SPACING.spacingXXL}>
+      <Flex gridGap={SPACING.spacing40}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+          <StyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('before_you_begin')}
           </StyledText>
 
-          {/* TODO(bc, 2022-08-29): update InvalidationWarning logic once calibration dashboard is in place {false ? <InvalidationWarning /> : null} */}
+          {(sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
+            sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION) &&
+            calInvalidationHandler !== undefined && (
+              <InvalidationWarning sessionType={sessionType} />
+            )}
           <Body sessionType={sessionType} />
         </Flex>
         <Flex flex="1">
@@ -147,12 +161,12 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       </Flex>
       <Flex
         width="100%"
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink />
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ? (
             <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
               {t('change_tip_rack')}

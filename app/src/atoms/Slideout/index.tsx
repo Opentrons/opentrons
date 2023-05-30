@@ -19,7 +19,7 @@ import {
 import { Divider } from '../structure'
 import { StyledText } from '../text'
 
-interface Props {
+export interface SlideoutProps {
   title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
@@ -102,7 +102,7 @@ const CLOSE_ICON_STYLE = css`
   }
 `
 
-export const Slideout = (props: Props): JSX.Element | null => {
+export const Slideout = (props: SlideoutProps): JSX.Element => {
   const { isExpanded, title, onCloseClick, children, footer } = props
   const slideOutRef = React.useRef<HTMLDivElement>(null)
   const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
@@ -144,6 +144,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
+        cursor="auto"
         position={POSITION_FIXED}
         right="0"
         top="0"
@@ -152,7 +153,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
         height="100%"
       >
         <Flex
-          paddingY={SPACING.spacing4}
+          paddingY={SPACING.spacing16}
           width="19.5rem"
           height="100%"
           flex="0 1 auto"
@@ -164,8 +165,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
               flexDirection={DIRECTION_ROW}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
-              paddingX={SPACING.spacing4}
-              marginBottom={SPACING.spacing4}
+              paddingX={SPACING.spacing16}
+              marginBottom={SPACING.spacing16}
             >
               <StyledText
                 as="h2"
@@ -193,7 +194,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
           )}
           <Divider marginY={0} color={COLORS.medGreyEnabled} />
           <Box
-            padding={SPACING.spacing4}
+            padding={SPACING.spacing16}
             flex="1 1 auto"
             overflowY="scroll"
             data-testid={`Slideout_body_${
@@ -206,8 +207,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
           </Box>
           {footer != null ? (
             <Box
-              paddingTop={SPACING.spacing4}
-              paddingX={SPACING.spacing4}
+              paddingTop={SPACING.spacing16}
+              paddingX={SPACING.spacing16}
               flex="0 0 auto"
               boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
               zIndex="3"

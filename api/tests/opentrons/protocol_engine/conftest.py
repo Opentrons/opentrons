@@ -10,14 +10,30 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware import load_definition
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocols.api_support.constants import (
+from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
     SHORT_TRASH_DECK,
+    STANDARD_OT3_DECK,
 )
 from opentrons.protocol_engine.types import ModuleDefinition
 
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control.api import API
+
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
+
+
+@pytest.fixture
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mocked out HardwareControlAPI of unspecified robot type."""
+    return decoy.mock(cls=OT2HardwareControlAPI)
+
+
+@pytest.fixture
+def ot2_hardware_api(decoy: Decoy) -> API:
+    """Get a mocked out OT-2 hardware API."""
+    return decoy.mock(cls=API)
 
 
 @pytest.mark.ot3_only
@@ -34,19 +50,25 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 
 @pytest.fixture(scope="session")
-def standard_deck_def() -> DeckDefinitionV3:
+def ot2_standard_deck_def() -> DeckDefinitionV3:
     """Get the OT-2 standard deck definition."""
     return load_deck(STANDARD_OT2_DECK, 3)
 
 
 @pytest.fixture(scope="session")
-def short_trash_deck_def() -> DeckDefinitionV3:
+def ot2_short_trash_deck_def() -> DeckDefinitionV3:
     """Get the OT-2 short-trash deck definition."""
     return load_deck(SHORT_TRASH_DECK, 3)
 
 
 @pytest.fixture(scope="session")
-def fixed_trash_def() -> LabwareDefinition:
+def ot3_standard_deck_def() -> DeckDefinitionV3:
+    """Get the OT-2 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 3)
+
+
+@pytest.fixture(scope="session")
+def ot2_fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-2 standard fixed trash."""
     return LabwareDefinition.parse_obj(
         load_definition("opentrons_1_trash_1100ml_fixed", 1)
@@ -54,10 +76,18 @@ def fixed_trash_def() -> LabwareDefinition:
 
 
 @pytest.fixture(scope="session")
-def short_fixed_trash_def() -> LabwareDefinition:
+def ot2_short_fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-2 short fixed trash."""
     return LabwareDefinition.parse_obj(
         load_definition("opentrons_1_trash_850ml_fixed", 1)
+    )
+
+
+@pytest.fixture(scope="session")
+def ot3_fixed_trash_def() -> LabwareDefinition:
+    """Get the definition of the OT-3 fixed trash."""
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_1_trash_3200ml_fixed", 1)
     )
 
 
@@ -81,7 +111,7 @@ def tip_rack_def() -> LabwareDefinition:
     return LabwareDefinition.parse_obj(load_definition("opentrons_96_tiprack_300ul", 1))
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def falcon_tuberack_def() -> LabwareDefinition:
     """Get the definition of the 6-well Falcon tuberack."""
     return LabwareDefinition.parse_obj(
@@ -89,7 +119,7 @@ def falcon_tuberack_def() -> LabwareDefinition:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def magdeck_well_plate_def() -> LabwareDefinition:
     """Get the definition of a well place compatible with magdeck."""
     return LabwareDefinition.parse_obj(
@@ -143,4 +173,11 @@ def thermocycler_v2_def() -> ModuleDefinition:
 def heater_shaker_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 heater-shaker."""
     definition = load_shared_data("module/definitions/3/heaterShakerModuleV1.json")
+    return ModuleDefinition.parse_raw(definition)
+
+
+@pytest.fixture(scope="session")
+def mag_block_v1_def() -> ModuleDefinition:
+    """Get the definition of a V1 Mag Block."""
+    definition = load_shared_data("module/definitions/3/magneticBlockV1.json")
     return ModuleDefinition.parse_raw(definition)

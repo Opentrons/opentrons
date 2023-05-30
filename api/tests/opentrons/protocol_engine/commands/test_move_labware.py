@@ -9,6 +9,8 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     LoadedLabware,
     LabwareMovementStrategy,
+    LabwareOffsetVector,
+    ExperimentalOffsetData,
 )
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands.move_labware import (
@@ -102,6 +104,8 @@ async def test_gripper_move_labware_implementation(
         labwareId="my-cool-labware-id",
         newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         strategy=LabwareMovementStrategy.USING_GRIPPER,
+        usePickUpLocationLpcOffset=True,
+        pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -141,6 +145,12 @@ async def test_gripper_move_labware_implementation(
             current_location=validated_from_location,
             new_location=validated_new_location,
             new_offset_id="wowzers-a-new-offset-id",
+            experimental_offset_data=ExperimentalOffsetData(
+                usePickUpLocationLpcOffset=True,
+                useDropLocationLpcOffset=False,
+                pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+                dropOffset=None,
+            ),
         ),
         times=1,
     )
@@ -199,7 +209,7 @@ async def test_move_labware_raises_for_labware_or_module_not_found(
             labware_definition_uri="opentrons-test/load-name/1",
             labware_location=ModuleLocation(moduleId="imaginary-module-id-2"),
         )
-    ).then_raise(errors.ModuleNotLoadedError("Woops 2.0!"))
+    ).then_raise(errors.ModuleNotLoadedError(module_id="woops-i-dont-exist"))
 
     with pytest.raises(errors.ModuleNotLoadedError):
         await subject.execute(move_labware_from_questionable_module_params)

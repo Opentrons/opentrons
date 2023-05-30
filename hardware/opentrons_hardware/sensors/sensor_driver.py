@@ -1,14 +1,24 @@
 """Capacitve Sensor Driver Class."""
+import time
+import asyncio
+import csv
 
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, Any, Sequence
 from contextlib import asynccontextmanager
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
+import opentrons_hardware.sensors.types as sensor_types
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.messages import (
+    message_definitions,
+    MessageDefinition,
+)
 from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
+    NodeId,
 )
 from opentrons_hardware.sensors.types import (
     SensorDataType,
@@ -16,7 +26,7 @@ from opentrons_hardware.sensors.types import (
 )
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
-    PollSensorInformation,
+    BaselineSensorInformation,
     WriteSensorInformation,
     SensorThresholdInformation,
 )
@@ -75,12 +85,12 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        poll_for_ms: int,
+        number_of_reads: int,
         timeout: int = 1,
     ) -> Optional[SensorReturnType]:
         """Poll the given sensor."""
-        poll = PollSensorInformation(sensor.sensor, poll_for_ms)
-        sensor_data = await self._scheduler.run_poll(
+        poll = BaselineSensorInformation(sensor.sensor, number_of_reads)
+        sensor_data = await self._scheduler.run_baseline(
             poll, can_messenger, timeout, sensor.expected_responses
         )
         if not sensor_data:
@@ -113,6 +123,24 @@ class SensorDriver(AbstractSensorDriver):
         write = WriteSensorInformation(sensor.sensor, data)
         await self._scheduler.send_write(write, can_messenger)
 
+    async def send_stop_threshold(
+        self,
+        can_messenger: CanMessenger,
+        sensor: ThresholdSensorType,
+        timeout: int = 1,
+    ) -> Optional[SensorReturnType]:
+        """Send threshold for stopping a move."""
+        write = SensorThresholdInformation(
+            sensor.sensor,
+            SensorDataType.build(sensor.stop_threshold, sensor.sensor.sensor_type),
+            SensorThresholdMode.absolute,
+        )
+        threshold_data = await self._scheduler.send_threshold(write, can_messenger)
+        if not threshold_data:
+            return threshold_data
+        sensor.stop_threshold = threshold_data.to_float()
+        return threshold_data
+
     async def send_zero_threshold(
         self,
         can_messenger: CanMessenger,
@@ -138,10 +166,16 @@ class SensorDriver(AbstractSensorDriver):
         self,
         can_messenger: CanMessenger,
         sensor: BaseSensorType,
-        binding: SensorOutputBinding = SensorOutputBinding.sync,
+        binding: Optional[Sequence[SensorOutputBinding]] = None,
     ) -> AsyncIterator[None]:
         """Send a BindSensorOutputRequest."""
         sensor_info = sensor.sensor
+
+        if binding is not None:
+            binding_field = SensorOutputBindingField.from_flags(binding)
+        else:
+            binding_field = SensorOutputBindingField(SensorOutputBinding.none)
+
         try:
             await can_messenger.send(
                 node_id=sensor_info.node_id,
@@ -149,7 +183,7 @@ class SensorDriver(AbstractSensorDriver):
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(sensor_info.sensor_type),
                         sensor_id=SensorIdField(sensor_info.sensor_id),
-                        binding=SensorOutputBindingField(binding),
+                        binding=binding_field,
                     )
                 ),
             )
@@ -181,3 +215,49 @@ class SensorDriver(AbstractSensorDriver):
             can_messenger,
             timeout,
         )
+
+
+class LogListener:
+    """Capture incoming sensor messages."""
+
+    def __init__(
+        self,
+        mount: NodeId,
+        data_file: Any,
+        file_heading: Sequence[str],
+        sensor_metadata: Sequence[Any],
+    ) -> None:
+        """Build the capturer."""
+        self.csv_writer = Any
+        self.data_file = data_file
+        self.file_heading = file_heading
+        self.sensor_metadata = sensor_metadata
+        self.response_queue: asyncio.Queue[float] = asyncio.Queue()
+        self.mount = mount
+        self.start_time = 0.0
+
+    async def __aenter__(self) -> None:
+        """Create a csv heading for logging pressure readings."""
+        self.data_file = open(self.data_file, "a")
+        self.csv_writer = csv.writer(self.data_file)
+        self.csv_writer.writerows([self.file_heading, self.sensor_metadata])
+
+        self.start_time = time.time()
+
+    async def __aexit__(self, *args: Any) -> None:
+        """Close csv file."""
+        self.data_file.close()
+
+    def __call__(
+        self,
+        message: MessageDefinition,
+        arbitration_id: ArbitrationId,
+    ) -> None:
+        """Callback entry point for capturing messages."""
+        if isinstance(message, message_definitions.ReadFromSensorResponse):
+            data = sensor_types.SensorDataType.build(
+                message.payload.sensor_data, message.payload.sensor
+            ).to_float()
+            self.response_queue.put_nowait(data)
+            current_time = round((time.time() - self.start_time), 3)
+            self.csv_writer.writerow([current_time, data])  # type: ignore

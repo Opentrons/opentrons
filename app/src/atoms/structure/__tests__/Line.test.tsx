@@ -19,7 +19,9 @@ describe('Line', () => {
     const { getByTestId } = render(props)
     const line = getByTestId('line')
     expect(line).toHaveStyle('width: 100%')
-    expect(line).toHaveStyle(`borderBottom: 1px solid ${COLORS.medGreyEnabled}`)
+    expect(line).toHaveStyle(
+      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
+    )
   })
 
   it('renders line with additional props', () => {
@@ -28,11 +30,11 @@ describe('Line', () => {
       width: '80%',
       color: COLORS.blueEnabled,
       marginY: 0,
-      paddingX: SPACING.spacing2,
+      paddingX: SPACING.spacing4,
     }
     const { getByTestId } = render(props)
     const line = getByTestId('line')
-    expect(line).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+    expect(line).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(line).toHaveStyle('width: 80%')
     expect(line).toHaveStyle('margin-top: 0')
     expect(line).toHaveStyle('margin-bottom: 0')

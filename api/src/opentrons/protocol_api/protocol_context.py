@@ -4,13 +4,12 @@ import logging
 from typing import (
     Callable,
     Dict,
-    Iterator,
     List,
     NamedTuple,
     Optional,
-    Tuple,
     Type,
     Union,
+    Mapping,
     cast,
 )
 
@@ -19,6 +18,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
@@ -28,20 +28,25 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from ._types import OffDeckType
 from .core.common import ModuleCore, ProtocolCore
-from .core.labware import AbstractLabware
+from .core.core_map import LoadedCoreMap
+from .core.engine.module_core import NonConnectedModuleCore
 from .core.module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
+from .core.engine import ENGINE_CORE_API_VERSION
+from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
+from ._liquid import Liquid
+from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
 from .module_contexts import (
@@ -49,6 +54,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
     ModuleContext,
 )
 
@@ -61,6 +67,7 @@ ModuleTypes = Union[
     MagneticModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 ]
 
 
@@ -93,34 +100,40 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         api_version: APIVersion,
-        implementation: ProtocolCore,
+        core: ProtocolCore,
         broker: Optional[Broker] = None,
+        core_map: Optional[LoadedCoreMap] = None,
+        deck: Optional[Deck] = None,
+        bundled_data: Optional[Dict[str, bytes]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
         :param api_version: The API version to use.
-        :param implementation: The protocol implementation core.
+        :param core: The protocol implementation core.
         :param labware_offset_provider: Where this protocol context and its child
                                         module contexts will get labware offsets from.
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
+        :param bundled_data: A dict mapping filenames to the contents of data
+                             files. Can be used by the protocol, since it is
+                             exposed as
+                             :py:attr:`.ProtocolContext.bundled_data`
         """
         super().__init__(broker)
-
         self._api_version = api_version
-        self._implementation = implementation
+        self._core = core
+        self._core_map = core_map or LoadedCoreMap()
+        self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
 
-        if self._api_version > MAX_SUPPORTED_VERSION:
-            raise RuntimeError(
-                f"API version {self._api_version} is not supported by this "
-                f"robot software. Please either reduce your requested API "
-                f"version or update your robot."
-            )
-
+        # With the introduction of Extension mount type, this dict initializes to include
+        # the extension mount, for both ot2 & 3. While it doesn't seem like it would
+        # create an issue in the current PAPI context, it would be much safer to
+        # only use mounts available on the robot.
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
-        self._modules: Dict[DeckSlotName, ModuleTypes] = {}
+        self._bundled_data: Dict[str, bytes] = bundled_data or {}
+        self._load_fixed_trash()
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -146,7 +159,7 @@ class ProtocolContext(CommandPublisher):
             "This function will be deprecated in later versions."
             "Please use with caution."
         )
-        return HardwareManager(hardware=self._implementation.get_hardware())
+        return HardwareManager(hardware=self._core.get_hardware())
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -158,7 +171,7 @@ class ProtocolContext(CommandPublisher):
         ``data/mydata/aspirations.csv`` it will be in the dict as
         ``'aspirations.csv'``) to the bytes contents of the files.
         """
-        return self._implementation.get_bundled_data()
+        return self._bundled_data
 
     def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""
@@ -200,8 +213,20 @@ class ProtocolContext(CommandPublisher):
                                                # 10 mm/s
                 protocol.max_speeds['X'] = None  # reset to default
 
+        .. caution::
+            This property is not yet supported on
+            :ref:`API version <v2-versioning>` 2.14 or higher.
         """
-        return self._implementation.get_max_speeds()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
+            # See https://opentrons.atlassian.net/browse/RCORE-373
+            raise APIVersionError(
+                "ProtocolContext.max_speeds is not supported at apiLevel 2.14 or higher."
+                " Use a lower apiLevel or set speeds using InstrumentContext.default_speed"
+                " or the per-method 'speed' argument."
+            )
+
+        return self._core.get_max_speeds()
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
@@ -233,7 +258,7 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
-        return self._implementation.is_simulating()
+        return self._core.is_simulating()
 
     @requires_version(2, 0)
     def load_labware_from_definition(
@@ -256,7 +281,7 @@ class ProtocolContext(CommandPublisher):
                           as in the run log and the calibration view in the
                           Opentrons app.
         """
-        load_params = self._implementation.add_labware_definition(labware_def)
+        load_params = self._core.add_labware_definition(labware_def)
 
         return self.load_labware(
             load_name=load_params.load_name,
@@ -284,23 +309,37 @@ class ProtocolContext(CommandPublisher):
         This function returns the created and initialized labware for use
         later in the protocol.
 
-        :param load_name: A string to use for looking up a labware definition
-        :param location: The slot into which to load the labware such as
-                         1 or '1'
+        :param str load_name: A string to use for looking up a labware definition.
+            You can find the ``load_name`` for any standard labware on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+
+        :param location: The slot into which to load the labware,
+            such as ``1`` or ``"1"``.
+
         :type location: int or str
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        :param str namespace: The namespace the labware definition belongs to.
-            If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition. If
-            unspecified, will use version 1.
+
+        :param str label: An optional special name to give the labware. If specified, this
+            is the name the labware will appear as in the run log and the calibration
+            view in the Opentrons app.
+
+        :param str namespace: The namespace that the labware definition belongs to.
+            If unspecified, will search both:
+
+              * ``"opentrons"``, to load standard Opentrons labware definitions.
+              * ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons standard
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
 
-        labware_core = self._implementation.load_labware(
+        labware_core = self._core.load_labware(
             load_name=load_name,
             location=deck_slot,
             label=label,
@@ -308,9 +347,15 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        return Labware(implementation=labware_core)
+        labware = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._core,
+            core_map=self._core_map,
+        )
+        self._core_map.add(labware_core, labware)
+
+        return labware
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -348,25 +393,27 @@ class ProtocolContext(CommandPublisher):
         :returns: Dict mapping deck slot number to labware, sorted in order of
                   the locations.
         """
+        labware_cores = (
+            (core.get_deck_slot(), core) for core in self._core.get_labware_cores()
+        )
 
-        def _only_labwares() -> Iterator[Tuple[int, Labware]]:
-            for slotnum, slotitem in self._implementation.get_deck().items():
-                if isinstance(slotitem, AbstractLabware):
-                    yield slotnum, Labware(implementation=slotitem)
-                elif isinstance(slotitem, Labware):
-                    yield slotnum, slotitem
-                elif isinstance(slotitem, ModuleGeometry):
-                    if slotitem.labware:
-                        yield slotnum, slotitem.labware
+        return {
+            slot.as_int(): self._core_map.get(core)
+            for slot, core in labware_cores
+            if slot is not None
+        }
 
-        return dict(_only_labwares())
-
-    # TODO: gate move_labware behind API version
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+    @requires_version(2, 15)
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes],
+        new_location: Union[DeckLocation, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
+        use_pick_up_location_lpc_offset: bool = False,
+        use_drop_location_lpc_offset: bool = False,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
         """Move a loaded labware to a new location.
 
@@ -377,12 +424,23 @@ class ProtocolContext(CommandPublisher):
                         using :py:meth:`load_labware`
 
         :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module`.
+                             loaded on the deck using :py:meth:`load_module`
+                             or off deck using :py:obj:`OFF_DECK`.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
                             to perform a manual move and click resume to continue
                             protocol execution.
+
+        Other experimental params:
+
+        :param use_pick_up_location_lpc_offset: Whether to use LPC offset of the labware
+                                                associated with its pick up location.
+        :param use_drop_location_lpc_offset: Whether to use LPC offset of the labware
+                                             associated with its drop off location.
+        :param pick_up_offset: Offset to use when picking up labware.
+        :param drop_offset: Offset to use when dropping off labware.
+
         Before moving a labware from or to a hardware module, make sure that the labware
         and its new location is reachable by the gripper. So, thermocycler lid should be
         open and heater-shaker's labware latch should be open.
@@ -395,16 +453,32 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location = (
-            new_location._core
-            if isinstance(new_location, ModuleContext)
-            else validation.ensure_deck_slot(new_location)
-        )
+        location: Union[ModuleCore, OffDeckType, DeckSlotName]
+        if isinstance(new_location, ModuleContext):
+            location = new_location._core
+        elif isinstance(new_location, OffDeckType):
+            location = new_location
+        else:
+            location = validation.ensure_deck_slot(new_location)
 
-        self._implementation.move_labware(
-            labware_core=labware._implementation,
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
+        self._core.move_labware(
+            labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
 
     @requires_version(2, 0)
@@ -433,11 +507,13 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler---it will always be
                          in Slot 7.
-        :param configuration: Only valid in Python API version 2.4 and later.
-                              Used to specify the slot configuration of the
-                              Thermocycler. If you wish to use the non-full-plate
-                              configuration, you must pass the keyword
-                              value ``semi``.
+        :param configuration: Configure a thermocycler to be in the ``semi`` position.
+                              This parameter does not work. Do not use it.
+
+            .. versionchanged:: 2.14
+                This parameter dangerously modified the protocol's geometry system,
+                and it didn't function properly, so it was removed.
+
         :type location: str or int or None
         :returns: The loaded and initialized module---a
                   :py:class:`TemperatureModuleContext`,
@@ -445,18 +521,32 @@ class ProtocolContext(CommandPublisher):
                   :py:class:`ThermocyclerContext`, or
                   :py:class:`HeaterShakerContext`,
                   depending on what you requested with ``module_name``.
-        """
 
-        if self._api_version < APIVersion(2, 4) and configuration:
-            raise APIVersionError(
-                f"You have specified API {self._api_version}, but you are"
-                "using Thermocycler parameters only available in 2.4"
-            )
+                  .. versionchanged:: 2.15
+                    Added :py:class:`MagneticBlockContext` return value.
+        """
+        if configuration:
+            if self._api_version < APIVersion(2, 4):
+                raise APIVersionError(
+                    f"You have specified API {self._api_version}, but you are"
+                    "using Thermocycler parameters only available in 2.4"
+                )
+            if self._api_version >= ENGINE_CORE_API_VERSION:
+                raise APIVersionError(
+                    "The configuration parameter of load_module has been removed."
+                )
 
         requested_model = validation.ensure_module_model(module_name)
+        if isinstance(
+            requested_model, MagneticBlockModel
+        ) and self._api_version < APIVersion(2, 15):
+            raise APIVersionError(
+                f"Module of type {module_name} is only available in versions 2.15 and above."
+            )
+
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
 
-        module_core = self._implementation.load_module(
+        module_core = self._core.load_module(
             model=requested_model,
             deck_slot=deck_slot,
             configuration=configuration,
@@ -464,12 +554,13 @@ class ProtocolContext(CommandPublisher):
 
         module_context = _create_module_context(
             module_core=module_core,
-            protocol_core=self._implementation,
+            protocol_core=self._core,
+            core_map=self._core_map,
             broker=self._broker,
             api_version=self._api_version,
         )
 
-        self._modules[module_core.get_deck_slot()] = module_context
+        self._core_map.add(module_core, module_context)
 
         return module_context
 
@@ -490,7 +581,8 @@ class ProtocolContext(CommandPublisher):
                                            ordered by slot number.
         """
         return {
-            int(deck_slot.value): module for deck_slot, module in self._modules.items()
+            core.get_deck_slot().as_int(): self._core_map.get(core)
+            for core in self._core.get_module_cores()
         }
 
     @requires_version(2, 0)
@@ -525,11 +617,17 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        checked_mount = validation.ensure_mount(mount)
-        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        tip_racks = tip_racks or []
-        existing_instrument = self._instruments[checked_mount]
+        is_96_channel = instrument_name == "p1000_96"
+        if is_96_channel and isinstance(self._core, ProtocolEngineCore):
+            checked_instrument_name = instrument_name
+            checked_mount = Mount.LEFT
+        else:
+            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+            checked_mount = validation.ensure_mount(mount)
 
+        tip_racks = tip_racks or []
+
+        existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
             # TODO(mc, 2022-08-25): create specific exception type
             raise RuntimeError(
@@ -541,8 +639,10 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        instrument_core = self._implementation.load_instrument(
-            instrument_name=checked_instrument_name,
+        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
+        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
+        instrument_core = self._core.load_instrument(
+            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
             mount=checked_mount,
         )
 
@@ -554,9 +654,9 @@ class ProtocolContext(CommandPublisher):
             )
 
         instrument = InstrumentContext(
-            ctx=self,
+            core=instrument_core,
+            protocol_core=self._core,
             broker=self._broker,
-            implementation=instrument_core,
             api_version=self._api_version,
             tip_racks=tip_racks,
             trash=self.fixed_trash,
@@ -605,7 +705,7 @@ class ProtocolContext(CommandPublisher):
         :param str msg: An optional message to show to connected clients. The
             Opentrons App will show this in the run log.
         """
-        self._implementation.pause(msg=msg)
+        self._core.pause(msg=msg)
 
     @publish(command=cmds.resume)
     @requires_version(2, 0)
@@ -618,7 +718,16 @@ class ProtocolContext(CommandPublisher):
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
-        self._implementation.resume()
+        if self._api_version >= ENGINE_CORE_API_VERSION:
+            raise APIVersionError(
+                "A Python Protocol cannot safely resume itself after a pause."
+                " To wait automatically for a period of time, use ProtocolContext.delay()."
+            )
+
+        # TODO(mc, 2023-02-13): this assert should be enough for mypy
+        # investigate if upgrading mypy allows the `cast` to be removed
+        assert isinstance(self._core, LegacyProtocolCore)
+        cast(LegacyProtocolCore, self._core).resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
@@ -631,7 +740,7 @@ class ProtocolContext(CommandPublisher):
         so cannot be used to communicate real-time information from the robot's
         actual run.
         """
-        self._implementation.comment(msg=msg)
+        self._core.comment(msg=msg)
 
     @publish(command=cmds.delay)
     @requires_version(2, 0)
@@ -649,46 +758,41 @@ class ProtocolContext(CommandPublisher):
         If both `seconds` and `minutes` are specified, they will be added.
         """
         delay_time = seconds + minutes * 60
-        self._implementation.delay(seconds=delay_time, msg=msg)
+        self._core.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
     def home(self) -> None:
         """Homes the robot."""
-        logger.debug("home")
-        self._implementation.home()
+        self._core.home()
 
     @property
     def location_cache(self) -> Optional[Location]:
         """The cache used by the robot to determine where it last was."""
-        return self._implementation.get_last_location()
+        return self._core.get_last_location()
 
     @location_cache.setter
     def location_cache(self, loc: Optional[Location]) -> None:
-        self._implementation.set_last_location(loc)
+        self._core.set_last_location(loc)
 
     @property  # type: ignore
     @requires_version(2, 0)
     def deck(self) -> Deck:
-        """The object holding the deck layout of the robot.
+        """An interface to provide information about the current deck layout.
 
         This object behaves like a dictionary with keys for both numeric
-        and string slot numbers (for instance, ``protocol.deck[1]`` and
-        ``protocol.deck['1']`` will both return the object in slot 1). If
-        nothing is loaded into a slot, ``None`` will be present. This object
-        is useful for determining if a slot in the deck is free. Rather than
-        filtering the objects in the deck map yourself, you can also use
-        :py:attr:`loaded_labwares` to see a dict of labwares and
-        :py:attr:`loaded_modules` to see a dict of modules. For advanced
-        control you can delete an item of labware from the deck with
-        e.g. ``del protocol.deck['1']`` to free a slot for new labware.
-        (Note that for each slot only the last labware used in a command will
-        be available for calibration in the OpenTrons UI, and that the
-        tallest labware on the deck will be calculated using only currently
-        loaded labware, meaning that the labware loaded should always
-        reflect the labware physically on the deck (or be higher than the
-        labware on the deck).
+        and string slot numbers - for instance, ``protocol.deck[1]`` and
+        ``protocol.deck['1']`` will both return the object in slot 1. If
+        nothing is loaded into a slot, ``None`` will be present.
+
+        This object is useful for determining if a slot in the deck is free.
+        Rather than filtering the objects in the deck map yourself,
+        you can also use :py:attr:`loaded_labwares` to see a dict of labwares
+        and :py:attr:`loaded_modules` to see a dict of modules.
+
+        For advanced control you can delete an item of labware from the deck
+        with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
         """
-        return self._implementation.get_deck()
+        return self._deck
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -698,12 +802,17 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        trash = self._implementation.get_fixed_trash()
-        # TODO AL 20201113 - remove this when DeckLayout only holds
-        #  LabwareInterface instances.
-        if isinstance(trash, AbstractLabware):
-            return Labware(implementation=trash)
-        return cast("Labware", trash)
+        return self._core_map.get(self._core.fixed_trash)
+
+    def _load_fixed_trash(self) -> None:
+        fixed_trash_core = self._core.fixed_trash
+        fixed_trash = Labware(
+            core=fixed_trash_core,
+            api_version=self._api_version,
+            protocol_core=self._core,
+            core_map=self._core_map,
+        )
+        self._core_map.add(fixed_trash_core, fixed_trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:
@@ -712,24 +821,44 @@ class ProtocolContext(CommandPublisher):
 
         :param bool on: If true, turn on rail lights; otherwise, turn off.
         """
-        self._implementation.set_rail_lights(on=on)
+        self._core.set_rail_lights(on=on)
+
+    @requires_version(2, 14)
+    def define_liquid(
+        self, name: str, description: Optional[str], display_color: Optional[str]
+    ) -> Liquid:
+        """
+        Define a liquid within a protocol.
+
+        :param str name: A human-readable name for the liquid.
+        :param str description: An optional description of the liquid.
+        :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+
+        :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
+        """
+        return self._core.define_liquid(
+            name=name,
+            description=description,
+            display_color=display_color,
+        )
 
     @property  # type: ignore
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
         """Returns True if the rail lights are on"""
-        return self._implementation.get_rail_lights_on()
+        return self._core.get_rail_lights_on()
 
     @property  # type: ignore
     @requires_version(2, 5)
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
-        return self._implementation.door_closed()
+        return self._core.door_closed()
 
 
 def _create_module_context(
-    module_core: ModuleCore,
+    module_core: Union[ModuleCore, NonConnectedModuleCore],
     protocol_core: ProtocolCore,
+    core_map: LoadedCoreMap,
     api_version: APIVersion,
     broker: Broker,
 ) -> ModuleTypes:
@@ -742,12 +871,15 @@ def _create_module_context(
         module_cls = ThermocyclerContext
     elif isinstance(module_core, AbstractHeaterShakerCore):
         module_cls = HeaterShakerContext
+    elif isinstance(module_core, AbstractMagneticBlockCore):
+        module_cls = MagneticBlockContext
     else:
         assert False, "Unsupported module type"
 
     return module_cls(
         core=module_core,
         protocol_core=protocol_core,
+        core_map=core_map,
         api_version=api_version,
         broker=broker,
     )

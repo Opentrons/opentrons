@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -8,6 +8,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { StyledText } from '../../atoms/text'
 import { UploadInput } from './UploadInput'
 import { EmptyStateLinks } from './EmptyStateLinks'
 export function ProtocolsEmptyState(): JSX.Element | null {
@@ -17,8 +18,8 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
       width="100%"
-      padding={SPACING.spacing4}
-      paddingTop={SPACING.spacing6}
+      padding={SPACING.spacing16}
+      paddingTop={SPACING.spacing32}
       transform="translateY(25%)"
     >
       <StyledText role="complementary" as="h1">

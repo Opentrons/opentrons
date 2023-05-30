@@ -23,6 +23,8 @@ make setup
 make -C app dev
 ```
 
+**Note:** By default, `make dev` will run the OT-2 spin of the app. If you'd like to run the OT-3 spin, you can pass `OPENTRONS_PROJECT=ot3` to make as an environment variable or flag: `make -C app dev OPENTRONS_PROJECT=ot3`. Unlike in the packaged app, the dev app will have the same product name as the OT-2 spin and so will reuse configuration; this means you won't get some default settings unless you remove the config directory first.
+
 **Note:** If you would like to interact with a virtual robot server being served at `localhost`, you will need to manually add `localhost` to the discovery candidates list. This can be done through the app's GUI settings for "Connect to a robot via IP address / Add Manual IP Address"
 
 At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
@@ -73,6 +75,11 @@ Choose a continuous chunk of target copy that composes a translatable unit. This
    - If no, use the [`useTranslation` hook](https://react.i18next.com/latest/usetranslation-hook) to retrieve the `t` function.
 
 **Note**: If a component utilizes both the `Trans` component and the `useTranslation` hook, be sure to pass the `t` function in as the `t` prop of the `Trans` component. That way the same namespace resolution order is maintained for all translation keys within that component.
+
+3. Does your copy need to be a specific format (e.g. `upperCase`, `capitalize`, `sentenceCase`, `titleCase`)?
+
+   - If yes, use [`useTranslation` hook](https://react.i18next.com/latest/usetranslation-hook) to retrieve the `t` and `i18n` function and specify the format. (e.g. `const { t, i18n } = useTranslation('shared')` `{i18n.format(t('close'), 'upperCase')}`)
+   - If no,when using the `useTranslation` hook, only use the `t` function.
 
 ## Testing
 
@@ -125,7 +132,7 @@ ANALYZER=1 make -C app
 [electron]: https://www.electronjs.org/
 [electron-renderer]: https://electronjs.org/docs/tutorial/quick-start#renderer-process
 [hmr]: https://webpack.js.org/concepts/hot-module-replacement/
-[react]: https://reactjs.org/
+[react]: https://react.dev/
 [redux]: http://redux.js.org/
 [css-modules]: https://github.com/css-modules/css-modules
 [babel]: https://babeljs.io/

@@ -1,3 +1,5 @@
+import type { Agent } from 'http'
+
 import type {
   RobotState,
   HostState,
@@ -25,6 +27,7 @@ export type Capability =
   | 'balenaUpdate'
   | 'buildrootMigration'
   | 'buildrootUpdate'
+  | 'systemUpdate'
   | 'restart'
 
 export type CapabilityMap = {
@@ -88,6 +91,8 @@ export interface HealthPollerTarget {
   ip: string
   /** Port address used to construct health URLs */
   port: number
+  /** custom http agent used in request */
+  agent?: Agent
 }
 
 /**

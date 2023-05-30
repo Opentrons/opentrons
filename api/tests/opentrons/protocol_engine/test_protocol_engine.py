@@ -6,7 +6,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
@@ -82,7 +82,7 @@ def model_utils(decoy: Decoy) -> ModelUtils:
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock HardwareControlAPI."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
@@ -281,7 +281,7 @@ async def test_add_and_execute_command(
 
     decoy.when(
         await state_store.wait_for(
-            condition=state_store.commands.get_is_complete,
+            condition=state_store.commands.get_command_is_final,
             command_id="command-id",
         ),
     ).then_do(_stub_completed)
@@ -502,7 +502,9 @@ async def test_wait_until_complete(
     await subject.wait_until_complete()
 
     decoy.verify(
-        await state_store.wait_for(condition=state_store.commands.get_all_complete)
+        await state_store.wait_for(
+            condition=state_store.commands.get_all_commands_final
+        )
     )
 
 
@@ -629,7 +631,7 @@ def test_add_liquid(
 ) -> None:
     """It should dispatch an AddLiquidAction action."""
     subject.add_liquid(
-        liquid=Liquid(id="water-id", displayName="water", description="water desc"),
+        id="water-id", name="water", description="water desc", color=None
     )
 
     decoy.verify(
@@ -637,7 +639,7 @@ def test_add_liquid(
             AddLiquidAction(
                 liquid=Liquid(
                     id="water-id", displayName="water", description="water desc"
-                ),
+                )
             )
         )
     )

@@ -12,5 +12,9 @@ module.exports = {
     '../components/**/*.stories.@(js|jsx|ts|tsx)',
     '../app/**/*.stories.@(js|jsx|ts|tsx)',
   ],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    'storybook-addon-pseudo-states',
+  ],
 }

@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { shallow, mount } from 'enzyme'
-import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
+import {
+  DeprecatedPrimaryButton,
+  AlertModal,
+  OutlineButton,
+} from '@opentrons/components'
 import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
 import {
   LabwareDefinition2,
@@ -113,14 +117,14 @@ describe('FileSidebar', () => {
     props.canDownload = false
 
     const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
 
     expect(downloadButton.prop('disabled')).toEqual(true)
   })
 
   it('warning modal is shown when export is clicked with no command', () => {
     const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
     downloadButton.simulate('click')
     const alertModal = wrapper.find(AlertModal)
 
@@ -135,7 +139,7 @@ describe('FileSidebar', () => {
     props.savedStepForms = savedStepForms
 
     const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
     downloadButton.simulate('click')
     const alertModal = wrapper.find(AlertModal)
 
@@ -157,7 +161,7 @@ describe('FileSidebar', () => {
     props.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
     downloadButton.simulate('click')
     const alertModal = wrapper.find(AlertModal)
 
@@ -174,7 +178,7 @@ describe('FileSidebar', () => {
     props.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
     downloadButton.simulate('click')
     const alertModal = wrapper.find(AlertModal)
 
@@ -207,19 +211,19 @@ describe('FileSidebar', () => {
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v6_protocol_6_10',
+      hintKey: 'export_v6_protocol_6_20',
       content: v6WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })
 
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
     downloadButton.simulate('click')
 
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v6_protocol_6_10',
+      hintKey: 'export_v6_protocol_6_20',
       content: v6WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),

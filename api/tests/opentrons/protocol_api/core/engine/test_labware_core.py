@@ -4,15 +4,20 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefDict,
+    LabwareParameters as LabwareParamsDict,
+    LabwareUri,
+)
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     Parameters as LabwareDefinitionParameters,
     Metadata as LabwareDefinitionMetadata,
 )
 
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import LabwareCore, WellCore
@@ -62,21 +67,28 @@ def test_get_load_params(subject: LabwareCore) -> None:
 
 
 def test_set_calibration(subject: LabwareCore) -> None:
-    """It should no-op if calibration is set."""
-    subject.set_calibration(Point(1, 2, 3))
+    """It should raise if you attempt to set calibration."""
+    with pytest.raises(NotImplementedError):
+        subject.set_calibration(Point(1, 2, 3))
 
 
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(namespace="hello", ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            namespace="hello",
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            ordering=[],
+        )
     ],
 )
 def test_get_definition(subject: LabwareCore) -> None:
     """It should get the labware's definition as a dictionary."""
-    result = subject.get_definition()
-
-    assert result == cast(LabwareDefDict, {"namespace": "hello", "ordering": []})
+    assert subject.get_definition() == cast(
+        LabwareDefDict,
+        {"namespace": "hello", "parameters": {"loadName": "world"}, "ordering": []},
+    )
+    assert subject.get_parameters() == cast(LabwareParamsDict, {"loadName": "world"})
 
 
 def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
@@ -114,6 +126,34 @@ def test_get_display_name(subject: LabwareCore) -> None:
     "labware_definition",
     [
         LabwareDefinition.construct(  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(loadName="load-name"),  # type: ignore[call-arg]
+        ),
+    ],
+)
+def test_get_name_load_name(subject: LabwareCore) -> None:
+    """It should get the load name when no display name is defined."""
+    result = subject.get_name()
+
+    assert result == "load-name"
+
+
+def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
+    """It should get the user display name when one is defined."""
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("cool-labware")
+    ).then_return("my cool display name")
+
+    subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
+
+    result = subject.get_name()
+
+    assert result == "my cool display name"
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
             ordering=[],
             parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
         )
@@ -134,13 +174,20 @@ def test_is_tip_rack(subject: LabwareCore) -> None:
         )
     ],
 )
-def test_get_wells(subject: LabwareCore) -> None:
-    """It should get a wells list in order, from the definition."""
-    result = subject.get_wells()
+def test_get_well_columns(subject: LabwareCore) -> None:
+    """It should get a well name columns from the definition."""
+    result = subject.get_well_columns()
 
-    assert len(result) == 4
-    assert all(isinstance(wc, WellCore) for wc in result)
-    assert list(wc.get_name() for wc in result) == ["A1", "B1", "A2", "B2"]
+    assert result == [["A1", "B1"], ["A2", "B2"]]
+
+
+def test_get_well_core(subject: LabwareCore) -> None:
+    """It should get a well name grid from the definition."""
+    result = subject.get_well_core("A1")
+
+    assert isinstance(result, WellCore)
+    assert result.get_name() == "A1"
+    assert result.labware_id == "cool-labware"
 
 
 def test_get_uri(
@@ -149,21 +196,13 @@ def test_get_uri(
     """It should get a labware's URI from the core."""
     decoy.when(
         mock_engine_client.state.labware.get_definition_uri("cool-labware")
-    ).then_return("great/uri/42")
+    ).then_return(LabwareUri("great/uri/42"))
 
     result = subject.get_uri()
 
     assert result == "great/uri/42"
 
 
-@pytest.mark.parametrize(
-    "labware_definition",
-    [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
-            ordering=[["A1", "B1"], ["A2", "B2"]],
-        )
-    ],
-)
 def test_get_next_tip(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
@@ -171,24 +210,123 @@ def test_get_next_tip(
     decoy.when(
         mock_engine_client.state.tips.get_next_tip(
             labware_id="cool-labware",
-            use_column=True,
+            num_tips=8,
             starting_tip_name="B1",
         )
     ).then_return("A2")
 
-    starting_tip = subject.get_wells()[1]
+    starting_tip = WellCore(
+        name="B1", labware_id="cool-labware", engine_client=mock_engine_client
+    )
     result = subject.get_next_tip(num_tips=8, starting_tip=starting_tip)
 
-    assert isinstance(result, WellCore)
-    assert result.labware_id == "cool-labware"
-    assert result.get_name() == "A2"
-    assert result is subject.get_wells()[2]
-    assert result is subject.get_wells_by_name()["A2"]
+    assert result == "A2"
 
 
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    ],
+)
 def test_reset_tips(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
     """It should reset the tip state of a labware."""
     subject.reset_tips()
     decoy.verify(mock_engine_client.reset_tips(labware_id="cool-labware"), times=1)
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(isTiprack=False),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+                displayName="Cool Display Name"
+            ),
+        )
+    ],
+)
+def test_reset_tips_raises_if_not_tip_rack(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should raise an exception if the labware isn't a tip rack."""
+    with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
+        subject.reset_tips()
+
+
+def test_get_tip_length(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should get the tip length of a labware."""
+    decoy.when(
+        mock_engine_client.state.labware.get_tip_length("cool-labware")
+    ).then_return(1.23)
+
+    result = subject.get_tip_length()
+
+    assert result == 1.23
+
+
+def test_highest_z(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should return the highest z of a labware."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_labware_highest_z("cool-labware")
+    ).then_return(9000.1)
+
+    result = subject.highest_z
+
+    assert result == 9000.1
+
+
+def test_get_calibrated_offset(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should get the calibrated offset."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_labware_position("cool-labware")
+    ).then_return(Point(1, 2, 3))
+
+    result = subject.get_calibrated_offset()
+
+    assert result == Point(1, 2, 3)
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinitionParameters.construct(quirks=["quirk"]),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_get_quirks(subject: LabwareCore) -> None:
+    """It should get a list of labware quirks."""
+    result = subject.get_quirks()
+
+    assert result == ["quirk"]
+
+
+def test_get_deck_slot(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should return its deck slot location, if in a slot."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_ancestor_slot_name("cool-labware")
+    ).then_return(DeckSlotName.SLOT_5)
+
+    assert subject.get_deck_slot() == DeckSlotName.SLOT_5
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_ancestor_slot_name("cool-labware")
+    ).then_raise(LabwareNotOnDeckError("oh no"))
+
+    assert subject.get_deck_slot() is None

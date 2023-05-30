@@ -8,13 +8,14 @@ import {
   Flex,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
+  AlertPrimaryButton,
   SPACING,
   Link,
   TYPOGRAPHY,
   ALIGN_CENTER,
+  PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { AlertPrimaryButton, PrimaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../molecules/Modal'
 import {
   useDispatchApiRequest,
@@ -70,7 +71,7 @@ export function FactoryResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" paddingBottom={SPACING.spacing5}>
+            <StyledText as="p" paddingBottom={SPACING.spacing24}>
               {t('factory_reset_modal_description')}
             </StyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -78,7 +79,7 @@ export function FactoryResetModal({
                 role="button"
                 onClick={closeModal}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginRight={SPACING.spacing5}
+                marginRight={SPACING.spacing24}
                 css={TYPOGRAPHY.linkPSemiBold}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
@@ -101,8 +102,8 @@ export function FactoryResetModal({
         >
           <StyledText
             as="p"
-            marginBottom={SPACING.spacing5}
-            paddingBottom={SPACING.spacing5}
+            marginBottom={SPACING.spacing24}
+            paddingBottom={SPACING.spacing24}
           >
             {t('connection_lost_description')}
           </StyledText>

@@ -24,6 +24,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../../hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
@@ -57,7 +58,8 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     runId
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const { protocolData, robotType } = useProtocolDetailsForRun(runId)
+  const { robotType } = useProtocolDetailsForRun(runId)
+  const protocolData = useMostRecentCompletedAnalysis(runId)
   const liquids = parseLiquidsInLoadOrder(
     protocolData?.liquids != null ? protocolData?.liquids : [],
     protocolData?.commands ?? []
@@ -97,7 +99,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 nestedLabwareDisplayName,
               }) => (
                 <Module
-                  key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                  key={`LabwareSetup_Module_${String(
+                    moduleDef.model
+                  )}_${x}${y}`}
                   x={x}
                   y={y}
                   orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -110,7 +114,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 >
                   {nestedLabwareDef != null && nestedLabwareId != null ? (
                     <React.Fragment
-                      key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                      key={`LabwareSetup_Labware_${String(
+                        nestedLabwareDef.metadata.displayName
+                      )}_${x}${y}`}
                     >
                       <LabwareRender definition={nestedLabwareDef} />
                       <LabwareInfoOverlay
@@ -135,7 +141,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 const labwareHasLiquid = !isEmpty(wellFill)
                 return (
                   <React.Fragment
-                    key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                    key={`LabwareSetup_Labware_${String(
+                      labwareDef.metadata.displayName
+                    )}_${x}${y}`}
                   >
                     <g
                       transform={`translate(${x},${y})`}

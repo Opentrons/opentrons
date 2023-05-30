@@ -34,12 +34,12 @@ export const getPrimaryPipetteId = (
 
   if (leftPipetteSpecs == null) {
     throw new Error(
-      `could not find pipette specs for ${leftPipette.pipetteName}`
+      `could not find pipette specs for ${String(leftPipette.pipetteName)}`
     )
   }
   if (rightPipetteSpecs == null) {
     throw new Error(
-      `could not find pipette specs for ${rightPipette.pipetteName}`
+      `could not find pipette specs for ${String(rightPipette.pipetteName)}`
     )
   }
 

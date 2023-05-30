@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Box } from '@opentrons/components'
 import { SUCCESS, FAILURE, PENDING } from '../../redux/robot-api'
-import { useFeatureFlag } from '../../redux/config'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 import type {
@@ -40,7 +39,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
   const groupLabels = [
     t('plunger_positions'),
     t('tip_pickup_drop'),
-    t('for_dev_use_only'),
     t('power_force'),
   ]
 
@@ -49,9 +47,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
       ? // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
         updateRequest.error.message || t('an_error_occurred_while_updating')
       : null
-
-  // TODO(mc, 2019-12-09): remove this feature flag
-  const __showHiddenFields = useFeatureFlag('allPipetteConfig')
 
   // when an in-progress request completes, close modal if response was ok
   React.useEffect(() => {
@@ -70,7 +65,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
           updateSettings={updateSettings}
           groupLabels={groupLabels}
           formId={formId}
-          __showHiddenFields={__showHiddenFields}
         />
       )}
     </Box>

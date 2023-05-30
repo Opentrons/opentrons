@@ -6,6 +6,7 @@ import {
   Flex,
   Link,
   TYPOGRAPHY,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 
@@ -13,7 +14,6 @@ import { StyledText } from '../../../atoms/text'
 import { Portal } from '../../../App/portal'
 import { Modal } from '../../../molecules/Modal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { PrimaryButton } from '../../../atoms/buttons'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/ot2-get-started'
@@ -40,7 +40,7 @@ export function NewRobotSetupHelp(): JSX.Element {
             onClose={() => setShowNewRobotHelpModal(false)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <StyledText as="p" marginBottom={SPACING.spacing16}>
                 {t('use_usb_cable_for_new_robot')}
               </StyledText>
               <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>

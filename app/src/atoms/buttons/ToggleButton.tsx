@@ -46,7 +46,7 @@ interface ToggleButtonProps extends StyleProps {
 }
 
 export const ToggleButton = (props: ToggleButtonProps): JSX.Element => {
-  const { label, toggledOn, disabled, ...buttonProps } = props
+  const { label, toggledOn, disabled, size, ...buttonProps } = props
   const iconName = toggledOn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'
 
   return (
@@ -55,7 +55,7 @@ export const ToggleButton = (props: ToggleButtonProps): JSX.Element => {
       role="switch"
       aria-label={label}
       aria-checked={toggledOn}
-      size={SIZE_2}
+      size={size ?? SIZE_2}
       css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
       {...buttonProps}
     >

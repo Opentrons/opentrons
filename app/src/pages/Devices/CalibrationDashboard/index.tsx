@@ -1,27 +1,46 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useHistory, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { ApiHostProvider } from '@opentrons/react-api-client'
+import { CalibrationTaskList } from '../../../organisms/CalibrationTaskList'
+import { OPENTRONS_USB } from '../../../redux/discovery'
+import { appShellRequestor } from '../../../redux/shell/remote'
+import { useDashboardCalibrateDeck } from './hooks/useDashboardCalibrateDeck'
+import { useDashboardCalibratePipOffset } from './hooks/useDashboardCalibratePipOffset'
+import { useDashboardCalibrateTipLength } from './hooks/useDashboardCalibrateTipLength'
+import { useRobot } from '../../../organisms/Devices/hooks'
 
-import { COLORS } from '@opentrons/components'
-
-import { Modal } from '../../../molecules/Modal'
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 
 export function CalibrationDashboard(): JSX.Element {
-  const { t } = useTranslation('robot_calibration')
-  const history = useHistory()
-  const { robotName } = useParams<NavRouteParams>()
-
+  const { robotName } = useParams<DesktopRouteParams>()
+  const robot = useRobot(robotName)
+  const [
+    dashboardOffsetCalLauncher,
+    DashboardOffsetCalWizard,
+  ] = useDashboardCalibratePipOffset(robotName)
+  const [
+    dashboardTipLengthCalLauncher,
+    DashboardTipLengthCalWizard,
+  ] = useDashboardCalibrateTipLength(robotName)
+  const [
+    dashboardDeckCalLauncher,
+    DashboardDeckCalWizard,
+  ] = useDashboardCalibrateDeck(robotName)
   return (
-    <Modal
-      title={`${robotName} ${t('calibration_dashboard')}`}
-      onClose={() =>
-        history.push(`/devices/${robotName}/robot-settings/calibration`)
-      }
-      fullPage
-      backgroundColor={COLORS.fundamentalsBackground}
+    <ApiHostProvider
+      key={robot?.name}
+      hostname={robot?.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      calibration task list
-    </Modal>
+      <CalibrationTaskList
+        robotName={robotName}
+        deckCalLauncher={dashboardDeckCalLauncher}
+        tipLengthCalLauncher={dashboardTipLengthCalLauncher}
+        pipOffsetCalLauncher={dashboardOffsetCalLauncher}
+      />
+      {DashboardDeckCalWizard}
+      {DashboardOffsetCalWizard}
+      {DashboardTipLengthCalWizard}
+    </ApiHostProvider>
   )
 }

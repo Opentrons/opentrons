@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Mount,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -19,7 +20,6 @@ import {
   SMALL_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
@@ -129,16 +129,16 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={SPACING.spacing6}
+        padding={SPACING.spacing32}
         minHeight="32rem"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignSelf={ALIGN_STRETCH}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            <StyledText as="h1" marginBottom={SPACING.spacing16}>
               {titleText}
             </StyledText>
             <StyledText as="p">
@@ -166,12 +166,12 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           jog={jog}
           stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
         />
-        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing4}>
           {confirmLink}
         </Box>
         <Flex
           width="100%"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <NeedHelpLink />

@@ -6,25 +6,27 @@ Slices of the tests will be selected as candidates for automation and then perfo
 
 ## Notes
 
-- This folder is not plugged into the global Make ecosystem of the Opentrons mono repository. This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
+- This folder is **not** plugged into the global Make ecosystem of the Opentrons mono repository. This is intentional, the tools in this folder are independent and will likely be used by only a few and are in no way a dependency of any other part of this repository.
 
 ## Steps
 
-1. Have python installed per [CONTRIBUTING.md](../CONTRIBUTING.md)
+1. Have pyenv installed per [DEV_SETUP.md](../DEV_SETUP.md)
+   1. Install python 3.11
 2. Install the Opentrons application on your machine.
-   1. https://opentrons.com/ot-app/
+   1. <https://opentrons.com/ot-app/>
    2. This could also be done by building the installer on a branch and installing the App.
       1. for Mac
          1. `make -C app-shell dist-osx`
 3. Install Chromedriver
    1. in the app-testing directory
-      1. `sudo ./ci-tools/mac_get_chromedriver.sh 13.1.8` per the version of electron in the root package.json for electron
+      1. `sudo ./ci-tools/mac_get_chromedriver.sh 21.3.1` per the version of electron in the root package.json for electron
+         1. Windows `sudo .\ci-tools\windows_get_chromedriver.ps1 -version 21.3.1`
          1. if you experience `wget: command not found`
             1. brew install wget and try again
    2. when you run `chromedriver --version`
       1. It should work
       2. It should output the below. The chromedriver version must match Electron version we build into the App.
-         1. ChromeDriver 91.0.4472.164 (6c672af59118e1b9f132f26dedbd34fdce3affb1-refs/heads/master@{#883390})
+         1. ChromeDriver 106.0.5249.181 (7e86549ea18ccbc17d7b600e3cd4190f45db35c7-refs/heads/main@{#1045491})
 4. Create .env from example.env `cp example.env .env`
    1. Fill in values (if there are secrets)
    2. Make sure the paths work on your machine
@@ -36,38 +38,12 @@ Slices of the tests will be selected as candidates for automation and then perfo
 7. Run all tests
    1. `make test`
 8. Run specific test(s)
-   1. `pipenv run python -m pytest -k test_initial_load_no_robot`
+   1. `pipenv run python -m pytest -k test_labware_landing`
       1. [See docs on pytest -k flag](https://docs.pytest.org/en/6.2.x/usage.html#specifying-tests-selecting-tests)
-
-## Possible ToDo
-
-- Once there is a mass of tests to see the patterns to abstract:
-  - Abstract env variables and config file setup into data structures and functions instead of inline?
-  - Extend or change the reporting output?
-- Mac and Windows github action runners?
-- Caching in github action runners?
-- Add the option/capability to 'build and install' instead of 'download and install' on runners.
-- Define steps for a VM/docker locally for linux runs?
-- Define steps for a VM locally for windows runs?
-- Better injection of dependencies to relieve import bloat?
-- Test case objects describing setup, "test data", test case meta data for tracking?
-- Test execution history into DataDog
-
-## commands
-
-use xdist
-`pipenv run pytest -n3`
-
-run black
-`make format`
-`make black`
-
-run lint
-`make lint`
 
 ## Tools
 
-python 3.10.2 - manage python with [pyenv](https://realpython.com/intro-to-pyenv)
+python 3.11.0 - manage python with [pyenv](https://realpython.com/intro-to-pyenv)
 [pipenv](https://pipenv.pypa.io/en/latest/)
 
 ## Locator Tool
@@ -75,6 +51,8 @@ python 3.10.2 - manage python with [pyenv](https://realpython.com/intro-to-pyenv
 Using the python REPL we can launch the app and in real time compose element locator strategies.
 Then we can execute them, proving they work.
 This alleviates having to run tests over and over to validate element locator strategies.
+
+> Using this tool is imperative to reduce time of development when creating/troubleshooting element locators.
 
 From the app-testing directory
 
@@ -88,3 +66,40 @@ pipenv run python -i locators.py
 
 > sometimes chromedriver does not cleanly exit.
 > `pkill -x chromedriver`
+
+## Emulation
+
+We have made the choice to setup all test runs local and in CI against this emulator [config](./ci-tools/ot2_with_all_modules.yaml)
+
+To use locally setup the [emulator](https://github.com/Opentrons/opentrons-emulation)
+
+run our expected config
+
+```shell
+make run file_path=$MONOREPOPATH/app-testing/ci-tools/ot2_with_all_modules.yaml
+```
+
+ctrl-c to stop
+
+remove the containers (this resets calibration, stopping them does not)
+
+```shell
+make remove file_path=$MONOREPOPATH/app-testing/ci-tools/ot2_with_all_modules.yaml
+```
+
+## Gotchas
+
+- Only have 1 robot connected at once.
+  - Build locators like you have more than 1 to future proof.
+
+## Analysis Test
+
+The analysis test `pipenv run pytest -k test_analyses` is driven by the comma delimited string variable `APP_ANALYSIS_TEST_PROTOCOLS` in `.env`
+This allows us to run one or many.
+
+### Adding protocols
+
+1. add the protocol file named according to the naming convention in the files/protocols appropriate folder
+1. add the protocol stem to `protocol_files.py`
+1. add the protocol data as a property to `protocols.py`
+1. run `make print-protocols`

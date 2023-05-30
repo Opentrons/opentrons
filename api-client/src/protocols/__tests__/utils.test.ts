@@ -3,7 +3,7 @@ import {
   parsePipetteEntity,
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
-  parseAllRequiredModuleModelsById,
+  parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
@@ -67,9 +67,26 @@ const mockLoadLiquidRunTimeCommands = [
       liquidId: '1',
       labwareId: 'mockLabwareId2',
       volumeByWell: {
-        A1: 33,
-        B1: 33,
-        C1: 33,
+        D3: 40,
+      },
+    },
+    result: {},
+    startedAt: '2022-09-07T19:47:42.786212+00:00',
+    completedAt: '2022-09-07T19:47:42.786285+00:00',
+  },
+  {
+    id: '1e03ae10-7e9b-465c-bc72-21ab5706bfb0',
+    createdAt: '2022-09-07T19:47:42.781323+00:00',
+    commandType: 'loadLiquid',
+    key: '48df9766-04ff-4927-9f2d-4efdcf0b3df8',
+    status: 'succeeded',
+    params: {
+      liquidId: '1',
+      labwareId: 'mockLabwareId2',
+      volumeByWell: {
+        A3: 33,
+        B3: 33,
+        C3: 33,
       },
     },
     result: {},
@@ -141,7 +158,9 @@ describe('parseInitialPipetteNamesByMount', () => {
 })
 describe('parsePipetteEntity', () => {
   it('returns pipette names by id if loaded', () => {
-    const expected = [{ id: 'pipette-0', pipetteName: 'p300_single_gen2' }]
+    const expected = [
+      { id: 'pipette-0', pipetteName: 'p300_single_gen2', mount: 'left' },
+    ]
     expect(parsePipetteEntity(mockRunTimeCommands)).toEqual(expected)
   })
 })
@@ -151,15 +170,23 @@ describe('parseAllRequiredModuleModels', () => {
     expect(parseAllRequiredModuleModels(mockRunTimeCommands)).toEqual(expected)
   })
 })
-describe('parseAllRequiredModuleModelsById', () => {
+describe('parseRequiredModulesEntity', () => {
   it('returns models by id for all loaded modules', () => {
-    const expected = {
-      'module-0': { model: 'magneticModuleV2' },
-      'module-1': { model: 'temperatureModuleV2' },
-    }
-    expect(parseAllRequiredModuleModelsById(mockRunTimeCommands)).toEqual(
-      expected
-    )
+    const expected = [
+      {
+        id: 'module-0',
+        model: 'magneticModuleV2',
+        location: { slotName: '1' },
+        serialNumber: '',
+      },
+      {
+        id: 'module-1',
+        model: 'temperatureModuleV2',
+        location: { slotName: '3' },
+        serialNumber: '',
+      },
+    ]
+    expect(parseRequiredModulesEntity(mockRunTimeCommands)).toEqual(expected)
   })
 })
 describe('parseInitialLoadedLabwareBySlot', () => {
@@ -216,12 +243,14 @@ describe('parseInitialLoadedLabwareById', () => {
         loadName: 'opentrons_96_tiprack_300ul',
         definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
         displayName: 'Opentrons 96 Tip Rack 300 µL',
+        location: { slotName: '2' },
       },
       {
         id: 'labware-2',
         loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
         definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
         displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        location: { moduleId: 'module-0' },
       },
       {
         id: 'labware-3',
@@ -230,6 +259,7 @@ describe('parseInitialLoadedLabwareById', () => {
           'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1',
         displayName:
           'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap',
+        location: { moduleId: 'module-1' },
       },
     ]
     expect(parseInitialLoadedLabwareEntity(mockRunTimeCommands)).toEqual(
@@ -317,9 +347,10 @@ describe('parseLabwareInfoByLiquidId', () => {
         {
           labwareId: 'mockLabwareId2',
           volumeByWell: {
-            A1: 33,
-            B1: 33,
-            C1: 33,
+            A3: 33,
+            B3: 33,
+            C3: 33,
+            D3: 40,
           },
         },
       ],

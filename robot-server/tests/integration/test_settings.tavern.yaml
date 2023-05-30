@@ -2,12 +2,12 @@
 test_name: GET Settings
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Settings GET request returns correct info
     request:
       method: GET
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
     response:
       status_code: 200
       json:
@@ -54,16 +54,16 @@ stages:
             description: !re_search 'Opentrons-internal setting to test new hardware'
             restart_required: true
             value: !anything
-          - id: enableProtocolEnginePAPICore
+          - id: rearPanelIntegration
             old_id: Null
-            title: Enable experimental execution core for Python protocols
-            description: !re_search 'Opentrons-internal setting to test new execution logic'
+            title: 'Enable robots with the new usb connected rear-panel board.'
+            description: !re_search 'This is an Opentrons-internal setting to test new rear-panel.'
             restart_required: false
             value: !anything
-          - id: enableLoadLiquid
+          - id: disableStallDetection
             old_id: Null
-            title: Enable load liquid command and liquids translation
-            description: !re_search 'Allow load liquid command and liquids translation.'
+            title: 'Disable stall detection on the Flex.'
+            description: !re_search 'This is an Opentrons-internal setting for hardware-testing.'
             restart_required: false
             value: !anything
         links: !anydict
@@ -73,7 +73,7 @@ stages:
 test_name: POST Setting and value
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
   - parametrize:
       key: id
       vals:
@@ -92,7 +92,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
       json:
         id: '{id}'
         value: '{value}'
@@ -109,7 +109,7 @@ stages:
 test_name: POST Settings with no values
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
   - parametrize:
       key: id
       vals:
@@ -123,7 +123,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
       json:
         id: '{id}'
     response:
@@ -139,12 +139,12 @@ stages:
 test_name: POST With incorrect ID
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Post with incorrect ID
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
       json:
         id: notARealID
         value: true

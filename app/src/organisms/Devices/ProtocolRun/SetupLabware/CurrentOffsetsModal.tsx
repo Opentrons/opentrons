@@ -2,10 +2,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import pick from 'lodash/pick'
+
 import {
   getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import {
   Flex,
@@ -14,37 +16,41 @@ import {
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_END,
-  ALIGN_CENTER,
-  Link,
 } from '@opentrons/components'
+
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import { ModalHeader, ModalShell } from '../../../../molecules/Modal'
+import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
-import { getLoadedLabwareDefinitionsByUri } from '../../../../resources/protocols/utils'
+import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'
+import { getLatestCurrentOffsets } from '../SetupLabwarePositionCheck/utils'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import { PrimaryButton } from '../../../../atoms/buttons'
+import type {
+  RunTimeCommand,
+  LoadedLabware,
+  LoadedModule,
+} from '@opentrons/shared-data'
 
 const OffsetTable = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing1};
-  margin: ${SPACING.spacing4} 0;
+  border-spacing: 0 ${SPACING.spacing2};
+  margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  padding: ${SPACING.spacing2};
+  padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
   background-color: ${COLORS.fundamentalsBackground};
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
 `
 
 const OffsetTableDatum = styled('td')`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   white-space: break-spaces;
   text-overflow: wrap;
 `
@@ -52,19 +58,77 @@ const OffsetTableDatum = styled('td')`
 interface CurrentOffsetsModalProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  modules: LoadedModule[]
   onCloseClick: () => void
 }
 export function CurrentOffsetsModal(
   props: CurrentOffsetsModalProps
 ): JSX.Element {
-  const { currentOffsets, commands, onCloseClick } = props
+  const { currentOffsets, commands, labware, modules, onCloseClick } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)
-  const [showCodeSnippet, setShowCodeSnippet] = React.useState<boolean>(false)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
+  const latestCurrentOffsets = getLatestCurrentOffsets(currentOffsets)
 
+  const TableComponent = (
+    <OffsetTable>
+      <thead>
+        <tr>
+          <OffsetTableHeader>{t('location')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+        </tr>
+      </thead>
+      <tbody>
+        {latestCurrentOffsets.map(offset => {
+          const labwareDisplayName =
+            offset.definitionUri in defsByURI
+              ? getLabwareDisplayName(defsByURI[offset.definitionUri])
+              : offset.definitionUri
+          return (
+            <OffsetTableRow key={offset.id}>
+              <OffsetTableDatum>
+                {t('slot', { slotName: offset.location.slotName })}
+                {offset.location.moduleModel != null
+                  ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
+                  : null}
+              </OffsetTableDatum>
+              <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
+              <OffsetTableDatum>
+                <OffsetVector {...offset.vector} />
+              </OffsetTableDatum>
+            </OffsetTableRow>
+          )
+        })}
+      </tbody>
+    </OffsetTable>
+  )
+
+  const JupyterSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="jupyter"
+      labwareOffsets={latestCurrentOffsets.map(o =>
+        pick(o, ['definitionUri', 'location', 'vector'])
+      )}
+      commands={commands ?? []}
+      labware={labware ?? []}
+      modules={modules ?? []}
+    />
+  )
+  const CommandLineSnippet = (
+    <PythonLabwareOffsetSnippet
+      mode="cli"
+      labwareOffsets={latestCurrentOffsets.map(o =>
+        pick(o, ['definitionUri', 'location', 'vector'])
+      )}
+      commands={commands ?? []}
+      labware={labware ?? []}
+      modules={modules ?? []}
+    />
+  )
   return (
     <ModalShell
       maxWidth="40rem"
@@ -75,75 +139,17 @@ export function CurrentOffsetsModal(
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={SPACING.spacing6}
+        padding={SPACING.spacing32}
       >
         {isLabwareOffsetCodeSnippetsOn ? (
-          <Link
-            role="link"
-            css={TYPOGRAPHY.labelSemiBold}
-            color={COLORS.darkBlackEnabled}
-            onClick={() => setShowCodeSnippet(true)}
-          >
-            {t('get_labware_offset_data')}
-          </Link>
-        ) : null}
-        {showCodeSnippet ? (
-          <PrimaryButton onClick={() => setShowCodeSnippet(false)}>
-            TODO ADD JUPYTER/CLI SNIPPET SUPPORT
-          </PrimaryButton>
-        ) : null}
-
-        <OffsetTable>
-          <thead>
-            <tr>
-              <OffsetTableHeader>{t('location')}</OffsetTableHeader>
-              <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-              <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {currentOffsets.map(offset => (
-              <OffsetTableRow key={offset.id}>
-                <OffsetTableDatum>
-                  {t('slot', { slotName: offset.location.slotName })}
-                  {offset.location.moduleModel != null
-                    ? ` - ${getModuleDisplayName(offset.location.moduleModel)}`
-                    : null}
-                </OffsetTableDatum>
-                <OffsetTableDatum>
-                  {getLabwareDisplayName(defsByURI[offset.definitionUri])}
-                </OffsetTableDatum>
-                <OffsetTableDatum>
-                  <OffsetVector {...offset.vector} />
-                </OffsetTableDatum>
-              </OffsetTableRow>
-            ))}
-          </tbody>
-        </OffsetTable>
-        <Flex
-          width="100%"
-          marginTop={SPACING.spacing6}
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing3}
-        >
-          <Link
-            css={TYPOGRAPHY.linkPSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={onCloseClick}
-            role="button"
-          >
-            {t('shared:cancel')}
-          </Link>
-          <PrimaryButton
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            onClick={() => {
-              console.log('TODO, run LPC')
-            }}
-          >
-            {t('run_labware_position_check')}
-          </PrimaryButton>
-        </Flex>
+          <LabwareOffsetTabs
+            TableComponent={TableComponent}
+            JupyterComponent={JupyterSnippet}
+            CommandLineComponent={CommandLineSnippet}
+          />
+        ) : (
+          TableComponent
+        )}
       </Flex>
     </ModalShell>
   )

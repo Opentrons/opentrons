@@ -16,13 +16,13 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
-import flatBottom from '@opentrons/app/src/assets/images/flatbottom_thermal_adapter.png'
-import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.png'
-import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
-import universal from '@opentrons/app/src/assets/images/universal_thermal_adapter.png'
-import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
-import { StyledText } from '@opentrons/app/src/atoms/text/StyledText'
+import heaterShaker from '../../../assets/images/heater_shaker_empty.png'
+import flatBottom from '../../../assets/images/flatbottom_thermal_adapter.png'
+import deepwell from '../../../assets/images/deepwell_thermal_adapter.png'
+import pcr from '../../../assets/images/pcr_thermal_adapter.png'
+import universal from '../../../assets/images/universal_thermal_adapter.png'
+import screwdriver from '../../../assets/images/t10_torx_screwdriver.png'
+import { StyledText } from '../../../atoms/text'
 
 import type {
   LabwareDefinition2,
@@ -40,15 +40,15 @@ interface IntroContainerProps {
 
 const IntroItem = (props: IntroContainerProps): JSX.Element => {
   let multiText: JSX.Element = <div></div>
-  const leftPadding = props.image != null ? SPACING.spacingL : SPACING.spacing3
+  const leftPadding = props.image != null ? SPACING.spacing24 : SPACING.spacing8
 
   if (props.subtext != null) {
     multiText = (
-      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacingM}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing20}>
         <Flex
           fontSize={TYPOGRAPHY.fontSizeLabel}
           paddingLeft={leftPadding}
-          paddingTop={SPACING.spacing3}
+          paddingTop={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
         >
           {props.text}
@@ -56,7 +56,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
         <Flex
           fontSize={TYPOGRAPHY.fontSizeH6}
           paddingLeft={leftPadding}
-          paddingTop={SPACING.spacing1}
+          paddingTop={SPACING.spacing2}
           alignItems={ALIGN_CENTER}
         >
           {props.subtext}
@@ -68,7 +68,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
       <Flex
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingLeft={leftPadding}
-        paddingTop={SPACING.spacing3}
+        paddingTop={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         {props.text}
@@ -77,15 +77,15 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
   }
   return (
     <Flex
-      marginTop={SPACING.spacing3}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+      marginTop={SPACING.spacing8}
+      border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
       flexDirection={DIRECTION_ROW}
       width="21.5rem"
-      paddingBottom={SPACING.spacing3}
+      paddingBottom={SPACING.spacing8}
     >
       {props.image != null ? (
         <>
-          <Flex paddingLeft={SPACING.spacingXS} paddingTop={SPACING.spacing3}>
+          <Flex paddingLeft={SPACING.spacing4} paddingTop={SPACING.spacing8}>
             {props.image}
           </Flex>
           {multiText}
@@ -129,7 +129,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
 
   return (
     <Flex
-      padding={SPACING.spacingM}
+      padding={SPACING.spacing20}
       flexDirection={DIRECTION_COLUMN}
       marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >
@@ -166,7 +166,10 @@ export function Introduction(props: IntroductionProps): JSX.Element {
                   height="4.313rem"
                   css={THERMAL_ADAPTER_TRANSFORM}
                 >
-                  <img src={adapterImage} alt={`${thermalAdapterName}`} />
+                  <img
+                    src={adapterImage}
+                    alt={`${String(thermalAdapterName)}`}
+                  />
                 </Flex>
               ) : undefined
             }

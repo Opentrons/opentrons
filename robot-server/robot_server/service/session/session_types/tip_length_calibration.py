@@ -1,5 +1,6 @@
-from typing import cast, Awaitable, Optional
+from typing import cast, Awaitable, Optional, Any, Union
 from opentrons.types import Mount
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
@@ -45,6 +46,13 @@ class TipLengthCalibration(BaseSession):
         )
         self._shutdown_coroutine = shutdown_handler
 
+    @staticmethod
+    def _verify_tip_rack(tip_rack_def: Union[Any, None]) -> Optional[LabwareDefinition]:
+        if tip_rack_def:
+            labware.verify_definition(tip_rack_def)
+            return cast(LabwareDefinition, tip_rack_def)
+        return None
+
     @classmethod
     async def create(
         cls, configuration: SessionConfiguration, instance_meta: SessionMetaData
@@ -52,15 +60,12 @@ class TipLengthCalibration(BaseSession):
         assert isinstance(instance_meta.create_params, SessionCreateParams)
         has_calibration_block = instance_meta.create_params.hasCalibrationBlock
         mount = instance_meta.create_params.mount
-        tip_rack_def = instance_meta.create_params.tipRackDefinition
-        if tip_rack_def:
-            verified_definition = labware.verify_definition(tip_rack_def)
-        else:
-            raise SessionCreationException("No tiprack def provided")
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
-        session_controls_lights = not configuration.hardware.get_lights()["rails"]
+        session_controls_lights = not (await configuration.hardware.get_lights())[
+            "rails"
+        ]
         await configuration.hardware.cache_instruments()
         await configuration.hardware.home()
         try:
@@ -68,7 +73,9 @@ class TipLengthCalibration(BaseSession):
                 hardware=configuration.hardware,
                 mount=Mount[mount.upper()],
                 has_calibration_block=has_calibration_block,
-                tip_rack=verified_definition,
+                tip_rack=TipLengthCalibration._verify_tip_rack(
+                    instance_meta.create_params.tipRackDefinition
+                ),
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))

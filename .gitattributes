@@ -3,4 +3,5 @@
 # These files are binary and line endings should be left untouched
 *.hex binary
 *.bat binary
+*.gltf binary
 api/pypi-readme.rst text eol=lf

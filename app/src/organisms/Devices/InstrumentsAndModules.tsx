@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
-import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useModulesQuery,
+  usePipettesQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
 import {
   Flex,
@@ -17,13 +22,18 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsOT3, useIsRobotViewable, useRunStatuses } from './hooks'
+import {
+  getIs96ChannelPipetteAttached,
+  getOffsetCalibrationForMount,
+} from './utils'
 import { PipetteCard } from './PipetteCard'
+import { GripperCard } from '../GripperCard'
 
 const EQUIPMENT_POLL_MS = 5000
+const FETCH_PIPETTE_CAL_POLL = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -32,15 +42,26 @@ export function InstrumentsAndModules({
   robotName,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-
-  const attachedPipettes = usePipettesQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })?.data ?? { left: undefined, right: undefined }
+  const attachedPipettes = usePipettesQuery(
+    {},
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    }
+  )?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
   const isOT3 = useIsOT3(robotName)
 
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
+  // { refetchInterval: EQUIPMENT_POLL_MS, },
+  const extensionInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
+
+  const is96ChannelAttached = getIs96ChannelPipetteAttached(
+    attachedPipettes?.left ?? null
+  )
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // split modules in half and map into each column separately to avoid
@@ -53,9 +74,25 @@ export function InstrumentsAndModules({
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
-  // TODO(bh, 2022-10-27): get gripper data, create interface
-  // const gripper = { model: null }
-  const gripper = { model: 'Opentrons Gripper GEN1' }
+  // The following pipetteOffset related code has been lifted out of the PipetteCard component
+  // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
+  // Instead we now capture all offset calibration data here, and pass the appropriate calibration
+  // data to the associated card via props
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({
+      refetchInterval: FETCH_PIPETTE_CAL_POLL,
+      enabled: !isOT3,
+    })?.data?.data ?? []
+  const leftMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    LEFT
+  )
+  const rightMountOffsetCalibration = getOffsetCalibrationForMount(
+    pipetteOffsetCalibrations,
+    attachedPipettes,
+    RIGHT
+  )
 
   return (
     <Flex
@@ -66,7 +103,7 @@ export function InstrumentsAndModules({
       <StyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
@@ -75,26 +112,26 @@ export function InstrumentsAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
         {currentRunId != null && !isRunTerminal && (
           <Flex
-            paddingBottom={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            paddingX={SPACING.spacing2}
+            paddingX={SPACING.spacing4}
             width="100%"
           >
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex gridGap={SPACING.spacing3} width="100%">
+          <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
@@ -103,35 +140,31 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
+                isPipetteCalibrated={
+                  isOT3
+                    ? attachedInstruments?.data?.find(i => i.mount === 'left')
+                        ?.data?.calibratedOffset != null
+                    : leftMountOffsetCalibration != null
+                }
                 mount={LEFT}
                 robotName={robotName}
+                is96ChannelAttached={is96ChannelAttached}
               />
-              {/* extension mount here */}
               {isOT3 ? (
-                <InstrumentCard
-                  description={
-                    gripper.model != null ? gripper.model : t('shared:empty')
+                <GripperCard
+                  attachedGripper={extensionInstrument}
+                  isCalibrated={
+                    attachedInstruments?.data?.find(
+                      i => i.mount === 'extension'
+                    )?.data?.calibratedOffset != null
                   }
-                  isGripperAttached={gripper.model != null}
-                  label={t('shared:extension_mount')}
-                  // TODO(bh, 2022-10-27): insert gripper recalibrate and detach functions, empty mount menu items
-                  menuOverlayItems={[
-                    {
-                      label: 'Recalibrate gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Recalibrate gripper'),
-                    },
-                    {
-                      label: 'Detach gripper',
-                      disabled: gripper.model == null,
-                      onClick: () => console.log('Detach gripper'),
-                    },
-                  ]}
                 />
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
+                  key={`moduleCard_${String(module.moduleType)}_${String(
+                    index
+                  )}`}
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
@@ -141,22 +174,34 @@ export function InstrumentsAndModules({
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
-              <PipetteCard
-                pipetteId={attachedPipettes.right?.id}
-                pipetteInfo={
-                  attachedPipettes.right?.model != null
-                    ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
-                      null
-                    : null
-                }
-                mount={RIGHT}
-                robotName={robotName}
-              />
+              {!Boolean(is96ChannelAttached) ? (
+                <PipetteCard
+                  pipetteId={attachedPipettes.right?.id}
+                  pipetteInfo={
+                    attachedPipettes.right?.model != null
+                      ? getPipetteModelSpecs(attachedPipettes.right?.model) ??
+                        null
+                      : null
+                  }
+                  isPipetteCalibrated={
+                    isOT3
+                      ? attachedInstruments?.data?.find(
+                          i => i.mount === 'right'
+                        )?.data?.calibratedOffset != null
+                      : rightMountOffsetCalibration != null
+                  }
+                  mount={RIGHT}
+                  robotName={robotName}
+                  is96ChannelAttached={false}
+                />
+              ) : null}
               {rightColumnModules.map((module, index) => (
                 <ModuleCard
-                  key={`moduleCard_${module.moduleType}_${index}`}
+                  key={`moduleCard_${String(module.moduleType)}_${String(
+                    index
+                  )}`}
                   robotName={robotName}
                   module={module}
                   isLoadedInRun={false}
@@ -168,10 +213,10 @@ export function InstrumentsAndModules({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingSM}
+            gridGap={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             minHeight={SIZE_3}
-            padding={SPACING.spacingSM}
+            padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText

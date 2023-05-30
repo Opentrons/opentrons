@@ -23,6 +23,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
+    BaselineSensorResponse,
     ReadFromSensorRequest,
     SetSensorThresholdRequest,
     WriteToSensorRequest,
@@ -41,6 +42,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SensorThresholdResponsePayload,
     BindSensorOutputRequestPayload,
     PeripheralStatusResponsePayload,
+    BaselineSensorResponsePayload,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
@@ -92,7 +94,7 @@ def sensor_driver() -> SensorDriver:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
                     sensor_id=SensorIdField(SensorId.S0),
-                    sample_rate=UInt16Field(10),
+                    number_of_reads=UInt16Field(10),
                 )
             ),
         ],
@@ -102,7 +104,7 @@ def sensor_driver() -> SensorDriver:
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
                     sensor_id=SensorIdField(SensorId.S0),
-                    sample_rate=UInt16Field(10),
+                    number_of_reads=UInt16Field(10),
                 )
             ),
         ],
@@ -127,7 +129,7 @@ async def test_polling(
         [lazy_fixture("environment_sensor")],
     ],
 )
-async def test_receive_data_polling(
+async def test_baseline_averaging(
     sensor_driver: SensorDriver,
     sensor_type: BaseSensorType,
     mock_messenger: mock.AsyncMock,
@@ -139,16 +141,16 @@ async def test_receive_data_polling(
         """Message responder."""
         if sensor_type.sensor.sensor_type == SensorType.environment:
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(SensorType.humidity),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -156,16 +158,16 @@ async def test_receive_data_polling(
                 ),
             )
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(SensorType.temperature),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -174,16 +176,16 @@ async def test_receive_data_polling(
             )
         else:
             can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor_data=Int32Field(256),
+                BaselineSensorResponse(
+                    payload=BaselineSensorResponsePayload(
+                        offset_average=Int32Field(256),
                         sensor_id=SensorIdField(SensorId.S0),
                         sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                     )
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=BaselineSensorResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -251,8 +253,10 @@ async def test_write(
     )
     messenger = mock.AsyncMock(spec=CanMessenger)
     await sensor_driver.write(messenger, sensor_type, data)
-    messenger.send.assert_called_once_with(
-        node_id=sensor_type.sensor.node_id, message=message
+    messenger.ensure_send.assert_called_once_with(
+        node_id=sensor_type.sensor.node_id,
+        message=message,
+        expected_nodes=[sensor_type.sensor.node_id],
     )
 
 
@@ -418,7 +422,7 @@ async def test_threshold(
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=SensorThresholdResponse.message_id,
                         node_id=NodeId.host,
                         function_code=0,
                         originating_node_id=node_id,
@@ -460,7 +464,7 @@ async def test_bind_to_sync(
     async with sensor_driver.bind_output(
         mock_messenger,
         sensor_type,
-        SensorOutputBinding.sync,
+        [SensorOutputBinding.sync],
     ):
         mock_messenger.send.assert_called_with(
             node_id=sensor_type.sensor.node_id,
@@ -484,6 +488,7 @@ async def test_bind_to_sync(
     )
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     argnames=["sensor_type", "timeout"],
     argvalues=[
@@ -502,7 +507,7 @@ async def test_get_baseline(
     """Test for get_baseline.
 
     Tests that a BaselineSensorRequest gets sent,
-    and reads ReadFromSensorResponse message containing the
+    and reads BaselineSensorResponse message containing the
     correct information.
     """
 
@@ -511,16 +516,16 @@ async def test_get_baseline(
         if isinstance(message, BaselineSensorRequest):
             if sensor_type.sensor.sensor_type == SensorType.environment:
                 can_message_notifier.notify(
-                    ReadFromSensorResponse(
-                        payload=ReadFromSensorResponsePayload(
-                            sensor_data=Int32Field(50),
+                    BaselineSensorResponse(
+                        payload=BaselineSensorResponsePayload(
+                            offset_average=Int32Field(50),
                             sensor_id=SensorIdField(SensorId.S0),
                             sensor=SensorTypeField(SensorType.humidity),
                         )
                     ),
                     ArbitrationId(
                         parts=ArbitrationIdParts(
-                            message_id=ReadFromSensorResponse.message_id,
+                            message_id=BaselineSensorResponse.message_id,
                             node_id=NodeId.host,
                             function_code=0,
                             originating_node_id=node_id,
@@ -528,16 +533,16 @@ async def test_get_baseline(
                     ),
                 )
                 can_message_notifier.notify(
-                    ReadFromSensorResponse(
-                        payload=ReadFromSensorResponsePayload(
-                            sensor_data=Int32Field(50),
+                    BaselineSensorResponse(
+                        payload=BaselineSensorResponsePayload(
+                            offset_average=Int32Field(50),
                             sensor_id=SensorIdField(SensorId.S0),
                             sensor=SensorTypeField(SensorType.temperature),
                         )
                     ),
                     ArbitrationId(
                         parts=ArbitrationIdParts(
-                            message_id=ReadFromSensorResponse.message_id,
+                            message_id=BaselineSensorResponse.message_id,
                             node_id=NodeId.host,
                             function_code=0,
                             originating_node_id=node_id,
@@ -546,16 +551,16 @@ async def test_get_baseline(
                 )
             else:
                 can_message_notifier.notify(
-                    ReadFromSensorResponse(
-                        payload=ReadFromSensorResponsePayload(
+                    BaselineSensorResponse(
+                        payload=BaselineSensorResponsePayload(
                             sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                             sensor_id=SensorIdField(SensorId.S0),
-                            sensor_data=Int32Field(50),
+                            offset_average=Int32Field(50),
                         )
                     ),
                     ArbitrationId(
                         parts=ArbitrationIdParts(
-                            message_id=ReadFromSensorResponse.message_id,
+                            message_id=BaselineSensorResponse.message_id,
                             node_id=node_id,
                             function_code=0,
                             originating_node_id=node_id,
@@ -584,6 +589,7 @@ async def test_get_baseline(
         )
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     argnames=["sensor_type", "timeout", "data_points"],
     argvalues=[
@@ -616,7 +622,7 @@ async def test_debug_poll(
 ) -> None:
     """Test for debug poll."""
     async with sensor_driver.bind_output(
-        mock_messenger, sensor_type, SensorOutputBinding.report
+        mock_messenger, sensor_type, [SensorOutputBinding.report]
     ):
         with patch.object(
             sensor_driver._scheduler,
@@ -644,6 +650,7 @@ async def test_debug_poll(
     )
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     argnames=["sensor_type", "timeout"],
     argvalues=[
@@ -674,7 +681,7 @@ async def test_peripheral_status(
                 ),
                 ArbitrationId(
                     parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
+                        message_id=PeripheralStatusResponse.message_id,
                         node_id=node_id,
                         function_code=0,
                         originating_node_id=node_id,

@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { AlertModal, Box, SPACING_2, Text } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
-import { Portal } from '../../App/portal'
 import { useLogger } from '../../logger'
-import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
-import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
-import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
+import { FatalErrorModal } from './FatalErrorModal'
+
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface LabwarePositionCheckModalProps {
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   runId: string
+  maintenanceRunId: string
+  existingOffsets: LabwareOffset[]
+  mostRecentAnalysis: CompletedProtocolAnalysis | null
   caughtError?: Error
 }
 
@@ -23,33 +23,26 @@ export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
   const logger = useLogger(__filename)
-  const manualDeckStateModificationEnabled = useFeatureFlag(
-    'enableManualDeckStateModification'
-  )
-
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(props.runId)
-
-  const existingOffsets =
-    useRunQuery(props.runId).data?.data?.labwareOffsets ?? []
 
   return (
-    <ErrorBoundary logger={logger} ErrorComponent={CrashingErrorModal}>
-      {manualDeckStateModificationEnabled ? (
-        <LabwarePositionCheckComponent
-          {...props}
-          {...{ mostRecentAnalysis, existingOffsets }}
-        />
-      ) : (
-        <DeprecatedLabwarePositionCheckComponent {...props} />
-      )}
+    <ErrorBoundary
+      logger={logger}
+      ErrorComponent={FatalErrorModal}
+      onClose={props.onCloseClick}
+    >
+      <LabwarePositionCheckComponent {...props} />
     </ErrorBoundary>
   )
 }
 
 interface ErrorBoundaryProps {
   children: React.ReactNode
+  onClose: () => void
   logger: ReturnType<typeof useLogger>
-  ErrorComponent: (props: { errorMessage: string }) => JSX.Element
+  ErrorComponent: (props: {
+    errorMessage: string
+    onClose: () => void
+  }) => JSX.Element
 }
 class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
@@ -73,31 +66,14 @@ class ErrorBoundary extends React.Component<
   render(): ErrorBoundaryProps['children'] | JSX.Element {
     const { ErrorComponent, children } = this.props
     const { error } = this.state
-    if (error != null) return <ErrorComponent errorMessage={error.message} />
+    if (error != null)
+      return (
+        <ErrorComponent
+          errorMessage={error.message}
+          onClose={this.props.onClose}
+        />
+      )
     // Normally, just render children
     return children
   }
-}
-
-interface CrashingErrorModalProps {
-  errorMessage: string
-}
-function CrashingErrorModal(props: CrashingErrorModalProps): JSX.Element {
-  const { t } = useTranslation(['labware_position_check', 'shared'])
-  return (
-    <Portal level="top">
-      <AlertModal
-        heading={t('error_modal_header')}
-        iconName={null}
-        alertOverlay
-      >
-        <Box>
-          <Text>{t('error_modal_problem_in_app')}</Text>
-          <Text marginTop={SPACING_2}>
-            `${t('shared:error')}: ${props.errorMessage}`
-          </Text>
-        </Box>
-      </AlertModal>
-    </Portal>
-  )
 }

@@ -7,8 +7,12 @@ import pytest
 from decoy import Decoy, matchers
 from typing import TYPE_CHECKING, Union
 
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons_shared_data.gripper.constants import (
+    LABWARE_GRIP_FORCE,
+    IDLE_STATE_GRIP_FORCE,
+)
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.types import DeckSlotName, Point
 
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
@@ -20,8 +24,11 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetLocation,
     LabwareOffsetVector,
     LabwareLocation,
+    ExperimentalOffsetData,
 )
-
+from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
+    ThermocyclerPlateLifter,
+)
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
@@ -52,9 +59,21 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
-def model_utils(decoy: Decoy) -> ModelUtils:
-    """Get a mocked out ModelUtils instance."""
-    return decoy.mock(cls=ModelUtils)
+def equipment(decoy: Decoy) -> EquipmentHandler:
+    """Get a mocked out EquipmentHandler instance."""
+    return decoy.mock(cls=EquipmentHandler)
+
+
+@pytest.fixture
+def movement(decoy: Decoy) -> MovementHandler:
+    """Get a mocked out MovementHandler."""
+    return decoy.mock(cls=MovementHandler)
+
+
+@pytest.fixture
+def thermocycler_plate_lifter(decoy: Decoy) -> ThermocyclerPlateLifter:
+    """Get a mocked out ThermocyclerPlateLifter instance."""
+    return decoy.mock(cls=ThermocyclerPlateLifter)
 
 
 @pytest.fixture
@@ -69,12 +88,24 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
     return decoy.mock(cls=HeaterShakerMovementFlagger)
 
 
+def default_experimental_movement_data() -> ExperimentalOffsetData:
+    """Experimental movement data with default values."""
+    return ExperimentalOffsetData(
+        usePickUpLocationLpcOffset=False,
+        useDropLocationLpcOffset=False,
+        pickUpOffset=None,
+        dropOffset=None,
+    )
+
+
 @pytest.mark.ot3_only
 @pytest.fixture
 def subject(
     ot3_hardware_api: OT3API,
     state_store: StateStore,
-    model_utils: ModelUtils,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
 ) -> LabwareMovementHandler:
@@ -82,7 +113,9 @@ def subject(
     return LabwareMovementHandler(
         hardware_api=ot3_hardware_api,
         state_store=state_store,
-        model_utils=model_utils,
+        equipment=equipment,
+        movement=movement,
+        thermocycler_plate_lifter=thermocycler_plate_lifter,
         thermocycler_movement_flagger=thermocycler_movement_flagger,
         heater_shaker_movement_flagger=heater_shaker_movement_flagger,
     )
@@ -108,6 +141,7 @@ def subject(
 async def test_move_labware_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
+    thermocycler_plate_lifter: ThermocyclerPlateLifter,
     ot3_hardware_api: OT3API,
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation],
@@ -148,13 +182,20 @@ async def test_move_labware_with_gripper(
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
         )
     )
+    experimental_offset_data = ExperimentalOffsetData(
+        usePickUpLocationLpcOffset=True,
+        useDropLocationLpcOffset=False,
+        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
     expected_waypoints = [
         Point(777, 888, 999),  # gripper retract at current location
-        Point(101.1, 102.2, 999),  # move to above slot 1
-        Point(101.1, 102.2, 119.8),  # move to labware on slot 1
-        Point(101.1, 102.2, 999),  # gripper retract at current location
-        Point(201.5, 202.6, 999),  # move to above slot 3
-        Point(201.5, 202.6, 220.2),  # move down to labware drop height on slot 3
+        Point(100.1, 100.2, 999),  # move to above slot 1
+        Point(100.1, 100.2, 116.8),  # move to labware on slot 1
+        Point(100.1, 100.2, 999),  # gripper retract at current location
+        Point(202.0, 204.0, 999),  # move to above slot 3
+        Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
         Point(201.5, 202.6, 999),  # retract in place
     ]
 
@@ -163,24 +204,27 @@ async def test_move_labware_with_gripper(
         current_location=from_location,
         new_location=to_location,
         new_offset_id="new-offset-id",
+        experimental_offset_data=experimental_offset_data,
     )
 
     gripper = OT3Mount.GRIPPER
     decoy.verify(
         await ot3_hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]),
-        await ot3_hardware_api.home_gripper_jaw(),
+        await thermocycler_plate_lifter.lift_plate_for_labware_movement(from_location),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
         ),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[1]
         ),
+        await ot3_hardware_api.home_gripper_jaw(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[2]
         ),
-        await ot3_hardware_api.grip(
-            force_newtons=20
-        ),  # TODO: replace this once we have this spec in hardware control
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
+        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[3]
         ),
@@ -191,9 +235,10 @@ async def test_move_labware_with_gripper(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
         await ot3_hardware_api.ungrip(),
-        await ot3_hardware_api.move_to(
-            mount=gripper, abs_position=expected_waypoints[6]
-        ),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
+        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
+        # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
+        await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
     )
 
 
@@ -201,14 +246,16 @@ async def test_labware_movement_raises_on_ot2(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareControlAPI,
-    model_utils: ModelUtils,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
 ) -> None:
     """It should raise an error when attempting a gripper movement on a non-OT3 bot."""
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     subject = LabwareMovementHandler(
         hardware_api=hardware_api,
         state_store=state_store,
-        model_utils=model_utils,
+        equipment=equipment,
+        movement=movement,
     )
 
     with pytest.raises(HardwareNotSupportedError):
@@ -217,6 +264,7 @@ async def test_labware_movement_raises_on_ot2(
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             new_offset_id=None,
+            experimental_offset_data=default_experimental_movement_data(),
         )
 
 
@@ -226,7 +274,6 @@ async def test_labware_movement_skips_for_virtual_gripper(
     state_store: StateStore,
     ot3_hardware_api: OT3API,
     subject: LabwareMovementHandler,
-    model_utils: ModelUtils,
 ) -> None:
     """It should neither raise error nor move gripper when using virtual gripper."""
     decoy.when(state_store.config.use_virtual_gripper).then_return(True)
@@ -234,6 +281,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
         labware_id="labware-id",
         current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        experimental_offset_data=default_experimental_movement_data(),
         new_offset_id=None,
     )
     decoy.verify(
@@ -260,6 +308,7 @@ async def test_labware_movement_raises_without_gripper(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            experimental_offset_data=default_experimental_movement_data(),
             new_offset_id=None,
         )
 

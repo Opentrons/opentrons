@@ -13,10 +13,10 @@ import {
   Box,
   COLORS,
   Link,
+  PrimaryButton,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import { PrimaryButton } from '../../atoms/buttons'
 import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
 import {
   getCalibrationForPipette,
@@ -76,17 +76,20 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     defaultTipracks,
   } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
-  const pipSerial = usePipettesQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })?.data?.[mount].id
+  const pipSerial = usePipettesQuery(
+    {},
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    }
+  )?.data?.[mount].id
 
   const pipetteOffsetCal = useSelector((state: State) =>
-    robotName && pipSerial
+    robotName != null && pipSerial != null
       ? getCalibrationForPipette(state, robotName, pipSerial, mount)
       : null
   )
   const tipLengthCal = useSelector((state: State) =>
-    robotName && pipSerial && pipetteOffsetCal
+    robotName != null && pipSerial != null && pipetteOffsetCal != null
       ? getTipLengthForPipetteAndTiprack(
           state,
           robotName,
@@ -96,13 +99,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       : null
   )
   const allTipLengthCal = useSelector((state: State) =>
-    robotName ? getTipLengthCalibrations(state, robotName) : []
+    robotName != null ? getTipLengthCalibrations(state, robotName) : []
   )
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
 
-  const allTipRackDefs = defaultTipracks
-    ? defaultTipracks.concat(customTipRacks)
-    : customTipRacks
+  const allTipRackDefs =
+    defaultTipracks != null
+      ? defaultTipracks.concat(customTipRacks)
+      : customTipRacks
   const tipRackByUriMap = allTipRackDefs.reduce<TipRackMap>((obj, lw) => {
     if (lw) {
       obj[getLabwareDefURI(lw)] = {
@@ -117,8 +121,8 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           // Old tip length data don't have tiprack uri info, so we are using the
           // tiprack hash in pipette offset to check against tip length cal for
           // backward compatability purposes
-          (pipetteOffsetCal &&
-          tipLengthCal &&
+          (pipetteOffsetCal != null &&
+          tipLengthCal != null &&
           pipetteOffsetCal.tiprackUri === getLabwareDefURI(lw)
             ? tipLengthCal
             : null),
@@ -127,9 +131,10 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     return obj
   }, {})
 
-  const opentronsTipRacksOptions: SelectOption[] = defaultTipracks
-    ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
-    : []
+  const opentronsTipRacksOptions: SelectOption[] =
+    defaultTipracks != null
+      ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
+      : []
   const customTipRacksOptions: SelectOption[] = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
@@ -151,7 +156,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   const [selectedValue, setSelectedValue] = React.useState<
     SingleValue<SelectOption> | MultiValue<SelectOption>
   >(
-    chosenTipRack
+    chosenTipRack != null
       ? formatOptionsFromLabwareDef(chosenTipRack)
       : formatOptionsFromLabwareDef(tipRack.definition)
   )
@@ -160,7 +165,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     selected: SingleValue<SelectOption> | MultiValue<SelectOption>,
     _: unknown
   ): void => {
-    selected && setSelectedValue(selected)
+    selected != null && setSelectedValue(selected)
   }
   const handleUseTipRack = (): void => {
     const value = (selectedValue as SelectOption).value
@@ -177,18 +182,18 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
-      <Flex gridGap={SPACING.spacingXXL}>
+      <Flex gridGap={SPACING.spacing40}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <StyledText
             css={TYPOGRAPHY.h1Default}
-            marginBottom={SPACING.spacing4}
+            marginBottom={SPACING.spacing16}
           >
             {t('choose_a_tip_rack')}
           </StyledText>
@@ -198,7 +203,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           >
             {t('select_tip_rack')}
           </StyledText>
-          <Box marginBottom={SPACING.spacingSM}>
+          <Box marginBottom={SPACING.spacing12}>
             <Select
               isSearchable={false}
               options={groupOptions}
@@ -216,7 +221,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
               strong: (
                 <strong
                   style={{
-                    marginRight: SPACING.spacing2,
+                    marginRight: SPACING.spacing4,
                     fontWeight: TYPOGRAPHY.fontWeightSemiBold,
                   }}
                 />
@@ -227,13 +232,13 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         </Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <Banner type="warning">
-            <StyledText as="p" marginRight={SPACING.spacing4}>
+            <StyledText as="p" marginRight={SPACING.spacing16}>
               {t('opentrons_tip_racks_recommended')}
             </StyledText>
           </Banner>
-          <Divider marginY={SPACING.spacing3} width="100%" />
+          <Divider marginY={SPACING.spacing8} width="100%" />
           <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
-          <Divider marginY={SPACING.spacing3} width="100%" />
+          <Divider marginY={SPACING.spacing8} width="100%" />
           <StyledText as="label" color={COLORS.darkGreyEnabled}>
             {t('calibration_on_opentrons_tips_is_important')}
           </StyledText>
@@ -241,18 +246,18 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       </Flex>
       <Flex
         width="100%"
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink />
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <Link
             role="button"
             css={TYPOGRAPHY.darkLinkH4SemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={() => closeModal()}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {t('shared:cancel')}
           </Link>

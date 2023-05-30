@@ -42,10 +42,32 @@ from opentrons.commands import types as command_types
 
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import PythonProtocol, BundleContents
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
+
+
+# See Jira RCORE-535.
+_PYTHON_TOO_NEW_MESSAGE = (
+    "Python protocols with apiLevels higher than 2.13"
+    " cannot currently be simulated with"
+    " the opentrons_simulate command-line tool,"
+    " the opentrons.simulate.simulate() function,"
+    " or the opentrons.simulate.get_protocol_api() function."
+    " Use a lower apiLevel"
+    " or use the Opentrons App instead."
+)
+_JSON_TOO_NEW_MESSAGE = (
+    "Protocols created by recent versions of Protocol Designer"
+    " cannot currently be simulated with"
+    " the opentrons_simulate command-line tool"
+    " or the opentrons.simulate.simulate() function."
+    " Use the Opentrons App instead."
+)
 
 
 class AccumulatingHandler(logging.Handler):
@@ -139,6 +161,8 @@ def get_protocol_api(
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     hardware_simulator: Optional[ThreadManagedHardware] = None,
+    # TODO(mm, 2022-12-14): The name and type of this parameter should be unified with
+    # robotType in a standalone Python protocol's `requirements` dict. Jira RCORE-318.
     machine: Optional[MachineType] = None,
 ) -> protocol_api.ProtocolContext:
     """
@@ -211,6 +235,9 @@ def get_protocol_api(
 def _check_hardware_simulator(
     hardware_simulator: Optional[ThreadManagedHardware], machine: Optional[MachineType]
 ) -> ThreadManagedHardware:
+    # TODO(mm, 2022-12-14): This should fail with a more descriptive error if someone
+    # runs this on a robot, and that robot doesn't have a matching robot type.
+    # Jira RCORE-318.
     if hardware_simulator:
         return hardware_simulator
     elif machine == "ot3" or should_use_ot3():
@@ -232,14 +259,21 @@ def _build_protocol_context(
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
     """
-    context = protocol_api.create_protocol_context(
-        api_version=version,
-        hardware_api=hardware_simulator,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-        use_simulating_core=True,
-    )
+    try:
+        context = protocol_api.create_protocol_context(
+            api_version=version,
+            hardware_api=hardware_simulator,
+            # FIXME(2022-12-02): Instead of guessing,
+            # match this to the robot type declared by the protocol.
+            # https://opentrons.atlassian.net/browse/RSS-156
+            deck_type=guess_deck_type_from_global_config(),
+            bundled_labware=bundled_labware,
+            bundled_data=bundled_data,
+            extra_labware=extra_labware,
+            use_simulating_core=True,
+        )
+    except protocol_api.ProtocolEngineCoreRequiredError as e:
+        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
     context.home()
     return context
 
@@ -257,7 +291,7 @@ def bundle_from_sim(
             isinstance(lw, opentrons.protocol_api.labware.Labware)
             and lw.uri not in bundled_labware
         ):
-            bundled_labware[lw.uri] = lw._implementation.get_definition()
+            bundled_labware[lw.uri] = lw._core.get_definition()
 
     return BundleContents(
         protocol.text,
@@ -267,7 +301,7 @@ def bundle_from_sim(
     )
 
 
-def simulate(
+def simulate(  # noqa: C901
     protocol_file: TextIO,
     file_name: Optional[str] = None,
     custom_labware_paths: Optional[List[str]] = None,
@@ -276,6 +310,9 @@ def simulate(
     hardware_simulator_file_path: Optional[str] = None,
     duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
+    # TODO(mm, 2022-12-14): Now that protocols declare their target robot types
+    # intrinsically, the `machine` param should be removed in favor of determining
+    # it automatically.
     machine: Optional[MachineType] = None,
 ) -> Tuple[List[Mapping[str, Any]], Optional[BundleContents]]:
     """
@@ -367,22 +404,35 @@ def simulate(
             pathlib.Path(hardware_simulator_file_path),
         )
 
-    protocol = parse.parse(
-        contents, file_name, extra_labware=extra_labware, extra_data=extra_data
-    )
+    try:
+        protocol = parse.parse(
+            contents, file_name, extra_labware=extra_labware, extra_data=extra_data
+        )
+    except parse.JSONSchemaVersionTooNewError as e:
+        if e.attempted_schema_version == 6:
+            # See Jira RCORE-535.
+            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+        else:
+            raise
+
     bundle_contents: Optional[BundleContents] = None
 
     # we want a None literal rather than empty dict so get_protocol_api
     # will look for custom labware if this is a robot
     gpa_extras = getattr(protocol, "extra_labware", None) or None
-    context = get_protocol_api(
-        getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
-        bundled_labware=getattr(protocol, "bundled_labware", None),
-        bundled_data=getattr(protocol, "bundled_data", None),
-        hardware_simulator=hardware_simulator,
-        extra_labware=gpa_extras,
-        machine=machine,
-    )
+
+    try:
+        context = get_protocol_api(
+            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
+            bundled_labware=getattr(protocol, "bundled_labware", None),
+            bundled_data=getattr(protocol, "bundled_data", None),
+            hardware_simulator=hardware_simulator,
+            extra_labware=gpa_extras,
+            machine=machine,
+        )
+    except protocol_api.ProtocolEngineCoreRequiredError as e:
+        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
+
     broker = context.broker
     scraper = CommandScraper(stack_logger, log_level, broker)
     if duration_estimator:
@@ -603,6 +653,7 @@ def main() -> int:
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
 
+    # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
     runlog, maybe_bundle = simulate(

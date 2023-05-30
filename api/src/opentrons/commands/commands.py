@@ -6,7 +6,6 @@ from .helpers import stringify_location, listify
 from . import types as command_types
 
 from opentrons.types import Location
-from opentrons.protocols.api_support.util import FlowRates
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -45,11 +44,11 @@ def dispense(
     instrument: InstrumentContext,
     volume: float,
     location: Location,
+    flow_rate: float,
     rate: float,
 ) -> command_types.DispenseCommand:
     location_text = stringify_location(location)
     template = "Dispensing {volume} uL into {location} at {flow} uL/sec"
-    flow_rate = rate * FlowRates(instrument._implementation).dispense
     text = template.format(volume=float(volume), location=location_text, flow=flow_rate)
 
     return {

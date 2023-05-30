@@ -1,31 +1,43 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union
+from typing_extensions import Literal
+from typing import Dict, Optional, Type, Union, List, Tuple
 
+from opentrons.protocol_engine.commands import LoadModuleResult
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, MountType, Location, DeckSlotName
+from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    ModuleType,
-)
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.deck_item import DeckItem
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadedLabware,
+    LoadedModule,
+)
+from opentrons.protocol_engine.types import (
+    ModuleModel as ProtocolEngineModuleModel,
+    OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnModuleError,
+)
 
+from ... import validation
+from ..._types import OffDeckType
+from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -36,20 +48,25 @@ from .module_core import (
     MagneticModuleCore,
     ThermocyclerModuleCore,
     HeaterShakerModuleCore,
+    NonConnectedModuleCore,
+    MagneticBlockCore,
 )
-from .exceptions import InvalidModuleLocationError
+from .exceptions import InvalidModuleLocationError, UnknownLocationError
+from . import load_labware_params
+from . import deck_conflict
 
 
-# TODO(mc, 2022-08-24): many of these methods are likely unnecessary
-# in a ProtocolEngine world. As we develop this core, we should remove
-# and consolidate logic as we need to across all cores rather than
-# necessarily try to support every one of these behaviors in the engine.
-class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
+class ProtocolCore(
+    AbstractProtocol[
+        InstrumentCore, LabwareCore, Union[ModuleCore, NonConnectedModuleCore]
+    ]
+):
     """Protocol API core using a ProtocolEngine.
 
     Args:
-        engine_client: A synchronous client to the ProtocolEngine
-            that is executing the protocol.
+        engine_client: A client to the ProtocolEngine that is executing the protocol.
+        api_version: The Python Protocol API versionat which  this core is operating.
+        sync_hardware: A SynchronousAdapter-wrapped Hardware Control API.
     """
 
     def __init__(
@@ -61,38 +78,35 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         self._engine_client = engine_client
         self._api_version = api_version
         self._sync_hardware = sync_hardware
-        self._fixed_trash_core = LabwareCore(
-            labware_id=engine_client.state.labware.get_fixed_trash_id(),
-            engine_client=engine_client,
-        )
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
+        self._labware_cores_by_id: Dict[str, LabwareCore] = {}
+        self._module_cores_by_id: Dict[
+            str, Union[ModuleCore, NonConnectedModuleCore]
+        ] = {}
+        self._load_fixed_trash()
 
     @property
     def api_version(self) -> APIVersion:
         """Get the api version protocol target."""
         return self._api_version
 
-    def get_bundled_data(self) -> Dict[str, bytes]:
-        """Get a map of file names to byte contents.
+    @property
+    def robot_type(self) -> RobotType:
+        return self._engine_client.state.config.robot_type
 
-        Deprecated method for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_data not implemented")
+    @property
+    def fixed_trash(self) -> LabwareCore:
+        """Get the fixed trash labware."""
+        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+        return self._labware_cores_by_id[trash_id]
 
-    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of labware names to definition dicts.
-
-        Deprecated method used for past experiment with ZIP protocols.
-        """
-        raise NotImplementedError("ProtocolCore.get_bundled_labware not implemented")
-
-    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
-        """Get a map of extra labware names to definition dicts.
-
-        Used to assist load custom labware definitions.
-        """
-        raise NotImplementedError("ProtocolCore.get_extra_labware not implemented")
+    def _load_fixed_trash(self) -> None:
+        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+        self._labware_cores_by_id[trash_id] = LabwareCore(
+            labware_id=trash_id,
+            engine_client=self._engine_client,
+        )
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
@@ -104,7 +118,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def is_simulating(self) -> bool:
         """Get whether the protocol is being analyzed or actually run."""
-        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
+        return self._engine_client.state.config.ignore_pause
 
     def add_labware_definition(
         self,
@@ -119,54 +133,125 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore],
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         module_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(location, ModuleCore):
+        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             module_location = ModuleLocation(moduleId=location.module_id)
         else:
             module_location = DeckSlotLocation(slotName=location)
 
+        custom_labware_params = (
+            self._engine_client.state.labware.find_custom_labware_load_params()
+        )
+        namespace, version = load_labware_params.resolve(
+            load_name, namespace, version, custom_labware_params
+        )
+
         load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=module_location,
-            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
-            version=version or 1,
+            namespace=namespace,
+            version=version,
             display_name=label,
         )
-        return LabwareCore(
+
+        # FIXME(mm, 2023-02-21):
+        #
+        # We're wrongly checking for deck conflicts *after* we've already loaded the
+        # labware into the ProtocolEngine. If it turns out there is a conflict,
+        # and this check raises, it will leave this object and its ProtocolEngine
+        # in a confusing inconsistent state.
+        #
+        # I expect we can get away with this in practice a lot of the time because
+        # exceptions in Python protocols are mostly treated as fatal, anyway.
+        # Users rarely catch them.
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_labware_id=load_result.labwareId,
+            # It's important that we don't fetch these IDs from Protocol Engine, and
+            # use our own bookkeeping instead. If we fetched these IDs from Protocol
+            # Engine, it would have leaked state from Labware Position Check in the
+            # same HTTP run.
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
+
+        labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
         )
 
+        self._labware_cores_by_id[labware_core.labware_id] = labware_core
+
+        return labware_core
+
+    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareCore,
-        new_location: Union[DeckSlotName, ModuleCore],
+        new_location: Union[
+            DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
         use_gripper: bool,
+        use_pick_up_location_lpc_offset: bool,
+        use_drop_location_lpc_offset: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(new_location, ModuleCore):
+        to_location: Union[ModuleLocation, DeckSlotLocation, str]
+        if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
             to_location = ModuleLocation(moduleId=new_location.module_id)
-        else:
+        elif new_location == OffDeckType.OFF_DECK:
+            to_location = OFF_DECK_LOCATION
+        elif isinstance(new_location, DeckSlotName):
             to_location = DeckSlotLocation(slotName=new_location)
+        else:
+            raise UnknownLocationError(
+                f"move_labware is not supported with the given location: {new_location}."
+            )
 
         strategy = (
             LabwareMovementStrategy.USING_GRIPPER
             if use_gripper
             else LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE
         )
+        _pick_up_offset = (
+            LabwareOffsetVector(
+                x=pick_up_offset[0], y=pick_up_offset[1], z=pick_up_offset[2]
+            )
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            LabwareOffsetVector(x=drop_offset[0], y=drop_offset[1], z=drop_offset[2])
+            if drop_offset
+            else None
+        )
+
+        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
+        # when move_labware() support is no longer experimental.
 
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=to_location,
             strategy=strategy,
+            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
+            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
         )
+        if strategy == LabwareMovementStrategy.USING_GRIPPER:
+            # Clear out last location since it is not relevant to pipetting
+            # and we only use last location for in-place pipetting commands
+            self.set_last_location(location=None, mount=Mount.EXTENSION)
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel
@@ -186,8 +271,10 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> ModuleCore:
+    ) -> Union[ModuleCore, NonConnectedModuleCore]:
         """Load a module into the protocol."""
+        assert configuration is None, "Module `configuration` is deprecated"
+
         # TODO(mc, 2022-10-20): move to public ProtocolContext
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
@@ -200,30 +287,80 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             model=EngineModuleModel(model),
             location=DeckSlotLocation(slotName=deck_slot),
         )
-        module_type = result.model.as_type()
 
-        selected_hardware = self._resolve_module_hardware(result.serialNumber, model)
+        module_core = self._get_module_core(load_module_result=result, model=model)
 
-        # TODO(mc, 2022-10-25): move to module core factory function
+        # FIXME(mm, 2023-02-21):
+        # We're wrongly doing this conflict check *after* we've already loaded the
+        # module into the ProtocolEngine. See FIXME comment in self.load_labware().
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_module_id=result.moduleId,
+            # It's important that we don't fetch these IDs from Protocol Engine.
+            # See comment in self.load_labware().
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
+
+        self._module_cores_by_id[module_core.module_id] = module_core
+
+        return module_core
+
+    def _create_non_connected_module_core(
+        self, load_module_result: LoadModuleResult
+    ) -> NonConnectedModuleCore:
+        return MagneticBlockCore(
+            module_id=load_module_result.moduleId,
+            engine_client=self._engine_client,
+            api_version=self.api_version,
+        )
+
+    def _create_module_core(
+        self, load_module_result: LoadModuleResult, model: ModuleModel
+    ) -> ModuleCore:
         module_core_cls: Type[ModuleCore] = ModuleCore
-        if module_type == ModuleType.TEMPERATURE:
-            module_core_cls = TemperatureModuleCore
-        elif module_type == ModuleType.MAGNETIC:
-            module_core_cls = MagneticModuleCore
-        elif module_type == ModuleType.THERMOCYCLER:
-            module_core_cls = ThermocyclerModuleCore
-        elif module_type == ModuleType.HEATER_SHAKER:
-            module_core_cls = HeaterShakerModuleCore
+
+        type_lookup: Dict[ModuleType, Type[ModuleCore]] = {
+            ModuleType.TEMPERATURE: TemperatureModuleCore,
+            ModuleType.MAGNETIC: MagneticModuleCore,
+            ModuleType.THERMOCYCLER: ThermocyclerModuleCore,
+            ModuleType.HEATER_SHAKER: HeaterShakerModuleCore,
+        }
+
+        module_type = load_module_result.model.as_type()
+
+        module_core_cls = type_lookup[module_type]
+
+        assert (
+            load_module_result.serialNumber is not None
+        ), "Expected a connected module but did not get a serial number."
+        selected_hardware = self._resolve_module_hardware(
+            load_module_result.serialNumber, model
+        )
 
         return module_core_cls(
-            module_id=result.moduleId,
+            module_id=load_module_result.moduleId,
             engine_client=self._engine_client,
             api_version=self.api_version,
             sync_module_hardware=SynchronousAdapter(selected_hardware),
         )
 
+    def _get_module_core(
+        self, load_module_result: LoadModuleResult, model: ModuleModel
+    ) -> Union[ModuleCore, NonConnectedModuleCore]:
+        if ProtocolEngineModuleModel.is_magnetic_block(load_module_result.model):
+            return self._create_non_connected_module_core(load_module_result)
+        else:
+            return self._create_module_core(
+                load_module_result=load_module_result, model=model
+            )
+
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_instrument(
-        self, instrument_name: PipetteNameType, mount: Mount
+        self, instrument_name: Union[PipetteNameType, Literal["p1000_96"]], mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
@@ -242,21 +379,13 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
             engine_client=self._engine_client,
             sync_hardware_api=self._sync_hardware,
             protocol_core=self,
+            # TODO(mm, 2022-11-10): Deduplicate "400" with legacy core.
+            default_movement_speed=400,
         )
-
-    def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
-        """Get all loaded instruments by mount."""
-        raise NotImplementedError("ProtocolCore.get_loaded_instruments not implemented")
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
-
-    def resume(self) -> None:
-        """Resume the protocol."""
-        # TODO(mm, 2022-11-08): This method is not usable in practice. Consider removing
-        # it from both cores. https://github.com/Opentrons/opentrons/issues/8209
-        raise NotImplementedError("ProtocolCore.resume not implemented")
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
@@ -268,27 +397,19 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        raise NotImplementedError("ProtocolCore.home not implemented")
-
-    def get_deck(self) -> Deck:
-        """Get an interface to get and modify the deck layout."""
-        raise NotImplementedError("ProtocolCore.get_deck not implemented")
-
-    def get_fixed_trash(self) -> DeckItem:
-        """Get the fixed trash labware."""
-        return self._fixed_trash_core
+        self._engine_client.home(axes=None)
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        raise NotImplementedError("ProtocolCore.set_rail_lights not implemented")
+        self._engine_client.set_rail_lights(on=on)
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
-        raise NotImplementedError("ProtocolCore.get_rail_lights_on not implemented")
+        return self._sync_hardware.get_lights()["rails"]  # type: ignore[no-any-return]
 
     def door_closed(self) -> bool:
         """Get whether the device's front door is closed."""
-        raise NotImplementedError("ProtocolCore.door_closed not implemented")
+        return self._sync_hardware.door_state == DoorState.CLOSED  # type: ignore[no-any-return]
 
     def get_last_location(
         self,
@@ -308,3 +429,88 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         """Set the last accessed location."""
         self._last_location = location
         self._last_mount = mount
+
+    def get_deck_definition(self) -> DeckDefinitionV3:
+        """Get the geometry definition of the robot's deck."""
+        return self._engine_client.state.labware.get_deck_definition()
+
+    def get_slot_item(
+        self, slot_name: DeckSlotName
+    ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
+        """Get the contents of a given slot, if any."""
+        loaded_item = self._engine_client.state.geometry.get_slot_item(
+            slot_name=slot_name,
+            allowed_labware_ids=set(self._labware_cores_by_id.keys()),
+            allowed_module_ids=set(self._module_cores_by_id.keys()),
+        )
+
+        if isinstance(loaded_item, LoadedLabware):
+            return self._labware_cores_by_id[loaded_item.id]
+
+        if isinstance(loaded_item, LoadedModule):
+            return self._module_cores_by_id[loaded_item.id]
+
+        return None
+
+    def get_labware_on_module(
+        self, module_core: Union[ModuleCore, NonConnectedModuleCore]
+    ) -> Optional[LabwareCore]:
+        """Get the item on top of a given module, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_module(
+                module_core.module_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnModuleError:
+            return None
+
+    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+        """Get the absolute coordinate of a slot's center."""
+        return self._engine_client.state.labware.get_slot_center_position(slot_name)
+
+    def get_highest_z(self) -> float:
+        """Get the highest Z point of all deck items."""
+        return self._engine_client.state.geometry.get_all_labware_highest_z()
+
+    def get_labware_cores(self) -> List[LabwareCore]:
+        """Get all loaded labware cores."""
+        return list(self._labware_cores_by_id.values())
+
+    def get_module_cores(self) -> List[Union[ModuleCore, NonConnectedModuleCore]]:
+        """Get all loaded module cores."""
+        return list(self._module_cores_by_id.values())
+
+    def define_liquid(
+        self,
+        name: str,
+        description: Optional[str],
+        display_color: Optional[str],
+    ) -> Liquid:
+        """Define a liquid to load into a well."""
+        liquid = self._engine_client.add_liquid(
+            name=name, description=description, color=display_color
+        )
+
+        return Liquid(
+            _id=liquid.id,
+            name=liquid.displayName,
+            description=liquid.description,
+            display_color=(
+                liquid.displayColor.__root__ if liquid.displayColor else None
+            ),
+        )
+
+    def get_labware_location(
+        self, labware_core: LabwareCore
+    ) -> Union[str, ModuleCore, NonConnectedModuleCore, None]:
+        """Get labware parent location."""
+        labware_location = self._engine_client.state.labware.get_location(
+            labware_core.labware_id
+        )
+        if isinstance(labware_location, DeckSlotLocation):
+            return validation.ensure_deck_slot_string(
+                labware_location.slotName, self._engine_client.state.config.robot_type
+            )
+        elif isinstance(labware_location, ModuleLocation):
+            return self._module_cores_by_id.get(labware_location.moduleId)
+        return None

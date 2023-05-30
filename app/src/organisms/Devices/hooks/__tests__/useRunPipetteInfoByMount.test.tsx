@@ -1,7 +1,12 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  getLoadedLabwareDefinitionsByUri,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import _tiprack10ul from '@opentrons/shared-data/labware/definitions/2/opentrons_96_tiprack_10ul/1.json'
 
 import {
@@ -16,11 +21,10 @@ import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
 } from '../../../../redux/pipettes/__fixtures__'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
-  useTipLengthCalibrations,
-  useProtocolDetailsForRun,
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
 } from '..'
@@ -29,17 +33,20 @@ import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
-  LegacySchemaAdapterOutput,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { PipetteInfo, ProtocolDetails, StoredProtocolAnalysis } from '..'
+import type { PipetteInfo } from '..'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {
     ...actualSharedData,
     getPipetteNameSpecs: jest.fn(),
+    getLoadedLabwareDefinitionsByUri: jest.fn(),
   }
 })
+jest.mock('@opentrons/react-api-client')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../useAttachedPipetteCalibrations')
 jest.mock('../useAttachedPipettes')
 jest.mock('../useTipLengthCalibrations')
@@ -55,14 +62,17 @@ const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jes
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
-const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
-  typeof useTipLengthCalibrations
+const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
+  typeof useAllTipLengthCalibrationsQuery
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
+>
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
 
 const PIPETTE_CALIBRATIONS = {
@@ -121,7 +131,7 @@ const modifiedSimpleV6Protocol = ({
       pipetteName: 'p10_single',
     },
   ],
-} as any) as LegacySchemaAdapterOutput
+} as any) as ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
@@ -133,25 +143,32 @@ const PROTOCOL_DETAILS = {
 describe('useRunPipetteInfoByMount hook', () => {
   beforeEach(() => {
     when(mockUseAttachedPipetteCalibrations)
-      .calledWith('otie')
+      .calledWith()
       .mockReturnValue(PIPETTE_CALIBRATIONS)
     when(mockUseAttachedPipettes)
       .calledWith()
       .mockReturnValue(ATTACHED_PIPETTES)
-    when(mockUseTipLengthCalibrations)
-      .calledWith('otie')
-      .mockReturnValue(TIP_LENGTH_CALIBRATIONS)
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseAllTipLengthCalibrationsQuery)
+      .calledWith()
+      .mockReturnValue({ data: { data: TIP_LENGTH_CALIBRATIONS } } as any)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS)
+      .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
-      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
     when(mockGetPipetteNameSpecs)
       .calledWith('p10_single')
       .mockReturnValue({
         displayName: 'P10 Single-Channel GEN1',
       } as PipetteNameSpecs)
+    when(mockGetLoadedLabwareDefinitionsByUri)
+      .calledWith(
+        _uncastedModifiedSimpleV6Protocol.commands as RunTimeCommand[]
+      )
+      .mockReturnValue(
+        _uncastedModifiedSimpleV6Protocol.labwareDefinitions as {}
+      )
   })
 
   afterEach(() => {
@@ -159,11 +176,11 @@ describe('useRunPipetteInfoByMount hook', () => {
   })
 
   it('should return empty mounts when protocol details not found', () => {
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
-      .mockReturnValue({} as ProtocolDetails)
+      .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
-    const { result } = renderHook(() => useRunPipetteInfoByMount('otie', '1'))
+    const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: null,
       right: null,
@@ -171,7 +188,7 @@ describe('useRunPipetteInfoByMount hook', () => {
   })
 
   it('should return run pipette info by mount', () => {
-    const { result } = renderHook(() => useRunPipetteInfoByMount('otie', '1'))
+    const { result } = renderHook(() => useRunPipetteInfoByMount('1'))
     expect(result.current).toStrictEqual({
       left: ({
         id: 'pipetteId',

@@ -89,7 +89,7 @@ describe('PipetteSettingsSlideout', () => {
 
     getByRole('heading', { name: 'Left Pipette Settings' })
     const inputs = getAllByRole('textbox')
-    expect(inputs.length).toBe(9)
+    expect(inputs.length).toBe(13)
   })
 
   it('renders close button that calls props.onCloseClick when clicked', () => {

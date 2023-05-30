@@ -40,6 +40,7 @@ def test_prompt_message_without_payload(
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
+        "1",
     ]
     r = can_comm.prompt_message(mock_get_input, mock_output)
     assert r == CanMessage(
@@ -48,7 +49,7 @@ def test_prompt_message_without_payload(
                 message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
             )
         ),
-        data=b"",
+        data=b"\x00\x00\x00\x01",
     )
 
 
@@ -61,6 +62,7 @@ def test_prompt_message_with_payload(
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
+        "1",
         str(0xFF00FF00),
         str(0xAA00BB00),
     ]
@@ -71,7 +73,7 @@ def test_prompt_message_with_payload(
                 message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
             )
         ),
-        data=b"\xff\x00\xff\x00\xAA\00\xBB\x00",
+        data=b"\x00\x00\x00\x01\xff\x00\xff\x00\xAA\00\xBB\x00",
     )
 
 
@@ -119,6 +121,7 @@ def test_prompt_message_bad_input(
     mock_get_input.side_effect = [
         str(list(MessageId).index(message_id)),
         str(list(NodeId).index(node_id)),
+        "1",
         "-123",
         # out of range for Uint32
         str(0x1FF00FF00),

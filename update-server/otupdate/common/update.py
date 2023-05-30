@@ -21,7 +21,10 @@ from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from .handler_type import Handler
 from .session import UpdateSession, Stages
 
-from otupdate.openembedded.updater import UPDATE_PKG
+from otupdate.openembedded.update_actions import UPDATE_PKG_OE
+from otupdate.buildroot.update_actions import UPDATE_PKG_BR
+
+VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
 
 SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
@@ -129,6 +132,7 @@ def _begin_write(
         if exc:
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
         else:
+            LOG.info(f"Finished update session {session}")
             session.set_stage(Stages.DONE)
 
     write_future.add_done_callback(write_done)
@@ -172,7 +176,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'ot2-system.zip'.
+    body called 'system-update.zip'. NOTE: OT2 will also support 'ot2-system.zip'
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -184,9 +188,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         )
     reader = await request.multipart()
     async for part in reader:
-        # TODO (al, 2022-04-18): This check should not be here. All ot2 and
-        #  ot3 disambiguation should happen in update actions.
-        if part.name != "ot2-system.zip" and part.name != UPDATE_PKG:
+        if part.name not in VALID_UPDATE_PKG:
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:
@@ -207,7 +209,6 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        # TODO (al, 2022-04-18): Use of part.name should not be here
         os.path.join(session.download_path, part.name),
         maybe_actions,
     )

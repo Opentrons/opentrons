@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 
+import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
@@ -14,17 +16,19 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  truncateString,
 } from '@opentrons/components'
 
-import { SecondaryTertiaryButton } from '../../atoms/buttons'
+import { QuaternaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
-import { useProtocolDetailsForRun } from './hooks'
+import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 
-import type { StyleProps } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { Dispatch, State } from '../../redux/types'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {
@@ -40,31 +44,63 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   ])
   const history = useHistory()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const dispatch = useDispatch<Dispatch>()
 
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
-  const { displayName } = useProtocolDetailsForRun(currentRunId)
+  const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
+  const protocolId = runRecord?.data?.protocolId ?? null
+  const { data: protocolRecord } = useProtocolQuery(protocolId, {
+    staleTime: Infinity,
+  })
+  const displayName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null && currentRunStatus != null && displayName != null ? (
       <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
         <StyledText
           as="label"
-          paddingRight={SPACING.spacing3}
+          paddingRight={SPACING.spacing8}
           overflowWrap="anywhere"
         >
-          {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
+          {`${truncateString(displayName, 80, 65)}; ${t(
+            `run_details:status_${currentRunStatus}`
+          )}`}
         </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
-            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-log'
+            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
           }`}
-          id={`RobotStatusHeader_${name}_goToRun`}
+          id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
-          <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
+          <QuaternaryButton>{t('go_to_run')}</QuaternaryButton>
         </Link>
       </Flex>
     ) : null
+
+  const { ethernet, wifi } = useSelector((state: State) =>
+    getNetworkInterfaces(state, name)
+  )
+
+  let iconName: IconName | null = null
+  let tooltipTranslationKey = null
+  if (wifi?.ipAddress != null) {
+    iconName = 'wifi'
+    tooltipTranslationKey = 'device_settings:wifi'
+  } else if (ethernet?.ipAddress != null) {
+    iconName = 'ethernet'
+    tooltipTranslationKey = 'device_settings:ethernet'
+  } else if (local != null && local) {
+    iconName = 'usb'
+    tooltipTranslationKey = 'device_settings:wired_usb'
+  }
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(name))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps}>
@@ -73,39 +109,40 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           as="h6"
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing1}
-          id={`RobotStatusHeader_${name}_robotModel`}
+          paddingBottom={SPACING.spacing2}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
+          id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
             <StyledText
               as="h3"
-              id={`RobotStatusHeader_${name}_robotName`}
+              id={`RobotStatusHeader_${String(name)}_robotName`}
               overflowWrap="anywhere"
             >
               {name}
             </StyledText>
-            <Btn
-              {...targetProps}
-              marginRight={SPACING.spacing3}
-              onClick={() =>
-                history.push(`/devices/${name}/robot-settings/networking`)
-              }
-            >
-              <Icon
-                // local boolean corresponds to a wired usb connection for OT-2
-                // TODO(bh, 2022-10-19): for OT-3, determine what robot data looks like for wired usb and ethernet connections
-                name={local != null && local ? 'usb' : 'wifi'}
-                color={COLORS.darkGreyEnabled}
-                size="1.25rem"
-              />
-            </Btn>
+            {iconName != null ? (
+              <Btn
+                {...targetProps}
+                marginRight={SPACING.spacing8}
+                onClick={() =>
+                  history.push(`/devices/${name}/robot-settings/networking`)
+                }
+              >
+                <Icon
+                  aria-label={iconName}
+                  paddingTop={SPACING.spacing4}
+                  name={iconName}
+                  color={COLORS.darkGreyEnabled}
+                  size="1.25rem"
+                />
+              </Btn>
+            ) : null}
             <Tooltip tooltipProps={tooltipProps} width="auto">
-              {local != null && local
-                ? t('device_settings:wired_usb')
-                : t('device_settings:wifi')}
+              {tooltipTranslationKey != null ? t(tooltipTranslationKey) : ''}
             </Tooltip>
           </Flex>
         </Flex>

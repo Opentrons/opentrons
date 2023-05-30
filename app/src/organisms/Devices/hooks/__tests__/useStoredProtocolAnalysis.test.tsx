@@ -6,7 +6,7 @@ import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 
 import {
-  parseAllRequiredModuleModelsById,
+  parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
@@ -20,14 +20,12 @@ import {
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
   LABWARE_ENTITY,
-  LABWARE_DEFINITIONS,
-  MODULE_MODELS_BY_ID,
-  PIPETTE_NAME_BY_ID,
+  MODULE_ENTITY,
+  PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
 
 import type { Protocol, Run } from '@opentrons/api-client'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data')
 jest.mock('@opentrons/api-client')
@@ -41,17 +39,14 @@ const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
   typeof getStoredProtocol
 >
-const mockParseAllRequiredModuleModelsById = parseAllRequiredModuleModelsById as jest.MockedFunction<
-  typeof parseAllRequiredModuleModelsById
+const mockParseRequiredModulesEntity = parseRequiredModulesEntity as jest.MockedFunction<
+  typeof parseRequiredModulesEntity
 >
 const mockParseInitialLoadedLabwareEntity = parseInitialLoadedLabwareEntity as jest.MockedFunction<
   typeof parseInitialLoadedLabwareEntity
 >
 const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
   typeof parsePipetteEntity
->
-const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
-  typeof getLoadedLabwareDefinitionsByUri
 >
 const store: Store<any> = createStore(jest.fn(), {})
 
@@ -89,16 +84,9 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockGetStoredProtocol)
       .calledWith(undefined as any)
       .mockReturnValue(null)
-    when(mockGetLoadedLabwareDefinitionsByUri)
-      .calledWith(
-        modifiedStoredProtocolData?.mostRecentAnalysis?.commands ?? []
-      )
-      .mockReturnValue(LABWARE_DEFINITIONS)
-    when(mockParseAllRequiredModuleModelsById).mockReturnValue(
-      MODULE_MODELS_BY_ID
-    )
+    when(mockParseRequiredModulesEntity).mockReturnValue([MODULE_ENTITY])
     when(mockParseInitialLoadedLabwareEntity).mockReturnValue([LABWARE_ENTITY])
-    when(mockParsePipetteEntity).mockReturnValue([PIPETTE_NAME_BY_ID])
+    when(mockParsePipetteEntity).mockReturnValue([PIPETTE_ENTITY])
   })
   afterEach(() => {
     resetAllWhenMocks()

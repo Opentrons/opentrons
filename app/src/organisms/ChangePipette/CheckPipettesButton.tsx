@@ -1,89 +1,51 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import {
-  useDispatchApiRequests,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '../../redux/robot-api'
-import { useFeatureFlag } from '../../redux/config'
-import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
 import { StyledText } from '../../atoms/text'
 import {
-  PrimaryButton as DeprecatedPrimaryButton,
   Icon,
   DIRECTION_ROW,
   Flex,
   COLORS,
   ALIGN_CENTER,
   SPACING,
+  SIZE_1,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
-
-import type { State } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {
   robotName: string
   children?: React.ReactNode
-  className?: string
-  hidden?: boolean
-  actualPipette?: PipetteModelSpecs
+  direction?: 'detach' | 'attach'
   onDone?: () => void
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const {
-    robotName,
-    onDone,
-    children,
-    className,
-    actualPipette,
-    hidden = false,
-  } = props
+  const { onDone, children, direction } = props
   const { t } = useTranslation('change_pipette')
-
-  const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
-  const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
-    if (
-      dispatchedAction.type === FETCH_PIPETTES &&
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-      dispatchedAction.meta.requestId
-    ) {
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
+  const [isPending, setIsPending] = React.useState(false)
+  const { refetch: refetchPipettes } = usePipettesQuery(
+    { refresh: true },
+    {
+      enabled: false,
+      onSettled: () => {
+        setIsPending(false)
+      },
     }
-  })
-
-  const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    fetchPipettesRequestId.current
-      ? getRequestById(state, fetchPipettesRequestId.current)
-      : null
-  )?.status
-  const isPending = requestStatus === PENDING
-
-  React.useEffect(() => {
-    if (requestStatus === SUCCESS && onDone) onDone()
-  }, [onDone, requestStatus])
-
-  const displayButton = hidden ? null : (
-    <DeprecatedPrimaryButton
-      onClick={handleClick}
-      disabled={isPending}
-      className={className}
-    >
-      {isPending ? <Icon name="ot-spinner" height="1rem" spin /> : children}
-    </DeprecatedPrimaryButton>
   )
-
+  const handleClick = (): void => {
+    setIsPending(true)
+    refetchPipettes()
+      .then(() => {
+        onDone?.()
+      })
+      .catch(() => {})
+  }
   const icon = (
-    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
+    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing8} />
   )
 
   let body
@@ -101,23 +63,28 @@ export function CheckPipettesButton(
       <>
         <Icon
           name="ot-spinner"
-          height="1rem"
+          height={SIZE_1}
           spin
-          marginRight={SPACING.spacing3}
+          marginRight={SPACING.spacing8}
         />
         <StyledText>
-          {actualPipette
+          {direction === DETACH
             ? t('confirming_detachment')
             : t('confirming_attachment')}
         </StyledText>
       </>
     )
   } else if (children == null && !isPending) {
-    body = actualPipette ? t('confirm_detachment') : t('confirm_attachment')
+    body =
+      direction === DETACH ? t('confirm_detachment') : t('confirm_attachment')
   }
 
-  return enableChangePipetteWizard ? (
-    <PrimaryButton onClick={handleClick} aria-label="Confirm">
+  return (
+    <PrimaryButton
+      onClick={handleClick}
+      aria-label="Confirm"
+      disabled={isPending}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         color={COLORS.white}
@@ -126,8 +93,5 @@ export function CheckPipettesButton(
         {body}
       </Flex>
     </PrimaryButton>
-  ) : (
-    //  TODO(jr, 17/08/22): remove this button when we remove the FF
-    displayButton
   )
 }

@@ -124,6 +124,19 @@ def mock_user_flow_with_custom_tiprack(mock_hw, custom_tiprack_def, request):
 
 
 @pytest.fixture(params=[True, False])
+def mock_user_flow_with_default_tiprack(mock_hw, request):
+    has_calibration_block = request.param
+    mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
+    m = TipCalibrationUserFlow(
+        hardware=mock_hw,
+        mount=mount,
+        has_calibration_block=has_calibration_block,
+    )
+
+    yield m
+
+
+@pytest.fixture(params=[True, False])
 def mock_user_flow_all_combos(mock_hw_all_combos, request):
     has_calibration_block = request.param
     hw = mock_hw_all_combos
@@ -331,6 +344,12 @@ async def test_save_custom_tiprack_def(
     assert os.path.exists(
         config.get_custom_tiprack_def_path() / "custom/minimal_labware_def/1.json"
     )
+
+
+async def test_default_tiprack_def(mock_user_flow_with_default_tiprack):
+    uf = mock_user_flow_with_default_tiprack
+
+    assert uf._tip_rack.load_name == "opentrons_96_tiprack_300ul"
 
 
 @pytest.mark.parametrize(argnames="mount", argvalues=[Mount.RIGHT, Mount.LEFT])

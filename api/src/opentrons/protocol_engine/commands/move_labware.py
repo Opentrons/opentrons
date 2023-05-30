@@ -5,7 +5,12 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from ..types import LabwareLocation, LabwareMovementStrategy
+from ..types import (
+    LabwareLocation,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    ExperimentalOffsetData,
+)
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -16,6 +21,7 @@ if TYPE_CHECKING:
 MoveLabwareCommandType = Literal["moveLabware"]
 
 
+# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
 class MoveLabwareParams(BaseModel):
     """Input parameters for a ``moveLabware`` command."""
 
@@ -25,6 +31,26 @@ class MoveLabwareParams(BaseModel):
         ...,
         description="Whether to use the gripper to perform the labware movement"
         " or to perform a manual movement with an option to pause.",
+    )
+    usePickUpLocationLpcOffset: bool = Field(
+        False,
+        description="Whether to use LPC offset of the labware associated with its "
+        "pick up location. Experimental param, subject to change.",
+    )
+    useDropLocationLpcOffset: bool = Field(
+        False,
+        description="Whether to use LPC offset of the labware associated with its "
+        "drop off location. Experimental param, subject to change.",
+    )
+    pickUpOffset: Optional[LabwareOffsetVector] = Field(
+        None,
+        description="Offset to use when picking up labware. "
+        "Experimental param, subject to change",
+    )
+    dropOffset: Optional[LabwareOffsetVector] = Field(
+        None,
+        description="Offset to use when dropping off labware. "
+        "Experimental param, subject to change",
     )
 
 
@@ -91,12 +117,18 @@ class MoveLabwareImplementation(
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
                 empty_new_location,
             )
-
+            experimental_offset_data = ExperimentalOffsetData(
+                usePickUpLocationLpcOffset=params.usePickUpLocationLpcOffset,
+                useDropLocationLpcOffset=params.useDropLocationLpcOffset,
+                pickUpOffset=params.pickUpOffset,
+                dropOffset=params.dropOffset,
+            )
             # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,
                 current_location=validated_current_loc,
                 new_location=validated_new_loc,
+                experimental_offset_data=experimental_offset_data,
                 new_offset_id=new_offset_id,
             )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:

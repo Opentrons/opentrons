@@ -3,17 +3,21 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
+} from '../../../redux/analytics'
 import { LabwareCard } from '../../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 jest.mock('../../../organisms/LabwareCard')
 jest.mock('../../../organisms/AddCustomLabwareSlideout')
+jest.mock('../../../organisms/ToasterOven')
 jest.mock('../hooks')
-jest.mock('../helpers/getAllDefs')
 jest.mock('../../../redux/analytics')
 
 const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
@@ -32,8 +36,12 @@ const mockUseNewLabwareName = useNewLabwareName as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 let mockTrackEvent: jest.Mock
+const mockMakeSnackbar = jest.fn()
+const mockMakeToast = jest.fn()
+const mockEatToast = jest.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -63,6 +71,11 @@ describe('Labware', () => {
       newLabwareName: null,
       clearLabwareName: jest.fn(),
     })
+    mockUseToaster.mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      makeToast: mockMakeToast,
+      eatToast: mockEatToast,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -91,7 +104,7 @@ describe('Labware', () => {
     const btn = getByRole('link', { name: 'Open Labware Creator' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'openLabwareCreatorFromBottomOfLabwareLibraryList',
+      name: ANALYTICS_OPEN_LABWARE_CREATOR_FROM_BOTTOM_OF_LABWARE_LIBRARY_LIST,
       properties: {},
     })
   })
@@ -100,16 +113,24 @@ describe('Labware', () => {
       labwareFailureMessage: 'mock failure message',
       clearLabwareFailure: jest.fn(),
     })
-    const [{ getByText }] = render()
-    getByText('mock failure message')
+    render()
+    expect(mockMakeToast).toBeCalledWith(
+      'mock failure message',
+      'error',
+      expect.any(Object)
+    )
   })
   it('renders success toast if there is a new labware name', () => {
     mockUseNewLabwareName.mockReturnValue({
       newLabwareName: 'mock filename',
       clearLabwareName: jest.fn(),
     })
-    const [{ getByText }] = render()
-    getByText('mock filename imported.')
+    render()
+    expect(mockMakeToast).toBeCalledWith(
+      'mock filename imported.',
+      'success',
+      expect.any(Object)
+    )
   })
   it('renders filter by menu when it is clicked', () => {
     const [{ getByText, getByRole }] = render()

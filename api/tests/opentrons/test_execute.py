@@ -53,7 +53,7 @@ def test_execute_function_apiv2(
         "id": "testid",
     }
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-        "config": load(PipetteModel("p300_single_v1.5")),
+        "config": load(PipetteModel("p1000_single_v1")),
         "id": "testid2",
     }
     entries = []
@@ -64,10 +64,10 @@ def test_execute_function_apiv2(
 
     execute.execute(protocol.filelike, "testosaur_v2.py", emit_runlog=emit_runlog)
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1",
-        "Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 150.0 uL/sec",
-        "Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 300.0 uL/sec",
-        "Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1",
+        "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
+        "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
+        "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
+        "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
     ]
 
 
@@ -242,7 +242,7 @@ def test_execute_extra_labware(
     no_lw = execute.get_protocol_api("2.0")
 
     # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
-    assert not no_lw._implementation._extra_labware  # type: ignore[attr-defined]
+    assert not no_lw._core._extra_labware  # type: ignore[attr-defined]
     protocol.filelike.seek(0)
     monkeypatch.setattr(execute, "IS_ROBOT", True)
     monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", fixturedir)
@@ -255,9 +255,9 @@ def test_execute_extra_labware(
     # make sure the extra labware loaded by default is right
     ctx = execute.get_protocol_api("2.0")
     # TODO(mc, 2021-09-12): `_extra_labware` is not defined on `AbstractProtocol`
-    assert len(
-        ctx._implementation._extra_labware.keys()  # type: ignore[attr-defined]
-    ) == len(os.listdir(fixturedir))
+    assert len(ctx._core._extra_labware.keys()) == len(  # type: ignore[attr-defined]
+        os.listdir(fixturedir)
+    )
 
     assert ctx.load_labware("fixture_12_trough", 1, namespace="fixture")
 

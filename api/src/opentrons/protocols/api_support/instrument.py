@@ -95,10 +95,8 @@ def validate_tiprack(
         valid_vols = VALID_PIP_TIPRACK_VOL[instrument_name.split("_")[0]]
         if tiprack_vol not in valid_vols:
             log.warning(
-                f"The pipette {instrument_name} and its tip rack "
-                f"{tip_rack.load_name} in slot {tip_rack.parent} appear to "
-                "be mismatched. Please check your protocol before running "
-                "on the robot."
+                f"The pipette {instrument_name} and its tip rack {tip_rack.load_name}"
+                " appear to be mismatched. Please check your protocol."
             )
 
 

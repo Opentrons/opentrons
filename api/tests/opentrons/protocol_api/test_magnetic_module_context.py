@@ -5,8 +5,10 @@ from decoy import Decoy, matchers
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules import MagneticStatus
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MagneticModuleContext
 from opentrons.protocol_api.core.common import ProtocolCore, MagneticModuleCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 
 
 @pytest.fixture
@@ -19,6 +21,12 @@ def mock_core(decoy: Decoy) -> MagneticModuleCore:
 def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock protocol implementation core."""
     return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
+def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock LoadedCoreMap."""
+    return decoy.mock(cls=LoadedCoreMap)
 
 
 @pytest.fixture
@@ -38,12 +46,14 @@ def subject(
     api_version: APIVersion,
     mock_core: MagneticModuleCore,
     mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
     mock_broker: Broker,
 ) -> MagneticModuleContext:
     """Get a magnetic module context with its dependencies mocked out."""
     return MagneticModuleContext(
         core=mock_core,
         protocol_core=mock_protocol_core,
+        core_map=mock_core_map,
         broker=mock_broker,
         api_version=api_version,
     )
@@ -79,13 +89,14 @@ def test_get_status(
     assert result == "disengaged"
 
 
-def test_engage_height_from_home(
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+def test_engage_height_from_home_succeeds_on_low_version(
     decoy: Decoy,
     mock_broker: Broker,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:
-    """It should engage if given a raw motor height."""
+    """It should engage if given a raw motor height and the apiLevel is low."""
     subject.engage(height=42.0)
 
     decoy.verify(
@@ -96,6 +107,31 @@ def test_engage_height_from_home(
         mock_core.engage(height_from_home=42.0),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
     )
+
+
+# TODO(mm, 2023-02-09): Add MAX_SUPPORTED_VERSION when it's >=2.14.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_engage_height_from_home_raises_on_high_version(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should error if given a raw motor height and the apiLevel is high."""
+    with pytest.raises(APIVersionError):
+        subject.engage(height=42.0)
+    with pytest.raises(APIVersionError):
+        subject.engage(42.0)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_calibrate_raises_on_high_version(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should raise a deprecation error."""
+    with pytest.raises(APIVersionError):
+        subject.calibrate()
 
 
 def test_engage_height_from_base(
@@ -150,3 +186,14 @@ def test_engage_offset_from_default_low_version(
         mock_core.engage_to_labware(offset=42.0, preserve_half_mm=True),
         times=1,
     )
+
+
+def test_serial_number(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should get the module's unique serial number."""
+    decoy.when(mock_core.get_serial_number()).then_return("abc-123")
+    result = subject.serial_number
+    assert result == "abc-123"

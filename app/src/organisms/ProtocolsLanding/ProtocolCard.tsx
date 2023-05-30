@@ -8,7 +8,8 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
-  THERMOCYCLER_MODULE_V2,
+  OT3_STANDARD_MODEL,
+  getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
   Box,
@@ -33,31 +34,41 @@ import {
   parseAllRequiredModuleModels,
 } from '@opentrons/api-client'
 
-import { useFeatureFlag } from '../../redux/config'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { getAnalysisStatus, getProtocolDisplayName } from './utils'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+  getRobotTypeDisplayName,
+} from './utils'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
-interface ProtocolCardProps extends StoredProtocolData {
-  handleRunProtocol: () => void
+interface ProtocolCardProps {
+  handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  storedProtocolData: StoredProtocolData
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
     handleRunProtocol,
+    handleSendProtocolToOT3,
+    storedProtocolData,
+  } = props
+  const {
     protocolKey,
     srcFileNames,
     mostRecentAnalysis,
     modified,
-  } = props
+  } = storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -73,7 +84,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       borderRadius={BORDERS.radiusSoftCorners}
       cursor="pointer"
       minWidth="36rem"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       position="relative"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
       css={BORDERS.cardOutlineBorder}
@@ -87,12 +98,13 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       />
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <ProtocolOverflowMenu
-          protocolKey={protocolKey}
           handleRunProtocol={handleRunProtocol}
+          handleSendProtocolToOT3={handleSendProtocolToOT3}
+          storedProtocolData={storedProtocolData}
         />
       </Box>
     </Box>
@@ -115,7 +127,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     modified,
   } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -126,17 +137,15 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   )
 
-  const requiredModuleModelsWithFF = enableThermocyclerGen2
-    ? requiredModuleModels
-    : requiredModuleModels.filter(mod => mod !== THERMOCYCLER_MODULE_V2)
+  const requiredModuleTypes = requiredModuleModels.map(getModuleType)
 
-  const requiredModuleTypes = requiredModuleModelsWithFF.map(getModuleType)
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       flex="1 0 100%"
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
     >
       <Box
         size="6rem"
@@ -160,10 +169,10 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       <Flex
         flex="1 0"
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         {/* error and protocol name section */}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {analysisStatus === 'error' ? (
             <ProtocolAnalysisFailure
               protocolKey={protocolKey}
@@ -184,23 +193,26 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             {t('loading_data')}
           </StyledText>
         ) : (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-            <Flex gridGap={SPACING.spacing4}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <Flex gridGap={SPACING.spacing16}>
               <Flex
-                flex={`0 0 ${SIZE_2}`}
+                flex={`0 0 ${
+                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                }`}
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
               >
                 <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                   {t('robot')}
                 </StyledText>
-                {/* TODO(bh, 2022-10-14): read intended robot from protocol */}
-                <StyledText as="p">OT-2</StyledText>
+                <StyledText as="p">
+                  {getRobotTypeDisplayName(robotType)}
+                </StyledText>
               </Flex>
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
@@ -213,7 +225,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                     loading: <StyledText as="p">{t('no_data')}</StyledText>,
                     error: <StyledText as="p">{t('no_data')}</StyledText>,
                     complete: (
-                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
+                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
                         {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
                         {leftMountPipetteName != null ? (
                           <InstrumentContainer
@@ -231,7 +243,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                             }
                           />
                         ) : null}
-                        {/* TODO(bh, 2022-10-14): insert gripper if found */}
+                        {mostRecentAnalysis != null &&
+                        getProtocolUsesGripper(mostRecentAnalysis) ? (
+                          <InstrumentContainer
+                            displayName={getGripperDisplayName('gripperV1')}
+                          />
+                        ) : null}
                       </Flex>
                     ),
                   }[analysisStatus]
@@ -240,7 +257,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="0 0 6rem"
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
@@ -254,7 +271,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                           color={COLORS.darkGreyEnabled}
                           moduleType={moduleType}
                           height="1rem"
-                          marginRight={SPACING.spacing3}
+                          marginRight={SPACING.spacing8}
                         />
                       ))}
                     </Flex>
