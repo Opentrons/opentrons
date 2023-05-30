@@ -28,6 +28,9 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 For more details about this release, please see the full [technical change log][]. 
 
+## Smaller Known Issues In This Release
+- Gripper calibration occasionally seems like it "skipped a step", going straight from front to rear calibration. If this happens, exit and rerun. This is because of a server error that isn't getting properly reported. We're working on both fixing the error and its reporting, but in the meantime exiting and rerunning the process should fix it. This is RQA-844.
+
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
 ### ODD
