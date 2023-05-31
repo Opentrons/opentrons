@@ -28,7 +28,7 @@ interface RectProps {
 const TextSizeTile = styled(Box)`
   width: 10.5625rem;
   height: 6.25rem;
-  border-radius: ${BORDERS.size2};
+  border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: RectProps) =>
     props.isActive ? COLORS.highlightPurple1 : COLORS.highlightPurple2};
 `
