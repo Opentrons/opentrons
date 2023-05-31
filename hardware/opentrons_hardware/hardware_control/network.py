@@ -129,6 +129,33 @@ class NetworkInfo:
         )
         return device_info
 
+    async def probe_specific(
+        self, devices: Set[FirmwareTarget], timeout: float = 1.0
+    ) -> Dict[FirmwareTarget, DeviceInfoCache]:
+        """Probe for specific connected devices determined by the arguments.
+
+        This method checks for the presence of specific devices on the network, as opposed to
+        getting a general assessment of what's present. It will also update the internal cache
+        of device state for what it finds, but only for the devices in the argument.
+        """
+        can_devs: Set[NodeId] = {
+            NodeId(target) for target in devices if target in NodeId
+        }
+        usb_devs: Set[USBTarget] = {
+            USBTarget(target) for target in devices if target in USBTarget
+        }
+        can_device_info, usb_device_info = await asyncio.gather(
+            self._can_network_info.probe_specific(can_devs, timeout),
+            self._usb_network_info.probe_specific(usb_devs, timeout),
+        )
+        device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
+            node: cache for (node, cache) in can_device_info.items()
+        }
+        device_info.update(
+            {target: cache for (target, cache) in usb_device_info.items()}
+        )
+        return device_info
+
 
 class UsbNetworkInfo:
     """This class is responsible for keeping track of usb devices."""
@@ -159,6 +186,61 @@ class UsbNetworkInfo:
         else:
             log.debug(f"{msg} found {found} with nothing expected")
 
+    def _update_only(
+        self, only_devices: Set[USBTarget], found: Dict[USBTarget, DeviceInfoCache]
+    ) -> None:
+        for device in only_devices:
+            if device not in found:
+                self._device_info_cache.pop(device, None)
+            else:
+                self._device_info_cache[device] = found[device]
+
+    async def probe_specific(  # noqa: C901
+        self, devices: Set[USBTarget], timeout: float = 1.0
+    ) -> Dict[USBTarget, DeviceInfoCache]:
+        """Probe for a specific set of usb connected devices.
+
+        Sends a status requets to the usb messenger and waits for responses, ending when all devices
+        response or when a timeout occurs. Will cache the results but only for the targets passed as argument.
+        """
+        event = asyncio.Event()
+        targets: Dict[USBTarget, DeviceInfoCache] = dict()
+        if self._usb_messenger is None:
+            self._device_info_cache = {}
+            return targets
+
+        if not devices:
+            return targets
+
+        def listener(message: BinaryMessageDefinition) -> None:
+            if isinstance(message, USBDeviceInfoResponse):
+                device_info_cache = _parse_usb_device_info_response(message)
+                if device_info_cache:
+                    targets[USBTarget(device_info_cache.target)] = device_info_cache
+            if devices.issubset(targets):
+                event.set()
+
+        try:
+            self._usb_messenger.add_listener(listener)
+            await self._usb_messenger.send(
+                message=USBDeviceInfoRequest(),
+            )
+            await asyncio.wait_for(event.wait(), timeout)
+        except asyncio.TimeoutError:
+            self._log_failure(
+                devices, set(iter(targets.keys())), "Timeout during probe_specific"
+            )
+        except CommunicationError:
+            self._log_failure(
+                devices,
+                set(iter(targets.keys())),
+                "USB communications error during probe_specific",
+            )
+        finally:
+            self._usb_messenger.remove_listener(listener)
+            self._update_only(devices, targets)
+        return targets
+
     async def probe(
         self, expected: Optional[Set[USBTarget]] = None, timeout: float = 1.0
     ) -> Dict[USBTarget, DeviceInfoCache]:
@@ -181,6 +263,7 @@ class UsbNetworkInfo:
         targets: Dict[USBTarget, DeviceInfoCache] = dict()
 
         if self._usb_messenger is None:
+            self._device_info_cache = {}
             return targets
 
         def listener(message: BinaryMessageDefinition) -> None:
@@ -258,14 +341,17 @@ class CanNetworkInfo:
         nodes: Dict[NodeId, DeviceInfoCache] = dict()
 
         def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
-            if isinstance(message, CanDeviceInfoResponse):
-                device_info_cache = _parse_can_device_info_response(
-                    message, arbitration_id
-                )
-                if device_info_cache:
-                    nodes[
-                        NodeId(device_info_cache.target).application_for()
-                    ] = device_info_cache
+            if not isinstance(message, CanDeviceInfoResponse):
+                return
+            device_info_cache = _parse_can_device_info_response(message, arbitration_id)
+            if not device_info_cache:
+                return
+            nodes[
+                NodeId(device_info_cache.target).application_for()
+            ] = device_info_cache
+            log.info(
+                f"Info response from {NodeId(arbitration_id.parts.originating_node_id).name}: {device_info_cache}"
+            )
             if expected_nodes and expected_nodes.issubset(
                 {node.application_for() for node in nodes}
             ):
@@ -289,6 +375,60 @@ class CanNetworkInfo:
         finally:
             self._can_messenger.remove_listener(listener)
             self._device_info_cache = nodes
+        return nodes
+
+    async def probe_specific(
+        self, targets: Set[NodeId], timeout: float = 1.0
+    ) -> Dict[NodeId, DeviceInfoCache]:
+        """Probe specific devices to see whether they're present on the bus.
+
+        Sends a status request to the broadcast address and waits for responses from only
+        the specified devices. Ends either when the given devices respond or when a timeout
+        happens, whichever is first.
+
+        This will also update the cached values of present nodes, but unlike probe() does not
+        check for or care about any node not given and will not add or remove them from the
+        cache.
+        """
+        event = asyncio.Event()
+        nodes: Dict[NodeId, DeviceInfoCache] = dict()
+        target_applications = {target.application_for() for target in targets}
+
+        def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+            if not isinstance(message, CanDeviceInfoResponse):
+                return
+            device_info_cache = _parse_can_device_info_response(message, arbitration_id)
+
+            if not device_info_cache:
+                return
+
+            originating_device = NodeId(device_info_cache.target)
+            originating_application = originating_device.application_for()
+            if originating_application not in target_applications:
+                return
+            nodes[originating_application] = device_info_cache
+            if target_applications.issubset(nodes):
+                event.set()
+
+        self._can_messenger.add_listener(listener)
+        await self._can_messenger.send(
+            node_id=NodeId.broadcast,
+            message=CanDeviceInfoRequest(),
+        )
+        try:
+            await asyncio.wait_for(event.wait(), timeout)
+        except asyncio.TimeoutError:
+            log.warning(
+                "probe timed out before expected nodes found, missing "
+                f"{target_applications.difference(nodes)}"
+            )
+        finally:
+            self._can_messenger.remove_listener(listener)
+            for target in target_applications:
+                if target in nodes:
+                    self._device_info_cache[target] = nodes[target]
+                else:
+                    self._device_info_cache.pop(target, None)
         return nodes
 
 

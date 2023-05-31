@@ -86,6 +86,9 @@ class SubsystemManager:
         self._update_bag = update_bag
         if self._usb_messenger:
             self._expected_core_targets.add(USBTarget.rear_panel)
+        self._present_tools = tools.types.ToolSummary(
+            left=None, right=None, gripper=None
+        )
 
     @property
     def ok(self) -> bool:
@@ -142,11 +145,14 @@ class SubsystemManager:
         return bool(self._updates_required)
 
     async def start(self) -> None:
-        await self._probe_network_and_cache_fw_updates(self._expected_core_targets)
+        await self._probe_network_and_cache_fw_updates(
+            self._expected_core_targets, True
+        )
         self._tool_detection_task = asyncio.create_task(
             self._tool_detection_task_main()
         )
         await self.refresh()
+        log.info(f"Subsystem manager started with devices {self.device_info}")
 
     async def refresh(self) -> None:
         """Explicitly refresh the state of the system.
@@ -208,7 +214,7 @@ class SubsystemManager:
             log.info("No firmware updates required for specified subsystems.")
             return
 
-        log.info("Firmware updates are available.")
+        log.info("Updating firmware on {updating_subsystems}")
 
         update_details = {
             target: firmware_updates[target].filepath
@@ -244,9 +250,10 @@ class SubsystemManager:
                 )
                 status_callbacks[subsystem](upstream_status)
                 yield upstream_status
-
         # refresh the device_info cache and reset internal states
-        await self.refresh()
+        await self._probe_network_and_cache_fw_updates(
+            {subsystem_to_target(subsystem) for subsystem in updating_subsystems}, False
+        )
         # make sure the update actually succeeded
         device_info = self.device_info
         for subsystem in updating_subsystems:
@@ -299,9 +306,17 @@ class SubsystemManager:
         self._updates_required = self._get_required_fw_updates(set(), False)
 
     async def _probe_network_and_cache_fw_updates(
-        self, targets: Set[FirmwareTarget]
+        self, targets: Set[FirmwareTarget], broadcast: bool = True
     ) -> None:
-        await self._network_info.probe(targets)
+        checked_targets = {
+            target
+            for target in targets
+            if target_to_subsystem(target) not in self._updates_ongoing
+        }
+        if broadcast:
+            await self._network_info.probe(checked_targets)
+        else:
+            await self._network_info.probe_specific(checked_targets)
         self._update_fw_update_requirements()
 
     @contextmanager
@@ -343,15 +358,16 @@ class SubsystemManager:
             # We got a notification from the head that something changed. Let's check whether the currently
             # attached tools are okay by getting their device info
             tool_nodes: Set[NodeId] = set()
-            if update.left:
+            if update.left != ToolType.nothing_attached:
                 tool_nodes.add(NodeId.pipette_left)
-            if update.right:
+            if update.right != ToolType.nothing_attached:
                 tool_nodes.add(NodeId.pipette_right)
-            if update.gripper:
+            if update.gripper != ToolType.nothing_attached:
                 tool_nodes.add(NodeId.gripper)
+            log.debug(f"Tool detect: update from head {update}, probing {tool_nodes}")
             try:
                 await self._probe_network_and_cache_fw_updates(
-                    self._expected_core_targets.union(tool_nodes)
+                    self._expected_core_targets.union(tool_nodes), False
                 )
             except TimeoutError:
                 log.exception("Problem in internal network probe")
@@ -364,6 +380,7 @@ class SubsystemManager:
                 gripper=self._tool_if_ok(update.gripper, NodeId.gripper),
             )
             self._present_tools = await self._tool_detector.resolve(to_resolve)
+            log.info(f"Present tools are now {self._present_tools}")
             async with self._tool_task_condition:
                 self._tool_task_state = True
                 self._tool_task_condition.notify_all()

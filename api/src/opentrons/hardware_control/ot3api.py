@@ -93,7 +93,13 @@ from .types import (
     StatusBarState,
     SubSystemState,
 )
-from .errors import MustHomeError, GripperNotAttachedError, AxisNotPresentError, UpdateOngoingError
+from .errors import (
+    MustHomeError,
+    GripperNotAttachedError,
+    AxisNotPresentError,
+    UpdateOngoingError,
+    FirmwareUpdateFailed,
+)
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
@@ -390,9 +396,9 @@ class OT3API(
                 yield update_status
         except SubsystemUpdating as e:
             raise UpdateOngoingError(e.msg) from e
-
-        # refresh Instrument cache
-        await self.cache_instruments()
+        except Exception as e:
+            mod_log.exception("Firmware update failed")
+            raise FirmwareUpdateFailed() from e
 
     # Incidentals (i.e. not motion) API
 

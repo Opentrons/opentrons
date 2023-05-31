@@ -55,6 +55,12 @@ class FirmwareUpdateRequired(RuntimeError):
     pass
 
 
+class FirmwareUpdateFailed(RuntimeError):
+    """An error raised when a firmware update fails."""
+
+    pass
+
+
 class InvalidPipetteName(KeyError):
     """Raised for an invalid pipette."""
 

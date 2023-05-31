@@ -267,10 +267,13 @@ def _update_types_from_devices(
 
 
 def _devices_to_check(
-    device_info: Dict[FirmwareTarget, DeviceInfoCache], targets: Set[FirmwareTarget]
+    device_info: Dict[FirmwareTarget, DeviceInfoCache],
+    targets: Optional[Set[FirmwareTarget]],
 ) -> Iterator[DeviceInfoCache]:
     known_targets = set(device_info.keys())
-    check_targets = known_targets.intersection(targets) if targets else known_targets
+    check_targets = (
+        known_targets.intersection(targets) if (targets is not None) else known_targets
+    )
     return (device_info[target] for target in check_targets)
 
 
@@ -280,18 +283,18 @@ def _should_update(
     force: bool,
 ) -> bool:
     if version_cache.target.is_bootloader():
-        log.info(f"Update required for {version_cache.target} (in bootloader)")
+        log.info(f"Update required for {version_cache.target.name} (in bootloader)")
         return True
     if force:
-        log.info(f"Update required for {version_cache.target} (forced)")
+        log.info(f"Update required for {version_cache.target.name} (forced)")
         return True
     if version_cache.shortsha != update_info.shortsha:
         log.info(
-            f"Update required for {version_cache.target} (reported sha {version_cache.shortsha} != {update_info.shortsha})"
+            f"Update required for {version_cache.target.name} (reported sha {version_cache.shortsha} != {update_info.shortsha})"
         )
         return True
     log.info(
-        f"No update required for {version_cache.target}, sha {version_cache.shortsha} matches and not forced"
+        f"No update required for {version_cache.target.name}, sha {version_cache.shortsha} matches and not forced"
     )
     return False
 
@@ -341,8 +344,6 @@ def check_firmware_updates(
     force: bool = False,
 ) -> Dict[FirmwareTarget, Tuple[int, str]]:
     """Returns a dict of NodeIds that require a firmware update and the path to the file to update them."""
-    targets = targets or set()
-
     known_firmware = load_firmware_manifest()
     if known_firmware is None:
         log.error("Could not load the known firmware.")
