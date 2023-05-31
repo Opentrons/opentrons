@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
@@ -238,6 +239,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const history = useHistory()
   const host = useHost()
   const { makeSnackbar } = useToaster()
+  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -251,8 +253,11 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      const runId: string = data.data.id
-      history.push(`/runs/${runId}/setup`)
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        )
     },
   })
 
