@@ -25,7 +25,11 @@ import {
   SIZE_2,
   Btn,
 } from '@opentrons/components'
-import { RUN_STATUS_FAILED, RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { LargeButton, TertiaryButton } from '../../atoms/buttons'
@@ -80,7 +84,9 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(runStatus !== RUN_STATUS_STOPPED)
+  const [showSplash, setShowSplash] = React.useState(
+    runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
+  )
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (_createRunResponse: Run): void =>
     history.push(`/runs/${runId}/setup`)
@@ -159,7 +165,9 @@ export function RunSummary(): JSX.Element {
                   color={COLORS.white}
                 />
                 <SplashHeader>
-                  {didRunSucceed ? t('run_complete_splash') : t('run_failed_splash')}
+                  {didRunSucceed
+                    ? t('run_complete_splash')
+                    : t('run_failed_splash')}
                 </SplashHeader>
               </Flex>
               <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
