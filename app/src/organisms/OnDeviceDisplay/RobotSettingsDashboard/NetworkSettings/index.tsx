@@ -44,12 +44,7 @@ export function NetworkSettings({
     showDetailsTab,
     setShowDetailsTab,
   ] = React.useState<ConnectionType | null>(null)
-  const {
-    isWifiConnected,
-    isEthernetConnected,
-    isUsbConnected,
-    activeSsid,
-  } = networkConnection
+  const { isWifiConnected, isEthernetConnected, activeSsid } = networkConnection
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName)
@@ -127,18 +122,6 @@ export function NetworkSettings({
               chipText={handleChipText(isEthernetConnected)}
               chipIconName="ot-check"
               displayDetailsTab={() => setShowDetailsTab('ethernet')}
-            />
-            {/* usb hard-coded */}
-            <NetworkSettingButton
-              buttonTitle={t('usb')}
-              buttonBackgroundColor={handleButtonBackgroundColor(
-                isUsbConnected
-              )}
-              iconName="usb"
-              chipType={handleChipType(isUsbConnected)}
-              chipText={handleChipText(isUsbConnected)}
-              chipIconName="ot-check"
-              displayDetailsTab={() => console.log('Not Implemented')}
             />
           </Flex>
         )
