@@ -74,13 +74,14 @@ export function Navigation(props: NavigationProps): JSX.Element {
         top="0"
         width="100%"
         backgroundColor={COLORS.white}
+        gridGap={SPACING.spacing24}
         aria-label="Navigation_container"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing32}>
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
             <NavigationLink
               to="/dashboard"
-              name={truncateString(robotName, 15)}
+              name={truncateString(robotName, icon ? 12 : 15)}
             />
             {icon && (
               <Icon
