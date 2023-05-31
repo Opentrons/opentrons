@@ -7,12 +7,13 @@ import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
+import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
-import { useFeatureFlag } from '../../../redux/config'
+import { getConfig, useFeatureFlag } from '../../../redux/config'
 import { getRobotModelByName } from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
@@ -40,8 +41,10 @@ import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
+import type { Config } from '../../../redux/config/types'
 import type { State } from '../../../redux/types'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../../redux/config')
@@ -114,6 +117,12 @@ const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
 >
 
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+
+const mockUseAuthorization = useAuthorization as jest.MockedFunction<
+  typeof useAuthorization
+>
+
 const mockToggleLights = jest.fn()
 
 const render = (props: React.ComponentProps<typeof RobotOverview>) => {
@@ -161,6 +170,21 @@ describe('RobotOverview', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('OT-2')
+    when(mockGetConfig)
+      .calledWith(MOCK_STATE)
+      .mockReturnValue({
+        support: { userId: 'opentrons-robot-user' },
+      } as Config)
+    when(mockUseAuthorization)
+      .calledWith({
+        subject: 'Opentrons',
+        agent: 'com.opentrons.app',
+        agentId: 'opentrons-robot-user',
+      })
+      .mockReturnValue({
+        authorizationToken: { token: 'my.authorization.jwt' },
+        registrationToken: { token: 'my.registration.jwt' },
+      })
   })
   afterEach(() => {
     jest.resetAllMocks()
