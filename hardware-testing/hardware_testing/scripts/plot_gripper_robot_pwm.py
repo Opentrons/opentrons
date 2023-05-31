@@ -2,6 +2,7 @@
 import os
 import sys
 import argparse
+import numpy as np
 import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -17,7 +18,7 @@ class Plot:
         self.PLOT_FONT = 16
         self.PLOT_PATH = "plot_gripper_robot_pwm/"
         self.PLOT_FORMAT = ".png"
-        self.compute = ["Average", "Median", "Maximum"]
+        self.compute = ["Average", "Median", "Maximum", "Minimum", "StdDev"]
         self.plot_param = {
             "figure":None,
             "filename":None,
@@ -31,6 +32,7 @@ class Plot:
             "legend":None,
             "annotation":None
         }
+        self.coefficients = {key:None for key in self.compute}
         self.create_folder()
         self.df_data = self.import_files(self.path)
         self.df_sum = self.summarize_df(self.df_data)
@@ -69,18 +71,25 @@ class Plot:
 
     def get_average(self, df):
         df_avg = pd.DataFrame()
-        df_avg["Avg Average Force"] = df.groupby(["Input PWM"])["Average Force"].mean()
-        df_avg["Avg Median Force"] = df.groupby(["Input PWM"])["Median Force"].mean()
-        df_avg["Avg Maximum Force"] = df.groupby(["Input PWM"])["Maximum Force"].mean()
-        df_avg["Avg Minimum Force"] = df.groupby(["Input PWM"])["Minimum Force"].mean()
-        df_avg["Avg StdDev Force"] = df.groupby(["Input PWM"])["StdDev Force"].mean()
+        for operation in self.compute:
+            df_avg[f"Avg {operation} Force"] = df.groupby(["Input PWM"])[f"{operation} Force"].mean()
         df_avg.reset_index(inplace=True)
-        print(df_avg)
+        for operation in self.compute:
+            x = df_avg["Input PWM"]
+            y = df_avg[f"Avg {operation} Force"]
+            poly = np.polyfit(x, y, 2)
+            df_avg[f"Poly {operation}"] = np.polyval(poly, x)
+            coefficients = ""
+            for value in poly:
+                coefficients += str(round(value, 5)) + ", "
+            self.coefficients[f"{operation}"] = coefficients
         return df_avg
 
     def create_plot(self):
         print("Plotting PWM-to-Force...")
         self.avg_force_plot()
+        print("Plotting PWM-to-Force Curve Fitting...")
+        self.avg_pwm_plot()
         print("Plots Saved!")
 
     def set_legend(self, figure, legend):
@@ -140,9 +149,9 @@ class Plot:
         df = self.df_sum
         df_avg = self.df_avg
         df["Input PWM"] = df["Input PWM"].astype(str) + " %"
-        for operate in self.compute:
+        for operation in self.compute:
             x_axis = "Part Number"
-            y_axis = f"{operate} Force"
+            y_axis = f"{operation} Force"
             x_start = df[x_axis].iloc[0]
             x_end = df[x_axis].iloc[-1]
             y_start = df[y_axis].iloc[0]
@@ -152,7 +161,7 @@ class Plot:
             avg_xpos = df[x_axis].iloc[0]
             fig.append(px.scatter(df, x=x_axis, y=[y_axis], color="Input PWM", symbol="Input PWM"))
             for i in range(len(df_avg)):
-                avg_force = df_avg[f"Avg {operate} Force"].iloc[i]
+                avg_force = df_avg[f"Avg {operation} Force"].iloc[i]
                 fig.append(px.line(x=[x_start, x_end], y=[avg_force, avg_force], line_dash_sequence=["dash"], color_discrete_sequence=self.list_colors[i:]))
                 avg_text = "Avg = {:.2f} N".format(avg_force)
                 avg_annotation.append(self.set_annotation(avg_xpos, avg_force, avg_text, ax_pos=50, ay_pos=-50))
@@ -161,14 +170,49 @@ class Plot:
                 subfig.add_traces(fig[i].data)
             subfig.update_traces(marker={"size":15})
             self.plot_param["figure"] = subfig
-            self.plot_param["filename"] = f"plot_{operate.lower()}_force"
-            self.plot_param["title"] = f"DVT Gripper {operate} Force (Input PWM DC)"
+            self.plot_param["filename"] = f"plot_{operation.lower()}_force"
+            self.plot_param["title"] = f"DVT Gripper {operation} Force (Input PWM DC)"
             self.plot_param["x_title"] = "Part Number"
-            self.plot_param["y_title"] = f"{operate} Output Force (N)"
+            self.plot_param["y_title"] = f"{operation} Output Force (N)"
             self.plot_param["x_range"] = None
             self.plot_param["y_range"] = [0, 25]
             self.plot_param["legend"] = "Input PWM"
             self.plot_param["annotation"] = avg_annotation
+            if "StdDev" in operation:
+                self.plot_param["y_range"] = [0, 1]
+            self.write_plot(self.plot_param)
+
+    def avg_pwm_plot(self):
+        df = self.df_avg
+        for operation in self.compute:
+            x_axis = "Input PWM"
+            y_axis = f"Avg {operation} Force"
+            y2_axis = f"Poly {operation}"
+            x_start = df[x_axis].iloc[0]
+            x_end = df[x_axis].iloc[-1]
+            y_start = df[y_axis].iloc[0]
+            y_end = df[y_axis].iloc[-1]
+            poly_xpos = df[x_axis].median()
+            poly_ypos = df[y_axis].median()
+            poly_text = "Coefficient Values: <br> {}".format(self.coefficients[f"{operation}"])
+            poly_annotation = self.set_annotation(poly_xpos, poly_ypos, poly_text, ax_pos=-100, ay_pos=-100)
+            fig1 = px.scatter(df, x=x_axis, y=[y_axis])
+            fig2 = px.line(df, x=x_axis, y=[y2_axis], line_dash_sequence=["dash"], color_discrete_sequence=["red"])
+            self.set_legend(fig2, ["2nd Order Polynomial"])
+            subfig = make_subplots()
+            subfig.add_traces(fig1.data + fig2.data)
+            subfig.update_traces(marker={"size":15})
+            self.plot_param["figure"] = subfig
+            self.plot_param["filename"] = f"plot_avg_{operation.lower()}_force_pwm"
+            self.plot_param["title"] = f"DVT Gripper Avg ({operation}) Force vs. PWM"
+            self.plot_param["x_title"] = "PWM Duty-Cycle (%)"
+            self.plot_param["y_title"] = f"Avg {operation} Output Force (N)"
+            self.plot_param["x_range"] = [0, 50]
+            self.plot_param["y_range"] = [0, 25]
+            self.plot_param["legend"] = "Data"
+            self.plot_param["annotation"] = [poly_annotation]
+            if "StdDev" in operation:
+                self.plot_param["y_range"] = [0, 1]
             self.write_plot(self.plot_param)
 
 if __name__ == '__main__':
