@@ -83,6 +83,7 @@
   "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",
   "run_again": "Run again",
   "run_canceled": "Run canceled.",
+  "run_canceled_splash": "Run canceled",
   "run_complete": "Run completed",
   "run_completed": "Run completed.",
   "run_complete_splash": "Run completed",

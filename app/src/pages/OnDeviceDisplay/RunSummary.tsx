@@ -95,8 +95,11 @@ export function RunSummary(): JSX.Element {
   )
 
   let headerText = t('run_complete_splash')
-  if (runStatus === RUN_STATUS_FAILED) headerText = t('run_failed_splash')
-  if (runStatus === RUN_STATUS_STOPPED) headerText = t('run_canceled')
+  if (runStatus === RUN_STATUS_FAILED) {
+    headerText = t('run_failed_splash')
+  } else if (runStatus === RUN_STATUS_STOPPED) {
+    headerText = t('run_canceled_splash')
+  }
 
   const handleReturnToDash = (): void => {
     closeCurrentRun()
