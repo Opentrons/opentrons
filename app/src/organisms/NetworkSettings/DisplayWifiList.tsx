@@ -117,7 +117,7 @@ export function DisplayWifiList({
               onClick={() => handleClick(nw)}
             >
               <Icon name="wifi" size="2.5rem" />
-              <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+              <StyledText as="h4">
                 {nw.ssid}
               </StyledText>
             </Btn>
