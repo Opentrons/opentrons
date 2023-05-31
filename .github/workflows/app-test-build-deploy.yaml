@@ -98,9 +98,6 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
-        exclude:
-          - os: format('macos-11{0}', startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build') || null)
-          - os: format('windows-2022{0}', startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build') || null)
 
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
@@ -108,14 +105,6 @@ jobs:
       - uses: 'actions/checkout@v3'
         with:
           fetch-depth: 0
-      - name: 'debug'
-        run: |
-          echo ${{ github.ref }}
-          echo ${{ startsWith(github.ref, 'refs/tags') }}
-          echo ${{ startsWith(github.ref, 'refs/heads/edge') }}
-          echo ${{ startsWith(github.ref, 'refs/heads/internal-release') }}
-          echo ${{ startsWith(github.ref, 'refs/heads/release') }}
-          echo ${{ endsWith(github.ref, 'app-build') }}
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
@@ -166,7 +155,7 @@ jobs:
           flags: app
 
       # build the desktop app and deploy it
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'build app for ${{ matrix.os }}'
         timeout-minutes: 60
         env:
@@ -187,7 +176,7 @@ jobs:
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'upload github artifact'
         uses: actions/upload-artifact@v3
         with:
@@ -255,7 +244,7 @@ jobs:
           make setup-js
 
       # build the app and deploy it
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'build app for ${{ matrix.os }}'
         timeout-minutes: 60
         env:
@@ -276,7 +265,7 @@ jobs:
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'upload github artifact'
         uses: actions/upload-artifact@v3
         with:
