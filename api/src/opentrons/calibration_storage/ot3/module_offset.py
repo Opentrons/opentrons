@@ -102,6 +102,8 @@ def get_module_offset(
         return None
 
 
+# TODO (ba, 2023-05-31) maybe look into lru_cache for loading offsets, to expose offset over http
+@lru_cache
 def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
     """Load all module offsets from the disk."""
 
