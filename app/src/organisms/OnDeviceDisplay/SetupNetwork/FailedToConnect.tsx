@@ -68,7 +68,7 @@ export function FailedToConnect({
           height="18.5rem"
           backgroundColor={COLORS.red3}
           justifyContent={JUSTIFY_CENTER}
-          borderRadius={BORDERS.size3}
+          borderRadius={BORDERS.borderRadiusSize3}
         >
           <Flex
             justifyContent={JUSTIFY_CENTER}

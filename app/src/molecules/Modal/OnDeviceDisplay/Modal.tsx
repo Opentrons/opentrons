@@ -60,7 +60,7 @@ export function Modal(props: ModalProps): JSX.Element {
         width={modalWidth}
         height="max-content"
         maxHeight="33.5rem"
-        borderRadius={BORDERS.size3}
+        borderRadius={BORDERS.borderRadiusSize3}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
@@ -84,7 +84,11 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingX={SPACING.spacing32}
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
-          borderRadius={`0px 0px ${BORDERS.size3} ${BORDERS.size3}`}
+          borderRadius={
+            isError
+              ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
+              : 0
+          }
         >
           {children}
         </Flex>
