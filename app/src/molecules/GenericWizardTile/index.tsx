@@ -118,7 +118,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing16}
         >
           {typeof header === 'string' ? (
             <StyledText as="h1" css={HEADER_STYLE}>
