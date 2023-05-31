@@ -234,7 +234,9 @@ def _pipette_with_liquid_settings(
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+        # pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+        # FIXME: don't leave this commented out!!!
+        pass
 
     def _dispense_on_approach() -> None:
         _do_user_pause(ctx, inspect, "about to dispense")
