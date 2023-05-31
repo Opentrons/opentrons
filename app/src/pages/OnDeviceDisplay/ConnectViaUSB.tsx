@@ -44,7 +44,7 @@ export function ConnectViaUSB(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_RELATIVE}
-          marginBottom={SPACING.spacing40}
+          marginBottom={SPACING.spacing64}
         >
           <Btn
             position={POSITION_ABSOLUTE}
@@ -75,6 +75,7 @@ export function ConnectViaUSB(): JSX.Element {
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_CENTER}
               gridGap={SPACING.spacing32}
+              padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
             >
               <Icon name="ot-check" size="3rem" color={COLORS.green2} />
               <Flex
@@ -105,7 +106,7 @@ export function ConnectViaUSB(): JSX.Element {
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.darkBlack20}
             flexDirection={DIRECTION_COLUMN}
-            padding={`${SPACING.spacing48} ${SPACING.spacing80}`}
+            padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
             gridGap={SPACING.spacing32}
             height="25.25rem"
             borderRadius={BORDERS.borderRadiusSize3}
@@ -120,7 +121,11 @@ export function ConnectViaUSB(): JSX.Element {
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('no_connection_found')}
               </StyledText>
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing8}
+                alignItems={ALIGN_CENTER}
+              >
                 <StyledText as="h4" color={COLORS.darkBlack70}>
                   {t('connect_via_usb_description_1')}
                 </StyledText>
