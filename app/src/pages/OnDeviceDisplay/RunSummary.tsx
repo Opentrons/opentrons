@@ -272,6 +272,11 @@ const SplashHeader = styled.h1`
   color: ${COLORS.white};
 `
 const SplashBody = styled.h4`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: break-word;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
