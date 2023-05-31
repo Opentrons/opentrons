@@ -111,3 +111,13 @@ class SimulatingDriver(AbstractThermocyclerDriver):
     @ensure_yield
     async def enter_programming_mode(self) -> None:
         pass
+
+    @ensure_yield
+    async def jog_lid(self, angle: float) -> None:
+        if self._model == ThermocyclerModuleModel.THERMOCYCLER_V1.value:
+            raise NotImplementedError()
+        self._lid_status = (
+            ThermocyclerLidStatus.IN_BETWEEN
+            if angle < 0
+            else ThermocyclerLidStatus.OPEN
+        )

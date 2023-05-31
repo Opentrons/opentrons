@@ -81,13 +81,15 @@ export function RobotSettingsDashboard(): JSX.Element {
             setCurrentOption={setCurrentOption}
             iconName="wifi"
           />
-          <RobotSettingButton
-            settingName={t('robot_name')}
-            settingInfo={robotName}
-            currentOption="RobotName"
-            setCurrentOption={setCurrentOption}
-            iconName="flex-robot"
-          />
+          <Link to="/robot-settings/rename-robot">
+            <RobotSettingButton
+              settingName={t('robot_name')}
+              settingInfo={robotName}
+              currentOption="RobotName"
+              setCurrentOption={setCurrentOption}
+              iconName="flex-robot"
+            />
+          </Link>
           <RobotSettingButton
             settingName={t('robot_system_version')}
             settingInfo={

@@ -2,12 +2,12 @@
 test_name: GET list of useful robot positions
 marks:
   - usefixtures:
-    - run_server
+    - ot2_server_base_url
 stages:
   - name: Get robot positions
     request:
       method: GET
-      url: "{host:s}:{port:d}/robot/positions"
+      url: "{ot2_server_base_url}/robot/positions"
     response:
       status_code: 200
       json:
@@ -32,12 +32,12 @@ stages:
 test_name: POST Move Robot
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: GET the left pipette attached to the robot
     request:
       method: GET
-      url: "{host:s}:{port:d}/pipettes"
+      url: "{ot2_server_base_url}/pipettes"
     response:
       status_code: 200
       save:
@@ -46,7 +46,7 @@ stages:
   - name: POST Move the left pipette to a specific location
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/move"
+      url: "{ot2_server_base_url}/robot/move"
       json:
         target: pipette
         point:
@@ -63,12 +63,12 @@ stages:
 test_name: POST Robot Home
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Home the Robot
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/home"
+      url: "{ot2_server_base_url}/robot/home"
       json:
         target: pipette
         mount: right
@@ -80,12 +80,12 @@ stages:
 test_name: Turn on the robot lights
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: POST Robot Lights
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{ot2_server_base_url}/robot/lights"
       json:
         "on": true # needed to escape "on" because it is a keyword
     response:
@@ -95,7 +95,7 @@ stages:
   - name: GET Robot lights status
     request:
       method: GET
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{ot2_server_base_url}/robot/lights"
     response:
       status_code: 200
       json:
@@ -104,12 +104,12 @@ stages:
 test_name: Turn off the robot lights
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: POST Robot Lights
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{ot2_server_base_url}/robot/lights"
       json:
         "on": false
     response:
@@ -119,7 +119,7 @@ stages:
   - name: GET Robot lights status
     request:
       method: GET
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{ot2_server_base_url}/robot/lights"
     response:
       status_code: 200
       json:

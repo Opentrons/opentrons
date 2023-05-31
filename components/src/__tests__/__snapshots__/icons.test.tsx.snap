@@ -1173,7 +1173,7 @@ exports[`icons help-circle renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons home-gantry renders correctly 1`] = `
+exports[`icons home-robot-arm renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
@@ -1528,6 +1528,30 @@ exports[`icons move-xy renders correctly 1`] = `
 >
   <path
     d="M9.45345 4.65104V8.07812H10.5472V4.65104L11.7139 5.72917L12.516 4.92708L10.0003 2.5L7.50293 4.92708L8.30501 5.72917L9.45345 4.65104Z M10.5651 15.3021L10.5651 11.875L9.47135 11.875L9.47135 15.3021L8.30469 14.224L7.5026 15.026L10.0182 17.4531L12.5156 15.026L11.7135 14.224L10.5651 15.3021Z M4.68376 10.5319L8.11084 10.5319L8.11084 9.43815L4.68376 9.43815L5.76188 8.27148L4.9598 7.4694L2.53271 9.98503L4.9598 12.4824L5.76188 11.6803L4.68376 10.5319Z M15.3348 9.42025L11.9077 9.42025L11.9077 10.514L15.3348 10.514L14.2567 11.6807L15.0588 12.4827L17.4858 9.96712L15.0588 7.46973L14.2567 8.27181L15.3348 9.42025Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons move-xy-circle renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 32 32"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M32 16C32 24.8366 24.8366 32 16 32C7.16344 32 0 24.8366 0 16C0 7.16344 7.16344 0 16 0C24.8366 0 32 7.16344 32 16ZM15.1247 7.44167V12.925H16.8747V7.44167L18.7414 9.16667L20.0247 7.88333L15.9997 4L12.0039 7.88333L13.2872 9.16667L15.1247 7.44167ZM16.9046 18.9998V24.4831L18.7421 22.7581L20.0254 24.0415L16.0296 27.9248L12.0046 24.0415L13.2879 22.7581L15.1546 24.4831V18.9998H16.9046ZM7.4944 16.8518H12.9777V15.1018H7.4944L9.2194 13.2352L7.93607 11.9518L4.05273 15.9768L7.93607 19.9727L9.2194 18.6893L7.4944 16.8518ZM19.0525 15.073H24.5359L22.8109 13.2355L24.0942 11.9521L27.9775 15.948L24.0942 19.973L22.8109 18.6896L24.5359 16.823H19.0525V15.073Z"
     fillRule="evenodd"
   />
 </svg>

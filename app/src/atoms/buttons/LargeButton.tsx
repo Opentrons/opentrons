@@ -68,7 +68,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     cursor: default;
-    border-radius: ${BORDERS.size4};
+    border-radius: ${BORDERS.borderRadiusSize4};
     box-shadow: none;
     padding: ${SPACING.spacing24};
     line-height: ${TYPOGRAPHY.lineHeight20};

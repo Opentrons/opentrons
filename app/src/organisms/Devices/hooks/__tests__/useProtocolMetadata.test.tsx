@@ -24,6 +24,7 @@ describe('useProtocolMetadata', () => {
     .mockReturnValue({
       data: {
         protocolType: 'json',
+        robotType: 'OT-3 Standard',
         metadata: {
           author: 'AUTHOR',
           description: 'DESCRIPTION',
@@ -40,16 +41,23 @@ describe('useProtocolMetadata', () => {
     jest.restoreAllMocks()
   })
 
-  it('should return author, lastUpdated, method, and description from redux selectors', () => {
+  it('should return author, lastUpdated, method, description, and robot type', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(useProtocolMetadata, { wrapper })
-    const { author, lastUpdated, creationMethod, description } = result.current
+    const {
+      author,
+      lastUpdated,
+      creationMethod,
+      description,
+      robotType,
+    } = result.current
 
     expect(author).toBe('AUTHOR')
     expect(lastUpdated).toBe(123456)
     expect(creationMethod).toBe('json')
     expect(description).toBe('DESCRIPTION')
+    expect(robotType).toBe('OT-3 Standard')
   })
 })

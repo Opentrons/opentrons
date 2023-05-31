@@ -2,8 +2,7 @@ test_name: Make sure Labware Position Check loads do not cause deck conflicts in
 
 marks:
   - usefixtures:
-    - run_server
-    - clean_server_state
+    - ot2_server_base_url
   - parametrize:
       # Try loading the Labware Position Check labware in every slot.
       key: slotName
@@ -12,7 +11,7 @@ marks:
 stages:
   - name: Upload the protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: tests/integration/protocols/load_one_labware_one_module_2_14.py
@@ -24,7 +23,7 @@ stages:
 
   - name: Create a run from the protocol
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -40,7 +39,7 @@ stages:
   # in other words, that this labware doesn't cause a deck conflict error.
   - name: Load a labware as if this were Labware Position Check
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -65,7 +64,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -77,7 +76,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -89,7 +88,7 @@ stages:
 
   - name: Check that the commands all completed successfully
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: GET
       params:
         cursor: 0
