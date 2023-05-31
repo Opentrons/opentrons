@@ -1156,7 +1156,7 @@ async def test_move_to_plunger_bottom(
     # tip attached, moving UP towards "bottom" position
     # NOTE: _move() is mocked, so we need to update the OT3API's
     #       cached coordinates in the test
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    pip_ax = OT3Axis.by_mount(mount)
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
@@ -1165,20 +1165,31 @@ async def test_move_to_plunger_bottom(
     )
 
 
-@pytest.mark.parametrize("input_position, expected_move_pos", [({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475})])
+@pytest.mark.parametrize(
+    "input_position, expected_move_pos",
+    [
+        ({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475}),
+        (
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
+        ),
+        (
+            {OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+            {OT3Axis.X: 477.2, OT3Axis.Y: 493.8, OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+        ),
+    ],
+)
 async def test_move_axes(
     ot3_hardware: ThreadManager[OT3API],
     mock_move: AsyncMock,
     mock_check_motor: Mock,
     input_position: Dict[OT3Axis, float],
-    expected_move_pos: OrderedDict[OT3Axis, float]
+    expected_move_pos: OrderedDict[OT3Axis, float],
 ):
 
     await ot3_hardware.move_axes(position=input_position)
     mock_check_motor.return_value = True
 
-    mock_move.reset_mock()
-    print(expected_move_pos)
     mock_move.assert_called_once_with(target_position=expected_move_pos, speed=None)
 
 

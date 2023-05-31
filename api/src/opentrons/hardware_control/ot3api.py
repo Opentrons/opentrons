@@ -1004,6 +1004,10 @@ class OT3API(
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
         assert position, "move_axes requires a none empty position"
+        # do we need this?
+        if not self._current_position:
+            await self.refresh_positions()
+
         for axis in position.keys():
             if not self._backend.axis_is_present(axis):
                 # create a custom error
@@ -1030,8 +1034,13 @@ class OT3API(
         for axis, position_value in position.items():
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
-        print(absolute_positions)
-        print(speed)
+
+        # do we need this?
+        if not self._backend.check_encoder_status(list(absolute_positions.keys())):
+            await self.home()
+
+        # do we need to _cache_and_maybe_retract_mount?
+
         await self._move(target_position=absolute_positions, speed=speed)
 
     async def move_rel(

@@ -6,12 +6,13 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionImplementation,
     MoveToMaintenancePositionResult,
+    MaintenancePosition,
 )
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point, MountType, Mount
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, OT3Axis
 
 
 @pytest.fixture
@@ -24,6 +25,13 @@ def subject(
     )
 
 
+@pytest.mark.parametrize(
+    "maintenance_position, z_offset, verify_axes",
+    [
+        (MaintenancePosition.AttachInstrument, 400, Mount.LEFT),
+        (MaintenancePosition.AttachPlate, 260, OT3Axis.Z_L, OT3Axis.Z_R),
+    ],
+)
 async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
