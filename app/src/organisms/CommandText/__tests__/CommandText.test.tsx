@@ -316,7 +316,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText('Setting Thermocycler block temperature to 20°C with hold time of 0 seconds after target reached')
+    getByText(
+      'Setting Thermocycler block temperature to 20°C with hold time of 0 seconds after target reached'
+    )
   })
   it('renders correct text for thermocycler/setTargetLidTemperature', () => {
     const mockTemp = 20
