@@ -2,10 +2,11 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict, Union, List, cast
+from typing import Optional, Callable, Tuple, Dict, Union, List, cast, TypeVar, Type
 
 import logging
 
+from opentrons_hardware.drivers.errors import CANCommunicationError
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
@@ -157,6 +158,9 @@ class AcknowledgeListener:
         return ErrorCode.ok
 
 
+E = TypeVar("E", bound=BaseException)
+
+
 class CanMessenger:
     """High level can messaging class wrapping a CanDriver.
 
@@ -199,9 +203,15 @@ class CanMessenger:
             f"Sending -->\n\tarbitration_id: {arbitration_id},\n\t"
             f"payload: {message.payload}"
         )
-        await self._drive.send(
-            message=CanMessage(arbitration_id=arbitration_id, data=data)
-        )
+        try:
+            await self._drive.send(
+                message=CanMessage(arbitration_id=arbitration_id, data=data)
+            )
+        except CANCommunicationError:
+            raise
+        except Exception as exc:
+            log.exception("Exception in CAN send")
+            raise CANCommunicationError(exc=exc) from exc
 
     async def ensure_send(
         self,
@@ -225,7 +235,13 @@ class CanMessenger:
             timeout=timeout,
             expected_nodes=expected_nodes,
         )
-        return await listener.send_and_verify_recieved()
+        try:
+            return await listener.send_and_verify_recieved()
+        except CANCommunicationError:
+            raise
+        except Exception as exc:
+            log.exception("Exception in CAN ensure_send")
+            raise CANCommunicationError(exc=exc) from exc
 
     async def __aenter__(self) -> CanMessenger:
         """Start messenger."""
@@ -233,10 +249,17 @@ class CanMessenger:
         return self
 
     async def __aexit__(
-        self, exc_type: type, exc_val: BaseException, exc_tb: Traceback
+        self,
+        exc_type: Optional[Type[E]],
+        exc_val: Optional[E],
+        exc_tb: Optional[Traceback],
     ) -> None:
         """Stop messenger."""
         await self.stop()
+        if exc_val:
+            if isinstance(exc_val, CANCommunicationError):
+                raise exc_val
+            raise CANCommunicationError(exc=exc_val)
 
     def start(self) -> None:
         """Start the reader task."""
@@ -274,9 +297,13 @@ class CanMessenger:
             await self._read_task()
         except asyncio.CancelledError:
             pass
-        except Exception:
-            log.exception("Exception in read")
+        except CANCommunicationError:
             raise
+        except AsyncHardwareError:
+            raise
+        except Exception as exc:
+            log.exception("Exception in read")
+            raise CANCommunicationError(exc=exc)
 
     async def _read_task(self) -> None:
         """Read task."""
