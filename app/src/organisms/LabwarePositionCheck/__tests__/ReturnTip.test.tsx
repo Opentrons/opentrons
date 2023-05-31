@@ -1,11 +1,18 @@
 import * as React from 'react'
 import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { ReturnTip } from '../ReturnTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+import { useProtocolMetadata } from '../../Devices/hooks'
+
+jest.mock('../../Devices/hooks')
+
+const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
+  typeof useProtocolMetadata
+>
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
   text: string
@@ -42,6 +49,7 @@ describe('ReturnTip', () => {
       tipPickUpOffset: null,
       isRobotMoving: false,
     }
+    mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })
   afterEach(() => {
     jest.restoreAllMocks()
