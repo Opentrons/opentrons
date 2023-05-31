@@ -30,3 +30,10 @@ class IDNotFound(ErrorDetails):
 
     id: Literal["IDNotFound"] = "IDNotFound"
     title: str = "ID Not Found"
+
+
+class FirmwareUpdateRequired(ErrorDetails):
+    """An error returned when a command requests to interact with hardware that requires an update."""
+
+    id: Literal["FirmwareUpdateRequired"] = "FirmwareUpdateRequired"
+    title: str = "Firmware Update Required"
