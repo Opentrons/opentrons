@@ -11,7 +11,7 @@ import {
   mockMoveLabwareCommandFromSlot,
   mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
-  mockModuleRenderInfo,
+  mockModuleRenderInfoWithLabware,
   mockLabwareRenderInfo,
 } from '../__fixtures__'
 
@@ -66,7 +66,7 @@ describe('InterventionModal', () => {
       ...props,
       command: mockMoveLabwareCommandFromSlot,
       robotType: OT2_STANDARD_MODEL,
-      moduleRenderInfo: mockModuleRenderInfo,
+      moduleRenderInfo: mockModuleRenderInfoWithLabware,
       labwareRenderInfo: mockLabwareRenderInfo,
       labwareName: LABWARE_NAME,
       oldDisplayLocation: 'Slot 1',
@@ -98,7 +98,7 @@ describe('InterventionModal', () => {
       ...props,
       command: mockMoveLabwareCommandFromModule,
       robotType: OT2_STANDARD_MODEL,
-      moduleRenderInfo: mockModuleRenderInfo,
+      moduleRenderInfo: mockModuleRenderInfoWithLabware,
       labwareRenderInfo: mockLabwareRenderInfo,
       labwareName: LABWARE_NAME,
       oldDisplayLocation: 'Slot 3',

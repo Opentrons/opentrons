@@ -78,6 +78,17 @@ export const mockMoveLabwareCommandFromModule = {
   },
 } as any
 
+export const mockMoveLabwareCommandToModule = {
+  commandType: 'moveLabware',
+  params: {
+    labwareId: 'mockLabwareID2',
+    newLocation: {
+      moduleId: 'mockTCModuleID',
+    },
+    strategy: 'manualMoveWithPause',
+  },
+} as any
+
 export const mockMoveLabwareCommandToOffDeck = {
   commandType: 'moveLabware',
   params: {
@@ -186,7 +197,7 @@ export const mockLabwareRenderInfo = [
   },
 ]
 
-export const mockModuleRenderInfo = [
+export const mockModuleRenderInfoWithLabware = [
   {
     moduleId: 'mockTCModuleID',
     x: 100,
@@ -194,5 +205,16 @@ export const mockModuleRenderInfo = [
     moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
     nestedLabwareDef: mockLabwareDefinition,
     nestedLabwareId: 'mockLabwareID',
+  },
+]
+
+export const mockModuleRenderInfoWithoutLabware = [
+  {
+    moduleId: 'mockTCModuleID',
+    x: 100,
+    y: 100,
+    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    nestedLabwareDef: null,
+    nestedLabwareId: null,
   },
 ]

@@ -8,8 +8,11 @@ import {
   mockLabwareDefinition,
   mockLabwareDefinitionsByUri,
   mockLabwareOnSlot,
+  mockLabwareRenderInfo,
   mockModule,
+  mockModuleRenderInfoWithoutLabware,
   mockMoveLabwareCommandFromSlot,
+  mockMoveLabwareCommandToModule,
   mockMoveLabwareCommandToOffDeck,
   mockRunData,
   mockThermocyclerModule,
@@ -359,7 +362,7 @@ describe('getLabwareAnimationParams', () => {
     expect(res).toEqual(null)
   })
 
-  it('returns expected animation params', () => {
+  it('returns null if the new location does not exist', () => {
     const res = getLabwareAnimationParams(
       [
         {
@@ -370,6 +373,26 @@ describe('getLabwareAnimationParams', () => {
         },
       ],
       [],
+      {
+        commandType: 'moveLabware',
+        params: {
+          labwareId: 'mockLabwareID',
+          newLocation: {
+            slotName: '42',
+          },
+          strategy: 'manualMoveWithPause',
+        },
+      } as any,
+      deckDefFixture as any
+    )
+
+    expect(res).toEqual(null)
+  })
+
+  it('returns expected animation params given a move from slot to slot', () => {
+    const res = getLabwareAnimationParams(
+      mockLabwareRenderInfo,
+      [],
       mockMoveLabwareCommandFromSlot,
       deckDefFixture as any
     )
@@ -377,6 +400,25 @@ describe('getLabwareAnimationParams', () => {
     expect(res).toBeTruthy()
     expect(res?.movementParams.xMovement).toEqual(132.5)
     expect(res?.movementParams.yMovement).toEqual(90.5)
+    expect(res?.movementParams.begin).toEqual('800ms;deck-in.end+0ms')
+    expect(res?.movementParams.duration).toEqual('800ms')
+    expect(res?.splashParams.inParams.begin).toEqual('labware-move.end+300ms')
+    expect(res?.splashParams.inParams.duration).toEqual('300ms')
+    expect(res?.splashParams.outParams.begin).toEqual('splash-in.end+300ms')
+    expect(res?.splashParams.outParams.duration).toEqual('300ms')
+  })
+
+  it('returns expected animation params given a move from slot to module', () => {
+    const res = getLabwareAnimationParams(
+      mockLabwareRenderInfo,
+      mockModuleRenderInfoWithoutLabware,
+      mockMoveLabwareCommandToModule,
+      deckDefFixture as any
+    )
+
+    expect(res).toBeTruthy()
+    expect(res?.movementParams.xMovement).toEqual(100)
+    expect(res?.movementParams.yMovement).toEqual(100)
     expect(res?.movementParams.begin).toEqual('800ms;deck-in.end+0ms')
     expect(res?.movementParams.duration).toEqual('800ms')
     expect(res?.splashParams.inParams.begin).toEqual('labware-move.end+300ms')
