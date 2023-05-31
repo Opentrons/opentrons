@@ -14,6 +14,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
+from opentrons_hardware.drivers.errors import CommunicationError
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest as CanDeviceInfoRequest,
@@ -151,6 +152,13 @@ class UsbNetworkInfo:
         """Set of usb devices on the network."""
         return set(self._device_info_cache)
 
+    @staticmethod
+    def _log_failure(expected: Set[USBTarget], found: Set[USBTarget], msg: str) -> None:
+        if expected:
+            log.warning(f"{msg} found {found} of {expected}")
+        else:
+            log.debug(f"{msg} found {found} with nothing expected")
+
     async def probe(
         self, expected: Optional[Set[USBTarget]] = None, timeout: float = 1.0
     ) -> Dict[USBTarget, DeviceInfoCache]:
@@ -183,20 +191,22 @@ class UsbNetworkInfo:
             if expected_targets and expected_targets.issubset(targets):
                 event.set()
 
-        self._usb_messenger.add_listener(listener)
-        await self._usb_messenger.send(
-            message=USBDeviceInfoRequest(),
-        )
         try:
+            self._usb_messenger.add_listener(listener)
+            await self._usb_messenger.send(
+                message=USBDeviceInfoRequest(),
+            )
             await asyncio.wait_for(event.wait(), timeout)
         except asyncio.TimeoutError:
-            if expected_targets:
-                log.warning(
-                    "probe timed out before expected targets found, missing "
-                    f"{expected_targets.difference(targets)}"
-                )
-            else:
-                log.debug("probe terminated (no expected set)")
+            self._log_failure(
+                expected_targets, set(iter(targets.keys())), "Timeout during probe"
+            )
+        except CommunicationError:
+            self._log_failure(
+                expected_targets,
+                set(iter(targets.keys())),
+                "USB communications error during probe",
+            )
         finally:
             self._usb_messenger.remove_listener(listener)
             self._device_info_cache = targets
