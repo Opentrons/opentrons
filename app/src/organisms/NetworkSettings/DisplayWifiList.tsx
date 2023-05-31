@@ -117,9 +117,7 @@ export function DisplayWifiList({
               onClick={() => handleClick(nw)}
             >
               <Icon name="wifi" size="2.5rem" />
-              <StyledText as="h4">
-                {nw.ssid}
-              </StyledText>
+              <StyledText as="h4">{nw.ssid}</StyledText>
             </Btn>
           ))
         : null}
@@ -137,9 +135,7 @@ export function DisplayWifiList({
         gridGap={SPACING.spacing4}
       >
         <Icon name="plus" size="2.5rem" color={COLORS.darkBlack100} />
-        <StyledText as="h4">
-          {t('join_other_network')}
-        </StyledText>
+        <StyledText as="h4">{t('join_other_network')}</StyledText>
       </Btn>
       {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
     </>
