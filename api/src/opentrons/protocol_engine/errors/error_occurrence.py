@@ -12,3 +12,4 @@ class ErrorOccurrence(BaseModel):
     errorType: str = Field(..., description="Specific error type that occurred.")
     createdAt: datetime = Field(..., description="When the error occurred.")
     detail: str = Field(..., description="A human-readable message about the error.")
+    errorCode: int = Field(..., description="An enumerated error code for the error type.")
