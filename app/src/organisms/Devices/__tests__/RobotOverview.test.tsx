@@ -14,9 +14,13 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { getConfig, useFeatureFlag } from '../../../redux/config'
-import { getRobotModelByName } from '../../../redux/discovery'
+import {
+  getRobotAddressesByName,
+  getRobotModelByName,
+} from '../../../redux/discovery'
 import {
   HEALTH_STATUS_OK,
+  OPENTRONS_USB,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery/constants'
 import {
@@ -42,6 +46,7 @@ import { RobotOverview } from '../RobotOverview'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
 import type { Config } from '../../../redux/config/types'
+import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
@@ -116,6 +121,9 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
   typeof getRobotModelByName
 >
+const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
+  typeof getRobotAddressesByName
+>
 
 const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
@@ -170,6 +178,9 @@ describe('RobotOverview', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('OT-2')
+    when(mockGetRobotAddressesByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .mockReturnValue([])
     when(mockGetConfig)
       .calledWith(MOCK_STATE)
       .mockReturnValue({
@@ -361,5 +372,17 @@ describe('RobotOverview', () => {
     const [{ getByText }] = render(props)
 
     getByText('mock RobotOverviewOverflowMenu')
+  })
+
+  it('requests a usb registration token if connected by usb', () => {
+    when(mockGetRobotAddressesByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .mockReturnValue([{ ip: OPENTRONS_USB } as DiscoveryClientRobotAddress])
+    render(props)
+    expect(mockUseAuthorization).toBeCalledWith({
+      subject: 'Opentrons',
+      agent: 'com.opentrons.app.usb',
+      agentId: 'opentrons-robot-user',
+    })
   })
 })

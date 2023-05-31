@@ -26,6 +26,7 @@ import { StyledText } from '../../atoms/text'
 import { getConfig } from '../../redux/config'
 import {
   CONNECTABLE,
+  getRobotAddressesByName,
   getRobotModelByName,
   OPENTRONS_USB,
 } from '../../redux/discovery'
@@ -67,14 +68,18 @@ export function RobotOverview({
 
   const userId = useSelector(getConfig)?.support?.userId ?? 'Opentrons-user'
 
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robot?.name ?? '')
+  )
+  const isUsbConnected = addresses.some(address => address.ip === OPENTRONS_USB)
+
   // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
   useAuthorization({
     subject: 'Opentrons',
     agent:
-      // define the agent of registration obtained via usb
-      robot?.ip === OPENTRONS_USB
-        ? 'com.opentrons.app.usb'
-        : 'com.opentrons.app',
+      // define the registration agent as usb if any usb hostname address exists
+      // may change when ODD no longer needs to rely on this
+      isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
     agentId: userId,
   })
 
