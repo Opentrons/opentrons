@@ -138,10 +138,10 @@ class USBPort:
         hub, port, hub_port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
-                return REV_OG_USB_PORTS.get(str(hub), hub), PortGroup.MAIN, port, None
+                return REV_OG_USB_PORTS.get(str(hub), hub), PortGroup.MAIN, port, None # hub should be None, unless there's an actual hub/extender
             else:
                 return hub, PortGroup.MAIN, REV_OG_USB_PORTS.get(str(port), port), None
-        elif board_revision == BoardRevision.B2:
+        elif board_revision == BoardRevision.FLEX_B2:
             if hub == OT3_USB_PORT_GROUP_LEFT:
                 port_group = PortGroup.LEFT
             elif hub == OT3_USB_PORT_GROUP_RIGHT:
@@ -152,11 +152,11 @@ class USBPort:
                 return hub, port_group, port, hub_port
             else:
                 return None, port_group, port, None
-        else:
-            if hub and hub == REV_A_USB_HUB:
-                return None, PortGroup.MAIN, port, None
+        else:  # any variant of OT2-Refresh
+            if hub_port:
+                return hub, PortGroup.MAIN, port, hub_port
             else:
-                return hub, PortGroup.MAIN, port, None
+                return None, PortGroup.MAIN, port, None
 
     def __hash__(self) -> int:
         """
