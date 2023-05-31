@@ -25,7 +25,7 @@ import {
   SIZE_2,
   Btn,
 } from '@opentrons/components'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import { RUN_STATUS_FAILED, RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { LargeButton, TertiaryButton } from '../../atoms/buttons'
@@ -60,7 +60,7 @@ export function RunSummary(): JSX.Element {
   const history = useHistory()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const runStatus = runRecord?.data.status ?? null
-  const isRunSucceeded = runStatus === RUN_STATUS_SUCCEEDED
+  const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -80,7 +80,7 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
+  const [showSplash, setShowSplash] = React.useState(runStatus !== RUN_STATUS_STOPPED)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (_createRunResponse: Run): void =>
     history.push(`/runs/${runId}/setup`)
@@ -94,9 +94,9 @@ export function RunSummary(): JSX.Element {
     false
   )
 
-  const runStatusText = isRunSucceeded
-    ? t('run_complete')
-    : t('run_failed_modal_title')
+  let headerText = t('run_complete_splash')
+  if (runStatus === RUN_STATUS_FAILED) headerText = t('run_failed_splash')
+  if (runStatus === RUN_STATUS_STOPPED) headerText = t('run_canceled')
 
   const handleReturnToDash = (): void => {
     closeCurrentRun()
@@ -146,16 +146,18 @@ export function RunSummary(): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing40}
             padding={SPACING.spacing40}
-            backgroundColor={isRunSucceeded ? COLORS.green2 : COLORS.red2}
+            backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
           >
             <SplashFrame>
               <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
                 <Icon
-                  name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
+                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                   size="4.5rem"
                   color={COLORS.white}
                 />
-                <SplashHeader> {runStatusText} </SplashHeader>
+                <SplashHeader>
+                  {didRunSucceed ? t('run_complete_splash') : t('run_failed_splash')}
+                </SplashHeader>
               </Flex>
               <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
                 <SplashBody>{protocolName}</SplashBody>
@@ -184,13 +186,13 @@ export function RunSummary(): JSX.Element {
             >
               <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                 <Icon
-                  name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
+                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                   size={SIZE_2}
                   color={
-                    isRunSucceeded ? COLORS.successEnabled : COLORS.errorEnabled
+                    didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
                   }
                 />
-                <SummaryHeader>{runStatusText}</SummaryHeader>
+                <SummaryHeader>{headerText}</SummaryHeader>
               </Flex>
               <ProtocolName>{protocolName}</ProtocolName>
               <Flex gridGap={SPACING.spacing8}>
@@ -234,7 +236,7 @@ export function RunSummary(): JSX.Element {
                 buttonText={t('run_again')}
                 height="17rem"
               />
-              {!isRunSucceeded ? (
+              {!didRunSucceed ? (
                 <LargeButton
                   flex="1"
                   iconName="info"
