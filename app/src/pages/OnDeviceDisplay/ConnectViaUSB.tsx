@@ -70,7 +70,7 @@ export function ConnectViaUSB(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.green3}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
               height="18.5rem"
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_CENTER}
@@ -108,7 +108,7 @@ export function ConnectViaUSB(): JSX.Element {
             padding={`${SPACING.spacing48} ${SPACING.spacing80}`}
             gridGap={SPACING.spacing32}
             height="25.25rem"
-            borderRadius={BORDERS.size3}
+            borderRadius={BORDERS.borderRadiusSize3}
           >
             <Icon name="ot-alert" size="3rem" />
             <Flex

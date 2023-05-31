@@ -89,7 +89,7 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size4}
+        borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
