@@ -261,7 +261,7 @@ export function ProtocolDashboard(): JSX.Element {
               borderRadius={BORDERS.size3}
             >
               <img
-                title={t('nothing_here_yet')}
+                alt={t('nothing_here_yet')}
                 src={imgSrc}
                 width="284px"
                 height="166px"
