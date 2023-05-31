@@ -23,6 +23,7 @@ import { FLOWS } from '../PipetteWizardFlows/constants'
 import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { get96ChannelFromModel } from './utils'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -43,6 +44,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
+
   const sharedGripperWizardProps: Pick<
     React.ComponentProps<typeof GripperWizardFlows>,
     'attachedGripper' | 'closeFlow'
@@ -52,8 +54,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
-  const is96Channel =
-    instrument?.instrumentModel.startsWith('p1000_96') ?? false
+  const is96Channel = get96ChannelFromModel(instrument?.instrumentModel)
 
   const handleDetach: React.MouseEventHandler = () => {
     setODDMaintenanceFlowInProgress()
