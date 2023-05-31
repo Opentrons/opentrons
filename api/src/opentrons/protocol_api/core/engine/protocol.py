@@ -279,7 +279,6 @@ class ProtocolCore(
         # once `Deck` and `ProtocolEngine` play nicely together
         if deck_slot is None:
             if ModuleType.from_model(model) == ModuleType.THERMOCYCLER:
-                # TODO
                 deck_slot = DeckSlotName.SLOT_7
             else:
                 raise InvalidModuleLocationError(deck_slot, model.name)
