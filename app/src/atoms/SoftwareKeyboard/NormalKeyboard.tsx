@@ -38,9 +38,9 @@ const customLayout = {
 
 const customDisplay = {
   '{numbers}': '123',
-  '{shift}': '⬆︎',
+  '{shift}': 'shift',
   '{space}': 'space',
-  '{backspace}': '⌫',
+  '{backspace}': 'del',
   '{abc}': 'ABC',
   '{symbols}': '#+=',
 }

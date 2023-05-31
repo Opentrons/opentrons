@@ -49,9 +49,9 @@ describe('SetWifiCred', () => {
     expect(getByLabelText('wifi_password')).toBeInTheDocument()
     getByRole('button', { name: 'Show' })
     // software keyboard
-    getByRole('button', { name: '⌫' })
+    getByRole('button', { name: 'del' })
     getByRole('button', { name: 'a' })
-    getByRole('button', { name: '⬆︎' })
+    getByRole('button', { name: 'shift' })
   })
 
   it('should display password', () => {

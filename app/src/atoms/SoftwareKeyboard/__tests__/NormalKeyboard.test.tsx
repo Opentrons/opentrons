@@ -42,7 +42,7 @@ describe('SoftwareKeyboard', () => {
       'j',
       'k',
       'l',
-      '⬆︎',
+      'shift',
       '123',
       'z',
       'x',
@@ -51,7 +51,7 @@ describe('SoftwareKeyboard', () => {
       'b',
       'n',
       'm',
-      '⌫',
+      'del',
       'space',
     ]
 
@@ -61,9 +61,9 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should render the software keyboards when hitting ⬆︎ shift key', () => {
+  it('should render the software keyboards when hitting shift key', () => {
     const { getAllByRole, getByRole } = render(props)
-    const shiftKey = getByRole('button', { name: '⬆︎' })
+    const shiftKey = getByRole('button', { name: 'shift' })
     fireEvent.click(shiftKey)
     const buttons = getAllByRole('button')
     const expectedButtonNames = [
@@ -86,7 +86,7 @@ describe('SoftwareKeyboard', () => {
       'J',
       'K',
       'L',
-      '⬆︎',
+      'shift',
       '123',
       'Z',
       'X',
@@ -95,7 +95,7 @@ describe('SoftwareKeyboard', () => {
       'B',
       'N',
       'M',
-      '⌫',
+      'del',
       'space',
     ]
 
@@ -138,7 +138,7 @@ describe('SoftwareKeyboard', () => {
       '?',
       '!',
       "'",
-      '⌫',
+      'del',
       'space',
     ]
 
@@ -183,7 +183,7 @@ describe('SoftwareKeyboard', () => {
       '?',
       '!',
       "'",
-      '⌫',
+      'del',
       'space',
     ]
 

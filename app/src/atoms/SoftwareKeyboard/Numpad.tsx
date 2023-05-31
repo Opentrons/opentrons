@@ -2,7 +2,7 @@ import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
 
 const customDisplay = {
-  '{backspace}': '⌫',
+  '{backspace}': 'del',
 }
 interface NumpadProps {
   onChange: (input: string) => void
