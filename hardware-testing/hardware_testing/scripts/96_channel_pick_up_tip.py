@@ -268,35 +268,38 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     pipette_model = hw_api.get_all_attached_instr()[OT3Mount.LEFT]["pipette_id"]
-    dial_data = {
-        "Ch1": None, "Ch2": None, "Ch3": None, "Ch4": None, "Ch5": None, "Ch6": None,
-        "Ch7": None, "Ch8": None, "Ch9": None, "Ch10": None, "Ch11": None, "Ch12": None,
-        "Ch13": None, "Ch14": None, "Ch15": None, "Ch16": None, "Ch17": None, "Ch18": None,
-        "Ch19": None, "Ch20": None, "Ch21": None, "Ch22": None, "Ch23": None, "Ch24": None,
-        "Ch25": None, "Ch26": None, "Ch27": None, "Ch28": None, "Ch29": None, "Ch30": None,
-        "Ch31": None, "Ch32": None, "Ch33": None, "Ch34": None, "Ch35": None, "Ch36": None,
-        "Ch37": None, "Ch38": None, "Ch39": None, "Ch40": None, "Ch41": None, "Ch42": None,
-        "Ch43": None, "Ch44": None, "Ch45": None, "Ch46": None, "Ch47": None, "Ch48": None,
-        "Ch49": None, "Ch50": None, "Ch51": None, "Ch52": None, "Ch53": None, "Ch54": None,
-        "Ch55": None, "Ch56": None, "Ch57": None, "Ch58": None, "Ch59": None, "Ch60": None,
-        "Ch61": None, "Ch62": None, "Ch63": None, "Ch64": None, "Ch65": None, "Ch66": None,
-        "Ch67": None, "Ch68": None, "Ch69": None, "Ch70": None, "Ch71": None, "Ch72": None,
-        "Ch73": None, "Ch74": None, "Ch75": None, "Ch76": None, "Ch77": None, "Ch78": None,
-        "Ch79": None, "Ch80": None, "Ch81": None, "Ch82": None, "Ch83": None, "Ch84": None,
-        "Ch85": None, "Ch86": None, "Ch87": None, "Ch88": None, "Ch89": None, "Ch90": None,
-        "Ch91": None, "Ch92": None, "Ch93": None, "Ch94": None, "Ch95": None, "Ch96": None,
-        "Motor Current": None,
-        "Trial": None,
-        "pipette_model": None,
-    }
+    # dial_data = {
+    #     "Ch1": None, "Ch2": None, "Ch3": None, "Ch4": None, "Ch5": None, "Ch6": None,
+    #     "Ch7": None, "Ch8": None, "Ch9": None, "Ch10": None, "Ch11": None, "Ch12": None,
+    #     "Ch13": None, "Ch14": None, "Ch15": None, "Ch16": None, "Ch17": None, "Ch18": None,
+    #     "Ch19": None, "Ch20": None, "Ch21": None, "Ch22": None, "Ch23": None, "Ch24": None,
+    #     "Ch25": None, "Ch26": None, "Ch27": None, "Ch28": None, "Ch29": None, "Ch30": None,
+    #     "Ch31": None, "Ch32": None, "Ch33": None, "Ch34": None, "Ch35": None, "Ch36": None,
+    #     "Ch37": None, "Ch38": None, "Ch39": None, "Ch40": None, "Ch41": None, "Ch42": None,
+    #     "Ch43": None, "Ch44": None, "Ch45": None, "Ch46": None, "Ch47": None, "Ch48": None,
+    #     "Ch49": None, "Ch50": None, "Ch51": None, "Ch52": None, "Ch53": None, "Ch54": None,
+    #     "Ch55": None, "Ch56": None, "Ch57": None, "Ch58": None, "Ch59": None, "Ch60": None,
+    #     "Ch61": None, "Ch62": None, "Ch63": None, "Ch64": None, "Ch65": None, "Ch66": None,
+    #     "Ch67": None, "Ch68": None, "Ch69": None, "Ch70": None, "Ch71": None, "Ch72": None,
+    #     "Ch73": None, "Ch74": None, "Ch75": None, "Ch76": None, "Ch77": None, "Ch78": None,
+    #     "Ch79": None, "Ch80": None, "Ch81": None, "Ch82": None, "Ch83": None, "Ch84": None,
+    #     "Ch85": None, "Ch86": None, "Ch87": None, "Ch88": None, "Ch89": None, "Ch90": None,
+    #     "Ch91": None, "Ch92": None, "Ch93": None, "Ch94": None, "Ch95": None, "Ch96": None,
+    #     "Motor Current": None,
+    #     "Trial": None,
+    #     "pipette_model": None,
+    # }
+
+    dial_data = {"Column_1": None, "Column_2": None, "Column_3": None, "Column_4": None, "Column_5": None, "Column_6": None,
+                "Column_7": None, "Column_8": None, "Column_9": None, "Column_10": None, "Column_11": None, "Column_12": None}
     # m_current = float(input("motor_current in amps: "))
     # pick_up_speed = float(input("pick up tip speed in mm/s: "))
-    # details = [pipette_model, m_current]
-    # test_n, test_f = file_setup(dial_data, details)
-    # file_name = "/home/root/.opentrons/testing_data/enc_data/enc_pu_test_%s-%s.csv" % (
-    #     m_current,
-    #     datetime.datetime.now().strftime("%m-%d-%y_%H-%M"),
-    # )
+    details = [pipette_model, m_current]
+    test_n, test_f = file_setup(dial_data, details)
+    file_name = "/home/root/.opentrons/testing_data/pickup_tip_test/pu_96_pipette_%s-%s.csv" % (
+        m_current,
+        datetime.datetime.now().strftime("%m-%d-%y_%H-%M"),
+    )
     # print(file_name)
     # print(test_n)
     # print(test_f)
@@ -341,9 +344,10 @@ async def _main() -> None:
 
     try:
         while True:
+            measurements = []
             for tip in range(1, tips_to_use + 1):
                 tip_count += 1
-                y_offset += 9
+                x_offset += 9
                 if tip_count % 8 == 0:
                     y_offset = 0
                 if tip_count % 8 == 0:
@@ -354,7 +358,17 @@ async def _main() -> None:
                 tip_position = Point(dial_loc[0] + x_offset,
                                         dial_loc[1] + y_offset,
                                         dial_loc[2])
+                measurements.append(tip_measurement)
+                if tip_count % 12 == 0:
+                    d_str = ''
+                    for m in measurements:
+                        d_str += str(m) + ','
+                    d_str = d_str[:-1]
+                    data.append_data_to_file(test_n, test_f, d_str)
+                    # Reset Measurements list
+                    measurements = []
                 await move_to_point(hw_api, mount, tip_position, cp)
+
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
             await hw_api.drop_tip(mount)
@@ -365,7 +379,6 @@ async def _main() -> None:
             await move_to_point(hw_api, mount, pickup_loc, cp)
             await hw_api.pick_up_tip(mount, tip_length=tip_length[args.tip_size])
             # await hw_api.home_z(mount)
-
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])
