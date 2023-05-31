@@ -5,5 +5,3 @@
 *.bat binary
 *.gltf binary
 api/pypi-readme.rst text eol=lf
-git ls-files --eol
-* -text
