@@ -80,9 +80,7 @@ class SlotTransit(NamedTuple):
     end: DeckSlotName
 
 
-# FIXME(mm, 2023-05-10): This needs to be updated for OT-3 slots. RLAB-339.
-# TODO
-_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -97,7 +95,16 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
-]
+}
+
+_OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+    SlotTransit(start=t.start.to_ot3_equivalent(), end=t.end.to_ot3_equivalent())
+    for t in _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+}
+
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
+    _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE | _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+)
 
 
 @dataclass(frozen=True)

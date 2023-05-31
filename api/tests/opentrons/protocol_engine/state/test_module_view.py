@@ -715,6 +715,13 @@ def test_thermocycler_dodging_by_slots(
 
 
 @pytest.mark.parametrize(
+    argnames=["from_slot", "to_slot"],
+    argvalues=[
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_B2, DeckSlotName.SLOT_D1),
+    ],
+)
+@pytest.mark.parametrize(
     argnames=["module_definition", "should_dodge"],
     argvalues=[
         (lazy_fixture("tempdeck_v1_def"), False),
@@ -727,6 +734,8 @@ def test_thermocycler_dodging_by_slots(
     ],
 )
 def test_thermocycler_dodging_by_modules(
+    from_slot: DeckSlotName,
+    to_slot: DeckSlotName,
     module_definition: ModuleDefinition,
     should_dodge: bool,
 ) -> None:
@@ -741,9 +750,7 @@ def test_thermocycler_dodging_by_modules(
         },
     )
     assert (
-        subject.should_dodge_thermocycler(
-            from_slot=DeckSlotName.SLOT_8, to_slot=DeckSlotName.SLOT_1
-        )
+        subject.should_dodge_thermocycler(from_slot=from_slot, to_slot=to_slot)
         is should_dodge
     )
 
