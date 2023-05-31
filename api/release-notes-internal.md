@@ -16,6 +16,7 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - The LED strip at the top of the robot now reacts to what the robot is doing!
 - The gripper pickup behavior has changed. The Thermocycler will use its plate lift to present plates to the gripper when the gripper is picking up from the Thermocycler, and the gripper will no longer wiggle.
 - Belt calibration should no longer conflict with the trash
+- APIv2.15 protocols will now drop tips at random locations within the trash if `drop_tip()` is called without any locations! This should resolve the issue of tips piling up at least to certain extent. To override randomized locations, you can specify a location argument to the `drop_tip` method.
 
 ### ODD
 - Updates to the UI of the robot settings
