@@ -332,6 +332,7 @@ def machine_from_deck(
         raise ValueError(
             "Moves must specify either exactly an " "x, y, and (z or a) or none of them"
         )
+
     # Pre-fill the dict we’ll send to the backend with the axes we don’t
     # need to transform
     machine_pos = {
@@ -348,13 +349,13 @@ def machine_from_deck(
         for axes, deck_point in point_for_z_axis.items()
     }
 
-    for transformed_point in transformed.values():
-        to_check = {
-            ax: transformed_point[idx]
-            for idx, ax in enumerate(deck_pos.keys())
-            if ax in ax.gantry_axes()
-        }
-        machine_pos.update({ax: pos for ax, pos in to_check.items()})
+    to_check = {}
+    for axis, point in transformed.items():
+        to_check[axis] = point.z
+        to_check[type(axis).X] = point.x
+        to_check[type(axis).Y] = point.y
+
+    machine_pos.update({ax: pos for ax, pos in to_check.items()})
     return machine_pos
 
 

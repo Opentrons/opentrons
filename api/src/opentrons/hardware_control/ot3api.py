@@ -821,10 +821,20 @@ class OT3API(
         """Return the current axes effectors position (in deck coords)."""
         if refresh:
             await self.refresh_positions()
-        print(self._current_position)
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            list(self._current_position.keys())
-        )
+
+        axes_to_validate = [
+            key
+            for key, value in self._current_position.items()
+            if key not in [OT3Axis.G, OT3Axis.P_L, OT3Axis.P_R]
+        ]
+
+        if not self._backend.check_encoder_status(axes_to_validate):
+            await self.home()
+
+        valid = self._backend.check_motor_status(axes_to_validate)
+        mod_log.info(f"is this valid? {valid}")
+
+        valid_motor = self._current_position and valid
         if not valid_motor:
             raise MustHomeError("Current position is invalid; please home motors.")
 
@@ -1004,14 +1014,12 @@ class OT3API(
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
         assert position, "move_axes requires a none empty position"
-        # do we need this?
-        if not self._current_position:
-            await self.refresh_positions()
 
         for axis in position.keys():
             if not self._backend.axis_is_present(axis):
                 # create a custom error
                 raise ValueError(f"{axis} is not present")
+
         absolute_positions: "OrderedDict[OT3Axis, float]" = OrderedDict()
         current_position = await self.current_axes_effector_positions()
         if OT3Axis.X in position:
@@ -1034,12 +1042,6 @@ class OT3API(
         for axis, position_value in position.items():
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
-
-        # do we need this?
-        if not self._backend.check_encoder_status(list(absolute_positions.keys())):
-            await self.home()
-
-        # do we need to _cache_and_maybe_retract_mount?
 
         await self._move(target_position=absolute_positions, speed=speed)
 
