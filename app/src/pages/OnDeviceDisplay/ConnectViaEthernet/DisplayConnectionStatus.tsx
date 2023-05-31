@@ -69,7 +69,7 @@ export function DisplayConnectionStatus({
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
               color={COLORS.darkBlack70}
-              margin='0 2rem'
+              margin="0 2rem"
             >
               {t('ethernet_connection_description')}
             </StyledText>
