@@ -17,7 +17,7 @@ interface UseAuthorizationResult {
 }
 
 export function useAuthorization(
-  createRegistrationParmas: CreateRegistrationParams
+  createRegistrationParams: CreateRegistrationParams
 ): UseAuthorizationResult {
   const host = useHost()
   // TODO(bh, 2023-05-31): refactor individual calls to react-query and separate mutations, consider moving this hook to app
@@ -25,7 +25,7 @@ export function useAuthorization(
   const authorizationToken = React.useRef<AuthorizationToken | null>(null)
 
   React.useEffect(() => {
-    createRegistration(host as HostConfig, createRegistrationParmas)
+    createRegistration(host as HostConfig, createRegistrationParams)
       .then(response => {
         registrationToken.current = response.data
         return createAuthorization(host as HostConfig, response.data)
