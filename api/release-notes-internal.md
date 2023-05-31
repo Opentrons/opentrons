@@ -4,27 +4,24 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.9.0
+# Internal Release 0.10.0
 
-This is internal release 0.9.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+This is internal release 0.10.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
 
 Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
 
 ## Big New Things
-### Robot Control
-- Stall detection is enabled for most moves. You might now get stall detection failures if you stall the robot.
-- Motor driver configuration changes should improve performance and prevent step loss on the gantry.
-- More USB connectivity fixes; updating should now work
-- Many 96-channel behavior fixes, especially around tip pickup.
 
-### Python Protocol API
-- ``move_labware`` now requires api level 2.15; as a bonus feature to sweeten the deal, however, you can now `move_labware` to a special `OFF_DECK` location
-- The Mount type has an `EXTENSION` entry for the gripper now
+### Robot Control
+- The LED strip at the top of the robot now reacts to what the robot is doing!
+- The gripper pickup behavior has changed. The Thermocycler will use its plate lift to present plates to the gripper when the gripper is picking up from the Thermocycler, and the gripper will no longer wiggle.
+- Belt calibration should no longer conflict with the trash
+- APIv2.15 protocols will now drop tips at random locations within the trash if `drop_tip()` is called without any locations! This should resolve the issue of tips piling up at least to certain extent. To override randomized locations, you can specify a location argument to the `drop_tip` method.
 
 ### ODD
-- You now get lovely little popups on the ODD when you send a protocol to an OT-3. 
-- Design passes on the following screens should improve little usability issues: protocols dashboard, connect to network, protocol details
-- The unboxing flow should handle USB connections better now
+- Updates to the UI of the robot settings
+- Updates to the design of the set-wifi SSID select screen
+- Updates to the design of the instrument dashboard and details screens
 
 For more details about this release, please see the full [technical change log][]. 
 
@@ -64,7 +61,5 @@ For more details about this release, please see the full [technical change log][
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
 - After a while, the ODD should go into idle; if you touch it, it will come back online
 
-## Smaller Known Issues
 
-## Smaller fun features
-- The lights work (don't do anything yet though)
+
