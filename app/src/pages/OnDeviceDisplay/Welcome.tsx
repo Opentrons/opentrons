@@ -9,8 +9,9 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { MediumButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
+
 
 import screenImage from '../../assets/images/on-device-display/welcome_background.png'
 
@@ -30,9 +31,8 @@ export function Welcome(): JSX.Element {
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText
-          fontSize={TYPOGRAPHY.fontSize38}
+          as='h2'
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          lineHeight={TYPOGRAPHY.lineHeight48}
         >
           {t('welcome_title')}
         </StyledText>
@@ -41,16 +41,15 @@ export function Welcome(): JSX.Element {
         <StyledText
           width="39.875rem"
           textAlign={TYPOGRAPHY.textAlignCenter}
-          fontSize={TYPOGRAPHY.fontSize28}
-          lineHeight={TYPOGRAPHY.lineHeight36}
+          as='h4'
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.darkBlack70}
         >
           {t('welcome_description')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing40}>
-        <SmallButton
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing28}>
+        <MediumButton
           buttonType="primary"
           buttonText={t('shared:get_started')}
           buttonCategory="rounded"

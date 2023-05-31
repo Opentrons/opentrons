@@ -5,6 +5,7 @@ export const spacing12 = '0.75rem' as const // 12px
 export const spacing16 = '1rem' as const // 16px
 export const spacing20 = '1.25rem' as const // 20px
 export const spacing24 = '1.5rem' as const // 24px
+export const spacing28 = '1.75rem' as const // 28px
 export const spacing32 = '2rem' as const // 32px
 export const spacing40 = '2.5rem' as const // 40px
 export const spacing48 = '3rem' as const // 48px
