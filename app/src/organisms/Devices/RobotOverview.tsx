@@ -24,7 +24,11 @@ import FLEX_PNG from '../../assets/images/FLEX.png'
 import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { getConfig } from '../../redux/config'
-import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
+import {
+  CONNECTABLE,
+  getRobotModelByName,
+  OPENTRONS_USB,
+} from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
@@ -64,18 +68,15 @@ export function RobotOverview({
   const userId = useSelector(getConfig)?.support?.userId ?? 'Opentrons-user'
 
   // TODO: remove registration/authorization here when AppApiHostProvider exists
-  const { authorizationToken, registrationToken } = useAuthorization({
+  useAuthorization({
     subject: 'Opentrons',
-    agent: 'com.opentrons.app',
+    agent:
+      // define the agent of registration obtained via usb
+      robot?.ip === OPENTRONS_USB
+        ? 'com.opentrons.app.usb'
+        : 'com.opentrons.app',
     agentId: userId,
   })
-
-  console.log(
-    'authorizationToken',
-    authorizationToken,
-    'registrationToken',
-    registrationToken
-  )
 
   return robot != null ? (
     <>
