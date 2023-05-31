@@ -66,7 +66,7 @@
   "step": "Step {{current}} / {{max}}",
   "stop": "stop",
   "terminate_activity": "Terminate activity",
-  "terminate": "terminate remote activity",
+  "terminate": "Terminate remote activity",
   "try_again": "try again",
   "unknown_error": "An unknown error occurred",
   "unknown": "unknown",

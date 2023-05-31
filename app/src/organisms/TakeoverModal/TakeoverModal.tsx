@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -30,7 +29,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
 
   const terminateHeader: ModalHeaderBaseProps = {
     title: t('terminate_activity') + '?',
-    iconName: 'information',
+    iconName: 'ot-alert',
     iconColor: COLORS.yellow2,
   }
 
@@ -42,10 +41,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             <StyledText as="p" marginBottom={SPACING.spacing40}>
               {t('confirm_terminate')}
             </StyledText>
-            <Flex
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              gridGap={SPACING.spacing4}
-            >
+            <Flex flex="1" gridGap={SPACING.spacing8}>
               <SmallButton
                 buttonType="primary"
                 onClick={() => setConfirmTerminate(false)}
@@ -79,27 +75,27 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               alignItems={ALIGN_CENTER}
             >
               <Icon
-                name="information"
+                name="ot-alert"
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />
               <StyledText
                 as="h4"
                 marginBottom={SPACING.spacing4}
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {i18n.format(t('robot_is_busy'), 'capitalize')}
               </StyledText>
-              <StyledText
-                as="p"
-                fontWeight={TYPOGRAPHY.fontWeightLight}
-                textAlign={TYPOGRAPHY.textAlignCenter}
-              >
+              <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
                 {t('computer_in_app_is_controlling_robot')}
               </StyledText>
             </Flex>
-            <StyledText as="p" onClick={() => setConfirmTerminate(true)}>
-              {i18n.format(t('terminate'), 'capitalize')}
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              onClick={() => setConfirmTerminate(true)}
+            >
+              {t('terminate')}
             </StyledText>
           </Flex>
         </Modal>
