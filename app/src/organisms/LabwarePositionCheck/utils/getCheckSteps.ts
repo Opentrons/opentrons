@@ -155,10 +155,6 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
         (innerAcc, { location, labwareId, moduleId }) => {
           if (
-            !getSlotHasMatingSurfaceUnitVector(
-              OT2_STANDARD_DECK_DEF,
-              location.slotName
-            ) ||
             labwareId !== currentLabware.id
           ) {
             return innerAcc

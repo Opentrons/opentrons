@@ -159,14 +159,7 @@ export const getLabwareIdsInOrder = (
       return [
         ...acc,
         ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
-          if (
-            !getSlotHasMatingSurfaceUnitVector(
-              OT2_STANDARD_DECK_DEF,
-              loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : ''
-            )
-          ) {
-            return innerAcc
-          }
+          if (labwareDef.parameters.format === 'trash') return innerAcc
           let slot = ''
           if (loc === 'offDeck') {
             slot = 'offDeck'
@@ -222,6 +215,7 @@ export const getAllUniqLocationsForLabware = (
   const labwareLocation = commands.reduce<LabwareLocation[]>(
     (acc, command: RunTimeCommand) =>
       command.commandType === 'loadLabware' &&
+      command.result?.definition.parameters.format !== 'trash' &&
       command.result?.labwareId === labwareId
         ? [...acc, command.params.location]
         : acc,
