@@ -826,14 +826,14 @@ def test_get_calibration_coordinates() -> None:
         "locations": {
             "orderedSlots": [
                 {
-                    "id": "1",
+                    "id": "D1",
                     "position": [2, 2, 0.0],
                     "boundingBox": {
                         "xDimension": 4.0,
                         "yDimension": 6.0,
                         "zDimension": 0,
                     },
-                    "displayName": "Slot 1",
+                    "displayName": "Slot D1",
                 }
             ]
         }
