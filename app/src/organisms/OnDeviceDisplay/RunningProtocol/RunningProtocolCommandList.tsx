@@ -176,7 +176,7 @@ export function RunningProtocolCommandList({
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.size2}
+                    borderRadius={BORDERS.borderRadiusSize2}
                   >
                     <CommandIcon command={command} />
                     <CommandText

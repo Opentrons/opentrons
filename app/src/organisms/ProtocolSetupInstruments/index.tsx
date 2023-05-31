@@ -21,6 +21,7 @@ import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { isGripperInCommands } from '../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -32,17 +33,16 @@ export function ProtocolSetupInstruments({
   setSetupScreen,
 }: ProtocolSetupInstrumentsProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: attachedInstruments, refetch } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
   } = useAllPipetteOffsetCalibrationsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const usesGripper =
-    mostRecentAnalysis?.commands.some(
-      c =>
-        c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper'
-    ) ?? false
+    mostRecentAnalysis != null
+      ? isGripperInCommands(mostRecentAnalysis?.commands ?? [])
+      : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper'
@@ -93,6 +93,7 @@ export function ProtocolSetupInstruments({
                   ) ?? null
                 : null
             }
+            instrumentsRefetch={refetch}
           />
         )
       })}

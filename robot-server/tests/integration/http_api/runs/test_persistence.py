@@ -29,8 +29,7 @@ def port() -> str:
 async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, None]:
     """Get a dev server and a client to that server."""
     async with RobotClient.make(
-        host="http://localhost",
-        port=port,
+        base_url=f"http://localhost:{port}",
         version="*",
     ) as client:
         assert await client.wait_until_dead(), "Server is running and must not be."

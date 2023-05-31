@@ -127,6 +127,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       proceed={proceed}
       isOnDevice={isOnDevice}
       errorMessage={errorMessage}
+      chainRunCommands={chainRunCommands}
+      mount={mount}
+      setShowErrorMessage={setShowErrorMessage}
     />
   ) : (
     <GenericWizardTile

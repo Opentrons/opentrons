@@ -37,7 +37,7 @@ import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScr
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
-import { useCurrentRunRoute } from './hooks'
+import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
@@ -250,6 +250,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
           <SleepScreen />
         ) : (
           <ToasterOven>
+            <ProtocolReceiptToasts />
             <Switch>
               {onDeviceDisplayRoutes.map(
                 ({ Component, exact, path }: RouteProps) => {
@@ -276,7 +277,13 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 function TopLevelRedirects(): JSX.Element | null {
   const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
   const currentRunRoute = useCurrentRunRoute()
+
   if (runRouteMatch != null && currentRunRoute == null)
     return <Redirect to="/dashboard" />
   return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
+}
+
+function ProtocolReceiptToasts(): null {
+  useProtocolReceiptToast()
+  return null
 }

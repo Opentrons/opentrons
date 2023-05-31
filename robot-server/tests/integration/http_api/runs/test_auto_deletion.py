@@ -20,7 +20,7 @@ async def test_runs_auto_delete(
 ) -> None:
     port = "15555"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()

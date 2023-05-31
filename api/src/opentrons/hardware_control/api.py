@@ -55,7 +55,7 @@ from .robot_calibration import (
     RobotCalibrationProvider,
     RobotCalibration,
 )
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
@@ -79,7 +79,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[RobotCalibration],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -347,9 +347,13 @@ class API(
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
-    async def set_status_bar_state(self, _: StatusBarState) -> None:
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
         """The status bar does not exist on OT-2!"""
         return None
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """There is no status bar on OT-2, return IDLE at all times."""
+        return StatusBarState.IDLE
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:

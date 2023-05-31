@@ -50,7 +50,7 @@ export function SmallModalChildren(
 
         <Flex
           backgroundColor={COLORS.blueEnabled}
-          borderRadius={BORDERS.size3}
+          borderRadius={BORDERS.borderRadiusSize3}
           flexDirection={DIRECTION_COLUMN}
           marginTop={SPACING.spacing32}
           onClick={handleCloseMaxPinsAlert}

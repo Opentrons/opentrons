@@ -37,7 +37,7 @@ export function RobotSystemVersion({
   isUpdateAvailable,
   setCurrentOption,
 }: RobotSystemVersionProps): JSX.Element {
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     'device_settings',
     'shared',
     'device_details',
@@ -76,7 +76,7 @@ export function RobotSystemVersion({
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing24} ${SPACING.spacing16}`}
               gridGap={SPACING.spacing16}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.warningBackgroundMed}
             >
@@ -86,7 +86,7 @@ export function RobotSystemVersion({
                 lineHeight="1.875rem"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
-                {t('app_settings:update_available')}
+                {i18n.format(t('app_settings:update_available'), 'capitalize')}
               </StyledText>
             </Flex>
           ) : null}
@@ -103,7 +103,7 @@ export function RobotSystemVersion({
               flexDirection={DIRECTION_ROW}
               padding={SPACING.spacing24}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
             >
               <StyledText
                 fontSize="1.5rem"

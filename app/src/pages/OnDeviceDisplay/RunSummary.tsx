@@ -48,6 +48,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
+import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -89,6 +90,9 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
+    false
+  )
 
   const runStatusText = isRunSucceeded
     ? t('run_complete')
@@ -109,8 +113,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleViewErrorDetails = (): void => {
-    // Note (kj:04/28/2023) the current RunFailedModal is needed to refactor before hooking up
-    console.log('will be added')
+    setShowRunFailedModal(true)
   }
 
   const handleClickSplash = (): void => {
@@ -167,6 +170,13 @@ export function RunSummary(): JSX.Element {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             padding={SPACING.spacing40}
           >
+            {showRunFailedModal ? (
+              <RunFailedModal
+                runId={runId}
+                setShowRunFailedModal={setShowRunFailedModal}
+                errors={runRecord?.data.errors}
+              />
+            ) : null}
             <Flex
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
@@ -262,6 +272,11 @@ const SplashHeader = styled.h1`
   color: ${COLORS.white};
 `
 const SplashBody = styled.h4`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: break-word;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -284,8 +299,8 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size3};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `
 

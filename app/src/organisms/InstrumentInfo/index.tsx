@@ -34,7 +34,7 @@ interface InstrumentInfoProps {
   instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
-  const { t } = useTranslation('instruments_dashboard')
+  const { t, i18n } = useTranslation('instruments_dashboard')
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -115,7 +115,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 ? formatTimestamp(
                     instrument.data.calibratedOffset?.last_modified
                   )
-                : t('no_cal_data')
+                : i18n.format(t('no_cal_data'), 'capitalize')
             }
           />
           <InfoItem label={t('firmware_version')} value="TODO" />
@@ -160,7 +160,7 @@ interface InfoItemProps extends StyleProps {
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
       backgroundColor={COLORS.lightGreyPressed}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

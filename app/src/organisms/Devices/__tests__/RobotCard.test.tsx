@@ -180,17 +180,10 @@ describe('RobotCard', () => {
     getByText('Mock RobotStatusHeader')
   })
 
-  it('renders the type of pipettes attached to left and right mounts', () => {
+  it('renders loading text while loading instruments', () => {
     const [{ getByText }] = render(props)
 
     getByText('instruments')
-    getByText(mockLeftProtoPipette.modelSpecs.displayName)
-    getByText(mockRightProtoPipette.modelSpecs.displayName)
-  })
-
-  it('renders a modules section', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Modules')
+    getByText('LOADING')
   })
 })
