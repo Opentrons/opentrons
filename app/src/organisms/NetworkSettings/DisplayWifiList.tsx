@@ -137,7 +137,7 @@ export function DisplayWifiList({
         gridGap={SPACING.spacing4}
       >
         <Icon name="plus" size="2.5rem" color={COLORS.darkBlack100} />
-        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+        <StyledText as="h4">
           {t('join_other_network')}
         </StyledText>
       </Btn>

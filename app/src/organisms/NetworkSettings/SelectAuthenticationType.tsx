@@ -64,8 +64,6 @@ export function SelectAuthenticationType({
   ] = React.useState<boolean>(false)
   const isInitialSetup = useIsFinishedUnboxing()
 
-  console.log('isInitialSetup', isInitialSetup)
-
   const handleClickBack = (): void => {
     if (fromWifiList != null) {
       // back to wifi list

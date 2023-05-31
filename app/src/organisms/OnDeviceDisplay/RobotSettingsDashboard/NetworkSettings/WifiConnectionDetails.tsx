@@ -105,7 +105,6 @@ export function WifiConnectionDetails({
       psk: password,
     }
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
-    // Note: kj 1/18/2023 for join_other network , this will be required by a following PR
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ type: changeState.type, ssid: options.ssid })
     }

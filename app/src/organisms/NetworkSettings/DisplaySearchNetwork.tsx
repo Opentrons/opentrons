@@ -33,7 +33,6 @@ export function DisplaySearchNetwork(): JSX.Element {
         <StyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight="2.72375rem"
           marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
