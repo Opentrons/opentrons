@@ -40,6 +40,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_step,
     NodeIdMotionValues,
     create_home_step,
+    create_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
@@ -329,11 +330,15 @@ def create_home_group(
 ) -> MoveGroup:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
-    step = create_home_step(
+    home = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
     )
-    move_group: MoveGroup = [step]
+    # halve the homing speed for backoff
+    backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
+    backoff = create_backoff_step(backoff_velocities)
+
+    move_group: MoveGroup = [home, backoff]
     return move_group
 
 
