@@ -43,6 +43,7 @@ describe('SoftwareKeyboard', () => {
       'k',
       'l',
       '⬆︎',
+      '123',
       'z',
       'x',
       'c',
@@ -51,7 +52,6 @@ describe('SoftwareKeyboard', () => {
       'n',
       'm',
       '⌫',
-      '123',
       'space',
     ]
 
@@ -87,6 +87,7 @@ describe('SoftwareKeyboard', () => {
       'K',
       'L',
       '⬆︎',
+      '123',
       'Z',
       'X',
       'C',
@@ -95,7 +96,6 @@ describe('SoftwareKeyboard', () => {
       'N',
       'M',
       '⌫',
-      '123',
       'space',
     ]
 
@@ -131,6 +131,7 @@ describe('SoftwareKeyboard', () => {
       '&',
       '@',
       '"',
+      'ABC',
       '#+=',
       '.',
       ',',
@@ -138,7 +139,6 @@ describe('SoftwareKeyboard', () => {
       '!',
       "'",
       '⌫',
-      'ABC',
       'space',
     ]
 
@@ -176,6 +176,7 @@ describe('SoftwareKeyboard', () => {
       '£',
       '¥',
       '·',
+      'ABC',
       '123',
       '.',
       ',',
@@ -183,7 +184,6 @@ describe('SoftwareKeyboard', () => {
       '!',
       "'",
       '⌫',
-      'ABC',
       'space',
     ]
 
