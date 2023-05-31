@@ -40,6 +40,7 @@ export const mockPausedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockPauseRequestedRun: RunData = {
@@ -63,6 +64,7 @@ export const mockPauseRequestedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockRunningRun: RunData = {
@@ -91,6 +93,7 @@ export const mockRunningRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockFailedRun: RunData = {
@@ -126,6 +129,7 @@ export const mockFailedRun: RunData = {
   ],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockStopRequestedRun: RunData = {
@@ -159,6 +163,7 @@ export const mockStopRequestedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockStoppedRun: RunData = {
@@ -192,6 +197,7 @@ export const mockStoppedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockSucceededRun: RunData = {
@@ -220,6 +226,7 @@ export const mockSucceededRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockIdleUnstartedRun: RunData = {
@@ -232,6 +239,7 @@ export const mockIdleUnstartedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockIdleStartedRun: RunData = {
@@ -260,6 +268,7 @@ export const mockIdleStartedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockCommand = {
