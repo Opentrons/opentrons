@@ -55,12 +55,15 @@ export function RecentRunProtocolCarousel({
     swipe.setSwipeType('')
   }
 
+  // We set a negative right margin to give the illusion of the carousel spilling
+  // off the page, as per the designs.
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing8}
       ref={swipe.ref}
+      marginRight={`-${SPACING.spacing40}`}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}

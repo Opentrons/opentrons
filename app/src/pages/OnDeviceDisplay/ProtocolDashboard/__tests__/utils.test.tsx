@@ -7,6 +7,7 @@ const mockProtocols = [
   {
     id: 'mockProtocol1',
     createdAt: '2022-05-03T21:36:12.494778+00:00',
+    robotType: 'OT-3 Standard',
     protocolType: 'json',
     metadata: {
       protocolName: 'yay mock protocol',
@@ -23,6 +24,7 @@ const mockProtocols = [
     id: 'mockProtocol2',
     createdAt: '2022-05-10T17:04:43.132768+00:00',
     protocolType: 'json',
+    robotType: 'OT-3 Standard',
     metadata: {
       protocolName: 'hello mock protocol',
       author: 'engineering',
@@ -37,6 +39,7 @@ const mockProtocols = [
   {
     id: 'mockProtocol3',
     createdAt: '2022-06-04T18:20:21.526508+00:00',
+    robotType: 'OT-3 Standard',
     protocolType: 'json',
     metadata: {
       protocolName: 'mock protocol',

@@ -27,6 +27,7 @@ const mockSortedProtocol = [
       description: 'mock protocol',
       name: 'Mock Protocol',
     },
+    robotType: 'OT-3 Standard',
     protocolType: 'python',
   },
 ] as ProtocolResource[]
