@@ -83,7 +83,6 @@ class LegacyCommandMapper:
 
         # equipment IDs by physical location
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {
-            # TODO?
             DeckSlotName.FIXED_TRASH: FIXED_TRASH_ID
         }
         self._labware_id_by_module_id: Dict[str, str] = {}
