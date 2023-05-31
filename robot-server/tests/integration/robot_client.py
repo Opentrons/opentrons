@@ -26,19 +26,16 @@ class RobotClient:
         self,
         httpx_client: httpx.AsyncClient,
         worker_executor: concurrent.futures.ThreadPoolExecutor,
-        host: str,
-        port: str,
+        base_url: str,
     ) -> None:
         """Initialize the client."""
-        self.base_url: str = f"{host}:{port}"
-        self.httpx_client: httpx.AsyncClient = httpx_client
-        self.worker_executor: concurrent.futures.ThreadPoolExecutor = worker_executor
+        self.httpx_client = httpx_client
+        self.worker_executor = worker_executor
+        self.base_url = base_url
 
     @staticmethod
     @contextlib.asynccontextmanager
-    async def make(
-        host: str, port: str, version: str
-    ) -> AsyncGenerator[RobotClient, None]:
+    async def make(base_url: str, version: str) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
                 headers={"opentrons-version": version},
@@ -51,8 +48,7 @@ class RobotClient:
                 yield RobotClient(
                     httpx_client=httpx_client,
                     worker_executor=worker_executor,
-                    host=host,
-                    port=port,
+                    base_url=base_url,
                 )
 
     async def alive(self) -> bool:

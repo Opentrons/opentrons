@@ -80,7 +80,6 @@
   "return_to_dashboard": "Return to dashboard",
   "right": "Right",
   "robot_has_previous_offsets": "This robot has stored Labware Offset data from previous protocol runs. Do you want to apply that data to this protocol run? You can still adjust any offsets with Labware Position Check.",
-  "robot_is_busy": "Robot is busy",
   "robot_was_recalibrated": "This robot was recalibrated after this Labware Offset data was stored.",
   "run_again": "Run again",
   "run_canceled": "Run canceled.",
