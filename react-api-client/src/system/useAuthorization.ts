@@ -20,7 +20,7 @@ export function useAuthorization(
   createRegistrationParmas: CreateRegistrationParams
 ): UseAuthorizationResult {
   const host = useHost()
-  // TODO: refactor individual calls to react-query and separate mutations, consider moving this hook to app
+  // TODO(bh, 2023-05-31): refactor individual calls to react-query and separate mutations, consider moving this hook to app
   const registrationToken = React.useRef<RegistrationToken | null>(null)
   const authorizationToken = React.useRef<AuthorizationToken | null>(null)
 

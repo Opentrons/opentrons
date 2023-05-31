@@ -67,7 +67,7 @@ export function RobotOverview({
 
   const userId = useSelector(getConfig)?.support?.userId ?? 'Opentrons-user'
 
-  // TODO: remove registration/authorization here when AppApiHostProvider exists
+  // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
   useAuthorization({
     subject: 'Opentrons',
     agent:
