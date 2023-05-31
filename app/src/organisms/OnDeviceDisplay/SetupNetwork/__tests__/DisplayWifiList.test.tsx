@@ -41,7 +41,6 @@ describe('DisplayWifiList', () => {
   beforeEach(() => {
     props = {
       list: mockWifiList,
-      isSearching: true,
       setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
       setChangeState: mockSetChangeState,
       setSelectedSsid: mockSetSelectedSsid,
@@ -59,11 +58,10 @@ describe('DisplayWifiList', () => {
     getByText('bar')
     getByText('baz')
     getByRole('button', { name: 'Back' })
-    expect(getByTestId('wifi_list_search_spinner')).toBeInTheDocument()
   })
 
   it('should not render a spinner', () => {
-    props = { ...props, isSearching: false }
+    props = { ...props }
     const [{ queryByTestId }] = render(props)
     expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
   })
