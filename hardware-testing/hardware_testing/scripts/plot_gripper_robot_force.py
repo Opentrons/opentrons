@@ -1,4 +1,4 @@
-"""Plot Gripper-on-Robot Force Check Results."""
+"""Plot Gripper-on-Robot Force Results."""
 import os
 import sys
 import argparse
@@ -79,7 +79,7 @@ class Plot:
         return df_avg
 
     def create_plot(self):
-        print("Plotting Force Check...")
+        print("Plotting Force-to-Force...")
         self.avg_force_plot()
         print("Plots Saved!")
 
@@ -162,7 +162,7 @@ class Plot:
             subfig.update_traces(marker={"size":15})
             self.plot_param["figure"] = subfig
             self.plot_param["filename"] = f"plot_{operate.lower()}_force"
-            self.plot_param["title"] = f"DVT Gripper {operate} Force"
+            self.plot_param["title"] = f"DVT Gripper {operate} Force (Input Force)"
             self.plot_param["x_title"] = "Part Number"
             self.plot_param["y_title"] = f"{operate} Output Force (N)"
             self.plot_param["x_range"] = None
@@ -172,7 +172,7 @@ class Plot:
             self.write_plot(self.plot_param)
 
 if __name__ == '__main__':
-    print("\nPlot Gripper-on-Robot Force Check Results\n")
-    path = str(input("Enter Gripper data path: ") or "gripper data")
+    print("\nPlot Gripper-on-Robot Force Results\n")
+    path = str(input("Enter Gripper Force data path: ") or "gripper force")
     plot = Plot(path)
     plot.create_plot()
